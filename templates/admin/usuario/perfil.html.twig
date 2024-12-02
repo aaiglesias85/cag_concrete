@@ -1,0 +1,194 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block subtitle %} - My Profile{% endblock %}
+
+{% block stylesheetspecific %}{% endblock %}
+
+{% block content %}
+    <!-- BEGIN: Subheader -->
+    <div class="m-subheader ">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <h3 class="m-subheader__title m-subheader__title--separator">My Profile</h3>
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">My Profile</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Manage your information</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- END: Subheader -->
+    <div class="m-content">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="m-portlet m-portlet--full-height">
+                    <div class="m-portlet__body">
+                        <div class="m-card-profile">
+                            <div class="m-card-profile__details">
+							<span class="m-card-profile__name">
+								{{ usuario.nombre }}
+							</span>
+                                <a href="mailto:{{ usuario.email }};" class="m-card-profile__email m-link">
+                                    {{ usuario.email }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="m-portlet m-portlet--full-height m-portlet--tabs">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-tools">
+                            <ul class="nav nav-tabs m-tabs m-tabs-line   m-tabs-line--left m-tabs-line--primary"
+                                role="tablist">
+                                <li class="nav-item m-tabs__item">
+                                    <a class="nav-link m-tabs__link active" data-toggle="tab"
+                                       href="#m_user_profile_tab_1"
+                                       role="tab">
+                                        <i class="flaticon-share m--hide"></i>
+                                        Update Profile
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="m_user_profile_tab_1">
+                            <form id="usuario-form" class="m-form m-form--fit m-form--label-align-right"
+                                  data-url="{{ url('updateMisDatosAdmin') }}">
+
+                                <input type="hidden" id="usuario_id" name="usuario_id" value="{{ usuario.usuarioId }}"/>
+
+                                <div class="m-portlet__body">
+                                    <div class="form-group m-form__group row">
+                                        <div class="col-10 ml-auto">
+                                            <h3 class="m-form__section">
+                                                <span class="ic-step-number" style="padding-top: 3px;">1</span>
+                                                Personal information
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Name</label>
+                                        <div class="col-7">
+                                            <input class="form-control m-input" type="text" id="nombre" name="nombre"
+                                                   value="{{ usuario.nombre }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Surname</label>
+                                        <div class="col-7">
+                                            <input class="form-control m-input" type="text" id="apellidos"
+                                                   name="apellidos"
+                                                   value="{{ usuario.apellidos }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Email</label>
+                                        <div class="col-7">
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text">@</span></div>
+                                                <input type="text" class="form-control" id="email" name="email"
+                                                       value="{{ usuario.email }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Phone</label>
+                                        <div class="col-7">
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                    class="flaticon-support"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" id="telefono" name="telefono"
+                                                       value="{{ usuario.telefono }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="m-form__seperator m-form__seperator--dashed m-form__seperator--space-2x"></div>
+                                    <div class="form-group m-form__group row">
+                                        <div class="col-10 ml-auto">
+                                            <h3 class="m-form__section">
+                                                <span class="ic-step-number" style="padding-top: 3px;">2</span> Change Password
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Current Password</label>
+                                        <div class="col-7">
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text"><i class="la la-key"></i></span></div>
+                                                <input type="password" class="form-control" id="password-actual"
+                                                       name="passwordactual">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Password</label>
+                                        <div class="col-7">
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text"><i class="la la-key"></i></span></div>
+                                                <input type="password" class="form-control" id="password"
+                                                       name="password">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row">
+                                        <label class="col-2 col-form-label">Repeat Password</label>
+                                        <div class="col-7">
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text"><i class="la la-key"></i></span></div>
+                                                <input type="password" class="form-control" id="repetirpassword"
+                                                       name="repetirpassword">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="m-form__actions">
+                                        <div class="row">
+                                            <div class="col-2"></div>
+                                            <div class="col-7">
+                                                <button id="btn-salvar-profile" type="button"
+                                                        class="btn btn-success m-btn m-btn--air m-btn--custom">
+                                                   Save Changes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascriptsspecific %}
+    <script src="{{ asset('bundles/ican/js/pages/profile.js') }}?{{ 'now' | date('U') }}"></script>
+    <script>
+        jQuery(document).ready(function () {
+            Profile.init();
+        });
+    </script>
+{% endblock %}

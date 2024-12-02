@@ -1,0 +1,142 @@
+{% extends 'admin/layout-login.html.twig' %}
+
+{% block subtitle %} - Login{% endblock %}
+
+{% block stylesheetspecific %}
+<style>
+    .m-login.m-login--6 .m-login__aside {
+        width: 900px !important;
+    }
+    .m-login.m-login--2 .m-login__wrapper .m-login__container .m-login__form {
+        margin: 3rem auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- begin:: Page -->
+    <div class="m-grid m-grid--hor m-grid--root m-page">
+        <div id="m_login" class="m-grid__item m-grid__item--fluid m-grid m-grid--hor m-login m-login--signin m-login--2 m-login-2--skin-2 m-grid__item m-grid__item--fluid m-grid m-grid--desktop m-grid--ver-desktop m-grid--hor-tablet-and-mobile m-login m-login--6">
+
+            <div class="m-grid__item   m-grid__item--order-tablet-and-mobile-2  m-grid m-grid--hor m-login__aside " style="background-image: url('{{ asset('bundles/ican/img/bg-login.jpg') }}'); background-size: cover;background-position: center center;background-repeat: no-repeat;">
+                <div class="m-grid__item">
+                    <div class="m-login__logo">
+                        <!--
+                        <a href="#">
+                            <img src="../../../assets/app/media/img/logos/logo-4.png">
+                        </a>
+                        -->
+                    </div>
+                </div>
+                <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver">
+                    <div class="m-grid__item m-grid__item--middle">
+                        <!--
+                        <span class="m-login__title">Whatever CTA's wave purpose important exit element</span>
+                        <span class="m-login__subtitle">Lorem ipsum amet estudiat</span>
+                         -->
+                    </div>
+                </div>
+                <div class="m-grid__item">
+                    <div class="m-login__info">
+                        <div class="m-login__section">
+                            <!--
+                            <a href="#" class="m-link">&copy 2018 Metronic</a>
+                            -->
+                        </div>
+                        <div class="m-login__section">
+                            <!--
+                            <a href="#" class="m-link">Privacy</a>
+                            <a href="#" class="m-link">Legal</a>
+                            <a href="#" class="m-link">Contact</a>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="m-grid__item m-grid__item--fluid m-grid__item--order-tablet-and-mobile-1 m-login__wrapper">
+                <div class="m-login__container">
+                    <div class="m-login__logo">
+                        <a href="javascript:;">
+                            <img src="{{ asset('bundles/ican/img/logo.jpg') }}" width="180">
+                        </a>
+                    </div>
+                    <div class="m-login__signin">
+                        <div class="m-login__title">
+                            <h3>Please, enter your credentials</h3>
+                        </div>
+
+                        <form id="form-login" class="m-login__form m-form" action="#"
+                              data-url="{{ url('auntenticarUsuario') }}" method="post">
+                            <div class="form-group m-form__group">
+                                <input class="form-control m-input" type="text" placeholder="Email" name="email"
+                                       id="email" autocomplete="off">
+                            </div>
+                            <div class="form-group m-form__group">
+                                <input class="form-control m-input m-login__form-input--last" type="password"
+                                       placeholder="Password" name="password" id="password" autocomplete="off">
+                            </div>
+                            <div class="row m-login__form-sub">
+                                <div class="col m--align-left m-login__form-left">
+                                    <label class="m-checkbox  m-checkbox--focus">
+                                        <input type="checkbox" name="remember" id="remember"> Remember
+                                        <span></span>
+                                    </label>
+                                </div>
+                                <div class="col m--align-right m-login__form-right">
+                                    <a href="javascript:;" id="m_login_forget_password" class="m-link">You forget your password?</a>
+                                </div>
+                            </div>
+                            <div class="m-login__form-action">
+                                <button id="m_login_signin_submit"
+                                        class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="m-login__forget-password">
+
+                        <div class="m-login__title">
+                            <h3>You forget your password?</h3>
+                        </div>
+                        <div class="m-login__desc">
+                            Enter your email address to recover your password:
+                        </div>
+
+                        <form id="forgot-form" class="m-login__form m-form" action="" data-url="{{ url('forgetPass') }}"
+                              method="post">
+                            <div class="form-group m-form__group">
+                                <input class="form-control m-input" type="text" placeholder="Email" name="email"
+                                       id="m_email" autocomplete="off">
+                            </div>
+                            <div class="m-login__form-action">
+                                <button id="m_login_forget_password_submit"
+                                        class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air  m-login__btn m-login__btn--primaryr">
+                                    Submit
+                                </button>&nbsp;&nbsp;
+                                <button id="m_login_forget_password_cancel"
+                                        class="btn btn-outline-focus m-btn m-btn--pill m-btn--custom m-login__btn">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end:: Page -->
+
+{% endblock %}
+
+
+{% block javascriptsspecific %}
+    <script src="{{ asset('bundles/ican/js/pages/login.js') }}?{{ 'now' | date('U') }}"></script>
+    <script>
+        jQuery(document).ready(function () {
+            Login.init();
+        });
+    </script>
+{% endblock %}

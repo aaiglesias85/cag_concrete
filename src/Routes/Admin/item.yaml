@@ -1,0 +1,23 @@
+item:
+  path:  /items
+  defaults: { _controller: App\Controller\Admin\ItemController::index }
+
+listarItemAdmin:
+  path:  /item/listarItem
+  defaults: { _controller: App\Controller\Admin\ItemController::listar, _format: json }
+
+eliminarItemAdmin:
+  path:  /item/eliminarItem
+  defaults: { _controller: App\Controller\Admin\ItemController::eliminar, _format: json }
+
+eliminarItemsAdmin:
+  path:  /item/eliminarItems
+  defaults: { _controller: App\Controller\Admin\ItemController::eliminarItems, _format: json }
+
+salvarItemAdmin:
+  path:  /item/salvarItem
+  defaults: { _controller: App\Controller\Admin\ItemController::salvar, _format: json }
+
+cargarDatosItemAdmin:
+  path:  /item/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ItemController::cargarDatos, _format: json }

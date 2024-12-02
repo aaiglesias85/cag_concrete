@@ -1,0 +1,410 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block subtitle %} - Users{% endblock %}
+
+{% block stylesheetspecific %}
+{% endblock %}
+
+{% block content %}
+    <!-- BEGIN: Subheader -->
+    <div class="m-subheader ">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <h3 class="m-subheader__title m-subheader__title--separator">Users</h3>
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Users</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Manage users</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- END: Subheader -->
+
+    <div class="m-content">
+        <div id="lista-usuario" class="m-portlet m-portlet--mobile" m-portlet="true">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Users
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        {% if permiso.agregar %}
+                            <li class="m-portlet__nav-item">
+                                <a id="btn-nuevo-usuario"
+                                   class="btn btn-success btn-icon"
+                                   href="javascript:;">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span class="m--hidden-mobile">New</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if permiso.eliminar %}
+                            <li class="m-portlet__nav-item">
+                                <a id="btn-eliminar-usuario"
+                                   class="btn btn-danger btn-icon"
+                                   href="javascript:;">
+                                    <span>
+                                        <i class="la la-trash-o"></i>
+                                        <span class="m--hidden-mobile">Delete</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;" m-portlet-tool="fullscreen"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon">
+                                <i class="la la-expand"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <!--begin: Search Form -->
+                <div class="form-group m-form__group row align-items-center mb-2">
+                    <!-- filtro perfil -->
+                    <div class="col-md-3">
+                        <select class="form-control m-select2" id="filtro-perfil">
+                            <option value="">Profile</option>
+                            {% for item in perfiles %}
+                                <option value="{{ item.rolId }}">{{ item.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="m-input-icon m-input-icon--left">
+                            <input type="text" class="form-control m-input m_form_search"
+                                   placeholder="Search...">
+                            <span class="m-input-icon__icon m-input-icon__icon--left">
+									<span><i class="la la-search"></i></span>
+								</span>
+                        </div>
+                    </div>
+
+                    <!-- btn filtrar -->
+                    <div class="col-md-2">
+                        <a href="javascript:;" id="btn-filtrar"
+                           class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                            <span>Search</span>
+                                        </span>
+                        </a>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+
+                <!--begin: Datatable -->
+                <div class="m_datatable" id="usuario-table-editable"></div>
+                <!--end: Datatable -->
+            </div>
+        </div>
+
+        <div id="form-usuario" class="m-portlet m--hide">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text" id="form-usuario-title">
+                            Do you want to create a new user? Follow the next steps:
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-usuario"><i
+                                        class="la la-close"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="m-portlet__body">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active wizard-tab" data-item="1"
+                           data-toggle="tab" href="#tab-content-general" id="tab-general">
+                            General
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="2"
+                           data-toggle="tab" href="#tab-content-permisos" id="tab-permisos">
+                            Permissions
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <div class="tab-pane active" id="tab-content-general" role="tabpanel">
+                        <form class="m-form" id="usuario-form" action="#" enctype="multipart/form-data" method="post">
+
+                            <input type="hidden" id="usuario_id" name="usuario_id"/>
+
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4" id="select-perfil">
+                                            <label>
+                                                <span class="ic-step-number">1</span>
+                                                Profile
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <select class="form-control m-select2 event-change" id="perfil"
+                                                    name="perfil">
+                                                <option value="">Select</option>
+                                                {% for item in perfiles %}
+                                                    <option value="{{ item.rolid }}">{{ item.nombre }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Name
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="nombre" name="nombre"/>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label>Lastname</label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="apellidos" name="apellidos"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <label>
+                                                <span class="ic-step-number">3</span>
+                                                Email
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text">@</span>
+                                                </div>
+                                                <input type="text" class="form-control event-change" id="email"
+                                                       name="email">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label>
+                                                Phone
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                        <span class="input-group-text"><i
+                                                    class="flaticon-support"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control event-change" id="telefono"
+                                                       name="telefono">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <label>
+                                                <span class="ic-step-number">4</span>
+                                                Password
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                                                class="la la-key"></i></span></div>
+                                                <input type="password" class="form-control event-change" id="password"
+                                                       name="password">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label>Repeat Password</label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                                                class="la la-key"></i></span></div>
+                                                <input type="password" class="form-control event-change"
+                                                       id="repetirpassword"
+                                                       name="repetirpassword">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label><span class="ic-step-number">5</span>Status</label>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="m-form__group form-group">
+                                                <div class="m-radio-inline">
+                                                    <label class="m-radio">
+                                                        <input type="radio" name="radioestado" id="estadoactivo"
+                                                               class="event-change" checked>
+                                                        Active
+                                                        <span></span>
+                                                    </label>
+                                                    <label class="m-radio">
+                                                        <input type="radio" name="radioestado" id="estadoinactivo"
+                                                               class="event-change">
+                                                        Inactive
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-permisos" role="tabpanel">
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                User permissions
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <p class="m-form__help">Select the options to which the user will have access</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm table-striped m-table m-table--head-bg-brand"
+                                           id="table-permisos">
+                                        <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th class="text-center" width="50">View</th>
+                                            <th class="text-center" width="50">Add</th>
+                                            <th class="text-center" width="50">Edit</th>
+                                            <th class="text-center" width="50">Delete</th>
+                                            <th class="text-center" width="50">All</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in funciones %}
+                                            <tr class="tr-permiso" data-id="{{ item.funcionId }}">
+                                                <td>{{ item.descripcion }}</td>
+                                                <td class="text-center">
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox"
+                                                               class="checkbox-permiso checkbox-permiso-ver"
+                                                               data-id="{{ item.funcionId }}">
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-center">
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox"
+                                                               class="checkbox-permiso checkbox-permiso-agregar"
+                                                               data-id="{{ item.funcionId }}">
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-center">
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox"
+                                                               class="checkbox-permiso checkbox-permiso-editar"
+                                                               data-id="{{ item.funcionId }}">
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-center">
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox"
+                                                               class="checkbox-permiso checkbox-permiso-eliminar"
+                                                               data-id="{{ item.funcionId }}">
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td class="text-center">
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox"
+                                                               class="checkbox-permiso checkbox-permiso-todos"
+                                                               data-id="{{ item.funcionId }}">
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="m-form">
+                    <div class="m-form__actions text-center">
+                        <button id="btn-wizard-anterior"
+                                class="btn btn-info m--hide" type="button">
+                            Back
+                        </button>
+
+                        <button id="btn-wizard-siguiente"
+                                class="btn btn-primary" type="button">
+                            Next
+                        </button>
+                        {% if permiso.agregar or permiso.editar %}
+                            <button id="btn-wizard-finalizar" class="btn btn-success m--hide" type="button">
+                                Save
+                            </button>
+                        {% endif %}
+                        <button class="btn btn-danger cerrar-form-usuario" type="button">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsspecific %}
+    <script src="{{ asset('bundles/ican/js/pages/usuarios.js') }}?{{ 'now' | date('U') }}"></script>
+    <script>
+
+        var permiso = {
+            agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
+            editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
+            eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
+        };
+
+        jQuery(document).ready(function () {
+            Usuarios.init();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,1116 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block subtitle %} - Projects{% endblock %}
+
+{% block stylesheetspecific %}
+
+    <!-- DevExtreme theme -->
+    <!--
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.5/css/dx.light.css">
+    -->
+
+{% endblock %}
+
+{% block content %}
+    <!-- BEGIN: Subheader -->
+    <div class="m-subheader ">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <h3 class="m-subheader__title m-subheader__title--separator">Projects</h3>
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Projects</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Manage projects</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- END: Subheader -->
+
+    <div class="m-content">
+        <div id="lista-project" class="m-portlet m-portlet--mobile" m-portlet="true">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Projects
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        {% if permiso.agregar %}
+                            <li class="m-portlet__nav-item">
+                                <a id="btn-nuevo-project"
+                                   class="btn btn-success btn-icon"
+                                   href="javascript:;">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span class="m--hidden-mobile">New</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if permiso.eliminar %}
+                            <li class="m-portlet__nav-item">
+                                <a id="btn-eliminar-project"
+                                   class="btn btn-danger btn-icon"
+                                   href="javascript:;">
+                                    <span>
+                                        <i class="la la-trash-o"></i>
+                                        <span class="m--hidden-mobile">Delete</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;" m-portlet-tool="fullscreen"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon">
+                                <i class="la la-expand"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <!--begin: Search Form -->
+                <div class="form-group m-form__group row align-items-center mb-2">
+                    <div class="col-md-2">
+                        <select class="form-control m-select2" id="filtro-company">
+                            <option value="">Company</option>
+                            {% for item in companies %}
+                                <option value="{{ item.companyId }}">{{ item.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control m-select2" id="filtro-status">
+                            <option value="">Status</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <div class='input-group date'>
+                            <input type='text' class="form-control m-input date-picker"
+                                   placeholder="From" autocomplete="off" id="fechaInicial"/>
+                            <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class='input-group date'>
+                            <input type='text' class="form-control m-input date-picker"
+                                   placeholder="To" autocomplete="off" id="fechaFin"/>
+                            <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="m-input-icon m-input-icon--left">
+                            <input type="text" class="form-control m-input m_form_search"
+                                   placeholder="Search...">
+                            <span class="m-input-icon__icon m-input-icon__icon--left">
+									<span><i class="la la-search"></i></span>
+								</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="javascript:;" id="btn-filtrar"
+                           class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                            <span>Search</span>
+                                        </span>
+                        </a>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable -->
+                <div class="m_datatable" id="project-table-editable"></div>
+                <!--end: Datatable -->
+            </div>
+        </div>
+
+        <div id="form-project" class="m-portlet m--hide">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text" id="form-project-title">
+                            Do you want to create a new project? Follow the next steps:
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-project"><i
+                                        class="la la-close"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="m-portlet__body">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active wizard-tab" data-item="1"
+                           data-toggle="tab" href="#tab-content-general" id="tab-general">
+                            General
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="2"
+                           data-toggle="tab" href="#tab-content-items" id="tab-items">
+                            Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="3"
+                           data-toggle="tab" href="#tab-content-contacts" id="tab-contacts">
+                            Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item  m--hide nav-item-hide">
+                        <a class="nav-link wizard-tab" data-item="4"
+                           data-toggle="tab" href="#tab-content-notes" id="tab-notes">
+                            Notes
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-content-general" role="tabpanel">
+                        <form class="m-form" id="project-form" action="#" enctype="multipart/form-data"
+                              method="post">
+
+                            <input type="hidden" id="project_id" name="project_id"/>
+
+                            <div class="m-form__section m-form__section--first">
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3" id="select-company">
+                                            <label>
+                                                <span class="ic-step-number">1</span>
+                                                Company
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <select class="form-control m-select2 event-change" id="company"
+                                                    name="company">
+                                                <option value="">Select</option>
+                                                {% for item in companies %}
+                                                    <option value="{{ item.companyId }}">{{ item.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Subcontract NO
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="subcontract"
+                                                   name="subcontract">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Manager
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="manager"
+                                                   name="manager">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Invoice Contact
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="invoice_contact"
+                                                   name="invoice_contact">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>
+                                                Invoice Due Date
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <div class='input-group date'>
+                                                <input type='text' class="form-control m-input date-picker event-change"
+                                                       placeholder="Due date" autocomplete="off"
+                                                       id="due_date" name="due_date"/>
+                                                <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Start Date
+                                            </label>
+                                            <div class='input-group date'>
+                                                <input type='text' class="form-control m-input date-picker event-change"
+                                                       placeholder="From" autocomplete="off"
+                                                       id="start_date" name="start_date"/>
+                                                <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                End Date
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class='input-group date'>
+                                                <input type='text' class="form-control m-input date-picker event-change"
+                                                       placeholder="To" autocomplete="off"
+                                                       id="end_date" name="end_date"/>
+                                                <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 m--hide" id="div-contract-amount">
+                                            <label>
+                                                Contract Amount
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="contract_amount"
+                                                       name="contract_amount" disabled>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Owner
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="owner"
+                                                   name="owner">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Project ID #
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="project_id_number" name="project_id_number"/>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Proposal ID #
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="proposal_number" name="proposal_number"/>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                County
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="county"
+                                                   name="county">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4" id="select-inspector">
+                                            <label>
+                                                Inspector
+                                            </label>
+                                            <select class="form-control m-select2 event-change" id="inspector"
+                                                    name="inspector">
+                                                <option value="">Select</option>
+                                                {% for item in inspectors %}
+                                                    <option value="{{ item.inspectorId }}">{{ item.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <div>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" class="form-control event-change"
+                                                           id="federal_funding" name="federal_funding"> Federal Funding
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <div>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" class="form-control event-change"
+                                                           id="certified_payrolls" name="certified_payrolls"> Certified
+                                                    payrolls
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">3</span>
+                                                C&G Project #
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="number" name="number"/>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <label>
+                                                Project Description
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="name" name="name"/>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <div>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" class="form-control event-change"
+                                                           id="resurfacing" name="resurfacing"> Resurfacing
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <label>Status</label>
+                                            <div class="m-radio-inline">
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestado" id="estadoactivo"
+                                                           class="event-change project-estado" value="1" checked>
+                                                    In Progress
+                                                    <span></span>
+                                                </label>
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestado" id="estadoinactivo"
+                                                           class="event-change project-estado" value="0">
+                                                    Not Started
+                                                    <span></span>
+                                                </label>
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestado" id="estadocompleted"
+                                                           class="event-change project-estado" value="2">
+                                                    Completed
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {#
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>
+                                                <span class="ic-step-number">6</span>
+                                                Location
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="location"
+                                                   name="location">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>
+                                                PO NUMBER
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="po_number" name="po_number"/>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>
+                                                PO CG
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="po_cg" name="po_cg"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                #}
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-items" role="tabpanel">
+                        <div class="row" id="lista-items">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                {% if permiso.agregar or permiso.editar %}
+                                                    <div class="col-md-2">
+                                                        <div class="btn-group">
+                                                            <button id="btn-agregar-item" class="btn btn-success"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                New <i class="la la-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="col-lg-2">
+                                                    <div class="input-group m-input-group">
+                                                        <div class="input-group-prepend"><span class="input-group-text"
+                                                                                               id="basic-addon1">Items:</span>
+                                                        </div>
+                                                        <input type="text" class="form-control m-input"
+                                                               id="total_count_items" value="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <div class="input-group m-input-group">
+                                                        <div class="input-group-prepend"><span class="input-group-text"
+                                                                                               id="basic-addon1">Total $:</span>
+                                                        </div>
+                                                        <input type="text" class="form-control m-input"
+                                                               id="total_total_items" value="" disabled>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2"></div>
+                                                <div class="col-md-3">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="items-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-contacts" role="tabpanel">
+                        <div class="row" id="lista-contacts">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+                                                    {% if permiso.agregar or permiso.editar %}
+                                                        <div class="btn-group">
+                                                            <button id="btn-agregar-contact" class="btn btn-success"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                New <i class="la la-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-contacts-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-notes" role="tabpanel">
+                        <div class="row" id="lista-notes">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                {% if permiso.agregar or permiso.editar %}
+                                                    <div class="col-md-2">
+                                                        <div class="btn-group">
+                                                            <button id="btn-agregar-note" class="btn btn-success"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                New <i class="la la-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="col-md-2">
+                                                    <div class='input-group date'>
+                                                        <input type='text' class="form-control m-input date-picker "
+                                                               placeholder="From" autocomplete="off"
+                                                               id="filtro-fecha-inicial-notes"/>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class='input-group date'>
+                                                        <input type='text' class="form-control m-input date-picker "
+                                                               placeholder="To" autocomplete="off"
+                                                               id="filtro-fecha-fin-notes"/>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <a href="javascript:;" id="btn-filtrar-notes"
+                                                       class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                                        <span>
+                                                            <i class="la la-search"></i>
+                                                            <span>Search</span>
+                                                        </span>
+                                                    </a>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <a id="btn-eliminar-notes"
+                                                       class="btn btn-danger btn-icon"
+                                                       href="javascript:;">
+                                                        <span>
+                                                            <i class="la la-trash-o"></i>
+                                                            <span class="m--hidden-mobile">Delete</span>
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="notes-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-form">
+                    <div class="m-form__actions text-center">
+                        <button id="btn-wizard-anterior"
+                                class="btn btn-info m--hide" type="button">
+                            Back
+                        </button>
+
+                        <button id="btn-wizard-siguiente"
+                                class="btn btn-primary" type="button">
+                            Next
+                        </button>
+                        {% if permiso.agregar or permiso.editar %}
+                            <button id="btn-wizard-finalizar" class="btn btn-success" type="button">
+                                Save
+                            </button>
+                        {% endif %}
+                        <button class="btn btn-danger cerrar-form-project" type="button">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- items -->
+    <div class="modal fade" id="modal-item" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        New item
+
+                        <span style="margin-left: 10px">
+                            <span id="proyect-number-item" class="m-badge m-badge--info"></span>
+                            <span id="proyect-name-item"></span>
+                        </span>
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="item-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <input type="hidden" id="project_item_id" name="project_item_id"/>
+
+                        <div class="form-group m-form__group">
+                            <div>
+                                <input type="checkbox" data-switch="true" id="item-type"
+                                       checked="checked" data-on-text="Existing item"
+                                       data-off-text="New item" data-on-color="success"
+                                       data-off-color="danger">
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Item
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <input type="text" class="form-control form-control-text m--hide"
+                                   id="item-name" name="item" placeholder="Enter the custom name"/>
+
+                            <div class="row" id="div-item">
+                                <div class="col-md-12" id="select-item">
+                                    <select class="form-control m-select2" id="item">
+                                        <option value="">Select</option>
+                                        {% for item in items %}
+                                            <option value="{{ item.itemId }}"
+                                                    data-unit="{{ item.unit.description }}"
+                                                    data-yield="{{ item.yieldCalculation }}"
+                                                    data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}">
+                                                {{ item.description }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Yield Calculation
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-12" id="select-yield-calculation">
+                                    <select class="form-control m-select2 event-change" id="yield-calculation"
+                                            name="yield">
+                                        <option value="">Select</option>
+                                        {% for item in yields_calculation %}
+                                            <option value="{{ item.id }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group m--hide" id="select-equation">
+                            <label>
+                                Equation
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="form-control m-select2 event-change" id="equation" name="equation">
+                                        <option value="">Select</option>
+                                        {% for item in equations %}
+                                            <option value="{{ item.equationId }}" data-equation="{{ item.equation }}">
+                                                {{ item.description }} {{ item.equation }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                    <a href="javascript:;" title="Add equation" id="btn-add-equation"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                        <i class="la la-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group m--hide" id="select-unit">
+                            <label>
+                                Unit
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="form-control m-select2 event-change" id="unit" name="unit">
+                                        <option value="">Select</option>
+                                        {% for item in units %}
+                                            <option value="{{ item.unitId }}">{{ item.description }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                    <a href="javascript:;" title="Add unit" id="btn-add-unit"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                        <i class="la la-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Quantity
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-number" id="item-quantity"
+                                           name="quantity">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Price
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="text" class="form-control form-control-number" id="item-price"
+                                               name="price">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-item">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-eliminar-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete the selected item?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btn-delete-item">Yes
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- notes -->
+    <div class="modal fade" id="modal-notes" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        New Note
+
+                        <span style="margin-left: 10px">
+                            <span id="proyect-number-note" class="m-badge m-badge--info"></span>
+                            <span id="proyect-name-note"></span>
+                        </span>
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="notes-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <input type="hidden" id="notes_id" name="notes_id"/>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                Date
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class='input-group date'>
+                                        <input type='text' class="form-control m-input date-picker "
+                                               placeholder="Select" autocomplete="off"
+                                               id="notes-date" name="date"/>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">2</span>
+                                Notes
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <textarea class="form-control" name="notes" id="notes" rows="6"></textarea>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-note">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-eliminar-notes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete the selected note?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btn-delete-note">Yes
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-eliminar-notes-date" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete the notes?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btn-delete-note-date">Yes
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- contacts -->
+    <div class="modal fade" id="modal-contact" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="contact-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <input type="hidden" id="contact_id" name="contact_id"/>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                Name
+                            </label>
+                            <input type="text" class="form-control form-control-text"
+                                   id="contact-name" name="name"/>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label>
+                                        <span class="ic-step-number">2</span>
+                                        Email
+                                    </label>
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text">@</span>
+                                        </div>
+                                        <input type="text" class="form-control" id="contact-email"
+                                               name="email">
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <label>
+                                        Phone
+                                    </label>
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend">
+                                        <span class="input-group-text"><i
+                                                    class="flaticon-support"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control phone" id="contact-phone"
+                                               name="phone">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">3</span>
+                                Role
+                            </label>
+                            <input type="text" class="form-control form-control-text"
+                                   id="contact-role" name="role"/>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">4</span>
+                                Notes
+                            </label>
+                            <textarea class="form-control form-control-text" rows="6"
+                                      id="contact-notes" name="notes"> </textarea>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-contact">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- components -->
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
+
+{% endblock %}
+
+{% block javascriptsspecific %}
+
+    <!-- DevExtreme libraries (reference only one of them) -->
+    <!--
+    <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.all.js"></script>
+    -->
+    <!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.web.js"></script> -->
+    <!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.viz.js"></script> -->
+
+    <!-- init components -->
+    <script>
+        jQuery(document).ready(function () {
+            ModalUnit.init();
+            ModalEquation.init();
+        });
+    </script>
+
+    <script src="{{ asset('bundles/ican/js/pages/projects.js') }}?{{ 'now' | date('U') }}"></script>
+    <script>
+
+        var permiso = {
+            agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
+            editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
+            eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
+        };
+
+        jQuery(document).ready(function () {
+            Projects.init();
+        });
+    </script>
+{% endblock %}

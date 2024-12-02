@@ -1,0 +1,42 @@
+<div class="modal fade" id="modal-equation" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New equation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="m-form" id="equation-form" action="#"
+                      enctype="multipart/form-data" method="post">
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Name
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+
+                        <input type="text" class="form-control form-control-text event-change"
+                               id="equation-descripcion" name="descripcion"/>
+                    </div>
+                    <div class="form-group m-form__group">
+                        <label>
+                            Equation
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+                        <input type="text" class="form-control form-control-text event-change"
+                               id="equation-equation" name="equation"/>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-equation">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ asset('bundles/ican/js/components/modal-equation.js') }}?{{ 'now' | date('U') }}"></script>

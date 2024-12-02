@@ -1,0 +1,380 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block subtitle %} - Dashboard{% endblock %}
+
+{% block stylesheetspecific %}
+    <style>
+        .m--bg-brand-donut {
+            background-color: #716aca !important;
+        }
+        .m-widget14__legend-text, .m-widget14__stat{
+            font-weight: bold !important;
+            color: #9699a2 !important;
+        }
+        .m-widget5__sales{
+            font-weight: bold !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- BEGIN: Subheader -->
+    <div class="m-subheader ">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <h3 class="m-subheader__title m-subheader__title--separator">Dashboard </h3>
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="#" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Website Statistics</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- END: Subheader -->
+    <div class="m-content">
+
+        <!-- filters -->
+        <div class="m-portlet">
+            <div class="m-portlet__body ">
+                <div class="row">
+
+                    <div class="col-12 col-sm-2 col-md-2 mb-2 mb-sm-0">
+                        <select class="form-control m-select2 event-change" id="status">
+                            <option value="">Status</option>
+                            <option value="1">In Progress</option>
+                            <option value="2">Completed</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-sm-3 col-md-3 mb-2 mb-sm-0">
+
+                        <select class="form-control m-select2 event-change" id="project" >
+                            <option></option>
+                        </select>
+                        {#
+                        <select class="form-control m-select2 event-change" id="project">
+                            <option value="">Project</option>
+                            {% for item in projects %}
+                                <option value="{{ item.project_id }}">{{ item.number }} - {{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                        #}
+                    </div>
+
+                    <div class="col-12 col-sm-3 col-md-2 mb-2 mb-sm-0">
+                        <div class='input-group date'>
+                            <input type='text' class="form-control m-input date-picker"
+                                   placeholder="From" autocomplete="off"
+                                   id="fechaInicial"/>
+                            <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-3 col-md-2 mb-2 mb-sm-0">
+                        <div class='input-group date'>
+                            <input type='text' class="form-control m-input date-picker"
+                                   placeholder="To" autocomplete="off"
+                                   id="fechaFin"/>
+                            <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-3 col-md-2 mb-2 mb-sm-0">
+                        <a href="javascript:;" id="btn-filtrar"
+                           class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                <span>
+                                    <i class="la la-search"></i>
+                                    <span>Search</span>
+                                </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="m-portlet">
+            <div class="m-portlet__body  m-portlet__body--no-padding">
+                <div class="row m-row--no-padding m-row--col-separator-xl">
+                    <div class="col-xl-4">
+
+                        <div class="m-widget1">
+                            <div class="m-widget1__item">
+                                <div class="row m-row--no-padding align-items-center">
+                                    <div class="col">
+                                        <h3 class="m-widget1__title">Projects</h3>
+                                        <span class="m-widget1__desc">In Progress</span><br>
+                                        <span class="m-widget1__desc">Not Started</span><br>
+                                        <span class="m-widget1__desc">Completed</span>
+                                    </div>
+                                    <div class="col m--align-right">
+                                        </br>
+                                        <span class="m-widget1__number m--font-info">{{ stats.total_proyectos_activos }}</span>
+                                        </br>
+                                        <span class="m-widget1__number m--font-danger">{{ stats.total_proyectos_inactivos }}</span>
+                                        </br>
+                                        <span class="m-widget1__number m--font-success">{{ stats.total_proyectos_completed }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% for item in projects %}
+                                <div class="m-widget1__item">
+                                    <div class="row m-row--no-padding align-items-center">
+                                        <div class="col">
+                                            <h3 class="m-widget1__title">{{ item.number }}</h3>
+                                            <span class="m-widget1__desc">{{ item.name }}</span>
+                                        </div>
+                                        <div class="col m--align-right">
+                                            <span>Due Date</span> </br>
+                                            <span class="m--font-info">{{ item.dueDate }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            {% if projects | length > 0 %}
+                                <div style="margin-top: 1.5rem;">
+                                    <a href="{{ url('project') }}"
+                                       class="btn m-btn--pill btn-secondary m-btn m-btn--hover-brand m-btn--custom">View
+                                        all</a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!--end:: Widgets/Stats2-1 -->
+                    </div>
+                    <div class="col-xl-4">
+
+                        <!--begin:: Widgets/Revenue Change-->
+                        <div class="m-widget14">
+                            <div class="m-widget14__header">
+                                <h3 class="m-widget14__title">
+                                    Cost Breakdown
+                                </h3>
+                                <span class="m-widget14__desc profit_chart_project_name"></span>
+                            </div>
+                            <div class="row  align-items-center">
+                                <div class="col">
+                                    <div id="m_chart_cost" class="m-widget14__chart" style="height: 160px">
+                                        <div class="m-widget14__stat" style="font-size: 1rem;" id="chart_cost_total">
+                                            ${{ chart1.total | number_format(2, '.', ',') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="m-widget14__legends" id="chart_cost_legends">
+
+                                        {% for item in chart1.data %}
+
+                                            <div class="m-widget14__legend">
+                                                <span class="m-widget14__legend-bullet {% if loop.index == 1 %}m--bg-accent{% endif %} {% if loop.index == 2 %}m--bg-warning{% endif %} {% if loop.index == 3 %}m--bg-brand-donut{% endif %}"></span>
+                                                <span class="m-widget14__legend-text">%{{ item.porciento | number_format(0, '.', ',') }} {{ item.name }}</span>
+                                            </div>
+
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--end:: Widgets/Revenue Change-->
+                    </div>
+                    <div class="col-xl-4">
+
+                        <!--begin:: Widgets/Profit Share-->
+                        <div class="m-widget14">
+                            <div class="m-widget14__header">
+                                <h3 class="m-widget14__title">
+                                    Invoice/Profit Share
+                                </h3>
+                                <span class="m-widget14__desc profit_chart_project_name">
+
+                                </span>
+                            </div>
+                            <div class="row  align-items-center">
+                                <div class="col">
+                                    <div id="m_chart_profit_share" class="m-widget14__chart" style="height: 160px">
+                                        <div class="m-widget14__stat" style="font-size: 1rem;" id="chart_profit_total">
+                                            ${{ chart2.total | number_format(2, '.', ',') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="m-widget14__legends" id="chart_profit_legends">
+
+                                        {% for item in chart2.data %}
+
+                                            <div class="m-widget14__legend">
+                                                <span class="m-widget14__legend-bullet {% if loop.index == 1 %}m--bg-accent{% endif %} {% if loop.index == 2 %}m--bg-warning{% endif %} {% if loop.index == 3 %}m--bg-brand-donut{% endif %}"></span>
+                                                <span class="m-widget14__legend-text">${{ item.amount | number_format(2, '.', ',') }} {{ item.name }}</span>
+                                            </div>
+
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--end:: Widgets/Profit Share-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="m-portlet">
+            <div class="m-portlet__body  m-portlet__body--no-padding">
+                <div class="row m-row--no-padding m-row--col-separator-xl">
+                    <div class="col-xl-4">
+                        <div class="m-widget14">
+                            <div class="m-widget14__header">
+                                <h3 class="m-widget14__title">
+                                    Sales Stats
+                                </h3>
+                                <span class="m-widget14__desc profit_chart_project_name"></span>
+                            </div>
+                            <div class="row  align-items-center">
+                                <div class="col">
+                                    <div class="m-widget15">
+                                        <div class="m-widget15__chart" style="height:180px;">
+                                            <canvas id="m_chart_sales_stats"></canvas>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 1.5rem;">
+                                        <a href="{{ url('invoice') }}"
+                                           class="btn m-btn--pill btn-secondary m-btn m-btn--hover-brand m-btn--custom">View
+                                            invoices</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4">
+                        <div class="m-widget14">
+                            <div class="m-widget14__header">
+                                <h3 class="m-widget14__title">
+                                    Pay Items Totals
+                                </h3>
+                                <span class="m-widget14__desc profit_chart_project_name"></span>
+                            </div>
+                            <div class="row  align-items-center">
+                                <div class="col">
+                                    <div class="m-widget5">
+                                        <div class="m-scrollable" data-scrollable="true" data-height="400" data-mobile-height="300">
+                                            <div id="items-body">
+                                                {% for item in items %}
+                                                    <div class="m-widget5__item">
+                                                        <div class="m-widget5__content">
+                                                            <div class="m-widget5__section">
+                                                                <h4 class="m-widget5__title">
+                                                                    {{ item.name }}
+                                                                </h4>
+                                                                <span class="m-widget5__desc">
+                                                    {{ item.unit }}
+										        </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="m-widget5__content">
+                                                            <div class="m-widget5__stats1 mr-5">
+                                                                <span class="m-widget5__sales">{{ item.quantity }}</span>
+                                                            </div>
+                                                            <div class="m-widget5__stats2">
+                                                                <span class="m-widget5__sales m--font-success m--font-bold"> ${{ item.amount | number_format(2,'.', ',') }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4">
+                        <div class="m-widget14">
+                            <div class="m-widget14__header">
+                                <h3 class="m-widget14__title">
+                                    Materials Totals
+                                </h3>
+                                <span class="m-widget14__desc profit_chart_project_name"></span>
+                            </div>
+                            <div class="row  align-items-center">
+                                <div class="col">
+                                    <div class="m-widget5">
+                                        <div class="m-scrollable" data-scrollable="true" data-height="400" data-mobile-height="300">
+                                            <div id="materials-body">
+                                                {% for item in materials %}
+                                                    <div class="m-widget5__item">
+                                                        <div class="m-widget5__content">
+                                                            <div class="m-widget5__section">
+                                                                <h4 class="m-widget5__title">
+                                                                    {{ item.name }}
+                                                                </h4>
+                                                                <span class="m-widget5__desc">{{ item.unit }}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="m-widget5__content">
+                                                            <div class="m-widget5__stats1 mr-5">
+                                                                <span class="m-widget5__sales">{{ item.quantity }}</span>
+                                                            </div>
+                                                            <div class="m-widget5__stats2">
+                                                                <span class="m-widget5__sales m--font-success m--font-bold"> ${{ item.amount | number_format(2,'.', ',') }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block javascriptsspecific %}
+    <script src="{{ asset('bundles/ican/js/pages/index.js') }}?{{ 'now' | date('U') }}"></script>
+    <script>
+
+        var chart1_data = {{ chart1|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+
+        var chart2_data = {{ chart2|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+
+        var chart3_data = {{ chart3|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+
+        jQuery(document).ready(function () {
+            Index.init();
+        });
+    </script>
+{% endblock %}

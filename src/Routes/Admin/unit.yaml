@@ -1,0 +1,23 @@
+unit:
+  path:  /units
+  defaults: { _controller: App\Controller\Admin\UnitController::index }
+
+listarUnitAdmin:
+  path:  /unit/listarUnit
+  defaults: { _controller: App\Controller\Admin\UnitController::listar, _format: json }
+
+eliminarUnitAdmin:
+  path:  /unit/eliminarUnit
+  defaults: { _controller: App\Controller\Admin\UnitController::eliminar, _format: json }
+
+eliminarUnitsAdmin:
+  path:  /unit/eliminarUnits
+  defaults: { _controller: App\Controller\Admin\UnitController::eliminarUnits, _format: json }
+
+salvarUnitAdmin:
+  path:  /unit/salvarUnit
+  defaults: { _controller: App\Controller\Admin\UnitController::salvar, _format: json }
+
+cargarDatosUnitAdmin:
+  path:  /unit/cargarDatos
+  defaults: { _controller: App\Controller\Admin\UnitController::cargarDatos, _format: json }

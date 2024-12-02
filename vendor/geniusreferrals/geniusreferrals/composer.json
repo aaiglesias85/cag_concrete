@@ -1,0 +1,31 @@
+{
+    "name": "geniusreferrals/geniusreferrals",
+    "type": "library",
+    "description": "This client allows you to implement referral programs using the Genius Referrals RESTful API.",
+    "keywords": ["referral", "referrals", "refer", "friend", "friends", "referral marketing programs", "word of mouse", "promotion programs", "referral programs", "refer a friend", "promotion campaigns", "referral campaigns", "marketing campaigns", "afiliation", "affiliate", "refer friend", "affiliates", "geniusreferrals"],
+    "homepage": "http://www.geniusreferrals.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Genius Referrals",
+            "email": "dev@geniusreferrals.com",
+            "homepage": "http://www.geniusreferrals.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/GeniusReferrals/Genius-Referrals-PHP/issues"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "mashape/unirest-php": "~3.0.1",
+        "apimatic/jsonmapper": "~1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "GeniusReferralsLib\\": "src/"
+        }
+    }
+}

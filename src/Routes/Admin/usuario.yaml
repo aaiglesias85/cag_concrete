@@ -1,0 +1,39 @@
+users:
+  path:  /users
+  defaults: { _controller: App\Controller\Admin\UsuarioController::index }
+
+listUsersAdmin:
+  path:  /usuario/listarUsuario
+  defaults: { _controller: App\Controller\Admin\UsuarioController::listar, _format: json}
+
+saveUserAdmin:
+  path:  /usuario/salvarUsuario
+  defaults: { _controller: App\Controller\Admin\UsuarioController::salvar, _format: json}
+
+updateMisDatosAdmin:
+  path:  /usuario/actualizarMisDatos
+  defaults: { _controller: App\Controller\Admin\UsuarioController::actualizarMisDatos, _format: json }
+
+deleteUserAdmin:
+  path:  /usuario/eliminarUsuario
+  defaults: { _controller: App\Controller\Admin\UsuarioController::eliminar, _format: json }
+
+eliminarUsuariosAdmin:
+  path:  /usuario/eliminarUsuarios
+  defaults: { _controller: App\Controller\Admin\UsuarioController::eliminarUsuarios, _format: json }
+
+activateUserAdmin:
+  path:  /usuario/activarUsuario
+  defaults: { _controller: App\Controller\Admin\UsuarioController::activarUsuario, _format: json }
+
+cargarDatosUsuarioAdmin:
+  path:  /usuario/cargarDatos
+  defaults: { _controller: App\Controller\Admin\UsuarioController::cargarDatos, _format: json }
+
+perfilAdmin:
+  path:  /profile
+  defaults: { _controller: App\Controller\Admin\UsuarioController::perfil }
+
+listarTodosUsuariosAdmin:
+  path:  /usuario/listarOrdenados
+  defaults: { _controller: App\Controller\Admin\UsuarioController::listarOrdenados, _format: json }

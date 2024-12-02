@@ -1,0 +1,27 @@
+company:
+  path:  /company
+  defaults: { _controller: App\Controller\Admin\CompanyController::index }
+
+listarCompanyAdmin:
+  path:  /company/listarCompany
+  defaults: { _controller: App\Controller\Admin\CompanyController::listar, _format: json }
+
+eliminarCompanyAdmin:
+  path:  /company/eliminarCompany
+  defaults: { _controller: App\Controller\Admin\CompanyController::eliminar, _format: json }
+
+eliminarCompaniesAdmin:
+  path:  /company/eliminarCompanies
+  defaults: { _controller: App\Controller\Admin\CompanyController::eliminarCompanies, _format: json }
+
+salvarCompanyAdmin:
+  path:  /company/salvarCompany
+  defaults: { _controller: App\Controller\Admin\CompanyController::salvar, _format: json }
+
+cargarDatosCompanyAdmin:
+  path:  /company/cargarDatos
+  defaults: { _controller: App\Controller\Admin\CompanyController::cargarDatos, _format: json }
+
+eliminarContactCompanyAdmin:
+  path:  /company/eliminarContact
+  defaults: { _controller: App\Controller\Admin\CompanyController::eliminarContact, _format: json }

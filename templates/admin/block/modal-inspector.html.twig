@@ -1,0 +1,61 @@
+<div class="modal fade" id="modal-inspector" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New inspector</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="m-form" id="inspector-form" action="#"
+                      enctype="multipart/form-data" method="post">
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Name
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+
+                        <input type="text" class="form-control form-control-text event-change"
+                               id="inspector-name" name="name"/>
+                    </div>
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Email
+                            <span class="ic-small italic">(optional)</span>
+                        </label>
+
+                        <div class="input-group m-input-group">
+                            <div class="input-group-prepend"><span class="input-group-text">@</span>
+                            </div>
+                            <input type="text" class="form-control" id="inspector-email" name="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Phone
+                            <span class="ic-small italic">(optional)</span>
+                        </label>
+                        <div class="input-group m-input-group">
+                            <div class="input-group-prepend">
+                                        <span class="input-group-text"><i
+                                                    class="flaticon-support"></i></span>
+                            </div>
+                            <input type="text" class="form-control event-change" id="inspector-phone" name="phone">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-inspector">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ asset('bundles/ican/js/components/modal-inspector.js') }}?{{ 'now' | date('U') }}"></script>

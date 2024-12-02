@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ asunto }}</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800');
+
+        .container {
+            width: 600px;
+            margin: auto
+        }
+
+        .row {
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+
+        .centrado {
+            float: none;
+            margin: auto;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        a:hover {
+            text-decoration: none
+        }
+
+        body {
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+            color: #777;
+            margin: 0px;
+        }
+
+        p {
+            font-weight: 300;
+        }
+
+        .cabecera {
+            /*color: #fff;
+            background-image: url({{ direccion_url }}/bundles/frontend/mailing/img/fondo-digimaq.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;*/
+            padding: 10px;
+            border-bottom: 2px solid #0ac355
+        }
+
+        .contenido a {
+            color: #222;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .contenido a:hover {
+            color: #666;
+            text-decoration: none
+        }
+
+        .centrado {
+            float: none;
+            margin: auto;
+        }
+
+        .letra-chica {
+            font-size: 12px;
+        }
+
+        h1 {
+            color: #415BA9;
+            text-transform: uppercase;
+            font-size: 28px;
+            margin-top: 20px;
+            line-height: 4rem;
+            text-align: center;
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+            font-weight: 700
+        }
+
+        h5 {
+            font-size: 16px;
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+            text-transform: uppercase;
+            margin-bottom: 0;
+            font-weight: 700;
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        h6 {
+            font-size: 16px;
+            margin-top: 0px;
+            margin-bottom: 3px;
+            font-weight: 300;
+            color: #666;
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+        }
+
+        .footer {
+            /*color: #fff;
+            background-image: url({{ direccion_url }}/bundles/frontend/mailing/img/fondo-digimaq.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;*/
+            padding: 10px;
+            border-top: 2px solid #0ac355
+        }
+
+        .col-3 {
+            width: 33%;
+            float: left;
+            position: relative;
+            min-height: 1px;
+            text-align: center
+        }
+
+        .m-b-50 {
+            margin-bottom: 50px;
+        }
+
+        .mensaje {
+            width: 100%;
+            border-bottom: 1px solid #777;
+        }
+
+        .cuadro {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .cuadro p {
+            margin-bottom: 5px;
+            margin-top: 0px;
+        }
+
+        .cuadro-color {
+            background-color: #1e6af924;
+        }
+
+        .chica {
+            font-size: .8em;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- cabecera -->
+<div class="container centrado">
+    <div class="row">
+        <div class="text-center cabecera">
+            <img src="{{ direccion_url }}/bundles/ican/img/logo.jpg" width="150" alt=""/>
+        </div>
+    </div>
+</div>
+
+<!-- contenido -->
+<div class="titulos">
+    <div class="container">
+        <div class="row">
+            <div class="centrado">
+                <h1>Password Recovery Notification</h1>
+
+                <p style="text-align:left; font-family:'Trebuchet MS', Arial, Helvetica, sans-serif; font-size:14px; margin:20px auto 0 auto; font-weight:100; padding: 0 40px 0 40px;">
+                    {{ contenido |raw }}
+                </p>
+
+                <br>
+
+
+                <p class="chica">*This message has been generated automatically by our system.<br> Please do not answer.<br></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <p style="width: 100%; clear: both; padding-top: 3em; text-align: center;">Kind regards<br>
+            Web Team
+        </p>
+    </div>
+</div>
+
+<!-- Contact Section -->
+
+<div class="container centrado">
+    <div class="row">
+        <div class="text-center footer">
+            <img src="{{ direccion_url }}/bundles/ican/img/logo.jpg" width="150" alt=""/>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

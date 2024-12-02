@@ -1,0 +1,202 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block subtitle %} - Employees{% endblock %}
+
+{% block stylesheetspecific %}{% endblock %}
+
+{% block content %}
+    <!-- BEGIN: Subheader -->
+    <div class="m-subheader ">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <h3 class="m-subheader__title m-subheader__title--separator">Employees</h3>
+                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
+                    <li class="m-nav__item m-nav__item--home">
+                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
+                            <i class="m-nav__link-icon la la-home"></i>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Employees</span>
+                        </a>
+                    </li>
+                    <li class="m-nav__separator">-</li>
+                    <li class="m-nav__item">
+                        <a href="" class="m-nav__link">
+                            <span class="m-nav__link-text">Manage employees</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- END: Subheader -->
+
+    <div class="m-content">
+        <div id="lista-employee" class="m-portlet m-portlet--mobile" m-portlet="true">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            Employees
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        {% if permiso.agregar %}
+                            <li class="m-portlet__nav-item">
+                                <a id="btn-nuevo-employee"
+                                   class="btn btn-success btn-icon"
+                                   href="javascript:;">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span class="m--hidden-mobile">New</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if permiso.eliminar %}
+                            <li class="m-portlet__nav-item">
+                                <a id="btn-eliminar-employee"
+                                   class="btn btn-danger btn-icon"
+                                   href="javascript:;">
+                                    <span>
+                                        <i class="la la-trash-o"></i>
+                                        <span class="m--hidden-mobile">Delete</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;" m-portlet-tool="fullscreen"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon">
+                                <i class="la la-expand"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="m-portlet__body">
+                <!--begin: Search Form -->
+                <div class="form-group m-form__group row align-items-center mb-2">
+                    <div class="col-md-4">
+                        <div class="m-input-icon m-input-icon--left">
+                            <input type="text" class="form-control m-input m_form_search"
+                                   placeholder="Search...">
+                            <span class="m-input-icon__icon m-input-icon__icon--left">
+									<span><i class="la la-search"></i></span>
+								</span>
+                        </div>
+                    </div>
+                </div>
+                <!--end: Search Form -->
+                <!--begin: Datatable -->
+                <div class="m_datatable" id="employee-table-editable"></div>
+                <!--end: Datatable -->
+            </div>
+        </div>
+
+        <div id="form-employee" class="m-portlet m--hide">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text" id="form-employee-title">
+                            Do you want to create a new employee? Follow the next steps:
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-employee"><i
+                                        class="la la-close"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <form class="m-form" id="employee-form" action="#"
+                  enctype="multipart/form-data" method="post">
+
+                <input type="hidden" id="employee_id" name="employee_id"/>
+
+                <div class="m-portlet__body">
+                    <div class="m-form__section m-form__section--first">
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                Name
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <input type="text" class="form-control form-control-text event-change"
+                                   id="name" name="name"/>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">2</span>
+                                Hourly Rate
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control form-control-text just-float event-change"
+                                           id="hourly_rate" name="hourly_rate"/>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">3</span>
+                                Position
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-text event-change"
+                                           id="position" name="position"/>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="m-form__actions">
+                        {% if permiso.agregar or permiso.editar %}
+                            <button id="btn-salvar-employee" class="btn btn-success" type="button">
+                                Save
+                            </button>
+                        {% endif %}
+                        <button class="btn btn-danger cerrar-form-employee" type="button">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block javascriptsspecific %}
+    <script src="{{ asset('bundles/ican/js/pages/employees.js') }}?{{ 'now' | date('U') }}"></script>
+    <script>
+
+        var permiso = {
+            agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
+            editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
+            eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
+        };
+
+        jQuery(document).ready(function () {
+            Employees.init();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,39 @@
+data_tracking:
+  path: /data-tracking
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::index }
+
+listarDataTrackingAdmin:
+  path: /data-tracking/listar
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::listar, _format: json }
+
+salvarDataTrackingAdmin:
+  path: /data-tracking/salvarDataTracking
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::salvar, _format: json }
+
+eliminarDataTrackingAdmin:
+  path: /data-tracking/eliminarDataTracking
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminar, _format: json }
+
+eliminarDataTrackingsAdmin:
+  path: /data-tracking/eliminarDataTrackings
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarDataTrackings, _format: json }
+
+cargarDatosDataTrackingAdmin:
+  path: /data-tracking/cargarDatos
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::cargarDatos, _format: json }
+
+eliminarItemDataTrackingAdmin:
+  path: /data-tracking/eliminarItem
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarItem, _format: json }
+
+eliminarLaborDataTrackingAdmin:
+  path: /data-tracking/eliminarLabor
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarLabor, _format: json }
+
+eliminarMaterialDataTrackingAdmin:
+  path: /data-tracking/eliminarMaterial
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarMaterial, _format: json }
+
+eliminarConcVendorDataTrackingAdmin:
+  path: /data-tracking/eliminarConcVendor
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarConcVendor, _format: json }

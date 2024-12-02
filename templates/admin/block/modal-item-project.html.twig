@@ -1,0 +1,173 @@
+<div class="modal fade" id="modal-item" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    New item
+
+                    <span style="margin-left: 10px">
+                            <span id="proyect-number-item" class="m-badge m-badge--info"></span>
+                            <span id="proyect-name-item"></span>
+                        </span>
+                </h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+
+            </div>
+            <div class="modal-body">
+                <form class="m-form" id="item-form" action="#"
+                      enctype="multipart/form-data" method="post">
+
+                    <input type="hidden" id="project_item_id" name="project_item_id"/>
+
+                    <div class="form-group m-form__group">
+                        <div>
+                            <input type="checkbox" data-switch="true" id="item-type"
+                                   checked="checked" data-on-text="Existing item"
+                                   data-off-text="New item" data-on-color="success"
+                                   data-off-color="danger">
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Item
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+
+                        <input type="text" class="form-control form-control-text m--hide"
+                               id="item-name" name="item" placeholder="Enter the custom name"/>
+
+                        <div class="row" id="div-item">
+                            <div class="col-md-12" id="select-item">
+                                <select class="form-control m-select2" id="item">
+                                    <option value="">Select</option>
+                                    {% for item in items %}
+                                        <option value="{{ item.itemId }}"
+                                                data-unit="{{ item.unit.description }}"
+                                                data-yield="{{ item.yieldCalculation }}"
+                                                data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}">
+                                            {{ item.description }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Yield Calculation
+                            <span class="ic-small italic">(optional)</span>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-12" id="select-yield-calculation">
+                                <select class="form-control m-select2 event-change" id="yield-calculation"
+                                        name="yield">
+                                    <option value="">Select</option>
+                                    {% for item in yields_calculation %}
+                                        <option value="{{ item.id }}">{{ item.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group m--hide" id="select-equation">
+                        <label>
+                            Equation
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <select class="form-control m-select2 event-change" id="equation" name="equation">
+                                    <option value="">Select</option>
+                                    {% for item in equations %}
+                                        <option value="{{ item.equationId }}"> {{ item.description }} {{ item.equation }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                <a href="javascript:;" title="Add equation" id="btn-add-equation"
+                                   class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                    <i class="la la-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group m--hide" id="select-unit">
+                        <label>
+                            Unit
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <select class="form-control m-select2 event-change" id="unit" name="unit">
+                                    <option value="">Select</option>
+                                    {% for item in units %}
+                                        <option value="{{ item.unitId }}">{{ item.description }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                <a href="javascript:;" title="Add unit" id="btn-add-unit"
+                                   class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                    <i class="la la-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Quantity
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control form-control-number" id="item-quantity"
+                                       name="quantity">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group m-form__group">
+                        <label>
+                            Price
+                            <span class="ic-small italic">(required)</span>
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group m-input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">$</span>
+                                    </div>
+                                    <input type="text" class="form-control form-control-number" id="item-price"
+                                           name="price">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-item">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- components -->
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
+
+<script src="{{ asset('bundles/ican/js/components/modal-item-project.js') }}?{{ 'now' | date('U') }}"></script>

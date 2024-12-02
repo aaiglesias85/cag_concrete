@@ -1,0 +1,23 @@
+material:
+  path:  /materials
+  defaults: { _controller: App\Controller\Admin\MaterialController::index }
+
+listarMaterialAdmin:
+  path:  /material/listarMaterial
+  defaults: { _controller: App\Controller\Admin\MaterialController::listar, _format: json }
+
+eliminarMaterialAdmin:
+  path:  /material/eliminarMaterial
+  defaults: { _controller: App\Controller\Admin\MaterialController::eliminar, _format: json }
+
+eliminarMaterialsAdmin:
+  path:  /material/eliminarMaterials
+  defaults: { _controller: App\Controller\Admin\MaterialController::eliminarMaterials, _format: json }
+
+salvarMaterialAdmin:
+  path:  /material/salvarMaterial
+  defaults: { _controller: App\Controller\Admin\MaterialController::salvar, _format: json }
+
+cargarDatosMaterialAdmin:
+  path:  /material/cargarDatos
+  defaults: { _controller: App\Controller\Admin\MaterialController::cargarDatos, _format: json }

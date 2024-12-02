@@ -1,0 +1,458 @@
+@charset "utf-8";
+:link, :visited {
+    text-decoration: none
+}
+
+ul, ol {
+    list-style: none
+}
+
+h1, h2, h3, h4, h5, h6, pre, code {
+    font-size: 1em;
+}
+
+ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, body, html, p, blockquote, fieldset, input, td, tr {
+    margin: 0;
+    padding: 0
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+a img, :link img, :visited img {
+    border: none
+}
+
+address {
+    font-style: normal
+}
+
+a {
+    text-decoration: none;
+    color: #003b4f;
+    padding: 0;
+    margin: 0;
+    outline: 0
+}
+
+a:hover {
+    text-decoration: none;
+    color: #a10303;
+    -webkit-transition: color 300ms ease-in;
+    -moz-transition: color 300ms ease-in;
+    -o-transition: color 300ms ease-in;
+    transition: color 300ms ease-in;
+}
+
+h1, h2, h3, h4, p, td {
+    padding: 0px;
+    margin: 0px;
+    font-weight: normal
+}
+
+h1 {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #3f3f3f;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 0;
+    color: #074894;
+}
+
+h4 {
+    display: inline;
+    color: #333;
+    font-size: 9px;
+    font-weight: normal;
+    line-height: 10px;
+    margin: 5px 0;
+    text-transform: uppercase;
+    font-style: normal;
+}
+
+p {
+    font-size: 13px;
+    margin: 10px 0
+}
+
+.tabla-cotizador td {
+    padding: 5px;
+    font-weight: bold;
+    border: 0.5px solid #074894;
+    text-align: center;
+    font-size: 14px;
+    color: #074894;
+}
+
+/*.tabla-cotizador td,th{
+    padding:15px 5px;
+    border:1px solid #0748945c;
+    text-align:center;
+}*/
+
+.tabla-cotizador .carts {
+    text-align: center;
+    font-size: 22px;
+    color: #666;
+    width: 80px
+}
+
+.tabla-cotizador .precio {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    width: 150px
+}
+
+.tabla-cotizador .subtotal {
+    text-align: center;
+    font-size: 12px;
+    color: #333;
+    width: 150px
+}
+
+.tabla-cotizador td.total {
+    width: 60px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+}
+
+.tabla-cotizador .cantidad {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    width: 150px
+}
+
+.tabla-cotizador .descripcion {
+    text-align: left;
+    font-size: 14px;
+    color: #666;
+    width: 380px;
+    padding: 15px 15px;
+}
+
+.tabla-cotizador .descripcion h1 {
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+    margin: 0
+}
+
+.tabla-cotizador .descripcion p {
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+    margin: 0
+}
+
+.tabla-cotizador .descripcion .desc td, th {
+    border: 0;
+    text-align: left;
+    padding: 2px 0;
+    margin: 0
+}
+
+.tabla-cotizador .articulo-co {
+    padding: 0;
+    margin: 0;
+    width: 180px
+}
+
+.tabla-cotizador .articulo-co div {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    width: 219px;
+    height: 140px
+}
+
+.tabla-cotizador .datos-user {
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    color: #074894;
+    width: 80px;
+    padding: 15px 15px;
+}
+
+.tabla-cotizador .datos-user-info {
+    text-align: left;
+    font-size: 14px;
+    color: #50626c;
+    width: 455px;
+    padding: 15px 15px;
+    font-weight: normal;
+    padding-left: 50px;
+}
+
+textarea { /*overflow-x:hidden; overflow-y:scroll;*/
+    overflow: auto;
+    resize: vertical;
+    moz-resize: vertical;
+    -webkit-resize: vertical;
+}
+
+.table-links-bar {
+    width: 100%;
+    margin: 20px 0;
+    border-top: 1px solid #c6d5dc;
+    border-bottom: 1px solid #c6d5dc;
+    float: left;
+    line-height: 40px;
+}
+
+.table-link-web {
+    float: left;
+}
+
+.table-link-mail {
+    float: right;
+}
+
+.message-text-box {
+    width: 577px;
+    float: left;
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3f3f3f;
+    float: left;
+    line-height: 108px;
+    margin-left: 55px;
+    font-family: Helvetica, sans-serif;
+}
+
+a, a:hover {
+    /*color: #fff;*/
+    text-decoration: none;
+}
+
+.page_footer {
+    background: #064894;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    font-family: Helvetica, sans-serif;
+    text-align: center;
+    padding: 5px;
+}
+
+body {
+    color: #000;
+}
+
+.row {
+    margin-right: -15px;
+    margin-left: -15px;
+    margin-top: 20px;
+    padding: 15px;
+    width: 100%;
+}
+
+/*.row:before,
+.row:after{
+    display: table;
+    content: " ";
+}*/
+
+.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    width: 700px;
+}
+
+.col-md-4 {
+    width: 33.33333333333333%;
+}
+
+#wrapper {
+    width: 100%;
+    padding: 20px;
+}
+
+a.web {
+    font-weight: bold;
+    color: #000;
+}
+
+table {
+    max-width: 100%;
+    background-color: transparent;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.428571429;
+    vertical-align: top;
+}
+
+.tabla-td {
+    padding: 10px;
+}
+
+.border-table {
+    border: 1px solid;
+    border-radius: 25px;
+}
+
+.borderless > tbody > tr > td, .borderless > thead > tr > th {
+    border-top-style: none !important;
+    border-left-style: none !important;
+    border-right-style: none !important;
+    border-bottom-style: none !important;
+}
+
+/*.borderless > thead{
+    border: 1px solid #c0c0c0;
+}*/
+
+.dato-tabla {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.detalle-producto {
+    text-transform: uppercase;
+}
+
+
+
+div.header {
+    width: 100%;
+    color: #fff;
+    /*background-image: url(../../frontend/pdf/img/fondo-digimaq.jpg);*/
+    background: #064894;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-bottom: 2px solid #0ac355;
+}
+
+div.footer {
+    width: 100%;
+    padding-bottom: 10px;
+    background: #064894;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-top: 2px solid #0ac355;
+}
+
+.footer h3, .footer h3 a{
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.footer p {
+    display: block;
+    color: #fff;
+    font-size: 10px;
+    text-align: center;
+    font-weight: normal;
+    line-height: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-transform: none;
+    font-style: normal;
+}
+
+.footer p a {
+    color: #fff;
+}
+
+
+.container{
+    padding-left: 40px;
+    width: 700px;
+    padding-right: 40px;
+}
+
+.tabla-header td{
+    border: none !important;
+}
+
+.tabla-pedido td {
+    padding: 5px;
+    font-weight: bold;
+    border: 0.5px solid #fff;
+    text-align: center;
+    font-size: 14px;
+    color: #fff;
+    padding: 10px;
+}
+
+
+.logo{
+    width: 500px;
+    padding-bottom: 10px;
+}
+.logo p{
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.logo img{
+    width: 150px;
+}
+.pedido{
+    width: 200px;
+    padding-top: 40px;
+}
+.tabla-pedido{
+    background-color: #172968;
+}
+
+.tabla-cotizador{
+    padding-top: 20px;
+}
+
+.tabla-cotizador td.datos-header{
+    background: #074894;
+    border: 0.5px solid #074894;
+    color: #fff;
+    font-size: 14px;
+    text-align: left;
+}
+.titles{
+    background: #074894;
+    border: 0.5px solid #074894;
+    color: #fff;
+    font-size: 16px;
+    text-align: left;
+}
+
+div.comentarios{
+    width: 700px;
+    border: 0.5px solid #425BA9;
+    padding: 10px;
+}
+.text-center{
+    text-align: center;
+}

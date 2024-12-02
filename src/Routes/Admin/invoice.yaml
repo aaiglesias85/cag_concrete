@@ -1,0 +1,31 @@
+invoice:
+  path: /invoices
+  defaults: { _controller: App\Controller\Admin\InvoiceController::index }
+
+listarInvoiceAdmin:
+  path: /invoice/listarInvoice
+  defaults: { _controller: App\Controller\Admin\InvoiceController::listar, _format: json }
+
+eliminarInvoiceAdmin:
+  path: /invoice/eliminarInvoice
+  defaults: { _controller: App\Controller\Admin\InvoiceController::eliminar, _format: json }
+
+eliminarInvoicesAdmin:
+  path: /invoice/eliminarInvoices
+  defaults: { _controller: App\Controller\Admin\InvoiceController::eliminarInvoices, _format: json }
+
+salvarInvoiceAdmin:
+  path: /invoice/salvarInvoice
+  defaults: { _controller: App\Controller\Admin\InvoiceController::salvar, _format: json }
+
+cargarDatosInvoiceAdmin:
+  path: /invoice/cargarDatos
+  defaults: { _controller: App\Controller\Admin\InvoiceController::cargarDatos, _format: json }
+
+eliminarItemInvoiceAdmin:
+  path: /invoice/eliminarItem
+  defaults: { _controller: App\Controller\Admin\InvoiceController::eliminarItem, _format: json }
+
+exportarExcelInvoiceAdmin:
+  path:  /invoice/exportarExcel
+  defaults: { _controller: App\Controller\Admin\InvoiceController::exportarExcel, _format: json }

@@ -1,0 +1,66 @@
+project:
+  path: /project
+  defaults: { _controller: App\Controller\Admin\ProjectController::index }
+
+listarProjectAdmin:
+  path: /project/listarProject
+  defaults: { _controller: App\Controller\Admin\ProjectController::listar, _format: json }
+
+salvarProjectAdmin:
+  path: /project/salvarProject
+  defaults: { _controller: App\Controller\Admin\ProjectController::salvar, _format: json }
+
+eliminarProjectAdmin:
+  path: /project/eliminarProject
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminar, _format: json }
+
+eliminarProjectsAdmin:
+  path: /project/eliminarProjects
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarProjects, _format: json }
+
+cargarDatosProjectAdmin:
+  path: /project/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ProjectController::cargarDatos, _format: json }
+
+listarProjectsOrdenadosAdmin:
+  path: /project/listarOrdenados
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarOrdenados, _format: json }
+
+#invoice
+listarItemsParaInvoiceProjectAdmin:
+  path: /project/listarItemsParaInvoice
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarItemsParaInvoice, _format: json }
+
+#notes
+listarNotesProjectAdmin:
+  path: /project/listarNotes
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarNotes, _format: json }
+
+salvarNotesProjectAdmin:
+  path: /project/salvarNotes
+  defaults: { _controller: App\Controller\Admin\ProjectController::salvarNotes, _format: json }
+
+cargarDatosNotesProjectAdmin:
+  path: /project/cargarDatosNotes
+  defaults: { _controller: App\Controller\Admin\ProjectController::cargarDatosNotes, _format: json }
+
+eliminarNotesProjectAdmin:
+  path: /project/eliminarNotes
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarNotes, _format: json }
+
+eliminarNotesDateProjectAdmin:
+  path: /project/eliminarNotesDate
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarNotesDate, _format: json }
+
+#items
+listarItemsDeProjectAdmin:
+  path: /project/listarItems
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarItems, _format: json }
+
+eliminarItemProjectAdmin:
+  path: /project/eliminarItem
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarItem, _format: json }
+
+agregarItemProjectAdmin:
+  path: /project/agregarItem
+  defaults: { _controller: App\Controller\Admin\ProjectController::agregarItem, _format: json }

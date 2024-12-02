@@ -1,0 +1,23 @@
+inspectors:
+  path:  /inspectors
+  defaults: { _controller: App\Controller\Admin\InspectorController::index }
+
+listarInspectorAdmin:
+  path:  /inspector/listarInspector
+  defaults: { _controller: App\Controller\Admin\InspectorController::listar, _format: json }
+
+eliminarInspectorAdmin:
+  path:  /inspector/eliminarInspector
+  defaults: { _controller: App\Controller\Admin\InspectorController::eliminar, _format: json }
+
+eliminarInspectorsAdmin:
+  path:  /inspector/eliminarInspectors
+  defaults: { _controller: App\Controller\Admin\InspectorController::eliminarInspectors, _format: json }
+
+salvarInspectorAdmin:
+  path:  /inspector/salvarInspector
+  defaults: { _controller: App\Controller\Admin\InspectorController::salvar, _format: json }
+
+cargarDatosInspectorAdmin:
+  path:  /inspector/cargarDatos
+  defaults: { _controller: App\Controller\Admin\InspectorController::cargarDatos, _format: json }

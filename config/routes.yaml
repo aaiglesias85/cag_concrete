@@ -1,0 +1,33 @@
+#frontend:
+#  resource: '../src/Routes/Frontend/'
+#  type:     directory
+#  prefix:   /
+
+admin:
+  resource: '../src/Routes/Admin/'
+  type:     directory
+  prefix:   /
+
+auntenticarUsuario:
+  path:  /usuario/autenticar
+  defaults: { _controller: App\Controller\Admin\UsuarioController::autenticar, _format: json }
+
+forgetPass:
+  path:  /usuario/olvidoContrasenna
+  defaults: { _controller: App\Controller\Admin\UsuarioController::olvidoContrasenna, _format: json }
+
+login:
+  path:  /login
+  defaults: { _controller: App\Controller\Admin\UsuarioController::login }
+
+login_check:
+  path: /check
+
+logout:
+  path: /logout
+
+denegado:
+  path:  /denegado
+  defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
+
+#crons

@@ -1,0 +1,23 @@
+employee:
+  path:  /employees
+  defaults: { _controller: App\Controller\Admin\EmployeeController::index }
+
+listarEmployeeAdmin:
+  path:  /employee/listarEmployee
+  defaults: { _controller: App\Controller\Admin\EmployeeController::listar, _format: json }
+
+eliminarEmployeeAdmin:
+  path:  /employee/eliminarEmployee
+  defaults: { _controller: App\Controller\Admin\EmployeeController::eliminar, _format: json }
+
+eliminarEmployeesAdmin:
+  path:  /employee/eliminarEmployees
+  defaults: { _controller: App\Controller\Admin\EmployeeController::eliminarEmployees, _format: json }
+
+salvarEmployeeAdmin:
+  path:  /employee/salvarEmployee
+  defaults: { _controller: App\Controller\Admin\EmployeeController::salvar, _format: json }
+
+cargarDatosEmployeeAdmin:
+  path:  /employee/cargarDatos
+  defaults: { _controller: App\Controller\Admin\EmployeeController::cargarDatos, _format: json }

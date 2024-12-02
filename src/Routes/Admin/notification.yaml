@@ -1,0 +1,19 @@
+notification:
+  path:  /notifications
+  defaults: { _controller: App\Controller\Admin\NotificationController::index }
+
+listarNotificationAdmin:
+  path:  /notification/listarNotification
+  defaults: { _controller: App\Controller\Admin\NotificationController::listar, _format: json }
+
+eliminarNotificationAdmin:
+  path:  /notification/eliminarNotification
+  defaults: { _controller: App\Controller\Admin\NotificationController::eliminar, _format: json }
+
+eliminarNotificationsAdmin:
+  path:  /notification/eliminarNotifications
+  defaults: { _controller: App\Controller\Admin\NotificationController::eliminarNotifications, _format: json }
+
+leerNotificationesAdmin:
+  path:  /notification/leer
+  defaults: { _controller: App\Controller\Admin\NotificationController::leer, _format: json }

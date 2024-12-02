@@ -1,0 +1,27 @@
+rol:
+  path:  /profiles
+  defaults: { _controller: App\Controller\Admin\PerfilController::index }
+
+listarRolAdmin:
+  path:  /perfil/listarPerfil
+  defaults: { _controller: App\Controller\Admin\PerfilController::listar, _format: json }
+
+eliminarRolAdmin:
+  path:  /perfil/eliminarPerfil
+  defaults: { _controller: App\Controller\Admin\PerfilController::eliminar, _format: json }
+
+eliminarRolesAdmin:
+  path:  /perfil/eliminarPerfiles
+  defaults: { _controller: App\Controller\Admin\PerfilController::eliminarPerfiles, _format: json }
+
+salvarRolAdmin:
+  path:  /perfil/salvarPerfil
+  defaults: { _controller: App\Controller\Admin\PerfilController::salvar, _format: json }
+
+cargarDatosPerfilAdmin:
+  path:  /perfil/cargarDatos
+  defaults: { _controller: App\Controller\Admin\PerfilController::cargarDatos, _format: json }
+
+listarPermisosDeRolAdmin:
+  path:  /perfil/listarPermisos
+  defaults: { _controller: App\Controller\Admin\PerfilController::listarPermisos, _format: json }

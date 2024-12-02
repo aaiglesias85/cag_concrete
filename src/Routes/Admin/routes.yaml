@@ -1,0 +1,7 @@
+home:
+  path:  /
+  defaults: { _controller:  App\Controller\Admin\DefaultController::index }
+
+listarStatsDashboard:
+  path: /dashboard/listarStats
+  defaults: { _controller: App\Controller\Admin\DefaultController::listarStats, _format: json }

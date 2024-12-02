@@ -1,0 +1,15 @@
+log:
+  path:  /logs
+  defaults: { _controller: App\Controller\Admin\LogController::index }
+
+listarLogAdmin:
+  path:  /log/listarLog
+  defaults: { _controller: App\Controller\Admin\LogController::listar, _format: json }
+
+eliminarLogAdmin:
+  path:  /log/eliminarLog
+  defaults: { _controller: App\Controller\Admin\LogController::eliminar, _format: json }
+
+eliminarLogsAdmin:
+  path:  /log/eliminarLogs
+  defaults: { _controller: App\Controller\Admin\LogController::eliminarLogs, _format: json }
