@@ -21,6 +21,40 @@ class ProjectService extends Base
 {
 
     /**
+     * EliminarContact: Elimina un contact en la BD
+     * @param int $contact_id Id
+     * @author Marcel
+     */
+    public function EliminarContact($contact_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(ProjectContact::class)
+            ->find($contact_id);
+        /**@var ProjectContact $entity */
+        if ($entity != null) {
+
+            $contact_name = $entity->getName();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Contact";
+            $log_descripcion = "The project contact is deleted: $contact_name";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
+
+    /**
      * AgregarItem
      * @param $item_id
      * @param $item_name

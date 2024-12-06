@@ -199,7 +199,9 @@ class DataTrackingService extends Base
             $arreglo_resultado['measured_by'] = $entity->getMeasuredBy();
             $arreglo_resultado['conc_vendor'] = $entity->getConcVendor();
 
-            $total_conc_used = $entity->getTotalConcUsed();
+
+            $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+                ->TotalConcUsed($data_tracking_id);
             $arreglo_resultado['total_conc_used'] = $total_conc_used;
 
             $conc_price = $entity->getConcPrice();
@@ -261,7 +263,14 @@ class DataTrackingService extends Base
                 ->TotalLabor($data_tracking_id);
             $arreglo_resultado['total_labor_price'] = $total_labor_price;
 
-            $profit = $total_daily_today - ($total_concrete + $total_labor_price);
+
+            $total_material = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
+                ->TotalMaterials($data_tracking_id);
+
+            $total_overhead = $total_people * $overhead_price;
+
+            $profit = $total_daily_today - ($total_concrete + $total_labor_price + $total_material + $total_overhead);
+
             $arreglo_resultado['profit'] = $profit;
 
             $resultado['success'] = true;
@@ -861,9 +870,15 @@ class DataTrackingService extends Base
 
             $acciones = $this->ListarAcciones($data_tracking_id);
 
-            $lost_concrete = $this->CalcularLostConcrete($value);
-            // totales
+            // conc vendor
+            $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+                ->TotalConcUsed($data_tracking_id);
+
             $total_concrete_yiel = $this->CalcularTotalConcreteYiel($data_tracking_id);
+
+            $lost_concrete = round($total_conc_used - $total_concrete_yiel, 2);
+
+            // totales
 
             $total_quantity_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalQuantity($data_tracking_id);
@@ -871,10 +886,8 @@ class DataTrackingService extends Base
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalDaily($data_tracking_id);
 
-            // conc vendor
-            $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-                ->TotalConcUsed($data_tracking_id);
 
+            // concrete used price
             $total_concrete = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
                 ->TotalConcPrice($data_tracking_id);
 
@@ -882,11 +895,17 @@ class DataTrackingService extends Base
             $total_labor = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
                 ->TotalLabor($data_tracking_id);
 
-            $profit = $total_daily_today - ($total_concrete + $total_labor);
+            $total_material = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
+                ->TotalMaterials($data_tracking_id);
 
             $total_people = $value->getTotalPeople();
             $overhead_price = $value->getOverheadPrice();
             $total_overhead = $total_people * $overhead_price;
+
+            // "Labor Total" is the sum of Labor and Overhead Totals
+            $total_labor = $total_labor + $total_overhead;
+
+            $profit = $total_daily_today - ($total_concrete + $total_labor + $total_material);
 
             $arreglo_resultado[] = [
                 "id" => $data_tracking_id,
@@ -903,6 +922,7 @@ class DataTrackingService extends Base
                 "crewLead" => $value->getCrewLead(),
                 "notes" => $value->getNotes(),
                 "totalLabor" => $total_labor,
+                "totalMaterial" => $total_material,
                 "totalStamps" => $value->getTotalStamps(),
                 "otherMaterials" => $value->getOtherMaterials(),
                 // overhead
@@ -970,9 +990,11 @@ class DataTrackingService extends Base
     private function CalcularLostConcrete($value)
     {
         $total_conc_item = 0;
-        $total_conc_used = $value->getTotalConcUsed();
 
         $data_tracking_id = $value->getId();
+
+        $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->TotalConcUsed($data_tracking_id);
 
         $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
             ->ListarItems($data_tracking_id);

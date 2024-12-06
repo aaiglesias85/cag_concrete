@@ -629,4 +629,33 @@ class ProjectController extends AbstractController
         }
 
     }
+
+    /**
+     * eliminarContact Acción que elimina un contact en la BD
+     *
+     */
+    public function eliminarContact(Request $request)
+    {
+        $contact_id = $request->get('contact_id');
+
+        try {
+            $resultado = $this->projectService->EliminarContact($contact_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
+    }
 }

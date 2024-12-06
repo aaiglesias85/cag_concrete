@@ -210,7 +210,9 @@ class ProjectItemRepository extends EntityRepository
         if ($sSearch != "") {
             $consulta->andWhere('it.description LIKE :item OR p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg')
+              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg OR c.name LIKE :company OR
+               p.projectIdNumber LIKE :projectIdNumber OR p.location LIKE :location OR p.subcontract LIKE :subcontract OR
+               p.proposalNumber LIKE :proposal')
                 ->setParameter('item', "%${sSearch}%")
                 ->setParameter('invoiceContact', "%${sSearch}%")
                 ->setParameter('owner', "%${sSearch}%")
@@ -219,7 +221,14 @@ class ProjectItemRepository extends EntityRepository
                 ->setParameter('number', "%${sSearch}%")
                 ->setParameter('name', "%${sSearch}%")
                 ->setParameter('po', "%${sSearch}%")
-                ->setParameter('cg', "%${sSearch}%");
+                ->setParameter('cg', "%${sSearch}%")
+                ->setParameter('company', "%${sSearch}%")
+                ->setParameter('projectIdNumber', "%${sSearch}%")
+                ->setParameter('location', "%${sSearch}%")
+                ->setParameter('subcontract', "%${sSearch}%")
+                ->setParameter('proposal', "%${sSearch}%")
+
+            ;
         }
 
         if ($company_id != '') {
@@ -296,11 +305,15 @@ class ProjectItemRepository extends EntityRepository
             if (count($esta_query) == 1)
                 $where .= 'WHERE (it.description LIKE :item OR p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
+              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg OR c.name LIKE :empresa OR
+               p.projectIdNumber LIKE :projectId OR p.location LIKE :location OR p.subcontract LIKE :subcontract OR
+               p.proposalNumber LIKE :proposal) ';
             else
                 $where .= 'AND (it.description LIKE :item OR p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
+              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg OR c.name LIKE :empresa OR 
+              p.projectIdNumber LIKE :projectId OR p.location LIKE :location OR p.subcontract LIKE :subcontract OR
+              p.proposalNumber LIKE :proposal) ';
         }
 
         if ($company_id != '') {
@@ -361,6 +374,29 @@ class ProjectItemRepository extends EntityRepository
         $query = $em->createQuery($consulta);
         //Adicionar parametros
         //$sSearch
+
+        // proposal
+        $esta_query_proposal = substr_count($consulta, ':proposal');
+        if ($esta_query_proposal == 1)
+            $query->setParameter(':proposal', "%${sSearch}%");
+
+        //subcontract
+        $esta_query_subcontract = substr_count($consulta, ':subcontract');
+        if ($esta_query_subcontract == 1)
+            $query->setParameter(':subcontract', "%${sSearch}%");
+
+        $esta_query_location = substr_count($consulta, ':location');
+        if ($esta_query_location == 1)
+            $query->setParameter(':location', "%${sSearch}%");
+
+        $esta_query_projectIdNumber = substr_count($consulta, ':projectId');
+        if ($esta_query_projectIdNumber == 1)
+            $query->setParameter(':projectId', "%${sSearch}%");
+
+        $esta_query_empresa = substr_count($consulta, ':empresa');
+        if ($esta_query_empresa == 1)
+            $query->setParameter(':empresa', "%${sSearch}%");
+
         $esta_query_item = substr_count($consulta, ':item');
         if ($esta_query_item == 1)
             $query->setParameter(':item', "%${sSearch}%");

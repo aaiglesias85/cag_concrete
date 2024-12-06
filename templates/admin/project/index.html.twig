@@ -4,11 +4,6 @@
 
 {% block stylesheetspecific %}
 
-    <!-- DevExtreme theme -->
-    <!--
-    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.5/css/dx.light.css">
-    -->
-
 {% endblock %}
 
 {% block content %}
@@ -941,7 +936,15 @@
                                 Notes
                                 <span class="ic-small italic">(required)</span>
                             </label>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="notes" class="summernote"></div>
+                                </div>
+                            </div>
+                            {#
                             <textarea class="form-control" name="notes" id="notes" rows="6"></textarea>
+                            #}
                         </div>
 
                     </form>

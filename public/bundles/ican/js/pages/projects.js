@@ -193,7 +193,7 @@ var Projects = function () {
     }
 
     //Reset forms
-    var resetForms = function () {
+    var resetForms = function (reset_wizard = true) {
         $('#project-form input').each(function (e) {
             $element = $(this);
             $element.val('');
@@ -231,7 +231,10 @@ var Projects = function () {
         actualizarTableListaContacts();
 
         //Mostrar el primer tab
-        resetWizard();
+        if(reset_wizard){
+            resetWizard();
+        }
+
 
         event_change = false;
 
@@ -441,7 +444,13 @@ var Projects = function () {
                     }
 
                     if (!next) {
-                        cerrarForms();
+
+                        resetForms(false);
+
+                        var project_id = response.project_id;
+                        $('#project_id').val(project_id);
+
+                        editRow(project_id, false, false);
                     } else {
                         var project_id = response.project_id;
                         $('#project_id').val(project_id);
@@ -1568,6 +1577,9 @@ var Projects = function () {
             {
                 field: "notes",
                 title: "Notes",
+                template: function (row) {
+                    return `<div>${row.notes}</div>`;
+                }
             },
             {
                 field: "acciones",
@@ -1684,9 +1696,9 @@ var Projects = function () {
                 date: {
                     required: true
                 },
-                notes: {
+                /*notes: {
                     required: true,
-                }
+                }*/
             },
             showErrors: function (errorMap, errorList) {
                 // Clean up any tooltips for valid elements
@@ -1736,11 +1748,12 @@ var Projects = function () {
         $(document).on('click', "#btn-salvar-note", function (e) {
             e.preventDefault();
 
-            if ($('#notes-form').valid()) {
+            var notes = $('#notes').summernote('code');
+
+            if ($('#notes-form').valid() && notes !== '') {
 
                 var notes_id = $('#notes_id').val();
                 var project_id = $('#project_id').val();
-                var notes = $('#notes').val();
                 var date = $('#notes-date').val();
 
                 MyApp.block('#modal-notes .modal-content');
@@ -1761,9 +1774,12 @@ var Projects = function () {
 
                             toastr.success(response.message, "Success");
 
+                            if (notes_id !== '') {
+                                $('#modal-notes').modal('hide');
+                            }
+
                             // reset
                             resetFormNote();
-                            $('#modal-notes').modal('hide');
 
                             //actualizar lista
                             btnClickFiltrarNotes();
@@ -1780,6 +1796,19 @@ var Projects = function () {
                 });
 
 
+            }else{
+                if (notes == "") {
+                    var $element = $('.note-editor');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "Este campo es obligatorio")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'top'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
             }
         });
 
@@ -1846,7 +1875,7 @@ var Projects = function () {
             var fechaInicial = $('#filtro-fecha-inicial-notes').val();
             var fechaFin = $('#filtro-fecha-fin-notes').val();
 
-            if(fechaInicial === '' && fechaFin === ''){
+            if (fechaInicial === '' && fechaFin === '') {
                 toastr.error("Select the dates to delete", "");
                 return;
             }
@@ -1926,7 +1955,7 @@ var Projects = function () {
                     //Datos project
 
                     $('#notes-date').val(response.notes.date);
-                    $('#notes').val(response.notes.notes);
+                    $('#notes').summernote('code', response.notes.notes);
 
                 } else {
                     toastr.error(response.error, "");
@@ -1955,6 +1984,8 @@ var Projects = function () {
             $element.data("title", "").removeClass("has-error").tooltip("dispose");
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
+
+        $('#notes').summernote('code', '');
 
         var fecha_actual = new Date();
         $('#notes-date').val(fecha_actual.format('m/d/Y'));
@@ -2121,7 +2152,7 @@ var Projects = function () {
 
     };
     var actualizarTableListaContacts = function () {
-        if(oTableListaContacts){
+        if (oTableListaContacts) {
             oTableListaContacts.destroy();
         }
 
@@ -2219,12 +2250,15 @@ var Projects = function () {
                     }
                 }
 
+                if (nEditingRowContact != null) {
+                    $('#modal-contact').modal('hide');
+                }
+
                 //actualizar lista
                 actualizarTableListaContacts();
 
                 // reset
                 resetFormContact();
-                $('#modal-contact').modal('hide');
 
             }
 
@@ -2259,12 +2293,12 @@ var Projects = function () {
 
             if (contacts[posicion]) {
 
-                if(contacts[posicion].contact_id != ''){
+                if (contacts[posicion].contact_id !== '') {
                     MyApp.block('#lista-contacts-table-editable');
 
                     $.ajax({
                         type: "POST",
-                        url: "company/eliminarContact",
+                        url: "project/eliminarContact",
                         dataType: "json",
                         data: {
                             'contact_id': contacts[posicion].contact_id
@@ -2287,7 +2321,7 @@ var Projects = function () {
                             toastr.error(response.error, "Error !!!");
                         }
                     });
-                }else{
+                } else {
                     deleteContact(posicion);
                 }
             }
