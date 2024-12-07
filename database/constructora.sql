@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: localhost
--- Tiempo de generación: 23-11-2024 a las 16:50:47
+-- Servidor: db
+-- Tiempo de generación: 06-12-2024 a las 20:29:31
 -- Versión del servidor: 5.7.44
--- Versión de PHP: 8.1.29
+-- Versión de PHP: 8.2.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -101,7 +101,7 @@ CREATE TABLE `data_tracking` (
 
 INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `conc_vendor`, `crew_lead`, `notes`, `other_materials`, `total_conc_used`, `conc_price`, `total_stamps`, `total_people`, `overhead_price`, `created_at`, `updated_at`, `project_id`, `inspector_id`) VALUES
 (3, '2024-08-31', '45453', 'Marcel', NULL, '', '', '', NULL, NULL, 0.00, 0.00, 0.00, '2024-06-23 21:07:27', '2024-11-22 19:14:41', 2, NULL),
-(4, '2024-06-11', '435435', 'Marcel', 'CMP', '', '', '', 20.00, 100.00, 0.00, 40.00, 3500.00, '2024-06-23 21:16:44', '2024-08-10 19:15:28', 3, NULL);
+(4, '2024-06-11', '435435', 'Marcel', NULL, '', '', '', NULL, NULL, 0.00, 1.00, 100.00, '2024-06-23 21:16:44', '2024-12-05 22:58:01', 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -117,6 +117,13 @@ CREATE TABLE `data_tracking_conc_vendor` (
   `data_tracking_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `data_tracking_conc_vendor`
+--
+
+INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`, `conc_price`, `data_tracking_id`) VALUES
+(1, 'Disrupsoft', 5.00, 10.00, 4);
+
 -- --------------------------------------------------------
 
 --
@@ -127,6 +134,7 @@ CREATE TABLE `data_tracking_item` (
   `id` int(11) NOT NULL,
   `quantity` decimal(18,6) DEFAULT NULL,
   `price` decimal(18,2) DEFAULT NULL,
+  `notes` text,
   `data_tracking_id` int(11) DEFAULT NULL,
   `project_item_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -135,11 +143,11 @@ CREATE TABLE `data_tracking_item` (
 -- Volcado de datos para la tabla `data_tracking_item`
 --
 
-INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `data_tracking_id`, `project_item_id`) VALUES
-(8, 40.000000, 160.00, 3, 11),
-(9, 50.000000, 200.00, 3, 12),
-(11, 50.000000, 16.50, 4, 1),
-(12, 30.000000, 63.00, 4, 2);
+INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_tracking_id`, `project_item_id`) VALUES
+(8, 40.000000, 160.00, NULL, 3, 11),
+(9, 50.000000, 200.00, NULL, 3, 12),
+(11, 50.000000, 16.50, NULL, 4, 1),
+(12, 30.000000, 63.00, NULL, 4, 2);
 
 -- --------------------------------------------------------
 
@@ -160,7 +168,7 @@ CREATE TABLE `data_tracking_labor` (
 --
 
 INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `data_tracking_id`, `employee_id`) VALUES
-(1, 20.00, 56.00, 4, 1),
+(1, 1.00, 56.00, 4, 1),
 (3, 5.00, 70.00, 3, 2),
 (4, 10.00, 56.00, 3, 1);
 
@@ -183,7 +191,7 @@ CREATE TABLE `data_tracking_material` (
 --
 
 INSERT INTO `data_tracking_material` (`id`, `quantity`, `price`, `data_tracking_id`, `material_id`) VALUES
-(1, 30.00, 5000.00, 4, 1),
+(1, 1.00, 100.00, 4, 1),
 (3, 5.00, 5000.00, 3, 1),
 (4, 10.00, 500.00, 3, 2);
 
@@ -642,7 +650,31 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (239, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-11-02 16:15:48', 1),
 (240, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-11-08 02:01:19', 1),
 (241, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2024-11-22 19:14:41', 1),
-(242, 'Delete', 'Data Tracking', 'The conc vendor of the data tracking is deleted, Conc Vendor: Disrupsoft, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2024-11-22 19:14:58', 1);
+(242, 'Delete', 'Data Tracking', 'The conc vendor of the data tracking is deleted, Conc Vendor: Disrupsoft, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2024-11-22 19:14:58', 1),
+(243, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:04:03', 1),
+(244, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:04:09', 1),
+(245, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:04:12', 1),
+(246, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:04:16', 1),
+(247, 'Add', 'Project Notes', 'The notes: cvcxvcx is add to the project: Houston Texas', '::1', '2024-12-05 22:04:26', 1),
+(248, 'Delete', 'Project Notes', 'The notes: cvcxvcx is delete from project: Houston Texas', '::1', '2024-12-05 22:04:30', 1),
+(249, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:08:58', 1),
+(250, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:10:21', 1),
+(251, 'Delete', 'Contact', 'The project contact is deleted: Administrador Sistema', '::1', '2024-12-05 22:16:35', 1),
+(252, 'Delete', 'Contact', 'The project contact is deleted: Geydis', '::1', '2024-12-05 22:16:37', 1),
+(253, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:16:41', 1),
+(254, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2024-12-05 22:16:43', 1),
+(255, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:35:03', 1),
+(256, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:45:42', 1),
+(257, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:46:03', 1),
+(258, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:47:49', 1),
+(259, 'Update', 'Material', 'The material is modified: Material 1', '::1', '2024-12-05 22:47:58', 1),
+(260, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:48:27', 1),
+(261, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:49:03', 1),
+(262, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2024-12-05 22:58:01', 1),
+(263, 'Update', 'Project Notes', 'The notes: Change start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023 is modified to the project: Houston Texas', '::1', '2024-12-06 18:05:46', 1),
+(264, 'Update', 'Project Notes', 'The notes: Change start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\n\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023\nChange start date, old value: 08/01/2023 is modified to the project: Houston Texas', '::1', '2024-12-06 18:18:53', 1),
+(265, 'Update', 'Project Notes', 'The notes: <p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p> is modified to the project: Houston Texas', '::1', '2024-12-06 18:28:17', 1),
+(266, 'Update', 'Project Notes', 'The notes: <p><br></p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p> is modified to the project: Houston Texas', '::1', '2024-12-06 18:29:57', 1);
 
 -- --------------------------------------------------------
 
@@ -662,7 +694,7 @@ CREATE TABLE `material` (
 --
 
 INSERT INTO `material` (`material_id`, `name`, `price`, `unit_id`) VALUES
-(1, 'Material 1', 5000.00, 3),
+(1, 'Material 1', 100.00, 3),
 (2, 'Material 2', 500.00, 5),
 (3, 'Material 3', 500.00, 4);
 
@@ -728,7 +760,7 @@ CREATE TABLE `project` (
 INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`) VALUES
 (1, NULL, '0009001', NULL, 'FL COUNTY', 'FL COUNTY', '', '', NULL, 0, '', 0, '', 0, NULL, NULL, '2024-05-31', 'Andres', 0, 'B3C210052148-0', 'ERS025', '2024-04-14 20:24:53', '2024-05-14 15:52:54', 1, 1),
 (2, NULL, '0009002', NULL, 'FL MIAMI', 'FL MIAMI', '', '', NULL, 0, '', 0, '', 0, NULL, NULL, '2024-05-28', 'Dan', 1, '896532', '896532', '2024-04-24 04:20:22', '2024-06-23 21:06:22', 1, 1),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2024-05-30', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2024-11-08 02:01:19', 3, 1);
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2024-05-30', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2024-12-05 22:16:43', 3, 1);
 
 -- --------------------------------------------------------
 
@@ -751,7 +783,7 @@ CREATE TABLE `project_contact` (
 --
 
 INSERT INTO `project_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `notes`, `project_id`) VALUES
-(1, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(955)383-3543', 'Master', 'dfsd fdsf ', 3);
+(1, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(955)383-3543', '', '', 3);
 
 -- --------------------------------------------------------
 
@@ -810,7 +842,7 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (6, 'Change end date, old value: 11/30/2024', '2024-11-02', 3),
 (7, 'Change start date, old value: 11/03/2024', '2024-11-02', 3),
 (8, 'Change start date, old value: 08/08/2023', '2024-11-02', 3),
-(9, 'Change start date, old value: 08/01/2023', '2024-11-08', 3);
+(9, '<p><br></p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p>', '2024-11-08', 3);
 
 -- --------------------------------------------------------
 
@@ -1240,7 +1272,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=243;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=267;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -1264,7 +1296,7 @@ ALTER TABLE `project`
 -- AUTO_INCREMENT de la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
-  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `project_item`
@@ -1276,7 +1308,7 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`

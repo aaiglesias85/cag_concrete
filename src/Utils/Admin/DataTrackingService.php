@@ -400,6 +400,7 @@ class DataTrackingService extends Base
                 "quantity" => $quantity,
                 "price" => $price,
                 "total" => $total,
+                "notes" => $value->getNotes(),
                 "yield_calculation" => $value->getProjectItem()->getYieldCalculation(),
                 "yield_calculation_name" => $yield_calculation_name,
                 "equation_id" => $value->getProjectItem()->getEquation() != null ? $value->getProjectItem()->getEquation()->getEquationId() : '',
@@ -834,6 +835,7 @@ class DataTrackingService extends Base
 
             $data_tracking_item_entity->setPrice($value->price);
             $data_tracking_item_entity->setQuantity($value->quantity);
+            $data_tracking_item_entity->setNotes($value->notes);
 
             if ($value->item_id != '') {
                 $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)

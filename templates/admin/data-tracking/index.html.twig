@@ -243,8 +243,9 @@
         </div>
     </div>
 
+    <!-- data tracking -->
     <div class="modal fade" id="modal-data-tracking" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
 
@@ -733,8 +734,6 @@
         </div>
     </div>
 
-
-
     <!-- items -->
     <div class="modal fade" id="modal-data-tracking-item" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
@@ -777,15 +776,25 @@
                         </div>
                         <div class="form-group m-form__group">
                             <label>
-                                Quatity
+                                Quantity
                                 <span class="ic-small italic">(required)</span>
                             </label>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <input type="text" class="form-control form-control-number"
                                            id="data-tracking-quantity" name="quantity">
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Notes
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+
+                            <textarea class="form-control" id="notes-item-data-tracking" name="notes" rows="6"></textarea>
+
                         </div>
 
                     </form>

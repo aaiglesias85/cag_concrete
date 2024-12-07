@@ -67,7 +67,7 @@ var DataTracking = function () {
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
+                    return `<span>$${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
                 }
             },
             {
@@ -76,7 +76,7 @@ var DataTracking = function () {
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
+                    return `<span>$${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
                 }
             },
             {
@@ -85,7 +85,7 @@ var DataTracking = function () {
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
+                    return `<span>$${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
                 }
             },
             {
@@ -94,7 +94,7 @@ var DataTracking = function () {
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
+                    return `<span>$${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
                 }
             },
 
@@ -1256,6 +1256,7 @@ var DataTracking = function () {
                 });
 
                 var quantity = $('#data-tracking-quantity').val();
+                var notes = $('#notes-item-data-tracking').val();
 
                 var price = item.price;
                 var total = quantity * price;
@@ -1277,6 +1278,7 @@ var DataTracking = function () {
                         quantity: quantity,
                         price: price,
                         total: total,
+                        notes: notes,
                         posicion: items.length
                     });
 
@@ -1292,6 +1294,7 @@ var DataTracking = function () {
                         items_data_tracking[posicion].quantity = quantity;
                         items_data_tracking[posicion].price = price;
                         items_data_tracking[posicion].total = total;
+                        items_data_tracking[posicion].notes = notes;
                     }
                 }
 
@@ -1336,6 +1339,8 @@ var DataTracking = function () {
                 $('#item-data-tracking').trigger('change');
 
                 $('#data-tracking-quantity').val(items_data_tracking[posicion].quantity);
+
+                $('#notes-item-data-tracking').val(items_data_tracking[posicion].notes);
 
                 // open modal
                 $('#modal-data-tracking-item').modal('show');
@@ -1416,6 +1421,13 @@ var DataTracking = function () {
     };
     var resetFormItem = function () {
         $('#data-tracking-item-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+        $('#data-tracking-item-form textarea').each(function (e) {
             $element = $(this);
             $element.val('');
 

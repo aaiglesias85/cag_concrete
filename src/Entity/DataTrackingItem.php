@@ -36,6 +36,13 @@ class DataTrackingItem
     private $price;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="notes", type="text", nullable=false)
+     */
+    private $notes;
+
+    /**
      * @var ProjectItem
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\ProjectItem")
@@ -110,5 +117,15 @@ class DataTrackingItem
     public function setDataTracking($dataTracking)
     {
         $this->dataTracking = $dataTracking;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 }
