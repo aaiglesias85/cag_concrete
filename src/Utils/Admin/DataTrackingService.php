@@ -614,7 +614,10 @@ class DataTrackingService extends Base
         $total_stamps = $total_stamps == '' ? 0 : $total_stamps;
         $entity->setTotalStamps($total_stamps);
 
+        $total_people = $total_people == '' ? 0 : $total_people;
         $entity->setTotalPeople($total_people);
+
+        $overhead_price = $overhead_price == '' ? 0 : $overhead_price;
         $entity->setOverheadPrice($overhead_price);
 
         if ($is_new) {
