@@ -610,7 +610,10 @@ class DataTrackingService extends Base
         $entity->setNotes($notes);
         $entity->setOtherMaterials($other_materials);
         $entity->setTotalConcUsed($total_conc_used);
+
+        $total_stamps = $total_stamps == '' ? 0 : $total_stamps;
         $entity->setTotalStamps($total_stamps);
+
         $entity->setTotalPeople($total_people);
         $entity->setOverheadPrice($overhead_price);
 

@@ -279,7 +279,6 @@ var DataTracking = function () {
         //Mostrar el primer tab
         resetWizard();
 
-        $('#btn-eliminar-data-tracking').removeClass('m--hide').addClass('m--hide');
         $('#form-group-totals').removeClass('m--hide').addClass('m--hide');
 
         // add datos de proyecto

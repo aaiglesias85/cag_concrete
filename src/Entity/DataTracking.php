@@ -302,7 +302,7 @@ class DataTracking
         return $this->totalPeople;
     }
 
-    public function setTotalPeople(float $totalPeople): void
+    public function setTotalPeople($totalPeople): void
     {
         $this->totalPeople = $totalPeople;
     }
