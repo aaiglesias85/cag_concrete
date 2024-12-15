@@ -1453,7 +1453,17 @@ var DataTracking = function () {
 
         $(document).off('click', "#btn-reset-filtros-projects");
         $(document).on('click', "#btn-reset-filtros-projects", function (e) {
-            resetFormFilter();
+            resetFormFilter();         
+        });
+
+        $(document).off('click', "#btn-reset-filters");
+        $(document).on('click', "#btn-reset-filters", function (e) {
+            
+            $('#fechaInicial').val('');  
+            $('#fechaFin').val('');
+            $('#btn-filtrar-search').val(''); 
+            btnClickFiltrar();                                
+            
         });
 
         function btnClickFiltrarProjects() {
@@ -1502,18 +1512,18 @@ var DataTracking = function () {
                             // close modal
                             $('#modal-filter-project').modal('hide');
                         } else {
-                            toastr.error('No projects found', "Error !!!");
+                            toastr.error('No projects found', "Error");
                         }
 
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "Error");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#modal-filter-project .modal-content');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "Error");
                 }
             });
 
