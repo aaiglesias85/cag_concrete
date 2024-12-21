@@ -50,6 +50,13 @@ class Invoice
     private $notes;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="paid", type="boolean", nullable=false)
+     */
+    private $paid;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
@@ -160,6 +167,16 @@ class Invoice
     public function setNotes($notes)
     {
         $this->notes = $notes;
+    }
+
+    public function getPaid()
+    {
+        return $this->paid;
+    }
+
+    public function setPaid($paid): void
+    {
+        $this->paid = $paid;
     }
 
 }

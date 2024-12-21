@@ -53,6 +53,7 @@ class InvoiceController extends AbstractController
         $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
         $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
         $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
+        $paid = isset($query['paid']) && is_string($query['paid']) ? $query['paid'] : '';
 
         //Sort
         $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
@@ -66,7 +67,7 @@ class InvoiceController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->invoiceService->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin);
+            $total = $this->invoiceService->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -86,7 +87,7 @@ class InvoiceController extends AbstractController
                 'sort' => $sSortDir_0
             );
 
-            $data = $this->invoiceService->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
+            $data = $this->invoiceService->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -115,6 +116,7 @@ class InvoiceController extends AbstractController
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
         $notes = $request->get('notes');
+        $paid = $request->get('paid');
 
         // items
         $items = $request->get('items');
@@ -125,9 +127,9 @@ class InvoiceController extends AbstractController
         try {
 
             if ($invoice_id == "") {
-                $resultado = $this->invoiceService->SalvarInvoice($project_id, $start_date, $end_date, $notes, $items, $exportar);
+                $resultado = $this->invoiceService->SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
             } else {
-                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $items, $exportar);
+                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
             }
 
             if ($resultado['success']) {
@@ -292,5 +294,33 @@ class InvoiceController extends AbstractController
 
             return $this->json($resultadoJson);
         }
+    }
+
+    /**
+     * paid Acción para pagar un invoice
+     *
+     */
+    public function paid(Request $request)
+    {
+        $invoice_id = $request->get('invoice_id');
+
+        try {
+            $resultado = $this->invoiceService->PaidInvoice($invoice_id);
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                return $this->json($resultadoJson);
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+                return $this->json($resultadoJson);
+            }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
     }
 }

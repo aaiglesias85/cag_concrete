@@ -43,6 +43,27 @@ class InvoiceItem
     private $price;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="paid_qty", type="float", nullable=false)
+     */
+    private $paidQty;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="paid_amount", type="float", nullable=false)
+     */
+    private $paidAmount;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="paid_amount_total", type="float", nullable=false)
+     */
+    private $paidAmountTotal;
+
+    /**
      * @var Invoice
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Invoice")
@@ -136,6 +157,36 @@ class InvoiceItem
     public function setQuantityFromPrevious($quantityFromPrevious)
     {
         $this->quantityFromPrevious = $quantityFromPrevious;
+    }
+
+    public function getPaidQty()
+    {
+        return $this->paidQty;
+    }
+
+    public function setPaidQty($paidQty)
+    {
+        $this->paidQty = $paidQty;
+    }
+
+    public function getPaidAmount()
+    {
+        return $this->paidAmount;
+    }
+
+    public function setPaidAmount($paidAmount)
+    {
+        $this->paidAmount = $paidAmount;
+    }
+
+    public function getPaidAmountTotal()
+    {
+        return $this->paidAmountTotal;
+    }
+
+    public function setPaidAmountTotal($paidAmountTotal)
+    {
+        $this->paidAmountTotal = $paidAmountTotal;
     }
 
 }

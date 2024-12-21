@@ -557,13 +557,13 @@ class DataTrackingService extends Base
         $em = $this->getDoctrine()->getManager();
 
         // validar que no exista el datatracking
-        $existe_data_tracking = $this->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
+        /*$existe_data_tracking = $this->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
         if ($existe_data_tracking) {
             $resultado['success'] = false;
             $resultado['error'] = "A record already exists for the selected project and date";
 
             return $resultado;
-        }
+        }*/
 
 
         // validar project

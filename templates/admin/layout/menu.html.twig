@@ -18,8 +18,8 @@
 
             <!-- menu inicio -->
             {% if menu.menuInicio %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
-                    <a href="{{ url('home') }}" class="m-menu__link menu-tooltip" data-title="Dashboard">
+                <li class="m-menu__item  m-menu__item--submenu mb-3" aria-haspopup="true">
+                    <a href="{{ url('home') }}" class="m-menu__link menu-tooltip" data-title="Home">
                         <i class="m-menu__link-icon flaticon-line-graph"></i>
                         <span class="m-menu__link-text">Home</span>
                         <i class="m-menu__ver-arrow la la-angle-right"></i>
@@ -27,9 +27,87 @@
                 </li>
             {% endif %}
 
+            <!-- menu projects -->
+            {% if menu.menuCompany or menu.menuProject %}
+                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
+                    m-menu-submenu-toggle="click">
+                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
+                        <i class="m-menu__link-icon flaticon-suitcase"></i>
+                        <span class="m-menu__link-text">Projects</span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+                    <div class="m-menu__submenu m-menu__submenu--up">
+                        <span class="m-menu__arrow"></span>
+                        <ul class="m-menu__subnav">
+                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
+                                <span class="m-menu__link"><span class="m-menu__link-text">Projects</span></span>
+                            </li>
+
+                            {% if menu.menuCompany %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('company') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Companies</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% if menu.menuProject %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('project') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Projects</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </li>
+            {% endif %}
+
+            <!-- menu invoice -->
+            {% if menu.menuDataTracking or menu.menuInvoice %}
+                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
+                    m-menu-submenu-toggle="click">
+                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Accounting">
+                        <i class="m-menu__link-icon flaticon-piggy-bank"></i>
+                        <span class="m-menu__link-text">Accounting</span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+                    <div class="m-menu__submenu m-menu__submenu--up">
+                        <span class="m-menu__arrow"></span>
+                        <ul class="m-menu__subnav">
+                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
+                                <span class="m-menu__link"><span class="m-menu__link-text">Accounting</span></span>
+                            </li>
+
+                            {% if menu.menuDataTracking %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('data_tracking') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Data Tracking</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% if menu.menuInvoice %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('invoice') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Invoices</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </li>
+            {% endif %}
+
             <!-- menu content -->
             {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuEmployee or menu.menuMaterial %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
+                <li class="m-menu__item  m-menu__item--submenu m-menu__item--bottom-3" aria-haspopup="true"
                     m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Libraries">
                         <i class="m-menu__link-icon flaticon-list"></i>
@@ -93,84 +171,6 @@
                                     <a href="{{ url('material') }}" class="m-menu__link ">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                         <span class="m-menu__link-text">Materials</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
-
-            <!-- menu projects -->
-            {% if menu.menuCompany or menu.menuProject %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
-                    m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
-                        <i class="m-menu__link-icon flaticon-suitcase"></i>
-                        <span class="m-menu__link-text">Projects</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Projects</span></span>
-                            </li>
-
-                            {% if menu.menuCompany %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('company') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Companies</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuProject %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('project') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Projects</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
-
-            <!-- menu invoice -->
-            {% if menu.menuDataTracking or menu.menuInvoice %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
-                    m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Invoices">
-                        <i class="m-menu__link-icon flaticon-layers"></i>
-                        <span class="m-menu__link-text">Invoices</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Invoices</span></span>
-                            </li>
-
-                            {% if menu.menuDataTracking %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('data_tracking') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Data Tracking</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuInvoice %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('invoice') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Invoices</span>
                                     </a>
                                 </li>
                             {% endif %}

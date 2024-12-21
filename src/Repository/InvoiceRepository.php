@@ -35,7 +35,7 @@ class InvoiceRepository extends EntityRepository
      * @return Invoice[]
      */
     public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                                   $company_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '')
+                                   $company_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $paid = '')
     {
         $consulta = $this->createQueryBuilder('i')
             ->leftJoin('i.project', 'p')
@@ -74,6 +74,11 @@ class InvoiceRepository extends EntityRepository
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
+        if ($paid !== '') {
+            $consulta->andWhere('i.paid = :paid')
+                ->setParameter('paid', $paid);
+        }
+
         switch ($iSortCol_0) {
             case "project":
                 $consulta->orderBy("p.name", $sSortDir_0);
@@ -103,7 +108,7 @@ class InvoiceRepository extends EntityRepository
      *
      * @author Marcel
      */
-    public function TotalInvoices($sSearch = '', $company_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function TotalInvoices($sSearch = '', $company_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $paid = '')
     {
         $em = $this->getEntityManager();
         $consulta = 'SELECT COUNT(i.invoiceId) FROM App\Entity\Invoice i ';
@@ -160,6 +165,15 @@ class InvoiceRepository extends EntityRepository
             }
         }
 
+        if ($paid !== '') {
+
+            $esta_query = explode("WHERE", $where);
+            if (count($esta_query) == 1)
+                $where .= 'WHERE (i.paid = :paid) ';
+            else
+                $where .= 'AND (i.paid = :paid) ';
+        }
+
         $consulta .= $join;
         $consulta .= $where;
         $query = $em->createQuery($consulta);
@@ -191,6 +205,11 @@ class InvoiceRepository extends EntityRepository
         $esta_query_fin = substr_count($consulta, ':fin');
         if ($esta_query_fin == 1) {
             $query->setParameter('fin', $fecha_fin);
+        }
+
+        $esta_query_paid = substr_count($consulta, ':paid');
+        if ($esta_query_paid == 1) {
+            $query->setParameter('paid', $paid);
         }
 
         $total = $query->getSingleScalarResult();

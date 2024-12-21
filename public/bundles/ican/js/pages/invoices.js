@@ -56,13 +56,27 @@ var Invoices = function () {
                 width: 150
             },
             {
+                field: "paid",
+                title: "Paid",
+                responsive: {visible: 'lg'},
+                width: 80,
+                // callback function support for column rendering
+                template: function (row) {
+                    var status = {
+                        1: {'title': 'Yes', 'class': ' m-badge--success'},
+                        0: {'title': 'No', 'class': ' m-badge--danger'}
+                    };
+                    return '<span class="m-badge ' + status[row.paid].class + ' m-badge--wide">' + status[row.paid].title + '</span>';
+                }
+            },
+            {
                 field: "createdAt",
                 title: "Created At",
                 width: 100,
             },
             {
                 field: "acciones",
-                width: 120,
+                width: 150,
                 title: "Actions",
                 sortable: false,
                 overflow: 'visible',
@@ -171,6 +185,9 @@ var Invoices = function () {
         var fechaFin = $('#fechaFin').val();
         query.fechaFin = fechaFin;
 
+        var paid = $('#filtro-paid').val();
+        query.paid = paid;
+
         oTable.setDataSourceQuery(query);
         oTable.load();
     }
@@ -205,6 +222,8 @@ var Invoices = function () {
 
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
+
+        $('#paidinactivo').prop('checked', true);
 
         // items
         items = [];
@@ -303,6 +322,7 @@ var Invoices = function () {
                 var start_date = $('#start_date').val();
                 var end_date = $('#end_date').val();
                 var notes = $('#notes').val();
+                var paid = ($('#paidactivo').prop('checked')) ? 1 : 0;
 
                 MyApp.block('#form-invoice');
 
@@ -316,6 +336,7 @@ var Invoices = function () {
                         'start_date': start_date,
                         'end_date': end_date,
                         'notes': notes,
+                        'paid': paid,
                         'items': JSON.stringify(items),
                         'exportar': exportar ? 1 : 0
                     },
@@ -453,6 +474,11 @@ var Invoices = function () {
                         $('#start_date').val(response.invoice.start_date);
                         $('#end_date').val(response.invoice.end_date);
                         $('#notes').val(response.invoice.notes);
+
+                        if (response.invoice.paid) {
+                            $('#paidactivo').prop('checked', true);
+                            $('#paidinactivo').prop('checked', false);
+                        }
 
 
                         $('#company').on('change', changeCompany);
@@ -1036,6 +1062,30 @@ var Invoices = function () {
                 }
             },
             {
+                field: "paid_qty",
+                title: " Paid Qty",
+                width: 100,
+                textAlign: 'center',
+            },
+            {
+                field: "paid_amount",
+                title: "Paid Amount",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.paid_amount, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "paid_amount_total",
+                title: "Paid Amount Total",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.paid_amount_total, 2, '.', ',')}</span>`;
+                }
+            },
+            {
                 field: "posicion",
                 width: 120,
                 title: "Actions",
@@ -1186,16 +1236,26 @@ var Invoices = function () {
                 var price = $('#item-price').val();
                 var total = $('#item-total').val();
 
+                // payment
+                var paid_qty = $('#item-paid-qty').val();
+                var paid_amount = $('#item-paid-amount').val();
+                var paid_amount_total = $('#item-paid-amount-total').val();
+
                 var posicion = nEditingRowItem;
                 if (items[posicion]) {
                     items[posicion].quantity = quantity;
                     items[posicion].price = price;
                     items[posicion].amount = total;
 
+                    // payment
+                    items[posicion].paid_qty = paid_qty;
+                    items[posicion].paid_amount = paid_amount;
+                    items[posicion].paid_amount_total = paid_amount_total;
+
                     items[posicion].quantity_completed = quantity + items[posicion].quantity_from_previous;
 
                     var total_amount = items[posicion].quantity_completed  * price;
-                    tems[posicion].total_amount = total_amount;
+                    items[posicion].total_amount = total_amount;
                 }
 
                 //actualizar lista
@@ -1229,6 +1289,11 @@ var Invoices = function () {
 
                 $('#item-quantity').on('change', calcularTotalItem);
                 $('#item-price').on('change', calcularTotalItem);
+
+
+                $('#item-paid-qty').val(items[posicion].paid_qty);
+                $('#item-paid-amount').val(items[posicion].paid_amount);
+                $('#item-paid-amount-total').val(items[posicion].paid_amount_total);
 
                 // open modal
                 $('#modal-item').modal('show');
@@ -1311,6 +1376,47 @@ var Invoices = function () {
         nEditingRowItem = null;
     };
 
+    //Paid
+    var initAccionPaid = function () {
+        //Activar usuario
+        $(document).off('click', "#invoice-table-editable a.block");
+        $(document).on('click', "#invoice-table-editable a.block", function (e) {
+            e.preventDefault();
+            /* Get the row as a parent of the link that was clicked on */
+            var invoice_id = $(this).data('id');
+            cambiarEstadoInvoice(invoice_id);
+        });
+
+        function cambiarEstadoInvoice(invoice_id) {
+
+            MyApp.block('#invoice-table-editable');
+
+            $.ajax({
+                type: "POST",
+                url: "invoice/paid",
+                dataType: "json",
+                data: {
+                    'invoice_id': invoice_id
+                },
+                success: function (response) {
+                    mApp.unblock('#invoice-table-editable');
+
+                    if (response.success) {
+                        toastr.success("The operation was successful", "Success !!!");
+                        oTable.load();
+
+                    } else {
+                        toastr.error(response.error, "Error !!!");
+                    }
+                },
+                failure: function (response) {
+                    mApp.unblock('#invoice-table-editable');
+                    toastr.error(response.error, "Error !!!");
+                }
+            });
+        }
+    };
+
 
     return {
         //main function to initiate the module
@@ -1328,7 +1434,7 @@ var Invoices = function () {
             initAccionEliminar();
             initAccionExportar();
             initAccionFiltrar();
-
+            initAccionPaid();
 
             // items
             initTableItems();

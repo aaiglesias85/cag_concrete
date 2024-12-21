@@ -21,6 +21,33 @@ class InvoiceService extends Base
 {
 
     /**
+     * PaidInvoice: Paga un invoice
+     * @param int $invoice_id Id
+     * @author Marcel
+     */
+    public function PaidInvoice($invoice_id)
+    {
+        $resultado = array();
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+            ->find($invoice_id);
+        /** @var Invoice $invoice */
+        if (!is_null($invoice)) {
+
+            $invoice->setPaid(!$invoice->getPaid());
+
+            $em->flush();
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+        return $resultado;
+    }
+
+    /**
      * ExportarExcel: Exporta a excel el invoice
      *
      *
@@ -250,6 +277,7 @@ class InvoiceService extends Base
             $arreglo_resultado['start_date'] = $entity->getStartDate()->format('m/d/Y');
             $arreglo_resultado['end_date'] = $entity->getEndDate()->format('m/d/Y');
             $arreglo_resultado['notes'] = $entity->getNotes();
+            $arreglo_resultado['paid'] = $entity->getPaid();
 
             // projects
             $projects = $this->ListarProjectsDeCompany($company_id);
@@ -293,6 +321,11 @@ class InvoiceService extends Base
 
             $total_amount = $quantity_completed * $price;
 
+            // payment
+            $paid_qty = $value->getPaidQty();
+            $paid_amount = $value->getPaidAmount();
+            $paid_amount_total = $value->getPaidAmountTotal();
+
             $items[] = [
                 "invoice_item_id" => $value->getId(),
                 "project_item_id" => $value->getProjectItem()->getId(),
@@ -307,6 +340,9 @@ class InvoiceService extends Base
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,
                 "total_amount" => $total_amount,
+                "paid_qty" => $paid_qty,
+                "paid_amount" => $paid_amount,
+                "paid_amount_total" => $paid_amount_total,
                 "posicion" => $key
             ];
         }
@@ -440,7 +476,7 @@ class InvoiceService extends Base
      * @param int $invoice_id Id
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $items, $exportar)
+    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -461,6 +497,7 @@ class InvoiceService extends Base
             }
 
             $entity->setNotes($notes);
+            $entity->setPaid($paid);
 
             if ($project_id != '') {
                 $project = $this->getDoctrine()->getRepository(Project::class)
@@ -502,7 +539,7 @@ class InvoiceService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $items, $exportar)
+    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -524,6 +561,7 @@ class InvoiceService extends Base
         }
 
         $entity->setNotes($notes);
+        $entity->setPaid($paid);
 
         if ($project_id != '') {
             $project = $this->getDoctrine()->getRepository(Project::class)
@@ -569,7 +607,8 @@ class InvoiceService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
-        //Senderos
+        //items
+        $paid = true;
         foreach ($items as $value) {
 
             $invoice_item_entity = null;
@@ -594,12 +633,27 @@ class InvoiceService extends Base
                 $invoice_item_entity->setProjectItem($project_item_entity);
             }
 
+            // payment
+            $invoice_item_entity->setPaidQty($value->paid_qty);
+            $invoice_item_entity->setPaidAmount($value->paid_amount);
+            $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
+
+            // si falta alguno no pago el invoice
+            if($value->paid_qty == '' || $value->paid_amount == '' || $value->paid_amount_total == ''){
+                $paid = false;
+            }
+
 
             if ($is_new_item) {
                 $invoice_item_entity->setInvoice($entity);
 
                 $em->persist($invoice_item_entity);
             }
+        }
+
+        // paid invoice
+        if(!$entity->getPaid()){
+            $entity->setPaid($paid);
         }
     }
 
@@ -612,13 +666,13 @@ class InvoiceService extends Base
      *
      * @author Marcel
      */
-    public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin)
+    public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid)
     {
         $arreglo_resultado = array();
         $cont = 0;
 
         $lista = $this->getDoctrine()->getRepository(Invoice::class)
-            ->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
+            ->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
 
         foreach ($lista as $value) {
             $invoice_id = $value->getInvoiceId();
@@ -638,6 +692,7 @@ class InvoiceService extends Base
                 "notes" => $this->truncate($value->getNotes(), 50),
                 "total" => number_format($total, 2, '.', ','),
                 "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
+                "paid" => $value->getPaid() ? 1 : 0,
                 "acciones" => $acciones
             );
 
@@ -652,10 +707,10 @@ class InvoiceService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin)
+    public function TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid)
     {
         $total = $this->getDoctrine()->getRepository(Invoice::class)
-            ->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin);
+            ->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
 
         return $total;
     }
@@ -675,6 +730,7 @@ class InvoiceService extends Base
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
+                $acciones .= '<a href="javascript:;" class="block m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill" title="Paid/Unpaid record" data-id="' . $id . '"> <i class="la la-dollar"></i> </a> ';
             } else {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
             }

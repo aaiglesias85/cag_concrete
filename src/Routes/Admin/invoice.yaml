@@ -29,3 +29,7 @@ eliminarItemInvoiceAdmin:
 exportarExcelInvoiceAdmin:
   path:  /invoice/exportarExcel
   defaults: { _controller: App\Controller\Admin\InvoiceController::exportarExcel, _format: json }
+
+paidInvoiceAdmin:
+  path:  /invoice/paid
+  defaults: { _controller: App\Controller\Admin\InvoiceController::paid, _format: json }
