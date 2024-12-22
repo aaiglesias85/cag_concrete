@@ -572,7 +572,7 @@ class ProjectService extends Base
                 "contract_qty" => $contract_qty,
                 "price" => $price,
                 "contract_amount" => $contract_amount,
-                "quantity_from_previous" => $quantity_from_previous,
+                "quantity_from_previous" => $quantity_from_previous ?? 0,
                 "quantity" => $quantity,
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,

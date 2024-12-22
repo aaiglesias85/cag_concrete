@@ -287,6 +287,10 @@ class InvoiceService extends Base
             $items = $this->ListarItemsDeInvoice($invoice_id);
             $arreglo_resultado['items'] = $items;
 
+            // payments
+            $payments = $this->ListarPaymentsDeInvoice($invoice_id);
+            $arreglo_resultado['payments'] = $payments;
+
             $resultado['success'] = true;
             $resultado['invoice'] = $arreglo_resultado;
         }
@@ -321,12 +325,60 @@ class InvoiceService extends Base
 
             $total_amount = $quantity_completed * $price;
 
+            $items[] = [
+                "invoice_item_id" => $value->getId(),
+                "project_item_id" => $value->getProjectItem()->getId(),
+                "item_id" => $value->getProjectItem()->getItem()->getItemId(),
+                "item" => $value->getProjectItem()->getItem()->getDescription(),
+                "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
+                "contract_qty" => $contract_qty,
+                "price" => $price,
+                "contract_amount" => $contract_amount,
+                "quantity_from_previous" => $quantity_from_previous,
+                "quantity" => $quantity,
+                "quantity_completed" => $quantity_completed,
+                "amount" => $amount,
+                "total_amount" => $total_amount,
+                "posicion" => $key
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * ListarPaymentsDeInvoice
+     * @param $invoice_id
+     * @return array
+     */
+    public function ListarPaymentsDeInvoice($invoice_id)
+    {
+        $payments = [];
+
+        $lista = $this->getDoctrine()->getRepository(InvoiceItem::class)
+            ->ListarItems($invoice_id);
+        foreach ($lista as $key => $value) {
+
+            $contract_qty = $value->getProjectItem()->getQuantity();
+            $price = $value->getPrice();
+            $contract_amount = $contract_qty * $price;
+
+            $quantity_from_previous = $value->getQuantityFromPrevious();
+
+            $quantity = $value->getQuantity();
+
+            $quantity_completed = $quantity + $quantity_from_previous;
+
+            $amount = $quantity * $price;
+
+            $total_amount = $quantity_completed * $price;
+
             // payment
             $paid_qty = $value->getPaidQty();
             $paid_amount = $value->getPaidAmount();
             $paid_amount_total = $value->getPaidAmountTotal();
 
-            $items[] = [
+            $payments[] = [
                 "invoice_item_id" => $value->getId(),
                 "project_item_id" => $value->getProjectItem()->getId(),
                 "item_id" => $value->getProjectItem()->getItem()->getItemId(),
@@ -347,7 +399,7 @@ class InvoiceService extends Base
             ];
         }
 
-        return $items;
+        return $payments;
     }
 
     /**
@@ -476,7 +528,7 @@ class InvoiceService extends Base
      * @param int $invoice_id Id
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
+    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -510,6 +562,9 @@ class InvoiceService extends Base
             // items
             $this->SalvarItems($entity, $items);
 
+            // payments
+            $this->SalvarPayments($entity, $payments);
+
             $em->flush();
 
             //Salvar log
@@ -539,7 +594,7 @@ class InvoiceService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
+    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -576,6 +631,9 @@ class InvoiceService extends Base
         // items
         $this->SalvarItems($entity, $items);
 
+        // payments
+        $this->SalvarPayments($entity, $payments);
+
         $em->flush();
 
         //Salvar log
@@ -608,7 +666,7 @@ class InvoiceService extends Base
         $em = $this->getDoctrine()->getManager();
 
         //items
-        $paid = true;
+
         foreach ($items as $value) {
 
             $invoice_item_entity = null;
@@ -631,6 +689,42 @@ class InvoiceService extends Base
             if ($value->project_item_id != '') {
                 $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)->find($value->project_item_id);
                 $invoice_item_entity->setProjectItem($project_item_entity);
+            }
+
+
+            if ($is_new_item) {
+                $invoice_item_entity->setInvoice($entity);
+
+                $em->persist($invoice_item_entity);
+            }
+        }
+    }
+
+    /**
+     * SalvarPayments
+     * @param array $payments
+     * @param Invoice $entity
+     * @return void
+     */
+    public function SalvarPayments($entity, $payments)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //items
+        $paid = true;
+        foreach ($payments as $value) {
+
+            $invoice_item_entity = null;
+
+            if (is_numeric($value->invoice_item_id)) {
+                $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                    ->find($value->invoice_item_id);
+            }
+
+            $is_new_item = false;
+            if ($invoice_item_entity == null) {
+                $invoice_item_entity = new InvoiceItem();
+                $is_new_item = true;
             }
 
             // payment
@@ -666,13 +760,13 @@ class InvoiceService extends Base
      *
      * @author Marcel
      */
-    public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid)
+    public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin)
     {
         $arreglo_resultado = array();
         $cont = 0;
 
         $lista = $this->getDoctrine()->getRepository(Invoice::class)
-            ->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
+            ->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
 
         foreach ($lista as $value) {
             $invoice_id = $value->getInvoiceId();
@@ -707,10 +801,10 @@ class InvoiceService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid)
+    public function TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin)
     {
         $total = $this->getDoctrine()->getRepository(Invoice::class)
-            ->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
+            ->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin);
 
         return $total;
     }
@@ -734,12 +828,14 @@ class InvoiceService extends Base
             } else {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
             }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
         }
 
         $acciones .= ' <a href="javascript:;" class="excel m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Export excel" data-id="' . $id . '"><i class="la la-file-excel-o"></i></a>';
+
+
+        if (count($permiso) > 0 && $permiso[0]['eliminar']) {
+            $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
+        }
 
         return $acciones;
     }

@@ -185,9 +185,6 @@ var Invoices = function () {
         var fechaFin = $('#fechaFin').val();
         query.fechaFin = fechaFin;
 
-        var paid = $('#filtro-paid').val();
-        query.paid = paid;
-
         oTable.setDataSourceQuery(query);
         oTable.load();
     }
@@ -228,6 +225,10 @@ var Invoices = function () {
         // items
         items = [];
         actualizarTableListaItems();
+
+        // payments
+        payments = [];
+        actualizarTableListaPayments();
 
         //Mostrar el primer tab
         resetWizard();
@@ -338,6 +339,7 @@ var Invoices = function () {
                         'notes': notes,
                         'paid': paid,
                         'items': JSON.stringify(items),
+                        'payments': JSON.stringify(payments),
                         'exportar': exportar ? 1 : 0
                     },
                     success: function (response) {
@@ -489,6 +491,10 @@ var Invoices = function () {
                         // items
                         items = response.invoice.items;
                         actualizarTableListaItems();
+
+                        // payments
+                        payments = response.invoice.payments;
+                        actualizarTableListaPayments();
 
                         event_change = false;
 
@@ -714,7 +720,7 @@ var Invoices = function () {
                                 quantity: item.quantity,
                                 price: item.price,
                                 contract_amount: item.contract_amount,
-                                quantity_from_previous: item.quantity_from_previous,
+                                quantity_from_previous: item.quantity_from_previous ?? 0,
                                 quantity_completed: item.quantity_completed,
                                 amount: item.amount,
                                 total_amount: item.total_amount,
@@ -864,7 +870,7 @@ var Invoices = function () {
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 2;
+    var totalTabs = 3;
     var initWizard = function () {
         $(document).off('click', "#form-invoice .wizard-tab");
         $(document).on('click', "#form-invoice .wizard-tab", function (e) {
@@ -899,6 +905,9 @@ var Invoices = function () {
             switch (activeTab) {
                 case 2:
                     actualizarTableListaItems();
+                    break;
+                case 3:
+                    actualizarTableListaPayments();
                     break;
             }
 
@@ -942,6 +951,10 @@ var Invoices = function () {
                 case 2:
                     $('#tab-items').tab('show');
                     actualizarTableListaItems();
+                    break;
+                case 3:
+                    $('#tab-payments').tab('show');
+                    actualizarTableListaPayments();
                     break;
             }
         }, 0);
@@ -1061,30 +1074,7 @@ var Invoices = function () {
                     return `<span>${MyApp.formatearNumero(row.total_amount, 2, '.', ',')}</span>`;
                 }
             },
-            {
-                field: "paid_qty",
-                title: " Paid Qty",
-                width: 100,
-                textAlign: 'center',
-            },
-            {
-                field: "paid_amount",
-                title: "Paid Amount",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.paid_amount, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "paid_amount_total",
-                title: "Paid Amount Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.paid_amount_total, 2, '.', ',')}</span>`;
-                }
-            },
+
             {
                 field: "posicion",
                 width: 120,
@@ -1236,23 +1226,14 @@ var Invoices = function () {
                 var price = $('#item-price').val();
                 var total = $('#item-total').val();
 
-                // payment
-                var paid_qty = $('#item-paid-qty').val();
-                var paid_amount = $('#item-paid-amount').val();
-                var paid_amount_total = $('#item-paid-amount-total').val();
-
                 var posicion = nEditingRowItem;
                 if (items[posicion]) {
                     items[posicion].quantity = quantity;
                     items[posicion].price = price;
                     items[posicion].amount = total;
 
-                    // payment
-                    items[posicion].paid_qty = paid_qty;
-                    items[posicion].paid_amount = paid_amount;
-                    items[posicion].paid_amount_total = paid_amount_total;
-
-                    items[posicion].quantity_completed = quantity + items[posicion].quantity_from_previous;
+                    var quantity_from_previous = items[posicion].quantity_from_previous ?? 0
+                    items[posicion].quantity_completed = quantity + quantity_from_previous;
 
                     var total_amount = items[posicion].quantity_completed  * price;
                     items[posicion].total_amount = total_amount;
@@ -1289,11 +1270,6 @@ var Invoices = function () {
 
                 $('#item-quantity').on('change', calcularTotalItem);
                 $('#item-price').on('change', calcularTotalItem);
-
-
-                $('#item-paid-qty').val(items[posicion].paid_qty);
-                $('#item-paid-amount').val(items[posicion].paid_amount);
-                $('#item-paid-amount-total').val(items[posicion].paid_amount_total);
 
                 // open modal
                 $('#modal-item').modal('show');
@@ -1376,6 +1352,283 @@ var Invoices = function () {
         nEditingRowItem = null;
     };
 
+    // payments details
+    var oTablePayments;
+    var payments = [];
+    var nEditingRowPayment = null;
+    var initTablePayments = function () {
+        MyApp.block('#payments-table-editable');
+
+        var table = $('#payments-table-editable');
+
+        var aoColumns = [
+            {
+                field: "item",
+                title: "Item",
+            },
+            {
+                field: "unit",
+                title: "Unit",
+                width: 100,
+            },
+            {
+                field: "contract_qty",
+                title: "Contract QTY",
+                width: 100,
+                textAlign: 'center',
+            },
+            {
+                field: "price",
+                title: "Unit Price",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "contract_amount",
+                title: "Contract Amount",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.contract_amount, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "quantity",
+                title: "Invoiced Qty",
+                width: 100,
+                textAlign: 'center',
+            },
+            {
+                field: "amount",
+                title: "Invoiced Amount $",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.amount, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "paid_qty",
+                title: " Paid Qty",
+                width: 100,
+                textAlign: 'center',
+            },
+            {
+                field: "paid_amount",
+                title: "Paid Amount",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.paid_amount, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "paid_amount_total",
+                title: "Paid Amount Total",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.paid_amount_total, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTablePayments = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: payments,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-payments .m_form_search'),
+            }
+        });
+
+        //Events
+        oTablePayments
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#payments-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#payments-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#payments-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#payments-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#payments-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+    };
+
+    var actualizarTableListaPayments = function () {
+        if (oTablePayments) {
+            oTablePayments.destroy();
+        }
+
+        initTablePayments();
+    }
+    var initFormPayment = function () {
+        $("#payment-form").validate({
+            rules: {
+                paidqty: {
+                    required: true,
+                },
+                paidamount: {
+                    required: true
+                },
+                paidamounttotal: {
+                    required: true
+                },
+            },
+            showErrors: function (errorMap, errorList) {
+                // Clean up any tooltips for valid elements
+                $.each(this.validElements(), function (index, element) {
+                    var $element = $(element);
+
+                    $element.data("title", "") // Clear the title - there is no error associated anymore
+                        .removeClass("has-error")
+                        .tooltip("dispose");
+
+                    $element
+                        .closest('.form-group')
+                        .removeClass('has-error').addClass('success');
+                });
+
+                // Create new tooltips for invalid elements
+                $.each(errorList, function (index, error) {
+                    var $element = $(error.element);
+
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", error.message)
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+
+                });
+            },
+        });
+    };
+    var initAccionesPayments = function () {
+
+        $(document).off('click', "#btn-salvar-payment");
+        $(document).on('click', "#btn-salvar-payment", function (e) {
+            e.preventDefault();
+
+            if ($('#payment-form').valid()) {
+
+                // payment
+                var paid_qty = $('#item-paid-qty').val();
+                var paid_amount = $('#item-paid-amount').val();
+                var paid_amount_total = $('#item-paid-amount-total').val();
+
+                var posicion = nEditingRowPayment;
+                if (payments[posicion]) {
+
+                    // payment
+                    payments[posicion].paid_qty = paid_qty;
+                    payments[posicion].paid_amount = paid_amount;
+                    payments[posicion].paid_amount_total = paid_amount_total;
+                }
+
+                //actualizar lista
+                actualizarTableListaPayments();
+
+                // reset
+                resetFormPayment();
+                $('#modal-payment').modal('hide');
+
+            }
+
+        });
+
+        $(document).off('click', "#payments-table-editable a.edit");
+        $(document).on('click', "#payments-table-editable a.edit", function (e) {
+            var posicion = $(this).data('posicion');
+            if (payments[posicion]) {
+
+                // reset
+                resetFormPayment();
+
+                nEditingRowPayment = posicion;
+
+                $('#item-paid-qty').val(payments[posicion].paid_qty);
+                $('#item-paid-amount').val(payments[posicion].paid_amount);
+                $('#item-paid-amount-total').val(payments[posicion].paid_amount_total);
+
+                // open modal
+                $('#modal-payment').modal('show');
+
+            }
+        });
+    };
+    var resetFormPayment = function () {
+        $('#payment-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+        nEditingRowPayment = null;
+    };
+
     //Paid
     var initAccionPaid = function () {
         //Activar usuario
@@ -1440,6 +1693,11 @@ var Invoices = function () {
             initTableItems();
             initFormItem();
             initAccionesItems();
+
+            // payments
+            initTablePayments();
+            initFormPayment();
+            initAccionesPayments();
 
             initAccionChange();
         }

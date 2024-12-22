@@ -53,7 +53,6 @@ class InvoiceController extends AbstractController
         $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
         $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
         $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
-        $paid = isset($query['paid']) && is_string($query['paid']) ? $query['paid'] : '';
 
         //Sort
         $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
@@ -67,7 +66,7 @@ class InvoiceController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->invoiceService->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
+            $total = $this->invoiceService->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -87,7 +86,7 @@ class InvoiceController extends AbstractController
                 'sort' => $sSortDir_0
             );
 
-            $data = $this->invoiceService->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
+            $data = $this->invoiceService->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -122,14 +121,18 @@ class InvoiceController extends AbstractController
         $items = $request->get('items');
         $items = json_decode($items);
 
+        // payments
+        $payments = $request->get('payments');
+        $payments = json_decode($payments);
+
         $exportar = $request->get('exportar');
 
         try {
 
             if ($invoice_id == "") {
-                $resultado = $this->invoiceService->SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+                $resultado = $this->invoiceService->SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar);
             } else {
-                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar);
             }
 
             if ($resultado['success']) {
