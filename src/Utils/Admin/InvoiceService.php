@@ -528,7 +528,7 @@ class InvoiceService extends Base
      * @param int $invoice_id Id
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar)
+    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -594,7 +594,7 @@ class InvoiceService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar)
+    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -630,6 +630,8 @@ class InvoiceService extends Base
 
         // items
         $this->SalvarItems($entity, $items);
+
+        $em->flush();
 
         // payments
         $this->SalvarPayments($entity, $payments);
@@ -708,45 +710,29 @@ class InvoiceService extends Base
      */
     public function SalvarPayments($entity, $payments)
     {
-        $em = $this->getDoctrine()->getManager();
+        $invoice_id = $entity->getInvoiceId();
 
         //items
         $paid = true;
         foreach ($payments as $value) {
 
-            $invoice_item_entity = null;
-
-            if (is_numeric($value->invoice_item_id)) {
-                $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                    ->find($value->invoice_item_id);
+            $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                ->BuscarItem($invoice_id, $value->project_item_id);
+            if ($invoice_item_entity != null) {
+                // payment
+                $invoice_item_entity->setPaidQty($value->paid_qty);
+                $invoice_item_entity->setPaidAmount($value->paid_amount);
+                $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
             }
-
-            $is_new_item = false;
-            if ($invoice_item_entity == null) {
-                $invoice_item_entity = new InvoiceItem();
-                $is_new_item = true;
-            }
-
-            // payment
-            $invoice_item_entity->setPaidQty($value->paid_qty);
-            $invoice_item_entity->setPaidAmount($value->paid_amount);
-            $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
 
             // si falta alguno no pago el invoice
-            if($value->paid_qty == 0 || $value->paid_amount == 0 || $value->paid_amount_total == 0){
+            if ($value->paid_qty == 0 || $value->paid_amount == 0 || $value->paid_amount_total == 0) {
                 $paid = false;
-            }
-
-
-            if ($is_new_item) {
-                $invoice_item_entity->setInvoice($entity);
-
-                $em->persist($invoice_item_entity);
             }
         }
 
         // paid invoice
-        if(!empty($payments) && !$entity->getPaid()){
+        if (!empty($payments) && !$entity->getPaid()) {
             $entity->setPaid($paid);
         }
     }

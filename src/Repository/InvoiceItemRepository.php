@@ -196,4 +196,29 @@ class InvoiceItemRepository extends EntityRepository
 
         return $query->getSingleScalarResult();
     }
+
+
+    /**
+     * BuscarItem: Busca un item
+     *
+     * @return InvoiceItem
+     */
+    public function BuscarItem($invoice_id, $project_item_id)
+    {
+        $consulta = $this->createQueryBuilder('i_i')
+            ->leftJoin('i_i.invoice', 'i')
+            ->leftJoin('i_i.projectItem', 'p_i');
+
+        if ($invoice_id != '') {
+            $consulta->andWhere('i.invoiceId = :invoice_id')
+                ->setParameter('invoice_id', $invoice_id);
+        }
+
+        if ($project_item_id != '') {
+            $consulta->andWhere('p_i.id = :project_item_id')
+                ->setParameter('project_item_id', $project_item_id);
+        }
+
+        return $consulta->getQuery()->getOneOrNullResult();
+    }
 }
