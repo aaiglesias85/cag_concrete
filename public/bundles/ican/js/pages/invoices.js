@@ -726,8 +726,30 @@ var Invoices = function () {
                                 total_amount: item.total_amount,
                                 posicion: items.length
                             });
+
+                            payments.push({
+                                invoice_item_id: '',
+                                project_item_id: item.project_item_id,
+                                item_id: item.item_id,
+                                item: item.item,
+                                unit: item.unit,
+                                contract_qty: item.contract_qty,
+                                quantity: item.quantity,
+                                price: item.price,
+                                contract_amount: item.contract_amount,
+                                quantity_from_previous: item.quantity_from_previous ?? 0,
+                                quantity_completed: item.quantity_completed,
+                                amount: item.amount,
+                                total_amount: item.total_amount,
+                                paid_qty: 0,
+                                paid_amount: 0,
+                                paid_amount_total: 0,
+                                posicion: items.length
+                            });
                         }
                         actualizarTableListaItems();
+
+                        actualizarTableListaPayments();
 
                     } else {
                         toastr.error(response.error, "Error !!!");
