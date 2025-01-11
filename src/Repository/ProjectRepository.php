@@ -335,7 +335,7 @@ class ProjectRepository extends EntityRepository
      *
      * @return Project[]
      */
-    public function ListarProjectsParaDashboard($from = '', $to = '', $sort = 'ASC', $limit = 3)
+    public function ListarProjectsParaDashboard($from = '', $to = '', $sort = 'ASC', $limit = 3, $project_id = '')
     {
         $consulta = $this->createQueryBuilder('p')
             ->leftJoin('p.company', 'c')
@@ -358,6 +358,11 @@ class ProjectRepository extends EntityRepository
 
             $consulta->andWhere('p.endDate <= :fecha_final')
                 ->setParameter('fecha_final', $to);
+        }
+
+        if($project_id != ''){
+            $consulta->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
         }
 
         $consulta->orderBy('p.dueDate', $sort);

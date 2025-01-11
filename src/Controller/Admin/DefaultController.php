@@ -33,7 +33,7 @@ class DefaultController extends AbstractController
             if ($permiso[0]['ver']) {
 
                 //last 6 projects
-                $projects = $this->defaultService->ListarProjectsParaDashboard('DESC', 6);
+                $projects = $this->defaultService->ListarProjectsParaDashboard( '', 'DESC', 6);
 
                 // filter projects
                 $filter_projects = $this->defaultService->ListarProjectsParaDashboard();

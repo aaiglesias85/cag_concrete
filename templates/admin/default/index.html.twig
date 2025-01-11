@@ -249,31 +249,37 @@
         <div class="m-portlet">
             <div class="m-portlet__body  m-portlet__body--no-padding">
                 <div class="row m-row--no-padding m-row--col-separator-xl">
+
                     <div class="col-xl-4">
+
+                        <!--begin:: Widgets/Profit Share-->
                         <div class="m-widget14">
                             <div class="m-widget14__header">
                                 <h3 class="m-widget14__title">
                                     Sales Stats
                                 </h3>
-                                <span class="m-widget14__desc profit_chart_project_name"></span>
+                                <span class="m-widget14__desc profit_chart_project_name">
+
+                                </span>
                             </div>
                             <div class="row  align-items-center">
                                 <div class="col">
-                                    <div class="m-widget15">
-                                        <div class="m-widget15__chart" style="height:180px;">
-                                            <canvas id="m_chart_sales_stats"></canvas>
+                                    <div id="m_chart_sales_stats" class="m-widget14__chart" style="height: 160px">
+                                        <div class="m-widget14__stat" style="font-size: 1rem;" id="m_chart_sales_stats_total">
+                                            ${{ chart3.total | number_format(2, '.', ',') }}
                                         </div>
                                     </div>
-
-                                    <div style="margin-top: 1.5rem;">
-                                        <a href="{{ url('invoice') }}"
-                                           class="btn m-btn--pill btn-secondary m-btn m-btn--hover-brand m-btn--custom">View
-                                            invoices</a>
+                                </div>
+                                <div class="col">
+                                    <div class="m-widget14__legends" id="m_chart_sales_stats_legends">
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!--end:: Widgets/Profit Share-->
                     </div>
+
                     <div class="col-xl-4">
                         <div class="m-widget14">
                             <div class="m-widget14__header">

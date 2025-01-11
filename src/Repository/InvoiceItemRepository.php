@@ -94,7 +94,7 @@ class InvoiceItemRepository extends EntityRepository
      *
      * @author Marcel
      */
-    public function TotalInvoice($invoice_id = '', $company_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $item_id = '')
+    public function TotalInvoice($invoice_id = '', $company_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $item_id = '', $status = '')
     {
         $em = $this->getEntityManager();
         $consulta = 'SELECT SUM(i_i.quantity * i_i.price) FROM App\Entity\InvoiceItem i_i ';
@@ -159,6 +159,14 @@ class InvoiceItemRepository extends EntityRepository
             }
         }
 
+        if ($status !== '') {
+            $esta_query = explode("WHERE", $where);
+            if (count($esta_query) == 1)
+                $where .= 'WHERE (p.status = :status) ';
+            else
+                $where .= 'AND (p.status = :status) ';
+        }
+
         $consulta .= $join;
         $consulta .= $where;
         $query = $em->createQuery($consulta);
@@ -192,6 +200,11 @@ class InvoiceItemRepository extends EntityRepository
         $esta_query_fin = substr_count($consulta, ':fin');
         if ($esta_query_fin == 1) {
             $query->setParameter('fin', $fecha_fin);
+        }
+
+        $esta_query_status = substr_count($consulta, ':status');
+        if ($esta_query_status == 1) {
+            $query->setParameter('status', $status);
         }
 
         return $query->getSingleScalarResult();

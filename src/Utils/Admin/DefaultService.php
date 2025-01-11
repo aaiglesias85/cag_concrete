@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\Company;
 use App\Entity\DataTracking;
+use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingMaterial;
@@ -44,12 +45,12 @@ class DefaultService extends Base
      * ListarProjectsParaDashboard: lista los projects ordenados por el due date
      * @return array
      */
-    public function ListarProjectsParaDashboard($sort = 'ASC', $limit = '')
+    public function ListarProjectsParaDashboard($project_id = '', $sort = 'ASC', $limit = '')
     {
         $arreglo_resultado = [];
 
         $lista = $this->getDoctrine()->getRepository(Project::class)
-            ->ListarProjectsParaDashboard('', '', $sort, $limit);
+            ->ListarProjectsParaDashboard('', '', $sort, $limit, $project_id);
         foreach ($lista as $value) {
             $project_id = $value->getProjectId();
 
@@ -179,41 +180,35 @@ class DefaultService extends Base
      */
     public function DevolverDataChart3($project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
-        $anno = date('Y');
+        /*$anno = date('Y');
         $fecha_inicial =  $fecha_inicial == '' ? "01/01/$anno": $fecha_inicial;
         $fecha_final = $fecha_fin == '' ? "12/31/$anno": $fecha_fin;
+        */
 
-        $meses = [];
+        // profit total
+        $total = $this->getDoctrine()->getRepository(InvoiceItem::class)->TotalInvoice('', '', '', $fecha_inicial, $fecha_fin, '', '');
+
+        // invoices
         $data = [];
 
         $invoices = $this->getDoctrine()->getRepository(Invoice::class)
-            ->ListarInvoicesRangoFecha('', $project_id, $fecha_inicial, $fecha_final, $status);
+            ->ListarInvoicesRangoFecha('', $project_id, $fecha_inicial, $fecha_fin, $status);
         foreach ($invoices as $invoice) {
 
-            $fecha = $this->DevolverMes($invoice->getStartDate()->format('m'));
             $amount = $this->getDoctrine()->getRepository(InvoiceItem::class)
                 ->TotalInvoice($invoice->getInvoiceId());
 
-            $esta = false;
-            foreach ($meses as $value) {
-                if ($value == $fecha) {
-                    $esta = true;
-                }
-            }
-            if (!$esta) {
-                array_push($meses, $fecha);
-                array_push($data, $amount);
-            } else {
-                for ($i = 0; $i < count($meses); $i++) {
-                    if ($meses[$i] == $fecha) {
-                        $data[$i] += $amount;
-                    }
-                }
-            }
+            $porciento = $total > 0 ? round($amount / $total * 100) : 0;
+
+            $data[] = [
+                'name' => 'Invoice #' . $invoice->getNumber(),
+                'amount' => $amount,
+                'porciento' => $porciento
+            ];
         }
 
         return [
-            'labels' => $meses,
+            'total' => $total,
             'data' => $data
         ];
     }
@@ -225,7 +220,7 @@ class DefaultService extends Base
     public function DevolverDataChartProfit($project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
         // profit total
-        $total = $this->CalcularProfitTotal($project_id, $fecha_inicial, $fecha_fin, $status);
+        $total = $this->CalcularProfitTotal('', $fecha_inicial, $fecha_fin, $status);
 
 
         // projects
@@ -243,14 +238,7 @@ class DefaultService extends Base
         ];
 
         // profit
-        $profit_concrete = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->TotalConcrete($project_id, $fecha_inicial, $fecha_fin, $status);
-
-        $profit_labor = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-            ->TotalLabor('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
-
-        $amount_profit = $amount_daily - ($profit_concrete + $profit_labor);
-
+        $amount_profit = $this->CalcularProfitTotal($project_id, $fecha_inicial, $fecha_fin, $status);;
         $porciento_profit = $total > 0 ? round($amount_profit / $total * 100) : 0;
 
         $data[] = [
@@ -267,26 +255,37 @@ class DefaultService extends Base
 
     private function CalcularProfitTotal($project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
-        $total_concrete = 0;
-        $total_labor = 0;
-        $total_daily = 0;
+        $profit = 0;
 
-        $projects = $this->ListarProjectsParaDashboard();
+        $projects = $this->ListarProjectsParaDashboard($project_id);
         foreach ($projects as $project) {
             $project_id = $project['project_id'];
 
-            $total_concrete += $this->getDoctrine()->getRepository(DataTracking::class)
-                ->TotalConcrete($project_id, $fecha_inicial, $fecha_fin, $status);
+            $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+                ->TotalDaily('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+            // concrete used price
+            $total_concrete = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+                ->TotalConcPrice('', $project_id, $fecha_inicial, $fecha_fin, $status);
+
 
             $total_labor = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
                 ->TotalLabor('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
 
-            $total_daily += $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                ->TotalDaily('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+            $total_material = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
+                ->TotalMaterials('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+            $total_overhead = $this->getDoctrine()->getRepository(DataTracking::class)
+                ->TotalOverhead('', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+            // "Labor Total" is the sum of Labor and Overhead Totals
+            $total_labor = $total_labor + $total_overhead;
+
+            $profit += $total_daily_today - ($total_concrete + $total_labor + $total_material);
         }
 
 
-        return $total_daily - ($total_concrete + $total_labor);
+        return $profit;
     }
 
     /**
@@ -295,15 +294,21 @@ class DefaultService extends Base
      */
     public function DevolverDataChartCosts($project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
-        // total
-        $total_concrete = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->TotalConcrete($project_id, $fecha_inicial, $fecha_fin, $status);
+        // concrete used price
+        $total_concrete = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->TotalConcPrice('', $project_id, $fecha_inicial, $fecha_fin, $status);
 
         $total_labor = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
             ->TotalLabor('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
 
         $total_material = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
             ->TotalMaterials('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+        $total_overhead = $this->getDoctrine()->getRepository(DataTracking::class)
+            ->TotalOverhead('', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+        // "Labor Total" is the sum of Labor and Overhead Totals
+        $total_labor = $total_labor + $total_overhead;
 
         $total = $total_concrete + $total_labor + $total_material;
 
