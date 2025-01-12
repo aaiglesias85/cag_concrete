@@ -37,3 +37,7 @@ eliminarMaterialDataTrackingAdmin:
 eliminarConcVendorDataTrackingAdmin:
   path: /data-tracking/eliminarConcVendor
   defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarConcVendor, _format: json }
+
+validarSiExisteDataTrackingAdmin:
+  path: /data-tracking/validarSiExiste
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::validarSiExiste, _format: json }

@@ -49,6 +49,28 @@ class DataTrackingRepository extends EntityRepository
     }
 
     /**
+     * ListarDataTrackingsDeOverhead: Lista el data tracking de un overhead price
+     *
+     * @return DataTracking[]
+     */
+    public function ListarDataTrackingsDeOverhead($overhead_id)
+    {
+        $consulta = $this->createQueryBuilder('d_t')
+            ->leftJoin('d_t.overhead', 'o_p');
+
+        if ($overhead_id != '') {
+            $consulta->andWhere('o_p.overheadId = :overhead_id')
+                ->setParameter('overhead_id', $overhead_id);
+        }
+
+
+        $consulta->orderBy('d_t.date', "ASC");
+
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarDataTrackingsDeInspector: Lista el data tracking de un inspector
      *
      * @return DataTracking[]
@@ -276,7 +298,7 @@ class DataTrackingRepository extends EntityRepository
      *
      * @return DataTracking[]
      */
-    public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id = '', $fecha_inicial = '', $fecha_fin = '', $pending = '')
     {
         $consulta = $this->createQueryBuilder('d_t')
             ->leftJoin('d_t.project', 'p')
@@ -316,6 +338,11 @@ class DataTrackingRepository extends EntityRepository
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
+        if ($pending !== '') {
+            $consulta->andWhere('d_t.pending = :pending')
+                ->setParameter('pending', $pending);
+        }
+
         switch ($iSortCol_0) {
             case "project":
                 $consulta->orderBy("p.name", $sSortDir_0);
@@ -346,7 +373,7 @@ class DataTrackingRepository extends EntityRepository
      *
      * @author Marcel
      */
-    public function TotalDataTrackings($sSearch, $project_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function TotalDataTrackings($sSearch, $project_id = '', $fecha_inicial = '', $fecha_fin = '', $pending = '')
     {
         $em = $this->getEntityManager();
         $consulta = 'SELECT COUNT(d_t.id) FROM App\Entity\DataTracking d_t ';
@@ -366,7 +393,7 @@ class DataTrackingRepository extends EntityRepository
             if (count($esta_query) == 1)
                 $where .= 'WHERE (p.projectId = :project_id) ';
             else
-                $where .= 'AND (c.projectId = :project_id) ';
+                $where .= 'AND (p.projectId = :project_id) ';
         }
 
         if ($fecha_inicial != "") {
@@ -393,6 +420,14 @@ class DataTrackingRepository extends EntityRepository
             } else {
                 $where .= ' AND (d_t.date <= :fin) ';
             }
+        }
+
+        if ($pending !== '') {
+            $esta_query = explode("WHERE", $where);
+            if (count($esta_query) == 1)
+                $where .= 'WHERE (d_t.pending = :pending) ';
+            else
+                $where .= 'AND (d_t.pending = :pending) ';
         }
 
         $consulta .= $join;
@@ -441,6 +476,11 @@ class DataTrackingRepository extends EntityRepository
         $esta_query_fin = substr_count($consulta, ':fin');
         if ($esta_query_fin == 1) {
             $query->setParameter('fin', $fecha_fin);
+        }
+
+        $esta_query_pending = substr_count($consulta, ':pending');
+        if ($esta_query_pending == 1) {
+            $query->setParameter('pending', $pending);
         }
 
         $total = $query->getSingleScalarResult();

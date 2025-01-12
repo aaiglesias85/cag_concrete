@@ -8,6 +8,7 @@ use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Item;
 use App\Entity\Material;
+use App\Entity\OverheadPrice;
 use App\Entity\Project;
 use App\Entity\Unit;
 use App\Utils\Admin\DataTrackingService;
@@ -50,12 +51,17 @@ class DataTrackingController extends AbstractController
                 $materials = $this->trackingService->getDoctrine()->getRepository(Material::class)
                     ->ListarOrdenados();
 
+                // overheads
+                $overheads = $this->trackingService->getDoctrine()->getRepository(OverheadPrice::class)
+                    ->ListarOrdenados();
+
                 return $this->render('admin/data-tracking/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
                     'inspectors' => $inspectors,
                     'employees' => $employees,
-                    'materials' => $materials
+                    'materials' => $materials,
+                    'overheads' => $overheads,
                 ));
             }
         } else {
@@ -76,6 +82,7 @@ class DataTrackingController extends AbstractController
         $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
         $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
         $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
+        $pending = isset($query['pending']) && is_string($query['pending']) ? $query['pending'] : '';
 
         //Sort
         $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
@@ -89,7 +96,7 @@ class DataTrackingController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->trackingService->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin);
+            $total = $this->trackingService->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -110,7 +117,7 @@ class DataTrackingController extends AbstractController
             );
 
             $data = $this->trackingService->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                $project_id, $fecha_inicial, $fecha_fin);
+                $project_id, $fecha_inicial, $fecha_fin, $pending);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -148,7 +155,9 @@ class DataTrackingController extends AbstractController
         $total_conc_used = $request->get('total_conc_used');
         $total_stamps = $request->get('total_stamps');
         $total_people = $request->get('total_people');
-        $overhead_price = $request->get('overhead_price');
+        $overhead_price_id = $request->get('overhead_price_id');
+        $color_used = $request->get('color_used');
+        $color_price = $request->get('color_price');
 
         // conc_vendors
         $conc_vendors = $request->get('conc_vendors');
@@ -170,7 +179,7 @@ class DataTrackingController extends AbstractController
 
             $resultado = $this->trackingService->SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                 $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
-                $total_conc_used, $total_stamps, $total_people, $overhead_price, $items, $labor, $materials, $conc_vendors);
+                $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials, $conc_vendors, $color_used, $color_price);
 
             if ($resultado['success']) {
 
@@ -383,6 +392,34 @@ class DataTrackingController extends AbstractController
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['error'] = $resultado['error'];
             }
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * validarSiExiste Acción para verificar si existe un datatracking
+     *
+     */
+    public function validarSiExiste(Request $request)
+    {
+        $data_tracking_id = $request->get('data_tracking_id');
+
+        $project_id = $request->get('project_id');
+        $date = $request->get('date');
+
+        try {
+
+            $existe = $this->trackingService->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['existe'] = $existe;
 
             return $this->json($resultadoJson);
 

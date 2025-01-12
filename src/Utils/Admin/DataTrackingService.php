@@ -11,6 +11,7 @@ use App\Entity\Employee;
 use App\Entity\Inspector;
 use App\Entity\Item;
 use App\Entity\Material;
+use App\Entity\OverheadPrice;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
 use App\Utils\Base;
@@ -216,8 +217,15 @@ class DataTrackingService extends Base
 
             $overhead_price = $entity->getOverheadPrice();
             $arreglo_resultado['overhead_price'] = $overhead_price;
+            $arreglo_resultado['overhead_price_id'] = $entity->getOverhead() != null ? $entity->getOverhead()->getOverheadId() : '';
 
             $arreglo_resultado['total_stamps'] = $entity->getTotalStamps();
+
+            $color_used = $entity->getColorUsed();
+            $arreglo_resultado['color_used'] = $color_used;
+
+            $color_price = $entity->getColorPrice();
+            $arreglo_resultado['color_price'] = $color_price;
 
             // conc vendors
             $conc_vendors = $this->ListarConcVendorsDeDataTracking($data_tracking_id);
@@ -363,6 +371,7 @@ class DataTrackingService extends Base
                 'data_tracking_labor_id' => $value->getId(),
                 "employee_id" => $value->getEmployee()->getEmployeeId(),
                 "employee" => $value->getEmployee()->getName(),
+                "role" => $value->getRole(),
                 "hours" => $hours,
                 "hourly_rate" => $hourly_rate,
                 "total" => $total,
@@ -551,7 +560,8 @@ class DataTrackingService extends Base
      */
     public function SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                                        $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
-                                       $total_conc_used, $total_stamps, $total_people, $overhead_price, $items, $labor, $materials, $conc_vendors)
+                                       $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials, $conc_vendors,
+                                       $color_used, $color_price)
     {
 
         $em = $this->getDoctrine()->getManager();
@@ -617,8 +627,25 @@ class DataTrackingService extends Base
         $total_people = $total_people == '' ? 0 : $total_people;
         $entity->setTotalPeople($total_people);
 
-        $overhead_price = $overhead_price == '' ? 0 : $overhead_price;
-        $entity->setOverheadPrice($overhead_price);
+        // overhead
+        $entity->setOverhead(null);
+        $entity->setOverheadPrice(0);
+
+        if ($overhead_price_id != '') {
+            $overhead_entity = $this->getDoctrine()->getRepository(OverheadPrice::class)
+                ->find($overhead_price_id);
+            $entity->setOverhead($overhead_entity);
+
+            $overhead_price = $overhead_entity != null ? $overhead_entity->getPrice() : 0;
+            $entity->setOverheadPrice($overhead_price);
+        }
+
+        // color
+        $color_used = $color_used == '' ? 0 : $color_used;
+        $entity->setColorUsed($color_used);
+
+        $color_price = $color_price == '' ? 0 : $color_price;
+        $entity->setColorPrice($color_price);
 
         if ($is_new) {
 
@@ -770,6 +797,7 @@ class DataTrackingService extends Base
 
             $data_tracking_labor_entity->setHourlyRate($value->hourly_rate);
             $data_tracking_labor_entity->setHours($value->hours);
+            $data_tracking_labor_entity->setRole($value->role);
 
             if ($value->employee_id != '') {
                 $employee_entity = $this->getDoctrine()->getRepository(Employee::class)
@@ -824,6 +852,8 @@ class DataTrackingService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $pending = false;
+
         foreach ($items as $value) {
 
             $data_tracking_item_entity = null;
@@ -854,7 +884,15 @@ class DataTrackingService extends Base
 
                 $em->persist($data_tracking_item_entity);
             }
+
+            if($value->quantity == 0){
+                $pending = true;
+            }
+
         }
+
+        // pending
+        $entity->setPending($pending);
     }
 
     /**
@@ -866,12 +904,12 @@ class DataTrackingService extends Base
      *
      * @author Marcel
      */
-    public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin)
+    public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending)
     {
         $arreglo_resultado = array();
 
         $lista = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
+            ->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
 
         foreach ($lista as $value) {
             $data_tracking_id = $value->getId();
@@ -915,6 +953,13 @@ class DataTrackingService extends Base
 
             $profit = $total_daily_today - ($total_concrete + $total_labor + $total_material);
 
+            // color
+            $color_used = $value->getColorUsed();
+            $color_price = $value->getColorPrice();
+            $total_color = $color_used * $color_price;
+
+            $pending = $value->getPending() ? 1 : 0;
+
             $arreglo_resultado[] = [
                 "id" => $data_tracking_id,
                 'project' => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getName(),
@@ -937,12 +982,17 @@ class DataTrackingService extends Base
                 "totalPeople" => $total_people,
                 "overheadPrice" => $overhead_price,
                 "totalOverhead" => $total_overhead,
+                // color
+                "colorUsed" => $color_used,
+                "colorPrice" => $color_price,
+                "totalColor" => $total_color,
                 // totales
                 "total_concrete_yiel" => $total_concrete_yiel,
                 'total_quantity_today' => $total_quantity_today != null ? $total_quantity_today : 0,
                 'total_daily_today' => $total_daily_today,
                 'total_concrete' => $total_concrete,
                 'profit' => $profit,
+                'pending' => $pending,
                 'acciones' => $acciones
             ];
         }
@@ -955,10 +1005,10 @@ class DataTrackingService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin)
+    public function TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending)
     {
         $total = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin);
+            ->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending);
 
         return $total;
     }
@@ -1032,13 +1082,11 @@ class DataTrackingService extends Base
         $usuario = $this->getUser();
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 10);
 
-        $acciones = "";
+        $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
 
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
             }
             if ($permiso[0]['eliminar']) {
                 $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';

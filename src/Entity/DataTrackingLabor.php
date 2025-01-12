@@ -36,6 +36,13 @@ class DataTrackingLabor
     private $hourlyRate;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="role", type="string", length=255, nullable=false)
+     */
+    private $role;
+
+    /**
      * @var Employee
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Employee")
@@ -110,5 +117,15 @@ class DataTrackingLabor
     public function setDataTracking($dataTracking)
     {
         $this->dataTracking = $dataTracking;
+    }
+
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    public function setRole($role)
+    {
+        $this->role = $role;
     }
 }

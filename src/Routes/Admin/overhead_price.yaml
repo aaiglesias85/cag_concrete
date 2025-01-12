@@ -1,0 +1,23 @@
+overheadprice:
+  path:  /overhead-price
+  defaults: { _controller: App\Controller\Admin\OverheadPriceController::index }
+
+listarOverheadAdmin:
+  path:  /overhead-price/listarOverhead
+  defaults: { _controller: App\Controller\Admin\OverheadPriceController::listar, _format: json }
+
+eliminarOverheadAdmin:
+  path:  /overhead-price/eliminarOverhead
+  defaults: { _controller: App\Controller\Admin\OverheadPriceController::eliminar, _format: json }
+
+eliminarOverheadsAdmin:
+  path:  /overhead-price/eliminarOverheads
+  defaults: { _controller: App\Controller\Admin\OverheadPriceController::eliminarOverheads, _format: json }
+
+salvarOverheadAdmin:
+  path:  /overhead-price/salvarOverhead
+  defaults: { _controller: App\Controller\Admin\OverheadPriceController::salvar, _format: json }
+
+cargarDatosOverheadAdmin:
+  path:  /overhead-price/cargarDatos
+  defaults: { _controller: App\Controller\Admin\OverheadPriceController::cargarDatos, _format: json }

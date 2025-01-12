@@ -3,7 +3,11 @@
 {% block subtitle %} - Data Tracking{% endblock %}
 
 {% block stylesheetspecific %}
-
+<style>
+    .m-datatable.m-datatable--default>.m-datatable__table>.m-datatable__body .m-datatable__row.row-pending>.m-datatable__cell {
+        background: #FFB38C;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -120,6 +124,13 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-1 mb-2">
+                                    <select class="form-control m-select2 event-change" id="pending">
+                                        <option value="">Status</option>
+                                        <option value="1">Pending</option>
+                                        <option value="0">Completed</option>
+                                    </select>
+                                </div>
                                 <div class="col-md-2 mb-2">
                                     <div class="m-input-icon m-input-icon--left">
                                         <input type="text" class="form-control m-input m_form_search"
@@ -131,17 +142,17 @@
                                 </div>
                                 <div class="col-md-2 mb-2 d-flex">
                                     <a href="javascript:;" id="btn-filtrar"
-                                      class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air"
-                                      style="margin-right: 10px;">
+                                       class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air"
+                                       style="margin-right: 10px;">
                                         <span>
                                             <i class="la la-search"></i>
                                             <span>Search</span>
                                         </span>
                                     </a>
-                                      <!-- Botón Reset filters -->
+                                    <!-- Botón Reset filters -->
                                     <a href="#" id="btn-reset-filters"
-                                    class="btn btn-danger m-btn m-btn--custom m-btn--icon m-btn--air"
-                                    aria-label="Reset filters">
+                                       class="btn btn-danger m-btn m-btn--custom m-btn--icon m-btn--air"
+                                       aria-label="Reset filters">
                                         <span>
                                             <i class="la la-refresh"></i>
                                             <span>Reset filters</span>
@@ -434,20 +445,25 @@
                                                 Total People
                                                 <span class="ic-small italic">(optional)</span>
                                             </label>
-                                            <input type="text" class="form-control form-control-number" id="total_people"
-                                                   name="total_people">
+                                            <input type="text" class="form-control form-control-number"
+                                                   id="total_people"
+                                                   name="total_people" disabled>
                                         </div>
                                         <div class="col-md-4">
                                             <label>
                                                 Overhead Price
                                             </label>
-                                            <div class="input-group m-input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">$</span>
-                                                </div>
-                                                <input type="text" class="form-control form-control-number"
-                                                       id="overhead_price" name="overhead_price">
-                                            </div>
+
+                                            <select class="form-control m-select2 event-change" id="overhead_price"
+                                                    name="overhead_price">
+                                                <option value="">Select</option>
+                                                {% for item in overheads %}
+                                                    <option value="{{ item.overheadId }}"
+                                                            data-price="{{ item.price }}">
+                                                        ${{ item.price }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label>
@@ -464,6 +480,7 @@
                                     </div>
                                 </div>
 
+                                {#
                                 <div class="form-group m-form__group ic-form-group">
                                     <div class="row">
                                         <div class="col-md-4">
@@ -480,6 +497,46 @@
                                             </label>
                                             <input type="text" class="form-control form-control-number"
                                                    id="total_stamps" name="total_stamps">
+                                        </div>
+                                    </div>
+                                </div>
+                                #}
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>
+                                                <span class="ic-step-number">4</span>
+                                                Color Used
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-number"
+                                                   id="color_used" name="color_used">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Color Price
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="color_price" name="color_price">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Total Color
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="total_color_price" name="total_color_price"
+                                                       disabled>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -554,7 +611,7 @@
                             <div class="row" id="lista-items">
                                 <div class="col-lg-12">
                                     <!--begin: Search Form -->
-                                    <div class="m-form m-form--label-align-right">
+                                    <div class="m-form m-form--label-align-right mb-2">
                                         <div class="row align-items-center">
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
@@ -597,7 +654,7 @@
                             <div class="row" id="lista-labor">
                                 <div class="col-lg-12">
                                     <!--begin: Search Form -->
-                                    <div class="m-form m-form--label-align-right">
+                                    <div class="m-form m-form--label-align-right mb-2">
                                         <div class="row align-items-center">
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
@@ -615,8 +672,9 @@
                                                     <div class="col-lg-4"></div>
                                                     <div class="col-lg-3">
                                                         <div class="input-group m-input-group">
-                                                            <div class="input-group-prepend"><span class="input-group-text"
-                                                                                                   id="basic-addon1">Total $:</span>
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
                                                             </div>
                                                             <input type="text" class="form-control m-input"
                                                                    id="monto_total_labor" value="" disabled>
@@ -649,14 +707,15 @@
                             <div class="row" id="lista-material">
                                 <div class="col-lg-12">
                                     <!--begin: Search Form -->
-                                    <div class="m-form m-form--label-align-right">
+                                    <div class="m-form m-form--label-align-right mb-2">
                                         <div class="row align-items-center">
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
                                                     {% if permiso.agregar or permiso.editar %}
                                                         <div class="col-md-2">
                                                             <div class="btn-group">
-                                                                <button id="btn-agregar-material" class="btn btn-success"
+                                                                <button id="btn-agregar-material"
+                                                                        class="btn btn-success"
                                                                         style="margin-bottom: 20px; margin-top: 10px;">
                                                                     New <i class="la la-plus"></i>
                                                                 </button>
@@ -692,14 +751,15 @@
                             <div class="row" id="lista-conc-vendor">
                                 <div class="col-lg-12">
                                     <!--begin: Search Form -->
-                                    <div class="m-form m-form--label-align-right">
+                                    <div class="m-form m-form--label-align-right mb-2">
                                         <div class="row align-items-center">
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
                                                     {% if permiso.agregar or permiso.editar %}
                                                         <div class="col-md-2">
                                                             <div class="btn-group">
-                                                                <button id="btn-agregar-conc-vendor" class="btn btn-success"
+                                                                <button id="btn-agregar-conc-vendor"
+                                                                        class="btn btn-success"
                                                                         style="margin-bottom: 20px; margin-top: 10px;">
                                                                     New <i class="la la-plus"></i>
                                                                 </button>
@@ -739,6 +799,41 @@
                     {% endif %}
 
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal confirm data tracking -->
+    <div class="modal fade" id="modal-data-tracking-confirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Duplicate Measurement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="m-alert m-alert--icon m-alert--outline alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="m-alert__icon">
+                            <i class="la la-warning"></i>
+                        </div>
+                        <div class="m-alert__text">
+                            <strong>Warning!</strong> Duplicate Measurement
+                        </div>
+                    </div>
+                    <p>
+                        There is already a measurement for the project and the selected date
+                    </p>
+                    <p>
+                        Are you sure you want to create a duplicate measurement?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btn-save-data-tracking-confirm">Yes
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
                 </div>
             </div>
         </div>
@@ -803,7 +898,8 @@
                                 <span class="ic-small italic">(optional)</span>
                             </label>
 
-                            <textarea class="form-control" id="notes-item-data-tracking" name="notes" rows="6"></textarea>
+                            <textarea class="form-control" id="notes-item-data-tracking" name="notes"
+                                      rows="6"></textarea>
 
                         </div>
 
@@ -870,6 +966,14 @@
                             </div>
                         </div>
 
+                        <div class="form-group m-form__group">
+                            <label>
+                                Position/Role
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+                            <input type="text" class="form-control" id="labor-role" name="role" />
+                        </div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -923,6 +1027,31 @@
                         </div>
 
                         <div class="form-group m-form__group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>
+                                        Unit
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <input type="text" class="form-control form-control-number" id="material-unit"
+                                           name="unit" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>
+                                        Price
+                                    </label>
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="text" class="form-control form-control-number" id="material-price"
+                                               name="price" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
                             <label>
                                 Quantity
                                 <span class="ic-small italic">(required)</span>
@@ -934,6 +1063,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -1018,9 +1148,445 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="btn-salvar-data-tracking-conc-vendor">Save</button>
+                    <button type="button" class="btn btn-success" id="btn-salvar-data-tracking-conc-vendor">Save
+                    </button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ver datatracking -->
+    <div class="modal fade" id="modal-data-tracking-detalle" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Measurement Details
+
+                        <span style="margin-left: 10px">
+                        <span id="proyect-number-detalle" class="m-badge m-badge--info"></span>
+                        <span id="proyect-name-detalle"></span>
+                    </span>
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active wizard-tab" data-item="1"
+                               data-toggle="tab" href="#tab-content-general-detalle" id="tab-general-detalle">
+                                General
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="2"
+                               data-toggle="tab" href="#tab-content-items-detalle" id="tab-items-detalle">
+                                Items
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="3"
+                               data-toggle="tab" href="#tab-content-labor-detalle" id="tab-labor-detalle">
+                                Labor
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="4"
+                               data-toggle="tab" href="#tab-content-material-detalle" id="tab-material-detalle">
+                                Materials
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="5"
+                               data-toggle="tab" href="#tab-content-conc-vendor-detalle" id="tab-conc-vendor-detalle">
+                                Conc Vendors
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab-content-general-detalle" role="tabpanel">
+                            <form class="m-form" id="data-tracking-detalle-form" action="#"
+                                  enctype="multipart/form-data" method="post">
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>
+                                                <span class="ic-step-number">1</span>
+                                                Date
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class='input-group date'>
+                                                <input type='text' class="form-control m-input date-picker "
+                                                       placeholder="Select" autocomplete="off"
+                                                       id="data-tracking-date-detalle" name="date"/>
+                                                <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="la la-calendar glyphicon-th"></i>
+                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>
+                                                Inspector
+                                            </label>
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <select class="form-control m-select2 event-change"
+                                                            id="inspector-detalle"
+                                                            name="inspector" disabled>
+                                                        <option value="">Select</option>
+                                                        {% for item in inspectors %}
+                                                            <option value="{{ item.inspectorId }}">{{ item.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Station Number(s)
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="station_number-detalle"
+                                                   name="station_number" disabled>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>
+                                                Measured By
+                                            </label>
+                                            <input type="text" class="form-control" id="measured_by-detalle"
+                                                   name="measured_by" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>
+                                                <span class="ic-step-number">3</span>
+                                                Total People
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-number"
+                                                   id="total_people-detalle"
+                                                   name="total_people" disabled>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Overhead Price
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="overhead_price-detalle" name="overhead_price" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Total Overhead
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="total_overhead_price-detalle" name="total_overhead_price"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {#
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>
+                                                <span class="ic-step-number">4</span>
+                                                Crew Lead
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="crew_lead-detalle"
+                                                   name="crew_lead" disabled>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Total Stamps
+                                            </label>
+                                            <input type="text" class="form-control form-control-number"
+                                                   id="total_stamps-detalle" name="total_stamps" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                #}
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>
+                                                <span class="ic-step-number">4</span>
+                                                Color Used
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-number"
+                                                   id="color_used-detalle" name="color_used" disabled>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Color Price
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="color_price-detalle" name="color_price" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Total Color
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="total_color_price-detalle" name="total_color_price-detalle"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>
+                                                <span class="ic-step-number">5</span>
+                                                Notes
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <textarea class="form-control" id="notes-detalle" name="notes" rows="3"
+                                                      disabled></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>
+                                                Other Materials
+                                            </label>
+                                            <textarea class="form-control" id="other_materials-detalle"
+                                                      name="other_materials"
+                                                      rows="3" disabled></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">6</span>
+                                                Total Concrete Yield
+                                            </label>
+                                            <input type="text" class="form-control form-control-number"
+                                                   id="total_concrete_yiel-detalle" name="total_concrete_yiel" disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Quantity today
+                                            </label>
+                                            <input type="text" class="form-control" id="total_quantity_today"
+                                                   name="total_quantity_today-detalle" disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Daily total
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="total_daily_today-detalle" name="total_daily_today" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Profit
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="profit-detalle"
+                                                       name="profit" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="tab-content-items-detalle" role="tabpanel">
+                            <div class="row" id="lista-items-detalle">
+                                <div class="col-lg-12">
+                                    <!--begin: Search Form -->
+                                    <div class="m-form m-form--label-align-right mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-xl-12 order-1">
+                                                <div class="form-group m-form__group row align-items-center">
+                                                    <div class="col-lg-9"></div>
+                                                    <div class="col-md-3">
+                                                        <div class="m-input-icon m-input-icon--left">
+                                                            <input type="text"
+                                                                   class="form-control m-input m_form_search"
+                                                                   placeholder="Search...">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--end: Search Form -->
+                                    <!--begin: Datatable -->
+                                    <div class="m_datatable" id="items-detalle-table-editable"></div>
+                                    <!--end: Datatable -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-content-labor-detalle" role="tabpanel">
+                            <div class="row" id="lista-labor-detalle">
+                                <div class="col-lg-12">
+                                    <!--begin: Search Form -->
+                                    <div class="m-form m-form--label-align-right mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-xl-12 order-1">
+                                                <div class="form-group m-form__group row align-items-center">
+                                                    <div class="col-lg-6"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_labor-detalle" value="" disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="m-input-icon m-input-icon--left">
+                                                            <input type="text"
+                                                                   class="form-control m-input m_form_search"
+                                                                   placeholder="Search...">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--end: Search Form -->
+                                    <!--begin: Datatable -->
+                                    <div class="m_datatable" id="labor-detalle-table-editable"></div>
+                                    <!--end: Datatable -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-content-material-detalle" role="tabpanel">
+                            <div class="row" id="lista-material-detalle">
+                                <div class="col-lg-12">
+                                    <!--begin: Search Form -->
+                                    <div class="m-form m-form--label-align-right mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-xl-12 order-1">
+                                                <div class="form-group m-form__group row align-items-center">
+
+                                                    <div class="col-lg-9"></div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="m-input-icon m-input-icon--left">
+                                                            <input type="text"
+                                                                   class="form-control m-input m_form_search"
+                                                                   placeholder="Search...">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--end: Search Form -->
+                                    <!--begin: Datatable -->
+                                    <div class="m_datatable" id="material-detalle-table-editable"></div>
+                                    <!--end: Datatable -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-content-conc-vendor-detalle" role="tabpanel">
+                            <div class="row" id="lista-conc-vendor-detalle">
+                                <div class="col-lg-12">
+                                    <!--begin: Search Form -->
+                                    <div class="m-form m-form--label-align-right mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-xl-12 order-1">
+                                                <div class="form-group m-form__group row align-items-center">
+
+                                                    <div class="col-lg-9"></div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="m-input-icon m-input-icon--left">
+                                                            <input type="text"
+                                                                   class="form-control m-input m_form_search"
+                                                                   placeholder="Search...">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--end: Search Form -->
+                                    <!--begin: Datatable -->
+                                    <div class="m_datatable" id="conc-vendor-detalle-table-editable"></div>
+                                    <!--end: Datatable -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1043,6 +1609,7 @@
     </script>
 
     <script src="{{ asset('bundles/ican/js/pages/data-tracking.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('bundles/ican/js/pages/data-tracking-detalle.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {
@@ -1053,6 +1620,8 @@
 
         jQuery(document).ready(function () {
             DataTracking.init();
+
+            DataTrackingDetalle.init();
         });
     </script>
 {% endblock %}

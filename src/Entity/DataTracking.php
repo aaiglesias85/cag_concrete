@@ -107,6 +107,27 @@ class DataTracking
     private $overheadPrice;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="color_used", type="float", nullable=false)
+     */
+    private $colorUsed;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="color_price", type="float", nullable=false)
+     */
+    private $colorPrice;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="pending", type="boolean", nullable=false)
+     */
+    private $pending;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
@@ -140,6 +161,16 @@ class DataTracking
      * })
      */
     private $inspector;
+
+    /**
+     * @var OverheadPrice
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\OverheadPrice")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="overhead_price_id", referencedColumnName="overhead_id")
+     * })
+     */
+    private $overhead;
 
     /**
      * Get id
@@ -297,12 +328,12 @@ class DataTracking
         $this->concPrice = $concPrice;
     }
 
-    public function getTotalPeople(): float
+    public function getTotalPeople()
     {
         return $this->totalPeople;
     }
 
-    public function setTotalPeople($totalPeople): void
+    public function setTotalPeople($totalPeople)
     {
         $this->totalPeople = $totalPeople;
     }
@@ -315,5 +346,48 @@ class DataTracking
     public function setOverheadPrice( $overheadPrice)
     {
         $this->overheadPrice = $overheadPrice;
+    }
+
+    /**
+     * @return OverheadPrice
+     */
+    public function getOverhead()
+    {
+        return $this->overhead;
+    }
+
+    public function setOverhead($overhead)
+    {
+        $this->overhead = $overhead;
+    }
+
+    public function getColorPrice()
+    {
+        return $this->colorPrice;
+    }
+
+    public function setColorPrice( $colorPrice)
+    {
+        $this->colorPrice = $colorPrice;
+    }
+
+    public function getColorUsed()
+    {
+        return $this->colorUsed;
+    }
+
+    public function setColorUsed( $colorUsed)
+    {
+        $this->colorUsed = $colorUsed;
+    }
+
+    public function getPending()
+    {
+        return $this->pending;
+    }
+
+    public function setPending($pending)
+    {
+        $this->pending = $pending;
     }
 }

@@ -30,4 +30,7 @@ denegado:
   path:  /denegado
   defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
 
-#crons
+#scripts
+definirpendingdatatracking:
+  path:  /definir-pending-datatracking
+  defaults: { _controller: App\Controller\ScriptController::definirpendingdatatracking }
