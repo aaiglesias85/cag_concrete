@@ -501,6 +501,27 @@ var Index = function () {
         $('.profit_chart_project_name').html(project);
     }
 
+    var initAccionesProjects = function () {
+
+        $(document).off('click', ".project-item");
+        $(document).on('click', ".project-item", function (e) {
+            var project_id = $(this).data('id');
+            if (project_id) {
+
+                localStorage.setItem('project_id_edit', project_id);
+
+                // open
+                window.open(
+                    url_project,                // URL a abrir
+                    '_blank',           // Abrir en una nueva pestaña o ventana
+                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
+                );
+
+            }
+        });
+
+    };
+
     //== Public Functions
     return {
         // public functions
@@ -513,6 +534,8 @@ var Index = function () {
             initChart3();
 
             initAccionFiltrar();
+
+            initAccionesProjects();
         }
     };
 }();

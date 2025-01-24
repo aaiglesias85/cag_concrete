@@ -24,4 +24,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function definirnotificacionesduedate()
+    {
+        $this->scriptService->DefinirNotificacionesDueDate();
+
+        return new Response('OK', 200);
+    }
 }

@@ -54,6 +54,16 @@ class Notification
     private $usuario;
 
     /**
+     * @var Project
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="project_id", referencedColumnName="project_id")
+     * })
+     */
+    private $project;
+
+    /**
      * Get id
      *
      * @return integer
@@ -120,5 +130,18 @@ class Notification
     public function setUsuario(Usuario $usuario): void
     {
         $this->usuario = $usuario;
+    }
+
+    /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    public function setProject($project)
+    {
+        $this->project = $project;
     }
 }

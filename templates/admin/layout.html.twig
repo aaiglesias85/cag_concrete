@@ -117,6 +117,25 @@
         jQuery(document).ready(function () {
             MyApp.init();
         });
+
+        // notificaciones item
+        var url_project = "{{ url('project') }}";
+        $(document).off('click', ".notificacion-item");
+        $(document).on('click', ".notificacion-item", function (e) {
+            var project_id = $(this).data('id');
+            if (project_id != '') {
+
+                localStorage.setItem('project_id_edit', project_id);
+
+                // open
+                window.open(
+                    url_project,                // URL a abrir
+                    '_blank',           // Abrir en una nueva pestaña o ventana
+                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
+                );
+
+            }
+        });
     </script>
     <!-- END JAVASCRIPTS -->
     {% block javascriptsspecific %}  {% endblock %}

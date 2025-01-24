@@ -21,7 +21,7 @@ class ProjectController extends AbstractController
         $this->projectService = $projectService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $usuario = $this->getUser();
         $permiso = $this->projectService->BuscarPermiso($usuario->getUsuarioId(), 9);

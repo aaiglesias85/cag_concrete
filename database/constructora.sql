@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 12-01-2025 a las 17:32:14
+-- Tiempo de generación: 24-01-2025 a las 18:47:46
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -104,8 +104,9 @@ CREATE TABLE `data_tracking` (
 --
 
 INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `conc_vendor`, `crew_lead`, `notes`, `other_materials`, `total_conc_used`, `conc_price`, `total_stamps`, `total_people`, `overhead_price`, `color_used`, `color_price`, `pending`, `created_at`, `updated_at`, `project_id`, `inspector_id`, `overhead_price_id`) VALUES
-(3, '2024-08-31', '45453', 'Marcel', NULL, NULL, '', '', NULL, NULL, 0.00, 2.00, 100.00, 2.00, 100.00, NULL, '2024-06-23 21:07:27', '2025-01-12 17:18:59', 2, NULL, 1),
-(4, '2024-06-11', '435435', 'Marcel', NULL, '', '', '', NULL, NULL, 0.00, NULL, NULL, NULL, NULL, NULL, '2024-06-23 21:16:44', '2025-01-11 18:10:50', 3, NULL, NULL);
+(3, '2024-08-31', '45453', 'Marcel', NULL, NULL, '', '', NULL, NULL, 0.00, 2.00, 100.00, 2.00, 100.00, 1, '2024-06-23 21:07:27', '2025-01-12 17:43:03', 2, NULL, 1),
+(4, '2024-06-11', '435435', 'Marcel', NULL, '', '', '', NULL, NULL, 0.00, NULL, NULL, NULL, NULL, 0, '2024-06-23 21:16:44', '2025-01-11 18:10:50', 3, NULL, NULL),
+(5, '2025-01-24', '', '', NULL, NULL, '', '', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-01-24 17:18:51', '2025-01-24 17:29:00', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -127,7 +128,8 @@ CREATE TABLE `data_tracking_conc_vendor` (
 
 INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`, `conc_price`, `data_tracking_id`) VALUES
 (1, 'Disrupsoft', 5.00, 10.00, 4),
-(2, 'Disrupsoft', 100.00, 100.00, 3);
+(2, 'Disrupsoft', 100.00, 100.00, 3),
+(3, 'Disrupsoft', 50.00, 1000.00, 5);
 
 -- --------------------------------------------------------
 
@@ -152,7 +154,9 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_trac
 (8, 400.000000, 160.00, 'test', 3, 11),
 (9, 500.000000, 200.00, 'otra test', 3, 12),
 (11, 50.000000, 16.50, NULL, 4, 1),
-(12, 30.000000, 63.00, NULL, 4, 2);
+(12, 30.000000, 63.00, NULL, 4, 2),
+(13, 0.000000, 300.00, 'test pending', 3, 13),
+(14, 100.000000, 253.00, '', 5, 5);
 
 -- --------------------------------------------------------
 
@@ -399,7 +403,7 @@ INSERT INTO `item` (`item_id`, `description`, `price`, `yield_calculation`, `sta
 (17, 'PLAIN CONC DITCH PAVING', 47.18, 'equation', 1, '2024-04-12 20:26:54', '2024-05-12 19:18:15', 1, 2),
 (18, 'EXTRA CONCRETE', 208.00, NULL, 1, '2024-04-12 20:27:17', '2024-05-12 19:18:05', 3, NULL),
 (19, 'EXTRA LABOR', 1500.00, 'same', 1, '2024-04-12 20:27:37', '2024-05-12 19:17:54', 6, NULL),
-(20, 'Cubic Yards of Concrete', 150.00, 'none', 1, '2024-04-12 20:28:15', '2024-06-21 18:34:07', 3, NULL);
+(20, 'Cubic Yards of Concrete', 150.00, 'none', 1, '2024-04-12 20:28:15', '2025-01-24 18:34:15', 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -725,7 +729,12 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (302, 'Update', 'Overhead Price', 'The overhead price is modified: dsdsf dfffd', '::1', '2025-01-12 16:37:27', 1),
 (303, 'Delete', 'Overhead Price', 'The overhead price is deleted: dsdsf dfffd', '::1', '2025-01-12 16:37:31', 1),
 (304, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 16:57:43', 1),
-(305, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 17:18:59', 1);
+(305, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 17:18:59', 1),
+(306, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 17:43:03', 1),
+(307, 'Update', 'Project Notes', 'The notes: <p>Change start date, old value: 08/01/2023</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p> is modified to the project: Houston Texas', '::1', '2025-01-24 17:15:17', 1),
+(308, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 01/24/2025', '::1', '2025-01-24 17:18:51', 1),
+(309, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009001 - FL COUNTY, Date: 01/24/2025', '::1', '2025-01-24 17:29:00', 1),
+(310, 'Update', 'Item', 'The item is modified: Cubic Yards of Concrete', '::1', '2025-01-24 18:34:15', 1);
 
 -- --------------------------------------------------------
 
@@ -760,15 +769,16 @@ CREATE TABLE `notification` (
   `content` varchar(255) DEFAULT NULL,
   `readed` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL
+  `user_id` int(11) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `notification`
 --
 
-INSERT INTO `notification` (`id`, `content`, `readed`, `created_at`, `user_id`) VALUES
-(2, 'Generate april invoice', 1, '2024-04-16 13:23:00', 1);
+INSERT INTO `notification` (`id`, `content`, `readed`, `created_at`, `user_id`, `project_id`) VALUES
+(2, 'Generate april invoice', 1, '2024-04-16 13:23:00', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -914,7 +924,7 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (6, 'Change end date, old value: 11/30/2024', '2024-11-02', 3),
 (7, 'Change start date, old value: 11/03/2024', '2024-11-02', 3),
 (8, 'Change start date, old value: 08/08/2023', '2024-11-02', 3),
-(9, '<p><br></p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p>', '2024-11-08', 3);
+(9, '<p>Change start date, old value: 08/01/2023</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p>', '2024-11-08', 3);
 
 -- --------------------------------------------------------
 
@@ -1287,13 +1297,13 @@ ALTER TABLE `data_tracking`
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_item`
 --
 ALTER TABLE `data_tracking_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_labor`
@@ -1335,13 +1345,13 @@ ALTER TABLE `inspector`
 -- AUTO_INCREMENT de la tabla `invoice`
 --
 ALTER TABLE `invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `item`
@@ -1353,7 +1363,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=306;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=311;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -1371,7 +1381,7 @@ ALTER TABLE `notification`
 -- AUTO_INCREMENT de la tabla `overhead_price`
 --
 ALTER TABLE `overhead_price`
-  MODIFY `overhead_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `overhead_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `project`

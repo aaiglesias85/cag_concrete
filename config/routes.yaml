@@ -34,3 +34,7 @@ denegado:
 definirpendingdatatracking:
   path:  /definir-pending-datatracking
   defaults: { _controller: App\Controller\ScriptController::definirpendingdatatracking }
+
+definirnotificacionesduedate:
+  path:  /definir-notificaciones-duedate
+  defaults: { _controller: App\Controller\ScriptController::definirnotificacionesduedate }

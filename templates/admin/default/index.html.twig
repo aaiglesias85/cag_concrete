@@ -142,7 +142,7 @@
 
                             {% for item in projects %}
                                 <div class="m-widget1__item">
-                                    <div class="row m-row--no-padding align-items-center">
+                                    <div class="row m-row--no-padding align-items-center project-item" data-id="{{ item.project_id }}" style="cursor: pointer;">
                                         <div class="col">
                                             <h3 class="m-widget1__title">{{ item.number }}</h3>
                                             <span class="m-widget1__desc">{{ item.name }}</span>

@@ -2527,6 +2527,11 @@ var DataTracking = function () {
 
         // calcular profit
         calcularProfit();
+
+        // total quantity daily
+        var total_conc_used = calcularTotalConcUsed();
+        $('#total_quantity_today').val(total_conc_used);
+
     }
     var initFormConcVendor = function () {
         $("#data-tracking-conc-vendor-form").validate({
@@ -2537,9 +2542,9 @@ var DataTracking = function () {
                 conc_vendor: {
                     required: true
                 },
-                conc_price: {
+                /*conc_price: {
                     required: true
-                },
+                },*/
             },
             showErrors: function (errorMap, errorList) {
                 // Clean up any tooltips for valid elements
@@ -2749,6 +2754,15 @@ var DataTracking = function () {
 
         for (var i = 0; i < conc_vendors.length; i++) {
             total += conc_vendors[i].total_conc_used * conc_vendors[i].conc_price;
+        }
+
+        return total;
+    }
+    var calcularTotalConcUsed = function () {
+        var total = 0;
+
+        for (var i = 0; i < conc_vendors.length; i++) {
+            total += conc_vendors[i].total_conc_used;
         }
 
         return total;

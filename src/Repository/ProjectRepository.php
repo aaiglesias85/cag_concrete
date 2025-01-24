@@ -373,4 +373,30 @@ class ProjectRepository extends EntityRepository
 
         return $consulta->getQuery()->getResult();
     }
+
+    /**
+     * ListarProjectsParaNotificacionesDueDate: Lista los projects para notificaciones due date
+     *
+     * @return Project[]
+     */
+    public function ListarProjectsParaNotificacionesDueDate($from = '', $to = '', $sort = 'ASC')
+    {
+        $consulta = $this->createQueryBuilder('p')
+            ;
+
+        if ($from != "") {
+
+            $consulta->andWhere('p.dueDate >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $from);
+        }
+        if ($to != "") {
+
+            $consulta->andWhere('p.dueDate <= :fecha_final')
+                ->setParameter('fecha_final', $to);
+        }
+
+        $consulta->orderBy('p.dueDate', $sort);
+
+        return $consulta->getQuery()->getResult();
+    }
 }

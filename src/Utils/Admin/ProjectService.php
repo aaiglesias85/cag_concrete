@@ -9,6 +9,7 @@ use App\Entity\Inspector;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;
+use App\Entity\Notification;
 use App\Entity\Project;
 use App\Entity\DataTracking;
 use App\Entity\ProjectContact;
@@ -770,6 +771,13 @@ class ProjectService extends Base
                 $em->remove($note);
             }
 
+            // notificaciones
+            $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
+                ->ListarNotificacionesDeProject($project_id);
+            foreach ($notificaciones as $notificacion) {
+                $em->remove($notificacion);
+            }
+
             $project_descripcion = $entity->getName();
 
 
@@ -850,6 +858,13 @@ class ProjectService extends Base
                                 ->ListarNotesDeProject($project_id);
                             foreach ($notes as $note) {
                                 $em->remove($note);
+                            }
+
+                            // notificaciones
+                            $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
+                                ->ListarNotificacionesDeProject($project_id);
+                            foreach ($notificaciones as $notificacion) {
+                                $em->remove($notificacion);
                             }
 
                             $project_descripcion = $entity->getName();
@@ -1096,7 +1111,7 @@ class ProjectService extends Base
                 $entity->setStartDate($start_date);
             }
 
-            if ($end_date != '') {
+            if ($end_date != '' && $entity->getEndDate() != '') {
 
                 if ($end_date != $entity->getEndDate()->format('m/d/Y')) {
                     $notas[] = [
@@ -1431,6 +1446,14 @@ class ProjectService extends Base
             foreach ($lista as $p_i) {
                 $projects[] = $p_i->getProject();
             }
+
+            // si no encontro buscar en projects
+            if (empty($projects)) {
+                $projects = $this->getDoctrine()->getRepository(Project::class)
+                    ->ListarProjects($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+                        $company_id, '', $status, $fecha_inicial, $fecha_fin);
+            }
+
         } else {
             $projects = $this->getDoctrine()->getRepository(Project::class)
                 ->ListarProjects($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,

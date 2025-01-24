@@ -21,7 +21,8 @@ var Projects = function () {
                 selector: {class: 'm-checkbox--solid m-checkbox--brand'}
             });
         }
-        aoColumns.push({
+        aoColumns.push(
+            {
                 field: "projectNumber",
                 title: "C & G Project #",
                 width: 120,
@@ -231,7 +232,7 @@ var Projects = function () {
         actualizarTableListaContacts();
 
         //Mostrar el primer tab
-        if(reset_wizard){
+        if (reset_wizard) {
             resetWizard();
         }
 
@@ -1562,6 +1563,7 @@ var Projects = function () {
     // notes
     var oTableNotes;
     var rowDeleteNote = null;
+    var rowEditNote = null;
     var initTableNotes = function () {
         MyApp.block('#notes-table-editable');
 
@@ -1734,10 +1736,29 @@ var Projects = function () {
     };
     var initAccionesNotes = function () {
 
-        $(document).off('click', "#btn-agregar-note");
-        $(document).on('click', "#btn-agregar-note", function (e) {
+        $('#modal-notes').on('shown.bs.modal', function () {
+
+            $('#notes').summernote({
+                dialogsInBody: true,
+                height: 300
+            });
+
+            $.fn.modal.Constructor.prototype._enforceFocus = function () {
+            };
+
             // reset
             resetFormNote();
+
+            // editar nota
+            if (rowEditNote != null) {
+                editRowNote(rowEditNote);
+            }
+
+        });
+
+
+        $(document).off('click', "#btn-agregar-note");
+        $(document).on('click', "#btn-agregar-note", function (e) {
 
             $('#modal-notes').modal({
                 'show': true
@@ -1796,7 +1817,7 @@ var Projects = function () {
                 });
 
 
-            }else{
+            } else {
                 if (notes == "") {
                     var $element = $('.note-editor');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
@@ -1816,9 +1837,11 @@ var Projects = function () {
         $(document).on('click', "#notes-table-editable a.edit", function (e) {
             e.preventDefault();
 
-            var notes_id = $(this).data('id');
-            // editar nota
-            editRowNote(notes_id);
+            rowEditNote = $(this).data('id');
+
+            $('#modal-notes').modal({
+                'show': true
+            });
         });
 
         $(document).off('click', "#notes-table-editable a.delete");
@@ -1930,15 +1953,11 @@ var Projects = function () {
 
 
     };
+
     var editRowNote = function (notes_id) {
 
-        resetFormNote();
-
-        $('#modal-notes').modal({
-            'show': true
-        });
-
         $('#notes_id').val(notes_id);
+        rowEditNote = null;
 
         MyApp.block('#modal-notes .modal-content');
 
@@ -2396,6 +2415,21 @@ var Projects = function () {
             initAccionesContacts();
 
             initAccionChange();
+
+            // editar
+            var project_id_edit = localStorage.getItem('project_id_edit');
+            if (project_id_edit) {
+                resetForms();
+
+                $('#project_id').val(project_id_edit);
+
+                $('#form-project').removeClass('m--hide');
+                $('#lista-project').addClass('m--hide');
+
+                localStorage.removeItem('project_id_edit');
+
+                editRow(project_id_edit, false);
+            }
         }
 
     };

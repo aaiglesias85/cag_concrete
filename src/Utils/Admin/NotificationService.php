@@ -112,6 +112,7 @@ class NotificationService extends Base
             $arreglo_resultado[$cont]['fecha'] = $this->DevolverFechaFormatoBarras($value->getCreatedAt());
             $arreglo_resultado[$cont]['leida'] = $value->getReaded();
             $arreglo_resultado[$cont]['class'] = $value->getReaded() ? 'm-list-timeline__item--read' : '';
+            $arreglo_resultado[$cont]['project_id'] = $value->getProject() ? $value->getProject()->getProjectId() : '';
 
             $cont++;
         }

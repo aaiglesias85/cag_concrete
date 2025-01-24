@@ -27,6 +27,27 @@ class NotificationRepository extends EntityRepository
     }
 
     /**
+     * ListarNotificacionesDeProject: Lista las notificaciones
+     *
+     * @return Notification[]
+     */
+    public function ListarNotificacionesDeProject($project_id)
+    {
+        $consulta = $this->createQueryBuilder('n')
+            ->leftJoin('n.project', 'p');
+
+        if ($project_id != '') {
+            $consulta->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        $consulta->addOrderBy('n.createdAt', 'DESC');
+
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarNotificationsDeUsuarioSinLeer: Lista las notifications de un usuario sin leer de la BD
      * @param int $usuario_id Id del usuario
      *
@@ -62,8 +83,7 @@ class NotificationRepository extends EntityRepository
         if ($sSearch != "") {
             $consulta->andWhere('u.nombre LIKE :nombre OR n.content LIKE :content')
                 ->setParameter('nombre', "%${sSearch}%")
-                ->setParameter('content', "%${sSearch}%")
-                ;
+                ->setParameter('content', "%${sSearch}%");
         }
 
         if ($usuario_id != "") {

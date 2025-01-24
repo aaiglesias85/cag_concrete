@@ -38,11 +38,46 @@ class ItemService extends Base
             $arreglo_resultado['yield_calculation'] = $entity->getYieldCalculation();
             $arreglo_resultado['equation_id'] = $entity->getEquation() != null ? $entity->getEquation()->getEquationId() : '';
 
+            // projects
+            $projects = $this->ListarProjectsDeItem($item_id);
+            $arreglo_resultado['projects'] = $projects;
+
             $resultado['success'] = true;
             $resultado['item'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarProjectsDeItem
+     * @param $item_id
+     * @return array
+     */
+    public function ListarProjectsDeItem($item_id)
+    {
+        $projects = [];
+
+        $lista = $this->getDoctrine()->getRepository(ProjectItem::class)
+            ->ListarProjectsDeItem($item_id);
+        foreach ($lista as $key => $value) {
+            $project = [
+                'project_id' => $value->getProject()->getProjectId(),
+                "number" => $value->getProject()->getProjectNumber(),
+                "name" => $value->getProject()->getName(),
+                "location" => $value->getProject()->getLocation(),
+                "po_number" => $value->getProject()->getPoNumber(),
+                "po_cg" => $value->getProject()->getPoCG(),
+                "manager" => $value->getProject()->getManager(),
+                "status" => $value->getProject()->getStatus(),
+                "owner" => $value->getProject()->getOwner(),
+                "county" => $value->getProject()->getCounty(),
+                "posicion" => $key
+            ];
+            $projects[] = $project;
+        }
+
+        return $projects;
     }
 
     /**

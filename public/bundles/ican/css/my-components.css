@@ -406,3 +406,7 @@ div.tagsinput.has-error {
     background: #eaecf2;
     border-color: #eaecf2 !important;
 }
+
+.note-editor.note-frame .note-editing-area .note-editable {
+    padding-top: 20px;
+}

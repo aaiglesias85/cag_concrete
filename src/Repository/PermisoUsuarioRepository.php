@@ -51,7 +51,7 @@ class PermisoUsuarioRepository extends EntityRepository
      * ListarPermisosFuncion: Lista los permisos de una funcion
      * @param int $funcion_id
      *
-     * @author Marcel
+     * @return  PermisoUsuario[]
      */
     public function ListarPermisosFuncion($funcion_id)
     {

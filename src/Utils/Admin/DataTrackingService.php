@@ -254,8 +254,9 @@ class DataTrackingService extends Base
             $total_concrete_yiel = $this->CalcularTotalConcreteYiel($data_tracking_id);
             $arreglo_resultado['total_concrete_yiel'] = $total_concrete_yiel;
 
-            $total_quantity_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                ->TotalQuantity($data_tracking_id);
+            /*$total_quantity_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+                ->TotalQuantity($data_tracking_id);*/
+            $total_quantity_today = $total_conc_used;
             $arreglo_resultado['total_quantity_today'] = $total_quantity_today;
 
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
@@ -926,8 +927,9 @@ class DataTrackingService extends Base
 
             // totales
 
-            $total_quantity_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                ->TotalQuantity($data_tracking_id);
+            /*$total_quantity_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+                ->TotalQuantity($data_tracking_id);*/
+            $total_quantity_today = $total_conc_used;
 
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalDaily($data_tracking_id);

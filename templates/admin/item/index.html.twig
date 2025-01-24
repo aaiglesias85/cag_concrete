@@ -103,7 +103,7 @@
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text" id="form-item-title">
+                        <h3 class="m-portlet__head-text" id="form-project-title">
                             Do you want to create a new item? Follow the next steps:
                         </h3>
                     </div>
@@ -118,136 +118,203 @@
                     </ul>
                 </div>
             </div>
-            <form class="m-form" id="item-form" action="#"
-                  enctype="multipart/form-data" method="post">
 
-                <input type="hidden" id="item_id" name="item_id"/>
+            <div class="m-portlet__body">
 
-                <div class="m-portlet__body">
-                    <div class="m-form__section m-form__section--first">
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
-                                <span class="ic-step-number">1</span>
-                                Name
-                                <span class="ic-small italic">(required)</span>
-                            </label>
+                <ul class="nav nav-tabs m--hide" role="tablist" id="nav-tabs-item">
+                    <li class="nav-item">
+                        <a class="nav-link active wizard-tab" data-item="1"
+                           data-toggle="tab" href="#tab-content-general" id="tab-general">
+                            General
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="2"
+                           data-toggle="tab" href="#tab-content-projects" id="tab-projects">
+                            Projects
+                        </a>
+                    </li>
 
-                            <input type="text" class="form-control form-control-text event-change"
-                                   id="descripcion" name="descripcion"/>
-                        </div>
+                </ul>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <div class="row">
-                                <div class="col-md-4" id="select-unit">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-content-general" role="tabpanel">
+                        <form class="m-form" id="item-form" action="#" enctype="multipart/form-data"
+                              method="post">
+
+                            <input type="hidden" id="item_id" name="item_id"/>
+
+                            <div class="m-form__section m-form__section--first">
+
+                                <div class="form-group m-form__group ic-form-group">
                                     <label>
-                                        <span class="ic-step-number">2</span>
-                                        Unit
+                                        <span class="ic-step-number">1</span>
+                                        Name
                                         <span class="ic-small italic">(required)</span>
                                     </label>
 
+                                    <input type="text" class="form-control form-control-text event-change"
+                                           id="descripcion" name="descripcion"/>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
                                     <div class="row">
-                                        <div class="col-md-10">
-                                            <select class="form-control m-select2 event-change" id="unit" name="unit">
+                                        <div class="col-md-4" id="select-unit">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Unit
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <select class="form-control m-select2 event-change" id="unit" name="unit">
+                                                        <option value="">Select</option>
+                                                        {% for item in units %}
+                                                            <option value="{{ item.unitId }}">{{ item.description }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                                    <a href="javascript:;" title="Add unit" id="btn-add-unit"
+                                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {#
+                                        <div class="col-md-3">
+                                            <label>
+
+                                                Price
+
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control event-change form-control-number" id="price" name="price">
+                                            </div>
+                                        </div>
+                                        #}
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-3" id="select-yield-calculation">
+                                            <label>
+                                                <span class="ic-step-number">3</span>
+                                                Yield Calculation
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <select class="form-control m-select2 event-change" id="yield-calculation"
+                                                    name="yield">
                                                 <option value="">Select</option>
-                                                {% for item in units %}
-                                                    <option value="{{ item.unitId }}">{{ item.description }}
-                                                    </option>
+                                                {% for item in yields_calculation %}
+                                                    <option value="{{ item.id }}">{{ item.name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
-                                        <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                            <a href="javascript:;" title="Add unit" id="btn-add-unit"
-                                               class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
-                                                <i class="la la-plus"></i>
-                                            </a>
+                                        <div class="col-md-4 m--hide" id="select-equation">
+                                            <label>Equation</label>
+
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <select class="form-control m-select2 event-change" id="equation"
+                                                            name="equation">
+                                                        <option value="">Select</option>
+                                                        {% for item in equations %}
+                                                            <option value="{{ item.equationId }}"> {{ item.description }} {{ item.equation }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                                    <a href="javascript:;" title="Add equation" id="btn-add-equation"
+                                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                {#
-                                <div class="col-md-3">
-                                    <label>
 
-                                        Price
-
-                                    </label>
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text">$</span>
-                                        </div>
-                                        <input type="text" class="form-control event-change form-control-number" id="price" name="price">
-                                    </div>
-                                </div>
-                                #}
-                            </div>
-                        </div>
-
-                        <div class="form-group m-form__group ic-form-group">
-                            <div class="row">
-                                <div class="col-md-3" id="select-yield-calculation">
-                                    <label>
-                                        <span class="ic-step-number">3</span>
-                                        Yield Calculation
-                                        <span class="ic-small italic">(optional)</span>
-                                    </label>
-                                    <select class="form-control m-select2 event-change" id="yield-calculation"
-                                            name="yield">
-                                        <option value="">Select</option>
-                                        {% for item in yields_calculation %}
-                                            <option value="{{ item.id }}">{{ item.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-4 m--hide" id="select-equation">
-                                    <label>Equation</label>
-
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label><span class="ic-step-number">4</span>Status</label>
                                     <div class="row">
-                                        <div class="col-md-10">
-                                            <select class="form-control m-select2 event-change" id="equation"
-                                                    name="equation">
-                                                <option value="">Select</option>
-                                                {% for item in equations %}
-                                                    <option value="{{ item.equationId }}"> {{ item.description }} {{ item.equation }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                            <a href="javascript:;" title="Add equation" id="btn-add-equation"
-                                               class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
-                                                <i class="la la-plus"></i>
-                                            </a>
+                                        <div class="col-lg-12">
+                                            <div class="m-form__group form-group">
+                                                <div class="m-radio-inline">
+                                                    <label class="m-radio">
+                                                        <input type="radio" name="radioestado" id="estadoactivo"
+                                                               class="event-change" checked>
+                                                        Active
+                                                        <span></span>
+                                                    </label>
+                                                    <label class="m-radio">
+                                                        <input type="radio" name="radioestado" id="estadoinactivo"
+                                                               class="event-change">
+                                                        Inactive
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label><span class="ic-step-number">4</span>Status</label>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="m-form__group form-group">
-                                        <div class="m-radio-inline">
-                                            <label class="m-radio">
-                                                <input type="radio" name="radioestado" id="estadoactivo"
-                                                       class="event-change" checked>
-                                                Active
-                                                <span></span>
-                                            </label>
-                                            <label class="m-radio">
-                                                <input type="radio" name="radioestado" id="estadoinactivo"
-                                                       class="event-change">
-                                                Inactive
-                                                <span></span>
-                                            </label>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-projects" role="tabpanel">
+                        <div class="row" id="lista-projects">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right mb-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-9"></div>
+                                                <div class="col-md-3">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="projects-table-editable"></div>
+                                <!--end: Datatable -->
                             </div>
                         </div>
                     </div>
-                    <div class="m-form__actions">
+                </div>
+
+                <div class="m-form">
+                    <div class="m-form__actions text-center">
+                        <button id="btn-wizard-anterior"
+                                class="btn btn-info m--hide" type="button">
+                            Back
+                        </button>
+
+                        <button id="btn-wizard-siguiente"
+                                class="btn btn-primary m--hide" type="button">
+                            Next
+                        </button>
                         {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-salvar-item" class="btn btn-success" type="button">
+                            <button id="btn-wizard-finalizar" class="btn btn-success" type="button">
                                 Save
                             </button>
                         {% endif %}
@@ -256,7 +323,8 @@
                         </button>
                     </div>
                 </div>
-            </form>
+            </div>
+
         </div>
 
     </div>
@@ -287,6 +355,8 @@
             editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
             eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
         };
+
+
 
         jQuery(document).ready(function () {
             Items.init();

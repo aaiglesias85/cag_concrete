@@ -170,8 +170,13 @@ var Items = function () {
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
-        event_change = false;
+        // projects
+        projects = [];
+        actualizarTableListaProjects();
 
+        resetWizard();
+
+        event_change = false;
     };
 
     //Validacion
@@ -234,8 +239,8 @@ var Items = function () {
     };
     //Salvar
     var initAccionSalvar = function () {
-        $(document).off('click', "#btn-salvar-item");
-        $(document).on('click', "#btn-salvar-item", function (e) {
+        $(document).off('click', "#btn-wizard-finalizar");
+        $(document).on('click', "#btn-wizard-finalizar", function (e) {
             btnClickSalvarForm();
         });
 
@@ -422,6 +427,14 @@ var Items = function () {
                         $('#equation').trigger('change');
 
                         $('#yield-calculation').on('change', changeYield);
+
+                        // projects
+                        totalTabs = 2;
+                        $('#btn-wizard-siguiente').removeClass('m--hide');
+                        $('#nav-tabs-item').removeClass('m--hide');
+
+                        projects = response.item.projects;
+                        actualizarTableListaProjects();
 
                         event_change = false;
 
@@ -630,6 +643,233 @@ var Items = function () {
         });
     }
 
+    // projects
+    var oTableProjects;
+    var projects = [];
+    var initTableProjects = function () {
+        MyApp.block('#projects-table-editable');
+
+        var table = $('#projects-table-editable');
+
+        var aoColumns = [
+            {
+                field: "number",
+                title: "C & G Project #",
+                width: 120,
+            },
+            {
+                field: "county",
+                title: "County"
+            },
+            {
+                field: "name",
+                title: "Name"
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit project"><i class="la la-edit"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableProjects = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: projects,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-projects .m_form_search'),
+            }
+        });
+
+        //Events
+        oTableProjects
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#projects-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#projects-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#projects-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#projects-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#projects-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+    };
+    var actualizarTableListaProjects = function () {
+        if (oTableProjects) {
+            oTableProjects.destroy();
+        }
+
+        initTableProjects();
+    }
+
+    var initAccionesProjects = function () {
+
+        $(document).off('click', "#projects-table-editable a.edit");
+        $(document).on('click', "#projects-table-editable a.edit", function (e) {
+            var posicion = $(this).data('posicion');
+            if (projects[posicion]) {
+
+                localStorage.setItem('project_id_edit', projects[posicion].project_id);
+
+                // open
+                window.open(
+                    url_project,                // URL a abrir
+                    '_blank',           // Abrir en una nueva pestaña o ventana
+                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
+                );
+
+            }
+        });
+
+    };
+
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 1;
+    var initWizard = function () {
+        $(document).off('click', "#form-item .wizard-tab");
+        $(document).on('click', "#form-item .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
+
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
+            }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
+                $('#btn-wizard-siguiente').removeClass('m--hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('m--hide');
+                $('#btn-wizard-siguiente').removeClass('m--hide');
+            }
+            if (activeTab == totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('m--hide');
+                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
+            }
+
+            //bug visual de la tabla que muestra las cols corridas
+            switch (activeTab) {
+                case 2:
+                    actualizarTableListaProjects()
+                    break;
+            }
+
+        });
+
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('m--hide');
+                if (activeTab == totalTabs) {
+                    // $('#btn-wizard-finalizar').removeClass('m--hide');
+                    $('#btn-wizard-siguiente').addClass('m--hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('m--hide');
+            }
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').addClass('m--hide');
+                $('#btn-wizard-siguiente').removeClass('m--hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-projects').tab('show');
+                    actualizarTableListaProjects();
+                    break;
+
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 1;
+        mostrarTab();
+        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
+        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
+        $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
+        $('#nav-tabs-item').removeClass('m--hide').addClass('m--hide');
+    }
+    var validWizard = function () {
+        return true;
+    }
+
     return {
         //main function to initiate the module
         init: function () {
@@ -637,6 +877,7 @@ var Items = function () {
             initWidgets();
             initTable();
             initForm();
+            initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
@@ -650,6 +891,10 @@ var Items = function () {
             initAccionesUnit();
             // equations
             initAccionesEquation();
+
+            // projects
+            initTableProjects();
+            initAccionesProjects();
         }
 
     };

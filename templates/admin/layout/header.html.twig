@@ -83,14 +83,25 @@
                                                                     <div class="m-list-timeline__group">
                                                                         <div class="m-list-timeline__items">
                                                                             {% for item in notificaciones %}
-                                                                                <div class="m-list-timeline__item {{ item.class }}">
-                                                                                    <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
-                                                                                    <a class="m-list-timeline__text"
-                                                                                       href="{{ url('notification') }}">
-                                                                                        <b>{{ item.usuario }}</b><br>{{ item.descripcion }}
-                                                                                    </a>
-                                                                                    <span class="m-list-timeline__time">{{ item.fecha }}</span>
-                                                                                </div>
+                                                                                {% if item.project_id != '' %}
+                                                                                    <div class="m-list-timeline__item {{ item.class }}">
+                                                                                        <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
+                                                                                        <a class="m-list-timeline__text notificacion-item" data-id="{{ item.project_id }}"
+                                                                                           href="javascript:;">
+                                                                                            <b>{{ item.usuario }}</b><br>{{ item.descripcion }}
+                                                                                        </a>
+                                                                                        <span class="m-list-timeline__time">{{ item.fecha }}</span>
+                                                                                    </div>
+                                                                                    {% else %}
+                                                                                    <div class="m-list-timeline__item {{ item.class }}">
+                                                                                        <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
+                                                                                        <a class="m-list-timeline__text"
+                                                                                           href="{{ url('notification') }}">
+                                                                                            <b>{{ item.usuario }}</b><br>{{ item.descripcion }}
+                                                                                        </a>
+                                                                                        <span class="m-list-timeline__time">{{ item.fecha }}</span>
+                                                                                    </div>
+                                                                                {% endif %}
                                                                             {% endfor %}
                                                                         </div>
                                                                     </div>
