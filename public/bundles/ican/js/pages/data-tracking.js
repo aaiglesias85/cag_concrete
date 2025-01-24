@@ -173,9 +173,9 @@ var DataTracking = function () {
                     }
                 }
             },
-            rows:{
+            rows: {
                 afterTemplate: function (row, data, index) {
-                    if(data.pending === 1){
+                    if (data.pending === 1) {
                         $(row).addClass('row-pending');
                     }
                 }
@@ -426,11 +426,11 @@ var DataTracking = function () {
                         mApp.unblock('#modal-data-tracking .modal-content');
                         if (response.success) {
 
-                            if(response.existe){
+                            if (response.existe) {
 
                                 $('#modal-data-tracking-confirm').modal('show');
 
-                            }else{
+                            } else {
                                 SalvarDataTracking();
                             }
 
@@ -799,6 +799,20 @@ var DataTracking = function () {
 
         $('#color_used').change(calcularTotalColorPrice);
         $('#color_price').change(calcularTotalColorPrice);
+
+        $('#employee').change(changeEmployee);
+    }
+
+    var changeEmployee = function () {
+        var employee_id = $('#employee').val();
+
+        // reset
+        $('#labor-role').val('');
+        if (employee_id != '') {
+            var position = $('#employee option[value="' + employee_id + '"]').data("position");
+            $('#labor-role').val(position);
+        }
+
     }
 
     var initSelectProject = function () {
@@ -1946,6 +1960,28 @@ var DataTracking = function () {
                 }
             });
 
+        });
+
+        // employees
+        $(document).off('click', "#btn-add-employee");
+        $(document).on('click', "#btn-add-employee", function (e) {
+
+            ModalEmployee.mostrarModal();
+
+        });
+
+        $('#modal-employee').on('hidden.bs.modal', function () {
+            var employee = ModalEmployee.getEmployee();
+            if (employee != null) {
+                //add employee to select
+                $('#employee').append(new Option(employee.name, employee.employee_id, false, false));
+                $('#employee option[value="' + employee.employee_id + '"]').attr("data-rate", employee.hourlyRate);
+                $('#employee option[value="' + employee.employee_id + '"]').attr("data-position", employee.position);
+                $('#employee').select2();
+
+                $('#employee').val(employee.employee_id);
+                $('#employee').trigger('change');
+            }
         });
 
         function EliminarLabor(posicion) {

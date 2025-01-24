@@ -172,6 +172,7 @@ class EmployeeService extends Base
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
+            $resultado['employee_id'] = $entity->getEmployeeId();
 
             return $resultado;
         }
@@ -212,6 +213,7 @@ class EmployeeService extends Base
         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
         $resultado['success'] = true;
+        $resultado['employee_id'] = $entity->getEmployeeId();
 
         return $resultado;
     }

@@ -940,16 +940,23 @@
                                 <span class="ic-small italic">(required)</span>
                             </label>
                             <div class="row">
-                                <div class="col-md-12" id="select-employee">
+                                <div class="col-md-10" id="select-employee">
                                     <select class="form-control m-select2" id="employee">
                                         <option value="">Select</option>
                                         {% for item in employees %}
                                             <option value="{{ item.employeeId }}"
-                                                    data-rate="{{ item.hourlyRate }}">
+                                                    data-rate="{{ item.hourlyRate }}"
+                                                    data-position="{{ item.position }}">
                                                 {{ item.name }}
                                             </option>
                                         {% endfor %}
                                     </select>
+                                </div>
+                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                    <a href="javascript:;" title="Add employee" id="btn-add-employee"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                        <i class="la la-plus"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1594,6 +1601,7 @@
     <!-- components -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalInspector')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemProject')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployee')) }}
 
 {% endblock %}
 
@@ -1604,6 +1612,7 @@
         jQuery(document).ready(function () {
             ModalInspector.init();
             ModalItemProject.init();
+            ModalEmployee.init();
         });
     </script>
 

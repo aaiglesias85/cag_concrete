@@ -181,4 +181,11 @@ class DefaultController extends AbstractController
 
         ));
     }
+
+    public function renderModalEmployee()
+    {
+        return $this->render('admin/block/modal-employee.html.twig', array(
+
+        ));
+    }
 }
