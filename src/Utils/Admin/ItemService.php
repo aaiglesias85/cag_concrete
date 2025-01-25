@@ -266,13 +266,20 @@ class ItemService extends Base
                 $entity->setUnit($unit);
             }
 
-            $entity->setEquation(NULL);
+            $equation_id_old = $entity->getEquation() ? $entity->getEquation()->getEquationId() : '';
+            $equation = null;
+            $entity->setEquation($equation);
             if ($equation_id != '') {
                 $equation = $this->getDoctrine()->getRepository(Equation::class)->find($equation_id);
                 $entity->setEquation($equation);
             }
 
             $entity->setUpdatedAt(new \DateTime());
+
+            // actualizar en los item project
+            if ($equation_id_old != $equation_id) {
+                $this->ActualizarEquationItemProjects($item_id, $yield_calculation, $equation);
+            }
 
             $em->flush();
 
@@ -285,6 +292,22 @@ class ItemService extends Base
             $resultado['success'] = true;
 
             return $resultado;
+        }
+    }
+
+    /**
+     * ActualizarEquationItemProjects
+     * @param $item_id
+     * @param $equation
+     * @return void
+     */
+    public function ActualizarEquationItemProjects($item_id, $yield_calculation, $equation)
+    {
+        $project_items = $this->getDoctrine()->getRepository(ProjectItem::class)
+            ->ListarProjectsDeItem($item_id);
+        foreach ($project_items as $project_item) {
+            $project_item->setYieldCalculation($yield_calculation);
+            $project_item->setEquation($equation);
         }
     }
 

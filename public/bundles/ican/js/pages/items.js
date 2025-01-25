@@ -426,6 +426,11 @@ var Items = function () {
                         $('#equation').val(response.item.equation_id);
                         $('#equation').trigger('change');
 
+                        if (response.item.yield_calculation === 'equation') {
+                            $('#select-equation').removeClass('m--hide');
+                        }
+
+
                         $('#yield-calculation').on('change', changeYield);
 
                         // projects
@@ -614,7 +619,7 @@ var Items = function () {
 
         $('#modal-unit').on('hidden.bs.modal', function () {
             var unit = ModalUnit.getUnit();
-            if(unit != null){
+            if (unit != null) {
                 $('#unit').append(new Option(unit.description, unit.unit_id, false, false));
                 $('#unit').select2();
 
@@ -633,7 +638,7 @@ var Items = function () {
 
         $('#modal-equation').on('hidden.bs.modal', function () {
             var equation = ModalEquation.getEquation();
-            if(equation != null){
+            if (equation != null) {
                 $('#equation').append(new Option(`${equation.description} ${equation.equation}`, equation.equation_id, false, false));
                 $('#equation').select2();
 
