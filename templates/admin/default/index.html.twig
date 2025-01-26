@@ -7,12 +7,24 @@
         .m--bg-brand-donut {
             background-color: #716aca !important;
         }
-        .m-widget14__legend-text, .m-widget14__stat{
+
+        .m-widget14__legend-text, .m-widget14__stat {
             font-weight: bold !important;
             color: #9699a2 !important;
         }
-        .m-widget5__sales{
+
+        .m-widget5__sales {
             font-weight: bold !important;
+        }
+
+        #view-project > .input-group-text {
+            cursor: pointer;
+            background-color: #36a3f7;
+            border-color: #36a3f7;
+        }
+
+        #view-project > .input-group-text > i {
+            color: #fff;
         }
     </style>
 {% endblock %}
@@ -65,10 +77,10 @@
                     <div class="col-12 col-sm-3 col-md-5 mb-2 mb-sm-0">
 
                         <div class='input-group flex-nowrap'>
-                            <select class="form-control m-select2 event-change" id="project" >
+                            <select class="form-control m-select2 event-change" id="project">
                                 <option></option>
                             </select>
-                            <div class="input-group-append m--hide" style="cursor: pointer" id="view-project">
+                            <div class="input-group-append m--hide" id="view-project">
                                 <span class="input-group-text"><i class="flaticon-eye"></i></span>
                             </div>
                         </div>
@@ -147,7 +159,8 @@
 
                             {% for item in projects %}
                                 <div class="m-widget1__item">
-                                    <div class="row m-row--no-padding align-items-center project-item" data-id="{{ item.project_id }}" style="cursor: pointer;">
+                                    <div class="row m-row--no-padding align-items-center project-item"
+                                         data-id="{{ item.project_id }}" style="cursor: pointer;">
                                         <div class="col">
                                             <h3 class="m-widget1__title">{{ item.number }}</h3>
                                             <span class="m-widget1__desc">{{ item.name }}</span>
@@ -270,7 +283,8 @@
                             <div class="row  align-items-center">
                                 <div class="col">
                                     <div id="m_chart_sales_stats" class="m-widget14__chart" style="height: 160px">
-                                        <div class="m-widget14__stat" style="font-size: 1rem;" id="m_chart_sales_stats_total">
+                                        <div class="m-widget14__stat" style="font-size: 1rem;"
+                                             id="m_chart_sales_stats_total">
                                             ${{ chart3.total | number_format(2, '.', ',') }}
                                         </div>
                                     </div>
@@ -296,7 +310,8 @@
                             <div class="row  align-items-center">
                                 <div class="col">
                                     <div class="m-widget5">
-                                        <div class="m-scrollable" data-scrollable="true" data-height="400" data-mobile-height="300">
+                                        <div class="m-scrollable" data-scrollable="true" data-height="400"
+                                             data-mobile-height="300">
                                             <div id="items-body">
                                                 {% for item in items %}
                                                     <div class="m-widget5__item">
@@ -338,7 +353,8 @@
                             <div class="row  align-items-center">
                                 <div class="col">
                                     <div class="m-widget5">
-                                        <div class="m-scrollable" data-scrollable="true" data-height="400" data-mobile-height="300">
+                                        <div class="m-scrollable" data-scrollable="true" data-height="400"
+                                             data-mobile-height="300">
                                             <div id="materials-body">
                                                 {% for item in materials %}
                                                     <div class="m-widget5__item">
