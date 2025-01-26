@@ -1125,10 +1125,10 @@ class ProjectService extends Base
             }
 
             if ($due_date != '') {
-
-                if ($due_date != $entity->getDueDate()->format('m/d/Y')) {
+                $due_date_old = $entity->getDueDate() != '' ? $entity->getDueDate()->format('m/d/Y'): '';
+                if ($due_date != $due_date_old) {
                     $notas[] = [
-                        'notes' => 'Change due date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $entity->getDueDate()->format('m/d/Y')),
+                        'notes' => 'Change due date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $due_date_old),
                         'date' => new \DateTime()
                     ];
                 }
