@@ -1097,11 +1097,14 @@ class ProjectService extends Base
             }
             $entity->setCertifiedPayrolls($certified_payrolls);
 
+
+            // start date
+            $start_date_old = $entity->getStartDate() != '' ? $entity->getStartDate()->format('m/d/Y') : '';
             if ($start_date != '') {
 
-                if ($start_date != $entity->getStartDate()->format('m/d/Y')) {
+                if ($start_date != $start_date_old) {
                     $notas[] = [
-                        'notes' => 'Change start date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $entity->getStartDate()->format('m/d/Y')),
+                        'notes' => 'Change start date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $start_date_old),
                         'date' => new \DateTime()
                     ];
                 }
@@ -1111,11 +1114,14 @@ class ProjectService extends Base
                 $entity->setStartDate($start_date);
             }
 
-            if ($end_date != '' && $entity->getEndDate() != '') {
 
-                if ($end_date != $entity->getEndDate()->format('m/d/Y')) {
+            // end date
+            $end_date_old = $entity->getEndDate() != '' ? $entity->getEndDate()->format('m/d/Y') : '';
+            if ($end_date != '') {
+
+                if ($end_date != $end_date_old) {
                     $notas[] = [
-                        'notes' => 'Change end date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $entity->getEndDate()->format('m/d/Y')),
+                        'notes' => 'Change end date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $end_date_old),
                         'date' => new \DateTime()
                     ];
                 }
@@ -1124,8 +1130,10 @@ class ProjectService extends Base
                 $entity->setEndDate($end_date);
             }
 
+            // due date
+            $due_date_old = $entity->getDueDate() != '' ? $entity->getDueDate()->format('m/d/Y') : '';
+            $entity->setDueDate(NULL);
             if ($due_date != '') {
-                $due_date_old = $entity->getDueDate() != '' ? $entity->getDueDate()->format('m/d/Y'): '';
                 if ($due_date != $due_date_old) {
                     $notas[] = [
                         'notes' => 'Change due date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $due_date_old),
