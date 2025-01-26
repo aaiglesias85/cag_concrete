@@ -64,9 +64,14 @@
 
                     <div class="col-12 col-sm-3 col-md-3 mb-2 mb-sm-0">
 
-                        <select class="form-control m-select2 event-change" id="project" >
-                            <option></option>
-                        </select>
+                        <div class='input-group flex-nowrap'>
+                            <select class="form-control m-select2 event-change" id="project" >
+                                <option></option>
+                            </select>
+                            <div class="input-group-append m--hide" style="cursor: pointer" id="view-project">
+                                <span class="input-group-text"><i class="flaticon-eye"></i></span>
+                            </div>
+                        </div>
                         {#
                         <select class="form-control m-select2 event-change" id="project">
                             <option value="">Project</option>

@@ -293,15 +293,15 @@ var Index = function () {
                 url: "project/listarOrdenados",
                 dataType: 'json',
                 delay: 250,
-                data: function(params) {
+                data: function (params) {
                     return {
                         search: params.term  // El término de búsqueda ingresado por el usuario
                     };
                 },
-                processResults: function(data) {
+                processResults: function (data) {
                     // Convierte los resultados de la API en el formato que Select2 espera
                     return {
-                        results: $.map(data.projects, function(item) {
+                        results: $.map(data.projects, function (item) {
                             return {
                                 id: item.project_id,  // ID del elemento
                                 text: `${item.number} - ${item.name}` // El nombre que se mostrará
@@ -324,6 +324,14 @@ var Index = function () {
     }
 
     var changeProject = function (e) {
+        var project_id = $('#project').val();
+
+        // reset
+        $('#view-project').removeClass('m--hide').addClass('m--hide');
+        if (project_id && project_id !== '') {
+            $('#view-project').removeClass('m--hide');
+        }
+
         btnClickFiltrar();
     }
 
@@ -507,6 +515,23 @@ var Index = function () {
         $(document).on('click', ".project-item", function (e) {
             var project_id = $(this).data('id');
             if (project_id) {
+
+                localStorage.setItem('project_id_edit', project_id);
+
+                // open
+                window.open(
+                    url_project,                // URL a abrir
+                    '_blank',           // Abrir en una nueva pestaña o ventana
+                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
+                );
+
+            }
+        });
+
+        $(document).off('click', "#view-project");
+        $(document).on('click', "#view-project", function (e) {
+            var project_id = $('#project').val();
+            if (project_id && project_id !== '') {
 
                 localStorage.setItem('project_id_edit', project_id);
 
