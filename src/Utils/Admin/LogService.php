@@ -76,7 +76,7 @@ class LogService extends Base
         $arreglo_resultado = array();
         $cont = 0;
 
-        $usuario_id = ($usuario->isAdministrador()) ? "" : $usuario->getUsuarioId();
+        $usuario_id = $usuario->getUsuarioId();
 
         $lista = $this->getDoctrine()->getRepository(Log::class)
             ->ListarLogsRangoFecha("", "", 30, $usuario_id, 'DESC');
