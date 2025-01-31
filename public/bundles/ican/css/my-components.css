@@ -410,3 +410,22 @@ div.tagsinput.has-error {
 .note-editor.note-frame .note-editing-area .note-editable {
     padding-top: 20px;
 }
+
+.bg-notificacioness-nuevas .m-nav__link-icon-wrapper {
+    background: #dc3545;
+    border: 1px solid #dc3545;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bg-notificacioness-nuevas .m-nav__link-icon-wrapper:hover,
+.bg-notificacioness-nuevas .m-nav__link-icon-wrapper:focus,
+.bg-notificacioness-nuevas .m-nav__link-icon-wrapper:active,
+.bg-notificacioness-nuevas:hover .m-nav__link-icon-wrapper{
+    background: #c82333 !important; /* Un tono más oscuro */
+    border-color: #bd2130  !important;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.6) !important; /* Sombra sutil */
+}
+
+.bg-notificacioness-nuevas .m-nav__link-icon-wrapper >i {
+    color: #ffffff !important;
+}

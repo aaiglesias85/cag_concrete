@@ -41,10 +41,12 @@
                             <li class="m-nav__item m-topbar__notifications m-dropdown m-dropdown--large m-dropdown--arrow m-dropdown--align-right m-dropdown--mobile-full-width"
                                 m-dropdown-toggle="click" m-dropdown-persistent="1">
                                 <a href="javascript:;" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
+                                    {#
                                     {% if notificaciones_sin_leer > 0 %}
                                     <span class="m-nav__link-badge m-badge m-badge--dot m-badge--dot-small m-badge--danger"></span>
                                     {% endif %}
-                                    <span class="m-nav__link-icon">
+                                    #}
+                                    <span class="m-nav__link-icon {% if notificaciones_sin_leer > 0 %}bg-notificacioness-nuevas{% endif %}">
                                         <span class="m-nav__link-icon-wrapper"><i class="flaticon-alarm"></i></span>
                                     </span>
                                 </a>
