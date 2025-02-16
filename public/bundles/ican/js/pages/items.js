@@ -766,11 +766,7 @@ var Items = function () {
                 localStorage.setItem('project_id_edit', projects[posicion].project_id);
 
                 // open
-                window.open(
-                    url_project,                // URL a abrir
-                    '_blank',           // Abrir en una nueva pestaña o ventana
-                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
-                );
+                window.location.href = url_project;
 
             }
         });

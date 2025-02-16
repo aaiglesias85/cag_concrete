@@ -36,14 +36,18 @@ var ModalItemProject = function () {
         $('#item-name').val('');
         $('#item-name').removeClass('m--hide').addClass('m--hide');
 
-        $('#unit').val('');
-        $('#unit').trigger('change');
+        $('#unit-item-project').val('');
+        $('#unit-item-project').trigger('change');
         $('#select-unit').removeClass('m--hide').addClass('m--hide');
+
+        $('#div-item-quantity').removeClass('m--hide');
+        $('#item-quantity').val(0);
 
         if (!state) {
             $('#div-item').removeClass('m--hide').addClass('m--hide');
             $('#item-name').removeClass('m--hide');
             $('#select-unit').removeClass('m--hide');
+            $('#div-item-quantity').removeClass('m--hide').addClass('m--hide');
         }
     }
 
@@ -158,7 +162,7 @@ var ModalItemProject = function () {
 
             if ($('#item-form').valid() && isValidItem() && isValidYield() && isValidUnit()) {
 
-                var unit_id = $('#unit').val();
+                var unit_id = $('#unit-item-project').val();
                 var price = $('#item-price').val();
                 var quantity = $('#item-quantity').val();
                 var yield_calculation = $('#yield-calculation').val();
@@ -264,12 +268,11 @@ var ModalItemProject = function () {
             var valid = true;
 
             var item_type = $('#item-type').prop('checked');
-            var unit_id = $('#unit').val();
+            var unit_id = $('#unit-item-project').val();
 
             if (!item_type && unit_id == '') {
                 valid = false;
             }
-
 
             return valid;
         }
@@ -296,6 +299,9 @@ var ModalItemProject = function () {
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
 
+        $('#div-item-quantity').removeClass('m--hide');
+        $('#item-quantity').val(0);
+
         $('#item-type').prop('checked', true);
         $("#item-type").bootstrapSwitch("state", true, true);
 
@@ -312,8 +318,8 @@ var ModalItemProject = function () {
         $('#div-item').removeClass('m--hide');
         $('#item-name').removeClass('m--hide').addClass('m--hide');
 
-        $('#unit').val('');
-        $('#unit').trigger('change');
+        $('#unit-item-project').val('');
+        $('#unit-item-project').trigger('change');
         $('#select-unit').removeClass('m--hide').addClass('m--hide');
 
         var $element = $('.select2');
@@ -336,12 +342,12 @@ var ModalItemProject = function () {
 
         $('#modal-unit').on('hidden.bs.modal', function () {
             var unit = ModalUnit.getUnit();
-            if(unit != null){
-                $('#unit').append(new Option(unit.description, unit.unit_id, false, false));
-                $('#unit').select2();
+            if (unit != null) {
+                $('#unit-item-project').append(new Option(unit.description, unit.unit_id, false, false));
+                $('#unit-item-project').select2();
 
-                $('#unit').val(unit.unit_id);
-                $('#unit').trigger('change');
+                $('#unit-item-project').val(unit.unit_id);
+                $('#unit-item-project').trigger('change');
             }
         });
     }
@@ -355,7 +361,7 @@ var ModalItemProject = function () {
 
         $('#modal-equation').on('hidden.bs.modal', function () {
             var equation = ModalEquation.getEquation();
-            if(equation != null){
+            if (equation != null) {
                 $('#equation').append(new Option(`${equation.description} ${equation.equation}`, equation.equation_id, false, false));
                 $('#equation').select2();
 

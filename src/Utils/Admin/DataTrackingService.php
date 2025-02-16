@@ -7,7 +7,9 @@ use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingMaterial;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Employee;
+use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Item;
 use App\Entity\Material;
@@ -18,6 +20,7 @@ use App\Utils\Base;
 
 class DataTrackingService extends Base
 {
+
 
     /**
      * EliminarConcVendorDataTracking: Elimina un conc vendor en la BD
@@ -134,6 +137,44 @@ class DataTrackingService extends Base
     }
 
     /**
+     * EliminarItemSubcontract: Elimina un subcontract en la BD
+     * @param int $subcontract_id Id
+     * @author Marcel
+     */
+    public function EliminarItemSubcontract($subcontract_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->find($subcontract_id);
+        /**@var DataTrackingSubcontract $entity */
+        if ($entity != null) {
+
+
+            $project_name = $entity->getDataTracking()->getProject()->getProjectNumber() . " - " . $entity->getDataTracking()->getProject()->getName();
+            $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
+
+            $item_name = $entity->getItem()->getDescription();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Data Tracking";
+            $log_descripcion = "The subcontract item of the data tracking is deleted, Item: $item_name, Project: $project_name, Date: $date";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
+
+    /**
      * EliminarItemDataTracking: Elimina un item details en la BD
      * @param int $data_tracking_item_id Id
      * @author Marcel
@@ -235,6 +276,10 @@ class DataTrackingService extends Base
             $items = $this->ListarItemsDeDataTracking($data_tracking_id);
             $arreglo_resultado['items'] = $items;
 
+            // subcontracts
+            $subcontracts = $this->ListarSubcontractsDeDataTracking($data_tracking_id);
+            $arreglo_resultado['subcontracts'] = $subcontracts;
+
             // project items
             $arreglo_resultado['project_items'] = $projectService->ListarItemsDeProject($project_id);
 
@@ -261,6 +306,13 @@ class DataTrackingService extends Base
 
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalDaily($data_tracking_id);
+
+            $total_subcontract = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+                ->TotalPrice($data_tracking_id);
+
+            $total_daily_today = $total_daily_today - $total_subcontract;
+
+            $arreglo_resultado['total_subcontract'] = $total_subcontract;
             $arreglo_resultado['total_daily_today'] = $total_daily_today;
 
 
@@ -381,6 +433,39 @@ class DataTrackingService extends Base
         }
 
         return $items;
+    }
+
+    /**
+     * ListarSubcontractsDeDataTracking
+     * @param $data_tracking_id
+     * @return array
+     */
+    public function ListarSubcontractsDeDataTracking($data_tracking_id)
+    {
+        $subcontracts = [];
+
+        $lista = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontracts($data_tracking_id);
+        foreach ($lista as $key => $value) {
+
+            $quantity = $value->getQuantity();
+            $price = $value->getPrice();
+            $total = $quantity * $price;
+
+            $subcontracts[] = [
+                'subcontract_id' => $value->getId(),
+                "item_id" => $value->getItem()->getItemId(),
+                "item" => $value->getItem()->getDescription(),
+                "unit" => $value->getItem()->getUnit()->getDescription(),
+                "quantity" => $quantity,
+                "price" => $price,
+                "total" => $total,
+                "notes" => $value->getNotes(),
+                "posicion" => $key
+            ];
+        }
+
+        return $subcontracts;
     }
 
     /**
@@ -551,6 +636,13 @@ class DataTrackingService extends Base
         foreach ($data_tracking_materials as $data_tracking_material) {
             $em->remove($data_tracking_material);
         }
+
+        // data tracking subcontract
+        $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontracts($data_tracking_id);
+        foreach ($subcontract_items as $subcontract_item) {
+            $em->remove($subcontract_item);
+        }
     }
 
     /**
@@ -562,7 +654,7 @@ class DataTrackingService extends Base
     public function SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                                        $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
                                        $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials, $conc_vendors,
-                                       $color_used, $color_price)
+                                       $color_used, $color_price, $subcontracts)
     {
 
         $em = $this->getDoctrine()->getManager();
@@ -679,6 +771,8 @@ class DataTrackingService extends Base
         $this->SalvarLabor($entity, $labor);
         // materials
         $this->SalvarMaterials($entity, $materials);
+        // subcontracts
+        $this->SalvarSubcontracts($entity, $subcontracts);
 
         $em->flush();
 
@@ -844,6 +938,49 @@ class DataTrackingService extends Base
     }
 
     /**
+     * SalvarSubcontracts
+     * @param array $subcontracts
+     * @param DataTracking $entity
+     * @return array
+     */
+    public function SalvarSubcontracts($entity, $subcontracts)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($subcontracts as $value) {
+
+            $subcontract_entity = null;
+
+            if (is_numeric($value->subcontract_id)) {
+                $subcontract_entity = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+                    ->find($value->subcontract_id);
+            }
+
+            $is_new_subcontract = false;
+            if ($subcontract_entity == null) {
+                $subcontract_entity = new DataTrackingSubcontract();
+                $is_new_subcontract = true;
+            }
+
+            $subcontract_entity->setPrice($value->price);
+            $subcontract_entity->setQuantity($value->quantity);
+            $subcontract_entity->setNotes($value->notes);
+
+            if ($value->item_id != '') {
+                $item_entity = $this->getDoctrine()->getRepository(Item::class)
+                    ->find($value->item_id);
+                $subcontract_entity->setItem($item_entity);
+            }
+
+            if ($is_new_subcontract) {
+                $subcontract_entity->setDataTracking($entity);
+
+                $em->persist($subcontract_entity);
+            }
+        }
+    }
+
+    /**
      * SalvarItems
      * @param array $items
      * @param DataTracking $entity
@@ -933,6 +1070,11 @@ class DataTrackingService extends Base
 
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalDaily($data_tracking_id);
+
+            $total_subcontract = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+                ->TotalPrice($data_tracking_id);
+
+            $total_daily_today = $total_daily_today - $total_subcontract;
 
 
             // concrete used price

@@ -2,11 +2,13 @@
 
 namespace App\Utils;
 
+use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
+use App\Entity\Unit;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -889,5 +891,92 @@ class Base
         return $nota;
     }
 
+    /**
+     * AgregarNewItem
+     * @param $value
+     * @return Item
+     */
+    public function AgregarNewItem($value, $equation_entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $item_entity = new Item();
+
+        $item_entity->setDescription($value->item);
+        $item_entity->setPrice($value->price);
+        $item_entity->setStatus(1);
+        $item_entity->setYieldCalculation($value->yield_calculation);
+
+        if ($value->unit_id != '') {
+            $unit = $this->getDoctrine()->getRepository(Unit::class)->find($value->unit_id);
+            $item_entity->setUnit($unit);
+        }
+
+        $item_entity->setEquation($equation_entity);
+
+        $item_entity->setCreatedAt(new \DateTime());
+
+        $em->persist($item_entity);
+
+        $em->flush();
+
+        return $item_entity;
+    }
+
+    /***
+     * ListarTodosItems
+     * @return array
+     */
+    public function ListarTodosItems()
+    {
+        $items = [];
+
+        $lista = $this->getDoctrine()->getRepository(Item::class)->ListarOrdenados();
+        foreach ($lista as $value) {
+            $item = $this->DevolverItem($value);
+            $items[] = $item;
+        }
+
+        return $items;
+
+    }
+
+    /**
+     * DevolverItem
+     * @param Item $value
+     * @return array
+     */
+    public function DevolverItem($value)
+    {
+        $yield_calculation_name = $this->DevolverYieldCalculationDeItem($value);
+
+        return [
+            "item_id" => $value->getItemId(),
+            "item" => $value->getDescription(),
+            "unit" => $value->getUnit()->getDescription(),
+            "yield_calculation" => $value->getYieldCalculation(),
+            "yield_calculation_name" => $yield_calculation_name,
+            "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
+        ];
+    }
+
+    /**
+     * DevolverYieldCalculationDeItem
+     * @param Item $item_entity
+     * @return string
+     */
+    public function DevolverYieldCalculationDeItem($item_entity)
+    {
+        $yield_calculation = $item_entity->getYieldCalculation();
+
+        $yield_calculation_name = $this->BuscarYieldCalculation($yield_calculation);
+
+        // para la ecuacion devuelvo la ecuacion asociada
+        if ($yield_calculation == 'equation' && $item_entity->getEquation() != null) {
+            $yield_calculation_name = $item_entity->getEquation()->getEquation();
+        }
+
+        return $yield_calculation_name;
+    }
 
 }

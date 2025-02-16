@@ -8,6 +8,7 @@ use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingMaterial;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;
@@ -24,6 +25,12 @@ class DefaultService extends Base
      */
     public function FiltrarDashboard($project_id, $status, $fecha_inicial, $fecha_fin)
     {
+
+        //last 6 projects
+        $projects = $this->ListarProjectsParaDashboard( $project_id,$fecha_inicial, $fecha_fin, 'DESC', 6);
+
+        $stats = $this->ListarStats($fecha_inicial, $fecha_fin);
+
         $chart_costs = $this->DevolverDataChartCosts($project_id, $fecha_inicial, $fecha_fin, $status);
         $chart_profit = $this->DevolverDataChartProfit($project_id, $fecha_inicial, $fecha_fin, $status);
         $chart3 = $this->DevolverDataChart3($project_id, $fecha_inicial, $fecha_fin, $status);
@@ -33,6 +40,8 @@ class DefaultService extends Base
         $materials = $this->ListarMaterialsConMontos($project_id, $fecha_inicial, $fecha_fin, $status);
 
         return [
+            'projects' => $projects,
+            'stats' => $stats,
             'chart_costs' => $chart_costs,
             'chart_profit' => $chart_profit,
             'chart3' => $chart3,
@@ -45,12 +54,12 @@ class DefaultService extends Base
      * ListarProjectsParaDashboard: lista los projects ordenados por el due date
      * @return array
      */
-    public function ListarProjectsParaDashboard($project_id = '', $sort = 'ASC', $limit = '')
+    public function ListarProjectsParaDashboard($project_id = '', $from = '', $to = '', $sort = 'ASC', $limit = '')
     {
         $arreglo_resultado = [];
 
         $lista = $this->getDoctrine()->getRepository(Project::class)
-            ->ListarProjectsParaDashboard('', '', $sort, $limit, $project_id);
+            ->ListarProjectsParaDashboard($from, $to, $sort, $limit, $project_id);
         foreach ($lista as $value) {
             $project_id = $value->getProjectId();
 
@@ -71,19 +80,19 @@ class DefaultService extends Base
      * ListarStats: listar stats
      * @return array
      */
-    public function ListarStats()
+    public function ListarStats($from = '', $to = '')
     {
         // total de proyectos In Progress
         $total_proyectos_activos = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 1);
+            ->TotalProjects('', '', '', 1, $from, $to);
 
         // total de proyectos Not Started
         $total_proyectos_inactivos = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 0);
+            ->TotalProjects('', '', '', 0, $from, $to);
 
         // total de proyectos Completed
         $total_proyectos_completed = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 2);
+            ->TotalProjects('', '', '', 2, $from, $to);
 
         return [
             'total_proyectos_activos' => $total_proyectos_activos,
@@ -201,7 +210,7 @@ class DefaultService extends Base
             $porciento = $total > 0 ? round($amount / $total * 100) : 0;
 
             $data[] = [
-                'name' => 'Invoice #' . $invoice->getNumber(),
+                'name' => 'Invoice #' . $invoice->getNumber(). ", Project: #".$invoice->getProject()->getProjectNumber(),
                 'amount' => $amount,
                 'porciento' => $porciento
             ];
@@ -263,6 +272,12 @@ class DefaultService extends Base
 
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalDaily('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+            $total_subcontract = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+                ->TotalPrice('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+            $total_daily_today = $total_daily_today - $total_subcontract;
+
 
             // concrete used price
             $total_concrete = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)

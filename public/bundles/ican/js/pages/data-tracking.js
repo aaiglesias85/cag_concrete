@@ -39,6 +39,7 @@ var DataTracking = function () {
                 title: "Conc. Used (CY)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>${MyApp.formatearNumero(row.totalConcUsed, 2, '.', ',')}</span>`;
                 }
@@ -48,6 +49,7 @@ var DataTracking = function () {
                 title: "Conc. Yield (CY)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>${MyApp.formatearNumero(row.total_concrete_yiel, 2, '.', ',')}</span>`;
                 }
@@ -57,6 +59,7 @@ var DataTracking = function () {
                 title: "Difference (CY)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>${MyApp.formatearNumero(row.lostConcrete, 2, '.', ',')}</span>`;
                 }
@@ -66,6 +69,7 @@ var DataTracking = function () {
                 title: "Conc. Total ($)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>$${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
                 }
@@ -75,6 +79,7 @@ var DataTracking = function () {
                 title: "Labor Total ($)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>$${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
                 }
@@ -84,6 +89,7 @@ var DataTracking = function () {
                 title: "Daily Total ($)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>$${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
                 }
@@ -93,6 +99,7 @@ var DataTracking = function () {
                 title: "Profit ($)",
                 width: 100,
                 textAlign: 'center',
+                sortable: false,
                 template: function (row) {
                     return `<span>$${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
                 }
@@ -273,6 +280,23 @@ var DataTracking = function () {
         $('#overhead_price').val('');
         $('#overhead_price').trigger('change');
 
+        $('#item-subcontract').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#item-subcontract').select2();
+
+        $('.select-item-data-tracking').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('.select-item-data-tracking').select2();
+
+        for (var i = 0; i < items.length; i++) {
+            $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
+        }
+        $('.select-item-data-tracking').select2();
+
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
@@ -291,6 +315,10 @@ var DataTracking = function () {
         // conc vendors
         conc_vendors = [];
         actualizarTableListaConcVendors();
+
+        // subcontracts
+        subcontracts = [];
+        actualizarTableListaSubcontracts();
 
         //Mostrar el primer tab
         resetWizard();
@@ -491,6 +519,7 @@ var DataTracking = function () {
                     'color_used': color_used,
                     'color_price': color_price,
                     'items': JSON.stringify(items_data_tracking),
+                    'subcontracts': JSON.stringify(subcontracts),
                     'labor': JSON.stringify(labor),
                     'materials': JSON.stringify(materials),
                     'conc_vendors': JSON.stringify(conc_vendors)
@@ -554,6 +583,13 @@ var DataTracking = function () {
                     if (response.success) {
 
                         // datos project
+                        $('#project').off('change', changeProject);
+
+                        $('#project').val(response.data_tracking.project_id);
+                        $('#project').trigger('change');
+
+                        $('#project').on('change', changeProject);
+
                         $('#proyect-number').html(response.data_tracking.project_number);
                         $('#proyect-name').html(response.data_tracking.project_name);
 
@@ -613,12 +649,18 @@ var DataTracking = function () {
                         // conc vendors
                         conc_vendors = response.data_tracking.conc_vendors;
 
+                        // subcontracts
+                        subcontracts = response.data_tracking.subcontracts;
+
                         // totals
                         $('#form-group-totals').removeClass('m--hide');
                         $('#total_concrete_yiel').val(response.data_tracking.total_concrete_yiel);
                         $('#total_quantity_today').val(response.data_tracking.total_quantity_today);
-                        $('#total_daily_today').val(response.data_tracking.total_daily_today);
-                        $('#profit').val(response.data_tracking.profit);
+
+
+                        $('#total_daily_today').val(MyApp.formatearNumero(response.data_tracking.total_daily_today, 2, '.', ','));
+
+                        $('#profit').val(MyApp.formatearNumero(response.data_tracking.profit, 2, '.', ','));
 
                     } else {
                         toastr.error(response.error, "");
@@ -642,7 +684,7 @@ var DataTracking = function () {
             $('.select-item-data-tracking').select2();
 
             for (var i = 0; i < items.length; i++) {
-                $('.select-item-data-tracking').append(new Option(items[i].item, items[i].project_item_id, false, false));
+                $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
             }
             $('.select-item-data-tracking').select2();
         }
@@ -788,9 +830,6 @@ var DataTracking = function () {
         $('#yield-calculation').change(changeYield);
         $('#material').change(changeMaterial);
 
-        $(document).off('switchChange.bootstrapSwitch', '#item-type');
-        $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
-
         $('#total_conc_used').change(calcularTotalConcrete);
         $('#conc_price').change(calcularTotalConcrete);
 
@@ -881,6 +920,26 @@ var DataTracking = function () {
         return price;
     }
 
+    var calcularTotalItemsPrice = function () {
+        var total = 0;
+
+        for (var i = 0; i < items_data_tracking.length; i++) {
+            total += items_data_tracking[i].quantity * items_data_tracking[i].price;
+        }
+
+        return total;
+    }
+
+    var calcularTotalSubcontracts = function () {
+        var total = 0;
+
+        for (var i = 0; i < subcontracts.length; i++) {
+            total += subcontracts[i].quantity * subcontracts[i].price;
+        }
+
+        return total;
+    }
+
     var calcularProfit = function () {
         var data_tracking_id = $('#data_tracking_id').val();
         if (data_tracking_id !== '') {
@@ -888,10 +947,15 @@ var DataTracking = function () {
             var total_labor = calcularTotalLaborPrice();
             var total_material = calcularTotalMaterialPrice();
             var total_overhead = $('#total_overhead_price').val();
-            var total_daily_today = $('#total_daily_today').val();
+
+            var total_daily_today = calcularTotalItemsPrice();
+            var total_subcontracts = calcularTotalSubcontracts();
+            total_daily_today = total_daily_today - total_subcontracts;
+
+            $('#total_daily_today').val(MyApp.formatearNumero(total_daily_today, 2, '.', ','));
 
             var profit = parseFloat(total_daily_today) - (parseFloat(total_concrete) + parseFloat(total_labor) + parseFloat(total_material) + parseFloat(total_overhead));
-            $('#profit').val(profit);
+            $('#profit').val(MyApp.formatearNumero(profit, 2, '.', ','));
         }
     }
 
@@ -1001,6 +1065,13 @@ var DataTracking = function () {
     var listarItemsDeProject = function (project_id) {
         MyApp.block('#modal-data-tracking .modal-content');
 
+        // reset
+        $('.select-item-data-tracking').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('.select-item-data-tracking').select2();
+
         $.ajax({
             type: "POST",
             url: "project/listarItems",
@@ -1017,7 +1088,7 @@ var DataTracking = function () {
                     console.log(items);
 
                     for (var i = 0; i < items.length; i++) {
-                        $('.select-item-data-tracking').append(new Option(items[i].item, items[i].project_item_id, false, false));
+                        $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
                     }
                     $('.select-item-data-tracking').select2();
 
@@ -1081,7 +1152,7 @@ var DataTracking = function () {
             if (item != null) {
                 //add items to select
                 items.push(item);
-                $('.select-item-data-tracking').append(new Option(item.item, item.project_item_id, false, false));
+                $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, item.project_item_id, false, false));
                 $('.select-item-data-tracking').select2();
 
                 $('#item-data-tracking').val(item.project_item_id);
@@ -1090,11 +1161,34 @@ var DataTracking = function () {
         });
 
     };
+    var initAccionesModalItemsSubcontract = function () {
+
+        $(document).off('click', "#btn-add-item-subcontract");
+        $(document).on('click', "#btn-add-item-subcontract", function (e) {
+
+            ModalItemSubcontract.mostrarModal();
+
+        });
+
+        $('#modal-item-subcontract').on('hidden.bs.modal', function () {
+            var item = ModalItemSubcontract.getItem();
+            if (item != null) {
+                //add items to select
+                all_items.push(item);
+                $('#item-subcontract').append(new Option(item.item, item.item_id, false, false));
+                $('#item-subcontract').select2();
+
+                $('#item-subcontract').val(item.item_id);
+                $('#item-subcontract').trigger('change');
+            }
+        });
+
+    };
 
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 5;
+    var totalTabs = 6;
     var initWizard = function () {
         $(document).off('click', "#modal-data-tracking .wizard-tab");
         $(document).on('click', "#modal-data-tracking .wizard-tab", function (e) {
@@ -1123,6 +1217,9 @@ var DataTracking = function () {
                 case 5:
                     actualizarTableListaConcVendors()
                     break;
+                case 6:
+                    actualizarTableListaSubcontracts()
+                    break;
             }
 
         });
@@ -1149,12 +1246,16 @@ var DataTracking = function () {
                     $('#tab-conc-vendor').tab('show');
                     actualizarTableListaConcVendors();
                     break;
+                case 6:
+                    $('#tab-subcontracts').tab('show');
+                    actualizarTableListaSubcontracts();
+                    break;
             }
         }, 0);
     }
     var resetWizard = function () {
         activeTab = 1;
-        totalTabs = 5;
+        totalTabs = 6;
         mostrarTab();
     }
     var validWizard = function () {
@@ -1298,6 +1399,9 @@ var DataTracking = function () {
             .on('m-datatable--on-uncheck', function (e, args) {
                 //eventsWriter('Checkbox inactive: ' + args.toString());
             });
+
+        var total = calcularTotalItemsPrice();
+        $('#monto_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
     var actualizarTableListaItems = function () {
         if (oTableItems) {
@@ -1369,6 +1473,11 @@ var DataTracking = function () {
 
             if ($('#data-tracking-item-form').valid() && item_id != '') {
 
+                if (ExisteItem(item_id)) {
+                    toastr.error("The selected item has already been added", "Error !!!");
+                    return;
+                }
+
                 var item = items.find(function (val) {
                     return val.project_item_id == item_id;
                 });
@@ -1397,7 +1506,7 @@ var DataTracking = function () {
                         price: price,
                         total: total,
                         notes: notes,
-                        posicion: items.length
+                        posicion: items_data_tracking.length
                     });
 
                 } else {
@@ -1446,7 +1555,7 @@ var DataTracking = function () {
         $(document).off('click', "#items-table-editable a.edit");
         $(document).on('click', "#items-table-editable a.edit", function (e) {
             var posicion = $(this).data('posicion');
-            if (items[posicion]) {
+            if (items_data_tracking[posicion]) {
 
                 // reset
                 resetFormItem();
@@ -1488,6 +1597,29 @@ var DataTracking = function () {
             });
 
         });
+
+        function ExisteItem(item_id) {
+            var result = false;
+
+            if (nEditingRowItem == null) {
+                for (var i = 0; i < items_data_tracking.length; i++) {
+                    if (items_data_tracking[i].item_id == item_id) {
+                        result = true;
+                        break;
+                    }
+                }
+            } else {
+                var posicion = nEditingRowItem;
+                for (var i = 0; i < items_data_tracking.length; i++) {
+                    if (items_data_tracking[i].item_id == item_id && items_data_tracking[i].data_tracking_item_id !== items_data_tracking[posicion].data_tracking_item_id) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        };
 
         function EliminarItem(posicion) {
             if (items_data_tracking[posicion]) {
@@ -1577,9 +1709,17 @@ var DataTracking = function () {
         $(document).off('click', "#btn-reset-filters");
         $(document).on('click', "#btn-reset-filters", function (e) {
 
+            $('#lista-data-tracking .m_form_search').val('');
+
+            $('#project').val('');
+            $('#project').trigger('change');
+
             $('#fechaInicial').val('');
             $('#fechaFin').val('');
-            $('#btn-filtrar-search').val('');
+
+            $('#pending').val('');
+            $('#pending').trigger('change');
+
             btnClickFiltrar();
 
         });
@@ -2183,6 +2323,9 @@ var DataTracking = function () {
             .on('m-datatable--on-uncheck', function (e, args) {
                 //eventsWriter('Checkbox inactive: ' + args.toString());
             });
+
+        var total = calcularTotalMaterialPrice();
+        $('#monto_total_material').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
     var actualizarTableListaMaterial = function () {
         if (oTableMaterial) {
@@ -2553,6 +2696,9 @@ var DataTracking = function () {
             .on('m-datatable--on-uncheck', function (e, args) {
                 //eventsWriter('Checkbox inactive: ' + args.toString());
             });
+
+        var total = calcularTotalConcPrice();
+        $('#monto_total_conc_vendor').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
     var actualizarTableListaConcVendors = function () {
         if (oTableConcVendor) {
@@ -2804,6 +2950,420 @@ var DataTracking = function () {
         return total;
     }
 
+    // subcontracts
+    var oTableSubcontracts;
+    var subcontracts = [];
+    var nEditingRowSubcontract = null;
+    var initTableSubcontracts = function () {
+        MyApp.block('#subcontracts-table-editable');
+
+        var table = $('#subcontracts-table-editable');
+
+        var aoColumns = [
+            {
+                field: "item",
+                title: "Item",
+            },
+            {
+                field: "unit",
+                title: "Unit",
+                width: 100,
+            },
+            {
+                field: "quantity",
+                title: "Quantity",
+                width: 120,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "price",
+                title: "Price",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "total",
+                title: "$ Total",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableSubcontracts = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: subcontracts,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-subcontracts .m_form_search'),
+            }
+        });
+
+        //Events
+        oTableSubcontracts
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#subcontracts-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#subcontracts-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#subcontracts-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#subcontracts-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#subcontracts-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+        var total = calcularTotalSubcontracts();
+        $('#monto_total_subcontract').val(MyApp.formatearNumero(total, 2, '.', ','));
+    };
+    var actualizarTableListaSubcontracts = function () {
+        if (oTableSubcontracts) {
+            oTableSubcontracts.destroy();
+        }
+
+        initTableSubcontracts();
+
+        // calcular profit
+        calcularProfit();
+    }
+    var initFormSubcontract = function () {
+        $("#subcontract-form").validate({
+            rules: {
+                quantity: {
+                    required: true
+                },
+                price: {
+                    required: true
+                },
+            },
+            showErrors: function (errorMap, errorList) {
+                // Clean up any tooltips for valid elements
+                $.each(this.validElements(), function (index, element) {
+                    var $element = $(element);
+
+                    $element.data("title", "") // Clear the title - there is no error associated anymore
+                        .removeClass("has-error")
+                        .tooltip("dispose");
+
+                    $element
+                        .closest('.form-group')
+                        .removeClass('has-error').addClass('success');
+                });
+
+                // Create new tooltips for invalid elements
+                $.each(errorList, function (index, error) {
+                    var $element = $(error.element);
+
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", error.message)
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+
+                });
+            },
+        });
+    };
+    var initAccionesSubcontracts = function () {
+
+        $(document).off('click', "#btn-agregar-subcontract");
+        $(document).on('click', "#btn-agregar-subcontract", function (e) {
+            // reset
+            resetFormSubcontract();
+
+            $('#modal-subcontract').modal({
+                'show': true
+            });
+        });
+
+        $(document).off('click', "#btn-salvar-subcontract");
+        $(document).on('click', "#btn-salvar-subcontract", function (e) {
+            e.preventDefault();
+
+
+            var item_id = $('#item-subcontract').val();
+
+            if ($('#subcontract-form').valid() && item_id != '') {
+
+                if (ExistSubcontract(item_id)) {
+                    toastr.error("The selected item has already been added", "Error !!!");
+                    return;
+                }
+
+                var item = all_items.find(function (val) {
+                    return val.item_id == item_id;
+                });
+
+                var quantity = $('#quantity-subcontract').val();
+                var price = $('#price-subcontract').val();
+
+                var total = quantity * price;
+
+                var notes = $('#notes-subcontract').val();
+
+                if (nEditingRowItem == null) {
+
+                    subcontracts.push({
+                        subcontract_id: '',
+                        item_id: item_id,
+                        item: item.item,
+                        unit: item.unit,
+                        quantity: quantity,
+                        price: price,
+                        total: total,
+                        notes: notes,
+                        posicion: subcontracts.length
+                    });
+
+                } else {
+                    var posicion = nEditingRowSubcontract;
+                    if (subcontracts[posicion]) {
+                        subcontracts[posicion].item_id = item_id;
+                        subcontracts[posicion].item = item.item;
+                        subcontracts[posicion].unit = item.unit;
+                        subcontracts[posicion].quantity = quantity;
+                        subcontracts[posicion].price = price;
+                        subcontracts[posicion].total = total;
+                        subcontracts[posicion].notes = notes;
+                    }
+                }
+
+                //actualizar lista
+                actualizarTableListaSubcontracts();
+
+                if (nEditingRowSubcontract != null) {
+                    $('#modal-subcontract').modal('hide');
+                }
+
+                // reset
+                resetFormSubcontract();
+
+            } else {
+                if (item_id == '') {
+                    var $element = $('#select-item-subcontract .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+            }
+
+        });
+
+        $(document).off('click', "#subcontracts-table-editable a.edit");
+        $(document).on('click', "#subcontracts-table-editable a.edit", function (e) {
+            var posicion = $(this).data('posicion');
+            if (subcontracts[posicion]) {
+
+                // reset
+                resetFormSubcontract();
+
+                nEditingRowSubcontract = posicion;
+
+                $('#item-subcontract').val(subcontracts[posicion].item_id);
+                $('#item-subcontract').trigger('change');
+
+                $('#quantity-subcontract').val(subcontracts[posicion].quantity);
+                $('#price-subcontract').val(subcontracts[posicion].price);
+
+                $('#notes-subcontract').val(subcontracts[posicion].notes);
+
+                // open modal
+                $('#modal-subcontract').modal('show');
+
+            }
+        });
+
+        $(document).off('click', "#subcontracts-table-editable a.delete");
+        $(document).on('click', "#subcontracts-table-editable a.delete", function (e) {
+
+            e.preventDefault();
+            var posicion = $(this).data('posicion');
+
+            swal.fire({
+                buttonsStyling: false,
+                html: "Are you sure you want to delete the selected item?",
+                type: "warning",
+                confirmButtonText: "Yes, delete it!",
+                confirmButtonClass: "btn btn-sm btn-bold btn-success",
+                showCancelButton: true,
+                cancelButtonText: "No, cancel",
+                cancelButtonClass: "btn btn-sm btn-bold btn-danger"
+            }).then(function (result) {
+                if (result.value) {
+                    EliminarItem(posicion);
+                }
+            });
+
+        });
+
+        function ExistSubcontract(item_id) {
+            var result = false;
+
+            if (nEditingRowItem == null) {
+                for (var i = 0; i < subcontracts.length; i++) {
+                    if (subcontracts[i].item_id == item_id) {
+                        result = true;
+                        break;
+                    }
+                }
+            } else {
+                var posicion = nEditingRowItem;
+                for (var i = 0; i < subcontracts.length; i++) {
+                    if (subcontracts[i].item_id == item_id && subcontracts[i].subcontract_id !== subcontracts[posicion].subcontract_id) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        };
+
+        function EliminarItem(posicion) {
+            if (subcontracts[posicion]) {
+
+                if (subcontracts[posicion].subcontract_id != '') {
+                    MyApp.block('#subcontracts-table-editable');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "data-tracking/eliminarSubcontract",
+                        dataType: "json",
+                        data: {
+                            'subcontract_id': subcontracts[posicion].subcontract_id
+                        },
+                        success: function (response) {
+                            mApp.unblock('#subcontracts-table-editable');
+                            if (response.success) {
+
+                                toastr.success(response.message, "Success");
+
+                                deleteSubcontract(posicion);
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        },
+                        failure: function (response) {
+                            mApp.unblock('#subcontracts-table-editable');
+
+                            toastr.error(response.error, "");
+                        }
+                    });
+                } else {
+                    deleteSubcontract(posicion);
+                }
+            }
+        }
+
+        function deleteSubcontract(posicion) {
+            //Eliminar
+            subcontracts.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < subcontracts.length; i++) {
+                subcontracts[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaSubcontracts();
+        }
+    };
+    var resetFormSubcontract = function () {
+        $('#subcontract-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+        $('#subcontract-form textarea').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+
+        $('#item-subcontract').val('');
+        $('#item-subcontract').trigger('change');
+
+        var $element = $('.select2');
+        $element.removeClass('has-error').tooltip("dispose");
+
+        nEditingRowSubcontract = null;
+    };
+
     return {
         //main function to initiate the module
         init: function () {
@@ -2825,6 +3385,7 @@ var DataTracking = function () {
 
             // modal items
             initAccionesModalItems();
+            initAccionesModalItemsSubcontract();
 
             // items
             initTableItems();
@@ -2845,6 +3406,11 @@ var DataTracking = function () {
             initTableConcVendor();
             initFormConcVendor();
             initAccionesConcVendor();
+
+            // subcontracts
+            initTableSubcontracts();
+            initFormSubcontract();
+            initAccionesSubcontracts();
         }
 
     };

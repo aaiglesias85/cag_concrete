@@ -317,7 +317,12 @@
                                 Conc Vendors
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="6"
+                               data-toggle="tab" href="#tab-content-subcontracts" id="tab-subcontracts">
+                                Subcontracts
+                            </a>
+                        </li>
                     </ul>
 
                     <div class="tab-content">
@@ -460,7 +465,7 @@
                                                 {% for item in overheads %}
                                                     <option value="{{ item.overheadId }}"
                                                             data-price="{{ item.price }}">
-                                                        ${{ item.price }}
+                                                        ${{ item.name }} - ${{ item.price }}
                                                     </option>
                                                 {% endfor %}
                                             </select>
@@ -626,7 +631,17 @@
                                                         </div>
                                                     {% endif %}
 
-                                                    <div class="col-lg-7"></div>
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_items" value="" disabled>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="col-md-3">
                                                         <div class="m-input-icon m-input-icon--left">
@@ -723,7 +738,17 @@
                                                         </div>
                                                     {% endif %}
 
-                                                    <div class="col-lg-7"></div>
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_material" value="" disabled>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="col-md-3">
                                                         <div class="m-input-icon m-input-icon--left">
@@ -767,7 +792,17 @@
                                                         </div>
                                                     {% endif %}
 
-                                                    <div class="col-lg-7"></div>
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_conc_vendor" value="" disabled>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="col-md-3">
                                                         <div class="m-input-icon m-input-icon--left">
@@ -787,6 +822,59 @@
                                     <!--end: Search Form -->
                                     <!--begin: Datatable -->
                                     <div class="m_datatable" id="conc-vendor-table-editable"></div>
+                                    <!--end: Datatable -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab-content-subcontracts" role="tabpanel">
+                            <div class="row" id="lista-subcontracts">
+                                <div class="col-lg-12">
+                                    <!--begin: Search Form -->
+                                    <div class="m-form m-form--label-align-right mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-xl-12 order-1">
+                                                <div class="form-group m-form__group row align-items-center">
+                                                    {% if permiso.agregar or permiso.editar %}
+                                                        <div class="col-md-2">
+                                                            <div class="btn-group">
+                                                                <button id="btn-agregar-subcontract" class="btn btn-success"
+                                                                        style="margin-bottom: 20px; margin-top: 10px;">
+                                                                    New <i class="la la-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_subcontract" value="" disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="m-input-icon m-input-icon--left">
+                                                            <input type="text"
+                                                                   class="form-control m-input m_form_search"
+                                                                   placeholder="Search...">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--end: Search Form -->
+                                    <!--begin: Datatable -->
+                                    <div class="m_datatable" id="subcontracts-table-editable"></div>
                                     <!--end: Datatable -->
                                 </div>
                             </div>
@@ -907,6 +995,102 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" id="btn-salvar-data-tracking-item">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- subcontracts -->
+    <div class="modal fade" id="modal-subcontract" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        New Subcontract Item
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="subcontract-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <input type="hidden" id="subcontract_id" name="subcontract_id"/>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Pay Item Measured
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-10" id="select-item-subcontract">
+                                    <select class="form-control m-select2" id="item-subcontract">
+                                        <option value="">Select</option>
+                                        {% for item in items %}
+                                            <option value="{{ item.item_id }}">
+                                                {{ item.item }} - {{ item.unit }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                    <a href="javascript:;" title="Add item" id="btn-add-item-subcontract"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                        <i class="la la-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Quantity
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-number"
+                                           id="quantity-subcontract" name="quantity">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Price
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="text" class="form-control event-change form-control-number" id="price-subcontract" name="price">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Notes
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+
+                            <textarea class="form-control" id="notes-subcontract" name="notes"
+                                      rows="6"></textarea>
+
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-subcontract">Save</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
 
                 </div>
@@ -1216,6 +1400,12 @@
                                 Conc Vendors
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="6"
+                               data-toggle="tab" href="#tab-content-subcontracts-detalle" id="tab-subcontracts-detalle">
+                                Subcontracts
+                            </a>
+                        </li>
 
                     </ul>
 
@@ -1394,6 +1584,7 @@
                                             <textarea class="form-control" id="notes-detalle" name="notes" rows="3"
                                                       disabled></textarea>
                                         </div>
+                                        {#
                                         <div class="col-md-6">
                                             <label>
                                                 Other Materials
@@ -1402,6 +1593,7 @@
                                                       name="other_materials"
                                                       rows="3" disabled></textarea>
                                         </div>
+                                        #}
                                     </div>
                                 </div>
                                 <div class="form-group m-form__group ic-form-group">
@@ -1458,7 +1650,17 @@
                                         <div class="row align-items-center">
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
-                                                    <div class="col-lg-9"></div>
+                                                    <div class="col-lg-6"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_items-detalle" value="" disabled>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-md-3">
                                                         <div class="m-input-icon m-input-icon--left">
                                                             <input type="text"
@@ -1532,7 +1734,17 @@
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
 
-                                                    <div class="col-lg-9"></div>
+                                                    <div class="col-lg-6"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_material-detalle" value="" disabled>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="col-md-3">
                                                         <div class="m-input-icon m-input-icon--left">
@@ -1565,7 +1777,17 @@
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
 
-                                                    <div class="col-lg-9"></div>
+                                                    <div class="col-lg-6"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_conc_vendor-detalle" value="" disabled>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="col-md-3">
                                                         <div class="m-input-icon m-input-icon--left">
@@ -1589,6 +1811,49 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane" id="tab-content-subcontracts-detalle" role="tabpanel">
+                            <div class="row" id="lista-subcontracts-detalle">
+                                <div class="col-lg-12">
+                                    <!--begin: Search Form -->
+                                    <div class="m-form m-form--label-align-right mb-2">
+                                        <div class="row align-items-center">
+                                            <div class="col-xl-12 order-1">
+                                                <div class="form-group m-form__group row align-items-center">
+
+                                                    <div class="col-lg-6"></div>
+                                                    <div class="col-lg-3">
+                                                        <div class="input-group m-input-group">
+                                                            <div class="input-group-prepend"><span
+                                                                        class="input-group-text"
+                                                                        id="basic-addon1">Total $:</span>
+                                                            </div>
+                                                            <input type="text" class="form-control m-input"
+                                                                   id="monto_total_subcontract-detalle" value="" disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="m-input-icon m-input-icon--left">
+                                                            <input type="text"
+                                                                   class="form-control m-input m_form_search"
+                                                                   placeholder="Search...">
+                                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--end: Search Form -->
+                                    <!--begin: Datatable -->
+                                    <div class="m_datatable" id="subcontracts-detalle-table-editable"></div>
+                                    <!--end: Datatable -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1601,6 +1866,7 @@
     <!-- components -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalInspector')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemProject')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemSubcontract')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployee')) }}
 
 {% endblock %}
@@ -1612,6 +1878,7 @@
         jQuery(document).ready(function () {
             ModalInspector.init();
             ModalItemProject.init();
+            ModalItemSubcontract.init();
             ModalEmployee.init();
         });
     </script>
@@ -1625,6 +1892,9 @@
             editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
             eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
         };
+
+        var all_items = {{ items|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+        console.log(all_items);
 
         jQuery(document).ready(function () {
             DataTracking.init();

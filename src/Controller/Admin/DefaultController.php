@@ -33,7 +33,7 @@ class DefaultController extends AbstractController
             if ($permiso[0]['ver']) {
 
                 //last 6 projects
-                $projects = $this->defaultService->ListarProjectsParaDashboard( '', 'DESC', 6);
+                $projects = $this->defaultService->ListarProjectsParaDashboard( '', '', '', 'DESC', 6);
 
                 // filter projects
                 $filter_projects = $this->defaultService->ListarProjectsParaDashboard();
@@ -186,6 +186,24 @@ class DefaultController extends AbstractController
     {
         return $this->render('admin/block/modal-employee.html.twig', array(
 
+        ));
+    }
+
+    public function renderModalItemSubcontract()
+    {
+
+        $equations = $this->defaultService->getDoctrine()->getRepository(Equation::class)
+            ->ListarOrdenados();
+
+        $units = $this->defaultService->getDoctrine()->getRepository(Unit::class)
+            ->ListarOrdenados();
+
+        $yields_calculation = $this->defaultService->ListarYieldsCalculation();
+
+        return $this->render('admin/block/modal-item-subcontract.html.twig', array(
+            'equations' => $equations,
+            'yields_calculation' => $yields_calculation,
+            'units' => $units
         ));
     }
 }

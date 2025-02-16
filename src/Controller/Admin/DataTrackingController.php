@@ -21,11 +21,16 @@ class DataTrackingController extends AbstractController
 
     private $trackingService;
     private $projectService;
+    /**
+     * @var DataTrackingService
+     */
+    private $dataTrackingService;
 
-    public function __construct(DataTrackingService $trackingService, ProjectService $projectService)
+    public function __construct(DataTrackingService $trackingService, ProjectService $projectService, DataTrackingService $dataTrackingService)
     {
         $this->trackingService = $trackingService;
         $this->projectService = $projectService;
+        $this->dataTrackingService = $dataTrackingService;
     }
 
     public function index()
@@ -34,6 +39,9 @@ class DataTrackingController extends AbstractController
         $permiso = $this->trackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
+
+                // items
+                $items = $this->trackingService->ListarTodosItems();
 
                 // projects
                 $projects = $this->trackingService->getDoctrine()->getRepository(Project::class)
@@ -58,6 +66,7 @@ class DataTrackingController extends AbstractController
                 return $this->render('admin/data-tracking/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
+                    'items' => $items,
                     'inspectors' => $inspectors,
                     'employees' => $employees,
                     'materials' => $materials,
@@ -175,11 +184,16 @@ class DataTrackingController extends AbstractController
         $materials = $request->get('materials');
         $materials = json_decode($materials);
 
+        // subcontracts
+        $subcontracts = $request->get('subcontracts');
+        $subcontracts = json_decode($subcontracts);
+
         try {
 
             $resultado = $this->trackingService->SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                 $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
-                $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials, $conc_vendors, $color_used, $color_price);
+                $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials,
+                $conc_vendors, $color_used, $color_price, $subcontracts);
 
             if ($resultado['success']) {
 
@@ -297,6 +311,35 @@ class DataTrackingController extends AbstractController
 
         try {
             $resultado = $this->trackingService->EliminarItemDataTracking($data_tracking_item_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarSubcontract Acción que elimina un subcontract en la BD
+     *
+     */
+    public function eliminarSubcontract(Request $request)
+    {
+        $subcontract_id = $request->get('subcontract_id');
+
+        try {
+            $resultado = $this->trackingService->EliminarItemSubcontract($subcontract_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";

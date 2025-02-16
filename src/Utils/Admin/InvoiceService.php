@@ -105,11 +105,11 @@ class InvoiceService extends Base
 
         // project
         $project_entity = $invoice_entity->getProject();
-        $objWorksheet->setCellValue("C17", $project_entity->getLocation());
+        $objWorksheet->setCellValue("C17", $project_entity->getCounty());
         $objWorksheet->setCellValue("C18", $project_entity->getName());
-        $objWorksheet->setCellValue("G17", $project_entity->getProjectNumber());
-        $objWorksheet->setCellValue("G18", $project_entity->getPoNumber());
-        $objWorksheet->setCellValue("G19", $project_entity->getPoCG());
+        $objWorksheet->setCellValue("G17", "");
+        $objWorksheet->setCellValue("G18", $project_entity->getSubcontract());
+        $objWorksheet->setCellValue("G19", $project_entity->getProjectNumber());
 
         // notes
         $objWorksheet->setCellValue("B20", $invoice_entity->getNotes());
@@ -537,6 +537,15 @@ class InvoiceService extends Base
         /** @var Invoice $entity */
         if ($entity != null) {
 
+            // verificar fechas
+            $invoices = $this->getDoctrine()->getRepository(Invoice::class)
+                ->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+            if(!empty($invoices) && $invoices[0]->getInvoiceId() != $entity->getInvoiceId()){
+                $resultado['success'] = false;
+                $resultado['error'] = "An invoice already exists for that date range";
+                return $resultado;
+            }
+
 
             if ($start_date != '') {
                 $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
@@ -597,6 +606,15 @@ class InvoiceService extends Base
     public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
+
+        // verificar fechas
+        $invoices = $this->getDoctrine()->getRepository(Invoice::class)
+            ->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+        if(!empty($invoices)){
+            $resultado['success'] = false;
+            $resultado['error'] = "An invoice already exists for that date range";
+            return $resultado;
+        }
 
 
         $entity = new Invoice();

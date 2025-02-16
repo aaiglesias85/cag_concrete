@@ -52,13 +52,13 @@ class MaterialRepository extends EntityRepository
             ->leftJoin('m.unit', 'u');
 
         if ($sSearch != "")
-            $consulta->andWhere('m.name LIKE :name OR u.name LIKE :unit')
+            $consulta->andWhere('m.name LIKE :name OR u.description LIKE :unit')
                 ->setParameter('name', "%${sSearch}%")
                 ->setParameter('unit', "%${sSearch}%");
 
         switch ($iSortCol_0) {
             case "unit":
-                $consulta->orderBy("u.name", $sSortDir_0);
+                $consulta->orderBy("u.description", $sSortDir_0);
                 break;
             default:
                 $consulta->orderBy("m.$iSortCol_0", $sSortDir_0);
@@ -90,9 +90,9 @@ class MaterialRepository extends EntityRepository
         if ($sSearch != "") {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (m.name LIKE :name OR u.name LIKE :unit) ';
+                $where .= 'WHERE (m.name LIKE :name OR u.description LIKE :unit) ';
             else
-                $where .= 'AND (m.name LIKE :name OR u.name LIKE :unit) ';
+                $where .= 'AND (m.name LIKE :name OR u.description LIKE :unit) ';
         }
 
         $consulta .= $join;

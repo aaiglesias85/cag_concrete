@@ -21,7 +21,8 @@ var Invoices = function () {
                 selector: {class: 'm-checkbox--solid m-checkbox--brand'}
             });
         }
-        aoColumns.push({
+        aoColumns.push(
+            {
                 field: "number",
                 title: "Number",
                 width: 80,
@@ -164,6 +165,32 @@ var Invoices = function () {
         $(document).off('click', "#btn-filtrar");
         $(document).on('click', "#btn-filtrar", function (e) {
             btnClickFiltrar();
+        });
+
+    };
+    var initAccionResetFiltrar = function () {
+
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+
+            $('#lista-invoice .m_form_search').val('');
+
+            $('#filtro-company').val('');
+            $('#filtro-company').trigger('change');
+
+            // reset
+            $('#filtro-project option').each(function (e) {
+                if ($(this).val() != "")
+                    $(this).remove();
+            });
+            $('#filtro-project').select2();
+
+            $('#fechaInicial').val('');
+
+            $('#fechaFin').val('');
+
+            btnClickFiltrar();
+
         });
 
     };
@@ -432,85 +459,85 @@ var Invoices = function () {
 
             editRow(invoice_id);
         });
+    };
+    var editRow = function(invoice_id) {
 
-        function editRow(invoice_id) {
+        MyApp.block('#form-invoice');
 
-            MyApp.block('#form-invoice');
+        $.ajax({
+            type: "POST",
+            url: "invoice/cargarDatos",
+            dataType: "json",
+            data: {
+                'invoice_id': invoice_id
+            },
+            success: function (response) {
+                mApp.unblock('#form-invoice');
+                if (response.success) {
+                    //Datos invoice
 
-            $.ajax({
-                type: "POST",
-                url: "invoice/cargarDatos",
-                dataType: "json",
-                data: {
-                    'invoice_id': invoice_id
-                },
-                success: function (response) {
-                    mApp.unblock('#form-invoice');
-                    if (response.success) {
-                        //Datos invoice
+                    var formTitle = "You want to update the invoice? Follow the next steps:";
+                    $('#form-invoice-title').html(formTitle);
 
-                        var formTitle = "You want to update the invoice? Follow the next steps:";
-                        $('#form-invoice-title').html(formTitle);
-
-                        $('#company').off('change', changeCompany);
-                        $('#project').off('change', listarItems);
-                        $('#start_date').off('change', listarItems);
-                        $('#end_date').off('change', listarItems);
-
-
-                        $('#company').val(response.invoice.company_id);
-                        $('#company').trigger('change');
-
-                        //Llenar select
-                        var projects = response.invoice.projects;
-                        for (var i = 0; i < projects.length; i++) {
-                            var descripcion = `${projects[i].number} - ${projects[i].name}`;
-                            $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
-                        }
-                        $('#project').select2();
-
-                        $('#project').val(response.invoice.project_id);
-                        $('#project').trigger('change');
+                    $('#company').off('change', changeCompany);
+                    $('#project').off('change', listarItems);
+                    $('#start_date').off('change', listarItems);
+                    $('#end_date').off('change', listarItems);
 
 
-                        $('#start_date').val(response.invoice.start_date);
-                        $('#end_date').val(response.invoice.end_date);
-                        $('#notes').val(response.invoice.notes);
+                    $('#company').val(response.invoice.company_id);
+                    $('#company').trigger('change');
 
-                        if (response.invoice.paid) {
-                            $('#paidactivo').prop('checked', true);
-                            $('#paidinactivo').prop('checked', false);
-                        }
-
-
-                        $('#company').on('change', changeCompany);
-                        $('#project').on('change', listarItems);
-                        $('#start_date').on('change', listarItems);
-                        $('#end_date').on('change', listarItems);
-
-                        // items
-                        items = response.invoice.items;
-                        actualizarTableListaItems();
-
-                        // payments
-                        payments = response.invoice.payments;
-                        actualizarTableListaPayments();
-
-                        event_change = false;
-
-                    } else {
-                        toastr.error(response.error, "Error !!!");
+                    //Llenar select
+                    var projects = response.invoice.projects;
+                    for (var i = 0; i < projects.length; i++) {
+                        var descripcion = `${projects[i].number} - ${projects[i].name}`;
+                        $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
                     }
-                },
-                failure: function (response) {
-                    mApp.unblock('#form-invoice');
+                    $('#project').select2();
 
+                    $('#project').val(response.invoice.project_id);
+                    $('#project').trigger('change');
+
+
+                    $('#start_date').val(response.invoice.start_date);
+                    $('#end_date').val(response.invoice.end_date);
+                    $('#notes').val(response.invoice.notes);
+
+                    if (response.invoice.paid) {
+                        $('#paidactivo').prop('checked', true);
+                        $('#paidinactivo').prop('checked', false);
+                    }
+
+
+                    $('#company').on('change', changeCompany);
+                    $('#project').on('change', listarItems);
+                    $('#start_date').on('change', listarItems);
+                    $('#end_date').on('change', listarItems);
+
+                    // items
+                    items = response.invoice.items;
+                    actualizarTableListaItems();
+
+                    // payments
+                    payments = response.invoice.payments;
+                    actualizarTableListaPayments();
+
+                    event_change = false;
+
+                } else {
                     toastr.error(response.error, "Error !!!");
                 }
-            });
+            },
+            failure: function (response) {
+                mApp.unblock('#form-invoice');
 
-        }
+                toastr.error(response.error, "Error !!!");
+            }
+        });
+
     };
+
     //Eliminar
     var initAccionEliminar = function () {
         $(document).off('click', "#invoice-table-editable a.delete");
@@ -710,6 +737,9 @@ var Invoices = function () {
 
                         //Llenar select
                         for (let item of response.items) {
+
+                            var posicion = items.length;
+
                             items.push({
                                 invoice_item_id: '',
                                 project_item_id: item.project_item_id,
@@ -724,7 +754,7 @@ var Invoices = function () {
                                 quantity_completed: item.quantity_completed,
                                 amount: item.amount,
                                 total_amount: item.total_amount,
-                                posicion: items.length
+                                posicion: posicion
                             });
 
                             payments.push({
@@ -744,7 +774,7 @@ var Invoices = function () {
                                 paid_qty: 0,
                                 paid_amount: 0,
                                 paid_amount_total: 0,
-                                posicion: items.length
+                                posicion: posicion
                             });
                         }
                         actualizarTableListaItems();
@@ -1709,6 +1739,7 @@ var Invoices = function () {
             initAccionEliminar();
             initAccionExportar();
             initAccionFiltrar();
+            initAccionResetFiltrar();
             initAccionPaid();
 
             // items
@@ -1722,6 +1753,21 @@ var Invoices = function () {
             initAccionesPayments();
 
             initAccionChange();
+
+            // editar
+            var invoice_id_edit = localStorage.getItem('invoice_id_edit');
+            if (invoice_id_edit) {
+                resetForms();
+
+                $('#invoice_id').val(invoice_id_edit);
+
+                $('#form-invoice').removeClass('m--hide');
+                $('#lista-invoice').addClass('m--hide');
+
+                localStorage.removeItem('invoice_id_edit');
+
+                editRow(invoice_id_edit);
+            }
         }
 
     };

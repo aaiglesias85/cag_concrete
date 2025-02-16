@@ -74,7 +74,7 @@
                         </select>
                     </div>
 
-                    <div class="col-12 col-sm-3 col-md-5 mb-2 mb-sm-0">
+                    <div class="col-12 col-sm-3 col-md-4 mb-2 mb-sm-0">
 
                         <div class='input-group flex-nowrap'>
                             <select class="form-control m-select2 event-change" id="project">
@@ -118,12 +118,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-3 col-md-1 mb-2 mb-sm-0">
+                    <div class="col-12 col-sm-2 col-md-1 mb-2 mb-sm-0">
                         <a href="javascript:;" id="btn-filtrar"
                            class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
                                 <span>
                                     <i class="la la-search"></i>
                                     <span>Search</span>
+                                </span>
+                        </a>
+                    </div>
+                    <div class="col-12 col-sm-2 col-md-1 mb-2 mb-sm-0">
+                        <a href="javascript:;" id="btn-reset-filtrar"
+                           class="btn btn-danger">
+                                <span>
+                                    <i class="la la-refresh"></i>
+                                    <span>Reset filters</span>
                                 </span>
                         </a>
                     </div>
@@ -137,7 +146,7 @@
                 <div class="row m-row--no-padding m-row--col-separator-xl">
                     <div class="col-xl-4">
 
-                        <div class="m-widget1">
+                        <div class="m-widget1" id="m-widget1-stats">
                             <div class="m-widget1__item">
                                 <div class="row m-row--no-padding align-items-center">
                                     <div class="col">
@@ -175,7 +184,7 @@
 
                             {% if projects | length > 0 %}
                                 <div style="margin-top: 1.5rem;">
-                                    <a href="{{ url('project') }}"
+                                    <a href="javascript:;" id="btn-view-all-projects"
                                        class="btn m-btn--pill btn-secondary m-btn m-btn--hover-brand m-btn--custom">View
                                         all</a>
                                 </div>

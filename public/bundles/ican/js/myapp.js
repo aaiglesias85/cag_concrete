@@ -422,6 +422,13 @@ var MyApp = function () {
         }
     }
 
+    function getFirstDayOfMonth() {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        return `${firstDay.getMonth() + 1}/${firstDay.getDate()}/${firstDay.getFullYear()}`;
+    }
+
+
     return {
         //main function to initiate the module
         init: function () {
@@ -448,6 +455,7 @@ var MyApp = function () {
         formatearFechaCalendario: formatearFechaCalendario,
         convertirStringAFecha: convertirStringAFecha,
         formatearFecha: formatearFecha,
+        getFirstDayOfMonth: getFirstDayOfMonth,
         evaluateExpression: evaluateExpression,
         scrollTo: function (el, offset) {
             var pos = (el && el.length > 0) ? el.offset().top : 0;

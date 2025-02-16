@@ -54,6 +54,33 @@ class ProjectItemRepository extends EntityRepository
     }
 
     /**
+     * BuscarItemProject: busca un item
+     *
+     * @return ProjectItem[]
+     */
+    public function BuscarItemProject($project_id, $item_id)
+    {
+        $consulta = $this->createQueryBuilder('p_i')
+            ->leftJoin('p_i.project', 'p')
+            ->leftJoin('p_i.item', 'i');
+
+        if ($project_id != '') {
+            $consulta->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        if ($item_id != '') {
+            $consulta->andWhere('i.itemId = :item_id')
+                ->setParameter('item_id', $item_id);
+        }
+
+        $consulta->orderBy('p_i.id', "ASC");
+
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarProjectItemsDeEquation: Lista los items de una equation
      *
      * @return ProjectItem[]

@@ -171,6 +171,28 @@ var Projects = function () {
         });
 
     };
+    var initAccionResetFiltrar = function () {
+
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+
+            $('#lista-project .m_form_search').val('');
+
+            $('#filtro-company').val('');
+            $('#filtro-company').trigger('change');
+
+            $('#filtro-status').val('');
+            $('#filtro-status').trigger('change');
+
+            $('#fechaInicial').val('');
+
+            $('#fechaFin').val('');
+
+            btnClickFiltrar();
+
+        });
+
+    };
     var btnClickFiltrar = function () {
         var query = oTable.getDataSourceQuery();
 
@@ -230,6 +252,10 @@ var Projects = function () {
         //contacts
         contacts = [];
         actualizarTableListaContacts();
+
+        // invoices
+        invoices = [];
+        actualizarTableListaInvoices();
 
         //Mostrar el primer tab
         if (reset_wizard) {
@@ -618,8 +644,12 @@ var Projects = function () {
                     contacts = response.project.contacts;
                     actualizarTableListaContacts();
 
+                    // invoices
+                    invoices = response.project.invoices;
+                    actualizarTableListaInvoices();
+
                     // habilitar tab
-                    totalTabs = 4;
+                    totalTabs = 5;
                     $('.nav-item-hide').removeClass('m--hide');
 
                     event_change = false;
@@ -909,6 +939,9 @@ var Projects = function () {
                 case 4:
                     btnClickFiltrarNotes();
                     break;
+                case 5:
+                    actualizarTableListaInvoices();
+                    break;
             }
 
         });
@@ -961,6 +994,10 @@ var Projects = function () {
                 case 4:
                     $('#tab-notes').tab('show');
                     btnClickFiltrarNotes();
+                    break;
+                case 5:
+                    $('#tab-invoices').tab('show');
+                    actualizarTableListaInvoices();
                     break;
 
             }
@@ -2379,6 +2416,172 @@ var Projects = function () {
     };
 
 
+    // invoices
+    var oTableInvoices;
+    var invoices = [];
+    var initTableInvoices = function () {
+        MyApp.block('#invoices-table-editable');
+
+        var table = $('#invoices-table-editable');
+
+        var aoColumns = [
+            {
+                field: "number",
+                title: "Number",
+                width: 80,
+            },
+            {
+                field: "company",
+                title: "Company"
+            },
+            {
+                field: "project",
+                title: "Project"
+            },
+            {
+                field: "startDate",
+                title: "From",
+                width: 100,
+            },
+            {
+                field: "endDate",
+                title: "To",
+                width: 100,
+            },
+            {
+                field: "total",
+                title: "Amount",
+                width: 100,
+                textAlign: 'center',
+            },
+            {
+                field: "notes",
+                title: "Notes",
+                width: 150
+            },
+            {
+                field: "paid",
+                title: "Paid",
+                responsive: {visible: 'lg'},
+                width: 80,
+                // callback function support for column rendering
+                template: function (row) {
+                    var status = {
+                        1: {'title': 'Yes', 'class': ' m-badge--success'},
+                        0: {'title': 'No', 'class': ' m-badge--danger'}
+                    };
+                    return '<span class="m-badge ' + status[row.paid].class + ' m-badge--wide">' + status[row.paid].title + '</span>';
+                }
+            },
+            {
+                field: "createdAt",
+                title: "Created At",
+                width: 100,
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit invoice"><i class="la la-edit"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableInvoices = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: invoices,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-invoices .m_form_search'),
+            }
+        });
+
+        //Events
+        oTableInvoices
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#invoices-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#invoices-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#invoices-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#invoices-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#invoices-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+    };
+    var actualizarTableListaInvoices = function () {
+        if (oTableInvoices) {
+            oTableInvoices.destroy();
+        }
+
+        initTableInvoices();
+    }
+
+    var initAccionesInvoices = function () {
+
+        $(document).off('click', "#invoices-table-editable a.edit");
+        $(document).on('click', "#invoices-table-editable a.edit", function (e) {
+            var posicion = $(this).data('posicion');
+            if (invoices[posicion]) {
+
+                localStorage.setItem('invoice_id_edit', invoices[posicion].invoice_id);
+
+                // open
+                window.location.href = url_invoice;
+
+            }
+        });
+
+    };
+
+
     return {
         //main function to initiate the module
         init: function () {
@@ -2394,6 +2597,7 @@ var Projects = function () {
             initAccionEditar();
             initAccionEliminar();
             initAccionFiltrar();
+            initAccionResetFiltrar();
 
             // items
             initTableItems();
@@ -2414,6 +2618,10 @@ var Projects = function () {
             initFormContact();
             initAccionesContacts();
 
+            // invoices
+            initTableInvoices();
+            initAccionesInvoices();
+
             initAccionChange();
 
             // editar
@@ -2430,6 +2638,19 @@ var Projects = function () {
 
                 editRow(project_id_edit, false);
             }
+
+            // filtrar
+            var fechaInicial = localStorage.getItem('dashboard_fecha_inicial');
+            if(fechaInicial) {
+                $('#fechaInicial').val(fechaInicial);
+            }
+
+            var fechaFin = localStorage.getItem('dashboard_fecha_fin');
+            if(fechaFin) {
+                $('#fechaFin').val(fechaFin);
+            }
+
+            btnClickFiltrar();
         }
 
     };

@@ -41,6 +41,10 @@ var DataTrackingDetalle = function () {
         conc_vendors = [];
         actualizarTableListaConcVendors();
 
+        // subcontracts
+        subcontracts = [];
+        actualizarTableListaSubcontracts();
+
         //Mostrar el primer tab
         resetWizard();
 
@@ -121,12 +125,19 @@ var DataTrackingDetalle = function () {
 
                         // labor
                         labor = response.data_tracking.labor;
+                        actualizarTableListaLabor();
 
                         // materials
                         materials = response.data_tracking.materials;
+                        actualizarTableListaMaterial()
 
                         // conc vendors
                         conc_vendors = response.data_tracking.conc_vendors;
+                        actualizarTableListaConcVendors();
+
+                        // subcontracts
+                        subcontracts = response.data_tracking.subcontracts;
+                        actualizarTableListaSubcontracts();
 
                         // totals
                         $('#total_concrete_yiel-detalle').val(response.data_tracking.total_concrete_yiel);
@@ -176,7 +187,7 @@ var DataTrackingDetalle = function () {
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 5;
+    var totalTabs = 6;
     var initWizard = function () {
         $(document).off('click', "#modal-data-tracking-detalle-detalle .wizard-tab");
         $(document).on('click', "#modal-data-tracking-detalle-detalle .wizard-tab", function (e) {
@@ -205,6 +216,9 @@ var DataTrackingDetalle = function () {
                 case 5:
                     actualizarTableListaConcVendors()
                     break;
+                case 6:
+                    actualizarTableListaSubcontracts()
+                    break;
             }
 
         });
@@ -231,12 +245,16 @@ var DataTrackingDetalle = function () {
                     $('#tab-conc-vendor-detalle').tab('show');
                     actualizarTableListaConcVendors();
                     break;
+                case 6:
+                    $('#tab-subcontracts-detalle').tab('show');
+                    actualizarTableListaSubcontracts();
+                    break;
             }
         }, 0);
     }
     var resetWizard = function () {
         activeTab = 1;
-        totalTabs = 5;
+        totalTabs = 6;
         mostrarTab();
     }
 
@@ -353,6 +371,9 @@ var DataTrackingDetalle = function () {
             .on('m-datatable--on-uncheck', function (e, args) {
                 //eventsWriter('Checkbox inactive: ' + args.toString());
             });
+
+        var total = calcularTotalItemsPrice();
+        $('#monto_total_items-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
     var actualizarTableListaItems = function () {
         if (oTableItems) {
@@ -360,6 +381,15 @@ var DataTrackingDetalle = function () {
         }
 
         initTableItems();
+    }
+    var calcularTotalItemsPrice = function () {
+        var total = 0;
+
+        for (var i = 0; i < items_data_tracking.length; i++) {
+            total += items_data_tracking[i].quantity * items_data_tracking[i].price;
+        }
+
+        return total;
     }
 
     // labor
@@ -592,6 +622,9 @@ var DataTrackingDetalle = function () {
             .on('m-datatable--on-uncheck', function (e, args) {
                 //eventsWriter('Checkbox inactive: ' + args.toString());
             });
+
+        var total = calcularTotalMaterialPrice();
+        $('#monto_total_material-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
     var actualizarTableListaMaterial = function () {
         if (oTableMaterial) {
@@ -716,6 +749,9 @@ var DataTrackingDetalle = function () {
             .on('m-datatable--on-uncheck', function (e, args) {
                 //eventsWriter('Checkbox inactive: ' + args.toString());
             });
+
+        var total = calcularTotalConcPrice();
+        $('#monto_total_conc_vendor-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
     var actualizarTableListaConcVendors = function () {
         if (oTableConcVendor) {
@@ -729,6 +765,138 @@ var DataTrackingDetalle = function () {
 
         for (var i = 0; i < conc_vendors.length; i++) {
             total += conc_vendors[i].total_conc_used * conc_vendors[i].conc_price;
+        }
+
+        return total;
+    }
+
+    // subcontracts
+    var oTableSubcontracts;
+    var subcontracts = [];
+    var initTableSubcontracts = function () {
+
+        MyApp.block('#subcontracts-detalle-table-editable');
+
+        var table = $('#subcontracts-detalle-table-editable');
+
+        var aoColumns = [
+            {
+                field: "item",
+                title: "Item",
+            },
+            {
+                field: "unit",
+                title: "Unit",
+                width: 100,
+            },
+            {
+                field: "quantity",
+                title: "Quantity",
+                width: 120,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "price",
+                title: "Price",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "total",
+                title: "$ Total",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
+                }
+            }
+        ];
+        oTableSubcontracts = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: subcontracts,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-subcontracts-detalle .m_form_search'),
+            }
+        });
+
+        //Events
+        oTableSubcontracts
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#subcontracts-detalle-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#subcontracts-detalle-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#subcontracts-detalle-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#subcontracts-detalle-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#subcontracts-detalle-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+        var total = calcularTotalSubcontracts();
+        $('#monto_total_subcontract-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
+    };
+    var actualizarTableListaSubcontracts = function () {
+        if (oTableSubcontracts) {
+            oTableSubcontracts.destroy();
+        }
+
+        initTableSubcontracts();
+    }
+
+    var calcularTotalSubcontracts = function () {
+        var total = 0;
+
+        for (var i = 0; i < subcontracts.length; i++) {
+            total += subcontracts[i].quantity * subcontracts[i].price;
         }
 
         return total;
@@ -751,6 +919,8 @@ var DataTrackingDetalle = function () {
             initTableMaterial();
             // conc vendor
             initTableConcVendor();
+            // subcontracts
+            initTableSubcontracts();
         }
 
     };

@@ -72,6 +72,28 @@ class ProjectService extends Base
 
         $em = $this->getDoctrine()->getManager();
 
+        // validar si existe
+        if ($item_id !== '') {
+            $project_item = $this->getDoctrine()->getRepository(ProjectItem::class)
+                ->BuscarItemProject($project_id, $item_id);
+            if (!empty($project_item) && $project_item_id != $project_item[0]->getId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The item already exists in the project";
+                return $resultado;
+            }
+        } else {
+
+            //Verificar description
+            $item = $this->getDoctrine()->getRepository(Item::class)
+                ->findOneBy(['description' => $item_name]);
+            if ($item_id == '' && $item != null) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The item name is in use, please try entering another one.";
+                return $resultado;
+            }
+        }
+
+
         $project_entity = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
         if ($project_entity != null) {
             $project_item_entity = null;
@@ -633,11 +655,52 @@ class ProjectService extends Base
             $contacts = $this->ListarContacts($project_id);
             $arreglo_resultado['contacts'] = $contacts;
 
+            // invoices
+            $invoices = $this->ListarInvoicesDeProject($project_id);
+            $arreglo_resultado['invoices'] = $invoices;
+
             $resultado['success'] = true;
             $resultado['project'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarInvoicesDeProject
+     * @param $project_id
+     * @return array
+     */
+    public function ListarInvoicesDeProject($project_id)
+    {
+        $invoices = [];
+
+        $lista = $this->getDoctrine()->getRepository(Invoice::class)
+            ->ListarInvoicesDeProject($project_id);
+        foreach ($lista as $key => $value) {
+
+            $invoice_id = $value->getInvoiceId();
+
+            $total = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                ->TotalInvoice($invoice_id);
+
+            $invoice = [
+                "invoice_id" => $invoice_id,
+                "number" => $value->getNumber(),
+                "company" => $value->getProject()->getCompany()->getName(),
+                "project" => $value->getProject()->getName(),
+                "startDate" => $value->getStartDate()->format('m/d/Y'),
+                "endDate" => $value->getEndDate()->format('m/d/Y'),
+                "notes" => $this->truncate($value->getNotes(), 50),
+                "total" => number_format($total, 2, '.', ','),
+                "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
+                "paid" => $value->getPaid() ? 1 : 0,
+                "posicion" => $key
+            ];
+            $invoices[] = $invoice;
+        }
+
+        return $invoices;
     }
 
     /**
@@ -1395,38 +1458,6 @@ class ProjectService extends Base
         }
 
         return $items_news;
-    }
-
-    /**
-     * AgregarNewItem
-     * @param $value
-     * @return Item
-     */
-    private function AgregarNewItem($value, $equation_entity)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $item_entity = new Item();
-
-        $item_entity->setDescription($value->item);
-        $item_entity->setPrice($value->price);
-        $item_entity->setStatus(1);
-        $item_entity->setYieldCalculation($value->yield_calculation);
-
-        if ($value->unit_id != '') {
-            $unit = $this->getDoctrine()->getRepository(Unit::class)->find($value->unit_id);
-            $item_entity->setUnit($unit);
-        }
-
-        $item_entity->setEquation($equation_entity);
-
-        $item_entity->setCreatedAt(new \DateTime());
-
-        $em->persist($item_entity);
-
-        $em->flush();
-
-        return $item_entity;
     }
 
 

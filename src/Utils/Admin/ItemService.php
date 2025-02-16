@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\DataTrackingItem;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;
@@ -157,6 +158,13 @@ class ItemService extends Base
 
             $em->remove($project_item);
         }
+
+        // data tracking subcontract
+        $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontractsDeItem($project_item_id);
+        foreach ($subcontract_items as $subcontract_item) {
+            $em->remove($subcontract_item);
+        }
     }
 
     /**
@@ -290,6 +298,7 @@ class ItemService extends Base
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
+            $resultado['item'] = $this->DevolverItem($entity);
 
             return $resultado;
         }
@@ -359,6 +368,7 @@ class ItemService extends Base
         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
         $resultado['success'] = true;
+        $resultado['item'] = $this->DevolverItem($entity);
 
         return $resultado;
     }
@@ -401,25 +411,6 @@ class ItemService extends Base
         }
 
         return $arreglo_resultado;
-    }
-
-    /**
-     * DevolverYieldCalculationDeItem
-     * @param Item $item_entity
-     * @return string
-     */
-    private function DevolverYieldCalculationDeItem($item_entity)
-    {
-        $yield_calculation = $item_entity->getYieldCalculation();
-
-        $yield_calculation_name = $this->BuscarYieldCalculation($yield_calculation);
-
-        // para la ecuacion devuelvo la ecuacion asociada
-        if ($yield_calculation == 'equation' && $item_entity->getEquation() != null) {
-            $yield_calculation_name = $item_entity->getEquation()->getEquation();
-        }
-
-        return $yield_calculation_name;
     }
 
     /**

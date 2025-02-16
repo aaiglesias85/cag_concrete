@@ -314,6 +314,10 @@ var Index = function () {
             minimumInputLength: 3
         });
 
+        // fecha inicial
+        var fecha_inicio = MyApp.getFirstDayOfMonth();
+        $('#fechaInicial').val(fecha_inicio);
+
         // change
         $('#status').change(changeStatus);
         $('#project').change(changeProject);
@@ -342,6 +346,27 @@ var Index = function () {
             btnClickFiltrar();
         });
     };
+    var initAccionResetFiltrar = function () {
+
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+
+            $('#project').val('');
+            $('#project').trigger('change');
+
+            $('#status').val('');
+            $('#status').trigger('change');
+
+            $('#fechaInicial').val('');
+
+            $('#fechaFin').val('');
+
+            btnClickFiltrar();
+
+        });
+
+    };
+
     var btnClickFiltrar = function () {
 
         var project_id = $('#project').val();
@@ -367,6 +392,9 @@ var Index = function () {
 
                     // actualizar nombre de proyecto
                     updateProjectName();
+
+                    // actualizar stats
+                    updateStats(response.stats.stats, response.stats.projects);
 
                     // costs
                     chart1_data = response.stats.chart_costs;
@@ -397,6 +425,67 @@ var Index = function () {
             }
         });
 
+    }
+
+    var updateStats = function (stats, projects) {
+        // reset
+        $('#m-widget1-stats').html('');
+
+        var html = '';
+
+        //stats
+        html += `
+        <div class="m-widget1__item">
+            <div class="row m-row--no-padding align-items-center">
+                <div class="col">
+                    <h3 class="m-widget1__title">Projects</h3>
+                    <span class="m-widget1__desc">In Progress</span><br>
+                    <span class="m-widget1__desc">Not Started</span><br>
+                    <span class="m-widget1__desc">Completed</span>
+                </div>
+                <div class="col m--align-right">
+                    </br>
+                    <span class="m-widget1__number m--font-info">${ stats.total_proyectos_activos }</span>
+                    </br>
+                    <span class="m-widget1__number m--font-danger">${ stats.total_proyectos_inactivos }</span>
+                    </br>
+                    <span class="m-widget1__number m--font-success">${ stats.total_proyectos_completed }</span>
+                </div>
+            </div>
+        </div>
+        `;
+
+        for (let [i, item] of projects.entries()) {
+            html += `
+            <div class="m-widget1__item">
+                <div class="row m-row--no-padding align-items-center project-item"
+                     data-id="${ item.project_id }" style="cursor: pointer;">
+                    <div class="col">
+                        <h3 class="m-widget1__title">${ item.number }</h3>
+                        <span class="m-widget1__desc">${ item.name }</span>
+                    </div>
+                    <div class="col m--align-right">
+                        <span>Due Date</span> </br>
+                        <span class="m--font-info">${ item.dueDate }</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        if (projects.length > 0) {
+            html += `
+            <div style="margin-top: 1.5rem;">
+                <a href="javascript:;" id="btn-view-all-projects"
+                   class="btn m-btn--pill btn-secondary m-btn m-btn--hover-brand m-btn--custom">View
+                    all</a>
+            </div>
+            `;
+        }
+
+        $('#m-widget1-stats').html(html);
+
+        initAccionesProjects();
     }
 
     var updateItems = function (items) {
@@ -519,11 +608,7 @@ var Index = function () {
                 localStorage.setItem('project_id_edit', project_id);
 
                 // open
-                window.open(
-                    url_project,                // URL a abrir
-                    '_blank',           // Abrir en una nueva pestaña o ventana
-                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
-                );
+                window.location.href = url_project;
 
             }
         });
@@ -536,13 +621,22 @@ var Index = function () {
                 localStorage.setItem('project_id_edit', project_id);
 
                 // open
-                window.open(
-                    url_project,                // URL a abrir
-                    '_blank',           // Abrir en una nueva pestaña o ventana
-                    'noopener,noreferrer' // Evita que la ventana tenga acceso al objeto opener y no pase el Referer
-                );
+                window.location.href = url_project;
 
             }
+        });
+
+        $(document).off('click', "#btn-view-all-projects");
+        $(document).on('click', "#btn-view-all-projects", function (e) {
+
+            var fechaInicial = $('#fechaInicial').val();
+            localStorage.setItem('dashboard_fecha_inicial', fechaInicial);
+
+            var fechaFin = $('#fechaFin').val();
+            localStorage.setItem('dashboard_fecha_fin', fechaFin);
+
+            // open
+            window.location.href = url_project;
         });
 
     };
@@ -559,8 +653,12 @@ var Index = function () {
             initChart3();
 
             initAccionFiltrar();
+            initAccionResetFiltrar();
 
             initAccionesProjects();
+
+            // filtrar
+            btnClickFiltrar();
         }
     };
 }();
