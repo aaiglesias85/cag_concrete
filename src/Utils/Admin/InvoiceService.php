@@ -107,7 +107,7 @@ class InvoiceService extends Base
         $project_entity = $invoice_entity->getProject();
         $objWorksheet->setCellValue("C17", $project_entity->getCounty());
         $objWorksheet->setCellValue("C18", $project_entity->getName());
-        $objWorksheet->setCellValue("G17", "");
+        $objWorksheet->setCellValue("G17", $project_entity->getProjectIdNumber());
         $objWorksheet->setCellValue("G18", $project_entity->getSubcontract());
         $objWorksheet->setCellValue("G19", $project_entity->getProjectNumber());
 

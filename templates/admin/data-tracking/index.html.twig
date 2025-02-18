@@ -465,7 +465,7 @@
                                                 {% for item in overheads %}
                                                     <option value="{{ item.overheadId }}"
                                                             data-price="{{ item.price }}">
-                                                        ${{ item.name }} - ${{ item.price }}
+                                                        {{ item.name }} - ${{ item.price }}
                                                     </option>
                                                 {% endfor %}
                                             </select>
@@ -557,6 +557,7 @@
                                             </label>
                                             <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
                                         </div>
+                                        {#
                                         <div class="col-md-6">
                                             <label>
                                                 Other Materials
@@ -564,6 +565,7 @@
                                             <textarea class="form-control" id="other_materials" name="other_materials"
                                                       rows="3"></textarea>
                                         </div>
+                                        #}
                                     </div>
                                 </div>
 

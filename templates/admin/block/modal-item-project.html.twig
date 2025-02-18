@@ -49,7 +49,7 @@
                                                 data-unit="{{ item.unit.description }}"
                                                 data-yield="{{ item.yieldCalculation }}"
                                                 data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}">
-                                            {{ item.description }}
+                                            {{ item.description }} - {{ item.unit.description }}
                                         </option>
                                     {% endfor %}
                                 </select>

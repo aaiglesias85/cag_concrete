@@ -654,7 +654,7 @@ var DataTracking = function () {
 
                         // totals
                         $('#form-group-totals').removeClass('m--hide');
-                        $('#total_concrete_yiel').val(response.data_tracking.total_concrete_yiel);
+                        $('#total_concrete_yiel').val(MyApp.formatearNumero(response.data_tracking.total_concrete_yiel, 2, '.', ','));
                         $('#total_quantity_today').val(response.data_tracking.total_quantity_today);
 
 
@@ -1509,6 +1509,18 @@ var DataTracking = function () {
                         posicion: items_data_tracking.length
                     });
 
+                    subcontracts.push({
+                        subcontract_id: '',
+                        item_id: item.item_id,
+                        item: item.item,
+                        unit: item.unit,
+                        quantity: quantity,
+                        price: price,
+                        total: total,
+                        notes: notes,
+                        posicion: subcontracts.length
+                    });
+
                 } else {
                     var posicion = nEditingRowItem;
                     if (items_data_tracking[posicion]) {
@@ -1527,6 +1539,7 @@ var DataTracking = function () {
 
                 //actualizar lista
                 actualizarTableListaItems();
+                actualizarTableListaSubcontracts();
 
                 if (nEditingRowItem != null) {
                     $('#modal-data-tracking-item').modal('hide');

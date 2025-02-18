@@ -2651,6 +2651,9 @@ var Projects = function () {
             }
 
             btnClickFiltrar();
+
+            localStorage.removeItem('dashboard_fecha_inicial');
+            localStorage.removeItem('dashboard_fecha_fin');
         }
 
     };
