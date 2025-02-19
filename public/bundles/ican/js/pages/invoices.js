@@ -772,6 +772,7 @@ var Invoices = function () {
                                 amount: item.amount,
                                 total_amount: item.total_amount,
                                 paid_qty: 0,
+                                unpaid_qty: 0,
                                 paid_amount: 0,
                                 paid_amount_total: 0,
                                 posicion: posicion
