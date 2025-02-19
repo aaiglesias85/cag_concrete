@@ -1473,6 +1473,15 @@ var Invoices = function () {
                 }
             },
             {
+                field: "unpaid_qty",
+                title: " Unpaid Qty",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${row.unpaid_qty}</span>`;
+                }
+            },
+            {
                 field: "paid_amount",
                 title: "Paid Amount",
                 width: 100,
@@ -1683,7 +1692,11 @@ var Invoices = function () {
                 var price = payments[posicion].price;
                 var amount = payments[posicion].amount;
 
+                var quantity = payments[posicion].quantity;
+                var unpaid_qty = quantity - paid_qty;
+
                 payments[posicion].paid_qty = paid_qty;
+                payments[posicion].unpaid_qty = unpaid_qty;
                 payments[posicion].paid_amount = paid_qty * price;
                 payments[posicion].paid_amount_total = paid_qty * amount;
 

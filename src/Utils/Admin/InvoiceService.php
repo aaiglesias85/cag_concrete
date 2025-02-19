@@ -378,6 +378,8 @@ class InvoiceService extends Base
             $paid_amount = $value->getPaidAmount();
             $paid_amount_total = $value->getPaidAmountTotal();
 
+            $unpaid_qty = $quantity - $paid_qty;
+
             $payments[] = [
                 "invoice_item_id" => $value->getId(),
                 "project_item_id" => $value->getProjectItem()->getId(),
@@ -395,6 +397,7 @@ class InvoiceService extends Base
                 "paid_qty" => $paid_qty,
                 "paid_amount" => $paid_amount,
                 "paid_amount_total" => $paid_amount_total,
+                "unpaid_qty" => $unpaid_qty,
                 "posicion" => $key
             ];
         }
