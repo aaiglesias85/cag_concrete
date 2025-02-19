@@ -1499,7 +1499,7 @@ var Invoices = function () {
                     return `<span>${MyApp.formatearNumero(row.paid_amount_total, 2, '.', ',')}</span>`;
                 }
             },
-            /*{
+            {
                 field: "posicion",
                 width: 120,
                 title: "Actions",
@@ -1508,10 +1508,10 @@ var Invoices = function () {
                 textAlign: 'center',
                 template: function (row) {
                     return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="paid m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Paid item"><i class="la la-check"></i></a>
                     `;
                 }
-            }*/
+            }
         ];
         oTablePayments = table.mDatatable({
             // datasource definition
@@ -1693,6 +1693,26 @@ var Invoices = function () {
                 var amount = payments[posicion].amount;
 
                 var quantity = payments[posicion].quantity;
+                var unpaid_qty = quantity - paid_qty;
+
+                payments[posicion].paid_qty = paid_qty;
+                payments[posicion].unpaid_qty = unpaid_qty;
+                payments[posicion].paid_amount = paid_qty * price;
+                payments[posicion].paid_amount_total = paid_qty * amount;
+
+                actualizarTableListaPayments();
+            }
+        });
+
+        $(document).off('click', "#payments-table-editable a.paid");
+        $(document).on('click', "#payments-table-editable a.paid", function (e) {
+            var posicion = $(this).data('posicion');
+            if (payments[posicion]) {
+                var quantity = payments[posicion].quantity;
+                var paid_qty = quantity;
+                var price = payments[posicion].price;
+                var amount = payments[posicion].amount;
+
                 var unpaid_qty = quantity - paid_qty;
 
                 payments[posicion].paid_qty = paid_qty;
