@@ -1468,6 +1468,9 @@ var Invoices = function () {
                 title: " Paid Qty",
                 width: 100,
                 textAlign: 'center',
+                template: function (row) {
+                    return `<input type="number" class="form-control paid_qty" value="${row.paid_qty}" data-position="${row.posicion}" />`;
+                }
             },
             {
                 field: "paid_amount",
@@ -1487,7 +1490,7 @@ var Invoices = function () {
                     return `<span>${MyApp.formatearNumero(row.paid_amount_total, 2, '.', ',')}</span>`;
                 }
             },
-            {
+            /*{
                 field: "posicion",
                 width: 120,
                 title: "Actions",
@@ -1499,7 +1502,7 @@ var Invoices = function () {
                     <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
                     `;
                 }
-            }
+            }*/
         ];
         oTablePayments = table.mDatatable({
             // datasource definition
@@ -1668,6 +1671,23 @@ var Invoices = function () {
                 // open modal
                 $('#modal-payment').modal('show');
 
+            }
+        });
+
+        $(document).off('change', "#payments-table-editable input.paid_qty");
+        $(document).on('change', "#payments-table-editable input.paid_qty", function (e) {
+            var $this = $(this);
+            var posicion = $this.attr('data-position');
+            if (payments[posicion]) {
+                var paid_qty = $this.val();
+                var price = payments[posicion].price;
+                var amount = payments[posicion].amount;
+
+                payments[posicion].paid_qty = paid_qty;
+                payments[posicion].paid_amount = paid_qty * price;
+                payments[posicion].paid_amount_total = paid_qty * amount;
+
+                actualizarTableListaPayments();
             }
         });
     };
