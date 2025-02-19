@@ -1101,6 +1101,7 @@ var Invoices = function () {
                 title: "Quatity This Period",
                 width: 100,
                 textAlign: 'center',
+                sortable: "desc" // Orden descendente por defecto
             },
             {
                 field: "quantity_completed",
