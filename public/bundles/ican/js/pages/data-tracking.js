@@ -3180,7 +3180,7 @@ var DataTracking = function () {
 
                 var notes = $('#notes-subcontract').val();
 
-                if (nEditingRowItem == null) {
+                if (nEditingRowSubcontract == null) {
 
                     subcontracts.push({
                         subcontract_id: '',
@@ -3284,7 +3284,7 @@ var DataTracking = function () {
         function ExistSubcontract(item_id) {
             var result = false;
 
-            if (nEditingRowItem == null) {
+            if (nEditingRowSubcontract == null) {
                 for (var i = 0; i < subcontracts.length; i++) {
                     if (subcontracts[i].item_id == item_id) {
                         result = true;
