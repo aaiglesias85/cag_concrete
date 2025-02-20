@@ -1454,6 +1454,7 @@ var Invoices = function () {
                 title: "Invoiced Qty",
                 width: 100,
                 textAlign: 'center',
+                sortable: "desc" // Orden descendente por defecto
             },
             {
                 field: "amount",
@@ -1508,8 +1509,13 @@ var Invoices = function () {
                 overflow: 'visible',
                 textAlign: 'center',
                 template: function (row) {
+
+                    var class_css = row.unpaid_qty === 0 ? 'btn-success' : 'btn-danger';
+
                     return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="paid m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Paid item"><i class="la la-check"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" 
+                    class="paid m-portlet__nav-link btn m-btn m-btn--icon m-btn--icon-only m-btn--pill ${class_css}" 
+                        title="Paid item"><i class="la la-check"></i></a>
                     `;
                 }
             }
