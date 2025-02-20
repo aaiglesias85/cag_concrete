@@ -3292,7 +3292,7 @@ var DataTracking = function () {
                     }
                 }
             } else {
-                var posicion = nEditingRowItem;
+                var posicion = nEditingRowSubcontract;
                 for (var i = 0; i < subcontracts.length; i++) {
                     if (subcontracts[i].item_id == item_id && subcontracts[i].subcontract_id !== subcontracts[posicion].subcontract_id) {
                         result = true;
