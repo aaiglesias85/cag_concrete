@@ -79,8 +79,12 @@ class InvoiceService extends Base
         $fecha_actual = date('m/d/Y');
         $objWorksheet->setCellValueExplicit("H5", $fecha_actual, DataType::TYPE_STRING);
 
+        $project_entity = $invoice_entity->getProject();
+        $project_number = $project_entity->getProjectNumber();
+
         $number = $invoice_entity->getNumber();
-        $objWorksheet->setCellValue("I5", $number);
+
+        $objWorksheet->setCellValue("I5", "$project_number-$number");
 
         $start_date = $invoice_entity->getStartDate()->format('m/d/Y');
         $objWorksheet->setCellValueExplicit("H10", $start_date, DataType::TYPE_STRING);
@@ -104,12 +108,11 @@ class InvoiceService extends Base
         }
 
         // project
-        $project_entity = $invoice_entity->getProject();
         $objWorksheet->setCellValue("C17", $project_entity->getCounty());
         $objWorksheet->setCellValue("C18", $project_entity->getName());
         $objWorksheet->setCellValue("G17", $project_entity->getProjectIdNumber());
         $objWorksheet->setCellValue("G18", $project_entity->getSubcontract());
-        $objWorksheet->setCellValue("G19", $project_entity->getProjectNumber());
+        $objWorksheet->setCellValue("G19", $project_number);
 
         // notes
         $objWorksheet->setCellValue("B20", $invoice_entity->getNotes());
