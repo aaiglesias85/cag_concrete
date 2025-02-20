@@ -1023,7 +1023,7 @@ class DataTrackingService extends Base
                 $em->persist($data_tracking_item_entity);
             }
 
-            if($value->quantity == 0){
+            if ($value->quantity == 0) {
                 $pending = true;
             }
 
@@ -1172,9 +1172,13 @@ class DataTrackingService extends Base
 
             // aplicar el yield
             $quantity_yield = 0;
-            if ($data_tracking_item->getProjectItem()->getYieldCalculation() == "equation" && $data_tracking_item->getProjectItem()->getEquation() != null) {
-                $quantity = $data_tracking_item->getQuantity();
-                $quantity_yield = $this->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+            if ($data_tracking_item->getProjectItem()->getYieldCalculation() != '') {
+                if ($data_tracking_item->getProjectItem()->getYieldCalculation() == "equation" && $data_tracking_item->getProjectItem()->getEquation() != null) {
+                    $quantity = $data_tracking_item->getQuantity();
+                    $quantity_yield = $this->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+                } else {
+                    $quantity_yield = $data_tracking_item->getQuantity();
+                }
             }
 
             $total_conc_yiel += $quantity_yield;
