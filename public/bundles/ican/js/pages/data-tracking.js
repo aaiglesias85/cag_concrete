@@ -1304,6 +1304,15 @@ var DataTracking = function () {
                 }
             },
             {
+                field: "yield_calculation_valor",
+                title: "Yield Calculation Value",
+                width: 150,
+                textAlign: 'center',
+                template: function (row) {
+                    return row.yield_calculation_valor !== '' ? `<span>${MyApp.formatearNumero(row.yield_calculation_valor, 2, '.', ',')}</span>` : '';
+                }
+            },
+            {
                 field: "price",
                 title: "Price",
                 width: 100,
@@ -1492,6 +1501,17 @@ var DataTracking = function () {
                 var equation_id = item.equation_id;
                 var yield_calculation_name = item.yield_calculation_name;
 
+                // calcular yield
+                var yield_calculation_valor = '';
+                if (yield_calculation !== '' && yield_calculation !== 'none') {
+                    if (yield_calculation === 'same') {
+                        yield_calculation_valor = quantity;
+                    } else {
+                        yield_calculation_valor = MyApp.evaluateExpression(yield_calculation_name, quantity);
+                    }
+                }
+
+
                 if (nEditingRowItem == null) {
 
                     items_data_tracking.push({
@@ -1503,6 +1523,7 @@ var DataTracking = function () {
                         yield_calculation: yield_calculation,
                         yield_calculation_name: yield_calculation_name,
                         quantity: quantity,
+                        yield_calculation_valor: yield_calculation_valor,
                         price: price,
                         total: total,
                         notes: notes,
@@ -1529,6 +1550,7 @@ var DataTracking = function () {
                         items_data_tracking[posicion].unit = item.unit;
                         items_data_tracking[posicion].yield_calculation = yield_calculation;
                         items_data_tracking[posicion].yield_calculation_name = yield_calculation_name;
+                        items_data_tracking[posicion].yield_calculation_valor = yield_calculation_valor;
                         items_data_tracking[posicion].equation_id = equation_id;
                         items_data_tracking[posicion].quantity = quantity;
                         items_data_tracking[posicion].price = price;

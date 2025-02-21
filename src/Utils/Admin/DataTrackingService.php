@@ -487,6 +487,8 @@ class DataTrackingService extends Base
             $price = $value->getPrice();
             $total = $quantity * $price;
 
+            $yield_calculation_valor = $this->CalcularTotalConcreteYielItem($value);
+
             $items[] = [
                 'data_tracking_item_id' => $value->getId(),
                 "item_id" => $value->getProjectItem()->getId(),
@@ -498,6 +500,7 @@ class DataTrackingService extends Base
                 "notes" => $value->getNotes(),
                 "yield_calculation" => $value->getProjectItem()->getYieldCalculation(),
                 "yield_calculation_name" => $yield_calculation_name,
+                "yield_calculation_valor" => $yield_calculation_valor == 0 ? '' : $yield_calculation_valor,
                 "equation_id" => $value->getProjectItem()->getEquation() != null ? $value->getProjectItem()->getEquation()->getEquationId() : '',
                 "posicion" => $key
             ];
@@ -1169,23 +1172,35 @@ class DataTrackingService extends Base
         $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
             ->ListarItems($data_tracking_id);
         foreach ($data_tracking_items as $data_tracking_item) {
-
             // aplicar el yield
-            $quantity_yield = 0;
-            if ($data_tracking_item->getProjectItem()->getYieldCalculation() != '') {
-                if ($data_tracking_item->getProjectItem()->getYieldCalculation() == "equation" && $data_tracking_item->getProjectItem()->getEquation() != null) {
-                    $quantity = $data_tracking_item->getQuantity();
-                    $quantity_yield = $this->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
-                } else {
-                    $quantity_yield = $data_tracking_item->getQuantity();
-                }
-            }
-
+            $quantity_yield = $this->CalcularTotalConcreteYielItem($data_tracking_item);
             $total_conc_yiel += $quantity_yield;
 
         }
 
         return $total_conc_yiel;
+    }
+
+    /**
+     * CalcularTotalConcreteYielItem
+     * @param DataTrackingItem $data_tracking_item
+     * @return float
+     */
+    private function CalcularTotalConcreteYielItem($data_tracking_item)
+    {
+
+        $quantity_yield = 0;
+
+        if ($data_tracking_item->getProjectItem()->getYieldCalculation() != '' && $data_tracking_item->getProjectItem()->getYieldCalculation() != 'none') {
+            if ($data_tracking_item->getProjectItem()->getYieldCalculation() == "equation" && $data_tracking_item->getProjectItem()->getEquation() != null) {
+                $quantity = $data_tracking_item->getQuantity();
+                $quantity_yield = $this->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+            } else {
+                $quantity_yield = $data_tracking_item->getQuantity();
+            }
+        }
+
+        return $quantity_yield;
     }
 
     /**

@@ -405,6 +405,8 @@ var MyApp = function () {
     // evaluar expression
     var evaluateExpression = function (expression, variableValue) {
         try {
+            // poner minuscula
+            expression = expression.toLowerCase();
             // Sustituye 'x' por el valor de la variable, asumiendo que 'x' es la variable
             expression = expression.replace(/x/gi, variableValue);
 
