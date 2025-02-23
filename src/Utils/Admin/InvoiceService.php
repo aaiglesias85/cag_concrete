@@ -319,6 +319,7 @@ class InvoiceService extends Base
             $contract_amount = $contract_qty * $price;
 
             $quantity_from_previous = $value->getQuantityFromPrevious();
+            $unpaid_from_previous = $value->getUnpaidFromPrevious();
 
             $quantity = $value->getQuantity();
 
@@ -338,6 +339,7 @@ class InvoiceService extends Base
                 "price" => $price,
                 "contract_amount" => $contract_amount,
                 "quantity_from_previous" => $quantity_from_previous,
+                "unpaid_from_previous" => $unpaid_from_previous,
                 "quantity" => $quantity,
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,
@@ -367,6 +369,7 @@ class InvoiceService extends Base
             $contract_amount = $contract_qty * $price;
 
             $quantity_from_previous = $value->getQuantityFromPrevious();
+            $unpaid_from_previous = $value->getUnpaidFromPrevious();
 
             $quantity = $value->getQuantity();
 
@@ -393,6 +396,7 @@ class InvoiceService extends Base
                 "price" => $price,
                 "contract_amount" => $contract_amount,
                 "quantity_from_previous" => $quantity_from_previous,
+                "unpaid_from_previous" => $unpaid_from_previous,
                 "quantity" => $quantity,
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,
@@ -626,7 +630,7 @@ class InvoiceService extends Base
         $entity = new Invoice();
 
         // number
-        $number = $this->getDoctrine()->getRepository(Invoice::class)->TotalInvoices() + 1;
+        $number = $this->getDoctrine()->getRepository(Invoice::class)->TotalInvoices('', '', $project_id) + 1;
         $entity->setNumber($number);
 
         if ($start_date != '') {
@@ -709,6 +713,7 @@ class InvoiceService extends Base
             }
 
             $invoice_item_entity->setQuantityFromPrevious($value->quantity_from_previous);
+            $invoice_item_entity->setUnpaidFromPrevious($value->unpaid_from_previous);
             $invoice_item_entity->setQuantity($value->quantity);
             $invoice_item_entity->setPrice($value->price);
 

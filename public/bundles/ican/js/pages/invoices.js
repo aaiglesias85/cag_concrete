@@ -751,6 +751,7 @@ var Invoices = function () {
                                 price: item.price,
                                 contract_amount: item.contract_amount,
                                 quantity_from_previous: item.quantity_from_previous ?? 0,
+                                unpaid_from_previous: item.unpaid_from_previous ?? 0,
                                 quantity_completed: item.quantity_completed,
                                 amount: item.amount,
                                 total_amount: item.total_amount,
@@ -764,10 +765,11 @@ var Invoices = function () {
                                 item: item.item,
                                 unit: item.unit,
                                 contract_qty: item.contract_qty,
-                                quantity: item.quantity,
+                                quantity: item.quantity + item.unpaid_from_previous,
                                 price: item.price,
                                 contract_amount: item.contract_amount,
                                 quantity_from_previous: item.quantity_from_previous ?? 0,
+                                unpaid_from_previous: item.unpaid_from_previous ?? 0,
                                 quantity_completed: item.quantity_completed,
                                 amount: item.amount,
                                 total_amount: item.total_amount,
@@ -1105,6 +1107,15 @@ var Invoices = function () {
                 sortable: "desc" // Orden descendente por defecto
             },
             {
+                field: "unpaid_from_previous",
+                title: "Unpaid Quatity Previous Application",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<input type="number" class="form-control unpaid_qty" value="${row.unpaid_from_previous}" data-position="${row.posicion}" />`;
+                }
+            },
+            {
                 field: "quantity_completed",
                 title: "Total Quatity Completed",
                 width: 100,
@@ -1341,6 +1352,31 @@ var Invoices = function () {
             });
         });
 
+        $(document).off('change', "#items-table-editable input.unpaid_qty");
+        $(document).on('change', "#items-table-editable input.unpaid_qty", function (e) {
+            var $this = $(this);
+            var posicion = $this.attr('data-position');
+            if (items[posicion]) {
+
+                items[posicion].unpaid_from_previous = $this.val();
+
+                actualizarTableListaItems();
+
+                var payment_posicion = payments.findIndex(item => item.project_item_id === items[posicion].project_item_id);
+                if(payments[payment_posicion]){
+
+                    var unpaid_from_previous = parseFloat(items[posicion].unpaid_from_previous);
+                    var quantity = items[posicion].quantity ?? 0
+                    payments[payment_posicion].quantity = unpaid_from_previous + quantity;
+
+                    var paid_qty = payments[payment_posicion].paid_qty ?? 0;
+                    payments[payment_posicion].unpaid_qty = payments[payment_posicion].quantity - paid_qty;
+
+                    actualizarTableListaPayments();
+                }
+            }
+        });
+
         $(document).off('click', "#btn-delete-item");
         $(document).on('click', "#btn-delete-item", function (e) {
 
@@ -1423,7 +1459,7 @@ var Invoices = function () {
             {
                 field: "unit",
                 title: "Unit",
-                width: 100,
+                width: 50,
             },
             {
                 field: "contract_qty",
@@ -1510,7 +1546,7 @@ var Invoices = function () {
                 textAlign: 'center',
                 template: function (row) {
 
-                    var class_css = row.unpaid_qty === 0 ? 'btn-success' : 'btn-danger';
+                    var class_css = row.paid_qty > 0 ? 'btn-success' : 'btn-danger';
 
                     return `
                     <a href="javascript:;" data-posicion="${row.posicion}" 

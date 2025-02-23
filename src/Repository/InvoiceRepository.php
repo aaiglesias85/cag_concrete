@@ -143,9 +143,9 @@ class InvoiceRepository extends EntityRepository
         if ($project_id != '') {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (p.projectId = :project_id) ';
+                $where .= 'WHERE (p.projectId = :p_id) ';
             else
-                $where .= 'AND (p.projectId = :project_id) ';
+                $where .= 'AND (p.projectId = :p_id) ';
         }
 
         if ($company_id != '') {
@@ -236,9 +236,9 @@ class InvoiceRepository extends EntityRepository
         if ($esta_query_cg == 1)
             $query->setParameter(':cg', "%${sSearch}%");
 
-        $esta_query_project_id = substr_count($consulta, ':project_id');
+        $esta_query_project_id = substr_count($consulta, ':p_id');
         if ($esta_query_project_id == 1) {
-            $query->setParameter('project_id', $project_id);
+            $query->setParameter('p_id', $project_id);
         }
 
         $esta_query_company_id = substr_count($consulta, ':company_id');

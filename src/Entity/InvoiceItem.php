@@ -31,6 +31,13 @@ class InvoiceItem
     /**
      * @var float
      *
+     * @ORM\Column(name="unpaid_from_previous", type="float", nullable=false)
+     */
+    private $unpaidFromPrevious;
+
+    /**
+     * @var float
+     *
      * @ORM\Column(name="quantity", type="float", nullable=false)
      */
     private $quantity;
@@ -187,6 +194,16 @@ class InvoiceItem
     public function setPaidAmountTotal($paidAmountTotal)
     {
         $this->paidAmountTotal = $paidAmountTotal;
+    }
+
+    public function getUnpaidFromPrevious()
+    {
+        return $this->unpaidFromPrevious;
+    }
+
+    public function setUnpaidFromPrevious($unpaidFromPrevious)
+    {
+        $this->unpaidFromPrevious = $unpaidFromPrevious;
     }
 
 }
