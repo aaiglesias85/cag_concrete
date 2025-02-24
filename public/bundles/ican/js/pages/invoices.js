@@ -262,6 +262,7 @@ var Invoices = function () {
 
         event_change = false;
 
+        invoice = null;
     };
 
     //Validacion
@@ -445,6 +446,7 @@ var Invoices = function () {
     };
 
     //Editar
+    var invoice = null;
     var initAccionEditar = function () {
         $(document).off('click', "#invoice-table-editable a.edit");
         $(document).on('click', "#invoice-table-editable a.edit", function (e) {
@@ -475,6 +477,7 @@ var Invoices = function () {
                 mApp.unblock('#form-invoice');
                 if (response.success) {
                     //Datos invoice
+                    invoice = response.invoice;
 
                     var formTitle = "You want to update the invoice? Follow the next steps:";
                     $('#form-invoice-title').html(formTitle);
@@ -1119,7 +1122,11 @@ var Invoices = function () {
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<input type="number" class="form-control unpaid_qty" value="${row.unpaid_from_previous}" data-position="${row.posicion}" />`;
+                    var output = `<span>${MyApp.formatearNumero(row.unpaid_from_previous, 2, '.', ',')}</span>`;
+                    if(invoice === null || !invoice.paid){
+                        output = `<input type="number" class="form-control unpaid_qty" value="${row.unpaid_from_previous}" data-position="${row.posicion}" />`;
+                    }
+                    return output;
                 }
             },
             {
@@ -1515,7 +1522,11 @@ var Invoices = function () {
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<input type="number" class="form-control paid_qty" value="${row.paid_qty}" data-position="${row.posicion}" />`;
+                    var output = `<span>${MyApp.formatearNumero(row.paid_qty, 2, '.', ',')}</span>`;
+                    if(invoice === null || !invoice.paid){
+                        output = `<input type="number" class="form-control paid_qty" value="${row.paid_qty}" data-position="${row.posicion}" />`;
+                    }
+                    return output;
                 }
             },
             {
