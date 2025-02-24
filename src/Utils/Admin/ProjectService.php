@@ -589,6 +589,8 @@ class ProjectService extends Base
 
             $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
 
+            $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
+
             $items[] = [
                 "project_item_id" => $project_item_id,
                 "item_id" => $value->getItem()->getItemId(),
@@ -599,14 +601,31 @@ class ProjectService extends Base
                 "contract_amount" => $contract_amount,
                 "quantity_from_previous" => $quantity_from_previous ?? 0,
                 "unpaid_from_previous" => $unpaid_from_previous,
-                "quantity" => $quantity,
+                "quantity" => $quantity ?? 0,
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,
-                "total_amount" => $total_amount
+                "total_amount" => $total_amount,
+                "paid_amount_total" => $paid_amount_total
             ];
         }
 
         return $items;
+    }
+
+    /**
+     * CalculaPaidAmountTotalFromPreviusInvoice
+     * @param $project_item_id
+     * @return void
+     */
+    public function CalculaPaidAmountTotalFromPreviusInvoice($project_item_id){
+        $total = 0;
+
+        $invoice_items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarInvoicesDeItem($project_item_id);
+        foreach ($invoice_items as $value) {
+            $total += $value->getPaidAmount();
+        }
+
+        return $total;
     }
 
     /**

@@ -523,6 +523,10 @@ var Invoices = function () {
                     payments = response.invoice.payments;
                     actualizarTableListaPayments();
 
+                    // habilitar tab
+                    totalTabs = 3;
+                    $('.nav-item-hide').removeClass('m--hide');
+
                     event_change = false;
 
                 } else {
@@ -776,7 +780,7 @@ var Invoices = function () {
                                 paid_qty: 0,
                                 unpaid_qty: 0,
                                 paid_amount: 0,
-                                paid_amount_total: 0,
+                                paid_amount_total: item.paid_amount_total,
                                 posicion: posicion
                             });
                         }
@@ -925,7 +929,7 @@ var Invoices = function () {
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 3;
+    var totalTabs = 2;
     var initWizard = function () {
         $(document).off('click', "#form-invoice .wizard-tab");
         $(document).on('click', "#form-invoice .wizard-tab", function (e) {
@@ -1016,10 +1020,13 @@ var Invoices = function () {
     }
     var resetWizard = function () {
         activeTab = 1;
+        totalTabs = 2;
         mostrarTab();
         $('.btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-siguiente').removeClass('m--hide');
+
+        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
     }
     var validWizard = function () {
         var result = true;
@@ -1447,6 +1454,7 @@ var Invoices = function () {
     var payments = [];
     var nEditingRowPayment = null;
     var initTablePayments = function () {
+
         MyApp.block('#payments-table-editable');
 
         var table = $('#payments-table-editable');
@@ -1740,8 +1748,11 @@ var Invoices = function () {
 
                 payments[posicion].paid_qty = paid_qty;
                 payments[posicion].unpaid_qty = unpaid_qty;
-                payments[posicion].paid_amount = paid_qty * price;
-                payments[posicion].paid_amount_total = paid_qty * amount;
+
+                var paid_amount = paid_qty * price;
+                payments[posicion].paid_amount = paid_amount;
+
+                payments[posicion].paid_amount_total += paid_amount;
 
                 actualizarTableListaPayments();
             }
@@ -1760,8 +1771,11 @@ var Invoices = function () {
 
                 payments[posicion].paid_qty = paid_qty;
                 payments[posicion].unpaid_qty = unpaid_qty;
-                payments[posicion].paid_amount = paid_qty * price;
-                payments[posicion].paid_amount_total = paid_qty * amount;
+
+                var paid_amount = paid_qty * price;
+                payments[posicion].paid_amount = paid_amount;
+
+                payments[posicion].paid_amount_total += paid_amount;
 
                 actualizarTableListaPayments();
             }

@@ -371,7 +371,7 @@ class InvoiceService extends Base
             $quantity_from_previous = $value->getQuantityFromPrevious();
             $unpaid_from_previous = $value->getUnpaidFromPrevious();
 
-            $quantity = $value->getQuantity();
+            $quantity = $value->getQuantity() + $value->getUnpaidFromPrevious();
 
             $quantity_completed = $quantity + $quantity_from_previous;
 
@@ -550,22 +550,36 @@ class InvoiceService extends Base
             // verificar fechas
             $invoices = $this->getDoctrine()->getRepository(Invoice::class)
                 ->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
-            if(!empty($invoices) && $invoices[0]->getInvoiceId() != $entity->getInvoiceId()){
+            if (!empty($invoices) && $invoices[0]->getInvoiceId() != $entity->getInvoiceId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = "An invoice already exists for that date range";
                 return $resultado;
             }
 
-
+            // verificar que la fecha inicial no sea mayor que la inicial
             if ($start_date != '') {
                 $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
-                $entity->setStartDate($start_date);
             }
 
             if ($end_date != '') {
                 $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
-                $entity->setEndDate($end_date);
             }
+
+            if ($start_date && $end_date) {
+                if ($start_date > $end_date) {
+                    $resultado['success'] = false;
+                    $resultado['error'] = "The start date cannot be greater than the end date.";
+                    return $resultado;
+                }
+            } else {
+                $resultado['success'] = false;
+                $resultado['error'] = "Incorrect date format";
+                return $resultado;
+            }
+
+
+            $entity->setStartDate($start_date);
+            $entity->setEndDate($end_date);
 
             $entity->setNotes($notes);
             $entity->setPaid($paid);
@@ -620,12 +634,32 @@ class InvoiceService extends Base
         // verificar fechas
         $invoices = $this->getDoctrine()->getRepository(Invoice::class)
             ->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
-        if(!empty($invoices)){
+        if (!empty($invoices)) {
             $resultado['success'] = false;
             $resultado['error'] = "An invoice already exists for that date range";
             return $resultado;
         }
 
+        // verificar que la fecha inicial no sea mayor que la inicial
+        if ($start_date != '') {
+            $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
+        }
+
+        if ($end_date != '') {
+            $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
+        }
+
+        if ($start_date && $end_date) {
+            if ($start_date > $end_date) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The start date cannot be greater than the end date.";
+                return $resultado;
+            }
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "Incorrect date format";
+            return $resultado;
+        }
 
         $entity = new Invoice();
 
@@ -633,15 +667,8 @@ class InvoiceService extends Base
         $number = $this->getDoctrine()->getRepository(Invoice::class)->TotalInvoices('', '', $project_id) + 1;
         $entity->setNumber($number);
 
-        if ($start_date != '') {
-            $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
-            $entity->setStartDate($start_date);
-        }
-
-        if ($end_date != '') {
-            $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
-            $entity->setEndDate($end_date);
-        }
+        $entity->setStartDate($start_date);
+        $entity->setEndDate($end_date);
 
         $entity->setNotes($notes);
         $entity->setPaid($paid);
