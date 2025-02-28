@@ -69,6 +69,11 @@
                                                     <li class="nav-item m-tabs__item">
                                                         <a class="nav-link m-tabs__link" data-toggle="tab" href="#topbar_notifications_logs" role="tab">Logs</a>
                                                     </li>
+                                                    {% if advertisements | length > 0 %}
+                                                    <li class="nav-item m-tabs__item">
+                                                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#topbar_advertisments" role="tab">Advertisements</a>
+                                                    </li>
+                                                    {% endif %}
                                                 </ul>
                                                 <div class="tab-content">
                                                     <div class="tab-pane active" id="topbar_notifications_notifications" role="tabpanel">
@@ -142,6 +147,30 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="tab-pane" id="topbar_advertisments" role="tabpanel">
+                                                        <div class="m-dropdown__scrollable m-scrollable" data-scrollable="true" data-height="300" data-mobile-height="200">
+                                                            {% if advertisements | length > 0 %}
+                                                                <div class="m-list-timeline">
+                                                                    <div class="m-list-timeline__group">
+                                                                        <div class="m-list-timeline__items">
+                                                                            {% for item in advertisements %}
+                                                                                <div class="m-list-timeline__item">
+                                                                                    <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
+                                                                                    <a class="m-list-timeline__text view-advertisement"
+                                                                                       href="javascript:;" data-id="{{ item.advertisement_id }}"
+                                                                                       data-title="{{ item.title }}"
+                                                                                       data-url="{{ url('cargarDatosAdvertisementAdmin') }}">
+                                                                                        <b>{{ item.title }}</b><br>{{ item.description }}
+                                                                                    </a>
+                                                                                    <span class="m-list-timeline__time"></span>
+                                                                                </div>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             {% endif %}
                                                         </div>
                                                     </div>

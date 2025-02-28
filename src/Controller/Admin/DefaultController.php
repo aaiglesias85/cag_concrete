@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Equation;
 use App\Entity\Item;
 use App\Entity\Unit;
+use App\Utils\Admin\AdvertisementService;
 use App\Utils\Admin\DefaultService;
 use App\Utils\Admin\LogService;
 use App\Utils\Admin\NotificationService;
@@ -18,11 +19,16 @@ class DefaultController extends AbstractController
     private $logService;
     private $notificationService;
 
-    public function __construct(DefaultService $defaultService, LogService $logService, NotificationService $notificationService)
+    private $advertisementService;
+
+    public function __construct(DefaultService       $defaultService, LogService $logService,
+                                NotificationService  $notificationService,
+                                AdvertisementService $advertisementService)
     {
         $this->defaultService = $defaultService;
         $this->logService = $logService;
         $this->notificationService = $notificationService;
+        $this->advertisementService = $advertisementService;
     }
 
     public function index()
@@ -33,7 +39,7 @@ class DefaultController extends AbstractController
             if ($permiso[0]['ver']) {
 
                 //last 6 projects
-                $projects = $this->defaultService->ListarProjectsParaDashboard( '', '', '', 'DESC', 6);
+                $projects = $this->defaultService->ListarProjectsParaDashboard('', '', '', 'DESC', 6);
 
                 // filter projects
                 $filter_projects = $this->defaultService->ListarProjectsParaDashboard();
@@ -117,11 +123,13 @@ class DefaultController extends AbstractController
             }
         }
 
+        $advertisements = $this->advertisementService->ListarAdvertisementsUltimosDias();
 
         return $this->render('admin/layout/header.html.twig', array(
             'usuario' => $usuario,
             'logs' => $logs,
             'notificaciones' => $notificaciones,
+            'advertisements' => $advertisements,
             'notificaciones_sin_leer' => $sin_leer,
         ));
     }
@@ -163,30 +171,22 @@ class DefaultController extends AbstractController
 
     public function renderModalInspector()
     {
-        return $this->render('admin/block/modal-inspector.html.twig', array(
-
-        ));
+        return $this->render('admin/block/modal-inspector.html.twig', array());
     }
 
     public function renderModalEquation()
     {
-        return $this->render('admin/block/modal-equation.html.twig', array(
-
-        ));
+        return $this->render('admin/block/modal-equation.html.twig', array());
     }
 
     public function renderModalUnit()
     {
-        return $this->render('admin/block/modal-unit.html.twig', array(
-
-        ));
+        return $this->render('admin/block/modal-unit.html.twig', array());
     }
 
     public function renderModalEmployee()
     {
-        return $this->render('admin/block/modal-employee.html.twig', array(
-
-        ));
+        return $this->render('admin/block/modal-employee.html.twig', array());
     }
 
     public function renderModalItemSubcontract()
@@ -204,6 +204,16 @@ class DefaultController extends AbstractController
             'equations' => $equations,
             'yields_calculation' => $yields_calculation,
             'units' => $units
+        ));
+    }
+
+    public function renderModalAdvertisement()
+    {
+
+        $advertisements = $this->advertisementService->ListarAdvertisementsUltimosDias();
+
+        return $this->render('admin/block/modal-advertisement.html.twig', array(
+            'advertisement' => !empty($advertisements) ? $advertisements[0] : null,
         ));
     }
 }

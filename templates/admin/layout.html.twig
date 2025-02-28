@@ -89,6 +89,9 @@
         <i class="la la-arrow-up"></i>
     </div>
 
+    <!-- modal advertisement -->
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalAdvertisement')) }}
+
     {% include 'admin/block/modals.html.twig' %}
 
 {% endblock %}
@@ -137,6 +140,23 @@
             }
         });
     </script>
+
+    <!-- ver un advertisement desde el header -->
+    <script src="{{ asset('bundles/ican/js/components/modal-view-advertisement.js') }}"></script>
+    <script>
+        jQuery(document).ready(function () {
+            ModalViewAdvertisement.init();
+        });
+    </script>
+
+    <!-- mostrar el advertisement una ves al dia -->
+    <script src="{{ asset('bundles/ican/js/components/modal-advertisement.js') }}"></script>
+    <script>
+        jQuery(document).ready(function () {
+            ModalAdvertisement.init();
+        });
+    </script>
+
     <!-- END JAVASCRIPTS -->
     {% block javascriptsspecific %}  {% endblock %}
 {% endblock %}

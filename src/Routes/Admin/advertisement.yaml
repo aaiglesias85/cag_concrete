@@ -1,0 +1,23 @@
+advertisement:
+  path:  /advertisement
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::index }
+
+listarAdvertisementAdmin:
+  path:  /advertisement/listarAdvertisement
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::listar, _format: json }
+
+eliminarAdvertisementAdmin:
+  path:  /advertisement/eliminarAdvertisement
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::eliminar, _format: json }
+
+eliminarAdvertisementsAdmin:
+  path:  /advertisement/eliminarAdvertisements
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::eliminarAdvertisements, _format: json }
+
+salvarAdvertisementAdmin:
+  path:  /advertisement/salvarAdvertisement
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::salvar, _format: json }
+
+cargarDatosAdvertisementAdmin:
+  path:  /advertisement/cargarDatos
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::cargarDatos, _format: json }
