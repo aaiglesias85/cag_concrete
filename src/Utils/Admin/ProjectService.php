@@ -446,9 +446,12 @@ class ProjectService extends Base
 
             $acciones = $this->ListarAccionesNotes($notes_id);
 
+            $notes = $value->getNotes();
+            $notes = mb_convert_encoding($notes, 'UTF-8', 'UTF-8');
+
             $arreglo_resultado[$cont] = array(
                 "id" => $notes_id,
-                "notes" => $value->getNotes(),
+                "notes" => $notes,
                 "date" => $value->getDate()->format('m/d/Y'),
                 "acciones" => $acciones
             );
@@ -1567,8 +1570,6 @@ class ProjectService extends Base
 
             $cont++;
         }
-
-        $this->writelog(var_export($arreglo_resultado, true));
 
         return $arreglo_resultado;
     }
