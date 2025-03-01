@@ -617,7 +617,8 @@ class ProjectService extends Base
      * @param $project_item_id
      * @return void
      */
-    public function CalculaPaidAmountTotalFromPreviusInvoice($project_item_id){
+    public function CalculaPaidAmountTotalFromPreviusInvoice($project_item_id)
+    {
         $total = 0;
 
         $invoice_items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarInvoicesDeItem($project_item_id);
@@ -633,7 +634,8 @@ class ProjectService extends Base
      * @param $project_item_id
      * @return void
      */
-    public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id){
+    public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id)
+    {
         $unpaid_quantity = 0;
 
         $invoice_items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarInvoicesDeItem($project_item_id);
@@ -1565,6 +1567,8 @@ class ProjectService extends Base
 
             $cont++;
         }
+
+        $this->writelog(var_export($arreglo_resultado, true));
 
         return $arreglo_resultado;
     }
