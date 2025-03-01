@@ -286,17 +286,6 @@ var DataTracking = function () {
         });
         $('#item-subcontract').select2();
 
-        $('.select-item-data-tracking').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('.select-item-data-tracking').select2();
-
-        for (var i = 0; i < items.length; i++) {
-            $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
-        }
-        $('.select-item-data-tracking').select2();
-
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
@@ -674,21 +663,21 @@ var DataTracking = function () {
             });
 
         }
-
-        function actualizarSelectProjectItems() {
-            // reset
-            $('.select-item-data-tracking option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('.select-item-data-tracking').select2();
-
-            for (var i = 0; i < items.length; i++) {
-                $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
-            }
-            $('.select-item-data-tracking').select2();
-        }
     };
+
+    var actualizarSelectProjectItems = function() {
+        // reset
+        $('#item-data-tracking option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#item-data-tracking').select2();
+
+        for (var i = 0; i < items.length; i++) {
+            $('#item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
+        }
+        $('#item-data-tracking').select2();
+    }
 
     //Eliminar
     var initAccionEliminar = function () {
@@ -1049,11 +1038,11 @@ var DataTracking = function () {
         }
 
         // reset
-        $('.select-item-data-tracking option').each(function (e) {
+        $('#item-data-tracking option').each(function (e) {
             if ($(this).val() != "")
                 $(this).remove();
         });
-        $('.select-item-data-tracking').select2();
+        $('#item-data-tracking').select2();
 
         if (project_id != '') {
             listarItemsDeProject(project_id);
@@ -1064,13 +1053,6 @@ var DataTracking = function () {
 
     var listarItemsDeProject = function (project_id) {
         MyApp.block('#modal-data-tracking .modal-content');
-
-        // reset
-        $('.select-item-data-tracking').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('.select-item-data-tracking').select2();
 
         $.ajax({
             type: "POST",
@@ -1086,11 +1068,6 @@ var DataTracking = function () {
                     //Llenar select
                     items = response.items;
                     console.log(items);
-
-                    for (var i = 0; i < items.length; i++) {
-                        $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
-                    }
-                    $('.select-item-data-tracking').select2();
 
                 } else {
                     toastr.error(response.error, "");
@@ -1152,8 +1129,8 @@ var DataTracking = function () {
             if (item != null) {
                 //add items to select
                 items.push(item);
-                $('.select-item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, item.project_item_id, false, false));
-                $('.select-item-data-tracking').select2();
+                $('#item-data-tracking').append(new Option(`${item.item} - ${item.unit}`, item.project_item_id, false, false));
+                $('#item-data-tracking').select2();
 
                 $('#item-data-tracking').val(item.project_item_id);
                 $('#item-data-tracking').trigger('change');
@@ -1175,7 +1152,7 @@ var DataTracking = function () {
             if (item != null) {
                 //add items to select
                 all_items.push(item);
-                $('#item-subcontract').append(new Option(item.item, item.item_id, false, false));
+                $('#item-subcontract').append(new Option(`${item.item} - ${item.unit}`, item.item_id, false, false));
                 $('#item-subcontract').select2();
 
                 $('#item-subcontract').val(item.item_id);
@@ -1720,8 +1697,7 @@ var DataTracking = function () {
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
 
-        $('#item-data-tracking').val('');
-        $('#item-data-tracking').trigger('change');
+        actualizarSelectProjectItems();
 
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");

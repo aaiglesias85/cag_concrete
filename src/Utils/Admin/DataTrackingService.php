@@ -751,6 +751,9 @@ class DataTrackingService extends Base
 
             $em->persist($entity);
 
+            // modificar status del project
+            $this->ModificarStatusProject($project_entity, $date);
+
             $log_operacion = "Add";
             $project_desc = $project_entity->getProjectNumber() . ' - ' . $project_entity->getName();
             $log_descripcion = "The data tracking is add, Project: $project_desc, Date: $date";
@@ -787,6 +790,30 @@ class DataTrackingService extends Base
 
         return $resultado;
 
+    }
+
+    /**
+     * ModificarStatusProject
+     * @param Project $project_entity
+     * @param \DateTime $date
+     * @return void
+     */
+    public function ModificarStatusProject($project_entity, $date)
+    {
+
+        // si el proyecto no ha iniciado lo inicio
+        if ($project_entity->getStatus() == 0) {
+            $project_entity->setStatus(1);
+        }
+
+        // si el proyecto esta completado verifico la fecha de termino
+        if ($project_entity->getStatus() == 2 && $project_entity->getEndDate() != '') {
+            $end_date = $project_entity->getEndDate();
+            $date = \DateTime::createFromFormat('m/d/Y', $date);
+            if ($date > $end_date) {
+                $project_entity->setStatus(1);
+            }
+        }
     }
 
     /**
