@@ -38,24 +38,27 @@ class DefaultController extends AbstractController
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
+                // primer dia del mes
+                $from = $this->defaultService->ObtenerPrimerDiaMes();
+
                 //last 6 projects
-                $projects = $this->defaultService->ListarProjectsParaDashboard('', '', '', 'DESC', 6);
+                $projects = $this->defaultService->ListarProjectsParaDashboard('', $from, '', 'DESC', 6);
 
                 // filter projects
-                $filter_projects = $this->defaultService->ListarProjectsParaDashboard();
+                $filter_projects = $this->defaultService->ListarProjectsParaDashboard('', $from);
 
                 // stats
-                $stats = $this->defaultService->ListarStats();
+                $stats = $this->defaultService->ListarStats($from);
                 // chart 1
-                $chart1 = $this->defaultService->DevolverDataChartCosts();
+                $chart1 = $this->defaultService->DevolverDataChartCosts('', $from);
                 // chart 2
-                $chart2 = $this->defaultService->DevolverDataChartProfit();
+                $chart2 = $this->defaultService->DevolverDataChartProfit('', $from);
                 // chart 3
-                $chart3 = $this->defaultService->DevolverDataChart3();
+                $chart3 = $this->defaultService->DevolverDataChart3('', $from);
                 // items
-                $items = $this->defaultService->ListarItemsConMontos();
+                $items = $this->defaultService->ListarItemsConMontos('', $from);
                 // materials
-                $materials = $this->defaultService->ListarMaterialsConMontos();
+                $materials = $this->defaultService->ListarMaterialsConMontos('', $from);
 
                 return $this->render('admin/default/index.html.twig', array(
                     'usuario' => $usuario,

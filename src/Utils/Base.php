@@ -230,6 +230,21 @@ class Base
         return $fecha;
     }
 
+    // primer dia del mes
+    function ObtenerPrimerDiaMes()
+    {
+        // Crear un objeto DateTime con la fecha y hora actuales
+        $fecha = new \DateTime();
+
+        // Ajustar la fecha al primer día del mes actual
+        $fecha->modify('first day of this month');
+
+        // Formatear la fecha en el formato m/d/Y
+        $primer_dia_mes = $fecha->format('m/d/Y');
+
+        return $primer_dia_mes;
+    }
+
     //Generar hexadecimal aleatorio
     function generarCadenaAleatoria()
     {

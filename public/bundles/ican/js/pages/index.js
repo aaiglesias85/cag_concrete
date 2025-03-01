@@ -656,9 +656,6 @@ var Index = function () {
             initAccionResetFiltrar();
 
             initAccionesProjects();
-
-            // filtrar
-            btnClickFiltrar();
         }
     };
 }();
