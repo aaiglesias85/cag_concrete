@@ -415,13 +415,13 @@ var Index = function () {
                     updateMaterials(response.stats.materials);
 
                 } else {
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             },
             failure: function (response) {
                 mApp.unblock('.m-content');
 
-                toastr.error(response.error, "Error !!!");
+                toastr.error(response.error, "");
             }
         });
 

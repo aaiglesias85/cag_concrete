@@ -238,13 +238,13 @@ var Employees = function () {
                             cerrarForms();
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-employee');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             }
@@ -329,13 +329,13 @@ var Employees = function () {
                         event_change = false;
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#form-employee');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 
@@ -384,7 +384,7 @@ var Employees = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select employees to delete', "Error !!!");
+                toastr.error('Select employees to delete', "");
             }
         };
 
@@ -409,13 +409,13 @@ var Employees = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#employee-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -448,13 +448,13 @@ var Employees = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#employee-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };

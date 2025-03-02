@@ -225,18 +225,18 @@ var Perfiles = function () {
                             cerrarForms();
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-perfil');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             } else {
                 if (permisos.length == 0) {
-                    toastr.error("You must select the profile permissions", "Error !!!");
+                    toastr.error("You must select the profile permissions", "");
                 }
             }
         };
@@ -295,13 +295,13 @@ var Perfiles = function () {
                         marcarPermisos();
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#form-perfil');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 
@@ -350,7 +350,7 @@ var Perfiles = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select items to delete', "Error !!!");
+                toastr.error('Select items to delete', "");
             }
         };
 
@@ -375,13 +375,13 @@ var Perfiles = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#perfil-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -414,13 +414,13 @@ var Perfiles = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#perfil-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };

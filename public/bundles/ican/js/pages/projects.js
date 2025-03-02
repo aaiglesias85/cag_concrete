@@ -2368,13 +2368,13 @@ var Projects = function () {
                                 deleteContact(posicion);
 
                             } else {
-                                toastr.error(response.error, "Error !!!");
+                                toastr.error(response.error, "");
                             }
                         },
                         failure: function (response) {
                             mApp.unblock('#lista-contacts-table-editable');
 
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     });
                 } else {

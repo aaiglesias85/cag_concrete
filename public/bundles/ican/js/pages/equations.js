@@ -258,18 +258,18 @@ var Equations = function () {
                             cerrarForms();
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-equation');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             } else {
                 if (!/^[0-9+\-*\/\s\(\)x]+$/.test(equation)) {
-                    toastr.error('The equation expression is not valid', "Error !!!");
+                    toastr.error('The equation expression is not valid', "");
                 }
             }
         };
@@ -347,13 +347,13 @@ var Equations = function () {
                         event_change = false;
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#form-equation');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 
@@ -404,7 +404,7 @@ var Equations = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select items to delete', "Error !!!");
+                toastr.error('Select items to delete', "");
             }
         };
 
@@ -429,7 +429,7 @@ var Equations = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
 
                         // change pay items
                         equation_ids_con_items = response.equation_ids_con_items;
@@ -441,7 +441,7 @@ var Equations = function () {
                 failure: function (response) {
                     mApp.unblock('#equation-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -465,7 +465,7 @@ var Equations = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
 
                         // change pay items
                         equation_ids_con_items = response.equation_ids_con_items;
@@ -477,7 +477,7 @@ var Equations = function () {
                 failure: function (response) {
                     mApp.unblock('#equation-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -526,13 +526,13 @@ var Equations = function () {
                     actualizarTableListaPayItems();
 
                 } else {
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             },
             failure: function (response) {
                 mApp.unblock('#modal-pay-items .modal-content');
 
-                toastr.error(response.error, "Error !!!");
+                toastr.error(response.error, "");
             }
         });
     }
@@ -680,18 +680,18 @@ var Equations = function () {
 
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#modal-pay-items .modal-content');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
 
             } else {
-                toastr.error('Select the equation for all pay items', "Error !!!");
+                toastr.error('Select the equation for all pay items', "");
             }
 
         });
@@ -980,7 +980,7 @@ var Equations = function () {
                 result = false;
 
                 if (!test_expr) {
-                    toastr.error('The equation expression is not valid', "Error !!!");
+                    toastr.error('The equation expression is not valid', "");
                 }
             }
 

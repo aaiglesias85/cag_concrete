@@ -237,7 +237,7 @@ var Notifications = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select items to delete', "Error !!!");
+                toastr.error('Select items to delete', "");
             }
         };
 
@@ -261,13 +261,13 @@ var Notifications = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#notification-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -300,12 +300,12 @@ var Notifications = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#notification-table-editable');
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };

@@ -241,13 +241,13 @@ var Units = function () {
                             cerrarForms();
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-unit');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             }
@@ -316,13 +316,13 @@ var Units = function () {
                         event_change = false;
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#form-unit');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 
@@ -371,7 +371,7 @@ var Units = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select items to delete', "Error !!!");
+                toastr.error('Select items to delete', "");
             }
         };
 
@@ -396,13 +396,13 @@ var Units = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#unit-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -435,13 +435,13 @@ var Units = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#unit-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };

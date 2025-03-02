@@ -109,13 +109,13 @@ var ModalInspector = function () {
                             $('#modal-inspector').modal('hide');
 
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#modal-inspector .modal-content');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             }

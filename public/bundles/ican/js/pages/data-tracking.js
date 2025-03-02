@@ -1460,7 +1460,7 @@ var DataTracking = function () {
             if ($('#data-tracking-item-form').valid() && item_id != '') {
 
                 if (ExisteItem(item_id)) {
-                    toastr.error("The selected item has already been added", "Error !!!");
+                    toastr.error("The selected item has already been added", "");
                     return;
                 }
 
@@ -3163,7 +3163,7 @@ var DataTracking = function () {
             if ($('#subcontract-form').valid() && item_id != '') {
 
                 if (ExistSubcontract(item_id)) {
-                    toastr.error("The selected item has already been added", "Error !!!");
+                    toastr.error("The selected item has already been added", "");
                     return;
                 }
 

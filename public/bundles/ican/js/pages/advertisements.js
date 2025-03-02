@@ -279,13 +279,13 @@ var Advertisements = function () {
                             cerrarForms();
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-advertisement');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             } else {
@@ -390,13 +390,13 @@ var Advertisements = function () {
                         event_change = false;
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#form-advertisement');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 
@@ -445,7 +445,7 @@ var Advertisements = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select advertisements to delete', "Error !!!");
+                toastr.error('Select advertisements to delete', "");
             }
         };
 
@@ -472,13 +472,13 @@ var Advertisements = function () {
                         deleteAdvertisementHeader(advertisement_id);
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#advertisement-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -517,13 +517,13 @@ var Advertisements = function () {
                        }
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#advertisement-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };

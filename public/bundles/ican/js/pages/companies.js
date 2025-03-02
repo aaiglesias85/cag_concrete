@@ -257,13 +257,13 @@ var Companies = function () {
                             cerrarForms();
                             oTable.load();
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-company');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             }
@@ -362,13 +362,13 @@ var Companies = function () {
                         event_change = false;
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#form-company');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 
@@ -417,7 +417,7 @@ var Companies = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select companies to delete', "Error !!!");
+                toastr.error('Select companies to delete', "");
             }
         };
 
@@ -442,13 +442,13 @@ var Companies = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#company-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -481,13 +481,13 @@ var Companies = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#company-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -902,13 +902,13 @@ var Companies = function () {
                                 deleteContact(posicion);
 
                             } else {
-                                toastr.error(response.error, "Error !!!");
+                                toastr.error(response.error, "");
                             }
                         },
                         failure: function (response) {
                             mApp.unblock('#lista-contacts-table-editable');
 
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     });
                 }else{

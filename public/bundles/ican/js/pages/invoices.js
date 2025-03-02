@@ -383,13 +383,13 @@ var Invoices = function () {
                                 document.location = response.url;
                             }
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#form-invoice');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             } else {
@@ -533,13 +533,13 @@ var Invoices = function () {
                     event_change = false;
 
                 } else {
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             },
             failure: function (response) {
                 mApp.unblock('#form-invoice');
 
-                toastr.error(response.error, "Error !!!");
+                toastr.error(response.error, "");
             }
         });
 
@@ -588,7 +588,7 @@ var Invoices = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select invoices to delete', "Error !!!");
+                toastr.error('Select invoices to delete', "");
             }
         };
 
@@ -613,13 +613,13 @@ var Invoices = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#invoice-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -652,13 +652,13 @@ var Invoices = function () {
                         toastr.success(response.message, "Success !!!");
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#invoice-table-editable');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         };
@@ -687,13 +687,13 @@ var Invoices = function () {
                     if (response.success) {
                         document.location = response.url;
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#lista-invoice');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         });
@@ -792,13 +792,13 @@ var Invoices = function () {
                         actualizarTableListaPayments();
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#lista-items');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         }
@@ -838,13 +838,13 @@ var Invoices = function () {
                         $('#project').select2();
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#select-project');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         }
@@ -883,13 +883,13 @@ var Invoices = function () {
                         $('#filtro-project').select2();
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#select-filtro-project');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         }
@@ -1418,13 +1418,13 @@ var Invoices = function () {
                                 deleteItem(posicion);
 
                             } else {
-                                toastr.error(response.error, "Error !!!");
+                                toastr.error(response.error, "");
                             }
                         },
                         failure: function (response) {
                             mApp.unblock('#items-table-editable');
 
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     });
                 } else {
@@ -1833,12 +1833,12 @@ var Invoices = function () {
                         oTable.load();
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#invoice-table-editable');
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         }

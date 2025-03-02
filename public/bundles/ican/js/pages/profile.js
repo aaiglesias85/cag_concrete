@@ -114,13 +114,13 @@ var Profile = function () {
                         toastr.success(response.message, "Success !!!");
                         document.location = "";
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#m_user_profile_tab_1');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
         }

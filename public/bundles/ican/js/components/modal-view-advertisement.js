@@ -45,13 +45,13 @@ var ModalViewAdvertisement = function () {
                         $('#modal-view-advertisement .modal-body').html(response.advertisement.description);
 
                     } else {
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 },
                 failure: function (response) {
                     mApp.unblock('#modal-view-advertisement .modal-body');
 
-                    toastr.error(response.error, "Error !!!");
+                    toastr.error(response.error, "");
                 }
             });
 

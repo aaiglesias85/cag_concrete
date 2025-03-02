@@ -105,13 +105,13 @@ var ModalEmployee = function () {
                             $('#modal-employee').modal('hide');
 
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#modal-employee .modal-content');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             }

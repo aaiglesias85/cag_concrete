@@ -152,10 +152,10 @@ var MyApp = function () {
         toastr.options.positionClass = 'toast-top-center';
     }
     var showAlert = function (msg) {
-        toastr.error(msg, "Error !!!");
+        toastr.error(msg, "");
     };
     var showMessage = function (msg) {
-        toastr.success(msg, "Exito !!!");
+        toastr.success(msg, "");
     };
 
     var block = function (target) {

@@ -98,13 +98,13 @@ var ModalUnit = function () {
                             $('#modal-unit').modal('hide');
 
                         } else {
-                            toastr.error(response.error, "Error !!!");
+                            toastr.error(response.error, "");
                         }
                     },
                     failure: function (response) {
                         mApp.unblock('#modal-unit .modal-content');
 
-                        toastr.error(response.error, "Error !!!");
+                        toastr.error(response.error, "");
                     }
                 });
             }
