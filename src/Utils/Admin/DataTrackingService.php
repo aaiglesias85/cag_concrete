@@ -809,7 +809,7 @@ class DataTrackingService extends Base
         // si el proyecto esta completado verifico la fecha de termino
         if ($project_entity->getStatus() == 2 && $project_entity->getEndDate() != '') {
             $end_date = $project_entity->getEndDate();
-            $date = \DateTime::createFromFormat('m/d/Y', $date);
+            $date = \DateTime::createFromFormat('m/d/Y H:i:s', $date . " 00:00:00");
             if ($date > $end_date) {
                 $project_entity->setStatus(1);
             }

@@ -469,6 +469,8 @@ var Advertisements = function () {
 
                         toastr.success(response.message, "Success !!!");
 
+                        deleteAdvertisementHeader(advertisement_id);
+
                     } else {
                         toastr.error(response.error, "Error !!!");
                     }
@@ -483,11 +485,13 @@ var Advertisements = function () {
 
         function btnClickModalEliminarSeleccion() {
             var ids = '';
+            var header_ids = [];
             $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
                 if ($(this).prop('checked')) {
                     var value = $(this).attr('value');
                     if (value != undefined) {
                         ids += value + ',';
+                        header_ids.push(value);
                     }
                 }
             });
@@ -508,6 +512,10 @@ var Advertisements = function () {
                         oTable.load();
                         toastr.success(response.message, "Success !!!");
 
+                       for (const id of header_ids) {
+                           deleteAdvertisementHeader(id);
+                       }
+
                     } else {
                         toastr.error(response.error, "Error !!!");
                     }
@@ -519,6 +527,14 @@ var Advertisements = function () {
                 }
             });
         };
+
+        function deleteAdvertisementHeader(id) {
+            $('.view-advertisement').each(function () {
+                if ($(this).data('id') == id) {
+                    $(this).parent().remove();
+                }
+            });
+        }
     };
 
 
