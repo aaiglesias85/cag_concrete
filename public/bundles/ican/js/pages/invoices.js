@@ -374,7 +374,7 @@ var Invoices = function () {
                         mApp.unblock('#form-invoice');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
                             cerrarForms();
 
                             btnClickFiltrar();
@@ -610,7 +610,7 @@ var Invoices = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -649,7 +649,7 @@ var Invoices = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -1413,7 +1413,7 @@ var Invoices = function () {
                             mApp.unblock('#items-table-editable');
                             if (response.success) {
 
-                                toastr.success(response.message, "Success !!!");
+                                toastr.success(response.message, "");
 
                                 deleteItem(posicion);
 
@@ -1829,7 +1829,7 @@ var Invoices = function () {
                     mApp.unblock('#invoice-table-editable');
 
                     if (response.success) {
-                        toastr.success("The operation was successful", "Success !!!");
+                        toastr.success("The operation was successful", "");
                         oTable.load();
 
                     } else {

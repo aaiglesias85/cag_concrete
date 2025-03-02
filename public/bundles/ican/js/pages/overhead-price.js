@@ -228,7 +228,7 @@ var OverheadPrice = function () {
                         mApp.unblock('#form-overhead');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -399,7 +399,7 @@ var OverheadPrice = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -438,7 +438,7 @@ var OverheadPrice = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");

@@ -258,7 +258,7 @@ var Notifications = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -297,7 +297,7 @@ var Notifications = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");

@@ -234,7 +234,7 @@ var Employees = function () {
                         mApp.unblock('#form-employee');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -406,7 +406,7 @@ var Employees = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -445,7 +445,7 @@ var Employees = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");

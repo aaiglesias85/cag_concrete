@@ -90,7 +90,7 @@ var ModalUnit = function () {
                         mApp.unblock('#modal-unit .modal-content');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
 
                             unit_new = {unit_id: response.unit_id, description: descripcion};
 
