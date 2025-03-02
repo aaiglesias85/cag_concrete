@@ -280,7 +280,7 @@ var Items = function () {
                         mApp.unblock('#form-item');
                         if (response.success) {
 
-                            toastr.success(response.message, "");
+                            toastr.success(response.message, "Success !!!");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -521,7 +521,7 @@ var Items = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");
@@ -560,7 +560,7 @@ var Items = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");

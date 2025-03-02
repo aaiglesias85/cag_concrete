@@ -96,7 +96,7 @@ var ModalEquation = function () {
                         mApp.unblock('#modal-equation .modal-content');
                         if (response.success) {
 
-                            toastr.success(response.message, "");
+                            toastr.success(response.message, "Success !!!");
 
                             equation_new = {equation_id: response.equation_id, description: descripcion, equation: equation};
 

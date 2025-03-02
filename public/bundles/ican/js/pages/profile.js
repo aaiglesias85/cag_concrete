@@ -111,7 +111,7 @@ var Profile = function () {
                     mApp.unblock('#m_user_profile_tab_1');
                     if (response.success) {
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
                         document.location = "";
                     } else {
                         toastr.error(response.error, "");

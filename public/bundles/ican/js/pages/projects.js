@@ -2363,7 +2363,7 @@ var Projects = function () {
                             mApp.unblock('#lista-contacts-table-editable');
                             if (response.success) {
 
-                                toastr.success(response.message, "");
+                                toastr.success(response.message, "Success !!!");
 
                                 deleteContact(posicion);
 

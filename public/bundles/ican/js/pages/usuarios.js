@@ -355,7 +355,7 @@ var Usuarios = function () {
                     mApp.unblock('#form-usuario');
                     if (response.success) {
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
                         cerrarForms();
                         oTable.load();
                     } else {
@@ -483,7 +483,7 @@ var Usuarios = function () {
                     mApp.unblock('#usuario-table-editable');
 
                     if (response.success) {
-                        toastr.success("The operation was successful", "");
+                        toastr.success("The operation was successful", "Success !!!");
                         oTable.load();
 
                     } else {
@@ -561,7 +561,7 @@ var Usuarios = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");
@@ -600,7 +600,7 @@ var Usuarios = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");

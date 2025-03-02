@@ -101,7 +101,7 @@ var ModalInspector = function () {
                         mApp.unblock('#modal-inspector .modal-content');
                         if (response.success) {
 
-                            toastr.success(response.message, "");
+                            toastr.success(response.message, "Success !!!");
 
                             inspector_new = {inspector_id: response.inspector_id, name};
 

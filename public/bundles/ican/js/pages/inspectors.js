@@ -259,7 +259,7 @@ var Inspectors = function () {
                         mApp.unblock('#form-inspector');
                         if (response.success) {
 
-                            toastr.success(response.message, "");
+                            toastr.success(response.message, "Success !!!");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -436,7 +436,7 @@ var Inspectors = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");
@@ -475,7 +475,7 @@ var Inspectors = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");

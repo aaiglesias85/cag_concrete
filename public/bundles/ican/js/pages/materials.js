@@ -246,7 +246,7 @@ var Materials = function () {
                         mApp.unblock('#form-material');
                         if (response.success) {
 
-                            toastr.success(response.message, "");
+                            toastr.success(response.message, "Success !!!");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -433,7 +433,7 @@ var Materials = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");
@@ -472,7 +472,7 @@ var Materials = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "");
+                        toastr.success(response.message, "Success !!!");
 
                     } else {
                         toastr.error(response.error, "");
