@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 24-01-2025 a las 18:47:46
+-- Tiempo de generación: 02-03-2025 a las 02:50:12
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -20,6 +20,30 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `constructora`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `advertisement`
+--
+
+CREATE TABLE `advertisement` (
+  `advertisement_id` int(11) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `status` tinyint(1) DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `advertisement`
+--
+
+INSERT INTO `advertisement` (`advertisement_id`, `title`, `description`, `status`, `start_date`, `end_date`) VALUES
+(1, 'Fashion Store Advertisement', '<p><b>Fashion Store Advertisement</b></p><p>Step into style with our exclusive spring collection! From chic dresses to casual tees, find your perfect look today. Shop now and get 20% off your first order! Don\'t miss out on this season\'s must-haves. Limited time offer.</p>', 1, '2025-02-01', '2025-02-28'),
+(2, 'Fitness Gym Advertisement', '<p><strong data-start=\"326\" data-end=\"355\">Fitness Gym Advertisement</strong></p><p><em data-start=\"360\" data-end=\"581\">Get in shape with us! Join today and receive your first month FREE. Enjoy unlimited access to state-of-the-art gym equipment, group classes, and expert trainers. Start your fitness journey now and feel the difference!</em></p>', 1, NULL, NULL),
+(3, 'Travel Agency Advertisement', '<p><strong data-start=\"586\" data-end=\"617\">Travel Agency Advertisement</strong></p><p><em data-start=\"622\" data-end=\"849\">Dreaming of an exotic vacation? Book your next getaway with us! Whether it\'s relaxing on a tropical beach or exploring ancient cities, we offer affordable travel packages. Book now and save up to 30%! Your adventure awaits!</em></p>', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -104,9 +128,11 @@ CREATE TABLE `data_tracking` (
 --
 
 INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `conc_vendor`, `crew_lead`, `notes`, `other_materials`, `total_conc_used`, `conc_price`, `total_stamps`, `total_people`, `overhead_price`, `color_used`, `color_price`, `pending`, `created_at`, `updated_at`, `project_id`, `inspector_id`, `overhead_price_id`) VALUES
-(3, '2024-08-31', '45453', 'Marcel', NULL, NULL, '', '', NULL, NULL, 0.00, 2.00, 100.00, 2.00, 100.00, 1, '2024-06-23 21:07:27', '2025-01-12 17:43:03', 2, NULL, 1),
-(4, '2024-06-11', '435435', 'Marcel', NULL, '', '', '', NULL, NULL, 0.00, NULL, NULL, NULL, NULL, 0, '2024-06-23 21:16:44', '2025-01-11 18:10:50', 3, NULL, NULL),
-(5, '2025-01-24', '', '', NULL, NULL, '', '', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-01-24 17:18:51', '2025-01-24 17:29:00', 1, NULL, NULL);
+(3, '2024-08-31', '45453', 'Marcel', NULL, NULL, '', NULL, NULL, NULL, 0.00, 2.00, 100.00, 2.00, 100.00, 0, '2024-06-23 21:07:27', '2025-02-18 22:30:47', 2, NULL, 1),
+(4, '2024-06-11', '435435', 'Marcel', NULL, NULL, '', '', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 0, '2024-06-23 21:16:44', '2025-01-24 20:06:43', 3, NULL, NULL),
+(5, '2025-02-19', 'rtertert', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 1.00, 100.00, 0.00, 0.00, 0, '2025-02-19 23:15:27', '2025-02-21 17:41:52', 2, 1, 1),
+(6, '2025-03-01', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:25:07', NULL, 1, NULL, NULL),
+(7, '2025-03-02', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:43:40', NULL, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -129,7 +155,8 @@ CREATE TABLE `data_tracking_conc_vendor` (
 INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`, `conc_price`, `data_tracking_id`) VALUES
 (1, 'Disrupsoft', 5.00, 10.00, 4),
 (2, 'Disrupsoft', 100.00, 100.00, 3),
-(3, 'Disrupsoft', 50.00, 1000.00, 5);
+(3, 'DGGG', 25.00, 100.00, 5),
+(4, 'DIO', 50.00, 100.00, 5);
 
 -- --------------------------------------------------------
 
@@ -154,9 +181,15 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_trac
 (8, 400.000000, 160.00, 'test', 3, 11),
 (9, 500.000000, 200.00, 'otra test', 3, 12),
 (11, 50.000000, 16.50, NULL, 4, 1),
-(12, 30.000000, 63.00, NULL, 4, 2),
-(13, 0.000000, 300.00, 'test pending', 3, 13),
-(14, 100.000000, 253.00, '', 5, 5);
+(13, 10.000000, 300.00, 'test pending', 3, 13),
+(15, 10.000000, 100.00, '', 3, 16),
+(16, 10.000000, 160.00, '', 5, 11),
+(17, 10.000000, 200.00, '', 5, 12),
+(18, 10.000000, 300.00, '', 5, 13),
+(19, 10.000000, 100.00, '', 5, 16),
+(20, 10.000000, 100.00, '', 5, 17),
+(21, 10.000000, 100.00, '', 6, 18),
+(22, 10.000000, 100.00, '', 7, 18);
 
 -- --------------------------------------------------------
 
@@ -181,7 +214,10 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_t
 (1, 1.00, 56.00, 'Jefe', 4, 1),
 (3, 5.00, 70.00, 'Jefe', 3, 2),
 (4, 10.00, 56.00, 'Constructor', 3, 1),
-(5, 4.00, 70.00, 'Asistent', 4, 2);
+(5, 4.00, 70.00, 'Asistent', 4, 2),
+(6, 2.00, 2.00, 'RRHH', 4, 4),
+(7, 2.00, 2.00, 'Ayudante', 4, 5),
+(8, 5.00, 70.00, 'Developer', 5, 2);
 
 -- --------------------------------------------------------
 
@@ -204,7 +240,37 @@ CREATE TABLE `data_tracking_material` (
 INSERT INTO `data_tracking_material` (`id`, `quantity`, `price`, `data_tracking_id`, `material_id`) VALUES
 (1, 1.00, 100.00, 4, 1),
 (3, 5.00, 5000.00, 3, 1),
-(4, 10.00, 500.00, 3, 2);
+(4, 10.00, 500.00, 3, 2),
+(5, 5.00, 100.00, 5, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `data_tracking_subcontract`
+--
+
+CREATE TABLE `data_tracking_subcontract` (
+  `id` int(11) NOT NULL,
+  `quantity` decimal(18,2) DEFAULT NULL,
+  `price` decimal(18,2) DEFAULT NULL,
+  `notes` text,
+  `data_tracking_id` int(11) DEFAULT NULL,
+  `item_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `data_tracking_subcontract`
+--
+
+INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `data_tracking_id`, `item_id`) VALUES
+(6, 10.00, 100.00, '', 3, 11),
+(7, 10.00, 50.00, '', 5, 12),
+(8, 10.00, 60.00, '', 5, 6),
+(9, 10.00, 100.00, '', 5, 7),
+(10, 10.00, 50.00, '', 5, 11),
+(11, 10.00, 100.00, '', 5, 8),
+(12, 10.00, 100.00, '', 6, 11),
+(13, 10.00, 100.00, '', 7, 11);
 
 -- --------------------------------------------------------
 
@@ -225,7 +291,10 @@ CREATE TABLE `employee` (
 
 INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`) VALUES
 (1, 'Marcel Curbelo Carmona', 56.00, 'Gerente'),
-(2, 'Andres Iglesias', 70.00, 'Developer');
+(2, 'Andres Iglesias', 70.00, 'Developer'),
+(3, 'Geydis Marquez', 5.00, 'Jefe'),
+(4, 'Luis Miguel', 2.00, 'RRHH'),
+(5, 'Brian Marcel', 2.00, 'Ayudante');
 
 -- --------------------------------------------------------
 
@@ -279,7 +348,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (13, 'equation', 'Equations'),
 (14, 'employees', 'Employees'),
 (15, 'materials', 'Materials'),
-(16, 'overhead', 'Overhead Price');
+(16, 'overhead', 'Overhead Price'),
+(17, 'advertisement', 'Advertisements');
 
 -- --------------------------------------------------------
 
@@ -329,7 +399,9 @@ CREATE TABLE `invoice` (
 --
 
 INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`) VALUES
-(1, '1', '2024-08-01', '2024-08-31', '', 0, '2024-07-07 19:19:29', '2024-12-23 02:07:29', 2);
+(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2),
+(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2),
+(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2);
 
 -- --------------------------------------------------------
 
@@ -340,6 +412,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 CREATE TABLE `invoice_item` (
   `id` int(11) NOT NULL,
   `quantity_from_previous` decimal(18,6) DEFAULT NULL,
+  `unpaid_from_previous` decimal(18,6) NOT NULL,
   `quantity` decimal(18,6) DEFAULT NULL,
   `price` decimal(18,2) DEFAULT NULL,
   `paid_qty` decimal(18,6) DEFAULT NULL,
@@ -353,13 +426,22 @@ CREATE TABLE `invoice_item` (
 -- Volcado de datos para la tabla `invoice_item`
 --
 
-INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `quantity`, `price`, `paid_qty`, `paid_amount`, `paid_amount_total`, `invoice_id`, `project_item_id`) VALUES
-(1, NULL, 40.000000, 160.00, 1.000000, 100.000000, 100.000000, 1, 11),
-(2, NULL, 50.000000, 200.00, 1.000000, 100.000000, 100.000000, 1, 12),
-(3, NULL, 30.000000, 300.00, 1.000000, 100.000000, 100.000000, 1, 13),
-(4, 40.000000, 40.000000, 160.00, 1.000000, 100.000000, 100.000000, 1, 11),
-(5, 50.000000, 50.000000, 200.00, 1.000000, 100.000000, 100.000000, 1, 12),
-(6, 30.000000, 1.000000, 300.00, 2.000000, 100.000000, 100.000000, 1, 13);
+INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previous`, `quantity`, `price`, `paid_qty`, `paid_amount`, `paid_amount_total`, `invoice_id`, `project_item_id`) VALUES
+(37, 0.000000, 0.000000, 10.000000, 160.00, 4.000000, 640.000000, 640.000000, 9, 11),
+(38, 0.000000, 0.000000, 10.000000, 200.00, 4.000000, 800.000000, 800.000000, 9, 12),
+(39, 0.000000, 0.000000, 10.000000, 300.00, 4.000000, 1200.000000, 1200.000000, 9, 13),
+(40, 0.000000, 0.000000, 10.000000, 100.00, 4.000000, 400.000000, 400.000000, 9, 16),
+(41, 0.000000, 0.000000, 10.000000, 100.00, 4.000000, 400.000000, 400.000000, 9, 17),
+(52, 10.000000, 3.000000, 0.000000, 160.00, 1.000000, 160.000000, 800.000000, 12, 11),
+(53, 10.000000, 3.000000, 0.000000, 200.00, 1.000000, 200.000000, 1000.000000, 12, 12),
+(54, 10.000000, 3.000000, 0.000000, 300.00, 1.000000, 300.000000, 1500.000000, 12, 13),
+(55, 10.000000, 3.000000, 0.000000, 100.00, 1.000000, 100.000000, 500.000000, 12, 16),
+(56, 10.000000, 3.000000, 0.000000, 100.00, 1.000000, 100.000000, 500.000000, 12, 17),
+(57, 10.000000, 5.000000, 0.000000, 160.00, 5.000000, 800.000000, 1600.000000, 13, 11),
+(58, 10.000000, 5.000000, 0.000000, 200.00, 5.000000, 1000.000000, 2000.000000, 13, 12),
+(59, 10.000000, 5.000000, 0.000000, 300.00, 5.000000, 1500.000000, 3000.000000, 13, 13),
+(60, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, 500.000000, 1000.000000, 13, 16),
+(61, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, 500.000000, 1000.000000, 13, 17);
 
 -- --------------------------------------------------------
 
@@ -403,7 +485,10 @@ INSERT INTO `item` (`item_id`, `description`, `price`, `yield_calculation`, `sta
 (17, 'PLAIN CONC DITCH PAVING', 47.18, 'equation', 1, '2024-04-12 20:26:54', '2024-05-12 19:18:15', 1, 2),
 (18, 'EXTRA CONCRETE', 208.00, NULL, 1, '2024-04-12 20:27:17', '2024-05-12 19:18:05', 3, NULL),
 (19, 'EXTRA LABOR', 1500.00, 'same', 1, '2024-04-12 20:27:37', '2024-05-12 19:17:54', 6, NULL),
-(20, 'Cubic Yards of Concrete', 150.00, 'none', 1, '2024-04-12 20:28:15', '2025-01-24 18:34:15', 3, NULL);
+(20, 'Cubic Yards of Concrete', 150.00, 'none', 1, '2024-04-12 20:28:15', '2025-01-25 17:25:02', 3, NULL),
+(21, 'Test', 100.00, 'none', 1, '2025-02-16 17:49:58', NULL, 3, NULL),
+(22, 'Test 2', NULL, NULL, 1, '2025-02-16 19:46:08', NULL, 3, NULL),
+(23, 'Test 3', NULL, NULL, 1, '2025-02-16 19:47:33', NULL, 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -720,21 +805,85 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (293, 'Delete', 'Data Tracking', 'The data tracking is deleted, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-11 17:56:09', 1),
 (294, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-11 18:04:08', 1),
 (295, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2025-01-11 18:04:22', 1),
-(296, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2025-01-11 18:10:50', 1),
-(297, 'Add', 'Overhead Price', 'The overhead price is added: Price 1', '::1', '2025-01-12 16:36:46', 1),
-(298, 'Add', 'Overhead Price', 'The overhead price is added: Price 2', '::1', '2025-01-12 16:36:53', 1),
-(299, 'Update', 'Overhead Price', 'The overhead price is modified: Price 2', '::1', '2025-01-12 16:37:09', 1),
-(300, 'Add', 'Overhead Price', 'The overhead price is added: Price 3', '::1', '2025-01-12 16:37:15', 1),
-(301, 'Add', 'Overhead Price', 'The overhead price is added: dsdsf', '::1', '2025-01-12 16:37:22', 1),
-(302, 'Update', 'Overhead Price', 'The overhead price is modified: dsdsf dfffd', '::1', '2025-01-12 16:37:27', 1),
-(303, 'Delete', 'Overhead Price', 'The overhead price is deleted: dsdsf dfffd', '::1', '2025-01-12 16:37:31', 1),
-(304, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 16:57:43', 1),
-(305, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 17:18:59', 1),
-(306, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-01-12 17:43:03', 1),
-(307, 'Update', 'Project Notes', 'The notes: <p>Change start date, old value: 08/01/2023</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p> is modified to the project: Houston Texas', '::1', '2025-01-24 17:15:17', 1),
-(308, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 01/24/2025', '::1', '2025-01-24 17:18:51', 1),
-(309, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009001 - FL COUNTY, Date: 01/24/2025', '::1', '2025-01-24 17:29:00', 1),
-(310, 'Update', 'Item', 'The item is modified: Cubic Yards of Concrete', '::1', '2025-01-24 18:34:15', 1);
+(321, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-01-26 22:33:08', 1),
+(322, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-01-26 23:13:35', 1),
+(323, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-01-26 23:13:51', 1),
+(324, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-01-26 23:15:31', 1),
+(325, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-02-16 12:57:09', 1),
+(326, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-02-16 13:05:50', 1),
+(327, 'Update', 'Project', 'The project is modified: FL MIAMI', '::1', '2025-02-16 13:07:10', 1),
+(328, 'Delete', 'Data Tracking', 'The data tracking is deleted, Project: 0009001 - FL COUNTY, Date: 01/24/2025', '::1', '2025-02-16 13:53:56', 1),
+(329, 'Delete', 'Data Tracking', 'The item of the data tracking is deleted, Item: CONC SIDEWALK 8IN, Project: 0009003 - Houston Texas, Date: 06/11/2024', '::1', '2025-02-16 13:54:31', 1),
+(330, 'Delete', 'Project Item', 'The item: CONC DRIVEWAY 8IN of the project is deleted', '::1', '2025-02-16 13:55:22', 1),
+(331, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:08:41', 1),
+(332, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:18:35', 1),
+(333, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:22:13', 1),
+(334, 'Delete', 'Data Tracking', 'The subcontract item of the data tracking is deleted, Item: CONC CURB & GUTTEER 8INX30IN TP2, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:41:02', 1),
+(335, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:43:36', 1),
+(336, 'Add', 'Item', 'The item is added: Test 2', '::1', '2025-02-16 19:46:08', 1),
+(337, 'Add', 'Item', 'The item is added: Test 3', '::1', '2025-02-16 19:47:33', 1),
+(338, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:47:51', 1),
+(339, 'Delete', 'Data Tracking', 'The subcontract item of the data tracking is deleted, Item: Test 3, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:58:15', 1),
+(340, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-16 19:58:19', 1),
+(341, 'Delete', 'Data Tracking', 'The subcontract item of the data tracking is deleted, Item: CLASS B CONCRETE, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-18 22:26:12', 1),
+(342, 'Delete', 'Data Tracking', 'The subcontract item of the data tracking is deleted, Item: CONC DRIVEWAY 8IN, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-18 22:26:14', 1),
+(343, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-18 22:26:36', 1),
+(344, 'Delete', 'Data Tracking', 'The subcontract item of the data tracking is deleted, Item: CONC SPILLWAY TP3, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-18 22:28:04', 1),
+(345, 'Delete', 'Data Tracking', 'The item of the data tracking is deleted, Item: BAR REINF. STEEL , Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-18 22:28:07', 1),
+(346, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 08/31/2024', '::1', '2025-02-18 22:30:47', 1),
+(347, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-02-19 22:56:02', 1),
+(348, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-02-19 23:06:30', 1),
+(349, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-02-19 23:11:00', 1),
+(350, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-02-19 23:13:13', 1),
+(351, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009002 - FL MIAMI, Date: 02/19/2025', '::1', '2025-02-19 23:15:28', 1),
+(352, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-02-19 23:19:22', 1),
+(353, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-02-19 23:19:56', 1),
+(354, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 02/19/2025', '::1', '2025-02-20 01:17:59', 1),
+(355, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-02-20 01:24:54', 1),
+(356, 'Update', 'Project', 'The project is modified: FL MIAMI', '::1', '2025-02-21 17:36:25', 1),
+(357, 'Update', 'Data Tracking', 'The data tracking is modified, Project: 0009002 - FL MIAMI, Date: 02/19/2025', '::1', '2025-02-21 17:41:52', 1),
+(358, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-02-21 17:47:35', 1),
+(359, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-02-21 17:51:07', 1),
+(360, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-02-21 17:51:13', 1),
+(361, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-02-21 17:53:15', 1),
+(362, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-02-21 17:53:24', 1),
+(363, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-02-21 18:51:16', 1),
+(364, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-02-21 18:52:05', 1),
+(365, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-02-22 14:07:44', 1),
+(366, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-02-22 14:07:44', 1),
+(367, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-02-22 14:08:23', 1),
+(368, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-02-22 14:18:31', 1),
+(369, 'Add', 'Invoice', 'The invoice #3 is added', '::1', '2025-02-22 14:19:11', 1),
+(370, 'Delete', 'Invoice', 'The invoice #3 is deleted', '::1', '2025-02-22 14:19:47', 1),
+(371, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-02-22 14:19:47', 1),
+(372, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-02-24 01:52:32', 1),
+(373, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-02-24 02:01:04', 1),
+(374, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-02-24 02:11:48', 1),
+(375, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-02-24 02:13:46', 1),
+(376, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-02-24 02:17:18', 1),
+(377, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-02-24 02:18:34', 1),
+(378, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-02-24 02:19:18', 1),
+(379, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-02-24 02:22:13', 1),
+(380, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-02-24 02:25:18', 1),
+(381, 'Add', 'Invoice', 'The invoice #3 is added', '::1', '2025-02-24 02:27:06', 1),
+(382, 'Update', 'Invoice', 'The invoice #3 is modified', '::1', '2025-02-24 02:27:25', 1),
+(383, 'Add', 'Advertisement', 'The advertisement is added: ', '::1', '2025-02-28 18:24:52', 1),
+(384, 'Update', 'Advertisement', 'The advertisement is modified: Fashion Store Advertisement', '::1', '2025-02-28 18:25:47', 1),
+(385, 'Update', 'Advertisement', 'The advertisement is modified: Fashion Store Advertisement', '::1', '2025-02-28 18:27:24', 1),
+(386, 'Add', 'Advertisement', 'The advertisement is added: Fitness Gym Advertisement', '::1', '2025-02-28 18:28:53', 1),
+(387, 'Add', 'Advertisement', 'The advertisement is added: Travel Agency Advertisement', '::1', '2025-02-28 18:30:05', 1),
+(388, 'Add', 'Advertisement', 'The advertisement is added: ssdf', '::1', '2025-02-28 18:30:43', 1),
+(389, 'Delete', 'Advertisement', 'The advertisement is deleted: ssdf', '::1', '2025-02-28 18:30:46', 1),
+(390, 'Update', 'Advertisement', 'The advertisement is modified: Fashion Store Advertisement', '::1', '2025-02-28 23:21:30', 1),
+(391, 'Update', 'Advertisement', 'The advertisement is modified: Fashion Store Advertisement', '::1', '2025-02-28 23:21:48', 1),
+(392, 'Update', 'Advertisement', 'The advertisement is modified: Travel Agency Advertisement', '::1', '2025-02-28 23:21:53', 1),
+(393, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-01 13:02:56', 1),
+(394, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-01 13:03:05', 1),
+(395, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-01 13:11:26', 1),
+(396, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 03/01/2025', '::1', '2025-03-01 13:25:07', 1),
+(397, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-01 13:25:19', 1),
+(398, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 03/02/2025', '::1', '2025-03-01 13:43:40', 1),
+(399, 'Update', 'Project Notes', 'The notes: Change <b>status</b>, old value: <b>Not</b> <b>Started</b> is modified to the project: FL COUNTY', '::1', '2025-03-01 14:42:16', 1);
 
 -- --------------------------------------------------------
 
@@ -778,7 +927,9 @@ CREATE TABLE `notification` (
 --
 
 INSERT INTO `notification` (`id`, `content`, `readed`, `created_at`, `user_id`, `project_id`) VALUES
-(2, 'Generate april invoice', 1, '2024-04-16 13:23:00', 1, NULL);
+(2, 'Generate april invoice', 1, '2024-04-16 13:23:00', 1, NULL),
+(3, 'Project 0009003 - Houston Texas is close to its due date 01/29/2025', 1, '2025-01-24 16:25:30', 1, 3),
+(4, 'Project 0009001 - FL COUNTY is close to its due date 01/30/2025', 1, '2025-01-24 16:25:30', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -840,9 +991,9 @@ CREATE TABLE `project` (
 --
 
 INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`) VALUES
-(1, NULL, '0009001', NULL, 'FL COUNTY', 'FL COUNTY', '', '', NULL, 0, '', 0, '', 0, NULL, NULL, '2024-05-31', 'Andres', 0, 'B3C210052148-0', 'ERS025', '2024-04-14 20:24:53', '2024-05-14 15:52:54', 1, 1),
-(2, NULL, '0009002', NULL, 'FL MIAMI', 'FL MIAMI', '', '', NULL, 0, '', 0, '', 0, NULL, NULL, '2024-05-28', 'Dan', 1, '896532', '896532', '2024-04-24 04:20:22', '2024-06-23 21:06:22', 1, 1),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2024-05-30', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2024-12-05 22:16:43', 3, 1);
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 1, NULL, NULL, '2024-04-14 20:24:53', '2025-03-01 13:25:19', 1, 1),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', 1, 1),
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', 3, 1);
 
 -- --------------------------------------------------------
 
@@ -890,14 +1041,17 @@ CREATE TABLE `project_item` (
 INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `project_id`, `item_id`, `equation_id`) VALUES
 (1, 1500.000000, 16.50, 'equation', 3, 6, 2),
 (2, 2000.000000, 63.00, 'same', 3, 15, NULL),
-(4, 1600.000000, 150.00, 'equation', 3, 20, 2),
-(5, NULL, 253.00, 'none', 1, 10, NULL),
+(4, 1600.000000, 150.00, 'none', 3, 20, NULL),
 (8, 2500.000000, 25.00, 'equation', 3, 3, 2),
 (9, 2500.000000, 16.50, 'equation', 3, 7, 2),
 (10, 5000.000000, 70.00, 'equation', 3, 12, 2),
 (11, 50.000000, 160.00, 'none', 2, 12, NULL),
 (12, 60.000000, 200.00, '', 2, 6, NULL),
-(13, 50.000000, 300.00, '', 2, 7, NULL);
+(13, 50.000000, 300.00, '', 2, 7, NULL),
+(15, 10.000000, 100.00, 'same', 3, 21, NULL),
+(16, 0.000000, 100.00, 'same', 2, 11, NULL),
+(17, 100.000000, 100.00, 'equation', 2, 8, 2),
+(18, 10.000000, 100.00, 'none', 1, 11, NULL);
 
 -- --------------------------------------------------------
 
@@ -924,7 +1078,35 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (6, 'Change end date, old value: 11/30/2024', '2024-11-02', 3),
 (7, 'Change start date, old value: 11/03/2024', '2024-11-02', 3),
 (8, 'Change start date, old value: 08/08/2023', '2024-11-02', 3),
-(9, '<p>Change start date, old value: 08/01/2023</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p>', '2024-11-08', 3);
+(9, '<p>Change start date, old value: 08/01/2023</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023\n</p><p>Change start date, old value: 08/01/2023</p>', '2024-11-08', 3),
+(10, 'Change location, old value: FL COUNTY', '2025-01-24', 1),
+(11, 'Change contract amount, old value: ', '2025-01-24', 1),
+(12, 'Change proposal id #, old value: ', '2025-01-24', 1),
+(13, 'Change project id #, old value: ', '2025-01-24', 1),
+(14, 'Change owner, old value: ', '2025-01-24', 1),
+(15, 'Change Subcontract NO, old value: ', '2025-01-24', 1),
+(16, 'Change county, old value: ', '2025-01-24', 1),
+(17, 'Change due date, old value: 05/31/2024', '2025-01-24', 1),
+(18, 'Change due date, old value: 05/30/2024', '2025-01-24', 3),
+(19, 'Change due date, old value: 01/30/2025', '2025-01-26', 1),
+(20, 'Change due date, old value: ', '2025-01-26', 1),
+(21, 'Change end date, old value: ', '2025-01-26', 1),
+(22, 'Change location, old value: FL MIAMI', '2025-02-16', 2),
+(23, 'Change contract amount, old value: ', '2025-02-16', 2),
+(24, 'Change proposal id #, old value: ', '2025-02-16', 2),
+(25, 'Change project id #, old value: ', '2025-02-16', 2),
+(26, 'Change owner, old value: ', '2025-02-16', 2),
+(27, 'Change Subcontract NO, old value: ', '2025-02-16', 2),
+(28, 'Change county, old value: ', '2025-02-16', 2),
+(29, 'Change start date, old value: ', '2025-02-16', 2),
+(30, 'Change end date, old value: ', '2025-02-16', 2),
+(31, 'Change contract amount, old value: 35000', '2025-02-21', 2),
+(32, 'Change <b>status</b>, old value: <b>Not</b> <b>Started</b>', '2025-03-01', 1),
+(33, 'Change status, old value: In Progress', '2025-03-01', 1),
+(34, 'Change start date, old value: ', '2025-03-01', 1),
+(35, 'Change end date, old value: 01/31/2025', '2025-03-01', 1),
+(36, 'Change status, old value: In Progress', '2025-03-01', 1),
+(37, 'Change contract amount, old value: 0', '2025-03-01', 1);
 
 -- --------------------------------------------------------
 
@@ -984,7 +1166,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (25, 1, 1, 1, 1, 1, 13),
 (26, 1, 1, 1, 1, 1, 14),
 (27, 1, 1, 1, 1, 1, 15),
-(28, 1, 1, 1, 1, 1, 16);
+(28, 1, 1, 1, 1, 1, 16),
+(29, 1, 1, 1, 1, 1, 17);
 
 -- --------------------------------------------------------
 
@@ -1072,11 +1255,18 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (17, 1, 1, 1, 1, 1, 13),
 (18, 1, 1, 1, 1, 1, 14),
 (19, 1, 1, 1, 1, 1, 15),
-(20, 1, 1, 1, 1, 1, 16);
+(20, 1, 1, 1, 1, 1, 16),
+(21, 1, 1, 1, 1, 1, 17);
 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `advertisement`
+--
+ALTER TABLE `advertisement`
+  ADD PRIMARY KEY (`advertisement_id`);
 
 --
 -- Indices de la tabla `company`
@@ -1130,6 +1320,14 @@ ALTER TABLE `data_tracking_material`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_data_tracking_material` (`data_tracking_id`),
   ADD KEY `fk_data_tracking_material_2` (`material_id`);
+
+--
+-- Indices de la tabla `data_tracking_subcontract`
+--
+ALTER TABLE `data_tracking_subcontract`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Ref63452` (`data_tracking_id`),
+  ADD KEY `Ref63451` (`item_id`);
 
 --
 -- Indices de la tabla `employee`
@@ -1276,6 +1474,12 @@ ALTER TABLE `user_permission`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `advertisement`
+--
+ALTER TABLE `advertisement`
+  MODIFY `advertisement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT de la tabla `company`
 --
 ALTER TABLE `company`
@@ -1291,37 +1495,43 @@ ALTER TABLE `company_contact`
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_item`
 --
 ALTER TABLE `data_tracking_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_labor`
 --
 ALTER TABLE `data_tracking_labor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_material`
 --
 ALTER TABLE `data_tracking_material`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `data_tracking_subcontract`
+--
+ALTER TABLE `data_tracking_subcontract`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `employee`
 --
 ALTER TABLE `employee`
-  MODIFY `employee_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `employee_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `equation`
@@ -1333,7 +1543,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -1345,25 +1555,25 @@ ALTER TABLE `inspector`
 -- AUTO_INCREMENT de la tabla `invoice`
 --
 ALTER TABLE `invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT de la tabla `item`
 --
 ALTER TABLE `item`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=311;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=400;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -1375,7 +1585,7 @@ ALTER TABLE `material`
 -- AUTO_INCREMENT de la tabla `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `overhead_price`
@@ -1399,13 +1609,13 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_item`
 --
 ALTER TABLE `project_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -1417,7 +1627,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -1435,7 +1645,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Restricciones para tablas volcadas
@@ -1481,6 +1691,13 @@ ALTER TABLE `data_tracking_labor`
 ALTER TABLE `data_tracking_material`
   ADD CONSTRAINT `fk_data_tracking_material` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_data_tracking_material_2` FOREIGN KEY (`material_id`) REFERENCES `material` (`material_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `data_tracking_subcontract`
+--
+ALTER TABLE `data_tracking_subcontract`
+  ADD CONSTRAINT `Refdatatrackingsubcontract35` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `invoice`
