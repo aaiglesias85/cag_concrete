@@ -97,7 +97,7 @@ var ModalEmployee = function () {
                         mApp.unblock('#modal-employee .modal-content');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
 
                             employee_new = {employee_id: response.employee_id, name, hourlyRate: hourly_rate, position: position};
 

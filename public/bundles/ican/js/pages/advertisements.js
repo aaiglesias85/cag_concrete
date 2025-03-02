@@ -275,7 +275,7 @@ var Advertisements = function () {
                         mApp.unblock('#form-advertisement');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -467,7 +467,7 @@ var Advertisements = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                         deleteAdvertisementHeader(advertisement_id);
 
@@ -510,7 +510,7 @@ var Advertisements = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                        for (const id of header_ids) {
                            deleteAdvertisementHeader(id);

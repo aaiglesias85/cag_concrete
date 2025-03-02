@@ -253,7 +253,7 @@ var Companies = function () {
                         mApp.unblock('#form-company');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -439,7 +439,7 @@ var Companies = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -478,7 +478,7 @@ var Companies = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -897,7 +897,7 @@ var Companies = function () {
                             mApp.unblock('#lista-contacts-table-editable');
                             if (response.success) {
 
-                                toastr.success(response.message, "Success !!!");
+                                toastr.success(response.message, "");
 
                                 deleteContact(posicion);
 

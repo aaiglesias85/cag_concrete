@@ -254,7 +254,7 @@ var Equations = function () {
                         mApp.unblock('#form-equation');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
                             cerrarForms();
                             oTable.load();
                         } else {
@@ -426,7 +426,7 @@ var Equations = function () {
                     if (response.success) {
                         oTable.load();
 
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -462,7 +462,7 @@ var Equations = function () {
                     if (response.success) {
 
                         oTable.load();
-                        toastr.success(response.message, "Success !!!");
+                        toastr.success(response.message, "");
 
                     } else {
                         toastr.error(response.error, "");
@@ -673,7 +673,7 @@ var Equations = function () {
                         mApp.unblock('#modal-pay-items .modal-content');
                         if (response.success) {
 
-                            toastr.success(response.message, "Success !!!");
+                            toastr.success(response.message, "");
 
                             // close modal
                             $('#modal-pay-items').modal('hide');
