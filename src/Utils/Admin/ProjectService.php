@@ -1570,7 +1570,7 @@ class ProjectService extends Base
 
             $cont++;
         }
-        // $this->writelog(var_export($arreglo_resultado, true));
+        $this->writelog(var_export($arreglo_resultado, true));
 
         return $arreglo_resultado;
     }
