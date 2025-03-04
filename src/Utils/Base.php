@@ -900,12 +900,20 @@ class Base
 
         $lista = $this->getDoctrine()->getRepository(ProjectNotes::class)
             ->ListarNotesDeProject($project_id);
-        if (!empty($lista)) {
+        foreach ($lista as $value) {
+            $id = $value->getId();
+
+            $notes = strip_tags($value->getNotes());
+            $notes = json_encode($notes);
+
             $nota = [
-                'id' => $lista[0]->getId(),
-                'nota' => $this->truncate(strip_tags($lista[0]->getNotes()), 50),
-                'date' => $lista[0]->getDate()->format('m/d/Y')
+                'id' => $id,
+                'nota' => $this->truncate($notes, 50),
+                'date' => $value->getDate()->format('m/d/Y')
             ];
+            break;
+
+
         }
 
         return $nota;
