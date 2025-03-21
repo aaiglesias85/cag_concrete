@@ -76,7 +76,7 @@ var ModalEquation = function () {
 
             var equation = $('#equation-equation').val();
 
-            if ($('#equation-form').valid()  && /^[0-9+\-*\/\s\(\)x]+$/.test(equation)) {
+            if ($('#equation-form').valid() && /^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
 
                 var descripcion = $('#equation-descripcion').val();
 
@@ -113,6 +113,11 @@ var ModalEquation = function () {
                         toastr.error(response.error, "");
                     }
                 });
+            }
+            else {
+                if (!/^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
+                    toastr.error('The equation expression is not valid', "");
+                }
             }
         };
     };

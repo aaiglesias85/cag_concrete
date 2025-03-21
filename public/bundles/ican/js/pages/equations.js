@@ -268,7 +268,7 @@ var Equations = function () {
                     }
                 });
             } else {
-                if (!/^[0-9+\-*\/\s\(\)x]+$/.test(equation)) {
+                if (!/^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
                     toastr.error('The equation expression is not valid', "");
                 }
             }
