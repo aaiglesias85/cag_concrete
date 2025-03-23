@@ -43,7 +43,7 @@ class DataTrackingSubcontractRepository extends EntityRepository
             ->leftJoin('d_t_s.item', 'i');
 
         if ($item_id != '') {
-            $consulta->andWhere('i.id = :item_id')
+            $consulta->andWhere('i.itemId = :item_id')
                 ->setParameter('item_id', $item_id);
         }
 
