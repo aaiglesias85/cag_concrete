@@ -161,7 +161,7 @@ class ItemService extends Base
 
         // data tracking subcontract
         $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->ListarSubcontractsDeItem($project_item_id);
+            ->ListarSubcontractsDeItem($item_id);
         foreach ($subcontract_items as $subcontract_item) {
             $em->remove($subcontract_item);
         }
