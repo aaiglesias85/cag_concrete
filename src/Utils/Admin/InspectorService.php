@@ -166,13 +166,16 @@ class InspectorService extends Base
         /** @var Inspector $entity */
         if ($entity != null) {
             //Verificar description
-            $inspector = $this->getDoctrine()->getRepository(Inspector::class)
-                ->findOneBy(['email' => $email]);
-            if ($inspector != null && $entity->getInspectorId() != $inspector->getInspectorId()) {
-                $resultado['success'] = false;
-                $resultado['error'] = "The inspector email is in use, please try entering another one.";
-                return $resultado;
+            if ($email != '') {
+                $inspector = $this->getDoctrine()->getRepository(Inspector::class)
+                    ->findOneBy(['email' => $email]);
+                if ($inspector != null && $entity->getInspectorId() != $inspector->getInspectorId()) {
+                    $resultado['success'] = false;
+                    $resultado['error'] = "The inspector email is in use, please try entering another one.";
+                    return $resultado;
+                }
             }
+
 
             $entity->setName($name);
             $entity->setEmail($email);
@@ -206,13 +209,16 @@ class InspectorService extends Base
         $em = $this->getDoctrine()->getManager();
 
         //Verificar email
-        $inspector = $this->getDoctrine()->getRepository(Inspector::class)
-            ->findOneBy(['email' => $email]);
-        if ($inspector != null) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The inspector email is in use, please try entering another one.";
-            return $resultado;
+        if ($email != '') {
+            $inspector = $this->getDoctrine()->getRepository(Inspector::class)
+                ->findOneBy(['email' => $email]);
+            if ($inspector != null) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The inspector email is in use, please try entering another one.";
+                return $resultado;
+            }
         }
+
 
         $entity = new Inspector();
 

@@ -162,22 +162,31 @@ var Inspectors = function () {
 
     //Validacion
     var initForm = function () {
-        //Validacion
+
+        $.validator.addMethod("optionalEmail", function(value, element) {
+            // Si el campo está vacío, es válido (no obligatorio)
+            if (value === "") {
+                return true;
+            }
+            // Si tiene contenido, validamos que sea un email correcto
+            return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value);
+        }, "Por favor, ingrese un correo válido.");
+
         $("#inspector-form").validate({
             rules: {
                 name: {
                     required: true
                 },
                 email: {
-                    email: true
+                    optionalEmail: true // Usamos la validación personalizada en lugar de email:true
                 }
             },
             showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
+                // Limpiar tooltips de elementos válidos
                 $.each(this.validElements(), function (index, element) {
                     var $element = $(element);
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
+                    $element.data("title", "") // Limpiar el tooltip
                         .removeClass("has-error")
                         .tooltip("dispose");
 
@@ -186,23 +195,23 @@ var Inspectors = function () {
                         .removeClass('has-error').addClass('success');
                 });
 
-                // Create new tooltips for invalid elements
+                // Crear tooltips para elementos inválidos
                 $.each(errorList, function (index, error) {
                     var $element = $(error.element);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                    $element.tooltip("dispose") // Destruir cualquier tooltip previo
                         .data("title", error.message)
                         .addClass("has-error")
                         .tooltip({
                             placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+                        });
 
                     $element.closest('.form-group')
                         .removeClass('has-success').addClass('has-error');
-
                 });
             }
         });
+
 
     };
 
