@@ -4,12 +4,44 @@ namespace App\Utils;
 
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingItem;
+use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
 use App\Entity\Project;
+use App\Entity\ProjectItem;
 
 class ScriptService extends Base
 {
+
+    /**
+     * DefinirYieldCalculationItem
+     */
+    public function DefinirYieldCalculationItem()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // listar items
+        $items = $this->getDoctrine()->getRepository(Item::class)
+            ->findAll();
+        foreach ($items as $item) {
+            $item_id = $item->getItemId();
+
+            $yield_calculation = $item->getYieldCalculation();
+            $equation = $item->getEquation();
+
+            // actualizar en proyectos
+            $project_items = $this->getDoctrine()->getRepository(ProjectItem::class)
+                ->ListarProjectsDeItem($item_id);
+            foreach ($project_items as $project_item) {
+                $project_item->setYieldCalculation($yield_calculation);
+                $project_item->setEquation($equation);
+            }
+        }
+
+        $em->flush();
+
+
+    }
 
     /**
      * DefinirNotificacionesDueDate

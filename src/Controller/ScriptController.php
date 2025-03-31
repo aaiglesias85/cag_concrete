@@ -31,4 +31,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function definiryieldcalculationitem()
+    {
+        $this->scriptService->DefinirYieldCalculationItem();
+
+        return new Response('OK', 200);
+    }
 }

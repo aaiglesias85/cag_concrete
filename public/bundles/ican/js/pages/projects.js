@@ -804,6 +804,10 @@ var Projects = function () {
 
         $('.m-select2').select2();
 
+        $('#item').select2({
+            dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
+        });
+
         $('.phone').inputmask("mask", {
             "mask": "(999)999-9999"
         });

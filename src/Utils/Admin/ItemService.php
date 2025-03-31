@@ -267,6 +267,8 @@ class ItemService extends Base
             $entity->setDescription($description);
             // $entity->setPrice($price);
             $entity->setStatus($status);
+
+            $yield_calculation_old = $entity->getYieldCalculation();
             $entity->setYieldCalculation($yield_calculation);
 
             if ($unit_id != '') {
@@ -285,7 +287,7 @@ class ItemService extends Base
             $entity->setUpdatedAt(new \DateTime());
 
             // actualizar en los item project
-            if ($equation_id_old != $equation_id) {
+            if (($equation_id_old != $equation_id) || ($yield_calculation_old != $yield_calculation)) {
                 $this->ActualizarEquationItemProjects($item_id, $yield_calculation, $equation);
             }
 
