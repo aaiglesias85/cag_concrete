@@ -667,16 +667,16 @@ var DataTracking = function () {
 
     var actualizarSelectProjectItems = function() {
         // reset
-        $('#item-data-tracking option').each(function (e) {
+        $('.items-project option').each(function (e) {
             if ($(this).val() != "")
                 $(this).remove();
         });
-        $('#item-data-tracking').select2();
+        $('.items-project').select2();
 
         for (var i = 0; i < items.length; i++) {
-            $('#item-data-tracking').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
+            $('.items-project').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
         }
-        $('#item-data-tracking').select2();
+        $('.items-project').select2();
     }
 
     //Eliminar
@@ -1507,18 +1507,6 @@ var DataTracking = function () {
                         posicion: items_data_tracking.length
                     });
 
-                    subcontracts.push({
-                        subcontract_id: '',
-                        item_id: item.item_id,
-                        item: item.item,
-                        unit: item.unit,
-                        quantity: quantity,
-                        price: price,
-                        total: total,
-                        notes: notes,
-                        posicion: subcontracts.length
-                    });
-
                 } else {
                     var posicion = nEditingRowItem;
                     if (items_data_tracking[posicion]) {
@@ -1538,7 +1526,6 @@ var DataTracking = function () {
 
                 //actualizar lista
                 actualizarTableListaItems();
-                actualizarTableListaSubcontracts();
 
                 if (nEditingRowItem != null) {
                     $('#modal-data-tracking-item').modal('hide');

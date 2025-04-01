@@ -333,7 +333,7 @@
                         <li class="nav-item">
                             <a class="nav-link wizard-tab" data-item="6"
                                data-toggle="tab" href="#tab-content-subcontracts" id="tab-subcontracts">
-                                Subcontracts
+                                Subcontractor
                             </a>
                         </li>
                     </ul>
@@ -970,7 +970,7 @@
                             </label>
                             <div class="row">
                                 <div class="col-md-10" id="select-item-data-tracking">
-                                    <select class="form-control m-select2"
+                                    <select class="form-control m-select2 items-project"
                                             id="item-data-tracking">
                                         <option value="">Select</option>
                                     </select>
@@ -1045,13 +1045,8 @@
                             </label>
                             <div class="row">
                                 <div class="col-md-10" id="select-item-subcontract">
-                                    <select class="form-control m-select2" id="item-subcontract">
+                                    <select class="form-control m-select2 items-project" id="item-subcontract">
                                         <option value="">Select</option>
-                                        {% for item in items %}
-                                            <option value="{{ item.item_id }}">
-                                                {{ item.item }} - {{ item.unit }}
-                                            </option>
-                                        {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
