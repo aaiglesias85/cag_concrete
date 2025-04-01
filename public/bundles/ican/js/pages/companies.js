@@ -610,7 +610,7 @@ var Companies = function () {
         // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-siguiente').removeClass('m--hide');
-        $('#nav-item-calificaciones').removeClass('m--hide').addClass('m--hide');
+        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
     }
     var validWizard = function () {
         var result = true;
@@ -1005,6 +1005,19 @@ var Companies = function () {
                     }
                     return html;
                 }
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="detalle m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View project"><i class="la la-eye"></i></a>
+                    `;
+                }
             }
         ];
         oTableListaProjects = table.mDatatable({
@@ -1080,6 +1093,21 @@ var Companies = function () {
         initTableListaProjects();
     }
 
+    var initAccionesProjects = function () {
+
+        $(document).off('click', "#lista-projects-table-editable a.detalle");
+        $(document).on('click', "#lista-projects-table-editable a.detalle", function (e) {
+            var posicion = $(this).data('posicion');
+            if (projects[posicion]) {
+                localStorage.setItem('project_id_edit', projects[posicion].id);
+                // open
+                window.location.href = url_project;
+
+            }
+        });
+
+    };
+
     return {
         //main function to initiate the module
         init: function () {
@@ -1099,6 +1127,9 @@ var Companies = function () {
             // contacts
             initFormContact();
             initAccionesContacts();
+
+            // projects
+            initAccionesProjects();
 
             initAccionChange();
         }
