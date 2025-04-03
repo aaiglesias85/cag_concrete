@@ -28,7 +28,7 @@
             {% endif %}
 
             <!-- menu projects -->
-            {% if menu.menuCompany or menu.menuProject %}
+            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor %}
                 <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
                     m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
@@ -57,6 +57,15 @@
                                     <a href="{{ url('project') }}" class="m-menu__link ">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                         <span class="m-menu__link-text">Projects</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% if menu.menuSubcontractor %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('subcontractor') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Subcontractors</span>
                                     </a>
                                 </li>
                             {% endif %}

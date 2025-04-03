@@ -1,0 +1,61 @@
+subcontractor:
+  path:  /subcontractors
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::index }
+
+listarSubcontractorAdmin:
+  path:  /subcontractor/listarSubcontractor
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::listar, _format: json }
+
+eliminarSubcontractorAdmin:
+  path:  /subcontractor/eliminarSubcontractor
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::eliminar, _format: json }
+
+eliminarSubcontractorsAdmin:
+  path:  /subcontractor/eliminarSubcontractors
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::eliminarSubcontractors, _format: json }
+
+salvarSubcontractorAdmin:
+  path:  /subcontractor/salvarSubcontractor
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::salvar, _format: json }
+
+cargarDatosSubcontractorAdmin:
+  path:  /subcontractor/cargarDatos
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::cargarDatos, _format: json }
+  
+#employees
+listarEmployeesDeSubcontractorAdmin:
+  path: /subcontractor/listarEmployees
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::listarEmployees, _format: json }
+
+eliminarEmployeeSubcontractorAdmin:
+  path: /subcontractor/eliminarEmployee
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::eliminarEmployee, _format: json }
+
+agregarEmployeeSubcontractorAdmin:
+  path: /subcontractor/agregarEmployee
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::agregarEmployee, _format: json }
+
+cargarDatosEmployeeSubcontractorAdmin:
+  path: /subcontractor/cargarDatosEmployee
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::cargarDatosEmployee, _format: json }
+  
+#notes
+listarNotesSubcontractorAdmin:
+  path: /subcontractor/listarNotes
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::listarNotes, _format: json }
+
+salvarNotesSubcontractorAdmin:
+  path: /subcontractor/salvarNotes
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::salvarNotes, _format: json }
+
+cargarDatosNotesSubcontractorAdmin:
+  path: /subcontractor/cargarDatosNotes
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::cargarDatosNotes, _format: json }
+
+eliminarNotesSubcontractorAdmin:
+  path: /subcontractor/eliminarNotes
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::eliminarNotes, _format: json }
+
+eliminarNotesDateSubcontractorAdmin:
+  path: /subcontractor/eliminarNotesDate
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::eliminarNotesDate, _format: json }

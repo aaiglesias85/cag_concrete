@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 02-03-2025 a las 02:50:12
+-- Tiempo de generación: 01-04-2025 a las 23:27:02
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -35,15 +35,6 @@ CREATE TABLE `advertisement` (
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `advertisement`
---
-
-INSERT INTO `advertisement` (`advertisement_id`, `title`, `description`, `status`, `start_date`, `end_date`) VALUES
-(1, 'Fashion Store Advertisement', '<p><b>Fashion Store Advertisement</b></p><p>Step into style with our exclusive spring collection! From chic dresses to casual tees, find your perfect look today. Shop now and get 20% off your first order! Don\'t miss out on this season\'s must-haves. Limited time offer.</p>', 1, '2025-02-01', '2025-02-28'),
-(2, 'Fitness Gym Advertisement', '<p><strong data-start=\"326\" data-end=\"355\">Fitness Gym Advertisement</strong></p><p><em data-start=\"360\" data-end=\"581\">Get in shape with us! Join today and receive your first month FREE. Enjoy unlimited access to state-of-the-art gym equipment, group classes, and expert trainers. Start your fitness journey now and feel the difference!</em></p>', 1, NULL, NULL),
-(3, 'Travel Agency Advertisement', '<p><strong data-start=\"586\" data-end=\"617\">Travel Agency Advertisement</strong></p><p><em data-start=\"622\" data-end=\"849\">Dreaming of an exotic vacation? Book your next getaway with us! Whether it\'s relaxing on a tropical beach or exploring ancient cities, we offer affordable travel packages. Book now and save up to 30%! Your adventure awaits!</em></p>', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -132,7 +123,8 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (4, '2024-06-11', '435435', 'Marcel', NULL, NULL, '', '', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 0, '2024-06-23 21:16:44', '2025-01-24 20:06:43', 3, NULL, NULL),
 (5, '2025-02-19', 'rtertert', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 1.00, 100.00, 0.00, 0.00, 0, '2025-02-19 23:15:27', '2025-02-21 17:41:52', 2, 1, 1),
 (6, '2025-03-01', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:25:07', NULL, 1, NULL, NULL),
-(7, '2025-03-02', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:43:40', NULL, 1, NULL, NULL);
+(7, '2025-03-02', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:43:40', NULL, 1, NULL, NULL),
+(11, '2025-02-28', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-02 14:15:40', NULL, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -189,7 +181,8 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_trac
 (19, 10.000000, 100.00, '', 5, 16),
 (20, 10.000000, 100.00, '', 5, 17),
 (21, 10.000000, 100.00, '', 6, 18),
-(22, 10.000000, 100.00, '', 7, 18);
+(22, 10.000000, 100.00, '', 7, 18),
+(26, 10.000000, 100.00, '', 11, 18);
 
 -- --------------------------------------------------------
 
@@ -270,7 +263,8 @@ INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `da
 (10, 10.00, 50.00, '', 5, 11),
 (11, 10.00, 100.00, '', 5, 8),
 (12, 10.00, 100.00, '', 6, 11),
-(13, 10.00, 100.00, '', 7, 11);
+(13, 10.00, 100.00, '', 7, 11),
+(17, 10.00, 100.00, '', 11, 11);
 
 -- --------------------------------------------------------
 
@@ -349,7 +343,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (14, 'employees', 'Employees'),
 (15, 'materials', 'Materials'),
 (16, 'overhead', 'Overhead Price'),
-(17, 'advertisement', 'Advertisements');
+(17, 'advertisement', 'Advertisements'),
+(18, 'subcontractor', 'Subcontractor');
 
 -- --------------------------------------------------------
 
@@ -883,7 +878,20 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (396, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 03/01/2025', '::1', '2025-03-01 13:25:07', 1),
 (397, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-01 13:25:19', 1),
 (398, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 03/02/2025', '::1', '2025-03-01 13:43:40', 1),
-(399, 'Update', 'Project Notes', 'The notes: Change <b>status</b>, old value: <b>Not</b> <b>Started</b> is modified to the project: FL COUNTY', '::1', '2025-03-01 14:42:16', 1);
+(399, 'Update', 'Project Notes', 'The notes: Change <b>status</b>, old value: <b>Not</b> <b>Started</b> is modified to the project: FL COUNTY', '::1', '2025-03-01 14:42:16', 1),
+(400, 'Update', 'Advertisement', 'The advertisement is modified: Fashion Store Advertisement', '::1', '2025-03-02 13:56:39', 1),
+(401, 'Delete', 'Advertisement', 'The advertisement is deleted: Travel Agency Advertisement', '::1', '2025-03-02 14:01:54', 1),
+(402, 'Delete', 'Advertisement', 'The advertisement is deleted: Fashion Store Advertisement', '::1', '2025-03-02 14:02:06', 1),
+(403, 'Delete', 'Advertisement', 'The advertisement is deleted: Fitness Gym Advertisement', '::1', '2025-03-02 14:02:06', 1),
+(404, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:05:57', 1),
+(405, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-02 14:09:36', 1),
+(406, 'Delete', 'Data Tracking', 'The data tracking is deleted, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:09:47', 1),
+(407, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:10:03', 1),
+(408, 'Update', 'Project', 'The project is modified: FL COUNTY', '::1', '2025-03-02 14:13:09', 1),
+(409, 'Delete', 'Data Tracking', 'The data tracking is deleted, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:13:18', 1),
+(410, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:13:31', 1),
+(411, 'Delete', 'Data Tracking', 'The data tracking is deleted, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:15:16', 1),
+(412, 'Add', 'Data Tracking', 'The data tracking is add, Project: 0009001 - FL COUNTY, Date: 02/28/2025', '::1', '2025-03-02 14:15:40', 1);
 
 -- --------------------------------------------------------
 
@@ -991,7 +999,7 @@ CREATE TABLE `project` (
 --
 
 INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`) VALUES
-(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 1, NULL, NULL, '2024-04-14 20:24:53', '2025-03-01 13:25:19', 1, 1),
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', 1, 1),
 (2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', 1, 1),
 (3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', 3, 1);
 
@@ -1106,7 +1114,9 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (34, 'Change start date, old value: ', '2025-03-01', 1),
 (35, 'Change end date, old value: 01/31/2025', '2025-03-01', 1),
 (36, 'Change status, old value: In Progress', '2025-03-01', 1),
-(37, 'Change contract amount, old value: 0', '2025-03-01', 1);
+(37, 'Change contract amount, old value: 0', '2025-03-01', 1),
+(38, 'Change status, old value: In Progress', '2025-03-02', 1),
+(39, 'Change status, old value: In Progress', '2025-03-02', 1);
 
 -- --------------------------------------------------------
 
@@ -1167,7 +1177,50 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (26, 1, 1, 1, 1, 1, 14),
 (27, 1, 1, 1, 1, 1, 15),
 (28, 1, 1, 1, 1, 1, 16),
-(29, 1, 1, 1, 1, 1, 17);
+(29, 1, 1, 1, 1, 1, 17),
+(30, 1, 1, 1, 1, 1, 18);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `subcontractor`
+--
+
+CREATE TABLE `subcontractor` (
+  `subcontractor_id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `address` text,
+  `phone` varchar(50) DEFAULT NULL,
+  `contact_name` varchar(255) DEFAULT NULL,
+  `contact_email` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `subcontractor_employee`
+--
+
+CREATE TABLE `subcontractor_employee` (
+  `subcontractor_employee_id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `hourly_rate` decimal(8,2) DEFAULT NULL,
+  `position` varchar(255) DEFAULT NULL,
+  `subcontractor_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `subcontractor_notes`
+--
+
+CREATE TABLE `subcontractor_notes` (
+  `id` int(11) NOT NULL,
+  `notes` text,
+  `date` date DEFAULT NULL,
+  `subcontractor_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1256,7 +1309,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (18, 1, 1, 1, 1, 1, 14),
 (19, 1, 1, 1, 1, 1, 15),
 (20, 1, 1, 1, 1, 1, 16),
-(21, 1, 1, 1, 1, 1, 17);
+(21, 1, 1, 1, 1, 1, 17),
+(22, 1, 1, 1, 1, 1, 18);
 
 --
 -- Índices para tablas volcadas
@@ -1449,6 +1503,26 @@ ALTER TABLE `rol_permission`
   ADD KEY `Ref192` (`function_id`);
 
 --
+-- Indices de la tabla `subcontractor`
+--
+ALTER TABLE `subcontractor`
+  ADD PRIMARY KEY (`subcontractor_id`);
+
+--
+-- Indices de la tabla `subcontractor_employee`
+--
+ALTER TABLE `subcontractor_employee`
+  ADD PRIMARY KEY (`subcontractor_employee_id`),
+  ADD KEY `Ref63452` (`subcontractor_id`);
+
+--
+-- Indices de la tabla `subcontractor_notes`
+--
+ALTER TABLE `subcontractor_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Ref63453` (`subcontractor_id`);
+
+--
 -- Indices de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -1477,7 +1551,7 @@ ALTER TABLE `user_permission`
 -- AUTO_INCREMENT de la tabla `advertisement`
 --
 ALTER TABLE `advertisement`
-  MODIFY `advertisement_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `advertisement_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `company`
@@ -1495,7 +1569,7 @@ ALTER TABLE `company_contact`
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
@@ -1507,7 +1581,7 @@ ALTER TABLE `data_tracking_conc_vendor`
 -- AUTO_INCREMENT de la tabla `data_tracking_item`
 --
 ALTER TABLE `data_tracking_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_labor`
@@ -1525,7 +1599,7 @@ ALTER TABLE `data_tracking_material`
 -- AUTO_INCREMENT de la tabla `data_tracking_subcontract`
 --
 ALTER TABLE `data_tracking_subcontract`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `employee`
@@ -1543,7 +1617,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -1573,7 +1647,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=400;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=413;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -1615,7 +1689,7 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -1627,7 +1701,25 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT de la tabla `subcontractor`
+--
+ALTER TABLE `subcontractor`
+  MODIFY `subcontractor_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `subcontractor_employee`
+--
+ALTER TABLE `subcontractor_employee`
+  MODIFY `subcontractor_employee_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `subcontractor_notes`
+--
+ALTER TABLE `subcontractor_notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -1645,7 +1737,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Restricciones para tablas volcadas
@@ -1770,6 +1862,18 @@ ALTER TABLE `project_notes`
 ALTER TABLE `rol_permission`
   ADD CONSTRAINT `Reffunction2` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refrol1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`);
+
+--
+-- Filtros para la tabla `subcontractor_employee`
+--
+ALTER TABLE `subcontractor_employee`
+  ADD CONSTRAINT `Refsubcontractor35` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `subcontractor_notes`
+--
+ALTER TABLE `subcontractor_notes`
+  ADD CONSTRAINT `Refsubcontractor36` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `user`

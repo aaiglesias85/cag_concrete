@@ -597,7 +597,7 @@ var Companies = function () {
                 case 2:
                     $('#tab-contacts').tab('show');
                     break;
-                case 2:
+                case 3:
                     $('#tab-projects').tab('show');
                     actualizarTableListaProjects();
                     break;
