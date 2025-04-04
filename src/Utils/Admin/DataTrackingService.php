@@ -466,9 +466,9 @@ class DataTrackingService extends Base
 
             $subcontracts[] = [
                 'subcontract_id' => $value->getId(),
-                "item_id" => $value->getItem()->getItemId(),
-                "item" => $value->getItem()->getDescription(),
-                "unit" => $value->getItem()->getUnit()->getDescription(),
+                "project_item_id" => $value->getProjectItem()->getId(),
+                "item" => $value->getProjectItem()->getItem()->getDescription(),
+                "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
                 "quantity" => $quantity,
                 "price" => $price,
                 "total" => $total,
@@ -1014,10 +1014,10 @@ class DataTrackingService extends Base
             $subcontract_entity->setQuantity($value->quantity);
             $subcontract_entity->setNotes($value->notes);
 
-            if ($value->item_id != '') {
-                $item_entity = $this->getDoctrine()->getRepository(Item::class)
-                    ->find($value->item_id);
-                $subcontract_entity->setItem($item_entity);
+            if ($value->project_item_id != '') {
+                $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)
+                    ->find($value->project_item_id);
+                $subcontract_entity->setProjectItem($project_item_entity);
             }
 
             if ($is_new_subcontract) {

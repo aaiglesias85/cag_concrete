@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\Company;
 use App\Entity\DataTrackingItem;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Invoice;
@@ -218,6 +219,13 @@ class ProjectService extends Base
             ->ListarDataTrackingsDeItem($project_item_id);
         foreach ($data_tracking_items as $data_tracking_item) {
             $em->remove($data_tracking_item);
+        }
+
+        // subcontractors
+        $data_tracking_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontractsDeItemProject($project_item_id);
+        foreach ($data_tracking_subcontractors as $data_tracking_subcontractor) {
+            $em->remove($data_tracking_subcontractor);
         }
 
         // invoices

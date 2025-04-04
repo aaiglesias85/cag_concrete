@@ -52,6 +52,16 @@ class DataTrackingSubcontract
      */
     private $item;
 
+    /**
+     * @var ProjectItem
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\ProjectItem")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="project_item_id", referencedColumnName="id")
+     * })
+     */
+    private $projectItem;
+
 
     /**
      * @var DataTracking
@@ -127,5 +137,18 @@ class DataTrackingSubcontract
     public function setNotes($notes)
     {
         $this->notes = $notes;
+    }
+
+    /**
+     * @return ProjectItem
+     */
+    public function getProjectItem()
+    {
+        return $this->projectItem;
+    }
+
+    public function setProjectItem($projectItem)
+    {
+        $this->projectItem = $projectItem;
     }
 }

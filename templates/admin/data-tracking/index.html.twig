@@ -976,8 +976,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                    <a href="javascript:;" title="Add item" id="btn-add-item"
-                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                    <a href="javascript:;" title="Add item"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only btn-add-item">
                                         <i class="la la-plus"></i>
                                     </a>
                                 </div>
@@ -1050,8 +1050,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                    <a href="javascript:;" title="Add item" id="btn-add-item-subcontract"
-                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                    <a href="javascript:;" title="Add item"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only btn-add-item">
                                         <i class="la la-plus"></i>
                                     </a>
                                 </div>
@@ -1940,7 +1940,6 @@
     <!-- components -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalInspector')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemProject')) }}
-    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemSubcontract')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployee')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployeeSubcontractor')) }}
 
@@ -1953,7 +1952,6 @@
         jQuery(document).ready(function () {
             ModalInspector.init();
             ModalItemProject.init();
-            ModalItemSubcontract.init();
             ModalEmployee.init();
             ModalEmployeeSubcontractor.init();
         });

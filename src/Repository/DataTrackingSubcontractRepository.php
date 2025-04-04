@@ -33,7 +33,7 @@ class DataTrackingSubcontractRepository extends EntityRepository
 
 
     /**
-     * ListarSubcontractsDeItem: Lista el data tracking de item
+     * ListarSubcontractsDeItem: Lista el subcontractors de item
      *
      * @return DataTrackingSubcontract[]
      */
@@ -45,6 +45,27 @@ class DataTrackingSubcontractRepository extends EntityRepository
         if ($item_id != '') {
             $consulta->andWhere('i.itemId = :item_id')
                 ->setParameter('item_id', $item_id);
+        }
+
+
+        $consulta->orderBy('d_t_s.id', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
+     * ListarSubcontractsDeItemProject: Lista el subcontractors de item project
+     *
+     * @return DataTrackingSubcontract[]
+     */
+    public function ListarSubcontractsDeItemProject($project_item_id)
+    {
+        $consulta = $this->createQueryBuilder('d_t_s')
+            ->leftJoin('d_t_s.projectItem', 'p_i');
+
+        if ($project_item_id != '') {
+            $consulta->andWhere('p_i.id = :project_item_id')
+                ->setParameter('project_item_id', $project_item_id);
         }
 
 

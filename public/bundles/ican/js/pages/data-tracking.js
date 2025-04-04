@@ -1100,8 +1100,8 @@ var DataTracking = function () {
     // Items
     var initAccionesModalItems = function () {
 
-        $(document).off('click', "#btn-add-item");
-        $(document).on('click', "#btn-add-item", function (e) {
+        $(document).off('click', ".btn-add-item");
+        $(document).on('click', ".btn-add-item", function (e) {
 
             // add datos de proyecto
             var project = $("#project option:selected").text().split('-');
@@ -1115,34 +1115,11 @@ var DataTracking = function () {
             if (item != null) {
                 //add items to select
                 items.push(item);
-                $('#item-data-tracking').append(new Option(`${item.item} - ${item.unit}`, item.project_item_id, false, false));
-                $('#item-data-tracking').select2();
+                $('.items-project').append(new Option(`${item.item} - ${item.unit}`, item.project_item_id, false, false));
+                $('.items-project').select2();
 
                 $('#item-data-tracking').val(item.project_item_id);
                 $('#item-data-tracking').trigger('change');
-            }
-        });
-
-    };
-    var initAccionesModalItemsSubcontract = function () {
-
-        $(document).off('click', "#btn-add-item-subcontract");
-        $(document).on('click', "#btn-add-item-subcontract", function (e) {
-
-            ModalItemSubcontract.mostrarModal();
-
-        });
-
-        $('#modal-item-subcontract').on('hidden.bs.modal', function () {
-            var item = ModalItemSubcontract.getItem();
-            if (item != null) {
-                //add items to select
-                all_items.push(item);
-                $('#item-subcontract').append(new Option(`${item.item} - ${item.unit}`, item.item_id, false, false));
-                $('#item-subcontract').select2();
-
-                $('#item-subcontract').val(item.item_id);
-                $('#item-subcontract').trigger('change');
             }
         });
 
@@ -3321,17 +3298,17 @@ var DataTracking = function () {
             e.preventDefault();
 
 
-            var item_id = $('#item-subcontract').val();
+            var project_item_id = $('#item-subcontract').val();
 
-            if ($('#subcontract-form').valid() && item_id != '') {
+            if ($('#subcontract-form').valid() && project_item_id != '') {
 
-                if (ExistSubcontract(item_id)) {
+                if (ExistSubcontract(project_item_id)) {
                     toastr.error("The selected item has already been added", "");
                     return;
                 }
 
-                var item = all_items.find(function (val) {
-                    return val.item_id == item_id;
+                var item = items.find(function (val) {
+                    return val.project_item_id == project_item_id;
                 });
 
                 var quantity = $('#quantity-subcontract').val();
@@ -3345,7 +3322,7 @@ var DataTracking = function () {
 
                     subcontracts.push({
                         subcontract_id: '',
-                        item_id: item_id,
+                        project_item_id: project_item_id,
                         item: item.item,
                         unit: item.unit,
                         quantity: quantity,
@@ -3358,7 +3335,7 @@ var DataTracking = function () {
                 } else {
                     var posicion = nEditingRowSubcontract;
                     if (subcontracts[posicion]) {
-                        subcontracts[posicion].item_id = item_id;
+                        subcontracts[posicion].project_item_id = project_item_id;
                         subcontracts[posicion].item = item.item;
                         subcontracts[posicion].unit = item.unit;
                         subcontracts[posicion].quantity = quantity;
@@ -3379,7 +3356,7 @@ var DataTracking = function () {
                 resetFormSubcontract();
 
             } else {
-                if (item_id == '') {
+                if (project_item_id == '') {
                     var $element = $('#select-item-subcontract .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                         .data("title", "This field is required")
@@ -3405,7 +3382,7 @@ var DataTracking = function () {
 
                 nEditingRowSubcontract = posicion;
 
-                $('#item-subcontract').val(subcontracts[posicion].item_id);
+                $('#item-subcontract').val(subcontracts[posicion].project_item_id);
                 $('#item-subcontract').trigger('change');
 
                 $('#quantity-subcontract').val(subcontracts[posicion].quantity);
@@ -3436,18 +3413,18 @@ var DataTracking = function () {
                 cancelButtonClass: "btn btn-sm btn-bold btn-danger"
             }).then(function (result) {
                 if (result.value) {
-                    EliminarItem(posicion);
+                    EliminarSubcontractor(posicion);
                 }
             });
 
         });
 
-        function ExistSubcontract(item_id) {
+        function ExistSubcontract(project_item_id) {
             var result = false;
 
             if (nEditingRowSubcontract == null) {
                 for (var i = 0; i < subcontracts.length; i++) {
-                    if (subcontracts[i].item_id == item_id) {
+                    if (subcontracts[i].project_item_id == project_item_id) {
                         result = true;
                         break;
                     }
@@ -3455,7 +3432,7 @@ var DataTracking = function () {
             } else {
                 var posicion = nEditingRowSubcontract;
                 for (var i = 0; i < subcontracts.length; i++) {
-                    if (subcontracts[i].item_id == item_id && subcontracts[i].subcontract_id !== subcontracts[posicion].subcontract_id) {
+                    if (subcontracts[i].project_item_id == project_item_id && subcontracts[i].subcontract_id !== subcontracts[posicion].subcontract_id) {
                         result = true;
                         break;
                     }
@@ -3465,7 +3442,7 @@ var DataTracking = function () {
             return result;
         };
 
-        function EliminarItem(posicion) {
+        function EliminarSubcontractor(posicion) {
             if (subcontracts[posicion]) {
 
                 if (subcontracts[posicion].subcontract_id != '') {
@@ -3559,7 +3536,6 @@ var DataTracking = function () {
 
             // modal items
             initAccionesModalItems();
-            initAccionesModalItemsSubcontract();
 
             // items
             initTableItems();

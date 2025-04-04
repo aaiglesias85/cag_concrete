@@ -38,4 +38,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function definirsubcontractordatatrackingprojectitem()
+    {
+        $this->scriptService->DefinirSubcontractorDatatrackingProjectItem();
+
+        return new Response('OK', 200);
+    }
 }

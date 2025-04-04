@@ -4,6 +4,7 @@ namespace App\Utils;
 
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingItem;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
@@ -12,6 +13,33 @@ use App\Entity\ProjectItem;
 
 class ScriptService extends Base
 {
+
+    /**
+     * DefinirSubcontractorDatatrackingProjectItem
+     */
+    public function DefinirSubcontractorDatatrackingProjectItem()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // listar datatracking subcontractor
+        $datatrackings_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->findAll();
+        foreach ($datatrackings_subcontractors as $datatracking_subcontractor) {
+            $project_id = $datatracking_subcontractor->getDataTracking()->getProject()->getProjectId();
+            $item_id = $datatracking_subcontractor->getItem() ? $datatracking_subcontractor->getItem()->getItemId() : '';
+
+            $project_item = $this->getDoctrine()->getRepository(ProjectItem::class)
+                ->BuscarItemProject($project_id, $item_id);
+            if (!empty($project_item)) {
+                $datatracking_subcontractor->setProjectItem($project_item[0]);
+                $datatracking_subcontractor->setItem(null);
+            } else {
+                $em->remove($datatracking_subcontractor);
+            }
+        }
+
+        $em->flush();
+    }
 
     /**
      * DefinirYieldCalculationItem

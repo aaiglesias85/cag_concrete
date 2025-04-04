@@ -42,3 +42,7 @@ definirnotificacionesduedate:
 definiryieldcalculationitem:
   path:  /definir-yield-calculation-item
   defaults: { _controller: App\Controller\ScriptController::definiryieldcalculationitem }
+
+definirsubcontractordatatrackingprojectitem:
+  path:  /definir-subcontractor-datatracking-project-item
+  defaults: { _controller: App\Controller\ScriptController::definirsubcontractordatatrackingprojectitem }
