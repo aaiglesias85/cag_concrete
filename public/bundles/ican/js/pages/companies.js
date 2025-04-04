@@ -1061,7 +1061,7 @@ var Companies = function () {
         });
 
         //Events
-        oTableListaContacts
+        oTableListaProjects
             .on('m-datatable--on-ajax-done', function () {
                 mApp.unblock('#lista-projects-table-editable');
             })

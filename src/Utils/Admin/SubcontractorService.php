@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingSubcontract;
+use App\Entity\Project;
 use App\Entity\Subcontractor;
 use App\Entity\SubcontractorEmployee;
 use App\Entity\SubcontractorNotes;
@@ -505,12 +506,54 @@ class SubcontractorService extends Base
             $arreglo_resultado['contactName'] = $entity->getContactName();
             $arreglo_resultado['contactEmail'] = $entity->getContactEmail();
 
+            // projects
+            $projects = $this->ListarProjects($subcontractor_id);
+            $arreglo_resultado['projects'] = $projects;
+
             $resultado['success'] = true;
             $resultado['subcontractor'] = $arreglo_resultado;
         }
 
         return $resultado;
     }
+
+    /**
+     * ListarProjects
+     * @param $subcontractor_id
+     * @return array
+     */
+    public function ListarProjects($subcontractor_id)
+    {
+        $projects = [];
+
+        $subcontractor_projects = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarProjectsDeSubcontractor($subcontractor_id);
+
+        foreach ($subcontractor_projects as $key => $subcontractor_project) {
+            $value = $subcontractor_project->getDataTracking()->getProject();
+            $project_id = $value->getProjectId();
+
+            // listar ultima nota del proyecto
+            $nota = $this->ListarUltimaNotaDeProject($project_id);
+
+            $projects[] = [
+                "id" => $project_id,
+                "projectNumber" => $value->getProjectNumber(),
+                "name" => $value->getName(),
+                "company" => $value->getCompany()->getName(),
+                "county" => $value->getCounty(),
+                "status" => $value->getStatus(),
+                "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
+                "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',
+                "dueDate" => $value->getDueDate() != '' ? $value->getDueDate()->format('m/d/Y') : '',
+                'nota' => $nota,
+                'posicion' => $key
+            ];
+        }
+
+        return $projects;
+    }
+
 
     /**
      * EliminarSubcontractor: Elimina un rol en la BD

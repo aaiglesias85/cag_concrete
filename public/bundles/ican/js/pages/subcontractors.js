@@ -137,6 +137,10 @@ var Subcontractors = function () {
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
 
+        //projects
+        projects = [];
+        actualizarTableListaProjects();
+
         //Mostrar el primer tab
         resetWizard();
 
@@ -339,8 +343,12 @@ var Subcontractors = function () {
                         $('#contactName').val(response.subcontractor.contactName);
                         $('#contactEmail').val(response.subcontractor.contactEmail);
 
+                        // projects
+                        projects = response.subcontractor.projects;
+                        actualizarTableListaProjects();
+
                         // habilitar tab
-                        totalTabs = 3;
+                        totalTabs = 4;
                         $('#btn-wizard-siguiente').removeClass('m--hide');
                         $('.nav-item-hide').removeClass('m--hide');
 
@@ -540,6 +548,9 @@ var Subcontractors = function () {
                 case 3:
                     btnClickFiltrarNotes();
                     break;
+                case 4:
+                    actualizarTableListaProjects();
+                    break;
             }
 
         });
@@ -586,6 +597,10 @@ var Subcontractors = function () {
                 case 3:
                     $('#tab-notes').tab('show');
                     btnClickFiltrarNotes();
+                    break;
+                case 4:
+                    $('#tab-projects').tab('show');
+                    actualizarTableListaProjects();
                     break;
             }
         }, 0);
@@ -1406,6 +1421,164 @@ var Subcontractors = function () {
         $("#proyect-name-note").html($('#name').val());
     };
 
+    // Projects
+    var projects = [];
+    var oTableListaProjects;
+    var initTableListaProjects = function () {
+        MyApp.block('#lista-projects-table-editable');
+
+        var table = $('#lista-projects-table-editable');
+
+        var aoColumns = [
+            {
+                field: "county",
+                title: "County"
+            },
+            {
+                field: "name",
+                title: "Name"
+            },
+            {
+                field: "dueDate",
+                title: "Due Date",
+                width: 100,
+            },
+            {
+                field: "company",
+                title: "Company"
+            },
+            {
+                field: "status",
+                title: "Status",
+                responsive: {visible: 'lg'},
+                width: 100,
+                // callback function support for column rendering
+                template: function (row) {
+                    var status = {
+                        1: {'title': 'In Progress', 'class': ' m-badge--info'},
+                        0: {'title': 'Not Started', 'class': ' m-badge--danger'},
+                        2: {'title': 'Completed', 'class': ' m-badge--success'},
+                    };
+                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
+                }
+            },
+            {
+                field: "nota",
+                title: "Notes",
+                responsive: {visible: 'lg'},
+                width: 200,
+                sortable: false,
+                // callback function support for column rendering
+                template: function (row) {
+
+                    var html = '';
+                    if (row.nota != null) {
+                        html = `${row.nota.nota} <span class="m-badge m-badge--info">${row.nota.date}</span>`;
+                    }
+                    return html;
+                }
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="detalle m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View project"><i class="la la-eye"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableListaProjects = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: projects,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-projects .m_form_search'),
+            },
+        });
+
+        //Events
+        oTableListaProjects
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#lista-projects-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#lista-projects-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#lista-projects-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#lista-projects-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#lista-projects-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+    };
+    var actualizarTableListaProjects = function () {
+        if(oTableListaProjects){
+            oTableListaProjects.destroy();
+        }
+
+        initTableListaProjects();
+    }
+    var initAccionesProjects = function () {
+
+        $(document).off('click', "#lista-projects-table-editable a.detalle");
+        $(document).on('click', "#lista-projects-table-editable a.detalle", function (e) {
+            var posicion = $(this).data('posicion');
+            if (projects[posicion]) {
+                localStorage.setItem('project_id_edit', projects[posicion].id);
+                // open
+                window.location.href = url_project;
+
+            }
+        });
+
+    };
+
     return {
         //main function to initiate the module
         init: function () {
@@ -1431,6 +1604,9 @@ var Subcontractors = function () {
             initAccionFiltrarNotes();
             initFormNote();
             initAccionesNotes();
+
+            // projects
+            initAccionesProjects();
 
             initAccionChange();
         }
