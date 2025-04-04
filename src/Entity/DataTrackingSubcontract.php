@@ -74,6 +74,16 @@ class DataTrackingSubcontract
     private $dataTracking;
 
     /**
+     * @var Subcontractor
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Subcontractor")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="subcontractor_id", referencedColumnName="subcontractor_id")
+     * })
+     */
+    private $subcontractor;
+
+    /**
      * Get id
      *
      * @return integer
@@ -150,5 +160,18 @@ class DataTrackingSubcontract
     public function setProjectItem($projectItem)
     {
         $this->projectItem = $projectItem;
+    }
+
+    /**
+     * @return Subcontractor
+     */
+    public function getSubcontractor()
+    {
+        return $this->subcontractor;
+    }
+
+    public function setSubcontractor($subcontractor)
+    {
+        $this->subcontractor = $subcontractor;
     }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 03-04-2025 a las 21:33:11
+-- Tiempo de generación: 04-04-2025 a las 19:08:31
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -196,7 +196,7 @@ CREATE TABLE `data_tracking_labor` (
   `hourly_rate` decimal(18,2) DEFAULT NULL,
   `role` varchar(255) DEFAULT NULL,
   `data_tracking_id` int(11) NOT NULL,
-  `employee_id` int(11) NOT NULL,
+  `employee_id` int(11) DEFAULT NULL,
   `subcontractor_employee_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -249,23 +249,25 @@ CREATE TABLE `data_tracking_subcontract` (
   `price` decimal(18,2) DEFAULT NULL,
   `notes` text,
   `data_tracking_id` int(11) DEFAULT NULL,
-  `item_id` int(11) DEFAULT NULL
+  `subcontractor_id` int(11) DEFAULT NULL,
+  `item_id` int(11) DEFAULT NULL,
+  `project_item_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `data_tracking_subcontract`
 --
 
-INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `data_tracking_id`, `item_id`) VALUES
-(6, 10.00, 100.00, '', 3, 11),
-(7, 10.00, 50.00, '', 5, 12),
-(8, 10.00, 60.00, '', 5, 6),
-(9, 10.00, 100.00, '', 5, 7),
-(10, 10.00, 50.00, '', 5, 11),
-(11, 10.00, 100.00, '', 5, 8),
-(12, 10.00, 100.00, '', 6, 11),
-(13, 10.00, 100.00, '', 7, 11),
-(17, 10.00, 100.00, '', 11, 11);
+INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `data_tracking_id`, `subcontractor_id`, `item_id`, `project_item_id`) VALUES
+(6, 10.00, 100.00, '', 3, NULL, 11, NULL),
+(7, 10.00, 50.00, '', 5, NULL, 12, NULL),
+(8, 10.00, 60.00, '', 5, NULL, 6, NULL),
+(9, 10.00, 100.00, '', 5, NULL, 7, NULL),
+(10, 10.00, 50.00, '', 5, NULL, 11, NULL),
+(11, 10.00, 100.00, '', 5, NULL, 8, NULL),
+(12, 10.00, 100.00, '', 6, NULL, 11, NULL),
+(13, 10.00, 100.00, '', 7, NULL, 11, NULL),
+(17, 10.00, 100.00, '', 11, NULL, 11, NULL);
 
 -- --------------------------------------------------------
 
@@ -1383,7 +1385,9 @@ ALTER TABLE `data_tracking_material`
 ALTER TABLE `data_tracking_subcontract`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Ref63452` (`data_tracking_id`),
-  ADD KEY `Ref63451` (`item_id`);
+  ADD KEY `Ref63451` (`item_id`),
+  ADD KEY `project_item_id` (`project_item_id`),
+  ADD KEY `subcontractor_id` (`subcontractor_id`);
 
 --
 -- Indices de la tabla `employee`
@@ -1792,7 +1796,9 @@ ALTER TABLE `data_tracking_material`
 --
 ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract35` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
+  ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
 
 --
 -- Filtros para la tabla `invoice`

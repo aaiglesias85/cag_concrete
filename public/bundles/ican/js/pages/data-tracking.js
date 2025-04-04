@@ -3112,6 +3112,10 @@ var DataTracking = function () {
 
         var aoColumns = [
             {
+                field: "subcontractor",
+                title: "Subcontractor",
+            },
+            {
                 field: "item",
                 title: "Item",
             },
@@ -3299,13 +3303,16 @@ var DataTracking = function () {
 
 
             var project_item_id = $('#item-subcontract').val();
+            var subcontractor_id = $('#subcontractor').val();
 
-            if ($('#subcontract-form').valid() && project_item_id != '') {
+            if ($('#subcontract-form').valid() && project_item_id != '' && subcontractor_id !== '') {
 
                 if (ExistSubcontract(project_item_id)) {
                     toastr.error("The selected item has already been added", "");
                     return;
                 }
+
+                var subcontractor = subcontractor_id !== '' ? $("#subcontractor option:selected").text() : '';
 
                 var item = items.find(function (val) {
                     return val.project_item_id == project_item_id;
@@ -3322,6 +3329,8 @@ var DataTracking = function () {
 
                     subcontracts.push({
                         subcontract_id: '',
+                        subcontractor_id: subcontractor_id,
+                        subcontractor: subcontractor,
                         project_item_id: project_item_id,
                         item: item.item,
                         unit: item.unit,
@@ -3335,6 +3344,8 @@ var DataTracking = function () {
                 } else {
                     var posicion = nEditingRowSubcontract;
                     if (subcontracts[posicion]) {
+                        subcontracts[posicion].subcontractor_id = subcontractor_id;
+                        subcontracts[posicion].subcontractor = subcontractor;
                         subcontracts[posicion].project_item_id = project_item_id;
                         subcontracts[posicion].item = item.item;
                         subcontracts[posicion].unit = item.unit;
@@ -3356,6 +3367,18 @@ var DataTracking = function () {
                 resetFormSubcontract();
 
             } else {
+                if (subcontractor_id == '') {
+                    var $element = $('#select-subcontractor .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
                 if (project_item_id == '') {
                     var $element = $('#select-item-subcontract .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
@@ -3381,6 +3404,9 @@ var DataTracking = function () {
                 resetFormSubcontract();
 
                 nEditingRowSubcontract = posicion;
+
+                $('#subcontractor').val(subcontracts[posicion].subcontractor_id);
+                $('#subcontractor').trigger('change');
 
                 $('#item-subcontract').val(subcontracts[posicion].project_item_id);
                 $('#item-subcontract').trigger('change');
@@ -3505,6 +3531,9 @@ var DataTracking = function () {
             $element.data("title", "").removeClass("has-error").tooltip("dispose");
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
+
+        $('#subcontractor').val('');
+        $('#subcontractor').trigger('change');
 
         $('#item-subcontract').val('');
         $('#item-subcontract').trigger('change');

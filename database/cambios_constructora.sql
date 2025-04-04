@@ -59,3 +59,6 @@ ALTER TABLE `data_tracking_labor` CHANGE `employee_id` `employee_id` INT(11) NUL
 
 ALTER TABLE `data_tracking_subcontract` ADD `project_item_id` INT(11) NULL AFTER `item_id`, ADD INDEX (`project_item_id`);
 ALTER TABLE `data_tracking_subcontract` ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `data_tracking_subcontract` ADD `subcontractor_id` INT(11) NULL AFTER `data_tracking_id`, ADD INDEX (`subcontractor_id`);
+ALTER TABLE `data_tracking_subcontract` ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor`(`subcontractor_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;

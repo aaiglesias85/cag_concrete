@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\DataTrackingLabor;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Subcontractor;
 use App\Entity\SubcontractorEmployee;
 use App\Entity\SubcontractorNotes;
@@ -632,6 +633,13 @@ class SubcontractorService extends Base
             ->ListarNotesDeSubcontractor($subcontractor_id);
         foreach ($notes as $note) {
             $em->remove($note);
+        }
+
+        // datatracking
+        $datatrackings = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontractsDeSubcontractor($subcontractor_id);
+        foreach ($datatrackings as $datatracking) {
+            $em->remove($datatracking);
         }
     }
 

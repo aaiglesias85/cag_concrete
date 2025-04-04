@@ -16,6 +16,7 @@ use App\Entity\Material;
 use App\Entity\OverheadPrice;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
+use App\Entity\Subcontractor;
 use App\Entity\SubcontractorEmployee;
 use App\Utils\Base;
 
@@ -469,6 +470,8 @@ class DataTrackingService extends Base
                 "project_item_id" => $value->getProjectItem()->getId(),
                 "item" => $value->getProjectItem()->getItem()->getDescription(),
                 "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
+                "subcontractor_id" => $value->getSubcontractor() ? $value->getSubcontractor()->getSubcontractorId() : '',
+                "subcontractor" => $value->getSubcontractor() ? $value->getSubcontractor()->getName() : '',
                 "quantity" => $quantity,
                 "price" => $price,
                 "total" => $total,
@@ -1018,6 +1021,12 @@ class DataTrackingService extends Base
                 $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)
                     ->find($value->project_item_id);
                 $subcontract_entity->setProjectItem($project_item_entity);
+            }
+
+            if ($value->subcontractor_id != '') {
+                $subcontractor_entity = $this->getDoctrine()->getRepository(Subcontractor::class)
+                    ->find($value->subcontractor_id);
+                $subcontract_entity->setSubcontractor($subcontractor_entity);
             }
 
             if ($is_new_subcontract) {

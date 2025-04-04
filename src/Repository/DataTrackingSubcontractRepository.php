@@ -74,6 +74,27 @@ class DataTrackingSubcontractRepository extends EntityRepository
         return $consulta->getQuery()->getResult();
     }
 
+    /**
+     * ListarSubcontractsDeSubcontractor: Lista el subcontractors de subcontractor
+     *
+     * @return DataTrackingSubcontract[]
+     */
+    public function ListarSubcontractsDeSubcontractor($subcontractor_id)
+    {
+        $consulta = $this->createQueryBuilder('d_t_s')
+            ->leftJoin('d_t_s.subcontractor', 's');
+
+        if ($subcontractor_id != '') {
+            $consulta->andWhere('s.subcontractorId = :subcontractor_id')
+                ->setParameter('subcontractor_id', $subcontractor_id);
+        }
+
+
+        $consulta->orderBy('d_t_s.id', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
 
     /**
      * TotalQuantity: Total de quantity items de la BD
@@ -81,11 +102,11 @@ class DataTrackingSubcontractRepository extends EntityRepository
      *
      * @return float
      */
-    public function TotalQuantity($data_tracking_id = '', $item_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
+    public function TotalQuantity($data_tracking_id = '', $project_item_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
         $em = $this->getEntityManager();
         $consulta = 'SELECT SUM(d_t_s.quantity) FROM App\Entity\DataTrackingSubcontract d_t_s ';
-        $join = ' LEFT JOIN d_t_s.dataTracking d_t LEFT JOIN d_t.project p LEFT JOIN d_t_s.item i ';
+        $join = ' LEFT JOIN d_t_s.dataTracking d_t LEFT JOIN d_t.project p LEFT JOIN d_t_s.projectItem p_i ';
         $where = '';
 
         if ($data_tracking_id != '') {
@@ -96,12 +117,12 @@ class DataTrackingSubcontractRepository extends EntityRepository
                 $where .= 'AND (d_t.id = :data_tracking_id) ';
         }
 
-        if ($item_id != '') {
+        if ($project_item_id != '') {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (i.itemId = :item_id) ';
+                $where .= 'WHERE (p_i.id = :project_item_id) ';
             else
-                $where .= 'AND (i.itemId = :item_id) ';
+                $where .= 'AND (p_i.id = :project_item_id) ';
         }
 
         if ($fecha_inicial != "") {
@@ -146,9 +167,9 @@ class DataTrackingSubcontractRepository extends EntityRepository
             $query->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        $esta_query_item_id = substr_count($consulta, ':item_id');
-        if ($esta_query_item_id == 1) {
-            $query->setParameter('item_id', $item_id);
+        $esta_query_project_item_id = substr_count($consulta, ':project_item_id');
+        if ($esta_query_project_item_id == 1) {
+            $query->setParameter('project_item_id', $project_item_id);
         }
 
         $esta_query_start = substr_count($consulta, ':start');
@@ -175,11 +196,11 @@ class DataTrackingSubcontractRepository extends EntityRepository
      *
      * @return float
      */
-    public function TotalPrice($data_tracking_id = '', $item_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
+    public function TotalPrice($data_tracking_id = '', $project_item_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
         $em = $this->getEntityManager();
         $consulta = 'SELECT SUM(d_t_s.quantity * d_t_s.price) FROM App\Entity\DataTrackingSubcontract d_t_s ';
-        $join = ' LEFT JOIN d_t_s.dataTracking d_t LEFT JOIN d_t_s.item i LEFT JOIN d_t.project p ';
+        $join = ' LEFT JOIN d_t_s.dataTracking d_t LEFT JOIN d_t.project p JOIN d_t_s.projectItem p_i ';
         $where = '';
 
         if ($data_tracking_id != '') {
@@ -190,12 +211,12 @@ class DataTrackingSubcontractRepository extends EntityRepository
                 $where .= 'AND (d_t.id = :data_tracking_id) ';
         }
 
-        if ($item_id != '') {
+        if ($project_item_id != '') {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (i.itemId = :item_id) ';
+                $where .= 'WHERE (p_i.id = :project_item_id) ';
             else
-                $where .= 'AND (i.itemId = :item_id) ';
+                $where .= 'AND (p_i.id = :project_item_id) ';
         }
 
         if ($project_id != '') {
@@ -247,9 +268,9 @@ class DataTrackingSubcontractRepository extends EntityRepository
             $query->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        $esta_query_item_id = substr_count($consulta, ':item_id');
-        if ($esta_query_item_id == 1) {
-            $query->setParameter('item_id', $item_id);
+        $esta_query_project_item_id = substr_count($consulta, ':project_item_id');
+        if ($esta_query_project_item_id == 1) {
+            $query->setParameter('project_item_id', $project_item_id);
         }
 
         $esta_query_project_id = substr_count($consulta, ':project_id');
