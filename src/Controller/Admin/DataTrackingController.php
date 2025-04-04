@@ -10,6 +10,7 @@ use App\Entity\Item;
 use App\Entity\Material;
 use App\Entity\OverheadPrice;
 use App\Entity\Project;
+use App\Entity\Subcontractor;
 use App\Entity\Unit;
 use App\Utils\Admin\DataTrackingService;
 use App\Utils\Admin\ProjectService;
@@ -63,6 +64,10 @@ class DataTrackingController extends AbstractController
                 $overheads = $this->trackingService->getDoctrine()->getRepository(OverheadPrice::class)
                     ->ListarOrdenados();
 
+                // subcontractors
+                $subcontractors = $this->trackingService->getDoctrine()->getRepository(Subcontractor::class)
+                    ->ListarOrdenados();
+
                 return $this->render('admin/data-tracking/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
@@ -71,6 +76,7 @@ class DataTrackingController extends AbstractController
                     'employees' => $employees,
                     'materials' => $materials,
                     'overheads' => $overheads,
+                    'subcontractors' => $subcontractors,
                 ));
             }
         } else {

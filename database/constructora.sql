@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 01-04-2025 a las 23:27:02
+-- Tiempo de generación: 03-04-2025 a las 21:33:11
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -196,21 +196,22 @@ CREATE TABLE `data_tracking_labor` (
   `hourly_rate` decimal(18,2) DEFAULT NULL,
   `role` varchar(255) DEFAULT NULL,
   `data_tracking_id` int(11) NOT NULL,
-  `employee_id` int(11) NOT NULL
+  `employee_id` int(11) NOT NULL,
+  `subcontractor_employee_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `data_tracking_labor`
 --
 
-INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_tracking_id`, `employee_id`) VALUES
-(1, 1.00, 56.00, 'Jefe', 4, 1),
-(3, 5.00, 70.00, 'Jefe', 3, 2),
-(4, 10.00, 56.00, 'Constructor', 3, 1),
-(5, 4.00, 70.00, 'Asistent', 4, 2),
-(6, 2.00, 2.00, 'RRHH', 4, 4),
-(7, 2.00, 2.00, 'Ayudante', 4, 5),
-(8, 5.00, 70.00, 'Developer', 5, 2);
+INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_tracking_id`, `employee_id`, `subcontractor_employee_id`) VALUES
+(1, 1.00, 56.00, 'Jefe', 4, 1, NULL),
+(3, 5.00, 70.00, 'Jefe', 3, 2, NULL),
+(4, 10.00, 56.00, 'Constructor', 3, 1, NULL),
+(5, 4.00, 70.00, 'Asistent', 4, 2, NULL),
+(6, 2.00, 2.00, 'RRHH', 4, 4, NULL),
+(7, 2.00, 2.00, 'Ayudante', 4, 5, NULL),
+(8, 5.00, 70.00, 'Developer', 5, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -1365,7 +1366,8 @@ ALTER TABLE `data_tracking_item`
 ALTER TABLE `data_tracking_labor`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_data_tracking_labor` (`data_tracking_id`),
-  ADD KEY `fk_data_tracking_labor_employee` (`employee_id`);
+  ADD KEY `fk_data_tracking_labor_employee` (`employee_id`),
+  ADD KEY `subcontractor_employee_id` (`subcontractor_employee_id`);
 
 --
 -- Indices de la tabla `data_tracking_material`
@@ -1775,7 +1777,8 @@ ALTER TABLE `data_tracking_item`
 --
 ALTER TABLE `data_tracking_labor`
   ADD CONSTRAINT `fk_data_tracking_labor` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_data_tracking_labor_employee` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_data_tracking_labor_employee` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_data_tracking_labor_subcontractor_employee` FOREIGN KEY (`subcontractor_employee_id`) REFERENCES `subcontractor_employee` (`subcontractor_employee_id`);
 
 --
 -- Filtros para la tabla `data_tracking_material`

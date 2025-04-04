@@ -51,3 +51,8 @@ ALTER TABLE subcontractor_notes
 
 
 ALTER TABLE `subcontractor` ADD `created_at` DATETIME NULL AFTER `contact_email`, ADD `updated_at` DATETIME NULL AFTER `created_at`;
+
+ALTER TABLE `data_tracking_labor` ADD `subcontractor_employee_id` INT(11) NULL AFTER `employee_id`, ADD INDEX (`subcontractor_employee_id`);
+ALTER TABLE `data_tracking_labor` ADD CONSTRAINT `fk_data_tracking_labor_subcontractor_employee` FOREIGN KEY (`subcontractor_employee_id`) REFERENCES `subcontractor_employee`(`subcontractor_employee_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `data_tracking_labor` CHANGE `employee_id` `employee_id` INT(11) NULL;

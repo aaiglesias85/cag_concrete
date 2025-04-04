@@ -16,6 +16,7 @@ use App\Entity\Material;
 use App\Entity\OverheadPrice;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
+use App\Entity\SubcontractorEmployee;
 use App\Utils\Base;
 
 class DataTrackingService extends Base
@@ -416,14 +417,25 @@ class DataTrackingService extends Base
             ->ListarLabor($data_tracking_id);
         foreach ($lista as $key => $value) {
 
+            $employee_id = $value->getEmployee() !== null ? $value->getEmployee()->getEmployeeId() : '';
+
+            $subcontractor_employee_id = $value->getEmployeeSubcontractor() !== null ? $value->getEmployeeSubcontractor()->getEmployeeId() : '';
+            $subcontractor_id = $value->getEmployeeSubcontractor() !== null ? $value->getEmployeeSubcontractor()->getSubcontractor()->getSubcontractorId() : '';
+
+
+            $employee_name = $value->getEmployee() !== null ? $value->getEmployee()->getName() : $value->getEmployeeSubcontractor()->getName();
+
+
             $hours = $value->getHours();
             $hourly_rate = $value->getHourlyRate();
             $total = $hours * $hourly_rate;
 
             $items[] = [
                 'data_tracking_labor_id' => $value->getId(),
-                "employee_id" => $value->getEmployee()->getEmployeeId(),
-                "employee" => $value->getEmployee()->getName(),
+                "employee_id" => $employee_id,
+                "subcontractor_employee_id" => $subcontractor_employee_id,
+                "subcontractor_id" => $subcontractor_id,
+                "employee" => $employee_name,
                 "role" => $value->getRole(),
                 "hours" => $hours,
                 "hourly_rate" => $hourly_rate,
@@ -928,6 +940,12 @@ class DataTrackingService extends Base
                 $employee_entity = $this->getDoctrine()->getRepository(Employee::class)
                     ->find($value->employee_id);
                 $data_tracking_labor_entity->setEmployee($employee_entity);
+            }
+
+            if ($value->subcontractor_employee_id != '') {
+                $employee_entity = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
+                    ->find($value->subcontractor_employee_id);
+                $data_tracking_labor_entity->setEmployeeSubcontractor($employee_entity);
             }
 
             if ($is_new_data_tracking_labor) {

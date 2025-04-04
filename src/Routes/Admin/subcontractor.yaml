@@ -23,7 +23,7 @@ cargarDatosSubcontractorAdmin:
   defaults: { _controller: App\Controller\Admin\SubcontractorController::cargarDatos, _format: json }
   
 #employees
-listarEmployeesDeSubcontractorAdmin:
+listarEmployeesDeSubcontractorTableAdmin:
   path: /subcontractor/listarEmployees
   defaults: { _controller: App\Controller\Admin\SubcontractorController::listarEmployees, _format: json }
 
@@ -38,6 +38,10 @@ agregarEmployeeSubcontractorAdmin:
 cargarDatosEmployeeSubcontractorAdmin:
   path: /subcontractor/cargarDatosEmployee
   defaults: { _controller: App\Controller\Admin\SubcontractorController::cargarDatosEmployee, _format: json }
+
+listarEmployeesDeSubcontractorAdmin:
+  path: /subcontractor/listarEmployeesDeSubcontractor
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::listarEmployeesDeSubcontractor, _format: json }
   
 #notes
 listarNotesSubcontractorAdmin:

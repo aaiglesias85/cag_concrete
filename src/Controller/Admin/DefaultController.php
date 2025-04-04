@@ -192,6 +192,11 @@ class DefaultController extends AbstractController
         return $this->render('admin/block/modal-employee.html.twig', array());
     }
 
+    public function renderModalEmployeeSubcontractor()
+    {
+        return $this->render('admin/block/modal-employee-subcontractor.html.twig', array());
+    }
+
     public function renderModalItemSubcontract()
     {
 

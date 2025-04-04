@@ -520,6 +520,7 @@ class SubcontractorController extends AbstractController
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['employee_id'] = $resultado['employee_id'];
             } else {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['error'] = $resultado['error'];
@@ -564,5 +565,31 @@ class SubcontractorController extends AbstractController
             return $this->json($resultadoJson);
         }
 
+    }
+
+    /**
+     * listarEmployeesDeSubcontractor Acción que lista los employees subcontractors
+     *
+     */
+    public function listarEmployeesDeSubcontractor(Request $request)
+    {
+
+        $subcontractor_id = $request->get('subcontractor_id');
+
+        try {
+
+            $employees = $this->subcontractorService->ListarEmployeesDeSubcontractor($subcontractor_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['employees'] = $employees;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
     }
 }

@@ -53,6 +53,27 @@ class DataTrackingLaborRepository extends EntityRepository
         return $consulta->getQuery()->getResult();
     }
 
+    /**
+     * ListarDataTrackingsDeEmployeeSubcontractor: Lista el data tracking de employee subcontractor
+     *
+     * @return DataTrackingLabor[]
+     */
+    public function ListarDataTrackingsDeEmployeeSubcontractor($subcontractor_employee_id)
+    {
+        $consulta = $this->createQueryBuilder('d_t_l')
+            ->leftJoin('d_t_l.employeeSubcontractor', 's_e');
+
+        if ($subcontractor_employee_id != '') {
+            $consulta->andWhere('s_e.employeeId = :subcontractor_employee_id')
+                ->setParameter('subcontractor_employee_id', $subcontractor_employee_id);
+        }
+
+
+        $consulta->orderBy('d_t_l.id', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
 
     /**
      * TotalHours: Total de hours employees de la BD

@@ -1130,6 +1130,28 @@
                         <input type="hidden" id="data_tracking_labor_id" name="data_tracking_labor_id"/>
 
                         <div class="form-group m-form__group">
+                            <label>Employee Type</label>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="m-form__group form-group">
+                                        <div class="m-radio-inline">
+                                            <label class="m-radio">
+                                                <input type="radio" name="employeetype" id="employee-type-owner" checked>
+                                                Owner
+                                                <span></span>
+                                            </label>
+                                            <label class="m-radio">
+                                                <input type="radio" name="employeetype" id="employee-type-subcontractor" >
+                                                Subcontractor
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group" id="div-employee">
                             <label>
                                 Employee
                                 <span class="ic-small italic">(required)</span>
@@ -1155,6 +1177,47 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-group m-form__group m--hide" id="div-employee-subcontractor">
+                            <div class="row mb-5">
+                                <div class="col-md-12" id="select-subcontractor-labor">
+                                    <label>
+                                        Subcontractor
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <select class="form-control m-select2" id="subcontractor-labor">
+                                        <option value="">Select</option>
+                                        {% for item in subcontractors %}
+                                            <option value="{{ item.subcontractorId }}">
+                                                {{ item.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>
+                                        Employee
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-10" id="select-employee-subcontractor">
+                                            <select class="form-control m-select2" id="employee-subcontractor">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                            <a href="javascript:;" title="Add employee" id="btn-add-employee-subcontractor"
+                                               class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                                <i class="la la-plus"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group m-form__group">
                             <label>
                                 Hours
@@ -1879,6 +1942,7 @@
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemProject')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemSubcontract')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployee')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployeeSubcontractor')) }}
 
 {% endblock %}
 
@@ -1891,6 +1955,7 @@
             ModalItemProject.init();
             ModalItemSubcontract.init();
             ModalEmployee.init();
+            ModalEmployeeSubcontractor.init();
         });
     </script>
 

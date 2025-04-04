@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\DataTrackingLabor;
 use App\Entity\Subcontractor;
 use App\Entity\SubcontractorEmployee;
 use App\Entity\SubcontractorNotes;
@@ -9,6 +10,28 @@ use App\Utils\Base;
 
 class SubcontractorService extends Base
 {
+    /**
+     * ListarEmployeesDeSubcontractor
+     * @param $subcontractor_id
+     * @return []
+     */
+    public function ListarEmployeesDeSubcontractor($subcontractor_id)
+    {
+        $arreglo_resultado = [];
+
+        $employees = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
+            ->ListarEmployeesDeSubcontractor($subcontractor_id);
+        foreach ($employees as $employee) {
+            $arreglo_resultado[] = [
+                'employee_id' => $employee->getEmployeeId(),
+                'name' => $employee->getName(),
+                'hourlyRate' => $employee->getHourlyRate(),
+                'position' => $employee->getPosition(),
+            ];
+        }
+
+        return $arreglo_resultado;
+    }
 
     /**
      * CargarDatosEmployee: Carga los datos de un employee
@@ -88,6 +111,7 @@ class SubcontractorService extends Base
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
+            $resultado['employee_id'] = $entity->getEmployeeId();
 
         } else {
             $resultado['success'] = false;
@@ -114,7 +138,15 @@ class SubcontractorService extends Base
             $name = $entity->getName();
             $subcontractor_name = $entity->getSubcontractor()->getName();
 
+            // eliminar labor
+            $labors = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+                ->ListarDataTrackingsDeEmployeeSubcontractor($employee_id);
+            foreach ($labors as $labor) {
+                $em->remove($labor);
+            }
+
             $em->remove($entity);
+
             $em->flush();
 
             //Salvar log
@@ -584,6 +616,14 @@ class SubcontractorService extends Base
         $employees = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
             ->ListarEmployeesDeSubcontractor($subcontractor_id);
         foreach ($employees as $employee) {
+
+            // eliminar labor
+            $labors = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+                ->ListarDataTrackingsDeEmployeeSubcontractor($employee->getEmployeeId());
+            foreach ($labors as $labor) {
+                $em->remove($labor);
+            }
+
             $em->remove($employee);
         }
 

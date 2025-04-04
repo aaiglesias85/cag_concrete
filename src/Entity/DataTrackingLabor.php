@@ -52,6 +52,16 @@ class DataTrackingLabor
      */
     private $employee;
 
+    /**
+     * @var SubcontractorEmployee
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\SubcontractorEmployee")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="subcontractor_employee_id", referencedColumnName="subcontractor_employee_id")
+     * })
+     */
+    private $employeeSubcontractor;
+
 
     /**
      * @var DataTracking
@@ -127,5 +137,18 @@ class DataTrackingLabor
     public function setRole($role)
     {
         $this->role = $role;
+    }
+
+    /**
+     * @return SubcontractorEmployee
+     */
+    public function getEmployeeSubcontractor()
+    {
+        return $this->employeeSubcontractor;
+    }
+
+    public function setEmployeeSubcontractor($employeeSubcontractor)
+    {
+        $this->employeeSubcontractor = $employeeSubcontractor;
     }
 }

@@ -665,7 +665,7 @@ var DataTracking = function () {
         }
     };
 
-    var actualizarSelectProjectItems = function() {
+    var actualizarSelectProjectItems = function () {
         // reset
         $('.items-project option').each(function (e) {
             if ($(this).val() != "")
@@ -827,20 +827,6 @@ var DataTracking = function () {
 
         $('#color_used').change(calcularTotalColorPrice);
         $('#color_price').change(calcularTotalColorPrice);
-
-        $('#employee').change(changeEmployee);
-    }
-
-    var changeEmployee = function () {
-        var employee_id = $('#employee').val();
-
-        // reset
-        $('#labor-role').val('');
-        if (employee_id != '') {
-            var position = $('#employee option[value="' + employee_id + '"]').data("position");
-            $('#labor-role').val(position);
-        }
-
     }
 
     var initSelectProject = function () {
@@ -1993,14 +1979,24 @@ var DataTracking = function () {
 
 
             var employee_id = $('#employee').val();
+            var subcontractor_employee_id = $('#employee-subcontractor').val();
 
-            if ($('#data-tracking-labor-form').valid() && employee_id != '') {
+            if ($('#data-tracking-labor-form').valid() && (employee_id !== '' || subcontractor_employee_id !== '')) {
 
-                var employee = $("#employee option:selected").text();
+                var subcontractor_id = $('#subcontractor-labor').val();
+                var employee = employee_id !== '' ? $("#employee option:selected").text() : '';
+                if (employee === '') {
+                    employee = subcontractor_employee_id !== '' ? $("#employee-subcontractor option:selected").text() : '';
+                }
+
                 var hours = $('#hours').val();
                 var role = $('#labor-role').val();
 
                 var hourly_rate = $('#employee option[value="' + employee_id + '"]').attr("data-rate");
+                if (employee_id === '') {
+                    hourly_rate = $('#employee-subcontractor option[value="' + subcontractor_employee_id + '"]').attr("data-rate");
+                }
+
                 var total = hours * hourly_rate;
 
                 if (nEditingRowLabor == null) {
@@ -2008,6 +2004,8 @@ var DataTracking = function () {
                     labor.push({
                         data_tracking_labor_id: '',
                         employee_id: employee_id,
+                        subcontractor_id: subcontractor_id,
+                        subcontractor_employee_id: subcontractor_employee_id,
                         employee: employee,
                         hours: hours,
                         hourly_rate: hourly_rate,
@@ -2021,6 +2019,8 @@ var DataTracking = function () {
                     if (labor[posicion]) {
                         labor[posicion].employee_id = employee_id;
                         labor[posicion].employee = employee;
+                        labor[posicion].subcontractor_id = subcontractor_id;
+                        labor[posicion].subcontractor_employee_id = subcontractor_employee_id;
                         labor[posicion].hours = hours;
                         labor[posicion].hourly_rate = hourly_rate;
                         labor[posicion].total = total;
@@ -2039,8 +2039,20 @@ var DataTracking = function () {
                 resetFormLabor();
 
             } else {
-                if (employee_id == '') {
+                if (employee_id === '') {
                     var $element = $('#select-employee .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+                if (subcontractor_employee_id === '') {
+                    var $element = $('#select-employee-subcontractor .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                         .data("title", "This field is required")
                         .addClass("has-error")
@@ -2065,8 +2077,21 @@ var DataTracking = function () {
 
                 nEditingRowLabor = posicion;
 
-                $('#employee').val(labor[posicion].employee_id);
-                $('#employee').trigger('change');
+                if (labor[posicion].employee_id !== '') {
+                    $('#employee').val(labor[posicion].employee_id);
+                    $('#employee').trigger('change');
+                }
+
+                if (labor[posicion].subcontractor_employee_id !== '') {
+                    $('#employee-type-owner').prop('checked', false);
+                    $('#employee-type-subcontractor').prop('checked', true);
+
+                    $('#subcontractor-labor').val(labor[posicion].subcontractor_id);
+                    $('#subcontractor-labor').trigger('change');
+
+                    $('#div-employee').removeClass('m--hide').addClass('m--hide');
+                    $('#div-employee-subcontractor').removeClass('m--hide');
+                }
 
                 $('#hours').val(labor[posicion].hours);
                 $('#labor-role').val(labor[posicion].role);
@@ -2122,6 +2147,45 @@ var DataTracking = function () {
             }
         });
 
+        $(document).off('change', "#employee", changeEmployee);
+        $(document).on('change', "#employee", changeEmployee);
+
+        $(document).off('change', "#subcontractor-labor", changeSubcontractor);
+        $(document).on('change', "#subcontractor-labor", changeSubcontractor);
+
+        $(document).off('click', "#employee-type-owner", changeEmployeeType);
+        $(document).on('click', "#employee-type-owner", changeEmployeeType);
+
+        $(document).off('click', "#employee-type-subcontractor", changeEmployeeType);
+        $(document).on('click', "#employee-type-subcontractor", changeEmployeeType);
+
+        $(document).off('change', "#employee-subcontractor", changeEmployeeSubcontractor);
+        $(document).on('change', "#employee-subcontractor", changeEmployeeSubcontractor);
+
+        $(document).off('click', "#btn-add-employee-subcontractor");
+        $(document).on('click', "#btn-add-employee-subcontractor", function (e) {
+
+            ModalEmployeeSubcontractor.mostrarModal();
+
+            var subcontractor_id = $('#subcontractor-labor').val();
+            ModalEmployeeSubcontractor.setSubcontractorId(subcontractor_id);
+
+        });
+
+        $('#modal-employee-subcontractor').on('hidden.bs.modal', function () {
+            var employee = ModalEmployeeSubcontractor.getEmployee();
+            if (employee != null) {
+                //add employee to select
+                $('#employee-subcontractor').append(new Option(employee.name, employee.employee_id, false, false));
+                $('#employee-subcontractor option[value="' + employee.employee_id + '"]').attr("data-rate", employee.hourlyRate);
+                $('#employee-subcontractor option[value="' + employee.employee_id + '"]').attr("data-position", employee.position);
+                $('#employee-subcontractor').select2();
+
+                $('#employee-subcontractor').val(employee.employee_id);
+                $('#employee-subcontractor').trigger('change');
+            }
+        });
+
         function EliminarLabor(posicion) {
             if (labor[posicion]) {
 
@@ -2169,6 +2233,103 @@ var DataTracking = function () {
             //actualizar lista
             actualizarTableListaLabor();
         }
+
+        function changeEmployee() {
+            var employee_id = $('#employee').val();
+
+            // reset
+            $('#labor-role').val('');
+            if (employee_id != '') {
+                var position = $('#employee option[value="' + employee_id + '"]').data("position");
+                $('#labor-role').val(position);
+            }
+
+        }
+
+        function changeSubcontractor() {
+            var subcontractor_id = $('#subcontractor-labor').val();
+
+            // reset
+            $('#employee-subcontractor option').each(function (e) {
+                if ($(this).val() != "")
+                    $(this).remove();
+            });
+            $('#employee-subcontractor').select2();
+
+            if (subcontractor_id != '') {
+
+                MyApp.block('#select-employee-subcontractor');
+
+                $.ajax({
+                    type: "POST",
+                    url: "subcontractor/listarEmployeesDeSubcontractor",
+                    dataType: "json",
+                    data: {
+                        'subcontractor_id': subcontractor_id
+                    },
+                    success: function (response) {
+                        mApp.unblock('#select-employee-subcontractor');
+                        if (response.success) {
+
+                            //Llenar select
+                            var employees = response.employees;
+                            for (var i = 0; i < employees.length; i++) {
+                                $('#employee-subcontractor').append(new Option(employees[i].name, employees[i].employee_id, false, false));
+                                $('#employee-subcontractor option[value="' + employees[i].employee_id + '"]').attr("data-rate", employees[i].hourlyRate);
+                                $('#employee-subcontractor option[value="' + employees[i].employee_id + '"]').attr("data-position", employees[i].position);
+                            }
+                            $('#employee-subcontractor').select2();
+
+                            // select
+                            if (nEditingRowLabor) {
+                                $('#employee-subcontractor').val(labor[nEditingRowLabor].subcontractor_employee_id);
+                                $('#employee-subcontractor').trigger('change');
+                            }
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    },
+                    failure: function (response) {
+                        mApp.unblock('#select-employee-subcontractor');
+
+                        toastr.error(response.error, "");
+                    }
+                });
+            }
+        }
+
+        function changeEmployeeType() {
+            var owner_type = $('#employee-type-owner').prop('checked');
+
+            // reset
+            $('#div-employee').removeClass('m--hide');
+            $('#div-employee-subcontractor').removeClass('m--hide').addClass('m--hide');
+
+            $('#employee').val('');
+            $('#employee').trigger('change');
+
+            $('#subcontractor-labor').val('');
+            $('#subcontractor-labor').trigger('change');
+
+            if (!owner_type) {
+                $('#div-employee').removeClass('m--hide').addClass('m--hide');
+                $('#div-employee-subcontractor').removeClass('m--hide');
+            }
+
+        }
+
+        function changeEmployeeSubcontractor() {
+            var employee_id = $('#employee-subcontractor').val();
+
+            // reset
+            $('#labor-role').val('');
+            if (employee_id != '') {
+                var position = $('#employee-subcontractor option[value="' + employee_id + '"]').data("position");
+                $('#labor-role').val(position);
+            }
+
+        }
     };
     var resetFormLabor = function () {
         $('#data-tracking-labor-form input').each(function (e) {
@@ -2182,10 +2343,25 @@ var DataTracking = function () {
         $('#employee').val('');
         $('#employee').trigger('change');
 
+        $('#subcontractor-labor').val('');
+        $('#subcontractor-labor').trigger('change');
+
+        $('#employee-subcontractor option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#employee-subcontractor').select2();
+
+        $('#employee-type-owner').prop('checked', true);
+        $('#employee-type-subcontractor').prop('checked', false);
+
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
         nEditingRowLabor = null;
+
+        $('#div-employee').removeClass('m--hide');
+        $('#div-employee-subcontractor').removeClass('m--hide').addClass('m--hide');
     };
     var calcularTotalLaborPrice = function () {
         var total = 0;
