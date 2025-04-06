@@ -2142,11 +2142,22 @@ var DataTracking = function () {
         $(document).off('click', "#btn-add-employee-subcontractor");
         $(document).on('click', "#btn-add-employee-subcontractor", function (e) {
 
-            ModalEmployeeSubcontractor.mostrarModal();
-
             var subcontractor_id = $('#subcontractor-labor').val();
-            ModalEmployeeSubcontractor.setSubcontractorId(subcontractor_id);
+            if(subcontractor_id !== ''){
+                ModalEmployeeSubcontractor.mostrarModal();
+                ModalEmployeeSubcontractor.setSubcontractorId(subcontractor_id);
+            }else{
+                var $element = $('#select-subcontractor-labor .select2');
+                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                    .data("title", "This field is required")
+                    .addClass("has-error")
+                    .tooltip({
+                        placement: 'bottom'
+                    }); // Create a new tooltip based on the error messsage we just set in the title
 
+                $element.closest('.form-group')
+                    .removeClass('has-success').addClass('has-error');
+            }
         });
 
         $('#modal-employee-subcontractor').on('hidden.bs.modal', function () {
