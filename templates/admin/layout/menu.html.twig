@@ -210,6 +210,35 @@
                 </li>
             {% endif %}
 
+            <!-- menu reportes -->
+            {% if menu.menuReporteSubcontractor %}
+                <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true" m-menu-submenu-toggle="click">
+                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Reports">
+                        <i class="m-menu__link-icon flaticon-book"></i>
+                        <span class="m-menu__link-text">Reports</span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+                    <div class="m-menu__submenu m-menu__submenu--up">
+                        <span class="m-menu__arrow"></span>
+                        <ul class="m-menu__subnav">
+                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
+                                <span class="m-menu__link"><span class="m-menu__link-text">Reports</span></span>
+                            </li>
+
+                            {% if menu.menuReporteSubcontractor %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('reporte_subcontractor') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Subcontractors</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </li>
+            {% endif %}
+
 
             <!-- menu administrar -->
             {% if menu.menuRol or menu.menuUsuario or menu.menuLog %}

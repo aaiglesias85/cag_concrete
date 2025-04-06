@@ -537,6 +537,7 @@ class Base
             $menuOverhead = false;
             $menuAdvertisement = false;
             $menuSubcontractor = false;
+            $menuReporteSubcontractor = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -593,6 +594,9 @@ class Base
                 if ($permiso['funcion_id'] == 18 && $permiso['ver']) {
                     $menuSubcontractor = true;
                 }
+                if ($permiso['funcion_id'] == 19 && $permiso['ver']) {
+                    $menuReporteSubcontractor = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -613,6 +617,7 @@ class Base
                 'menuOverhead' => $menuOverhead,
                 'menuAdvertisement' => $menuAdvertisement,
                 'menuSubcontractor' => $menuSubcontractor,
+                'menuReporteSubcontractor' => $menuReporteSubcontractor,
             );
         }
 

@@ -19,17 +19,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DataTrackingController extends AbstractController
 {
-
-    private $trackingService;
     private $projectService;
     /**
      * @var DataTrackingService
      */
     private $dataTrackingService;
 
-    public function __construct(DataTrackingService $trackingService, ProjectService $projectService, DataTrackingService $dataTrackingService)
+    public function __construct(DataTrackingService $dataTrackingService, ProjectService $projectService, )
     {
-        $this->trackingService = $trackingService;
         $this->projectService = $projectService;
         $this->dataTrackingService = $dataTrackingService;
     }
@@ -37,15 +34,15 @@ class DataTrackingController extends AbstractController
     public function index()
     {
         $usuario = $this->getUser();
-        $permiso = $this->trackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
+        $permiso = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
                 // items
-                $items = $this->trackingService->ListarTodosItems();
+                $items = $this->dataTrackingService->ListarTodosItems();
 
                 // projects
-                $projects = $this->trackingService->getDoctrine()->getRepository(Project::class)
+                $projects = $this->dataTrackingService->getDoctrine()->getRepository(Project::class)
                     ->ListarOrdenados();
 
                 // inspectors
@@ -53,19 +50,19 @@ class DataTrackingController extends AbstractController
                     ->ListarOrdenados();
 
                 // employees
-                $employees = $this->trackingService->getDoctrine()->getRepository(Employee::class)
+                $employees = $this->dataTrackingService->getDoctrine()->getRepository(Employee::class)
                     ->ListarOrdenados();
 
                 // materials
-                $materials = $this->trackingService->getDoctrine()->getRepository(Material::class)
+                $materials = $this->dataTrackingService->getDoctrine()->getRepository(Material::class)
                     ->ListarOrdenados();
 
                 // overheads
-                $overheads = $this->trackingService->getDoctrine()->getRepository(OverheadPrice::class)
+                $overheads = $this->dataTrackingService->getDoctrine()->getRepository(OverheadPrice::class)
                     ->ListarOrdenados();
 
                 // subcontractors
-                $subcontractors = $this->trackingService->getDoctrine()->getRepository(Subcontractor::class)
+                $subcontractors = $this->dataTrackingService->getDoctrine()->getRepository(Subcontractor::class)
                     ->ListarOrdenados();
 
                 return $this->render('admin/data-tracking/index.html.twig', array(
@@ -111,7 +108,7 @@ class DataTrackingController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->trackingService->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending);
+            $total = $this->dataTrackingService->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -131,7 +128,7 @@ class DataTrackingController extends AbstractController
                 'sort' => $sSortDir_0
             );
 
-            $data = $this->trackingService->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+            $data = $this->dataTrackingService->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
                 $project_id, $fecha_inicial, $fecha_fin, $pending);
 
             $resultadoJson = array(
@@ -196,7 +193,7 @@ class DataTrackingController extends AbstractController
 
         try {
 
-            $resultado = $this->trackingService->SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
+            $resultado = $this->dataTrackingService->SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                 $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
                 $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials,
                 $conc_vendors, $color_used, $color_price, $subcontracts);
@@ -230,7 +227,7 @@ class DataTrackingController extends AbstractController
         $data_tracking_id = $request->get('data_tracking_id');
 
         try {
-            $resultado = $this->trackingService->EliminarDataTracking($data_tracking_id);
+            $resultado = $this->dataTrackingService->EliminarDataTracking($data_tracking_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -257,7 +254,7 @@ class DataTrackingController extends AbstractController
         $ids = $request->get('ids');
 
         try {
-            $resultado = $this->trackingService->EliminarDataTrackings($ids);
+            $resultado = $this->dataTrackingService->EliminarDataTrackings($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -286,7 +283,7 @@ class DataTrackingController extends AbstractController
         $data_tracking_id = $request->get('data_tracking_id');
 
         try {
-            $resultado = $this->trackingService->CargarDatosDataTracking($data_tracking_id, $this->projectService);
+            $resultado = $this->dataTrackingService->CargarDatosDataTracking($data_tracking_id, $this->projectService);
             if ($resultado['success']) {
 
                 $resultadoJson['success'] = $resultado['success'];
@@ -316,7 +313,7 @@ class DataTrackingController extends AbstractController
         $data_tracking_item_id = $request->get('data_tracking_item_id');
 
         try {
-            $resultado = $this->trackingService->EliminarItemDataTracking($data_tracking_item_id);
+            $resultado = $this->dataTrackingService->EliminarItemDataTracking($data_tracking_item_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -345,7 +342,7 @@ class DataTrackingController extends AbstractController
         $subcontract_id = $request->get('subcontract_id');
 
         try {
-            $resultado = $this->trackingService->EliminarItemSubcontract($subcontract_id);
+            $resultado = $this->dataTrackingService->EliminarItemSubcontract($subcontract_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -374,7 +371,7 @@ class DataTrackingController extends AbstractController
         $data_tracking_labor_id = $request->get('data_tracking_labor_id');
 
         try {
-            $resultado = $this->trackingService->EliminarLaborDataTracking($data_tracking_labor_id);
+            $resultado = $this->dataTrackingService->EliminarLaborDataTracking($data_tracking_labor_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -403,7 +400,7 @@ class DataTrackingController extends AbstractController
         $data_tracking_material_id = $request->get('data_tracking_material_id');
 
         try {
-            $resultado = $this->trackingService->EliminarMaterialDataTracking($data_tracking_material_id);
+            $resultado = $this->dataTrackingService->EliminarMaterialDataTracking($data_tracking_material_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -432,7 +429,7 @@ class DataTrackingController extends AbstractController
         $data_tracking_conc_vendor_id = $request->get('data_tracking_conc_vendor_id');
 
         try {
-            $resultado = $this->trackingService->EliminarConcVendorDataTracking($data_tracking_conc_vendor_id);
+            $resultado = $this->dataTrackingService->EliminarConcVendorDataTracking($data_tracking_conc_vendor_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
@@ -465,7 +462,7 @@ class DataTrackingController extends AbstractController
 
         try {
 
-            $existe = $this->trackingService->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
+            $existe = $this->dataTrackingService->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
 
             $resultadoJson['success'] = true;
             $resultadoJson['existe'] = $existe;

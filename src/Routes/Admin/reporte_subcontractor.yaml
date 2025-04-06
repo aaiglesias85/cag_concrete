@@ -1,0 +1,11 @@
+reporte_subcontractor:
+  path: /report-subcontractor
+  defaults: { _controller: App\Controller\Admin\ReporteSubcontractorController::index }
+
+listarReporteSubcontractorAdmin:
+  path: /report-subcontractor/listar
+  defaults: { _controller: App\Controller\Admin\ReporteSubcontractorController::listar, _format: json }
+
+exportarExcelReporteSubcontractorAdmin:
+  path:  /report-subcontractor/exportarExcel
+  defaults: { _controller: App\Controller\Admin\ReporteSubcontractorController::exportarExcel, _format: json }

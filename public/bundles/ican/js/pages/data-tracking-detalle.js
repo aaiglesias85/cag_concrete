@@ -781,6 +781,10 @@ var DataTrackingDetalle = function () {
 
         var aoColumns = [
             {
+                field: "subcontractor",
+                title: "Subcontractor",
+            },
+            {
                 field: "item",
                 title: "Item",
             },
