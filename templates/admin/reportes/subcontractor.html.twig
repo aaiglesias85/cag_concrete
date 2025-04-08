@@ -95,12 +95,9 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-2" >
+                                <div class="col-md-4 mb-2" id="select-project">
                                     <select class="form-control m-select2 event-change" id="filtro-project">
                                         <option value="">Project</option>
-                                        {% for item in projects %}
-                                            <option value="{{ item.projectId }}">{{ item.projectNumber }} - {{ item.name }}</option>
-                                        {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-2" id="select-project-item">
@@ -133,13 +130,22 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-2">
+                                <div class="col-md-4 mb-2">
                                     <div class="m-input-icon m-input-icon--left">
                                         <input type="text" class="form-control m-input m_form_search"
                                                placeholder="Search..." id="btn-filtrar-search">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
 									<span><i class="la la-search"></i></span>
 								        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Total $:</span>
+                                        </div>
+                                        <input type="text" class="form-control m-input"
+                                               id="total_reporte" value="" disabled>
                                     </div>
                                 </div>
                                 <div class="col-md-2 mb-2">

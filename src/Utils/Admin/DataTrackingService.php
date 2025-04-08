@@ -422,6 +422,7 @@ class DataTrackingService extends Base
 
             $subcontractor_employee_id = $value->getEmployeeSubcontractor() !== null ? $value->getEmployeeSubcontractor()->getEmployeeId() : '';
             $subcontractor_id = $value->getEmployeeSubcontractor() !== null ? $value->getEmployeeSubcontractor()->getSubcontractor()->getSubcontractorId() : '';
+            $subcontractor = $value->getEmployeeSubcontractor() !== null ? $value->getEmployeeSubcontractor()->getSubcontractor()->getName() : '';
 
 
             $employee_name = $value->getEmployee() !== null ? $value->getEmployee()->getName() : $value->getEmployeeSubcontractor()->getName();
@@ -436,6 +437,7 @@ class DataTrackingService extends Base
                 "employee_id" => $employee_id,
                 "subcontractor_employee_id" => $subcontractor_employee_id,
                 "subcontractor_id" => $subcontractor_id,
+                "subcontractor" => $subcontractor,
                 "employee" => $employee_name,
                 "role" => $value->getRole(),
                 "hours" => $hours,

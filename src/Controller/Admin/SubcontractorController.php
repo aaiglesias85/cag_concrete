@@ -105,12 +105,16 @@ class SubcontractorController extends AbstractController
         $contactName = $request->get('contactName');
         $contactEmail = $request->get('contactEmail');
 
+        $companyName = $request->get('companyName');
+        $companyPhone = $request->get('companyPhone');
+        $companyAddress = $request->get('companyAddress');
+
         try {
 
             if ($subcontractor_id == "") {
-                $resultado = $this->subcontractorService->SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail);
+                $resultado = $this->subcontractorService->SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
             } else {
-                $resultado = $this->subcontractorService->ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail);
+                $resultado = $this->subcontractorService->ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
             }
 
             if ($resultado['success']) {
@@ -582,6 +586,32 @@ class SubcontractorController extends AbstractController
 
             $resultadoJson['success'] = true;
             $resultadoJson['employees'] = $employees;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarProjects Acción que lista los projects de subcontractors
+     *
+     */
+    public function listarProjects(Request $request)
+    {
+
+        $subcontractor_id = $request->get('subcontractor_id');
+
+        try {
+
+            $projects = $this->subcontractorService->ListarProjects($subcontractor_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['projects'] = $projects;
 
             return $this->json($resultadoJson);
 

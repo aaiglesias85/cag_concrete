@@ -63,3 +63,9 @@ eliminarNotesSubcontractorAdmin:
 eliminarNotesDateSubcontractorAdmin:
   path: /subcontractor/eliminarNotesDate
   defaults: { _controller: App\Controller\Admin\SubcontractorController::eliminarNotesDate, _format: json }
+
+
+#projects
+listarProjectsDeSubcontractorTableAdmin:
+  path: /subcontractor/listarProjects
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::listarProjects, _format: json }

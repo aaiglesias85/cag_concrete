@@ -9,3 +9,7 @@ listarReporteSubcontractorAdmin:
 exportarExcelReporteSubcontractorAdmin:
   path:  /report-subcontractor/exportarExcel
   defaults: { _controller: App\Controller\Admin\ReporteSubcontractorController::exportarExcel, _format: json }
+
+devolverTotalReporteSubcontractorAdmin:
+  path: /report-subcontractor/devolverTotal
+  defaults: { _controller: App\Controller\Admin\ReporteSubcontractorController::devolverTotal, _format: json }

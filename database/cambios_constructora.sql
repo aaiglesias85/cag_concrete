@@ -70,3 +70,9 @@ VALUES ('1', '1', '1', '1', '1', '19');
 
 INSERT INTO `user_permission` (`view_permission`, `add_permission`, `edit_permission`, `delete_permission`, `user_id`, `function_id`)
 VALUES ('1', '1', '1', '1', '1', '19');
+
+
+ALTER TABLE `subcontractor`
+    ADD `company_name` VARCHAR(255) NULL AFTER `contact_email`,
+    ADD `company_phone` VARCHAR(50) NULL AFTER `company_name`,
+    ADD `company_address` VARCHAR(255) NULL AFTER `company_phone`;

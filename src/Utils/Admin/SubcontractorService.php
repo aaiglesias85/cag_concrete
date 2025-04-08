@@ -503,8 +503,13 @@ class SubcontractorService extends Base
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['phone'] = $entity->getPhone();
             $arreglo_resultado['address'] = $entity->getAddress();
+
             $arreglo_resultado['contactName'] = $entity->getContactName();
             $arreglo_resultado['contactEmail'] = $entity->getContactEmail();
+
+            $arreglo_resultado['companyName'] = $entity->getCompanyName();
+            $arreglo_resultado['companyPhone'] = $entity->getCompanyPhone();
+            $arreglo_resultado['companyAddress'] = $entity->getCompanyAddress();
 
             // projects
             $projects = $this->ListarProjects($subcontractor_id);
@@ -691,7 +696,7 @@ class SubcontractorService extends Base
      * @param int $subcontractor_id Id
      * @author Marcel
      */
-    public function ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail)
+    public function ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -714,6 +719,10 @@ class SubcontractorService extends Base
             $entity->setContactName($contactName);
             $entity->setContactEmail($contactEmail);
 
+            $entity->setCompanyName($companyName);
+            $entity->setCompanyPhone($companyPhone);
+            $entity->setCompanyAddress($companyAddress);
+
             $entity->setUpdatedAt(new \DateTime());
 
             $em->flush();
@@ -735,7 +744,7 @@ class SubcontractorService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail)
+    public function SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -755,6 +764,10 @@ class SubcontractorService extends Base
         $entity->setAddress($address);
         $entity->setContactName($contactName);
         $entity->setContactEmail($contactEmail);
+
+        $entity->setCompanyName($companyName);
+        $entity->setCompanyPhone($companyPhone);
+        $entity->setCompanyAddress($companyAddress);
 
         $entity->setCreatedAt(new \DateTime());
 

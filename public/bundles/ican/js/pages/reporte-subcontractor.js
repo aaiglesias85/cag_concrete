@@ -163,8 +163,11 @@ var ReporteSubcontractor = function () {
             $('#filtro-subcontractor').val('');
             $('#filtro-subcontractor').trigger('change');
 
-            $('#filtro-project').val('');
-            $('#filtro-project').trigger('change');
+            $('#filtro-project option').each(function (e) {
+                if ($(this).val() != "")
+                    $(this).remove();
+            });
+            $('#filtro-project').select2();
 
             $('#filtro-project-item option').each(function (e) {
                 if ($(this).val() != "")
@@ -203,6 +206,9 @@ var ReporteSubcontractor = function () {
 
         oTable.setDataSourceQuery(query);
         oTable.load();
+
+        // devolver total
+        devolverTotal();
     }
 
 
@@ -213,7 +219,73 @@ var ReporteSubcontractor = function () {
         $('.m-select2').select2();
 
         // change
+        $('#filtro-subcontractor').change(changeSubcontractor);
         $('#filtro-project').change(changeProject);
+    }
+
+    var changeSubcontractor = function (e) {
+        var subcontractor_id = $('#filtro-subcontractor').val();
+
+        // reset
+        $('#filtro-project option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#filtro-project').select2();
+
+        // reset
+        $('#filtro-project-item option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#filtro-project-item').select2();
+
+        if (subcontractor_id != '') {
+            listarProjectsDeSubcontractor(subcontractor_id);
+        }
+
+        btnClickFiltrar();
+    }
+    var listarProjectsDeSubcontractor = function (subcontractor_id) {
+        MyApp.block('#select-project');
+
+        $.ajax({
+            type: "POST",
+            url: "subcontractor/listarProjects",
+            dataType: "json",
+            data: {
+                'subcontractor_id': subcontractor_id
+            },
+            success: function (response) {
+                mApp.unblock('#select-project');
+                if (response.success) {
+
+                    //Llenar select
+                    actualizarSelectProjects(response.projects);
+
+                } else {
+                    toastr.error(response.error, "");
+                }
+            },
+            failure: function (response) {
+                mApp.unblock('#select-project');
+
+                toastr.error(response.error, "");
+            }
+        });
+    }
+    var actualizarSelectProjects = function (projects) {
+        // reset
+        $('#filtro-project option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#filtro-project').select2();
+
+        for (var i = 0; i < projects.length; i++) {
+            $('#filtro-project').append(new Option(`${projects[i].projectNumber} - ${projects[i].name}`, projects[i].id, false, false));
+        }
+        $('#filtro-project').select2();
     }
 
     var changeProject = function (e) {
@@ -330,6 +402,45 @@ var ReporteSubcontractor = function () {
         });
     };
 
+    var devolverTotal = function () {
+        var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
+        var subcontractor_id = $('#filtro-subcontractor').val();
+        var project_id = $('#filtro-project').val();
+        var project_item_id = $('#filtro-project-item').val();
+        var fecha_inicial = $('#fechaInicial').val();
+        var fecha_fin = $('#fechaFin').val();
+
+        MyApp.block('#lista-reporte-subcontractor');
+
+        $.ajax({
+            type: "POST",
+            url: "report-subcontractor/devolverTotal",
+            dataType: "json",
+            data: {
+                'search': generalSearch,
+                'subcontractor_id': subcontractor_id,
+                'project_id': project_id,
+                'project_item_id': project_item_id,
+                'fecha_inicial': fecha_inicial,
+                'fecha_fin': fecha_fin
+
+            },
+            success: function (response) {
+                mApp.unblock('#lista-reporte-subcontractor');
+                if (response.success) {
+                    $('#total_reporte').val(response.total);
+                } else {
+                    toastr.error(response.error, "");
+                }
+            },
+            failure: function (response) {
+                mApp.unblock('#lista-reporte-subcontractor');
+
+                toastr.error(response.error, "");
+            }
+        });
+    }
+
     return {
         //main function to initiate the module
         init: function () {
@@ -339,6 +450,8 @@ var ReporteSubcontractor = function () {
             
             initAccionFiltrar();
             initAccionExportar();
+
+            devolverTotal();
         }
 
     };

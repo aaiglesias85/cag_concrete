@@ -36,10 +36,14 @@ class SubcontractorRepository extends EntityRepository
         $consulta = $this->createQueryBuilder('s');
 
         if ($sSearch != ""){
-            $consulta->andWhere('s.contactEmail LIKE :contactEmail OR s.contactName LIKE :contactName OR s.phone LIKE :phone OR s.name LIKE :name')
+            $consulta->andWhere('s.companyPhone LIKE :companyPhone OR s.companyAddress LIKE :companyAddress OR s.companyName LIKE :companyName OR
+             s.contactEmail LIKE :contactEmail OR s.contactName LIKE :contactName OR s.phone LIKE :phone OR s.name LIKE :name')
                 ->setParameter('name', "%${sSearch}%")
                 ->setParameter('phone', "%${sSearch}%")
                 ->setParameter('contactName', "%${sSearch}%")
+                ->setParameter('companyName', "%${sSearch}%")
+                ->setParameter('companyAddress', "%${sSearch}%")
+                ->setParameter('companyPhone', "%${sSearch}%")
                 ->setParameter('contactEmail', "%${sSearch}%");
         }
 
@@ -71,9 +75,9 @@ class SubcontractorRepository extends EntityRepository
         if ($sSearch != "") {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (s.contactEmail LIKE :email OR s.contactName LIKE :contact OR s.phone LIKE :phone OR s.name LIKE :name) ';
+                $where .= 'WHERE (s.companyPhone LIKE :qaz OR s.companyAddress LIKE :wsx OR s.companyName LIKE :edc OR s.contactEmail LIKE :email OR s.contactName LIKE :contact OR s.phone LIKE :phone OR s.name LIKE :name) ';
             else
-                $where .= 'AND (s.contactEmail LIKE :email OR s.contactName LIKE :contact OR s.phone LIKE :phone OR s.name LIKE :name) ';
+                $where .= 'AND (s.companyPhone LIKE :qaz OR s.companyAddress LIKE :wsx OR s.companyName LIKE :edc OR s.contactEmail LIKE :email OR s.contactName LIKE :contact OR s.phone LIKE :phone OR s.name LIKE :name) ';
         }
 
         $consulta .= $join;
@@ -81,6 +85,18 @@ class SubcontractorRepository extends EntityRepository
         $query = $em->createQuery($consulta);
         //Adicionar parametros        
         //$sSearch
+        $esta_query_company_phone = substr_count($consulta, ':qaz');
+        if ($esta_query_company_phone == 1)
+            $query->setParameter(':qaz', "%${sSearch}%");
+
+        $esta_query_company_address = substr_count($consulta, ':wsx');
+        if ($esta_query_company_address == 1)
+            $query->setParameter(':wsx', "%${sSearch}%");
+
+        $esta_query_company_name = substr_count($consulta, ':edc');
+        if ($esta_query_company_name == 1)
+            $query->setParameter(':edc', "%${sSearch}%");
+
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
             $query->setParameter(':name', "%${sSearch}%");

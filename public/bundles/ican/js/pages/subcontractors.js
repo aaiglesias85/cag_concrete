@@ -137,6 +137,14 @@ var Subcontractors = function () {
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
 
+        $('#subcontractor-form textarea').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+
         //projects
         projects = [];
         actualizarTableListaProjects();
@@ -231,6 +239,10 @@ var Subcontractors = function () {
                 var contactName = $('#contactName').val();
                 var contactEmail = $('#contactEmail').val();
 
+                var companyName = $('#companyName').val();
+                var companyPhone = $('#companyPhone').val();
+                var companyAddress = $('#companyAddress').val();
+
                 MyApp.block('#form-subcontractor');
 
                 $.ajax({
@@ -244,6 +256,9 @@ var Subcontractors = function () {
                         'address': address,
                         'contactName': contactName,
                         'contactEmail': contactEmail,
+                        'companyName': companyName,
+                        'companyPhone': companyPhone,
+                        'companyAddress': companyAddress,
                     },
                     success: function (response) {
                         mApp.unblock('#form-subcontractor');
@@ -342,6 +357,10 @@ var Subcontractors = function () {
                         $('#address').val(response.subcontractor.address);
                         $('#contactName').val(response.subcontractor.contactName);
                         $('#contactEmail').val(response.subcontractor.contactEmail);
+
+                        $('#companyName').val(response.subcontractor.companyName);
+                        $('#companyPhone').val(response.subcontractor.companyPhone);
+                        $('#companyAddress').val(response.subcontractor.companyAddress);
 
                         // projects
                         projects = response.subcontractor.projects;

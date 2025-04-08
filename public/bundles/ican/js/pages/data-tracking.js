@@ -1775,6 +1775,10 @@ var DataTracking = function () {
                 title: "Employee",
             },
             {
+                field: "subcontractor",
+                title: "Subcontractor",
+            },
+            {
                 field: "role",
                 title: " Position/Role",
             },
@@ -1962,6 +1966,7 @@ var DataTracking = function () {
 
                 var subcontractor_id = $('#subcontractor-labor').val();
                 var employee = employee_id !== '' ? $("#employee option:selected").text() : '';
+                var subcontractor = subcontractor_id !== '' ? $("#subcontractor-labor option:selected").text() : '';
                 if (employee === '') {
                     employee = subcontractor_employee_id !== '' ? $("#employee-subcontractor option:selected").text() : '';
                 }
@@ -1982,6 +1987,7 @@ var DataTracking = function () {
                         data_tracking_labor_id: '',
                         employee_id: employee_id,
                         subcontractor_id: subcontractor_id,
+                        subcontractor: subcontractor,
                         subcontractor_employee_id: subcontractor_employee_id,
                         employee: employee,
                         hours: hours,
@@ -1997,6 +2003,7 @@ var DataTracking = function () {
                         labor[posicion].employee_id = employee_id;
                         labor[posicion].employee = employee;
                         labor[posicion].subcontractor_id = subcontractor_id;
+                        labor[posicion].subcontractor = subcontractor;
                         labor[posicion].subcontractor_employee_id = subcontractor_employee_id;
                         labor[posicion].hours = hours;
                         labor[posicion].hourly_rate = hourly_rate;

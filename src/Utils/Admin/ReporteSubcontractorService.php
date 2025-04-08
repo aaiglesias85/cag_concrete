@@ -15,6 +15,26 @@ class ReporteSubcontractorService extends Base
 {
 
     /**
+     * DevolverTotal: devuelve el total
+     * @param $search
+     * @param $subcontractor_id
+     * @param $project_id
+     * @param $project_item_id
+     * @param $fecha_inicial
+     * @param $fecha_fin
+     * @return bool|float|int|string|null
+     */
+    public function DevolverTotal($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    {
+        $total = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->DevolverTotalReporteSubcontractors($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+
+        $total = number_format($total, 2, '.', ',');
+
+        return $total;
+    }
+
+    /**
      * ExportarExcel: Exporta a excel el invoice
      *
      *

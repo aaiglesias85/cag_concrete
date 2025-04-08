@@ -57,6 +57,27 @@ class Subcontractor
     private $contactEmail;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="company_name", type="string", length=255, nullable=false)
+     */
+    private $companyName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="company_phone", type="string", length=50, nullable=false)
+     */
+    private $companyPhone;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="company_address", type="text", nullable=false)
+     */
+    private $companyAddress;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
@@ -148,6 +169,36 @@ class Subcontractor
     public function setAddress($address)
     {
         $this->address = $address;
+    }
+
+    public function getCompanyName()
+    {
+        return $this->companyName;
+    }
+
+    public function setCompanyName( $companyName)
+    {
+        $this->companyName = $companyName;
+    }
+
+    public function getCompanyPhone()
+    {
+        return $this->companyPhone;
+    }
+
+    public function setCompanyPhone( $companyPhone)
+    {
+        $this->companyPhone = $companyPhone;
+    }
+
+    public function getCompanyAddress()
+    {
+        return $this->companyAddress;
+    }
+
+    public function setCompanyAddress( $companyAddress)
+    {
+        $this->companyAddress = $companyAddress;
     }
 
 }

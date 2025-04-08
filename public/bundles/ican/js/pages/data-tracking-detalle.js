@@ -406,6 +406,10 @@ var DataTrackingDetalle = function () {
                 title: "Employee",
             },
             {
+                field: "subcontractor",
+                title: "Subcontractor",
+            },
+            {
                 field: "role",
                 title: " Position/Role",
             },

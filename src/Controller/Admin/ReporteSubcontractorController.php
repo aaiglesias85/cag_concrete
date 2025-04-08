@@ -28,17 +28,12 @@ class ReporteSubcontractorController extends AbstractController
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
-                // projects
-                $projects = $this->reporteService->getDoctrine()->getRepository(Project::class)
-                    ->ListarOrdenados();
-
                 // subcontractors
                 $subcontractors = $this->reporteService->getDoctrine()->getRepository(Subcontractor::class)
                     ->ListarOrdenados();
 
                 return $this->render('admin/reportes/subcontractor.html.twig', array(
                     'permiso' => $permiso[0],
-                    'projects' => $projects,
                     'subcontractors' => $subcontractors,
                 ));
             }
@@ -133,6 +128,35 @@ class ReporteSubcontractorController extends AbstractController
             $resultadoJson['success'] = true;
             $resultadoJson['message'] = "The operation was successful";
             $resultadoJson['url'] = $url;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * devolverTotal Acción para devolver el total
+     *
+     */
+    public function devolverTotal(Request $request)
+    {
+
+        $search = $request->get('search');
+        $subcontractor_id = $request->get('subcontractor_id');
+        $project_id = $request->get('project_id');
+        $project_item_id = $request->get('project_item_id');
+        $fecha_inicial = $request->get('fecha_inicial');
+        $fecha_fin = $request->get('fecha_fin');
+
+        try {
+            $total = $this->reporteService->DevolverTotal($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['total'] = $total;
 
             return $this->json($resultadoJson);
         } catch (\Exception $e) {
