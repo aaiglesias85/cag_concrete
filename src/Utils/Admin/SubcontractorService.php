@@ -815,6 +815,9 @@ class SubcontractorService extends Base
                 "address" => $value->getAddress(),
                 "contactName" => $value->getContactName(),
                 "contactEmail" => $value->getContactEmail(),
+                "companyName" => $value->getCompanyName(),
+                "companyPhone" => $value->getCompanyPhone(),
+                "companyAddress" => $value->getCompanyAddress(),
                 "acciones" => $acciones
             );
 

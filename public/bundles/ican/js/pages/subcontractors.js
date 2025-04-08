@@ -24,19 +24,35 @@ var Subcontractors = function () {
         aoColumns.push(
             {
                 field: "name",
-                title: "Name"
+                title: "Subcontractor Name"
             },
             {
                 field: "phone",
-                title: "Phone",
+                title: "Subcontractor Phone",
                 width: 200,
                 template: function (row) {
-                    return '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>';
+                    return row.phone !== '' ? '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>' : '';
                 }
             },
             {
                 field: "address",
-                title: "Address"
+                title: "Subcontractor Address"
+            },
+            {
+                field: "companyName",
+                title: "Company Name"
+            },
+            {
+                field: "companyPhone",
+                title: "Company Phone",
+                width: 200,
+                template: function (row) {
+                    return row.companyPhone !== '' ? '<a class="m-link" href="tel:' + row.companyPhone + '">' + row.companyPhone + '</a>' : '';
+                }
+            },
+            {
+                field: "companyAddress",
+                title: "Company Address"
             },
             {
                 field: "acciones",
