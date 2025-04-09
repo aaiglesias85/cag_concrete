@@ -24,11 +24,11 @@ var Subcontractors = function () {
         aoColumns.push(
             {
                 field: "name",
-                title: "Subcontractor Name"
+                title: "Name"
             },
             {
                 field: "phone",
-                title: "Subcontractor Phone",
+                title: "Phone",
                 width: 200,
                 template: function (row) {
                     return row.phone !== '' ? '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>' : '';
@@ -36,7 +36,7 @@ var Subcontractors = function () {
             },
             {
                 field: "address",
-                title: "Subcontractor Address"
+                title: "Address"
             },
             {
                 field: "companyName",
