@@ -36,6 +36,10 @@ var Projects = function () {
                 title: "Name"
             },
             {
+                field: "description",
+                title: "Description"
+            },
+            {
                 field: "dueDate",
                 title: "Due Date",
                 width: 100,
@@ -293,6 +297,9 @@ var Projects = function () {
                 name: {
                     required: true
                 },
+                description: {
+                    required: true
+                },
                 project_id_number: {
                     required: true
                 }
@@ -388,6 +395,7 @@ var Projects = function () {
         var inspector_id = $('#inspector').val();
         var number = $('#number').val();
         var name = $('#name').val();
+        var description = $('#description').val();
         var location = $('#location').val();
         var po_number = $('#po_number').val();
         var po_cg = $('#po_cg').val();
@@ -428,6 +436,7 @@ var Projects = function () {
                 'company_id': company_id,
                 'inspector_id': inspector_id,
                 'name': name,
+                'description': description,
                 'number': number,
                 'location': location,
                 'po_number': po_number,
@@ -601,6 +610,7 @@ var Projects = function () {
                     $('#inspector').trigger('change');
 
                     $('#name').val(response.project.name);
+                    $('#description').val(response.project.description);
                     $('#number').val(response.project.number);
 
                     $('#location').val(response.project.location);

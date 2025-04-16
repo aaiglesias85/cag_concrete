@@ -545,6 +545,7 @@ class SubcontractorService extends Base
                 "id" => $project_id,
                 "projectNumber" => $value->getProjectNumber(),
                 "name" => $value->getName(),
+                "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),
                 "county" => $value->getCounty(),
                 "status" => $value->getStatus(),
@@ -811,10 +812,13 @@ class SubcontractorService extends Base
             $arreglo_resultado[$cont] = array(
                 "id" => $subcontractor_id,
                 "name" => $value->getName(),
-                "phone" => $value->getPhone(),
+                "phone" => $value->getPhone() ?? '',
                 "address" => $value->getAddress(),
                 "contactName" => $value->getContactName(),
                 "contactEmail" => $value->getContactEmail(),
+                "companyName" => $value->getCompanyName(),
+                "companyPhone" => $value->getCompanyPhone() ?? '',
+                "companyAddress" => $value->getCompanyAddress(),
                 "acciones" => $acciones
             );
 

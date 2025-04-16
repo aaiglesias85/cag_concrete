@@ -304,7 +304,7 @@ var Index = function () {
                         results: $.map(data.projects, function (item) {
                             return {
                                 id: item.project_id,  // ID del elemento
-                                text: `${item.number} - ${item.name}` // El nombre que se mostrará
+                                text: `${item.number} - ${item.description}` // El nombre que se mostrará
                             };
                         })
                     };

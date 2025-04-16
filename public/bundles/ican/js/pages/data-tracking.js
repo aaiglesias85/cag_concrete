@@ -580,7 +580,7 @@ var DataTracking = function () {
                         $('#project').on('change', changeProject);
 
                         $('#proyect-number').html(response.data_tracking.project_number);
-                        $('#proyect-name').html(response.data_tracking.project_name);
+                        $('#proyect-name').html(response.data_tracking.project_description);
 
                         $('#data-tracking-date').val(response.data_tracking.date);
 
@@ -1366,7 +1366,8 @@ var DataTracking = function () {
         $("#data-tracking-item-form").validate({
             rules: {
                 quantity: {
-                    required: true
+                    required: true,
+                    pattern: /^[+-]?\d+$/  // permite +12, -34, 56, etc.
                 },
             },
             showErrors: function (errorMap, errorList) {
@@ -1431,7 +1432,7 @@ var DataTracking = function () {
                     return val.project_item_id == item_id;
                 });
 
-                var quantity = $('#data-tracking-quantity').val();
+                var quantity = DevolverCantidadItemDataTracking();
                 var notes = $('#notes-item-data-tracking').val();
 
                 var price = item.price;
@@ -1559,6 +1560,35 @@ var DataTracking = function () {
             });
 
         });
+
+        function DevolverCantidadItemDataTracking() {
+            var quantity = $('#data-tracking-quantity').val();
+
+            if (nEditingRowItem == null) {
+                quantity = quantity.trim().replace(/^[-+]/, "");
+            } else {
+                var old_cant = items_data_tracking[nEditingRowItem].quantity > 0 ? items_data_tracking[nEditingRowItem].quantity : 0;
+                var raw_quantity = quantity.trim(); // por si tiene espacios
+                var sign = raw_quantity.charAt(0); // obtenemos el primer carácter
+                var number = parseInt(raw_quantity.replace(/^[-+]/, ""), 10); // quitamos signo y convertimos a número
+
+                // Por defecto, si no tiene signo, consideramos que es una asignación directa
+                var new_quantity = 0;
+
+                if (sign === '+') {
+                    new_quantity = old_cant + number;
+                } else if (sign === '-') {
+                    new_quantity = old_cant - number;
+                } else {
+                    new_quantity = number; // caso sin signo, se reemplaza directamente
+                }
+
+                // Si el resultado es menor que cero, lo dejamos en cero
+                quantity = new_quantity < 0 ? 0 : new_quantity;
+            }
+
+            return quantity;
+        }
 
         function ExisteItem(item_id) {
             var result = false;
@@ -2150,10 +2180,10 @@ var DataTracking = function () {
         $(document).on('click', "#btn-add-employee-subcontractor", function (e) {
 
             var subcontractor_id = $('#subcontractor-labor').val();
-            if(subcontractor_id !== ''){
+            if (subcontractor_id !== '') {
                 ModalEmployeeSubcontractor.mostrarModal();
                 ModalEmployeeSubcontractor.setSubcontractorId(subcontractor_id);
-            }else{
+            } else {
                 var $element = $('#select-subcontractor-labor .select2');
                 $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                     .data("title", "This field is required")
@@ -3359,6 +3389,9 @@ var DataTracking = function () {
                         posicion: subcontracts.length
                     });
 
+                    // agregar el item en el data tracking
+                    AgregarItemDatatracking(project_item_id, quantity, notes);
+
                 } else {
                     var posicion = nEditingRowSubcontract;
                     if (subcontracts[posicion]) {
@@ -3462,6 +3495,56 @@ var DataTracking = function () {
             });
 
         });
+
+        function AgregarItemDatatracking(item_id, quantity, notes) {
+
+            // validar si existe
+            const existe_item = items_data_tracking.findIndex(item => item.item_id == item_id);
+            if (existe_item >= 0) {
+                return;
+            }
+
+            var item = items.find(function (val) {
+                return val.project_item_id == item_id;
+            });
+
+            var price = item.price;
+            var total = quantity * price;
+
+            var yield_calculation = item.yield_calculation;
+            var equation_id = item.equation_id;
+            var yield_calculation_name = item.yield_calculation_name;
+
+            // calcular yield
+            var yield_calculation_valor = '';
+            if (yield_calculation !== '' && yield_calculation !== 'none') {
+                if (yield_calculation === 'same') {
+                    yield_calculation_valor = quantity;
+                } else {
+                    yield_calculation_valor = MyApp.evaluateExpression(yield_calculation_name, quantity);
+                }
+            }
+
+            items_data_tracking.push({
+                data_tracking_item_id: '',
+                item_id: item_id,
+                item: item.item,
+                unit: item.unit,
+                equation_id: equation_id,
+                yield_calculation: yield_calculation,
+                yield_calculation_name: yield_calculation_name,
+                quantity: quantity,
+                yield_calculation_valor: yield_calculation_valor,
+                price: price,
+                total: total,
+                notes: notes,
+                posicion: items_data_tracking.length
+            });
+
+            //actualizar lista
+            actualizarTableListaItems();
+
+        }
 
         function ExistSubcontract(project_item_id) {
             var result = false;

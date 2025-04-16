@@ -528,7 +528,8 @@ class ProjectService extends Base
                 $projects[] = [
                     'project_id' => $project_id,
                     'number' => $value->getProjectNumber(),
-                    'name' => $value->getName()
+                    'name' => $value->getName(),
+                    'description' => $value->getDescription(),
                 ];
             }
 
@@ -683,6 +684,7 @@ class ProjectService extends Base
 
             $arreglo_resultado['number'] = $entity->getProjectNumber();
             $arreglo_resultado['name'] = $entity->getName();
+            $arreglo_resultado['description'] = $entity->getDescription();
             $arreglo_resultado['location'] = $entity->getLocation();
             $arreglo_resultado['po_number'] = $entity->getPoNumber();
             $arreglo_resultado['po_cg'] = $entity->getPoCG();
@@ -1021,7 +1023,7 @@ class ProjectService extends Base
      * @param int $project_id Id
      * @author Marcel
      */
-    public function ActualizarProject($project_id, $company_id, $inspector_id, $number, $name, $location,
+    public function ActualizarProject($project_id, $company_id, $inspector_id, $number, $name, $description, $location,
                                       $po_number, $po_cg, $manager, $status, $owner, $subcontract,
                                       $federal_funding, $county, $resurfacing, $invoice_contact,
                                       $certified_payrolls, $start_date, $end_date, $due_date,
@@ -1057,11 +1059,19 @@ class ProjectService extends Base
 
             if ($name != $entity->getName()) {
                 $notas[] = [
-                    'notes' => 'Change description, old value: ' . $entity->getName(),
+                    'notes' => 'Change name, old value: ' . $entity->getName(),
                     'date' => new \DateTime()
                 ];
             }
             $entity->setName($name);
+
+            if ($description != $entity->getDescription()) {
+                $notas[] = [
+                    'notes' => 'Change description, old value: ' . $entity->getDescription(),
+                    'date' => new \DateTime()
+                ];
+            }
+            $entity->setDescription($description);
 
             if ($location != $entity->getLocation()) {
                 $notas[] = [
@@ -1319,7 +1329,7 @@ class ProjectService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarProject($company_id, $inspector_id, $number, $name, $location,
+    public function SalvarProject($company_id, $inspector_id, $number, $name, $description, $location,
                                   $po_number, $po_cg, $manager, $status, $owner, $subcontract,
                                   $federal_funding, $county, $resurfacing, $invoice_contact,
                                   $certified_payrolls, $start_date, $end_date, $due_date,
@@ -1340,6 +1350,7 @@ class ProjectService extends Base
 
         $entity->setProjectNumber($number);
         $entity->setName($name);
+        $entity->setDescription($description);
         $entity->setLocation($location);
         $entity->setPoNumber($po_number);
         $entity->setPoCG($po_cg);
@@ -1566,6 +1577,7 @@ class ProjectService extends Base
                 "id" => $project_id,
                 "projectNumber" => $value->getProjectNumber(),
                 "name" => $value->getName(),
+                "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),
                 "county" => $value->getCounty(),
                 "status" => $value->getStatus(),

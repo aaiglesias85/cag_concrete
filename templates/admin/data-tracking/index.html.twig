@@ -110,7 +110,7 @@
                                         {# <option value="add">Add Projects</option> #}
                                         {% for item in projects %}
                                             <option value="{{ item.projectId }}">{{ item.projectNumber }}
-                                                - {{ item.name }}</option>
+                                                - {{ item.description }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -908,7 +908,7 @@
         </div>
     </div>
     <!-- Modal confirm data tracking -->
-    <div class="modal fade" id="modal-data-tracking-confirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal fade" id="modal-data-tracking-confirm" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -990,7 +990,7 @@
                             </label>
                             <div class="row">
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control form-control-number"
+                                    <input type="text" class="form-control"
                                            id="data-tracking-quantity" name="quantity">
                                 </div>
                             </div>

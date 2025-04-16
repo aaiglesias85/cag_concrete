@@ -24,7 +24,7 @@ class ProjectRepository extends EntityRepository
         if ($sSearch != "") {
             $consulta->andWhere('p.projectIdNumber LIKE :projectIdNumber OR p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg OR i.name LIKE :inspector')
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg OR i.name LIKE :inspector')
                 ->setParameter('projectIdNumber', "%${sSearch}%")
                 ->setParameter('invoiceContact', "%${sSearch}%")
                 ->setParameter('owner', "%${sSearch}%")
@@ -32,6 +32,7 @@ class ProjectRepository extends EntityRepository
                 ->setParameter('county', "%${sSearch}%")
                 ->setParameter('number', "%${sSearch}%")
                 ->setParameter('name', "%${sSearch}%")
+                ->setParameter('description', "%${sSearch}%")
                 ->setParameter('po', "%${sSearch}%")
                 ->setParameter('cg', "%${sSearch}%")
                 ->setParameter('inspector', "%${sSearch}%");
@@ -123,13 +124,14 @@ class ProjectRepository extends EntityRepository
         if ($sSearch != "") {
             $consulta->andWhere('p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg')
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg')
                 ->setParameter('invoiceContact', "%${sSearch}%")
                 ->setParameter('owner', "%${sSearch}%")
                 ->setParameter('manager', "%${sSearch}%")
                 ->setParameter('county', "%${sSearch}%")
                 ->setParameter('number', "%${sSearch}%")
                 ->setParameter('name', "%${sSearch}%")
+                ->setParameter('description', "%${sSearch}%")
                 ->setParameter('po', "%${sSearch}%")
                 ->setParameter('cg', "%${sSearch}%");
         }
@@ -205,11 +207,11 @@ class ProjectRepository extends EntityRepository
             if (count($esta_query) == 1)
                 $where .= 'WHERE (p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
             else
                 $where .= 'AND (p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :number OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
         }
 
         if ($company_id != '') {
@@ -287,6 +289,10 @@ class ProjectRepository extends EntityRepository
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
             $query->setParameter(':name', "%${sSearch}%");
+
+        $esta_query_description = substr_count($consulta, ':description');
+        if ($esta_query_description == 1)
+            $query->setParameter(':description', "%${sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)

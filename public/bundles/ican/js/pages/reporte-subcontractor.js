@@ -283,7 +283,7 @@ var ReporteSubcontractor = function () {
         $('#filtro-project').select2();
 
         for (var i = 0; i < projects.length; i++) {
-            $('#filtro-project').append(new Option(`${projects[i].projectNumber} - ${projects[i].name}`, projects[i].id, false, false));
+            $('#filtro-project').append(new Option(`${projects[i].projectNumber} - ${projects[i].description}`, projects[i].id, false, false));
         }
         $('#filtro-project').select2();
     }

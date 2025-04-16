@@ -93,204 +93,6 @@ class DataTrackingRepository extends EntityRepository
     }
 
     /**
-     * ListarDataTrackingsParaCalendario: Lista el data tracking
-     *
-     * @return DataTracking[]
-     */
-    public function ListarDataTrackingsParaCalendario($sSearch = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '')
-    {
-        $consulta = $this->createQueryBuilder('d_t')
-            ->leftJoin('d_t.project', 'p')
-            ->leftJoin('p.company', 'c')
-            ->leftJoin('d_t.inspector', 'ins');
-
-        if ($sSearch != "") {
-            $consulta->andWhere('p.projectNumber LIKE :number OR p.name LIKE :number OR d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR d_t.stationNumber LIKE :stationNumber OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials')
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('crewLead', "%${sSearch}%")
-                ->setParameter('stationNumber', "%${sSearch}%")
-                ->setParameter('measuredBy', "%${sSearch}%")
-                ->setParameter('notes', "%${sSearch}%")
-                ->setParameter('otherMaterials', "%${sSearch}%");
-        }
-
-        if ($project_id != '') {
-            $consulta->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
-
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $consulta->andWhere('d_t.date >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
-        if ($fecha_fin != "") {
-
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $consulta->andWhere('d_t.date <= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
-        }
-
-        $consulta->orderBy("d_t.date", 'ASC');
-
-        return $consulta->getQuery()->getResult();
-    }
-
-
-    /**
-     * TotalConcrete: Total de quantity * price items de la BD
-     * @param string $project_id
-     *
-     * @return float
-     */
-    public function TotalConcrete($project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
-    {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT SUM(d_t.totalConcUsed * d_t.concPrice) FROM App\Entity\DataTracking d_t ';
-        $join = ' LEFT JOIN d_t.project p ';
-        $where = '';
-
-        if ($project_id != '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (p.projectId = :project_id) ';
-            else
-                $where .= 'AND (p.projectId = :project_id) ';
-        }
-
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date >= :start) ';
-            else
-                $where .= 'AND (d_t.date >= :start) ';
-        }
-        if ($fecha_fin != "") {
-
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date <= :end) ';
-            else
-                $where .= 'AND (d_t.date <= :end) ';
-        }
-
-        if ($status !== '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (p.status = :status) ';
-            else
-                $where .= 'AND (p.status = :status) ';
-        }
-
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros
-
-        $esta_query_project_id = substr_count($consulta, ':project_id');
-        if ($esta_query_project_id == 1) {
-            $query->setParameter('project_id', $project_id);
-        }
-
-        $esta_query_start = substr_count($consulta, ':start');
-        if ($esta_query_start == 1) {
-            $query->setParameter('start', $fecha_inicial);
-        }
-
-        $esta_query_end = substr_count($consulta, ':end');
-        if ($esta_query_end == 1) {
-            $query->setParameter('end', $fecha_fin);
-        }
-
-        $esta_query_status = substr_count($consulta, ':status');
-        if ($esta_query_status == 1) {
-            $query->setParameter('status', $status);
-        }
-
-        return $query->getSingleScalarResult();
-    }
-
-    /**
-     * TotalLabor: Total de quantity * price items de la BD
-     * @param string $project_id
-     *
-     * @return float
-     */
-    public function TotalLabor($project_id = '', $fecha_inicial = '', $fecha_fin = '')
-    {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT SUM(d_t.totalLabor * d_t.laborPrice) FROM App\Entity\DataTracking d_t ';
-        $join = ' LEFT JOIN d_t.project p ';
-        $where = '';
-
-        if ($project_id != '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (p.projectId = :project_id) ';
-            else
-                $where .= 'AND (p.projectId = :project_id) ';
-        }
-
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date >= :start) ';
-            else
-                $where .= 'AND (d_t.date >= :start) ';
-        }
-        if ($fecha_fin != "") {
-
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date <= :end) ';
-            else
-                $where .= 'AND (d_t.date <= :end) ';
-        }
-
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros
-
-        $esta_query_project_id = substr_count($consulta, ':project_id');
-        if ($esta_query_project_id == 1) {
-            $query->setParameter('project_id', $project_id);
-        }
-
-        $esta_query_start = substr_count($consulta, ':start');
-        if ($esta_query_start == 1) {
-            $query->setParameter('start', $fecha_inicial);
-        }
-
-        $esta_query_end = substr_count($consulta, ':end');
-        if ($esta_query_end == 1) {
-            $query->setParameter('end', $fecha_fin);
-        }
-
-        return $query->getSingleScalarResult();
-    }
-
-    /**
      * ListarDataTrackings: Lista los datatrackings
      * @param int $start Inicio
      * @param int $limit Limite
@@ -306,9 +108,12 @@ class DataTrackingRepository extends EntityRepository
             ->leftJoin('d_t.inspector', 'ins');
 
         if ($sSearch != "") {
-            $consulta->andWhere('p.projectNumber LIKE :number OR p.name LIKE :name OR d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR d_t.stationNumber LIKE :stationNumber OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials')
+            $consulta->andWhere('p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description OR 
+            d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR 
+            d_t.stationNumber LIKE :stationNumber OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials')
                 ->setParameter('number', "%${sSearch}%")
                 ->setParameter('name', "%${sSearch}%")
+                ->setParameter('description', "%${sSearch}%")
                 ->setParameter('crewLead', "%${sSearch}%")
                 ->setParameter('stationNumber', "%${sSearch}%")
                 ->setParameter('measuredBy', "%${sSearch}%")
@@ -383,9 +188,9 @@ class DataTrackingRepository extends EntityRepository
         if ($sSearch != "") {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (p.projectNumber LIKE :number OR p.name LIKE :name OR d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR d_t.stationNumber LIKE :station OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials) ';
+                $where .= 'WHERE (p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description OR d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR d_t.stationNumber LIKE :station OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials) ';
             else
-                $where .= 'AND (p.projectNumber LIKE :number OR p.name LIKE :name OR d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR d_t.stationNumber LIKE :station OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials) ';
+                $where .= 'AND (p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description OR d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR d_t.stationNumber LIKE :station OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials) ';
         }
 
         if ($project_id != '') {
@@ -438,6 +243,10 @@ class DataTrackingRepository extends EntityRepository
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
             $query->setParameter(':name', "%${sSearch}%");
+
+        $esta_query_description = substr_count($consulta, ':description');
+        if ($esta_query_description == 1)
+            $query->setParameter(':description', "%${sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)

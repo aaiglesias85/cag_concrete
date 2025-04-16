@@ -59,6 +59,9 @@ class ReporteSubcontractorService extends Base
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
         $fila = 10;
+        $total = 0;
+        $total_qty = 0;
+        $total_price = 0;
 
         $lista = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
             ->ListarReporteSubcontractorsParaExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
@@ -69,13 +72,18 @@ class ReporteSubcontractorService extends Base
             $objWorksheet->setCellValueExplicit('A' . $fila, $date, DataType::TYPE_STRING);
 
             $subcontractor = $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "";
-            $project = $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getName();
+            $project = $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription();
             $item = $value->getProjectItem()->getItem()->getDescription();
             $unit = $value->getProjectItem()->getItem()->getUnit()->getDescription();
 
             $quantity = $value->getQuantity();
+            $total_qty += $quantity;
+
             $price = $value->getPrice();
-            $total = $quantity * $price;
+            $total_price += $price;
+
+            $subtotal = $quantity * $price;
+            $total+=$subtotal;
 
             $objWorksheet
                 ->setCellValue('B' . $fila, $subcontractor)
@@ -84,7 +92,7 @@ class ReporteSubcontractorService extends Base
                 ->setCellValue('E' . $fila, $unit)
                 ->setCellValue('F' . $fila, $quantity)
                 ->setCellValue('G' . $fila, $price)
-                ->setCellValue('H' . $fila, $total);
+                ->setCellValue('H' . $fila, $subtotal);
 
             $objWorksheet->getStyle('A' . $fila . ':A' . $fila)->applyFromArray($styleArray);
             $objWorksheet->getStyle('B' . $fila . ':B' . $fila)->applyFromArray($styleArray);
@@ -98,6 +106,19 @@ class ReporteSubcontractorService extends Base
             $fila++;
 
         }
+
+        // total
+        $fila++;
+        $objWorksheet
+            ->setCellValue('E' . $fila, "Total")
+            ->setCellValue('F' . $fila, $total_qty)
+            ->setCellValue('G' . $fila, $total_price)
+            ->setCellValue('H' . $fila, $total);
+
+        $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
+        $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
+        $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
+        $objWorksheet->getStyle('H' . $fila . ':H' . $fila)->applyFromArray($styleArray);
 
         //Salvar excel
         $fichero = "reporte-subcontractor.xlsx";
@@ -140,7 +161,7 @@ class ReporteSubcontractorService extends Base
             $arreglo_resultado[] = [
                 "id" => $value->getId(),
                 'subcontractor' => $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "",
-                'project' => $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getName(),
+                'project' => $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription(),
                 'date' => $value->getDataTracking()->getDate()->format('m/d/Y'),
                 'item' => $value->getProjectItem()->getItem()->getDescription(),
                 'unit' => $value->getProjectItem()->getItem()->getUnit()->getDescription(),

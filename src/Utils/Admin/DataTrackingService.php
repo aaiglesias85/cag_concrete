@@ -236,6 +236,7 @@ class DataTrackingService extends Base
             $arreglo_resultado['project_id'] = $project_id;
             $arreglo_resultado['project_number'] = $entity->getProject()->getProjectNumber();
             $arreglo_resultado['project_name'] = $entity->getProject()->getName();
+            $arreglo_resultado['project_description'] = $entity->getProject()->getDescription();
 
             $arreglo_resultado['date'] = $entity->getDate()->format('m/d/Y');
             $arreglo_resultado['inspector_id'] = $entity->getInspector() != null ? $entity->getInspector()->getInspectorId() : '';
@@ -1165,7 +1166,7 @@ class DataTrackingService extends Base
 
             $arreglo_resultado[] = [
                 "id" => $data_tracking_id,
-                'project' => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getName(),
+                'project' => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
                 'date' => $value->getDate()->format('m/d/Y'),
                 "stationNumber" => $value->getStationNumber(),
                 "measuredBy" => $value->getMeasuredBy(),

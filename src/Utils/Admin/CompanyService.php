@@ -104,6 +104,7 @@ class CompanyService extends Base
                 "id" => $project_id,
                 "projectNumber" => $value->getProjectNumber(),
                 "name" => $value->getName(),
+                "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),
                 "county" => $value->getCounty(),
                 "status" => $value->getStatus(),

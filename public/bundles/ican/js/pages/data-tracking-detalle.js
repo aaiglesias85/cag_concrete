@@ -92,7 +92,7 @@ var DataTrackingDetalle = function () {
 
                         // datos project
                         $('#proyect-number-detalle').html(response.data_tracking.project_number);
-                        $('#proyect-name-detalle').html(response.data_tracking.project_name);
+                        $('#proyect-name-detalle').html(response.data_tracking.project_description);
 
                         $('#data-tracking-date-detalle').val(response.data_tracking.date);
 

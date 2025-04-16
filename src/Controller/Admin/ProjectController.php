@@ -140,6 +140,7 @@ class ProjectController extends AbstractController
         $inspector_id = $request->get('inspector_id');
         $number = $request->get('number');
         $name = $request->get('name');
+        $description = $request->get('description');
         $location = $request->get('location');
         $po_number = $request->get('po_number');
         $po_cg = $request->get('po_cg');
@@ -171,13 +172,13 @@ class ProjectController extends AbstractController
         try {
 
             if ($project_id == "") {
-                $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name,
+                $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name, $description,
                     $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
                 $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             } else {
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
-                    $name, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
+                    $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             }
