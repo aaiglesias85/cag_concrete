@@ -119,6 +119,30 @@ class DataTrackingSubcontractRepository extends EntityRepository
         return $consulta->getQuery()->getResult();
     }
 
+    /**
+     * ListarSubcontractorsDeProject: Lista los subcontractors de un project
+     *
+     * @return DataTrackingSubcontract[]
+     */
+    public function ListarSubcontractorsDeProject($project_id)
+    {
+        $consulta = $this->createQueryBuilder('d_t_s')
+            ->leftJoin('d_t_s.dataTracking', 'd_t')
+            ->leftJoin('d_t.project', 'p')
+            ->leftJoin('d_t_s.subcontractor', 's');
+
+        if ($project_id != '') {
+            $consulta->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        $consulta->groupBy('s.subcontractorId');
+
+        $consulta->orderBy('s.name', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
 
     /**
      * TotalQuantity: Total de quantity items de la BD

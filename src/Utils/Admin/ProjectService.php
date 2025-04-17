@@ -23,6 +23,40 @@ class ProjectService extends Base
 {
 
     /**
+     * ListarSubcontractors
+     * @param $project_id
+     * @return array
+     */
+    public function ListarSubcontractors($project_id)
+    {
+        $subcontractors = [];
+
+        $project_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontractorsDeProject($project_id);
+
+        foreach ($project_subcontractors as $key => $project_subcontractor) {
+            $value = $project_subcontractor->getSubcontractor();
+            if ($value) {
+                $subcontractors[] = [
+                    "subcontractor_id" => $value->getSubcontractorId(),
+                    "name" => $value->getName(),
+                    "phone" => $value->getPhone(),
+                    "address" => $value->getAddress(),
+                    "contactName" => $value->getContactName(),
+                    "contactEmail" => $value->getContactEmail(),
+                    "companyName" => $value->getCompanyName(),
+                    "companyPhone" => $value->getCompanyPhone(),
+                    "companyAddress" => $value->getCompanyAddress(),
+                    'posicion' => $key
+                ];
+            }
+
+        }
+
+        return $subcontractors;
+    }
+
+    /**
      * EliminarContact: Elimina un contact en la BD
      * @param int $contact_id Id
      * @author Marcel
@@ -514,7 +548,7 @@ class ProjectService extends Base
      * @param $inspector_id
      * @return array
      */
-    public function ListarOrdenados($search, $company_id, $inspector_id, $from, $to, $status = '')
+    public function ListarOrdenados($search = '', $company_id = '', $inspector_id = '', $from = '', $to = '', $status = '')
     {
         $projects = [];
 

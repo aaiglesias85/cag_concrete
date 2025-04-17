@@ -659,4 +659,30 @@ class ProjectController extends AbstractController
         }
 
     }
+
+    /**
+     * listarSubcontractors Acción que lista los subcontractors de un project
+     *
+     */
+    public function listarSubcontractors(Request $request)
+    {
+
+        $project_id = $request->get('project_id');
+
+        try {
+
+            $subcontractors = $this->projectService->ListarSubcontractors($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['subcontractors'] = $subcontractors;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

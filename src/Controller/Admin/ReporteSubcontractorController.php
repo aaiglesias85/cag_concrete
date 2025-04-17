@@ -6,8 +6,10 @@ namespace App\Controller\Admin;
 use App\Entity\Project;
 use App\Entity\Subcontractor;
 
+use App\Utils\Admin\ProjectService;
 use App\Utils\Admin\ReporteSubcontractorService;
 
+use App\Utils\Admin\SubcontractorService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -15,10 +17,14 @@ class ReporteSubcontractorController extends AbstractController
 {
 
     private $reporteService;
+    private $projectService;
+    private $subcontractorService;
 
-    public function __construct(ReporteSubcontractorService $reporteService)
+    public function __construct(ReporteSubcontractorService $reporteService, ProjectService $projectService, SubcontractorService $subcontractorService)
     {
         $this->reporteService = $reporteService;
+        $this->projectService = $projectService;
+        $this->subcontractorService = $subcontractorService;
     }
 
     public function index()
@@ -29,12 +35,15 @@ class ReporteSubcontractorController extends AbstractController
             if ($permiso[0]['ver']) {
 
                 // subcontractors
-                $subcontractors = $this->reporteService->getDoctrine()->getRepository(Subcontractor::class)
-                    ->ListarOrdenados();
+                $subcontractors = $this->subcontractorService->ListarOrdenados();
+
+                // projects
+                $projects = $this->projectService->ListarOrdenados();
 
                 return $this->render('admin/reportes/subcontractor.html.twig', array(
                     'permiso' => $permiso[0],
                     'subcontractors' => $subcontractors,
+                    'projects' => $projects,
                 ));
             }
         } else {

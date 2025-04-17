@@ -225,13 +225,16 @@ var ReporteSubcontractor = function () {
 
     var changeSubcontractor = function (e) {
         var subcontractor_id = $('#filtro-subcontractor').val();
+        var project_id = $('#filtro-project').val();
 
         // reset
-        $('#filtro-project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project').select2();
+        if (project_id === '') {
+            $('#filtro-project option').each(function (e) {
+                if ($(this).val() != "")
+                    $(this).remove();
+            });
+            $('#filtro-project').select2();
+        }
 
         // reset
         $('#filtro-project-item option').each(function (e) {
@@ -241,12 +244,19 @@ var ReporteSubcontractor = function () {
         $('#filtro-project-item').select2();
 
         if (subcontractor_id != '') {
-            listarProjectsDeSubcontractor(subcontractor_id);
+            listarProjectsDeSubcontractor(subcontractor_id, project_id);
+        } else {
+            if (project_id === '') {
+                actualizarSelectProjects(all_projects);
+            }
+            if (subcontractor_id == '') {
+                actualizarSelectSubcontractors(all_subcontractors);
+            }
         }
 
         btnClickFiltrar();
     }
-    var listarProjectsDeSubcontractor = function (subcontractor_id) {
+    var listarProjectsDeSubcontractor = function (subcontractor_id, project_id) {
         MyApp.block('#select-project');
 
         $.ajax({
@@ -262,6 +272,11 @@ var ReporteSubcontractor = function () {
 
                     //Llenar select
                     actualizarSelectProjects(response.projects);
+
+                    if (project_id !== '') {
+                        $('#filtro-project').val(project_id);
+                        $('#filtro-project').trigger('change');
+                    }
 
                 } else {
                     toastr.error(response.error, "");
@@ -283,15 +298,25 @@ var ReporteSubcontractor = function () {
         $('#filtro-project').select2();
 
         for (var i = 0; i < projects.length; i++) {
-            $('#filtro-project').append(new Option(`${projects[i].projectNumber} - ${projects[i].description}`, projects[i].id, false, false));
+            $('#filtro-project').append(new Option(`${projects[i].number} - ${projects[i].description}`, projects[i].project_id, false, false));
         }
         $('#filtro-project').select2();
     }
 
     var changeProject = function (e) {
         var project_id = $('#filtro-project').val();
-        
+
         // reset
+        var subcontractor_id = $('#filtro-subcontractor').val();
+        if (subcontractor_id === '') {
+            $('#filtro-subcontractor option').each(function (e) {
+                if ($(this).val() != "")
+                    $(this).remove();
+            });
+            $('#filtro-subcontractor').select2();
+        }
+
+
         $('#filtro-project-item option').each(function (e) {
             if ($(this).val() != "")
                 $(this).remove();
@@ -299,7 +324,20 @@ var ReporteSubcontractor = function () {
         $('#filtro-project-item').select2();
 
         if (project_id != '') {
+
             listarItemsDeProject(project_id);
+
+            if (subcontractor_id === '') {
+                listarSubcontractorsDeProject(project_id);
+            }
+
+        } else {
+
+            if (subcontractor_id === '') {
+                actualizarSelectProjects(all_projects);
+                actualizarSelectSubcontractors(all_subcontractors);
+            }
+
         }
 
         btnClickFiltrar();
@@ -346,6 +384,48 @@ var ReporteSubcontractor = function () {
         $('#filtro-project-item').select2();
     }
 
+    var listarSubcontractorsDeProject = function (project_id) {
+        MyApp.block('#select-subcontractor');
+
+        $.ajax({
+            type: "POST",
+            url: "project/listarSubcontractors",
+            dataType: "json",
+            data: {
+                'project_id': project_id
+            },
+            success: function (response) {
+                mApp.unblock('#select-subcontractor');
+                if (response.success) {
+
+                    //Llenar select
+                    actualizarSelectSubcontractors(response.subcontractors);
+
+                } else {
+                    toastr.error(response.error, "");
+                }
+            },
+            failure: function (response) {
+                mApp.unblock('#select-subcontractor');
+
+                toastr.error(response.error, "");
+            }
+        });
+    }
+    var actualizarSelectSubcontractors = function (subcontractors) {
+        // reset
+        $('#filtro-subcontractor option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $('#filtro-subcontractor').select2();
+
+        for (var i = 0; i < subcontractors.length; i++) {
+            $('#filtro-subcontractor').append(new Option(subcontractors[i].name, subcontractors[i].subcontractor_id, false, false));
+        }
+        $('#filtro-subcontractor').select2();
+    }
+
     var initPortlets = function () {
         var portlet = new mPortlet('lista-reporte-subcontractor');
         portlet.on('afterFullscreenOn', function (portlet) {
@@ -383,7 +463,7 @@ var ReporteSubcontractor = function () {
                     'project_item_id': project_item_id,
                     'fecha_inicial': fecha_inicial,
                     'fecha_fin': fecha_fin
-                    
+
                 },
                 success: function (response) {
                     mApp.unblock('#lista-reporte-subcontractor');
@@ -447,7 +527,7 @@ var ReporteSubcontractor = function () {
 
             initWidgets();
             initTable();
-            
+
             initAccionFiltrar();
             initAccionExportar();
 
