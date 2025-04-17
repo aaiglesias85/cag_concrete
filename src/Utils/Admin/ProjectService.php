@@ -680,7 +680,9 @@ class ProjectService extends Base
         if ($entity != null) {
 
             $arreglo_resultado['company_id'] = $entity->getCompany()->getCompanyId();
+            $arreglo_resultado['company'] = $entity->getCompany()->getName();
             $arreglo_resultado['inspector_id'] = $entity->getInspector() != null ? $entity->getInspector()->getInspectorId() : '';
+            $arreglo_resultado['inspector'] = $entity->getInspector() != null ? $entity->getInspector()->getName() : '';
 
             $arreglo_resultado['number'] = $entity->getProjectNumber();
             $arreglo_resultado['name'] = $entity->getName();
@@ -1624,7 +1626,7 @@ class ProjectService extends Base
         $usuario = $this->getUser();
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 9);
 
-        $acciones = "";
+        $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
 
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {

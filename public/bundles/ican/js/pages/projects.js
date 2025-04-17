@@ -84,7 +84,7 @@ var Projects = function () {
             },
             {
                 field: "acciones",
-                width: 80,
+                width: 120,
                 title: "Actions",
                 sortable: false,
                 overflow: 'visible',

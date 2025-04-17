@@ -45,7 +45,7 @@
                             Projects
                         </h3>
                     </div>
-                     <div class="col-md-1">
+                    <div class="col-md-1">
                         <a href="javascript:;" id="btn-reset-filtrar"
                            class="btn">
                             <span>
@@ -150,7 +150,7 @@
                                         </span>
                         </a>
                     </div>
-               </div>
+                </div>
                 <!--end: Search Form -->
                 <!--begin: Datatable -->
                 <div class="m_datatable" id="project-table-editable"></div>
@@ -743,6 +743,516 @@
 
         </div>
 
+        <div id="form-project-detalle" class="m-portlet m--hide">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text" id="form-project-title">
+                            Project Details:
+                        </h3>
+                    </div>
+                </div>
+                <div class="m-portlet__head-tools">
+                    <ul class="m-portlet__nav">
+                        <li class="m-portlet__nav-item">
+                            <a href="javascript:;"
+                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-project"><i
+                                        class="la la-close"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="m-portlet__body">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active wizard-tab" data-item="1"
+                           data-toggle="tab" href="#tab-content-general-detalle" id="tab-general-detalle">
+                            General
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="2"
+                           data-toggle="tab" href="#tab-content-items-detalle" id="tab-items-detalle">
+                            Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="3"
+                           data-toggle="tab" href="#tab-content-contacts-detalle" id="tab-contacts-detalle">
+                            Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="4"
+                           data-toggle="tab" href="#tab-content-notes-detalle" id="tab-notes-detalle">
+                            Notes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="5"
+                           data-toggle="tab" href="#tab-content-invoices-detalle" id="tab-invoices-detalle">
+                            Invoices
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-content-general-detalle" role="tabpanel">
+                        <form class="m-form" id="project-form-detalle" action="#" enctype="multipart/form-data"
+                              method="post">
+
+                            <div class="m-form__section m-form__section--first">
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">1</span>
+                                                Company
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="company-detalle"
+                                                   disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Subcontract NO
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change"
+                                                   id="subcontract-detalle" disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Manager
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="manager-detalle"
+                                                   disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Invoice Contact
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change"
+                                                   id="invoice_contact-detalle" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>
+                                                Invoice Due Date
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <div class='input-group'>
+                                                <input type='text' class="form-control event-change"
+                                                       id="due_date-detalle" disabled/>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="la la-calendar glyphicon-th"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Start Date
+                                            </label>
+                                            <div class='input-group'>
+                                                <input type='text' class="form-control event-change"
+                                                       id="start_date-detalle" disabled/>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="la la-calendar glyphicon-th"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                End Date
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class='input-group'>
+                                                <input type='text' class="form-control event-change"
+                                                       id="end_date-detalle" disabled/>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="la la-calendar glyphicon-th"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label>
+                                                Contract Amount
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="text" class="form-control form-control-number"
+                                                       id="contract_amount-detalle" disabled>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Project Name
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="name-detalle"
+                                                   disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Owner
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="owner-detalle"
+                                                   disabled>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Project ID #
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="project_id_number-detalle" disabled/>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>
+                                                Proposal ID #
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="proposal_number-detalle" disabled/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>
+                                                County
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="county-detalle"
+                                                   disabled>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Inspector
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="inspector-detalle"
+                                                   disabled>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <div>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" class="form-control event-change"
+                                                           id="federal_funding-detalle" name="federal_funding"> Federal
+                                                    Funding
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <div>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" class="form-control event-change"
+                                                           id="certified_payrolls-detalle" name="certified_payrolls">
+                                                    Certified
+                                                    payrolls
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label>
+                                                <span class="ic-step-number">3</span>
+                                                C&G Project #
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="number-detalle" disabled/>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <label>
+                                                Project Description
+                                                <span class="ic-small italic">(required)</span>
+                                            </label>
+                                            <input type="text" class="form-control form-control-text event-change"
+                                                   id="description-detalle" disabled/>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <div>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" class="form-control event-change"
+                                                           id="resurfacing-detalle" name="resurfacing"> Resurfacing
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <label>Status</label>
+                                            <div class="m-radio-inline">
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestadodetalle"
+                                                           id="estadoactivo-detalle"
+                                                           class="event-change project-estado-detalle" value="1" checked>
+                                                    In Progress
+                                                    <span></span>
+                                                </label>
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestadodetalle"
+                                                           id="estadoinactivo-detalle"
+                                                           class="event-change project-estado-detalle" value="0">
+                                                    Not Started
+                                                    <span></span>
+                                                </label>
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestadodetalle"
+                                                           id="estadocompleted-detalle"
+                                                           class="event-change project-estado-detalle" value="2">
+                                                    Completed
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-items-detalle" role="tabpanel">
+                        <div class="row" id="lista-items-detalle">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right mb-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+
+                                                <div class="col-md-2">
+
+                                                </div>
+
+                                                <div class="col-lg-2">
+                                                    <div class="input-group m-input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">Items:</span>
+                                                        </div>
+                                                        <input type="text" class="form-control m-input"
+                                                               id="total_count_items-detalle" value="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <div class="input-group m-input-group">
+                                                        <div class="input-group-prepend"><span class="input-group-text">Total $:</span>
+                                                        </div>
+                                                        <input type="text" class="form-control m-input"
+                                                               id="total_total_items-detalle" value="" disabled>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2"></div>
+                                                <div class="col-md-3">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="items-table-editable-detalle"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-contacts-detalle" role="tabpanel">
+                        <div class="row" id="lista-contacts-detalle">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-contacts-table-editable-detalle"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-notes-detalle" role="tabpanel">
+                        <div class="row" id="lista-notes-detalle">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+
+                                                <div class="col-md-4">
+
+                                                </div>
+
+
+                                                <div class="col-md-2">
+                                                    <div class='input-group date'>
+                                                        <input type='text' class="form-control m-input date-picker "
+                                                               placeholder="From" autocomplete="off"
+                                                               id="filtro-fecha-inicial-notes-detalle"/>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class='input-group date'>
+                                                        <input type='text' class="form-control m-input date-picker "
+                                                               placeholder="To" autocomplete="off"
+                                                               id="filtro-fecha-fin-notes-detalle"/>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <i class="la la-calendar glyphicon-th"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <a href="javascript:;" id="btn-filtrar-notes-detalle"
+                                                       class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                                        <span>
+                                                            <i class="la la-search"></i>
+                                                            <span>Search</span>
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="notes-table-editable-detalle"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-invoices-detalle" role="tabpanel">
+                        <div class="row" id="lista-invoices-detalle">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right mb-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-9"></div>
+                                                <div class="col-md-3">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="invoices-table-editable-detalle"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-form">
+                    <div class="m-form__actions text-center">
+                        <button id="btn-wizard-anterior-detalle"
+                                class="btn btn-info m--hide" type="button">
+                            Back
+                        </button>
+
+                        <button id="btn-wizard-siguiente-detalle"
+                                class="btn btn-primary" type="button">
+                            Next
+                        </button>
+                        <button class="btn btn-danger cerrar-form-project-detalle" type="button">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
     <!-- items -->
@@ -1158,6 +1668,7 @@
     </script>
 
     <script src="{{ asset('bundles/ican/js/pages/projects.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('bundles/ican/js/pages/projects-detalle.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {
@@ -1170,6 +1681,7 @@
 
         jQuery(document).ready(function () {
             Projects.init();
+            ProjectsDetalle.init();
         });
     </script>
 {% endblock %}
