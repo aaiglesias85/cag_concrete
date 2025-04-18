@@ -220,4 +220,29 @@ class EmployeeController extends AbstractController
         }
 
     }
+
+    /**
+     * listarProjects Acción que lista los projects de employee
+     *
+     */
+    public function listarProjects(Request $request)
+    {
+        $employee_id = $request->get('employee_id');
+
+        try {
+
+            $projects = $this->employeeService->ListarProjects($employee_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['projects'] = $projects;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

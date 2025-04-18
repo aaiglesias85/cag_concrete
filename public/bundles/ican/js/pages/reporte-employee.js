@@ -1,12 +1,12 @@
-var ReporteSubcontractor = function () {
+var ReporteEmployee = function () {
 
     var oTable;
 
     //Inicializar table
     var initTable = function () {
-        MyApp.block('#reporte-subcontractor-table-editable');
+        MyApp.block('#reporte-employee-table-editable');
 
-        var table = $('#reporte-subcontractor-table-editable');
+        var table = $('#reporte-employee-table-editable');
 
         var aoColumns = [];
 
@@ -23,34 +23,29 @@ var ReporteSubcontractor = function () {
                 width: 150,
             },
             {
-                field: "subcontractor",
-                title: "Subcontractor",
+                field: "employee",
+                title: "Employee",
             },
             {
-                field: "item",
-                title: "Item",
+                field: "role",
+                title: "Role",
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
+                field: "hours",
+                title: "Hours",
                 width: 120,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
+                    return `<span>${MyApp.formatearNumero(row.hours, 2, '.', ',')}</span>`;
                 }
             },
             {
-                field: "price",
-                title: "Price",
+                field: "hourly_rate",
+                title: "Hourly Rate",
                 width: 100,
                 textAlign: 'center',
                 template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                    return `<span>${MyApp.formatearNumero(row.hourly_rate, 2, '.', ',')}</span>`;
                 }
             },
             {
@@ -69,7 +64,7 @@ var ReporteSubcontractor = function () {
                 type: 'remote',
                 source: {
                     read: {
-                        url: 'report-subcontractor/listar',
+                        url: 'report-employee/listar',
                     }
                 },
                 pageSize: 25,
@@ -117,22 +112,22 @@ var ReporteSubcontractor = function () {
         //Events
         oTable
             .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#reporte-subcontractor-table-editable');
+                mApp.unblock('#reporte-employee-table-editable');
             })
             .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#reporte-subcontractor-table-editable');
+                mApp.unblock('#reporte-employee-table-editable');
             })
             .on('m-datatable--on-layout-updated', function () {
                 console.log('Layout render updated');
             })
             .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#reporte-subcontractor-table-editable');
+                MyApp.block('#reporte-employee-table-editable');
             })
             .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#reporte-subcontractor-table-editable');
+                MyApp.block('#reporte-employee-table-editable');
             })
             .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#reporte-subcontractor-table-editable');
+                MyApp.block('#reporte-employee-table-editable');
             })
             .on('m-datatable--on-check', function (e, args) {
                 //eventsWriter('Checkbox active: ' + args.toString());
@@ -143,7 +138,7 @@ var ReporteSubcontractor = function () {
 
         //Busqueda
         var query = oTable.getDataSourceQuery();
-        $('#lista-reporte-subcontractor .m_form_search').on('keyup', function (e) {
+        $('#lista-reporte-employee .m_form_search').on('keyup', function (e) {
             btnClickFiltrar();
         }).val(query.generalSearch);
     };
@@ -158,15 +153,15 @@ var ReporteSubcontractor = function () {
         $(document).off('click', "#btn-reset-filters");
         $(document).on('click', "#btn-reset-filters", function (e) {
 
-            $('#lista-reporte-subcontractor .m_form_search').val('');
+            $('#lista-reporte-employee .m_form_search').val('');
 
-            $('#filtro-subcontractor option').each(function (e) {
+            $('#filtro-employee option').each(function (e) {
                 if ($(this).val() != "")
                     $(this).remove();
             });
-            $('#filtro-subcontractor').select2();
+            $('#filtro-employee').select2();
 
-            actualizarSelectSubcontractors(all_subcontractors);
+            actualizarSelectEmployees(all_employees);
 
             $('#filtro-project option').each(function (e) {
                 if ($(this).val() != "")
@@ -175,12 +170,6 @@ var ReporteSubcontractor = function () {
             $('#filtro-project').select2();
 
             actualizarSelectProjects(all_projects);
-
-            $('#filtro-project-item option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project-item').select2();
 
             $('#fechaInicial').val('');
             $('#fechaFin').val('');
@@ -193,17 +182,14 @@ var ReporteSubcontractor = function () {
     var btnClickFiltrar = function () {
         var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
+        var generalSearch = $('#lista-reporte-employee .m_form_search').val();
         query.generalSearch = generalSearch;
 
-        var subcontractor_id = $('#filtro-subcontractor').val();
-        query.subcontractor_id = subcontractor_id;
+        var employee_id = $('#filtro-employee').val();
+        query.employee_id = employee_id;
 
         var project_id = $('#filtro-project').val();
         query.project_id = project_id;
-
-        var project_item_id = $('#filtro-project-item').val();
-        query.project_item_id = project_item_id;
 
         var fechaInicial = $('#fechaInicial').val();
         query.fechaInicial = fechaInicial;
@@ -226,12 +212,12 @@ var ReporteSubcontractor = function () {
         $('.m-select2').select2();
 
         // change
-        $('#filtro-subcontractor').change(changeSubcontractor);
+        $('#filtro-employee').change(changeEmployee);
         $('#filtro-project').change(changeProject);
     }
 
-    var changeSubcontractor = function (e) {
-        var subcontractor_id = $('#filtro-subcontractor').val();
+    var changeEmployee = function (e) {
+        var employee_id = $('#filtro-employee').val();
         var project_id = $('#filtro-project').val();
 
         // reset
@@ -243,35 +229,28 @@ var ReporteSubcontractor = function () {
             $('#filtro-project').select2();
         }
 
-        // reset
-        $('#filtro-project-item option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project-item').select2();
-
-        if (subcontractor_id != '') {
-            listarProjectsDeSubcontractor(subcontractor_id, project_id);
+        if (employee_id != '') {
+            listarProjectsDeEmployee(employee_id, project_id);
         } else {
             if (project_id === '') {
                 actualizarSelectProjects(all_projects);
             }
-            if (subcontractor_id == '') {
-                actualizarSelectSubcontractors(all_subcontractors);
+            if (employee_id == '') {
+                actualizarSelectEmployees(all_employees);
             }
         }
 
         btnClickFiltrar();
     }
-    var listarProjectsDeSubcontractor = function (subcontractor_id, project_id) {
+    var listarProjectsDeEmployee = function (employee_id, project_id) {
         MyApp.block('#select-project');
 
         $.ajax({
             type: "POST",
-            url: "subcontractor/listarProjects",
+            url: "employee/listarProjects",
             dataType: "json",
             data: {
-                'subcontractor_id': subcontractor_id
+                'employee_id': employee_id
             },
             success: function (response) {
                 mApp.unblock('#select-project');
@@ -314,127 +293,77 @@ var ReporteSubcontractor = function () {
         var project_id = $('#filtro-project').val();
 
         // reset
-        var subcontractor_id = $('#filtro-subcontractor').val();
-        if (subcontractor_id === '') {
-            $('#filtro-subcontractor option').each(function (e) {
+        var employee_id = $('#filtro-employee').val();
+        if (employee_id === '') {
+            $('#filtro-employee option').each(function (e) {
                 if ($(this).val() != "")
                     $(this).remove();
             });
-            $('#filtro-subcontractor').select2();
+            $('#filtro-employee').select2();
         }
-
-
-        $('#filtro-project-item option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project-item').select2();
 
         if (project_id != '') {
 
-            listarItemsDeProject(project_id);
-
-            if (subcontractor_id === '') {
-                listarSubcontractorsDeProject(project_id);
+            if (employee_id === '') {
+                listarEmployeesDeProject(project_id);
             }
 
         } else {
 
-            if (subcontractor_id === '') {
+            if (employee_id === '') {
                 actualizarSelectProjects(all_projects);
-                actualizarSelectSubcontractors(all_subcontractors);
+                actualizarSelectEmployees(all_employees);
             }
 
         }
 
         btnClickFiltrar();
     }
-    var listarItemsDeProject = function (project_id) {
-        MyApp.block('#select-project-item');
+
+    var listarEmployeesDeProject = function (project_id) {
+        MyApp.block('#select-employee');
 
         $.ajax({
             type: "POST",
-            url: "project/listarItems",
+            url: "project/listarEmployees",
             dataType: "json",
             data: {
                 'project_id': project_id
             },
             success: function (response) {
-                mApp.unblock('#select-project-item');
+                mApp.unblock('#select-employee');
                 if (response.success) {
 
                     //Llenar select
-                    actualizarSelectProjectItems(response.items);
+                    actualizarSelectEmployees(response.employees);
 
                 } else {
                     toastr.error(response.error, "");
                 }
             },
             failure: function (response) {
-                mApp.unblock('#select-project-item');
+                mApp.unblock('#select-employee');
 
                 toastr.error(response.error, "");
             }
         });
     }
-    var actualizarSelectProjectItems = function (items) {
+    var actualizarSelectEmployees = function (employees) {
         // reset
-        $('#filtro-project-item option').each(function (e) {
+        $('#filtro-employee option').each(function (e) {
             if ($(this).val() != "")
                 $(this).remove();
         });
-        $('#filtro-project-item').select2();
+        $('#filtro-employee').select2();
 
-        for (var i = 0; i < items.length; i++) {
-            $('#filtro-project-item').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
+        for (var i = 0; i < employees.length; i++) {
+            $('#filtro-employee').append(new Option(employees[i].name, employees[i].employee_id, false, false));
         }
-        $('#filtro-project-item').select2();
-    }
-
-    var listarSubcontractorsDeProject = function (project_id) {
-        MyApp.block('#select-subcontractor');
-
-        $.ajax({
-            type: "POST",
-            url: "project/listarSubcontractors",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                mApp.unblock('#select-subcontractor');
-                if (response.success) {
-
-                    //Llenar select
-                    actualizarSelectSubcontractors(response.subcontractors);
-
-                } else {
-                    toastr.error(response.error, "");
-                }
-            },
-            failure: function (response) {
-                mApp.unblock('#select-subcontractor');
-
-                toastr.error(response.error, "");
-            }
-        });
-    }
-    var actualizarSelectSubcontractors = function (subcontractors) {
-        // reset
-        $('#filtro-subcontractor option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-subcontractor').select2();
-
-        for (var i = 0; i < subcontractors.length; i++) {
-            $('#filtro-subcontractor').append(new Option(subcontractors[i].name, subcontractors[i].subcontractor_id, false, false));
-        }
-        $('#filtro-subcontractor').select2();
+        $('#filtro-employee').select2();
     }
 
     var initPortlets = function () {
-        var portlet = new mPortlet('lista-reporte-subcontractor');
+        var portlet = new mPortlet('lista-reporte-employee');
         portlet.on('afterFullscreenOn', function (portlet) {
             $('.m-portlet').addClass('m-portlet--fullscreen');
         });
@@ -450,30 +379,28 @@ var ReporteSubcontractor = function () {
         $(document).on('click', "#btn-exportar", function (e) {
             e.preventDefault();
 
-            var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
-            var subcontractor_id = $('#filtro-subcontractor').val();
+            var generalSearch = $('#lista-reporte-employee .m_form_search').val();
+            var employee_id = $('#filtro-employee').val();
             var project_id = $('#filtro-project').val();
-            var project_item_id = $('#filtro-project-item').val();
             var fecha_inicial = $('#fechaInicial').val();
             var fecha_fin = $('#fechaFin').val();
 
-            MyApp.block('#lista-reporte-subcontractor');
+            MyApp.block('#lista-reporte-employee');
 
             $.ajax({
                 type: "POST",
-                url: "report-subcontractor/exportarExcel",
+                url: "report-employee/exportarExcel",
                 dataType: "json",
                 data: {
                     'search': generalSearch,
-                    'subcontractor_id': subcontractor_id,
+                    'employee_id': employee_id,
                     'project_id': project_id,
-                    'project_item_id': project_item_id,
                     'fecha_inicial': fecha_inicial,
                     'fecha_fin': fecha_fin
 
                 },
                 success: function (response) {
-                    mApp.unblock('#lista-reporte-subcontractor');
+                    mApp.unblock('#lista-reporte-employee');
                     if (response.success) {
                         document.location = response.url;
                     } else {
@@ -481,7 +408,7 @@ var ReporteSubcontractor = function () {
                     }
                 },
                 failure: function (response) {
-                    mApp.unblock('#lista-reporte-subcontractor');
+                    mApp.unblock('#lista-reporte-employee');
 
                     toastr.error(response.error, "");
                 }
@@ -490,30 +417,28 @@ var ReporteSubcontractor = function () {
     };
 
     var devolverTotal = function () {
-        var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
-        var subcontractor_id = $('#filtro-subcontractor').val();
+        var generalSearch = $('#lista-reporte-employee .m_form_search').val();
+        var employee_id = $('#filtro-employee').val();
         var project_id = $('#filtro-project').val();
-        var project_item_id = $('#filtro-project-item').val();
         var fecha_inicial = $('#fechaInicial').val();
         var fecha_fin = $('#fechaFin').val();
 
-        MyApp.block('#lista-reporte-subcontractor');
+        MyApp.block('#lista-reporte-employee');
 
         $.ajax({
             type: "POST",
-            url: "report-subcontractor/devolverTotal",
+            url: "report-employee/devolverTotal",
             dataType: "json",
             data: {
                 'search': generalSearch,
-                'subcontractor_id': subcontractor_id,
+                'employee_id': employee_id,
                 'project_id': project_id,
-                'project_item_id': project_item_id,
                 'fecha_inicial': fecha_inicial,
                 'fecha_fin': fecha_fin
 
             },
             success: function (response) {
-                mApp.unblock('#lista-reporte-subcontractor');
+                mApp.unblock('#lista-reporte-employee');
                 if (response.success) {
                     $('#total_reporte').val(response.total);
                 } else {
@@ -521,7 +446,7 @@ var ReporteSubcontractor = function () {
                 }
             },
             failure: function (response) {
-                mApp.unblock('#lista-reporte-subcontractor');
+                mApp.unblock('#lista-reporte-employee');
 
                 toastr.error(response.error, "");
             }

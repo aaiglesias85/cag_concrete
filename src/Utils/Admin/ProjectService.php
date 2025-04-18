@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\Company;
 use App\Entity\DataTrackingItem;
+use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
 use App\Entity\Inspector;
@@ -21,6 +22,32 @@ use App\Utils\Base;
 
 class ProjectService extends Base
 {
+
+    /**
+     * ListarEmployees
+     * @param $project_id
+     * @return array
+     */
+    public function ListarEmployees($project_id)
+    {
+        $employees = [];
+
+        $project_employees = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarEmployeesDeProject($project_id);
+
+        foreach ($project_employees as $key => $project_employee) {
+            $value = $project_employee->getEmployee();
+
+            $employees[] = [
+                "employee_id" => $value->getEmployeeId(),
+                "name" => $value->getName(),
+                'posicion' => $key
+            ];
+
+        }
+
+        return $employees;
+    }
 
     /**
      * ListarSubcontractors
