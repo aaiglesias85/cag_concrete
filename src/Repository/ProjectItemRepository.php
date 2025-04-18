@@ -114,8 +114,8 @@ class ProjectItemRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('p_i.quantity LIKE :quantity OR p_i.price LIKE :price')
-                ->setParameter('quantity', "%${sSearch}%")
-                ->setParameter('price', "%${sSearch}%");
+                ->setParameter('quantity', "%{$sSearch}%")
+                ->setParameter('price', "%{$sSearch}%");
         }
 
         if ($project_id != '') {
@@ -196,11 +196,11 @@ class ProjectItemRepository extends EntityRepository
         //$sSearch
         $esta_query_quantity = substr_count($consulta, ':quantity');
         if ($esta_query_quantity == 1)
-            $query->setParameter(':quantity', "%${sSearch}%");
+            $query->setParameter(':quantity', "%{$sSearch}%");
 
         $esta_query_price = substr_count($consulta, ':price');
         if ($esta_query_price == 1)
-            $query->setParameter(':price', "%${sSearch}%");
+            $query->setParameter(':price', "%{$sSearch}%");
 
         $esta_query_project_id = substr_count($consulta, ':project_id');
         if ($esta_query_project_id == 1) {
@@ -240,21 +240,21 @@ class ProjectItemRepository extends EntityRepository
               p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg OR c.name LIKE :company OR
                p.projectIdNumber LIKE :projectIdNumber OR p.location LIKE :location OR p.subcontract LIKE :subcontract OR
                p.proposalNumber LIKE :proposal')
-                ->setParameter('item', "%${sSearch}%")
-                ->setParameter('invoiceContact', "%${sSearch}%")
-                ->setParameter('owner', "%${sSearch}%")
-                ->setParameter('manager', "%${sSearch}%")
-                ->setParameter('county', "%${sSearch}%")
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%")
-                ->setParameter('po', "%${sSearch}%")
-                ->setParameter('cg', "%${sSearch}%")
-                ->setParameter('company', "%${sSearch}%")
-                ->setParameter('projectIdNumber', "%${sSearch}%")
-                ->setParameter('location', "%${sSearch}%")
-                ->setParameter('subcontract', "%${sSearch}%")
-                ->setParameter('proposal', "%${sSearch}%")
+                ->setParameter('item', "%{$sSearch}%")
+                ->setParameter('invoiceContact', "%{$sSearch}%")
+                ->setParameter('owner', "%{$sSearch}%")
+                ->setParameter('manager', "%{$sSearch}%")
+                ->setParameter('county', "%{$sSearch}%")
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%")
+                ->setParameter('po', "%{$sSearch}%")
+                ->setParameter('cg', "%{$sSearch}%")
+                ->setParameter('company', "%{$sSearch}%")
+                ->setParameter('projectIdNumber', "%{$sSearch}%")
+                ->setParameter('location', "%{$sSearch}%")
+                ->setParameter('subcontract', "%{$sSearch}%")
+                ->setParameter('proposal', "%{$sSearch}%")
 
             ;
         }
@@ -406,64 +406,64 @@ class ProjectItemRepository extends EntityRepository
         // proposal
         $esta_query_proposal = substr_count($consulta, ':proposal');
         if ($esta_query_proposal == 1)
-            $query->setParameter(':proposal', "%${sSearch}%");
+            $query->setParameter(':proposal', "%{$sSearch}%");
 
         //subcontract
         $esta_query_subcontract = substr_count($consulta, ':subcontract');
         if ($esta_query_subcontract == 1)
-            $query->setParameter(':subcontract', "%${sSearch}%");
+            $query->setParameter(':subcontract', "%{$sSearch}%");
 
         $esta_query_location = substr_count($consulta, ':location');
         if ($esta_query_location == 1)
-            $query->setParameter(':location', "%${sSearch}%");
+            $query->setParameter(':location', "%{$sSearch}%");
 
         $esta_query_projectIdNumber = substr_count($consulta, ':projectId');
         if ($esta_query_projectIdNumber == 1)
-            $query->setParameter(':projectId', "%${sSearch}%");
+            $query->setParameter(':projectId', "%{$sSearch}%");
 
         $esta_query_empresa = substr_count($consulta, ':empresa');
         if ($esta_query_empresa == 1)
-            $query->setParameter(':empresa', "%${sSearch}%");
+            $query->setParameter(':empresa', "%{$sSearch}%");
 
         $esta_query_item = substr_count($consulta, ':item');
         if ($esta_query_item == 1)
-            $query->setParameter(':item', "%${sSearch}%");
+            $query->setParameter(':item', "%{$sSearch}%");
 
         $esta_query_invoice_contact = substr_count($consulta, ':invoiceContact');
         if ($esta_query_invoice_contact == 1)
-            $query->setParameter(':invoiceContact', "%${sSearch}%");
+            $query->setParameter(':invoiceContact', "%{$sSearch}%");
 
         $esta_query_owner = substr_count($consulta, ':owner');
         if ($esta_query_owner == 1)
-            $query->setParameter(':owner', "%${sSearch}%");
+            $query->setParameter(':owner', "%{$sSearch}%");
 
         $esta_query_manager = substr_count($consulta, ':manager');
         if ($esta_query_manager == 1)
-            $query->setParameter(':manager', "%${sSearch}%");
+            $query->setParameter(':manager', "%{$sSearch}%");
 
         $esta_query_county = substr_count($consulta, ':county');
         if ($esta_query_county == 1)
-            $query->setParameter(':county', "%${sSearch}%");
+            $query->setParameter(':county', "%{$sSearch}%");
 
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_po = substr_count($consulta, ':po');
         if ($esta_query_po == 1)
-            $query->setParameter(':po', "%${sSearch}%");
+            $query->setParameter(':po', "%{$sSearch}%");
 
         $esta_query_cg = substr_count($consulta, ':cg');
         if ($esta_query_cg == 1)
-            $query->setParameter(':cg', "%${sSearch}%");
+            $query->setParameter(':cg', "%{$sSearch}%");
 
         $esta_query_company_id = substr_count($consulta, ':company_id');
         if ($esta_query_company_id == 1) {

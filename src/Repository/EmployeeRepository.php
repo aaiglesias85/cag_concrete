@@ -37,8 +37,8 @@ class EmployeeRepository extends EntityRepository
 
         if ($sSearch != ""){
             $consulta->andWhere('e.name LIKE :name OR e.position LIKE :position')
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('position', "%${sSearch}%");
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('position', "%{$sSearch}%");
         }
 
 
@@ -81,11 +81,11 @@ class EmployeeRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_position = substr_count($consulta, ':position');
         if ($esta_query_position == 1)
-            $query->setParameter(':position', "%${sSearch}%");
+            $query->setParameter(':position', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

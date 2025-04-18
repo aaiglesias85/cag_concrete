@@ -280,11 +280,11 @@ class DataTrackingLaborRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('e.name LIKE :employee OR d_t_l.role LIKE :role OR p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description')
-                ->setParameter('employee', "%${sSearch}%")
-                ->setParameter('role', "%${sSearch}%")
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%");
+                ->setParameter('employee', "%{$sSearch}%")
+                ->setParameter('role', "%{$sSearch}%")
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%");
         }
 
         if ($employee_id != '') {
@@ -409,23 +409,23 @@ class DataTrackingLaborRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_trabajador = substr_count($consulta, ':trabajador');
         if ($esta_query_trabajador == 1)
-            $query->setParameter(':trabajador', "%${sSearch}%");
+            $query->setParameter(':trabajador', "%{$sSearch}%");
 
         $esta_query_role = substr_count($consulta, ':role');
         if ($esta_query_role == 1)
-            $query->setParameter(':role', "%${sSearch}%");
+            $query->setParameter(':role', "%{$sSearch}%");
 
         $esta_query_employee_id = substr_count($consulta, ':employee_id');
         if ($esta_query_employee_id == 1) {
@@ -468,11 +468,11 @@ class DataTrackingLaborRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('e.name LIKE :employee OR d_t_l.role LIKE :role OR p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description')
-                ->setParameter('employee', "%${sSearch}%")
-                ->setParameter('role', "%${sSearch}%")
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%");
+                ->setParameter('employee', "%{$sSearch}%")
+                ->setParameter('role', "%{$sSearch}%")
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%");
         }
 
         if ($employee_id != '') {
@@ -577,23 +577,23 @@ class DataTrackingLaborRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_trabajador = substr_count($consulta, ':trabajador');
         if ($esta_query_trabajador == 1)
-            $query->setParameter(':trabajador', "%${sSearch}%");
+            $query->setParameter(':trabajador', "%{$sSearch}%");
 
         $esta_query_role = substr_count($consulta, ':role');
         if ($esta_query_role == 1)
-            $query->setParameter(':role', "%${sSearch}%");
+            $query->setParameter(':role', "%{$sSearch}%");
 
         $esta_query_employee_id = substr_count($consulta, ':employee_id');
         if ($esta_query_employee_id == 1) {

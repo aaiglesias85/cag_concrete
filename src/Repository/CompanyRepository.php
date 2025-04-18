@@ -37,10 +37,10 @@ class CompanyRepository extends EntityRepository
 
         if ($sSearch != ""){
             $consulta->andWhere('c.contactEmail LIKE :contactEmail OR c.contactName LIKE :contactName OR c.phone LIKE :phone OR c.name LIKE :name')
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('phone', "%${sSearch}%")
-                ->setParameter('contactName', "%${sSearch}%")
-                ->setParameter('contactEmail', "%${sSearch}%");
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('phone', "%{$sSearch}%")
+                ->setParameter('contactName', "%{$sSearch}%")
+                ->setParameter('contactEmail', "%{$sSearch}%");
         }
 
 
@@ -83,19 +83,19 @@ class CompanyRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_email = substr_count($consulta, ':email');
         if ($esta_query_email == 1)
-            $query->setParameter(':email', "%${sSearch}%");
+            $query->setParameter(':email', "%{$sSearch}%");
 
         $esta_query_phone = substr_count($consulta, ':phone');
         if ($esta_query_phone == 1)
-            $query->setParameter(':phone', "%${sSearch}%");
+            $query->setParameter(':phone', "%{$sSearch}%");
 
         $esta_query_contact = substr_count($consulta, ':contact');
         if ($esta_query_contact == 1)
-            $query->setParameter(':contact', "%${sSearch}%");
+            $query->setParameter(':contact', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

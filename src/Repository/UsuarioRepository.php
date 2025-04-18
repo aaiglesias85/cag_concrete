@@ -71,9 +71,9 @@ class UsuarioRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('u.email LIKE :email OR u.nombre LIKE :nombre OR u.apellidos LIKE :apellidos')
-                ->setParameter('email', "%${sSearch}%")
-                ->setParameter('nombre', "%${sSearch}%")
-                ->setParameter('apellidos', "%${sSearch}%");
+                ->setParameter('email', "%{$sSearch}%")
+                ->setParameter('nombre', "%{$sSearch}%")
+                ->setParameter('apellidos', "%{$sSearch}%");
         }
 
 
@@ -138,15 +138,15 @@ class UsuarioRepository extends EntityRepository
         //$sSearch        
         $esta_query_nombre = substr_count($consulta, ':nombre');
         if ($esta_query_nombre == 1)
-            $query->setParameter('nombre', "%${sSearch}%");
+            $query->setParameter('nombre', "%{$sSearch}%");
 
         $esta_query_email = substr_count($consulta, ':email');
         if ($esta_query_email == 1)
-            $query->setParameter('email', "%${sSearch}%");
+            $query->setParameter('email', "%{$sSearch}%");
 
         $esta_query_apellidos = substr_count($consulta, ':apellidos');
         if ($esta_query_apellidos == 1)
-            $query->setParameter('apellidos', "%${sSearch}%");
+            $query->setParameter('apellidos', "%{$sSearch}%");
 
         $esta_query_perfil_id = substr_count($consulta, ':perfil_id');
         if ($esta_query_perfil_id == 1) {

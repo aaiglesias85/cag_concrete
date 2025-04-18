@@ -38,7 +38,7 @@ class UnitRepository extends EntityRepository
 
         if ($sSearch != "")
             $consulta->andWhere('u.description LIKE :description')
-                ->setParameter('description', "%${sSearch}%");
+                ->setParameter('description', "%{$sSearch}%");
 
         $consulta->orderBy("u.$iSortCol_0", $sSortDir_0);
 
@@ -79,7 +79,7 @@ class UnitRepository extends EntityRepository
         //$sSearch
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

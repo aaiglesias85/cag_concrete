@@ -111,14 +111,14 @@ class DataTrackingRepository extends EntityRepository
             $consulta->andWhere('p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description OR 
             d_t.crewLead LIKE :crewLead OR d_t.measuredBy LIKE :measuredBy OR 
             d_t.stationNumber LIKE :stationNumber OR d_t.notes LIKE :notes OR  d_t.otherMaterials LIKE :otherMaterials')
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%")
-                ->setParameter('crewLead', "%${sSearch}%")
-                ->setParameter('stationNumber', "%${sSearch}%")
-                ->setParameter('measuredBy', "%${sSearch}%")
-                ->setParameter('notes', "%${sSearch}%")
-                ->setParameter('otherMaterials', "%${sSearch}%");
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%")
+                ->setParameter('crewLead', "%{$sSearch}%")
+                ->setParameter('stationNumber', "%{$sSearch}%")
+                ->setParameter('measuredBy', "%{$sSearch}%")
+                ->setParameter('notes', "%{$sSearch}%")
+                ->setParameter('otherMaterials', "%{$sSearch}%");
         }
 
         if ($project_id != '') {
@@ -242,35 +242,35 @@ class DataTrackingRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_crew = substr_count($consulta, ':crewLead');
         if ($esta_query_crew == 1)
-            $query->setParameter(':crewLead', "%${sSearch}%");
+            $query->setParameter(':crewLead', "%{$sSearch}%");
 
         $esta_query_measured= substr_count($consulta, ':measuredBy');
         if ($esta_query_measured == 1)
-            $query->setParameter(':measuredBy', "%${sSearch}%");
+            $query->setParameter(':measuredBy', "%{$sSearch}%");
 
         $esta_query_station = substr_count($consulta, ':station');
         if ($esta_query_station == 1)
-            $query->setParameter(':station', "%${sSearch}%");
+            $query->setParameter(':station', "%{$sSearch}%");
 
         $esta_query_notes = substr_count($consulta, ':notes');
         if ($esta_query_notes == 1)
-            $query->setParameter(':notes', "%${sSearch}%");
+            $query->setParameter(':notes', "%{$sSearch}%");
 
         $esta_query_materials = substr_count($consulta, ':otherMaterials');
         if ($esta_query_materials == 1)
-            $query->setParameter(':otherMaterials', "%${sSearch}%");
+            $query->setParameter(':otherMaterials', "%{$sSearch}%");
 
         $esta_query_project_id = substr_count($consulta, ':project_id');
         if ($esta_query_project_id == 1) {

@@ -53,8 +53,8 @@ class MaterialRepository extends EntityRepository
 
         if ($sSearch != "")
             $consulta->andWhere('m.name LIKE :name OR u.description LIKE :unit')
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('unit', "%${sSearch}%");
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('unit', "%{$sSearch}%");
 
         switch ($iSortCol_0) {
             case "unit":
@@ -102,11 +102,11 @@ class MaterialRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_unit = substr_count($consulta, ':unit');
         if ($esta_query_unit == 1)
-            $query->setParameter(':unit', "%${sSearch}%");
+            $query->setParameter(':unit', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

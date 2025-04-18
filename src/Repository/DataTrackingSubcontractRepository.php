@@ -364,11 +364,11 @@ class DataTrackingSubcontractRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('s.name LIKE :subcontractor OR i.description LIKE :item OR p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description')
-                ->setParameter('subcontractor', "%${sSearch}%")
-                ->setParameter('item', "%${sSearch}%")
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%");
+                ->setParameter('subcontractor', "%{$sSearch}%")
+                ->setParameter('item', "%{$sSearch}%")
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%");
         }
 
         if ($subcontractor_id != '') {
@@ -511,23 +511,23 @@ class DataTrackingSubcontractRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':klop');
         if ($esta_query_description == 1)
-            $query->setParameter(':klop', "%${sSearch}%");
+            $query->setParameter(':klop', "%{$sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_asdf = substr_count($consulta, ':asdf');
         if ($esta_query_asdf == 1)
-            $query->setParameter(':asdf', "%${sSearch}%");
+            $query->setParameter(':asdf', "%{$sSearch}%");
 
         $esta_query_qwer = substr_count($consulta, ':qwer');
         if ($esta_query_qwer == 1)
-            $query->setParameter(':qwer', "%${sSearch}%");
+            $query->setParameter(':qwer', "%{$sSearch}%");
 
         $esta_query_subcontractor_id = substr_count($consulta, ':subcontractor_id');
         if ($esta_query_subcontractor_id == 1) {
@@ -578,11 +578,11 @@ class DataTrackingSubcontractRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('s.name LIKE :subcontractor OR i.description LIKE :item OR p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description')
-                ->setParameter('subcontractor', "%${sSearch}%")
-                ->setParameter('item', "%${sSearch}%")
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%");
+                ->setParameter('subcontractor', "%{$sSearch}%")
+                ->setParameter('item', "%{$sSearch}%")
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%");
         }
 
         if ($subcontractor_id != '') {
@@ -700,23 +700,23 @@ class DataTrackingSubcontractRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':klop');
         if ($esta_query_description == 1)
-            $query->setParameter(':klop', "%${sSearch}%");
+            $query->setParameter(':klop', "%{$sSearch}%");
 
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_asdf = substr_count($consulta, ':asdf');
         if ($esta_query_asdf == 1)
-            $query->setParameter(':asdf', "%${sSearch}%");
+            $query->setParameter(':asdf', "%{$sSearch}%");
 
         $esta_query_qwer = substr_count($consulta, ':qwer');
         if ($esta_query_qwer == 1)
-            $query->setParameter(':qwer', "%${sSearch}%");
+            $query->setParameter(':qwer', "%{$sSearch}%");
 
         $esta_query_subcontractor_id = substr_count($consulta, ':subcontractor_id');
         if ($esta_query_subcontractor_id == 1) {

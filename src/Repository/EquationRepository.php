@@ -38,8 +38,8 @@ class EquationRepository extends EntityRepository
 
         if ($sSearch != "")
             $consulta->andWhere('e.description LIKE :description OR e.equation LIKE :equation')
-                ->setParameter('description', "%${sSearch}%")
-                ->setParameter('equation', "%${sSearch}%");
+                ->setParameter('description', "%{$sSearch}%")
+                ->setParameter('equation', "%{$sSearch}%");
 
         $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
 
@@ -79,11 +79,11 @@ class EquationRepository extends EntityRepository
         //$sSearch
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_equation = substr_count($consulta, ':equation');
         if ($esta_query_equation == 1)
-            $query->setParameter(':equation', "%${sSearch}%");
+            $query->setParameter(':equation', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

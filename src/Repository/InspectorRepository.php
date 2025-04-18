@@ -38,9 +38,9 @@ class InspectorRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('i.name LIKE :name OR i.email LIKE :email OR i.phone LIKE :phone')
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('email', "%${sSearch}%")
-                ->setParameter('phone', "%${sSearch}%");
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('email', "%{$sSearch}%")
+                ->setParameter('phone', "%{$sSearch}%");
         }
 
         $consulta->orderBy("i.$iSortCol_0", $sSortDir_0);
@@ -82,15 +82,15 @@ class InspectorRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_email = substr_count($consulta, ':email');
         if ($esta_query_email == 1)
-            $query->setParameter(':email', "%${sSearch}%");
+            $query->setParameter(':email', "%{$sSearch}%");
 
         $esta_query_phone = substr_count($consulta, ':phone');
         if ($esta_query_phone == 1)
-            $query->setParameter(':phone', "%${sSearch}%");
+            $query->setParameter(':phone', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;
