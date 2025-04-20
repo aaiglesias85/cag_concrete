@@ -82,8 +82,8 @@ class NotificationRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('u.nombre LIKE :nombre OR n.content LIKE :content')
-                ->setParameter('nombre', "%${sSearch}%")
-                ->setParameter('content', "%${sSearch}%");
+                ->setParameter('nombre', "%{$sSearch}%")
+                ->setParameter('content', "%{$sSearch}%");
         }
 
         if ($usuario_id != "") {
@@ -203,12 +203,12 @@ class NotificationRepository extends EntityRepository
 
         $esta_query_nombre = substr_count($consulta, ':nombre');
         if ($esta_query_nombre == 1) {
-            $query->setParameter('nombre', "%${sSearch}%");
+            $query->setParameter('nombre', "%{$sSearch}%");
         }
 
         $esta_query_content = substr_count($consulta, ':content');
         if ($esta_query_content == 1) {
-            $query->setParameter('content', "%${sSearch}%");
+            $query->setParameter('content', "%{$sSearch}%");
         }
 
         $total = $query->getSingleScalarResult();

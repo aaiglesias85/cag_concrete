@@ -67,6 +67,7 @@ class DefaultService extends Base
                 'project_id' => $project_id,
                 'number' => $value->getProjectNumber(),
                 'name' => $value->getName(),
+                'description' => $value->getDescription(),
                 'dueDate' => $value->getDueDate() != '' ? $value->getDueDate()->format('m/d/Y') : ''
             ];
 

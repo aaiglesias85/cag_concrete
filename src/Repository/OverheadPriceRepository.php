@@ -16,9 +16,8 @@ class OverheadPriceRepository extends EntityRepository
      */
     public function ListarOrdenados()
     {
-        $consulta = $this->createQueryBuilder('o_p')
-            ->orderBy('o_p.name', "ASC");
-
+        $consulta = $this->createQueryBuilder('o')
+            ->orderBy('o.name', "ASC");
 
         return $consulta->getQuery()->getResult();
     }
@@ -33,16 +32,15 @@ class OverheadPriceRepository extends EntityRepository
      */
     public function ListarOverheads($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $consulta = $this->createQueryBuilder('o_p');
+        $consulta = $this->createQueryBuilder('m');
 
-        if ($sSearch != "") {
-            $consulta->andWhere('o_p.name LIKE :name')
-                ->setParameter('name', "%${sSearch}%");
-        }
+        if ($sSearch != "")
+            $consulta->andWhere('o.name LIKE :name')
+                ->setParameter('name', "%{$sSearch}%")
+                ;
 
-
-        $consulta->orderBy("o_p.$iSortCol_0", $sSortDir_0);
-
+        $consulta->orderBy("o.$iSortCol_0", $sSortDir_0);
+        
         if ($limit > 0) {
             $consulta->setMaxResults($limit);
         }
@@ -61,16 +59,16 @@ class OverheadPriceRepository extends EntityRepository
     public function TotalOverheads($sSearch)
     {
         $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(o_p.overheadId) FROM App\Entity\OverheadPrice o_p ';
-        $join = '';
+        $consulta = 'SELECT COUNT(o.materialId) FROM App\Entity\OverheadPrice o ';
+        $join = ' ';
         $where = '';
 
         if ($sSearch != "") {
             $esta_query = explode("WHERE", $where);
             if (count($esta_query) == 1)
-                $where .= 'WHERE (o_p.name LIKE :name) ';
+                $where .= 'WHERE (o.name LIKE :name) ';
             else
-                $where .= 'AND (o_p.name LIKE :name) ';
+                $where .= 'AND (o.name LIKE :name) ';
         }
 
         $consulta .= $join;
@@ -80,7 +78,7 @@ class OverheadPriceRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

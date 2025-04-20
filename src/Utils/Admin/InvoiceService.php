@@ -109,7 +109,7 @@ class InvoiceService extends Base
 
         // project
         $objWorksheet->setCellValue("C17", $project_entity->getCounty());
-        $objWorksheet->setCellValue("C18", $project_entity->getName());
+        $objWorksheet->setCellValue("C18", $project_entity->getDescription());
         $objWorksheet->setCellValue("G17", $project_entity->getProjectIdNumber());
         $objWorksheet->setCellValue("G18", $project_entity->getSubcontract());
         $objWorksheet->setCellValue("G19", $project_number);
@@ -427,7 +427,8 @@ class InvoiceService extends Base
             $projects[] = [
                 'project_id' => $value->getProjectId(),
                 'number' => $value->getProjectNumber(),
-                'name' => $value->getName()
+                'name' => $value->getName(),
+                'description' => $value->getDescription()
             ];
         }
 
@@ -822,7 +823,7 @@ class InvoiceService extends Base
                 "id" => $invoice_id,
                 "number" => $value->getNumber(),
                 "company" => $value->getProject()->getCompany()->getName(),
-                "project" => $value->getProject()->getName(),
+                "project" => $value->getProject()->getDescription(),
                 "startDate" => $value->getStartDate()->format('m/d/Y'),
                 "endDate" => $value->getEndDate()->format('m/d/Y'),
                 "notes" => $this->truncate($value->getNotes(), 50),

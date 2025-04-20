@@ -47,8 +47,8 @@ class SubcontractorEmployeeRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('s_e.name LIKE :name OR s_e.position LIKE :position')
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('position', "%${sSearch}%");
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('position', "%{$sSearch}%");
         }
 
         if ($subcontractor_id != '') {
@@ -103,11 +103,11 @@ class SubcontractorEmployeeRepository extends EntityRepository
         //$sSearch
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_position = substr_count($consulta, ':position');
         if ($esta_query_position == 1)
-            $query->setParameter(':position', "%${sSearch}%");
+            $query->setParameter(':position', "%{$sSearch}%");
 
         $esta_query_subcontractor_id = substr_count($consulta, ':subcontractor_id');
         if ($esta_query_subcontractor_id == 1) {

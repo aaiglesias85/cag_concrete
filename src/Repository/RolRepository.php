@@ -47,7 +47,7 @@ class RolRepository extends EntityRepository
         
         if ($sSearch != "")
             $consulta->andWhere('p.nombre LIKE :nombre')
-                     ->setParameter('nombre', "%${sSearch}%")
+                     ->setParameter('nombre', "%{$sSearch}%")
                     ;
 
         $consulta->orderBy("p.$iSortCol_0", $sSortDir_0);
@@ -88,7 +88,7 @@ class RolRepository extends EntityRepository
         //$sSearch
         $esta_query_nombre = substr_count($consulta, ':nombre');
         if ($esta_query_nombre == 1)
-           $query->setParameter(':nombre', "%${sSearch}%");
+           $query->setParameter(':nombre', "%{$sSearch}%");
                 
         $total = $query->getSingleScalarResult();
         return $total;

@@ -2,47 +2,43 @@
 
 namespace App\Controller\Admin;
 
-
-use App\Entity\Project;
-use App\Entity\Subcontractor;
-
 use App\Utils\Admin\ProjectService;
-use App\Utils\Admin\ReporteSubcontractorService;
+use App\Utils\Admin\ReporteEmployeeService;
 
-use App\Utils\Admin\SubcontractorService;
+use App\Utils\Admin\EmployeeService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ReporteSubcontractorController extends AbstractController
+class ReporteEmployeeController extends AbstractController
 {
 
     private $reporteService;
     private $projectService;
-    private $subcontractorService;
+    private $employeeService;
 
-    public function __construct(ReporteSubcontractorService $reporteService, ProjectService $projectService, SubcontractorService $subcontractorService)
+    public function __construct(ReporteEmployeeService $reporteService, ProjectService $projectService, EmployeeService $employeeService)
     {
         $this->reporteService = $reporteService;
         $this->projectService = $projectService;
-        $this->subcontractorService = $subcontractorService;
+        $this->employeeService = $employeeService;
     }
 
     public function index()
     {
         $usuario = $this->getUser();
-        $permiso = $this->reporteService->BuscarPermiso($usuario->getUsuarioId(), 19);
+        $permiso = $this->reporteService->BuscarPermiso($usuario->getUsuarioId(), 20);
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
-                // subcontractors
-                $subcontractors = $this->subcontractorService->ListarOrdenados();
+                // employees
+                $employees = $this->employeeService->ListarOrdenados();
 
                 // projects
                 $projects = $this->projectService->ListarOrdenados();
 
-                return $this->render('admin/reportes/subcontractor.html.twig', array(
+                return $this->render('admin/reportes/employee.html.twig', array(
                     'permiso' => $permiso[0],
-                    'subcontractors' => $subcontractors,
+                    'employees' => $employees,
                     'projects' => $projects,
                 ));
             }
@@ -61,9 +57,8 @@ class ReporteSubcontractorController extends AbstractController
         // search filter by keywords
         $query = !empty($request->get('query')) ? $request->get('query') : array();
         $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $subcontractor_id = isset($query['subcontractor_id']) && is_string($query['subcontractor_id']) ? $query['subcontractor_id'] : '';
+        $employee_id = isset($query['employee_id']) && is_string($query['employee_id']) ? $query['employee_id'] : '';
         $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
-        $project_item_id = isset($query['project_item_id']) && is_string($query['project_item_id']) ? $query['project_item_id'] : '';
         $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
         $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
 
@@ -79,7 +74,7 @@ class ReporteSubcontractorController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->reporteService->TotalReporteSubcontractors($sSearch, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+            $total = $this->reporteService->TotalReporteEmployees($sSearch, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -99,8 +94,8 @@ class ReporteSubcontractorController extends AbstractController
                 'sort' => $sSortDir_0
             );
 
-            $data = $this->reporteService->ListarReporteSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+            $data = $this->reporteService->ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+                $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -125,14 +120,13 @@ class ReporteSubcontractorController extends AbstractController
     {
 
         $search = $request->get('search');
-        $subcontractor_id = $request->get('subcontractor_id');
+        $employee_id = $request->get('employee_id');
         $project_id = $request->get('project_id');
-        $project_item_id = $request->get('project_item_id');
         $fecha_inicial = $request->get('fecha_inicial');
         $fecha_fin = $request->get('fecha_fin');
 
         try {
-            $url = $this->reporteService->ExportarExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+            $url = $this->reporteService->ExportarExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson['success'] = true;
             $resultadoJson['message'] = "The operation was successful";
@@ -155,14 +149,13 @@ class ReporteSubcontractorController extends AbstractController
     {
 
         $search = $request->get('search');
-        $subcontractor_id = $request->get('subcontractor_id');
+        $employee_id = $request->get('employee_id');
         $project_id = $request->get('project_id');
-        $project_item_id = $request->get('project_item_id');
         $fecha_inicial = $request->get('fecha_inicial');
         $fecha_fin = $request->get('fecha_fin');
 
         try {
-            $total = $this->reporteService->DevolverTotal($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+            $total = $this->reporteService->DevolverTotal($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson['success'] = true;
             $resultadoJson['total'] = $total;

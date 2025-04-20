@@ -65,7 +65,7 @@ class ProjectNotesRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('p_n.notes LIKE :notes')
-                ->setParameter('notes', "%${sSearch}%");
+                ->setParameter('notes', "%{$sSearch}%");
         }
 
         if ($project_id != '') {
@@ -163,7 +163,7 @@ class ProjectNotesRepository extends EntityRepository
         //$sSearch
         $esta_query_notes = substr_count($consulta, ':notes');
         if ($esta_query_notes == 1)
-            $query->setParameter(':notes', "%${sSearch}%");
+            $query->setParameter(':notes', "%{$sSearch}%");
 
         $esta_query_project_id = substr_count($consulta, ':project_id');
         if ($esta_query_project_id == 1) {

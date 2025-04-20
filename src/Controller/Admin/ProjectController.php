@@ -140,6 +140,7 @@ class ProjectController extends AbstractController
         $inspector_id = $request->get('inspector_id');
         $number = $request->get('number');
         $name = $request->get('name');
+        $description = $request->get('description');
         $location = $request->get('location');
         $po_number = $request->get('po_number');
         $po_cg = $request->get('po_cg');
@@ -171,13 +172,13 @@ class ProjectController extends AbstractController
         try {
 
             if ($project_id == "") {
-                $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name,
+                $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name, $description,
                     $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
                 $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             } else {
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
-                    $name, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
+                    $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             }
@@ -657,5 +658,57 @@ class ProjectController extends AbstractController
             return $this->json($resultadoJson);
         }
 
+    }
+
+    /**
+     * listarSubcontractors Acción que lista los subcontractors de un project
+     *
+     */
+    public function listarSubcontractors(Request $request)
+    {
+
+        $project_id = $request->get('project_id');
+
+        try {
+
+            $subcontractors = $this->projectService->ListarSubcontractors($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['subcontractors'] = $subcontractors;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarEmployees Acción que lista los employees de un project
+     *
+     */
+    public function listarEmployees(Request $request)
+    {
+
+        $project_id = $request->get('project_id');
+
+        try {
+
+            $employees = $this->projectService->ListarEmployees($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['employees'] = $employees;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
     }
 }

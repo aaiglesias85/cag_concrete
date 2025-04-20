@@ -21,3 +21,8 @@ salvarEmployeeAdmin:
 cargarDatosEmployeeAdmin:
   path:  /employee/cargarDatos
   defaults: { _controller: App\Controller\Admin\EmployeeController::cargarDatos, _format: json }
+
+#projects
+listarProjectsDeEmployeeAdmin:
+  path: /employee/listarProjects
+  defaults: { _controller: App\Controller\Admin\EmployeeController::listarProjects, _format: json }

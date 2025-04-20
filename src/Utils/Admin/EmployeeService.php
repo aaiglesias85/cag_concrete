@@ -10,6 +10,68 @@ class EmployeeService extends Base
 {
 
     /**
+     * ListarOrdenados
+     * @return array
+     */
+    public function ListarOrdenados()
+    {
+        $employees = [];
+
+        $lista = $this->getDoctrine()->getRepository(Employee::class)
+            ->ListarOrdenados();
+
+        foreach ($lista as $value) {
+            $employees[] = [
+                'employee_id' => $value->getEmployeeId(),
+                'name' => $value->getName(),
+            ];
+
+        }
+
+        return $employees;
+    }
+
+    /**
+     * ListarProjects
+     * @param $employee_id
+     * @return array
+     */
+    public function ListarProjects($employee_id)
+    {
+        $projects = [];
+
+        $employee_projects = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarProjectsDeEmployee($employee_id);
+
+        foreach ($employee_projects as $key => $employee_project) {
+            $value = $employee_project->getDataTracking()->getProject();
+            $project_id = $value->getProjectId();
+
+            // listar ultima nota del proyecto
+            $nota = $this->ListarUltimaNotaDeProject($project_id);
+
+            $projects[] = [
+                "id" => $project_id,
+                "project_id" => $project_id,
+                "projectNumber" => $value->getProjectNumber(),
+                "number" => $value->getProjectNumber(),
+                "name" => $value->getName(),
+                "description" => $value->getDescription(),
+                "company" => $value->getCompany()->getName(),
+                "county" => $value->getCounty(),
+                "status" => $value->getStatus(),
+                "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
+                "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',
+                "dueDate" => $value->getDueDate() != '' ? $value->getDueDate()->format('m/d/Y') : '',
+                'nota' => $nota,
+                'posicion' => $key
+            ];
+        }
+
+        return $projects;
+    }
+
+    /**
      * CargarDatosEmployee: Carga los datos de un employee
      *
      * @param int $employee_id Id

@@ -1,0 +1,15 @@
+reporte_employee:
+  path: /report-employee
+  defaults: { _controller: App\Controller\Admin\ReporteEmployeeController::index }
+
+listarReporteEmployeeAdmin:
+  path: /report-employee/listar
+  defaults: { _controller: App\Controller\Admin\ReporteEmployeeController::listar, _format: json }
+
+exportarExcelReporteEmployeeAdmin:
+  path:  /report-employee/exportarExcel
+  defaults: { _controller: App\Controller\Admin\ReporteEmployeeController::exportarExcel, _format: json }
+
+devolverTotalReporteEmployeeAdmin:
+  path: /report-employee/devolverTotal
+  defaults: { _controller: App\Controller\Admin\ReporteEmployeeController::devolverTotal, _format: json }

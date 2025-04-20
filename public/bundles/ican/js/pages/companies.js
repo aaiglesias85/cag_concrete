@@ -967,6 +967,10 @@ var Companies = function () {
                 title: "Name"
             },
             {
+                field: "description",
+                title: "Description"
+            },
+            {
                 field: "dueDate",
                 title: "Due Date",
                 width: 100,

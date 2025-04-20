@@ -671,6 +671,10 @@ var Items = function () {
                 title: "Name"
             },
             {
+                field: "description",
+                title: "Description"
+            },
+            {
                 field: "posicion",
                 width: 120,
                 title: "Actions",

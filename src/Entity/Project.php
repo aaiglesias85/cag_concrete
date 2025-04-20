@@ -45,6 +45,13 @@ class Project
     /**
      * @var string
      *
+     * @ORM\Column(name="description", type="string", length=255, nullable=false)
+     */
+    private $description;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="location", type="string", length=255, nullable=false)
      */
     private $location;
@@ -206,14 +213,14 @@ class Project
         return $this->projectId;
     }
 
-    public function getName()
+    public function getDescription()
     {
-        return $this->name;
+        return $this->description;
     }
 
-    public function setName($name): void
+    public function setDescription($description): void
     {
-        $this->name = $name;
+        $this->description = $description;
     }
 
     public function getCreatedAt(): \DateTime
@@ -465,6 +472,16 @@ class Project
     public function setProjectIdNumber( $projectIdNumber)
     {
         $this->projectIdNumber = $projectIdNumber;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName( $name)
+    {
+        $this->name = $name;
     }
 
 }

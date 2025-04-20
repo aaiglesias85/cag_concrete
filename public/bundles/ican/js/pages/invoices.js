@@ -494,7 +494,7 @@ var Invoices = function () {
                     //Llenar select
                     var projects = response.invoice.projects;
                     for (var i = 0; i < projects.length; i++) {
-                        var descripcion = `${projects[i].number} - ${projects[i].name}`;
+                        var descripcion = `${projects[i].number} - ${projects[i].description}`;
                         $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
                     }
                     $('#project').select2();
@@ -832,7 +832,7 @@ var Invoices = function () {
                         //Llenar select
                         var projects = response.projects;
                         for (var i = 0; i < projects.length; i++) {
-                            var descripcion = `${projects[i].number} - ${projects[i].name}`;
+                            var descripcion = `${projects[i].number} - ${projects[i].description}`;
                             $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
                         }
                         $('#project').select2();
@@ -877,7 +877,7 @@ var Invoices = function () {
                         //Llenar select
                         var projects = response.projects;
                         for (var i = 0; i < projects.length; i++) {
-                            var descripcion = `${projects[i].number} - ${projects[i].name}`;
+                            var descripcion = `${projects[i].number} - ${projects[i].description}`;
                             $('#filtro-project').append(new Option(descripcion, projects[i].project_id, false, false));
                         }
                         $('#filtro-project').select2();

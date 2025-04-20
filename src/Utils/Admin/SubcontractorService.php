@@ -12,6 +12,29 @@ use App\Utils\Base;
 
 class SubcontractorService extends Base
 {
+
+    /**
+     * ListarOrdenados
+     * @return array
+     */
+    public function ListarOrdenados()
+    {
+        $subcontractors = [];
+
+        $lista = $this->getDoctrine()->getRepository(Subcontractor::class)
+            ->ListarOrdenados();
+
+        foreach ($lista as $value) {
+            $subcontractors[] = [
+                'subcontractor_id' => $value->getSubcontractorId(),
+                'name' => $value->getName(),
+            ];
+
+        }
+
+        return $subcontractors;
+    }
+
     /**
      * ListarEmployeesDeSubcontractor
      * @param $subcontractor_id
@@ -543,8 +566,11 @@ class SubcontractorService extends Base
 
             $projects[] = [
                 "id" => $project_id,
+                "project_id" => $project_id,
                 "projectNumber" => $value->getProjectNumber(),
+                "number" => $value->getProjectNumber(),
                 "name" => $value->getName(),
+                "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),
                 "county" => $value->getCounty(),
                 "status" => $value->getStatus(),

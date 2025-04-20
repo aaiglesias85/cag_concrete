@@ -66,6 +66,7 @@ class ItemService extends Base
                 'project_id' => $value->getProject()->getProjectId(),
                 "number" => $value->getProject()->getProjectNumber(),
                 "name" => $value->getProject()->getName(),
+                "description" => $value->getProject()->getDescription(),
                 "location" => $value->getProject()->getLocation(),
                 "po_number" => $value->getProject()->getPoNumber(),
                 "po_cg" => $value->getProject()->getPoCG(),

@@ -2,7 +2,7 @@
 
 namespace App\Utils\Admin;
 
-use App\Entity\DataTrackingSubcontract;
+use App\Entity\DataTrackingLabor;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -11,23 +11,22 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class ReporteSubcontractorService extends Base
+class ReporteEmployeeService extends Base
 {
 
     /**
      * DevolverTotal: devuelve el total
      * @param $search
-     * @param $subcontractor_id
+     * @param $employee_id
      * @param $project_id
-     * @param $project_item_id
      * @param $fecha_inicial
      * @param $fecha_fin
      * @return bool|float|int|string|null
      */
-    public function DevolverTotal($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    public function DevolverTotal($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
-        $total = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->DevolverTotalReporteSubcontractors($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+        $total = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->DevolverTotalReporteEmployees($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
         $total = number_format($total, 2, '.', ',');
 
@@ -40,7 +39,7 @@ class ReporteSubcontractorService extends Base
      *
      * @author Marcel
      */
-    public function ExportarExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    public function ExportarExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
         //Configurar excel
         Cell::setValueBinder(new AdvancedValueBinder());
@@ -55,44 +54,42 @@ class ReporteSubcontractorService extends Base
 
         // reader
         $reader = IOFactory::createReader('Xlsx');
-        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'reporte-subcontractor.xlsx');
+        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'reporte-employee.xlsx');
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
         $fila = 10;
         $total = 0;
-        $total_qty = 0;
-        $total_price = 0;
+        $total_hours = 0;
+        $total_hourly_rate = 0;
 
-        $lista = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->ListarReporteSubcontractorsParaExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+        $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarReporteEmployeesParaExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
         foreach ($lista as $value) {
 
 
             $date = $value->getDataTracking()->getDate()->format('m/d/Y');
             $objWorksheet->setCellValueExplicit('A' . $fila, $date, DataType::TYPE_STRING);
 
-            $subcontractor = $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "";
+            $employee = $value->getEmployee() ? $value->getEmployee()->getName() : "";
             $project = $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription();
-            $item = $value->getProjectItem()->getItem()->getDescription();
-            $unit = $value->getProjectItem()->getItem()->getUnit()->getDescription();
+            $role = $value->getRole();
 
-            $quantity = $value->getQuantity();
-            $total_qty += $quantity;
+            $hours = $value->getHours();
+            $total_hours += $hours;
 
-            $price = $value->getPrice();
-            $total_price += $price;
+            $hourly_rate = $value->getHourlyRate();
+            $total_hourly_rate += $hourly_rate;
 
-            $subtotal = $quantity * $price;
+            $subtotal = $hours * $hourly_rate;
             $total+=$subtotal;
 
             $objWorksheet
-                ->setCellValue('B' . $fila, $subcontractor)
+                ->setCellValue('B' . $fila, $employee)
                 ->setCellValue('C' . $fila, $project)
-                ->setCellValue('D' . $fila, $item)
-                ->setCellValue('E' . $fila, $unit)
-                ->setCellValue('F' . $fila, $quantity)
-                ->setCellValue('G' . $fila, $price)
-                ->setCellValue('H' . $fila, $subtotal);
+                ->setCellValue('D' . $fila, $role)
+                ->setCellValue('E' . $fila, $hours)
+                ->setCellValue('F' . $fila, $hourly_rate)
+                ->setCellValue('G' . $fila, $subtotal);
 
             $objWorksheet->getStyle('A' . $fila . ':A' . $fila)->applyFromArray($styleArray);
             $objWorksheet->getStyle('B' . $fila . ':B' . $fila)->applyFromArray($styleArray);
@@ -101,7 +98,6 @@ class ReporteSubcontractorService extends Base
             $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
             $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
             $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('H' . $fila . ':H' . $fila)->applyFromArray($styleArray);
 
             $fila++;
 
@@ -110,18 +106,19 @@ class ReporteSubcontractorService extends Base
         // total
         $fila++;
         $objWorksheet
-            ->setCellValue('E' . $fila, "Total")
-            ->setCellValue('F' . $fila, $total_qty)
-            ->setCellValue('G' . $fila, $total_price)
-            ->setCellValue('H' . $fila, $total);
+            ->setCellValue('D' . $fila, "Total")
+            ->setCellValue('E' . $fila, $total_hours)
+            ->setCellValue('F' . $fila, $total_hourly_rate)
+            ->setCellValue('G' . $fila, $total);
 
+        $objWorksheet->getStyle('D' . $fila . ':D' . $fila)->applyFromArray($styleArray);
         $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
         $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
         $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('H' . $fila . ':H' . $fila)->applyFromArray($styleArray);
+
 
         //Salvar excel
-        $fichero = "reporte-subcontractor.xlsx";
+        $fichero = "reporte-employee.xlsx";
 
         $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
         $objWriter->save("uploads" . DIRECTORY_SEPARATOR . "excel" . DIRECTORY_SEPARATOR . $fichero);
@@ -136,7 +133,7 @@ class ReporteSubcontractorService extends Base
     }
 
     /**
-     * ListarReporteSubcontractors: Listar los reporte subcontractors
+     * ListarReporteEmployees: Listar los reporte employees
      *
      * @param int $start Inicio
      * @param int $limit Limite
@@ -144,31 +141,29 @@ class ReporteSubcontractorService extends Base
      *
      * @author Marcel
      */
-    public function ListarReporteSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                                                $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    public function ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+                                                $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
         $arreglo_resultado = array();
 
-        $lista = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->ListarReporteSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+        $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
         foreach ($lista as $value) {
 
-            $quantity = $value->getQuantity();
-            $price = $value->getPrice();
-            $total = $quantity * $price;
+            $hours = $value->getHours();
+            $hourly_rate = $value->getHourlyRate();
+            $total = $hours * $hourly_rate;
 
             $arreglo_resultado[] = [
                 "id" => $value->getId(),
-                'subcontractor' => $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "",
+                'employee' => $value->getEmployee() ? $value->getEmployee()->getName() : "",
                 'project' => $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription(),
                 'date' => $value->getDataTracking()->getDate()->format('m/d/Y'),
-                'item' => $value->getProjectItem()->getItem()->getDescription(),
-                'unit' => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
-                "quantity" => $quantity,
-                "price" => $price,
+                "role" => $value->getRole(),
+                "hours" => $hours,
+                "hourly_rate" => $hourly_rate,
                 "total" => $total,
-                "notes" => $value->getNotes(),
             ];
         }
 
@@ -176,14 +171,14 @@ class ReporteSubcontractorService extends Base
     }
 
     /**
-     * TotalReporteSubcontractors: Total de reporte subcontractors
+     * TotalReporteEmployees: Total de reporte employees
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalReporteSubcontractors($sSearch, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    public function TotalReporteEmployees($sSearch, $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
-        $total = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->TotalReporteSubcontractors($sSearch, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+        $total = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->TotalReporteEmployees($sSearch, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
         return $total;
     }

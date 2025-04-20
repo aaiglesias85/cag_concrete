@@ -69,3 +69,13 @@ agregarItemProjectAdmin:
 eliminarContactProjectAdmin:
   path: /project/eliminarContact
   defaults: { _controller: App\Controller\Admin\ProjectController::eliminarContact, _format: json }
+
+#subcontractors
+listarSubcontractorsDeProjectAdmin:
+  path: /project/listarSubcontractors
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarSubcontractors, _format: json }
+
+#employees
+listarEmployeesDeProjectAdmin:
+  path: /project/listarEmployees
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarEmployees, _format: json }

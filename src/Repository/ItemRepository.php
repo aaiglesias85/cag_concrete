@@ -71,8 +71,8 @@ class ItemRepository extends EntityRepository
 
         if ($sSearch != "")
             $consulta->andWhere('i.description LIKE :description OR u.description LIKE :unit')
-                ->setParameter('description', "%${sSearch}%")
-                ->setParameter('unit', "%${sSearch}%");
+                ->setParameter('description', "%{$sSearch}%")
+                ->setParameter('unit', "%{$sSearch}%");
 
         switch ($iSortCol_0) {
             case "unit":
@@ -120,11 +120,11 @@ class ItemRepository extends EntityRepository
         //$sSearch
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_unit = substr_count($consulta, ':unit');
         if ($esta_query_unit == 1)
-            $query->setParameter(':unit', "%${sSearch}%");
+            $query->setParameter(':unit', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

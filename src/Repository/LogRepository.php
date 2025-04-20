@@ -42,11 +42,11 @@ class LogRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('u.nombre LIKE :nombre OR l.operacion LIKE :operacion OR l.categoria LIKE :categoria OR l.descripcion LIKE :descripcion OR l.ip LIKE :ip')
-                ->setParameter('nombre', "%${sSearch}%")
-                ->setParameter('operacion', "%${sSearch}%")
-                ->setParameter('categoria', "%${sSearch}%")
-                ->setParameter('descripcion', "%${sSearch}%")
-                ->setParameter('ip', "%${sSearch}%");
+                ->setParameter('nombre', "%{$sSearch}%")
+                ->setParameter('operacion', "%{$sSearch}%")
+                ->setParameter('categoria', "%{$sSearch}%")
+                ->setParameter('descripcion', "%{$sSearch}%")
+                ->setParameter('ip', "%{$sSearch}%");
         }
 
         if ($usuario_id != "") {
@@ -166,27 +166,27 @@ class LogRepository extends EntityRepository
 
         $esta_query_nombre = substr_count($consulta, ':nombre');
         if ($esta_query_nombre == 1) {
-            $query->setParameter('nombre', "%${sSearch}%");
+            $query->setParameter('nombre', "%{$sSearch}%");
         }
 
         $esta_query_operacion = substr_count($consulta, ':operacion');
         if ($esta_query_operacion == 1) {
-            $query->setParameter('operacion', "%${sSearch}%");
+            $query->setParameter('operacion', "%{$sSearch}%");
         }
 
         $esta_query_categoria = substr_count($consulta, ':categoria');
         if ($esta_query_categoria == 1) {
-            $query->setParameter('categoria', "%${sSearch}%");
+            $query->setParameter('categoria', "%{$sSearch}%");
         }
 
         $esta_query_descripcion = substr_count($consulta, ':descripcion');
         if ($esta_query_descripcion == 1) {
-            $query->setParameter('descripcion', "%${sSearch}%");
+            $query->setParameter('descripcion', "%{$sSearch}%");
         }
 
         $esta_query_ip = substr_count($consulta, ':ip');
         if ($esta_query_ip == 1) {
-            $query->setParameter('ip', "%${sSearch}%");
+            $query->setParameter('ip', "%{$sSearch}%");
         }
 
         $total = $query->getSingleScalarResult();

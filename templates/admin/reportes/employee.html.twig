@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block subtitle %} - Subcontractors Report{% endblock %}
+{% block subtitle %} - Employees Report{% endblock %}
 
 {% block stylesheetspecific %}
 
@@ -11,7 +11,7 @@
     <div class="m-subheader ">
         <div class="d-flex align-items-center">
             <div class="mr-auto">
-                <h3 class="m-subheader__title m-subheader__title--separator">Subcontractors Report</h3>
+                <h3 class="m-subheader__title m-subheader__title--separator">Employees Report</h3>
                 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
                     <li class="m-nav__item m-nav__item--home">
                         <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
@@ -21,13 +21,13 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Subcontractors Report</span>
+                            <span class="m-nav__link-text">Employees Report</span>
                         </a>
                     </li>
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Subcontractors report</span>
+                            <span class="m-nav__link-text">Employees report</span>
                         </a>
                     </li>
                 </ul>
@@ -38,12 +38,12 @@
 
     <div class="m-content">
 
-        <div id="lista-reporte-subcontractor" class="m-portlet m-portlet--mobile" m-portlet="true">
+        <div id="lista-reporte-employee" class="m-portlet m-portlet--mobile" m-portlet="true">
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
-                            Subcontractors Report
+                            Employees Report
                         </h3>
                     </div>
                       <div class="col-md-1">
@@ -87,11 +87,11 @@
                     <div class="row align-items-center">
                         <div class="col-xl-12 order-1">
                             <div class="row mb-2 align-items-center">
-                                <div class="col-md-4 mb-2" id="select-subcontractor">
-                                    <select class="form-control m-select2 event-change" id="filtro-subcontractor">
-                                        <option value="">Subcontractor</option>
-                                        {% for item in subcontractors %}
-                                            <option value="{{ item.subcontractor_id }}">{{ item.name }}</option>
+                                <div class="col-md-4 mb-2" id="select-employee">
+                                    <select class="form-control m-select2 event-change" id="filtro-employee">
+                                        <option value="">Employee</option>
+                                        {% for item in employees %}
+                                            <option value="{{ item.employee_id }}">{{ item.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -103,14 +103,6 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-2" id="select-project-item">
-                                    <select class="form-control m-select2 event-change" id="filtro-project-item">
-                                        <option value="">Item</option>
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row align-items-center">
                                 <div class="col-md-2 mb-2">
                                     <div class='input-group date'>
                                         <input type='text' class="form-control m-input date-picker"
@@ -133,6 +125,8 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row align-items-center">
                                 <div class="col-md-4 mb-2">
                                     <div class="m-input-icon m-input-icon--left">
                                         <input type="text" class="form-control m-input m_form_search"
@@ -168,7 +162,7 @@
                 </div>
                 <!--end: Search Form -->
                 <!--begin: Datatable -->
-                <div class="m_datatable" id="reporte-subcontractor-table-editable"></div>
+                <div class="m_datatable" id="reporte-employee-table-editable"></div>
                 <!--end: Datatable -->
             </div>
         </div>
@@ -181,7 +175,7 @@
 {% block javascriptsspecific %}
 
 
-    <script src="{{ asset('bundles/ican/js/pages/reporte-subcontractor.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('bundles/ican/js/pages/reporte-employee.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {
@@ -190,11 +184,11 @@
             eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
         };
 
-        var all_subcontractors = {{ subcontractors|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+        var all_employees = {{ employees|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
         var all_projects = {{ projects|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
 
         jQuery(document).ready(function () {
-            ReporteSubcontractor.init();
+            ReporteEmployee.init();
         });
     </script>
 {% endblock %}

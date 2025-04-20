@@ -62,8 +62,8 @@ class AdvertisementRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('a.title LIKE :title OR a.description LIKE :description')
-                ->setParameter('title', "%${sSearch}%")
-                ->setParameter('description', "%${sSearch}%");
+                ->setParameter('title', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%");
         }
 
         if ($fecha_inicial != "") {
@@ -149,11 +149,11 @@ class AdvertisementRepository extends EntityRepository
         //$sSearch
         $esta_query_title = substr_count($consulta, ':title');
         if ($esta_query_title == 1)
-            $query->setParameter(':title', "%${sSearch}%");
+            $query->setParameter(':title', "%{$sSearch}%");
 
         $esta_query_description = substr_count($consulta, ':description');
         if ($esta_query_description == 1)
-            $query->setParameter(':description', "%${sSearch}%");
+            $query->setParameter(':description', "%{$sSearch}%");
 
 
         $esta_query_inicio = substr_count($consulta, ':inicio');

@@ -38,13 +38,13 @@ class SubcontractorRepository extends EntityRepository
         if ($sSearch != ""){
             $consulta->andWhere('s.companyPhone LIKE :companyPhone OR s.companyAddress LIKE :companyAddress OR s.companyName LIKE :companyName OR
              s.contactEmail LIKE :contactEmail OR s.contactName LIKE :contactName OR s.phone LIKE :phone OR s.name LIKE :name')
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('phone', "%${sSearch}%")
-                ->setParameter('contactName', "%${sSearch}%")
-                ->setParameter('companyName', "%${sSearch}%")
-                ->setParameter('companyAddress', "%${sSearch}%")
-                ->setParameter('companyPhone', "%${sSearch}%")
-                ->setParameter('contactEmail', "%${sSearch}%");
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('phone', "%{$sSearch}%")
+                ->setParameter('contactName', "%{$sSearch}%")
+                ->setParameter('companyName', "%{$sSearch}%")
+                ->setParameter('companyAddress', "%{$sSearch}%")
+                ->setParameter('companyPhone', "%{$sSearch}%")
+                ->setParameter('contactEmail', "%{$sSearch}%");
         }
 
 
@@ -87,31 +87,31 @@ class SubcontractorRepository extends EntityRepository
         //$sSearch
         $esta_query_company_phone = substr_count($consulta, ':qaz');
         if ($esta_query_company_phone == 1)
-            $query->setParameter(':qaz', "%${sSearch}%");
+            $query->setParameter(':qaz', "%{$sSearch}%");
 
         $esta_query_company_address = substr_count($consulta, ':wsx');
         if ($esta_query_company_address == 1)
-            $query->setParameter(':wsx', "%${sSearch}%");
+            $query->setParameter(':wsx', "%{$sSearch}%");
 
         $esta_query_company_name = substr_count($consulta, ':edc');
         if ($esta_query_company_name == 1)
-            $query->setParameter(':edc', "%${sSearch}%");
+            $query->setParameter(':edc', "%{$sSearch}%");
 
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
 
         $esta_query_email = substr_count($consulta, ':email');
         if ($esta_query_email == 1)
-            $query->setParameter(':email', "%${sSearch}%");
+            $query->setParameter(':email', "%{$sSearch}%");
 
         $esta_query_phone = substr_count($consulta, ':phone');
         if ($esta_query_phone == 1)
-            $query->setParameter(':phone', "%${sSearch}%");
+            $query->setParameter(':phone', "%{$sSearch}%");
 
         $esta_query_contact = substr_count($consulta, ':contact');
         if ($esta_query_contact == 1)
-            $query->setParameter(':contact', "%${sSearch}%");
+            $query->setParameter(':contact', "%{$sSearch}%");
 
         $total = $query->getSingleScalarResult();
         return $total;

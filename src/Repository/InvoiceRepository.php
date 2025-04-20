@@ -45,17 +45,18 @@ class InvoiceRepository extends EntityRepository
             $consulta->andWhere('i.number LIKE :number OR i.notes LIKE :notes OR
             p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :project OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg')
-                ->setParameter('number', "%${sSearch}%")
-                ->setParameter('notes', "%${sSearch}%")
-                ->setParameter('invoiceContact', "%${sSearch}%")
-                ->setParameter('owner', "%${sSearch}%")
-                ->setParameter('manager', "%${sSearch}%")
-                ->setParameter('county', "%${sSearch}%")
-                ->setParameter('project', "%${sSearch}%")
-                ->setParameter('name', "%${sSearch}%")
-                ->setParameter('po', "%${sSearch}%")
-                ->setParameter('cg', "%${sSearch}%");
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg')
+                ->setParameter('number', "%{$sSearch}%")
+                ->setParameter('notes', "%{$sSearch}%")
+                ->setParameter('invoiceContact', "%{$sSearch}%")
+                ->setParameter('owner', "%{$sSearch}%")
+                ->setParameter('manager', "%{$sSearch}%")
+                ->setParameter('county', "%{$sSearch}%")
+                ->setParameter('project', "%{$sSearch}%")
+                ->setParameter('name', "%{$sSearch}%")
+                ->setParameter('description', "%{$sSearch}%")
+                ->setParameter('po', "%{$sSearch}%")
+                ->setParameter('cg', "%{$sSearch}%");
         }
 
         if ($company_id != '') {
@@ -132,12 +133,12 @@ class InvoiceRepository extends EntityRepository
                 $where .= 'WHERE (i.number LIKE :number OR i.notes LIKE :notes OR
             p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :project OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
             else
                 $where .= 'AND (i.number LIKE :number OR i.notes LIKE :notes OR
             p.invoiceContact LIKE :invoiceContact OR p.owner LIKE :owner OR
              p.manager LIKE :manager OR p.county LIKE :county OR p.projectNumber LIKE :project OR
-              p.name LIKE :name OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
+              p.name LIKE :name OR p.description LIKE :description OR p.poNumber LIKE :po OR p.poCG LIKE :cg) ';
         }
 
         if ($project_id != '') {
@@ -198,43 +199,47 @@ class InvoiceRepository extends EntityRepository
         //$sSearch
         $esta_query_number = substr_count($consulta, ':number');
         if ($esta_query_number == 1)
-            $query->setParameter(':number', "%${sSearch}%");
+            $query->setParameter(':number', "%{$sSearch}%");
 
         $esta_query_notes = substr_count($consulta, ':notes');
         if ($esta_query_notes == 1)
-            $query->setParameter(':notes', "%${sSearch}%");
+            $query->setParameter(':notes', "%{$sSearch}%");
 
         $esta_query_invoice_contact = substr_count($consulta, ':invoiceContact');
         if ($esta_query_invoice_contact == 1)
-            $query->setParameter(':invoiceContact', "%${sSearch}%");
+            $query->setParameter(':invoiceContact', "%{$sSearch}%");
 
         $esta_query_owner = substr_count($consulta, ':owner');
         if ($esta_query_owner == 1)
-            $query->setParameter(':owner', "%${sSearch}%");
+            $query->setParameter(':owner', "%{$sSearch}%");
 
         $esta_query_manager = substr_count($consulta, ':manager');
         if ($esta_query_manager == 1)
-            $query->setParameter(':manager', "%${sSearch}%");
+            $query->setParameter(':manager', "%{$sSearch}%");
 
         $esta_query_county = substr_count($consulta, ':county');
         if ($esta_query_county == 1)
-            $query->setParameter(':county', "%${sSearch}%");
+            $query->setParameter(':county', "%{$sSearch}%");
 
         $esta_query_name = substr_count($consulta, ':name');
         if ($esta_query_name == 1)
-            $query->setParameter(':name', "%${sSearch}%");
+            $query->setParameter(':name', "%{$sSearch}%");
+
+        $esta_query_description = substr_count($consulta, ':description');
+        if ($esta_query_description == 1)
+            $query->setParameter(':description', "%{$sSearch}%");
 
         $esta_query_project = substr_count($consulta, ':project');
         if ($esta_query_project == 1)
-            $query->setParameter(':project', "%${sSearch}%");
+            $query->setParameter(':project', "%{$sSearch}%");
 
         $esta_query_po = substr_count($consulta, ':po');
         if ($esta_query_po == 1)
-            $query->setParameter(':po', "%${sSearch}%");
+            $query->setParameter(':po', "%{$sSearch}%");
 
         $esta_query_cg = substr_count($consulta, ':cg');
         if ($esta_query_cg == 1)
-            $query->setParameter(':cg', "%${sSearch}%");
+            $query->setParameter(':cg', "%{$sSearch}%");
 
         $esta_query_project_id = substr_count($consulta, ':p_id');
         if ($esta_query_project_id == 1) {
