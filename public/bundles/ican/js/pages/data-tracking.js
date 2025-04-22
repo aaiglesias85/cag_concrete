@@ -1367,7 +1367,7 @@ var DataTracking = function () {
             rules: {
                 quantity: {
                     required: true,
-                    pattern: /^[+-]?\d+$/  // permite +12, -34, 56, etc.
+                    pattern: /^[+-]?\d+(\.\d+)?$/ // permite +12, -34, 56, etc.
                 },
             },
             showErrors: function (errorMap, errorList) {
@@ -1570,7 +1570,7 @@ var DataTracking = function () {
                 var old_cant = items_data_tracking[nEditingRowItem].quantity > 0 ? items_data_tracking[nEditingRowItem].quantity : 0;
                 var raw_quantity = quantity.trim(); // por si tiene espacios
                 var sign = raw_quantity.charAt(0); // obtenemos el primer carácter
-                var number = parseInt(raw_quantity.replace(/^[-+]/, ""), 10); // quitamos signo y convertimos a número
+                var number = parseFloat(raw_quantity.replace(/^[-+]/, "")); // quitamos signo y convertimos a número
 
                 // Por defecto, si no tiene signo, consideramos que es una asignación directa
                 var new_quantity = 0;
