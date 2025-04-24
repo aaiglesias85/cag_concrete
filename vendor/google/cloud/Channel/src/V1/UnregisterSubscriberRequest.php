@@ -20,13 +20,14 @@ class UnregisterSubscriberRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string account = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $account = '';
+    protected $account = '';
     /**
-     * Required. Service account to unregister from subscriber access to the topic.
+     * Required. Service account to unregister from subscriber access to the
+     * topic.
      *
      * Generated from protobuf field <code>string service_account = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
 
     /**
      * Constructor.
@@ -37,7 +38,8 @@ class UnregisterSubscriberRequest extends \Google\Protobuf\Internal\Message
      *     @type string $account
      *           Required. Resource name of the account.
      *     @type string $service_account
-     *           Required. Service account to unregister from subscriber access to the topic.
+     *           Required. Service account to unregister from subscriber access to the
+     *           topic.
      * }
      */
     public function __construct($data = NULL) {
@@ -72,7 +74,8 @@ class UnregisterSubscriberRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Service account to unregister from subscriber access to the topic.
+     * Required. Service account to unregister from subscriber access to the
+     * topic.
      *
      * Generated from protobuf field <code>string service_account = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -83,7 +86,8 @@ class UnregisterSubscriberRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Service account to unregister from subscriber access to the topic.
+     * Required. Service account to unregister from subscriber access to the
+     * topic.
      *
      * Generated from protobuf field <code>string service_account = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

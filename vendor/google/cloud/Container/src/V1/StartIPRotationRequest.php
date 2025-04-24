@@ -18,7 +18,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://developers.google.com/console/help/new/#projectnumber).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -44,18 +44,55 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
      */
     protected $cluster_id = '';
     /**
-     * The name (project, location, cluster id) of the cluster to start IP
+     * The name (project, location, cluster name) of the cluster to start IP
      * rotation. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string name = 6;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Whether to rotate credentials during IP rotation.
      *
      * Generated from protobuf field <code>bool rotate_credentials = 7;</code>
      */
-    private $rotate_credentials = false;
+    protected $rotate_credentials = false;
+
+    /**
+     * @param string $projectId Deprecated. The Google Developers Console [project ID or project
+     *                          number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+     *                          This field has been deprecated and replaced by the name field.
+     * @param string $zone      Deprecated. The name of the Google Compute Engine
+     *                          [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+     *                          cluster resides. This field has been deprecated and replaced by the name
+     *                          field.
+     * @param string $clusterId Deprecated. The name of the cluster.
+     *                          This field has been deprecated and replaced by the name field.
+     *
+     * @return \Google\Cloud\Container\V1\StartIPRotationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, string $zone, string $clusterId): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setZone($zone)
+            ->setClusterId($clusterId);
+    }
+
+    /**
+     * @param string $name The name (project, location, cluster name) of the cluster to start IP
+     *                     rotation. Specified in the format `projects/&#42;/locations/&#42;/clusters/*`.
+     *
+     * @return \Google\Cloud\Container\V1\StartIPRotationRequest
+     *
+     * @experimental
+     */
+    public static function buildFromName(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -65,7 +102,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Deprecated. The Google Developers Console [project ID or project
-     *           number](https://developers.google.com/console/help/new/#projectnumber).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *           This field has been deprecated and replaced by the name field.
      *     @type string $zone
      *           Deprecated. The name of the Google Compute Engine
@@ -76,7 +113,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
      *           Deprecated. The name of the cluster.
      *           This field has been deprecated and replaced by the name field.
      *     @type string $name
-     *           The name (project, location, cluster id) of the cluster to start IP
+     *           The name (project, location, cluster name) of the cluster to start IP
      *           rotation. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *     @type bool $rotate_credentials
      *           Whether to rotate credentials during IP rotation.
@@ -89,7 +126,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://developers.google.com/console/help/new/#projectnumber).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -104,7 +141,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://developers.google.com/console/help/new/#projectnumber).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -190,7 +227,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name (project, location, cluster id) of the cluster to start IP
+     * The name (project, location, cluster name) of the cluster to start IP
      * rotation. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string name = 6;</code>
@@ -202,7 +239,7 @@ class StartIPRotationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name (project, location, cluster id) of the cluster to start IP
+     * The name (project, location, cluster name) of the cluster to start IP
      * rotation. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string name = 6;</code>

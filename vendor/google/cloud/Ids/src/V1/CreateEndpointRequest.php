@@ -18,7 +18,7 @@ class CreateEndpointRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The endpoint identifier. This will be part of the endpoint's
      * resource name.
@@ -29,13 +29,13 @@ class CreateEndpointRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string endpoint_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $endpoint_id = '';
+    protected $endpoint_id = '';
     /**
      * Required. The endpoint to create.
      *
      * Generated from protobuf field <code>.google.cloud.ids.v1.Endpoint endpoint = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $endpoint = null;
+    protected $endpoint = null;
     /**
      * An optional request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -51,7 +51,30 @@ class CreateEndpointRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4;</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                        $parent     Required. The endpoint's parent. Please see
+     *                                                  {@see IDSClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Ids\V1\Endpoint $endpoint   Required. The endpoint to create.
+     * @param string                        $endpointId Required. The endpoint identifier. This will be part of the endpoint's
+     *                                                  resource name.
+     *                                                  This value must start with a lowercase letter followed by up to 62
+     *                                                  lowercase letters, numbers, or hyphens, and cannot end with a hyphen.
+     *                                                  Values that do not match this pattern will trigger an INVALID_ARGUMENT
+     *                                                  error.
+     *
+     * @return \Google\Cloud\Ids\V1\CreateEndpointRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Ids\V1\Endpoint $endpoint, string $endpointId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setEndpoint($endpoint)
+            ->setEndpointId($endpointId);
+    }
 
     /**
      * Constructor.

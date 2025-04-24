@@ -32,26 +32,26 @@ class ProductCatalogItem extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string currency_code = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $currency_code = '';
+    protected $currency_code = '';
     /**
      * Optional. Online stock state of the catalog item. Default is `IN_STOCK`.
      *
      * Generated from protobuf field <code>.google.cloud.recommendationengine.v1beta1.ProductCatalogItem.StockState stock_state = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $stock_state = 0;
+    protected $stock_state = 0;
     /**
      * Optional. The available quantity of the item.
      *
      * Generated from protobuf field <code>int64 available_quantity = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $available_quantity = 0;
+    protected $available_quantity = 0;
     /**
      * Optional. Canonical URL directly linking to the item detail page with a
      * length limit of 5 KiB..
      *
      * Generated from protobuf field <code>string canonical_product_uri = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $canonical_product_uri = '';
+    protected $canonical_product_uri = '';
     /**
      * Optional. Product images for the catalog item.
      *
@@ -87,7 +87,7 @@ class ProductCatalogItem extends \Google\Protobuf\Internal\Message
      *     @type string $canonical_product_uri
      *           Optional. Canonical URL directly linking to the item detail page with a
      *           length limit of 5 KiB..
-     *     @type \Google\Cloud\RecommendationEngine\V1beta1\Image[]|\Google\Protobuf\Internal\RepeatedField $images
+     *     @type array<\Google\Cloud\RecommendationEngine\V1beta1\Image>|\Google\Protobuf\Internal\RepeatedField $images
      *           Optional. Product images for the catalog item.
      * }
      */
@@ -317,7 +317,7 @@ class ProductCatalogItem extends \Google\Protobuf\Internal\Message
      * Optional. Product images for the catalog item.
      *
      * Generated from protobuf field <code>repeated .google.cloud.recommendationengine.v1beta1.Image images = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\RecommendationEngine\V1beta1\Image[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\RecommendationEngine\V1beta1\Image>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setImages($var)

@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-compute/v/stable)](https://packagist.org/packages/google/cloud-compute) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-compute.svg)](https://packagist.org/packages/google/cloud-compute)
 
-* [API Documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-compute/latest)
+* [API Documentation](https://cloud.google.com/php/docs/reference/cloud-compute/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -16,16 +16,10 @@ Allows you to create, manage, share and query data.
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-compute
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 ### Authentication
@@ -41,10 +35,15 @@ require 'vendor/autoload.php';
 use Google\Cloud\Compute\V1\InstancesClient;
 
 $instances = new InstancesClient();
-foreach ($instances->list_('[MY_PROJECT_ID]', 'us-west1') as $instance) {
+foreach ($instances->list('[MY_PROJECT_ID]', 'us-west1') as $instance) {
     print($instance->getName() . PHP_EOL);
 }
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

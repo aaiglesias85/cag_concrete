@@ -24,14 +24,21 @@ class IndexPrivateEndpoints extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string match_grpc_address = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $match_grpc_address = '';
+    protected $match_grpc_address = '';
     /**
-     * Output only. The name of the service attachment resource. Populated if private service
-     * connect is enabled.
+     * Output only. The name of the service attachment resource. Populated if
+     * private service connect is enabled.
      *
      * Generated from protobuf field <code>string service_attachment = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $service_attachment = '';
+    protected $service_attachment = '';
+    /**
+     * Output only. PscAutomatedEndpoints is populated if private service connect
+     * is enabled if PscAutomatedConfig is set.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PscAutomatedEndpoints psc_automated_endpoints = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $psc_automated_endpoints;
 
     /**
      * Constructor.
@@ -42,8 +49,11 @@ class IndexPrivateEndpoints extends \Google\Protobuf\Internal\Message
      *     @type string $match_grpc_address
      *           Output only. The ip address used to send match gRPC requests.
      *     @type string $service_attachment
-     *           Output only. The name of the service attachment resource. Populated if private service
-     *           connect is enabled.
+     *           Output only. The name of the service attachment resource. Populated if
+     *           private service connect is enabled.
+     *     @type array<\Google\Cloud\AIPlatform\V1\PscAutomatedEndpoints>|\Google\Protobuf\Internal\RepeatedField $psc_automated_endpoints
+     *           Output only. PscAutomatedEndpoints is populated if private service connect
+     *           is enabled if PscAutomatedConfig is set.
      * }
      */
     public function __construct($data = NULL) {
@@ -78,8 +88,8 @@ class IndexPrivateEndpoints extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The name of the service attachment resource. Populated if private service
-     * connect is enabled.
+     * Output only. The name of the service attachment resource. Populated if
+     * private service connect is enabled.
      *
      * Generated from protobuf field <code>string service_attachment = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -90,8 +100,8 @@ class IndexPrivateEndpoints extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The name of the service attachment resource. Populated if private service
-     * connect is enabled.
+     * Output only. The name of the service attachment resource. Populated if
+     * private service connect is enabled.
      *
      * Generated from protobuf field <code>string service_attachment = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -101,6 +111,34 @@ class IndexPrivateEndpoints extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->service_attachment = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. PscAutomatedEndpoints is populated if private service connect
+     * is enabled if PscAutomatedConfig is set.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PscAutomatedEndpoints psc_automated_endpoints = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getPscAutomatedEndpoints()
+    {
+        return $this->psc_automated_endpoints;
+    }
+
+    /**
+     * Output only. PscAutomatedEndpoints is populated if private service connect
+     * is enabled if PscAutomatedConfig is set.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PscAutomatedEndpoints psc_automated_endpoints = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<\Google\Cloud\AIPlatform\V1\PscAutomatedEndpoints>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setPscAutomatedEndpoints($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\AIPlatform\V1\PscAutomatedEndpoints::class);
+        $this->psc_automated_endpoints = $arr;
 
         return $this;
     }

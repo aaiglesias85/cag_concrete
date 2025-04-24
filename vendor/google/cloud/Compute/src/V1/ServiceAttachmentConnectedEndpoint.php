@@ -16,11 +16,23 @@ use Google\Protobuf\Internal\GPBUtil;
 class ServiceAttachmentConnectedEndpoint extends \Google\Protobuf\Internal\Message
 {
     /**
+     * The url of the consumer network.
+     *
+     * Generated from protobuf field <code>optional string consumer_network = 254357221;</code>
+     */
+    private $consumer_network = null;
+    /**
      * The url of a connected endpoint.
      *
      * Generated from protobuf field <code>optional string endpoint = 130489749;</code>
      */
     private $endpoint = null;
+    /**
+     * The number of consumer Network Connectivity Center spokes that the connected Private Service Connect endpoint has propagated to.
+     *
+     * Generated from protobuf field <code>optional uint32 propagated_connection_count = 324594130;</code>
+     */
+    private $propagated_connection_count = null;
     /**
      * The PSC connection id of the connected endpoint.
      *
@@ -41,8 +53,12 @@ class ServiceAttachmentConnectedEndpoint extends \Google\Protobuf\Internal\Messa
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type string $consumer_network
+     *           The url of the consumer network.
      *     @type string $endpoint
      *           The url of a connected endpoint.
+     *     @type int $propagated_connection_count
+     *           The number of consumer Network Connectivity Center spokes that the connected Private Service Connect endpoint has propagated to.
      *     @type int|string $psc_connection_id
      *           The PSC connection id of the connected endpoint.
      *     @type string $status
@@ -53,6 +69,42 @@ class ServiceAttachmentConnectedEndpoint extends \Google\Protobuf\Internal\Messa
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Cloud\Compute\V1\Compute::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * The url of the consumer network.
+     *
+     * Generated from protobuf field <code>optional string consumer_network = 254357221;</code>
+     * @return string
+     */
+    public function getConsumerNetwork()
+    {
+        return isset($this->consumer_network) ? $this->consumer_network : '';
+    }
+
+    public function hasConsumerNetwork()
+    {
+        return isset($this->consumer_network);
+    }
+
+    public function clearConsumerNetwork()
+    {
+        unset($this->consumer_network);
+    }
+
+    /**
+     * The url of the consumer network.
+     *
+     * Generated from protobuf field <code>optional string consumer_network = 254357221;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setConsumerNetwork($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->consumer_network = $var;
+
+        return $this;
     }
 
     /**
@@ -87,6 +139,42 @@ class ServiceAttachmentConnectedEndpoint extends \Google\Protobuf\Internal\Messa
     {
         GPBUtil::checkString($var, True);
         $this->endpoint = $var;
+
+        return $this;
+    }
+
+    /**
+     * The number of consumer Network Connectivity Center spokes that the connected Private Service Connect endpoint has propagated to.
+     *
+     * Generated from protobuf field <code>optional uint32 propagated_connection_count = 324594130;</code>
+     * @return int
+     */
+    public function getPropagatedConnectionCount()
+    {
+        return isset($this->propagated_connection_count) ? $this->propagated_connection_count : 0;
+    }
+
+    public function hasPropagatedConnectionCount()
+    {
+        return isset($this->propagated_connection_count);
+    }
+
+    public function clearPropagatedConnectionCount()
+    {
+        unset($this->propagated_connection_count);
+    }
+
+    /**
+     * The number of consumer Network Connectivity Center spokes that the connected Private Service Connect endpoint has propagated to.
+     *
+     * Generated from protobuf field <code>optional uint32 propagated_connection_count = 324594130;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setPropagatedConnectionCount($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->propagated_connection_count = $var;
 
         return $this;
     }

@@ -9,16 +9,19 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
+ * Response message for
+ * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ExplainResponse</code>
  */
 class ExplainResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The explanations of the Model's [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
-     * It has the same number of elements as [instances][google.cloud.aiplatform.v1.ExplainRequest.instances]
-     * to be explained.
+     * The explanations of the Model's
+     * [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     * It has the same number of elements as
+     * [instances][google.cloud.aiplatform.v1.ExplainRequest.instances] to be
+     * explained.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Explanation explanations = 1;</code>
      */
@@ -28,10 +31,11 @@ class ExplainResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string deployed_model_id = 2;</code>
      */
-    private $deployed_model_id = '';
+    protected $deployed_model_id = '';
     /**
      * The predictions that are the output of the predictions call.
-     * Same as [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     * Same as
+     * [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Value predictions = 3;</code>
      */
@@ -43,15 +47,18 @@ class ExplainResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\Explanation[]|\Google\Protobuf\Internal\RepeatedField $explanations
-     *           The explanations of the Model's [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
-     *           It has the same number of elements as [instances][google.cloud.aiplatform.v1.ExplainRequest.instances]
-     *           to be explained.
+     *     @type array<\Google\Cloud\AIPlatform\V1\Explanation>|\Google\Protobuf\Internal\RepeatedField $explanations
+     *           The explanations of the Model's
+     *           [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     *           It has the same number of elements as
+     *           [instances][google.cloud.aiplatform.v1.ExplainRequest.instances] to be
+     *           explained.
      *     @type string $deployed_model_id
      *           ID of the Endpoint's DeployedModel that served this explanation.
-     *     @type \Google\Protobuf\Value[]|\Google\Protobuf\Internal\RepeatedField $predictions
+     *     @type array<\Google\Protobuf\Value>|\Google\Protobuf\Internal\RepeatedField $predictions
      *           The predictions that are the output of the predictions call.
-     *           Same as [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     *           Same as
+     *           [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
      * }
      */
     public function __construct($data = NULL) {
@@ -60,9 +67,11 @@ class ExplainResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The explanations of the Model's [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
-     * It has the same number of elements as [instances][google.cloud.aiplatform.v1.ExplainRequest.instances]
-     * to be explained.
+     * The explanations of the Model's
+     * [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     * It has the same number of elements as
+     * [instances][google.cloud.aiplatform.v1.ExplainRequest.instances] to be
+     * explained.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Explanation explanations = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -73,12 +82,14 @@ class ExplainResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The explanations of the Model's [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
-     * It has the same number of elements as [instances][google.cloud.aiplatform.v1.ExplainRequest.instances]
-     * to be explained.
+     * The explanations of the Model's
+     * [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     * It has the same number of elements as
+     * [instances][google.cloud.aiplatform.v1.ExplainRequest.instances] to be
+     * explained.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Explanation explanations = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\Explanation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Explanation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setExplanations($var)
@@ -117,7 +128,8 @@ class ExplainResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * The predictions that are the output of the predictions call.
-     * Same as [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     * Same as
+     * [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Value predictions = 3;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -129,10 +141,11 @@ class ExplainResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * The predictions that are the output of the predictions call.
-     * Same as [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
+     * Same as
+     * [PredictResponse.predictions][google.cloud.aiplatform.v1.PredictResponse.predictions].
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Value predictions = 3;</code>
-     * @param \Google\Protobuf\Value[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Protobuf\Value>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPredictions($var)

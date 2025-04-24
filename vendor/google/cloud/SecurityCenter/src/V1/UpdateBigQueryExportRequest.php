@@ -20,14 +20,30 @@ class UpdateBigQueryExportRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.BigQueryExport big_query_export = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $big_query_export = null;
+    protected $big_query_export = null;
     /**
      * The list of fields to be updated.
      * If empty all mutable fields will be updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\SecurityCenter\V1\BigQueryExport $bigQueryExport Required. The BigQuery export being updated.
+     * @param \Google\Protobuf\FieldMask                     $updateMask     The list of fields to be updated.
+     *                                                                       If empty all mutable fields will be updated.
+     *
+     * @return \Google\Cloud\SecurityCenter\V1\UpdateBigQueryExportRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\SecurityCenter\V1\BigQueryExport $bigQueryExport, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setBigQueryExport($bigQueryExport)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

@@ -4,206 +4,136 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * InvoiceItem
- *
- * @ORM\Table(name="invoice_item")
- * @ORM\Entity(repositoryClass="App\Repository\InvoiceItemRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\InvoiceItemRepository')]
+#[ORM\Table(name: 'invoice_item')]
 class InvoiceItem
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity_from_previous", type="float", nullable=false)
-     */
-    private $quantityFromPrevious;
+    #[ORM\Column(name: 'quantity_from_previous', type: 'float', nullable: false)]
+    private ?float $quantityFromPrevious;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="unpaid_from_previous", type="float", nullable=false)
-     */
-    private $unpaidFromPrevious;
+    #[ORM\Column(name: 'unpaid_from_previous', type: 'float', nullable: false)]
+    private ?float $unpaidFromPrevious;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity", type="float", nullable=false)
-     */
-    private $quantity;
+    #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
+    private ?float $quantity;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
+    private ?float $price;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="paid_qty", type="float", nullable=false)
-     */
-    private $paidQty;
+    #[ORM\Column(name: 'paid_qty', type: 'float', nullable: false)]
+    private ?float $paidQty;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="paid_amount", type="float", nullable=false)
-     */
-    private $paidAmount;
+    #[ORM\Column(name: 'paid_amount', type: 'float', nullable: false)]
+    private ?float $paidAmount;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="paid_amount_total", type="float", nullable=false)
-     */
-    private $paidAmountTotal;
+    #[ORM\Column(name: 'paid_amount_total', type: 'float', nullable: false)]
+    private ?float $paidAmountTotal;
 
-    /**
-     * @var Invoice
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Invoice")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="invoice_id", referencedColumnName="invoice_id")
-     * })
-     */
-    private $invoice;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Invoice')]
+    #[ORM\JoinColumn(name: 'invoice_id', referencedColumnName: 'invoice_id')]
+    private ?Invoice $invoice;
 
-    /**
-     * @var ProjectItem
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\ProjectItem")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_item_id", referencedColumnName="id")
-     * })
-     */
-    private $projectItem;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\ProjectItem')]
+    #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id')]
+    private ?ProjectItem $projectItem;
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getQuantity()
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
-    public function getDate(): \DateTime
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTime $date): void
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * @return Invoice
-     */
-    public function getInvoice()
-    {
-        return $this->invoice;
-    }
-
-    public function setInvoice($invoice)
-    {
-        $this->invoice = $invoice;
-    }
-
-    /**
-     * @return ProjectItem
-     */
-    public function getProjectItem()
-    {
-        return $this->projectItem;
-    }
-
-    public function setProjectItem($projectItem)
-    {
-        $this->projectItem = $projectItem;
-    }
-
-    public function getQuantityFromPrevious()
+    public function getQuantityFromPrevious(): ?float
     {
         return $this->quantityFromPrevious;
     }
 
-    public function setQuantityFromPrevious($quantityFromPrevious)
+    public function setQuantityFromPrevious(?float $quantityFromPrevious): void
     {
         $this->quantityFromPrevious = $quantityFromPrevious;
     }
 
-    public function getPaidQty()
-    {
-        return $this->paidQty;
-    }
-
-    public function setPaidQty($paidQty)
-    {
-        $this->paidQty = $paidQty;
-    }
-
-    public function getPaidAmount()
-    {
-        return $this->paidAmount;
-    }
-
-    public function setPaidAmount($paidAmount)
-    {
-        $this->paidAmount = $paidAmount;
-    }
-
-    public function getPaidAmountTotal()
-    {
-        return $this->paidAmountTotal;
-    }
-
-    public function setPaidAmountTotal($paidAmountTotal)
-    {
-        $this->paidAmountTotal = $paidAmountTotal;
-    }
-
-    public function getUnpaidFromPrevious()
+    public function getUnpaidFromPrevious(): ?float
     {
         return $this->unpaidFromPrevious;
     }
 
-    public function setUnpaidFromPrevious($unpaidFromPrevious)
+    public function setUnpaidFromPrevious(?float $unpaidFromPrevious): void
     {
         $this->unpaidFromPrevious = $unpaidFromPrevious;
     }
 
+    public function getPaidQty(): ?float
+    {
+        return $this->paidQty;
+    }
+
+    public function setPaidQty(?float $paidQty): void
+    {
+        $this->paidQty = $paidQty;
+    }
+
+    public function getPaidAmount(): ?float
+    {
+        return $this->paidAmount;
+    }
+
+    public function setPaidAmount(?float $paidAmount): void
+    {
+        $this->paidAmount = $paidAmount;
+    }
+
+    public function getPaidAmountTotal(): ?float
+    {
+        return $this->paidAmountTotal;
+    }
+
+    public function setPaidAmountTotal(?float $paidAmountTotal): void
+    {
+        $this->paidAmountTotal = $paidAmountTotal;
+    }
+
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice(?Invoice $invoice): void
+    {
+        $this->invoice = $invoice;
+    }
+
+    public function getProjectItem(): ?ProjectItem
+    {
+        return $this->projectItem;
+    }
+
+    public function setProjectItem(?ProjectItem $projectItem): void
+    {
+        $this->projectItem = $projectItem;
+    }
 }

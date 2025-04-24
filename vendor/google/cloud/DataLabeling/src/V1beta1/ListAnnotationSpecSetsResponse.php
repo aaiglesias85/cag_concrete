@@ -26,7 +26,7 @@ class ListAnnotationSpecSetsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -34,7 +34,7 @@ class ListAnnotationSpecSetsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\DataLabeling\V1beta1\AnnotationSpecSet[]|\Google\Protobuf\Internal\RepeatedField $annotation_spec_sets
+     *     @type array<\Google\Cloud\DataLabeling\V1beta1\AnnotationSpecSet>|\Google\Protobuf\Internal\RepeatedField $annotation_spec_sets
      *           The list of annotation spec sets.
      *     @type string $next_page_token
      *           A token to retrieve next page of results.
@@ -60,7 +60,7 @@ class ListAnnotationSpecSetsResponse extends \Google\Protobuf\Internal\Message
      * The list of annotation spec sets.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datalabeling.v1beta1.AnnotationSpecSet annotation_spec_sets = 1;</code>
-     * @param \Google\Cloud\DataLabeling\V1beta1\AnnotationSpecSet[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DataLabeling\V1beta1\AnnotationSpecSet>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAnnotationSpecSets($var)

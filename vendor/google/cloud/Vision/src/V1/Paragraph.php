@@ -20,7 +20,7 @@ class Paragraph extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.vision.v1.TextAnnotation.TextProperty property = 1;</code>
      */
-    private $property = null;
+    protected $property = null;
     /**
      * The bounding box for the paragraph.
      * The vertices are in the order of top-left, top-right, bottom-right,
@@ -40,7 +40,7 @@ class Paragraph extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.vision.v1.BoundingPoly bounding_box = 2;</code>
      */
-    private $bounding_box = null;
+    protected $bounding_box = null;
     /**
      * List of all words in this paragraph.
      *
@@ -52,7 +52,7 @@ class Paragraph extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float confidence = 4;</code>
      */
-    private $confidence = 0.0;
+    protected $confidence = 0.0;
 
     /**
      * Constructor.
@@ -78,7 +78,7 @@ class Paragraph extends \Google\Protobuf\Internal\Message
      *                |    |
      *                1----0
      *             and the vertex order will still be (0, 1, 2, 3).
-     *     @type \Google\Cloud\Vision\V1\Word[]|\Google\Protobuf\Internal\RepeatedField $words
+     *     @type array<\Google\Cloud\Vision\V1\Word>|\Google\Protobuf\Internal\RepeatedField $words
      *           List of all words in this paragraph.
      *     @type float $confidence
      *           Confidence of the OCR results for the paragraph. Range [0, 1].
@@ -204,7 +204,7 @@ class Paragraph extends \Google\Protobuf\Internal\Message
      * List of all words in this paragraph.
      *
      * Generated from protobuf field <code>repeated .google.cloud.vision.v1.Word words = 3;</code>
-     * @param \Google\Cloud\Vision\V1\Word[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Vision\V1\Word>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setWords($var)

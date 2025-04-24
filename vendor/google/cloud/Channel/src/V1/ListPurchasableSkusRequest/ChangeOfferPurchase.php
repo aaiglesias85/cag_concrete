@@ -10,7 +10,8 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * List SKUs for upgrading or downgrading an entitlement. Make the purchase
- * using [CloudChannelService.ChangeOffer][google.cloud.channel.v1.CloudChannelService.ChangeOffer].
+ * using
+ * [CloudChannelService.ChangeOffer][google.cloud.channel.v1.CloudChannelService.ChangeOffer].
  *
  * Generated from protobuf message <code>google.cloud.channel.v1.ListPurchasableSkusRequest.ChangeOfferPurchase</code>
  */
@@ -23,13 +24,13 @@ class ChangeOfferPurchase extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string entitlement = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $entitlement = '';
+    protected $entitlement = '';
     /**
      * Required. Change Type for the entitlement.
      *
      * Generated from protobuf field <code>.google.cloud.channel.v1.ListPurchasableSkusRequest.ChangeOfferPurchase.ChangeType change_type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $change_type = 0;
+    protected $change_type = 0;
 
     /**
      * Constructor.
@@ -108,6 +109,4 @@ class ChangeOfferPurchase extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ChangeOfferPurchase::class, \Google\Cloud\Channel\V1\ListPurchasableSkusRequest_ChangeOfferPurchase::class);
 

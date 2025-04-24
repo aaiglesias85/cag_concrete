@@ -21,27 +21,51 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enabled = 1;</code>
      */
-    private $enabled = false;
+    protected $enabled = false;
     /**
-     * Minimum number of nodes for one location in the NodePool. Must be >= 1 and
-     * <= max_node_count.
+     * Minimum number of nodes for one location in the node pool. Must be greater
+     * than or equal to 0 and less than or equal to max_node_count.
      *
      * Generated from protobuf field <code>int32 min_node_count = 2;</code>
      */
-    private $min_node_count = 0;
+    protected $min_node_count = 0;
     /**
-     * Maximum number of nodes for one location in the NodePool. Must be >=
+     * Maximum number of nodes for one location in the node pool. Must be >=
      * min_node_count. There has to be enough quota to scale up the cluster.
      *
      * Generated from protobuf field <code>int32 max_node_count = 3;</code>
      */
-    private $max_node_count = 0;
+    protected $max_node_count = 0;
     /**
      * Can this node pool be deleted automatically.
      *
      * Generated from protobuf field <code>bool autoprovisioned = 4;</code>
      */
-    private $autoprovisioned = false;
+    protected $autoprovisioned = false;
+    /**
+     * Location policy used when scaling up a nodepool.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePoolAutoscaling.LocationPolicy location_policy = 5;</code>
+     */
+    protected $location_policy = 0;
+    /**
+     * Minimum number of nodes in the node pool. Must be greater than or equal
+     * to 0 and less than or equal to total_max_node_count.
+     * The total_*_node_count fields are mutually exclusive with the *_node_count
+     * fields.
+     *
+     * Generated from protobuf field <code>int32 total_min_node_count = 6;</code>
+     */
+    protected $total_min_node_count = 0;
+    /**
+     * Maximum number of nodes in the node pool. Must be greater than or equal to
+     * total_min_node_count. There has to be enough quota to scale up the cluster.
+     * The total_*_node_count fields are mutually exclusive with the *_node_count
+     * fields.
+     *
+     * Generated from protobuf field <code>int32 total_max_node_count = 7;</code>
+     */
+    protected $total_max_node_count = 0;
 
     /**
      * Constructor.
@@ -52,13 +76,25 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
      *     @type bool $enabled
      *           Is autoscaling enabled for this node pool.
      *     @type int $min_node_count
-     *           Minimum number of nodes for one location in the NodePool. Must be >= 1 and
-     *           <= max_node_count.
+     *           Minimum number of nodes for one location in the node pool. Must be greater
+     *           than or equal to 0 and less than or equal to max_node_count.
      *     @type int $max_node_count
-     *           Maximum number of nodes for one location in the NodePool. Must be >=
+     *           Maximum number of nodes for one location in the node pool. Must be >=
      *           min_node_count. There has to be enough quota to scale up the cluster.
      *     @type bool $autoprovisioned
      *           Can this node pool be deleted automatically.
+     *     @type int $location_policy
+     *           Location policy used when scaling up a nodepool.
+     *     @type int $total_min_node_count
+     *           Minimum number of nodes in the node pool. Must be greater than or equal
+     *           to 0 and less than or equal to total_max_node_count.
+     *           The total_*_node_count fields are mutually exclusive with the *_node_count
+     *           fields.
+     *     @type int $total_max_node_count
+     *           Maximum number of nodes in the node pool. Must be greater than or equal to
+     *           total_min_node_count. There has to be enough quota to scale up the cluster.
+     *           The total_*_node_count fields are mutually exclusive with the *_node_count
+     *           fields.
      * }
      */
     public function __construct($data = NULL) {
@@ -93,8 +129,8 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Minimum number of nodes for one location in the NodePool. Must be >= 1 and
-     * <= max_node_count.
+     * Minimum number of nodes for one location in the node pool. Must be greater
+     * than or equal to 0 and less than or equal to max_node_count.
      *
      * Generated from protobuf field <code>int32 min_node_count = 2;</code>
      * @return int
@@ -105,8 +141,8 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Minimum number of nodes for one location in the NodePool. Must be >= 1 and
-     * <= max_node_count.
+     * Minimum number of nodes for one location in the node pool. Must be greater
+     * than or equal to 0 and less than or equal to max_node_count.
      *
      * Generated from protobuf field <code>int32 min_node_count = 2;</code>
      * @param int $var
@@ -121,7 +157,7 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum number of nodes for one location in the NodePool. Must be >=
+     * Maximum number of nodes for one location in the node pool. Must be >=
      * min_node_count. There has to be enough quota to scale up the cluster.
      *
      * Generated from protobuf field <code>int32 max_node_count = 3;</code>
@@ -133,7 +169,7 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum number of nodes for one location in the NodePool. Must be >=
+     * Maximum number of nodes for one location in the node pool. Must be >=
      * min_node_count. There has to be enough quota to scale up the cluster.
      *
      * Generated from protobuf field <code>int32 max_node_count = 3;</code>
@@ -170,6 +206,96 @@ class NodePoolAutoscaling extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->autoprovisioned = $var;
+
+        return $this;
+    }
+
+    /**
+     * Location policy used when scaling up a nodepool.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePoolAutoscaling.LocationPolicy location_policy = 5;</code>
+     * @return int
+     */
+    public function getLocationPolicy()
+    {
+        return $this->location_policy;
+    }
+
+    /**
+     * Location policy used when scaling up a nodepool.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePoolAutoscaling.LocationPolicy location_policy = 5;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setLocationPolicy($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Container\V1\NodePoolAutoscaling\LocationPolicy::class);
+        $this->location_policy = $var;
+
+        return $this;
+    }
+
+    /**
+     * Minimum number of nodes in the node pool. Must be greater than or equal
+     * to 0 and less than or equal to total_max_node_count.
+     * The total_*_node_count fields are mutually exclusive with the *_node_count
+     * fields.
+     *
+     * Generated from protobuf field <code>int32 total_min_node_count = 6;</code>
+     * @return int
+     */
+    public function getTotalMinNodeCount()
+    {
+        return $this->total_min_node_count;
+    }
+
+    /**
+     * Minimum number of nodes in the node pool. Must be greater than or equal
+     * to 0 and less than or equal to total_max_node_count.
+     * The total_*_node_count fields are mutually exclusive with the *_node_count
+     * fields.
+     *
+     * Generated from protobuf field <code>int32 total_min_node_count = 6;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setTotalMinNodeCount($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->total_min_node_count = $var;
+
+        return $this;
+    }
+
+    /**
+     * Maximum number of nodes in the node pool. Must be greater than or equal to
+     * total_min_node_count. There has to be enough quota to scale up the cluster.
+     * The total_*_node_count fields are mutually exclusive with the *_node_count
+     * fields.
+     *
+     * Generated from protobuf field <code>int32 total_max_node_count = 7;</code>
+     * @return int
+     */
+    public function getTotalMaxNodeCount()
+    {
+        return $this->total_max_node_count;
+    }
+
+    /**
+     * Maximum number of nodes in the node pool. Must be greater than or equal to
+     * total_min_node_count. There has to be enough quota to scale up the cluster.
+     * The total_*_node_count fields are mutually exclusive with the *_node_count
+     * fields.
+     *
+     * Generated from protobuf field <code>int32 total_max_node_count = 7;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setTotalMaxNodeCount($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->total_max_node_count = $var;
 
         return $this;
     }

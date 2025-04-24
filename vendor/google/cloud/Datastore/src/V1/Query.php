@@ -10,6 +10,14 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A query for entities.
+ * The query stages are executed in the following order:
+ * 1. kind
+ * 2. filter
+ * 3. projection
+ * 4. order + start_cursor + end_cursor
+ * 5. offset
+ * 6. limit
+ * 7. find_nearest
  *
  * Generated from protobuf message <code>google.datastore.v1.Query</code>
  */
@@ -44,6 +52,9 @@ class Query extends \Google\Protobuf\Internal\Message
      * The properties to make distinct. The query results will contain the first
      * result for each distinct combination of values for the given properties
      * (if empty, all results are returned).
+     * Requires:
+     * * If `order` is specified, the set of distinct on properties must appear
+     * before the non-distinct on properties in `order`.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.PropertyReference distinct_on = 6;</code>
      */
@@ -82,6 +93,14 @@ class Query extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.Int32Value limit = 12;</code>
      */
     private $limit = null;
+    /**
+     * Optional. A potential Nearest Neighbors Search.
+     * Applies after all other filters and ordering.
+     * Finds the closest vector embeddings to the given query vector.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.FindNearest find_nearest = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $find_nearest = null;
 
     /**
      * Constructor.
@@ -89,19 +108,22 @@ class Query extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Datastore\V1\Projection[]|\Google\Protobuf\Internal\RepeatedField $projection
+     *     @type array<\Google\Cloud\Datastore\V1\Projection>|\Google\Protobuf\Internal\RepeatedField $projection
      *           The projection to return. Defaults to returning all properties.
-     *     @type \Google\Cloud\Datastore\V1\KindExpression[]|\Google\Protobuf\Internal\RepeatedField $kind
+     *     @type array<\Google\Cloud\Datastore\V1\KindExpression>|\Google\Protobuf\Internal\RepeatedField $kind
      *           The kinds to query (if empty, returns entities of all kinds).
      *           Currently at most 1 kind may be specified.
      *     @type \Google\Cloud\Datastore\V1\Filter $filter
      *           The filter to apply.
-     *     @type \Google\Cloud\Datastore\V1\PropertyOrder[]|\Google\Protobuf\Internal\RepeatedField $order
+     *     @type array<\Google\Cloud\Datastore\V1\PropertyOrder>|\Google\Protobuf\Internal\RepeatedField $order
      *           The order to apply to the query results (if empty, order is unspecified).
-     *     @type \Google\Cloud\Datastore\V1\PropertyReference[]|\Google\Protobuf\Internal\RepeatedField $distinct_on
+     *     @type array<\Google\Cloud\Datastore\V1\PropertyReference>|\Google\Protobuf\Internal\RepeatedField $distinct_on
      *           The properties to make distinct. The query results will contain the first
      *           result for each distinct combination of values for the given properties
      *           (if empty, all results are returned).
+     *           Requires:
+     *           * If `order` is specified, the set of distinct on properties must appear
+     *           before the non-distinct on properties in `order`.
      *     @type string $start_cursor
      *           A starting point for the query results. Query cursors are
      *           returned in query result batches and
@@ -120,6 +142,10 @@ class Query extends \Google\Protobuf\Internal\Message
      *           constraints. Optional.
      *           Unspecified is interpreted as no limit.
      *           Must be >= 0 if specified.
+     *     @type \Google\Cloud\Datastore\V1\FindNearest $find_nearest
+     *           Optional. A potential Nearest Neighbors Search.
+     *           Applies after all other filters and ordering.
+     *           Finds the closest vector embeddings to the given query vector.
      * }
      */
     public function __construct($data = NULL) {
@@ -142,7 +168,7 @@ class Query extends \Google\Protobuf\Internal\Message
      * The projection to return. Defaults to returning all properties.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.Projection projection = 2;</code>
-     * @param \Google\Cloud\Datastore\V1\Projection[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\Projection>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setProjection($var)
@@ -170,7 +196,7 @@ class Query extends \Google\Protobuf\Internal\Message
      * Currently at most 1 kind may be specified.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.KindExpression kind = 3;</code>
-     * @param \Google\Cloud\Datastore\V1\KindExpression[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\KindExpression>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setKind($var)
@@ -232,7 +258,7 @@ class Query extends \Google\Protobuf\Internal\Message
      * The order to apply to the query results (if empty, order is unspecified).
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.PropertyOrder order = 5;</code>
-     * @param \Google\Cloud\Datastore\V1\PropertyOrder[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\PropertyOrder>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOrder($var)
@@ -247,6 +273,9 @@ class Query extends \Google\Protobuf\Internal\Message
      * The properties to make distinct. The query results will contain the first
      * result for each distinct combination of values for the given properties
      * (if empty, all results are returned).
+     * Requires:
+     * * If `order` is specified, the set of distinct on properties must appear
+     * before the non-distinct on properties in `order`.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.PropertyReference distinct_on = 6;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -260,9 +289,12 @@ class Query extends \Google\Protobuf\Internal\Message
      * The properties to make distinct. The query results will contain the first
      * result for each distinct combination of values for the given properties
      * (if empty, all results are returned).
+     * Requires:
+     * * If `order` is specified, the set of distinct on properties must appear
+     * before the non-distinct on properties in `order`.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.PropertyReference distinct_on = 6;</code>
-     * @param \Google\Cloud\Datastore\V1\PropertyReference[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\PropertyReference>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDistinctOn($var)
@@ -439,6 +471,46 @@ class Query extends \Google\Protobuf\Internal\Message
     {
         $this->writeWrapperValue("limit", $var);
         return $this;}
+
+    /**
+     * Optional. A potential Nearest Neighbors Search.
+     * Applies after all other filters and ordering.
+     * Finds the closest vector embeddings to the given query vector.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.FindNearest find_nearest = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Datastore\V1\FindNearest|null
+     */
+    public function getFindNearest()
+    {
+        return $this->find_nearest;
+    }
+
+    public function hasFindNearest()
+    {
+        return isset($this->find_nearest);
+    }
+
+    public function clearFindNearest()
+    {
+        unset($this->find_nearest);
+    }
+
+    /**
+     * Optional. A potential Nearest Neighbors Search.
+     * Applies after all other filters and ordering.
+     * Finds the closest vector embeddings to the given query vector.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.FindNearest find_nearest = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Datastore\V1\FindNearest $var
+     * @return $this
+     */
+    public function setFindNearest($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastore\V1\FindNearest::class);
+        $this->find_nearest = $var;
+
+        return $this;
+    }
 
 }
 

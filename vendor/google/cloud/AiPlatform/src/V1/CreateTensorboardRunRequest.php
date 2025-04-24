@@ -9,35 +9,60 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [TensorboardService.CreateTensorboardRun][google.cloud.aiplatform.v1.TensorboardService.CreateTensorboardRun].
+ * Request message for
+ * [TensorboardService.CreateTensorboardRun][google.cloud.aiplatform.v1.TensorboardService.CreateTensorboardRun].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateTensorboardRunRequest</code>
  */
 class CreateTensorboardRunRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the TensorboardExperiment to create the TensorboardRun
-     * in. Format:
+     * Required. The resource name of the TensorboardExperiment to create the
+     * TensorboardRun in. Format:
      * `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The TensorboardRun to create.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.TensorboardRun tensorboard_run = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $tensorboard_run = null;
+    protected $tensorboard_run = null;
     /**
-     * Required. The ID to use for the Tensorboard run, which will become the final
+     * Required. The ID to use for the Tensorboard run, which becomes the final
      * component of the Tensorboard run's resource name.
      * This value should be 1-128 characters, and valid characters
-     * are /[a-z][0-9]-/.
+     * are `/[a-z][0-9]-/`.
      *
      * Generated from protobuf field <code>string tensorboard_run_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $tensorboard_run_id = '';
+    protected $tensorboard_run_id = '';
+
+    /**
+     * @param string                                     $parent           Required. The resource name of the TensorboardExperiment to create the
+     *                                                                     TensorboardRun in. Format:
+     *                                                                     `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
+     *                                                                     Please see {@see TensorboardServiceClient::tensorboardRunName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\TensorboardRun $tensorboardRun   Required. The TensorboardRun to create.
+     * @param string                                     $tensorboardRunId Required. The ID to use for the Tensorboard run, which becomes the final
+     *                                                                     component of the Tensorboard run's resource name.
+     *
+     *                                                                     This value should be 1-128 characters, and valid characters
+     *                                                                     are `/[a-z][0-9]-/`.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\CreateTensorboardRunRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AIPlatform\V1\TensorboardRun $tensorboardRun, string $tensorboardRunId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setTensorboardRun($tensorboardRun)
+            ->setTensorboardRunId($tensorboardRunId);
+    }
 
     /**
      * Constructor.
@@ -46,16 +71,16 @@ class CreateTensorboardRunRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The resource name of the TensorboardExperiment to create the TensorboardRun
-     *           in. Format:
+     *           Required. The resource name of the TensorboardExperiment to create the
+     *           TensorboardRun in. Format:
      *           `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
      *     @type \Google\Cloud\AIPlatform\V1\TensorboardRun $tensorboard_run
      *           Required. The TensorboardRun to create.
      *     @type string $tensorboard_run_id
-     *           Required. The ID to use for the Tensorboard run, which will become the final
+     *           Required. The ID to use for the Tensorboard run, which becomes the final
      *           component of the Tensorboard run's resource name.
      *           This value should be 1-128 characters, and valid characters
-     *           are /[a-z][0-9]-/.
+     *           are `/[a-z][0-9]-/`.
      * }
      */
     public function __construct($data = NULL) {
@@ -64,8 +89,8 @@ class CreateTensorboardRunRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the TensorboardExperiment to create the TensorboardRun
-     * in. Format:
+     * Required. The resource name of the TensorboardExperiment to create the
+     * TensorboardRun in. Format:
      * `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -77,8 +102,8 @@ class CreateTensorboardRunRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the TensorboardExperiment to create the TensorboardRun
-     * in. Format:
+     * Required. The resource name of the TensorboardExperiment to create the
+     * TensorboardRun in. Format:
      * `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -130,10 +155,10 @@ class CreateTensorboardRunRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the Tensorboard run, which will become the final
+     * Required. The ID to use for the Tensorboard run, which becomes the final
      * component of the Tensorboard run's resource name.
      * This value should be 1-128 characters, and valid characters
-     * are /[a-z][0-9]-/.
+     * are `/[a-z][0-9]-/`.
      *
      * Generated from protobuf field <code>string tensorboard_run_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -144,10 +169,10 @@ class CreateTensorboardRunRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the Tensorboard run, which will become the final
+     * Required. The ID to use for the Tensorboard run, which becomes the final
      * component of the Tensorboard run's resource name.
      * This value should be 1-128 characters, and valid characters
-     * are /[a-z][0-9]-/.
+     * are `/[a-z][0-9]-/`.
      *
      * Generated from protobuf field <code>string tensorboard_run_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

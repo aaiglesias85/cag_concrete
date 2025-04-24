@@ -17,17 +17,36 @@
 
 namespace Google\Cloud\PubSub;
 
-use Google\Cloud\Core\ArrayTrait;
+use Google\ApiCore\ApiException;
+use Google\ApiCore\Serializer;
+use Google\Cloud\Core\ApiHelperTrait;
 use Google\Cloud\Core\Duration;
-use Google\Cloud\Core\Exception\NotFoundException;
 use Google\Cloud\Core\Exception\BadRequestException;
-use Google\Cloud\Core\Iam\Iam;
+use Google\Cloud\Core\Exception\NotFoundException;
+use Google\Cloud\Core\Iam\IamManager;
+use Google\Cloud\Core\RequestHandler;
 use Google\Cloud\Core\Timestamp;
 use Google\Cloud\Core\TimeTrait;
 use Google\Cloud\Core\ValidateTrait;
-use Google\Cloud\PubSub\Connection\ConnectionInterface;
-use Google\Cloud\PubSub\Connection\IamSubscription;
-use Google\Cloud\PubSub\IncomingMessageTrait;
+use Google\Cloud\PubSub\V1\AcknowledgeRequest;
+use Google\Cloud\PubSub\V1\Client\PublisherClient;
+use Google\Cloud\PubSub\V1\Client\SubscriberClient;
+use Google\Cloud\PubSub\V1\DeadLetterPolicy;
+use Google\Cloud\PubSub\V1\DeleteSubscriptionRequest;
+use Google\Cloud\PubSub\V1\DetachSubscriptionRequest;
+use Google\Cloud\PubSub\V1\ExpirationPolicy;
+use Google\Cloud\PubSub\V1\GetSubscriptionRequest;
+use Google\Cloud\PubSub\V1\ModifyAckDeadlineRequest;
+use Google\Cloud\PubSub\V1\ModifyPushConfigRequest;
+use Google\Cloud\PubSub\V1\PullRequest;
+use Google\Cloud\PubSub\V1\PushConfig;
+use Google\Cloud\PubSub\V1\RetryPolicy;
+use Google\Cloud\PubSub\V1\SeekRequest;
+use Google\Cloud\PubSub\V1\Subscription as SubscriptionProto;
+use Google\Cloud\PubSub\V1\UpdateSubscriptionRequest;
+use Google\Protobuf\Duration as ProtobufDuration;
+use Google\Protobuf\FieldMask;
+use Google\Protobuf\Timestamp as ProtobufTimestamp;
 use InvalidArgumentException;
 
 /**
@@ -39,7 +58,7 @@ use InvalidArgumentException;
  * // Create subscription through a topic
  * use Google\Cloud\PubSub\PubSubClient;
  *
- * $pubsub = new PubSubClient();
+ * $pubsub = new PubSubClient(['projectId' => 'my-awesome-project']);
  *
  * $topic = $pubsub->topic('my-new-topic');
  *
@@ -50,7 +69,7 @@ use InvalidArgumentException;
  * // Create subscription through PubSubClient
  * use Google\Cloud\PubSub\PubSubClient;
  *
- * $pubsub = new PubSubClient();
+ * $pubsub = new PubSubClient(['projectId' => 'my-awesome-project']);
  *
  * $subscription = $pubsub->subscription(
  *     'my-new-subscription',
@@ -79,22 +98,21 @@ use InvalidArgumentException;
  */
 class Subscription
 {
-    use ArrayTrait;
     use IncomingMessageTrait;
     use ResourceNameTrait;
     use TimeTrait;
     use ValidateTrait;
+    use ApiHelperTrait;
 
     const MAX_MESSAGES = 1000;
 
-    // The Error Info reason that is used to identify a subscription
-    // with EOD enabled or not
-    const EXACTLY_ONCE_FAILURE_REASON = 'EXACTLY_ONCE_ACKID_FAILURE';
-
     /**
-     * @var ConnectionInterface
+     * @internal
+     * The request handler that is responsible for sending a request and
+     * serializing responses into relevant classes.
      */
-    protected $connection;
+    private RequestHandler $requestHandler;
+    private Serializer $serializer;
 
     /**
      * @var string
@@ -127,12 +145,42 @@ class Subscription
     private $iam;
 
     /**
+     * @var int
+     *
+     * The max time an exponential retry should delay for(in microseconds)
+     * set to 64 secs.
+     */
+    private static $exactlyOnceDeliveryMaxRetryTime = 64000000;
+
+    /**
+     * @var string
+     *
+     * The Error Info reason that is used to identify a subscription
+     * with Exactly Once Delivery enabled or not.
+     */
+    private static $exactlyOnceDeliveryFailureReason = 'EXACTLY_ONCE_ACKID_FAILURE';
+
+    /**
+     * @var string
+     */
+    private static $exactlyOnceDeliveryTransientFailurePrefix = 'TRANSIENT_FAILURE';
+
+    /**
+     * @var int
+     *
+     * Max num of retries for an Exactly Once Delivery enabled sub's ack operation.
+     */
+    private static $exactlyOnceDeliveryMaxRetries = 15;
+
+    /**
      * Create a Subscription.
      *
      * The idiomatic way to use this class is through the PubSubClient or Topic,
      * but you can instantiate it directly as well.
      *
-     * @param ConnectionInterface $connection The service connection object
+     * @param RequestHandler The request handler that is responsible for sending a request
+     * and serializing responses into relevant classes.
+     * @param Serializer $serializer The serializer instance to encode/decode messages.
      * @param string $projectId The current project
      * @param string $name The subscription name
      * @param string $topicName The topic name the subscription is attached to
@@ -140,14 +188,16 @@ class Subscription
      * @param array $info [optional] Subscription info. Used to pre-populate the object.
      */
     public function __construct(
-        ConnectionInterface $connection,
+        RequestHandler $requestHandler,
+        Serializer $serializer,
         $projectId,
         $name,
         $topicName,
         $encode,
         array $info = []
     ) {
-        $this->connection = $connection;
+        $this->requestHandler = $requestHandler;
+        $this->serializer = $serializer;
         $this->projectId = $projectId;
         $this->encode = (bool) $encode;
         $this->info = $info;
@@ -213,7 +263,7 @@ class Subscription
      * Execute a service request creating the subscription.
      *
      * The suggested way of creating a subscription is by calling through
-     * {@see Google\Cloud\PubSub\Topic::subscribe()} or {@see Google\Cloud\PubSub\Topic::subscription()}.
+     * {@see Topic::subscribe()} or {@see Topic::subscription()}.
      *
      * Returns subscription info in the format detailed in the documentation
      * for a [subscription](https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions#Subscription).
@@ -259,7 +309,7 @@ class Subscription
      *           delivery attempts for any message. The value must be between 5
      *           and 100.
      *     @type bool $enableMessageOrdering If true, messages published with
-     *           the same `orderingKey` in {@see Google\Cloud\PubSub\Message}
+     *           the same `orderingKey` in {@see Message}
      *           will be delivered to the subscribers in the order in which they
      *           are received by the Pub/Sub system. Otherwise, they may be
      *           delivered in any order.
@@ -326,6 +376,35 @@ class Subscription
      *           be between 0 and 600 seconds. Defaults to 600 seconds.
      *     @type bool $enableExactlyOnceDelivery Indicates whether to enable
      *           'Exactly Once Delivery' on the subscription.
+     *     @type array $cloudStorageConfig If provided, messages will be delivered to Google Cloud Storage.
+     *     @type string $cloudStorageConfig.bucket User-provided name for the Cloud Storage bucket.
+     *           The bucket must be created by the user. The bucket name must be without
+     *           any prefix like "gs://". See the [bucket naming
+     *           requirements] (https://cloud.google.com/storage/docs/buckets#naming).
+     *     @type string $cloudStorageConfig.filenamePrefix
+     *           User-provided prefix for Cloud Storage filename. See the [object naming
+     *           requirements](https://cloud.google.com/storage/docs/objects#naming).
+     *     @type string $cloudStorageConfig.filenameSuffix
+     *           User-provided suffix for Cloud Storage filename. See the [object naming
+     *           requirements](https://cloud.google.com/storage/docs/objects#naming). Must
+     *           not end in "/".
+     *     @type array $cloudStorageConfig.textConfig If present, payloads will be written
+     *           to Cloud Storage as raw text, separated by a newline.
+     *     @type array $cloudStorageConfig.avroConfig If set, message payloads and metadata
+     *           will be written to Cloud Storage in Avro format.
+     *     @type bool $cloudStorageConfig.avroConfig.writeMetadata
+     *           When true, write the subscription name, message_id, publish_time,
+     *           attributes, and ordering_key as additional fields in the output.
+     *     @type Duration|string $cloudStorageConfig.maxDuration The maximum duration
+     *           that can elapse before a new Cloud Storage file is created.
+     *           Min 1 minute, max 10 minutes, default 5 minutes. May not exceed the
+     *           subscription's acknowledgement deadline. If a string is provided,
+     *           it should be as a duration in seconds with up to nine fractional digits,
+     *           terminated by 's', e.g "3.5s"
+     *     @type int|string $cloudStorageConfig.maxBytes The maximum bytes that can be
+     *           written to a Cloud Storage file before a new file is created.
+     *           Min 1 KB, max 10 GiB. The max_bytes limit may be exceeded in cases where
+     *           messages are larger than the limit.
      * }
      * @return array An array of subscription info
      * @throws \InvalidArgumentException
@@ -341,12 +420,29 @@ class Subscription
             );
         }
 
-        $options = $this->formatSubscriptionDurations($options);
+        list($data, $optionalArgs) = $this->splitOptionalArgs($options);
 
-        $this->info = $this->connection->createSubscription([
-            'name' => $this->name,
-            'topic' => $this->topicName
-        ] + $this->formatDeadLetterPolicyForApi($options));
+        $data = $this->formatSubscriptionDurations($data);
+        $data = $this->formatDeadLetterPolicyForApi($data);
+
+        // convert args to protos
+        $protoMap = [
+            'expirationPolicy' => ExpirationPolicy::class,
+            'deadLetterPolicy' => DeadLetterPolicy::class,
+            'retryPolicy' => RetryPolicy::class,
+        ];
+        $data = $this->convertDataToProtos($data, $protoMap);
+        $data['name'] = $this->name;
+        $data['topic'] = $this->topicName;
+
+        $request = $this->serializer->decodeMessage(new SubscriptionProto(), $data);
+
+        $this->info = $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'createSubscription',
+            $request,
+            $options
+        );
 
         return $this->info;
     }
@@ -385,7 +481,7 @@ class Subscription
      *
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/UpdateSubscriptionRequest UpdateSubscriptionRequest
      *
-     * @param array $subscription {
+     * @param array $data {
      *     The Subscription data.
      *
      *     @type int $ackDeadlineSeconds The maximum time after a subscriber
@@ -413,7 +509,7 @@ class Subscription
      *           delivery attempts for any message. The value must be between 5
      *           and 100.
      *     @type bool $enableMessageOrdering If true, messages published with
-     *           the same `orderingKey` in {@see Google\Cloud\PubSub\Message}
+     *           the same `orderingKey` in {@see Message}
      *           will be delivered to the subscribers in the order in which they
      *           are received by the Pub/Sub system. Otherwise, they may be
      *           delivered in any order.
@@ -474,6 +570,35 @@ class Subscription
      *           be between 0 and 600 seconds. Defaults to 600 seconds.
      *     @type bool $enableExactlyOnceDelivery Indicates whether to enable
      *           'Exactly Once Delivery' on the subscription.
+     *     @type array $cloudStorageConfig If provided, messages will be delivered to Google Cloud Storage.
+     *     @type string $cloudStorageConfig.bucket User-provided name for the Cloud Storage bucket.
+     *           The bucket must be created by the user. The bucket name must be without
+     *           any prefix like "gs://". See the [bucket naming
+     *           requirements] (https://cloud.google.com/storage/docs/buckets#naming).
+     *     @type string $cloudStorageConfig.filenamePrefix
+     *           User-provided prefix for Cloud Storage filename. See the [object naming
+     *           requirements](https://cloud.google.com/storage/docs/objects#naming).
+     *     @type string $cloudStorageConfig.filenameSuffix
+     *           User-provided suffix for Cloud Storage filename. See the [object naming
+     *           requirements](https://cloud.google.com/storage/docs/objects#naming). Must
+     *           not end in "/".
+     *     @type array $cloudStorageConfig.textConfig If present, payloads will be written
+     *           to Cloud Storage as raw text, separated by a newline.
+     *     @type array $cloudStorageConfig.avroConfig If set, message payloads and metadata
+     *           will be written to Cloud Storage in Avro format.
+     *     @type bool $cloudStorageConfig.avroConfig.writeMetadata
+     *           When true, write the subscription name, message_id, publish_time,
+     *           attributes, and ordering_key as additional fields in the output.
+     *     @type Duration|string $cloudStorageConfig.maxDuration The maximum duration
+     *           that can elapse before a new Cloud Storage file is created.
+     *           Min 1 minute, max 10 minutes, default 5 minutes. May not exceed the
+     *           subscription's acknowledgement deadline. If a string is provided,
+     *           it should be as a duration in seconds with up to nine fractional digits,
+     *           terminated by 's', e.g "3.5s"
+     *     @type int|string $cloudStorageConfig.maxBytes The maximum bytes that can be
+     *           written to a Cloud Storage file before a new file is created.
+     *           Min 1 KB, max 10 GiB. The max_bytes limit may be exceeded in cases where
+     *           messages are larger than the limit.
      * }
      * @param array $options [optional] {
      *     Configuration options.
@@ -487,13 +612,13 @@ class Subscription
      * }
      * @return array The subscription info.
      */
-    public function update(array $subscription, array $options = [])
+    public function update(array $data, array $options = [])
     {
         $updateMaskPaths = $this->pluck('updateMask', $options, false) ?: [];
         if (!$updateMaskPaths) {
             $excludes = ['name', 'topic'];
             $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveArrayIterator($subscription),
+                new \RecursiveArrayIterator($data),
                 \RecursiveIteratorIterator::CHILD_FIRST
             );
             foreach ($iterator as $leafValue) {
@@ -515,17 +640,30 @@ class Subscription
             }
         }
 
-        $subscription = $this->formatSubscriptionDurations($subscription);
+        $maskPaths = [];
+        foreach ($updateMaskPaths as $path) {
+            $maskPaths[] = $this->serializer::toSnakeCase($path);
+        }
 
-        $subscription = [
-            'name' => $this->name
-        ] + $this->formatDeadLetterPolicyForApi($subscription);
+        $fieldMask = new FieldMask([
+            'paths' => $maskPaths
+        ]);
 
-        return $this->info = $this->connection->updateSubscription([
-            'name' => $this->name,
-            'subscription' => $subscription,
-            'updateMask' => implode(',', $updateMaskPaths)
-        ] + $options);
+        $data = $this->formatSubscriptionDurations($data);
+        $data = $this->formatDeadLetterPolicyForApi($data);
+        $data['name'] = $this->name;
+
+        $data = ['subscription' => $data, 'updateMask' => $fieldMask];
+        $data = $this->convertDataToProtos($data, ['subscription' => SubscriptionProto::class]);
+
+        $request = $this->serializer->decodeMessage(new UpdateSubscriptionRequest(), $data);
+
+        return $this->info = $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'updateSubscription',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -543,9 +681,17 @@ class Subscription
      */
     public function delete(array $options = [])
     {
-        $this->connection->deleteSubscription($options + [
-            'subscription' => $this->name
-        ]);
+        $request = $this->serializer->decodeMessage(
+            new DeleteSubscriptionRequest(),
+            ['subscription' => $this->name]
+        );
+
+        $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'deleteSubscription',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -553,10 +699,10 @@ class Subscription
      *
      * Service errors will NOT bubble up from this method. It will always return
      * a boolean value. If you want to check for errors, use
-     * {@see Google\Cloud\PubSub\Subscription::info()}.
+     * {@see Subscription::info()}.
      *
      * If you need to re-check the existence of a subscription that is already
-     * downloaded, call {@see Google\Cloud\PubSub\Subscription::reload()} first
+     * downloaded, call {@see Subscription::reload()} first
      * to refresh the cached information.
      *
      * Example:
@@ -583,7 +729,7 @@ class Subscription
      * Get info on a subscription
      *
      * If the info is already cached on the object, it will return that result.
-     * To fetch a fresh result, use {@see Google\Cloud\PubSub\Subscription::reload()}.
+     * To fetch a fresh result, use {@see Subscription::reload()}.
      *
      * Example:
      * ```
@@ -625,9 +771,17 @@ class Subscription
      */
     public function reload(array $options = [])
     {
-        return $this->info = $this->connection->getSubscription($options + [
-            'subscription' => $this->name
-        ]);
+        $request = $this->serializer->decodeMessage(
+            new GetSubscriptionRequest(),
+            ['subscription' => $this->name]
+        );
+
+        return $this->info = $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'getSubscription',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -657,21 +811,22 @@ class Subscription
      */
     public function pull(array $options = [])
     {
-        $messages = [];
-        $options['returnImmediately'] = isset($options['returnImmediately'])
-            ? $options['returnImmediately']
-            : false;
-        $options['maxMessages'] = isset($options['maxMessages'])
-            ? $options['maxMessages']
-            : self::MAX_MESSAGES;
+        list($data, $optionalArgs) = $this->splitOptionalArgs($options);
+        $data['subscription'] = $this->name;
+        $data['maxMessages'] =  $data['maxMessages'] ?? self::MAX_MESSAGES;
+        $request = $this->serializer->decodeMessage(new PullRequest(), $data);
 
-        $response = $this->connection->pull($options + [
-            'subscription' => $this->name
-        ]);
+        $messages = [];
+        $response = $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'pull',
+            $request,
+            $optionalArgs
+        );
 
         if (isset($response['receivedMessages'])) {
             foreach ($response['receivedMessages'] as $message) {
-                $messages[] = $this->messageFactory($message, $this->connection, $this->projectId, $this->encode);
+                $messages[] = $this->messageFactory($message, $this->projectId, $this->encode);
             }
         }
 
@@ -681,7 +836,7 @@ class Subscription
     /**
      * Acknowledge receipt of a message.
      *
-     * Use {@see Google\Cloud\PubSub\Subscription::acknowledgeBatch()} to
+     * Use {@see Subscription::acknowledgeBatch()} to
      * acknowledge multiple messages at once.
      *
      * Example:
@@ -692,24 +847,41 @@ class Subscription
      *     $subscription->acknowledge($message);
      * }
      * ```
+     * ```
+     * $messages = $subscription->pull();
+     *
+     * foreach ($messages as $message) {
+     *     $failedMsgs = $subscription->acknowledge($message, ['returnFailures' => true]);
+     *
+     *     // Either log or store the $failedMsgs to be retried later
+     * }
+     * ```
      *
      * @codingStandardsIgnoreStart
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/acknowledge Acknowledge Message
      * @codingStandardsIgnoreEnd
      *
      * @param Message $message A message object.
-     * @param array $options [optional] Configuration Options
-     * @return void
+     * @param array $options [optional] {
+     *      Configuration Options
+     *
+     *      @type bool $returnFailures If set, and if an acknowledgement is failed with a
+     *            temporary failure code, it will be retried with an exponential delay. This will also make sure
+     *            that the permanently failed message is returned to the caller. This is only true for a
+     *            subscription with 'Exactly Once Delivery' enabled.
+     *            Read more about EOD: https://cloud.google.com/pubsub/docs/exactly-once-delivery
+     * }
+     * @return void|array
      */
     public function acknowledge(Message $message, array $options = [])
     {
-        $this->acknowledgeBatch([$message], $options);
+        return $this->acknowledgeBatch([$message], $options);
     }
 
     /**
      * Acknowledge receipt of multiple messages at once.
      *
-     * Use {@see Google\Cloud\PubSub\Subscription::acknowledge()} to acknowledge
+     * Use {@see Subscription::acknowledge()} to acknowledge
      * a single message.
      *
      * Example:
@@ -718,27 +890,45 @@ class Subscription
      *
      * $subscription->acknowledgeBatch($messages);
      * ```
+     * ```
+     * $messages = $subscription->pull();
+     *
+     * $failedMsgs = $subscription->acknowledgeBatch($messages, ['returnFailures' => true]);
+     *
+     * // Either log or store the $failedMsgs to be retried later
+     * ```
      *
      * @codingStandardsIgnoreStart
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/acknowledge Acknowledge Message
      * @codingStandardsIgnoreEnd
      *
      * @param Message[] $messages An array of messages
-     * @param array $options Configuration Options
-     * @return void
+     * @param array $options [optional] {
+     *      Configuration Options
+     *
+     *      @type bool $returnFailures If set, and if a message is failed with a
+     *            temporary failure code, it will be retried with an exponential delay. This will also make sure
+     *            that the permanently failed message is returned to the caller. This is only true for a
+     *            subscription with 'Exactly Once Delivery' enabled.
+     *            Read more about EOD: https://cloud.google.com/pubsub/docs/exactly-once-delivery
+     * }
+     * @return void|array
      */
     public function acknowledgeBatch(array $messages, array $options = [])
     {
         $this->validateBatch($messages, Message::class);
 
+        $returnFailures = $this->pluck('returnFailures', $options, false) ?: false;
+
+        if ($returnFailures) {
+            return $this->acknowledgeBatchWithRetries($messages, $options);
+        }
+
         // the rpc may throw errors for a sub with EOD enabled
         // but we don't act on the exception to maintain compatibility
         try {
-            $this->connection->acknowledge($options + [
-                'subscription' => $this->name,
-                'ackIds' => $this->getMessageAckIds($messages)
-            ]);
-        } catch (BadRequestException $e) {
+            $this->sendAckRequest($messages, $options);
+        } catch (\Exception $e) {
             // bubble up the error if the exception isn't an EOD exception
             if (!$this->isExceptionExactlyOnce($e)) {
                 throw $e;
@@ -747,9 +937,25 @@ class Subscription
     }
 
     /**
+     * Helper that sends an acknowledge request but with retries.
+     *
+     * @param Message[] $messages An array of messages
+     * @param array $options Configuration Options
+     * @return array|void Array of messages which failed permanently
+     */
+    private function acknowledgeBatchWithRetries(array $messages, array $options = [])
+    {
+        $actionFunc = function (&$messages, $options) {
+            $this->sendAckRequest($messages, $options);
+        };
+
+        return $this->retryEodAction($actionFunc, $messages, $options);
+    }
+
+    /**
      * Set the acknowledge deadline for a single ackId.
      *
-     * Use {@see Google\Cloud\PubSub\Subscription::modifyAckDeadlineBatch()} to
+     * Use {@see Subscription::modifyAckDeadlineBatch()} to
      * modify the ack deadline for multiple messages at once.
      *
      * Example:
@@ -778,18 +984,26 @@ class Subscription
      *        seconds after the ModifyAckDeadline call was made. Specifying
      *        zero may immediately make the message available for another pull
      *        request.
-     * @param array $options [optional] Configuration Options
-     * @return void
+     * @param array $options [optional] {
+     *      Configuration Options
+     *
+     *      @type bool $returnFailures If set, and if a message is failed with a
+     *            temporary failure code, it will be retried with an exponential delay. This will also make sure
+     *            that the permanently failed message is returned to the caller. This is only true for a
+     *            subscription with 'Exactly Once Delivery' enabled.
+     *            Read more about EOD: https://cloud.google.com/pubsub/docs/exactly-once-delivery
+     * }
+     * @return void|array
      */
     public function modifyAckDeadline(Message $message, $seconds, array $options = [])
     {
-        $this->modifyAckDeadlineBatch([$message], $seconds, $options);
+        return $this->modifyAckDeadlineBatch([$message], $seconds, $options);
     }
 
     /**
      * Set the acknowledge deadline for multiple ackIds.
      *
-     * Use {@see Google\Cloud\PubSub\Subscription::modifyAckDeadline()} to
+     * Use {@see Subscription::modifyAckDeadline()} to
      * modify the ack deadline for a single message.
      *
      * Example:
@@ -805,6 +1019,12 @@ class Subscription
      * // Now we'll acknowledge
      * $subscription->acknowledgeBatch($messages);
      * ```
+     * ```
+     * $messages = $subscription->pull();
+     * $failedMsgs = $subscription->modifyAckDeadlineBatch($messages, 3, ['returnFailures' => true]);
+     *
+     * // Either log or store the $failedMsgs to be retried later
+     * ```
      *
      * @codingStandardsIgnoreStart
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/modifyAckDeadline Modify Ack Deadline
@@ -817,26 +1037,150 @@ class Subscription
      *        seconds after the ModifyAckDeadline call was made. Specifying
      *        zero may immediately make the message available for another pull
      *        request.
-     * @param array $options [optional] Configuration Options
-     * @return void
+     * @param array $options [optional] {
+     *      Configuration Options
+     *
+     *      @type bool $returnFailures If set, and if a message is failed with a
+     *            temporary failure code, it will be retried with an exponential delay. This will also make sure
+     *            that the permanently failed message is returned to the caller. This is only true for a
+     *            subscription with 'Exactly Once Delivery' enabled.
+     *            Read more about EOD: https://cloud.google.com/pubsub/docs/exactly-once-delivery
+     * }
+     * @return void|array
      */
     public function modifyAckDeadlineBatch(array $messages, $seconds, array $options = [])
     {
         $this->validateBatch($messages, Message::class);
 
+        $returnFailures = $this->pluck('returnFailures', $options, false) ?: false;
+
+        if ($returnFailures) {
+            return $this->modifyAckDeadlineBatchWithRetries($messages, $seconds, $options);
+        }
+
         // the rpc may throw errors for a sub with EOD enabled
         // but we don't act on the exception to maintain compatibility
         try {
-            $this->connection->modifyAckDeadline($options + [
-                'subscription' => $this->name,
-                'ackIds' => $this->getMessageAckIds($messages),
-                'ackDeadlineSeconds' => $seconds
-            ]);
+            $this->sendModAckRequest($messages, $seconds, $options);
         } catch (BadRequestException $e) {
             // bubble up the error if the exception isn't an EOD exception
             if (!$this->isExceptionExactlyOnce($e)) {
                 throw $e;
             }
+        }
+    }
+
+    /**
+     * Helper that sends a request to modify the ack deadline but with retries.
+     *
+     * @param Message[] $messages An array of messages
+     * @param int $seconds The new ack deadline with respect to the time
+     *        this request was sent to the Pub/Sub system. Must be >= 0. For
+     *        example, if the value is 10, the new ack deadline will expire 10
+     *        seconds after the ModifyAckDeadline call was made. Specifying
+     *        zero may immediately make the message available for another pull
+     *        request.
+     * @param array $options Configuration Options
+     *
+     * @return array
+     */
+    private function modifyAckDeadlineBatchWithRetries(array $messages, $seconds, array $options)
+    {
+        $actionFunc = function (&$messages, $options) use ($seconds) {
+            $this->sendModAckRequest($messages, $seconds, $options);
+        };
+
+        return $this->retryEodAction($actionFunc, $messages, $options);
+    }
+
+    /**
+     * Helper function to retry an action for an `Exactly Once Delivery` enabled subscription
+     * with an ExponentionBackOff.
+     *
+     * @param callable $actionFunc The function to be retried
+     * @param Messages[] $messages The messages to be passed on to the pubsub service
+     * @param array $options The configuration options
+     */
+    private function retryEodAction(callable $actionFunc, array $messages, array $options)
+    {
+        $failed = [];
+        $eodEnabled = true;
+        $startTime = time();
+        $maxAttemptTime = 10 * 60;  // 10 minutes
+
+        // Func that decides if we need to retry again or not
+        $retryFunc = function (
+            \Exception $e
+        ) use (
+            &$messages,
+            &$failed,
+            &$eodEnabled,
+            $startTime,
+            $maxAttemptTime
+        ) {
+            // If the subscription isn't EOD enabled, the method behaves as the acknowledge method.
+            // Info from the exception is used instead of $subscription->info() to avoid
+            // the need of `pubsub.subscriptions.get` permission.
+            if (!$this->isExceptionExactlyOnce($e)) {
+                $eodEnabled = false;
+                return false;
+            }
+
+            $retryAckIds = $this->getRetryableAckIds($e);
+
+            // Find the messages which can be retried
+            $messages = array_filter($messages, function ($message) use (
+                $retryAckIds,
+                &$failed,
+                $startTime,
+                $maxAttemptTime
+            ) {
+                // A message will only be retried if
+                // 1. It's ackId is in the list of retryable ackIds
+                // 2. The total time elapsed hasn't crossed $maxAttemptTime seconds
+                if (in_array($message->ackId(), $retryAckIds)
+                    && time() - $startTime < $maxAttemptTime
+                ) {
+                    return true;
+                }
+
+                // If a message ack fails permanently, we remove it from the $messages array
+                // and add it to the list of failed messages
+                $failed[] = $message;
+
+                return false;
+            });
+
+            // Retry only if there are retryable messages left
+            return count($messages) > 0;
+        };
+
+        // min delay of 1 sec, max delay of 64 secs
+        // doubles on every attempt
+        // We use 15 retries as the number of retries should be high enough to have a total delay
+        // of 10 minutes($maxAttemptTime)
+        $retrySettings = [
+            'initialRetryDelayMillis' => 1000,
+            'maxRetryDelayMillis' => self::$exactlyOnceDeliveryMaxRetryTime,
+            'retryDelayMultiplier' => 2,
+            'retryFunction' => $retryFunc,
+            'maxRetries' => self::$exactlyOnceDeliveryMaxRetries
+        ];
+
+        $options['retrySettings'] = $retrySettings;
+
+        try {
+            $actionFunc($messages, $options);
+        } catch (BadRequestException $e) {
+            // When an exception is thrown in the action func
+            // and retry function returns false
+            // the exception is passed here
+        }
+
+        // We don't return anything if EOD is disabled
+        // to make it behave like if the flag `returnFailures` wasn't set.
+        if ($eodEnabled) {
+            return $failed;
         }
     }
 
@@ -869,10 +1213,17 @@ class Subscription
      */
     public function modifyPushConfig(array $pushConfig, array $options = [])
     {
-        $this->connection->modifyPushConfig($options + [
-            'subscription' => $this->name,
-            'pushConfig' => $pushConfig
-        ]);
+        $data = ['pushConfig' => $pushConfig, 'subscription' => $this->name];
+        $data = $this->convertDataToProtos($data, ['pushConfig' => PushConfig::class]);
+
+        $request = $this->serializer->decodeMessage(new ModifyPushConfigRequest(), $data);
+
+        $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'modifyPushConfig',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -896,10 +1247,18 @@ class Subscription
      */
     public function seekToTime(Timestamp $timestamp, array $options = [])
     {
-        return $this->connection->seek([
-            'subscription' => $this->name,
-            'time' => $timestamp->formatAsString()
-        ] + $options);
+        $data = ['time' => $timestamp->formatForApi(), 'subscription' => $this->name];
+
+        $data = $this->convertDataToProtos($data, ['time' => ProtobufTimestamp::class]);
+        $request = $this->serializer->decodeMessage(new SeekRequest(), $data);
+
+        return $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'seek',
+            $request,
+            $options,
+            true
+        );
     }
 
     /**
@@ -922,10 +1281,16 @@ class Subscription
      */
     public function seekToSnapshot(Snapshot $snapshot, array $options = [])
     {
-        return $this->connection->seek([
-            'subscription' => $this->name,
-            'snapshot' => $snapshot->name()
-        ] + $options);
+        $data = ['subscription' => $this->name, 'snapshot' => $snapshot->name()];
+        $request = $this->serializer->decodeMessage(new SeekRequest(), $data);
+
+        return $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'seek',
+            $request,
+            $options,
+            true
+        );
     }
 
     /**
@@ -945,9 +1310,15 @@ class Subscription
      */
     public function detach(array $options = [])
     {
-        return $this->connection->detachSubscription([
-            'subscription' => $this->name
-        ] + $options);
+        $data = ['subscription' => $this->name];
+        $request = $this->serializer->decodeMessage(new DetachSubscriptionRequest(), $data);
+
+        return $this->requestHandler->sendRequest(
+            PublisherClient::class,
+            'detachSubscription',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -965,13 +1336,12 @@ class Subscription
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/testIamPermissions Test Subscription Permissions
      * @codingStandardsIgnoreEnd
      *
-     * @return Iam
+     * @return IamManager
      */
     public function iam()
     {
         if (!$this->iam) {
-            $iamConnection = new IamSubscription($this->connection);
-            $this->iam = new Iam($iamConnection, $this->name);
+            $this->iam = new IamManager($this->requestHandler, $this->serializer, SubscriberClient::class, $this->name);
         }
 
         return $this->iam;
@@ -996,84 +1366,106 @@ class Subscription
     /**
      * Format Duration objects for the API.
      *
-     * @param array $options
+     * @param array $data
      * @return array
      */
-    private function formatSubscriptionDurations(array $options)
+    private function formatSubscriptionDurations(array $data)
     {
-        if (isset($options['messageRetentionDuration']) && $options['messageRetentionDuration'] instanceof Duration) {
-            $duration = $options['messageRetentionDuration']->get();
-            $options['messageRetentionDuration'] = sprintf(
-                '%s.%ss',
-                $duration['seconds'],
-                $this->convertNanoSecondsToFraction($duration['nanos'], false)
+        if (isset($data['messageRetentionDuration'])) {
+            if ($data['messageRetentionDuration'] instanceof Duration) {
+                $duration = $data['messageRetentionDuration']->get();
+                $data['messageRetentionDuration'] = sprintf(
+                    '%s.%ss',
+                    $duration['seconds'],
+                    $this->convertNanoSecondsToFraction($duration['nanos'], false)
+                );
+            }
+            $data['messageRetentionDuration'] = new ProtobufDuration(
+                $this->formatDurationForApi($data['messageRetentionDuration'])
             );
         }
 
-        if (isset($options['expirationPolicy']['ttl']) && $options['expirationPolicy']['ttl'] instanceof Duration) {
-            $duration = $options['expirationPolicy']['ttl']->get();
-            $options['expirationPolicy']['ttl'] = sprintf(
-                '%s.%ss',
-                $duration['seconds'],
-                $this->convertNanoSecondsToFraction($duration['nanos'], false)
-            );
+        if (isset($data['retryPolicy'])) {
+            if (isset($data['expirationPolicy']['ttl']) && $data['expirationPolicy']['ttl'] instanceof Duration) {
+                $duration = $data['expirationPolicy']['ttl']->get();
+                $data['expirationPolicy']['ttl'] = sprintf(
+                    '%s.%ss',
+                    $duration['seconds'],
+                    $this->convertNanoSecondsToFraction($duration['nanos'], false)
+                );
+            }
+
+            if (isset($data['retryPolicy']['minimumBackoff']) &&
+                $data['retryPolicy']['minimumBackoff'] instanceof Duration
+            ) {
+                $duration = $data['retryPolicy']['minimumBackoff']->get();
+                $data['retryPolicy']['minimumBackoff'] = sprintf(
+                    '%s.%ss',
+                    $duration['seconds'],
+                    $this->convertNanoSecondsToFraction($duration['nanos'], false)
+                );
+            }
+
+            if (isset($data['retryPolicy']['maximumBackoff']) &&
+                $data['retryPolicy']['maximumBackoff'] instanceof Duration
+            ) {
+                $duration = $data['retryPolicy']['maximumBackoff']->get();
+                $data['retryPolicy']['maximumBackoff'] = sprintf(
+                    '%s.%ss',
+                    $duration['seconds'],
+                    $this->convertNanoSecondsToFraction($duration['nanos'], false)
+                );
+            }
         }
 
-        if (isset($options['retryPolicy']['minimumBackoff']) &&
-            $options['retryPolicy']['minimumBackoff'] instanceof Duration
+        if (isset($data['cloudStorageConfig']['maxDuration']) &&
+            $data['cloudStorageConfig']['maxDuration'] instanceof Duration
         ) {
-            $duration = $options['retryPolicy']['minimumBackoff']->get();
-            $options['retryPolicy']['minimumBackoff'] = sprintf(
+            $duration = $data['cloudStorageConfig']['maxDuration']->get();
+            $data['cloudStorageConfig']['maxDuration'] = sprintf(
                 '%s.%ss',
                 $duration['seconds'],
                 $this->convertNanoSecondsToFraction($duration['nanos'], false)
             );
         }
 
-        if (isset($options['retryPolicy']['maximumBackoff']) &&
-            $options['retryPolicy']['maximumBackoff'] instanceof Duration
-        ) {
-            $duration = $options['retryPolicy']['maximumBackoff']->get();
-            $options['retryPolicy']['maximumBackoff'] = sprintf(
-                '%s.%ss',
-                $duration['seconds'],
-                $this->convertNanoSecondsToFraction($duration['nanos'], false)
-            );
-        }
-
-        return $options;
+        return $data;
     }
 
     /**
      * Format dead letter topic subscription data for API.
      *
-     * @param array $subscription
+     * @param array $data
      * @return array
      */
-    private function formatDeadLetterPolicyForApi(array $subscription)
+    private function formatDeadLetterPolicyForApi(array $data)
     {
-        if (isset($subscription['deadLetterPolicy'])) {
-            if ($subscription['deadLetterPolicy']['deadLetterTopic'] instanceof Topic) {
-                $topic = $subscription['deadLetterPolicy']['deadLetterTopic'];
-                $subscription['deadLetterPolicy']['deadLetterTopic'] = $topic->name();
+        if (isset($data['deadLetterPolicy'])) {
+            if ($data['deadLetterPolicy']['deadLetterTopic'] instanceof Topic) {
+                $topic = $data['deadLetterPolicy']['deadLetterTopic'];
+                $data['deadLetterPolicy']['deadLetterTopic'] = $topic->name();
             }
         }
 
-        return $subscription;
+        return $data;
     }
 
     /**
      * Checks if a given exception failure is because of
      * an EOD failure.
      *
-     * @param BadRequestException $e
+     * @param \Exception $e
      * @return boolean
      */
-    private function isExceptionExactlyOnce(BadRequestException $e)
+    private function isExceptionExactlyOnce(\Exception $e)
     {
+        if (!$e instanceof ApiException && !$e instanceof BadRequestException) {
+            return false;
+        }
+
         $reason = $e->getReason();
 
-        return $reason === self::EXACTLY_ONCE_FAILURE_REASON;
+        return $reason === self::$exactlyOnceDeliveryFailureReason;
     }
 
     /**
@@ -1089,7 +1481,94 @@ class Subscription
             'topicName' => $this->topicName,
             'projectId' => $this->projectId,
             'info' => $this->info,
-            'connection' => get_class($this->connection)
+            'requestHandler' => $this->requestHandler
         ];
+    }
+
+    /**
+     * Returns the temporarily failed ackIds from the exception object
+     *
+     * @param \Exception
+     * @return array
+     */
+    private function getRetryableAckIds(\Exception $e)
+    {
+        $ackIds = [];
+
+        // EOD enabled subscription
+        if ($this->isExceptionExactlyOnce($e)) {
+            $metadata = $e->getErrorInfoMetadata();
+
+            foreach ($metadata as $ackId => $failureReason) {
+                // check if the prefix of the failure reason is same as
+                // the transient failure for EOD enabled subscriptions
+                if (strpos($failureReason, self::$exactlyOnceDeliveryTransientFailurePrefix) === 0) {
+                    $ackIds[] = $ackId;
+                }
+            }
+        }
+
+        return $ackIds;
+    }
+
+    /**
+     * Func to change the maximum delay time for an `Exactly Once Delivery` enabled subscription's
+     * retry attempt.
+     *
+     * @internal
+     */
+    public static function setMaxEodRetryTime($maxTime)
+    {
+        self::$exactlyOnceDeliveryMaxRetryTime = $maxTime;
+    }
+
+    /**
+     * Getter for the private static variable
+     * @return int
+     */
+    public static function getMaxRetries()
+    {
+        return self::$exactlyOnceDeliveryMaxRetries;
+    }
+
+    /**
+     * Helper function that sends an ack request for the given msgs.
+     *
+     * @param array $messages List of messages to ack.
+     * @param array $options
+     */
+    private function sendAckRequest(array $messages, array $options)
+    {
+        $ackIds = $this->getMessageAckIds($messages);
+        $data = ['subscription' => $this->name, 'ackIds' => $ackIds];
+        $request = $this->serializer->decodeMessage(new AcknowledgeRequest(), $data);
+
+        $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'acknowledge',
+            $request,
+            $options
+        );
+    }
+
+    /**
+     * Helper function that sends a modack request for the given msgs.
+     *
+     * @param array $messages List of messages to ack.
+     * @param int $seconds The new deadline in seconds.
+     * @param array $options
+     */
+    private function sendModAckRequest(array $messages, $seconds, array $options)
+    {
+        $ackIds = $this->getMessageAckIds($messages);
+        $data = ['subscription' => $this->name, 'ackIds' => $ackIds, 'ackDeadlineSeconds' => $seconds];
+        $request = $this->serializer->decodeMessage(new ModifyAckDeadlineRequest(), $data);
+
+        $this->requestHandler->sendRequest(
+            SubscriberClient::class,
+            'modifyAckDeadline',
+            $request,
+            $options
+        );
     }
 }

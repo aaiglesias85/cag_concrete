@@ -27,7 +27,23 @@ class GetSnapshotRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The unique name of the requested snapshot.
+     *                     Values are of the form
+     *                     `projects/{project}/instances/{instance}/clusters/{cluster}/snapshots/{snapshot}`. Please see
+     *                     {@see BigtableTableAdminClient::snapshotName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Bigtable\Admin\V2\GetSnapshotRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

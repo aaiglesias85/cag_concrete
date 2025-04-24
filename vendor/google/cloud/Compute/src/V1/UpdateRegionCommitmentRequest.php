@@ -16,7 +16,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class UpdateRegionCommitmentRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Name of the commitment for which auto renew is being updated.
+     * Name of the commitment that you want to update.
      *
      * Generated from protobuf field <code>string commitment = 482134805 [(.google.api.field_behavior) = REQUIRED];</code>
      */
@@ -57,13 +57,32 @@ class UpdateRegionCommitmentRequest extends \Google\Protobuf\Internal\Message
     private $update_mask = null;
 
     /**
+     * @param string                              $project            Project ID for this request.
+     * @param string                              $region             Name of the region for this request.
+     * @param string                              $commitment         Name of the commitment that you want to update.
+     * @param \Google\Cloud\Compute\V1\Commitment $commitmentResource The body resource for this request
+     *
+     * @return \Google\Cloud\Compute\V1\UpdateRegionCommitmentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $project, string $region, string $commitment, \Google\Cloud\Compute\V1\Commitment $commitmentResource): self
+    {
+        return (new self())
+            ->setProject($project)
+            ->setRegion($region)
+            ->setCommitment($commitment)
+            ->setCommitmentResource($commitmentResource);
+    }
+
+    /**
      * Constructor.
      *
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
      *     @type string $commitment
-     *           Name of the commitment for which auto renew is being updated.
+     *           Name of the commitment that you want to update.
      *     @type \Google\Cloud\Compute\V1\Commitment $commitment_resource
      *           The body resource for this request
      *     @type string $paths
@@ -83,7 +102,7 @@ class UpdateRegionCommitmentRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the commitment for which auto renew is being updated.
+     * Name of the commitment that you want to update.
      *
      * Generated from protobuf field <code>string commitment = 482134805 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -94,7 +113,7 @@ class UpdateRegionCommitmentRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the commitment for which auto renew is being updated.
+     * Name of the commitment that you want to update.
      *
      * Generated from protobuf field <code>string commitment = 482134805 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

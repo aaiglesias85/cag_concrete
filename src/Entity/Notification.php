@@ -4,109 +4,59 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Notification
- *
- * @ORM\Table(name="notification")
- * @ORM\Entity(repositoryClass="App\Repository\NotificationRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\NotificationRepository')]
+#[ORM\Table(name: 'notification')]
 class Notification
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(name: 'content', type: 'string', length: 255, nullable: false)]
+    private ?string $content;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="string", length=255, nullable=false)
-     */
-    private $content;
+    #[ORM\Column(name: 'readed', type: 'boolean', nullable: false)]
+    private ?bool $readed;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="readed", type="boolean", nullable=false)
-     */
-    private $readed;
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    private ?\DateTime $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
-     */
-    private $createdAt;
+    #[ORM\ManyToOne(targetEntity: 'Usuario')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
+    private ?Usuario $usuario;
 
-    /**
-     * @var Usuario
-     *
-     * @ORM\ManyToOne(targetEntity="Usuario")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
-     * })
-     */
-    private $usuario;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
+    private ?Project $project;
 
-    /**
-     * @var Project
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_id", referencedColumnName="project_id")
-     * })
-     */
-    private $project;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set content
-     *
-     * @param string $content
-     * @return Notification
-     */
-    public function setContent($content)
+    public function setContent(?string $content): self
     {
         $this->content = $content;
-
         return $this;
     }
 
-    /**
-     * Get content
-     *
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function getReaded()
+    public function getReaded(): ?bool
     {
         return $this->readed;
     }
 
-    public function setReaded($readed)
+    public function setReaded(?bool $readed): void
     {
         $this->readed = $readed;
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
@@ -116,31 +66,22 @@ class Notification
         $this->createdAt = $createdAt;
     }
 
-    /**
-     * @return Usuario
-     */
-    public function getUsuario(): Usuario
+    public function getUsuario(): ?Usuario
     {
         return $this->usuario;
     }
 
-    /**
-     * @param Usuario $usuario
-     */
-    public function setUsuario(Usuario $usuario): void
+    public function setUsuario(?Usuario $usuario): void
     {
         $this->usuario = $usuario;
     }
 
-    /**
-     * @return Project
-     */
-    public function getProject()
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function setProject($project)
+    public function setProject(?Project $project): void
     {
         $this->project = $project;
     }

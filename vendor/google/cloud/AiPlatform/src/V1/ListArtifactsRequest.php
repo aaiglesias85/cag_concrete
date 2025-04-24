@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts].
+ * Request message for
+ * [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListArtifactsRequest</code>
  */
@@ -22,16 +23,17 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of Artifacts to return. The service may return fewer.
      * Must be in range 1-1000, inclusive. Defaults to 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
-     * A page token, received from a previous [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
+     * A page token, received from a previous
+     * [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
      * call. Provide this to retrieve the subsequent page.
      * When paginating, all other provided parameters must match the call that
      * provided the page token. (Otherwise the request will fail with
@@ -39,7 +41,7 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Filter specifying the boolean condition for the Artifacts to satisfy in
      * order to be part of the result set.
@@ -56,6 +58,9 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *     To filter on metadata fields use traversal operation as follows:
      *     `metadata.<field_name>.<type_value>`.
      *     For example: `metadata.field_1.number_value = 10.0`
+     *     In case the field name contains special characters (such as colon), one
+     *     can embed it inside double quote.
+     *     For example: `metadata."field:1".number_value = 10.0`
      * *   **Context based filtering**:
      *     To filter Artifacts based on the contexts to which they belong, use the
      *     function operator with the full resource name
@@ -63,12 +68,40 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *     For example:
      *     `in_context("projects/<project_number>/locations/<location>/metadataStores/<metadatastore_name>/contexts/<context-id>")`
      * Each of the above supported filter types can be combined together using
-     * logical operators (`AND` & `OR`).
+     * logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     * is 5.
      * For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      */
-    private $filter = '';
+    protected $filter = '';
+    /**
+     * How the list of messages is ordered. Specify the values to order by and an
+     * ordering operation. The default sorting order is ascending. To specify
+     * descending order for a field, users append a " desc" suffix; for example:
+     * "foo desc, bar".
+     * Subfields are specified with a `.` character, such as foo.bar.
+     * see https://google.aip.dev/132#ordering for more details.
+     *
+     * Generated from protobuf field <code>string order_by = 5;</code>
+     */
+    protected $order_by = '';
+
+    /**
+     * @param string $parent Required. The MetadataStore whose Artifacts should be listed.
+     *                       Format:
+     *                       `projects/{project}/locations/{location}/metadataStores/{metadatastore}`
+     *                       Please see {@see MetadataServiceClient::metadataStoreName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListArtifactsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -84,7 +117,8 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *           The maximum number of Artifacts to return. The service may return fewer.
      *           Must be in range 1-1000, inclusive. Defaults to 100.
      *     @type string $page_token
-     *           A page token, received from a previous [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
+     *           A page token, received from a previous
+     *           [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
      *           call. Provide this to retrieve the subsequent page.
      *           When paginating, all other provided parameters must match the call that
      *           provided the page token. (Otherwise the request will fail with
@@ -105,6 +139,9 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *               To filter on metadata fields use traversal operation as follows:
      *               `metadata.<field_name>.<type_value>`.
      *               For example: `metadata.field_1.number_value = 10.0`
+     *               In case the field name contains special characters (such as colon), one
+     *               can embed it inside double quote.
+     *               For example: `metadata."field:1".number_value = 10.0`
      *           *   **Context based filtering**:
      *               To filter Artifacts based on the contexts to which they belong, use the
      *               function operator with the full resource name
@@ -112,8 +149,16 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *               For example:
      *               `in_context("projects/<project_number>/locations/<location>/metadataStores/<metadatastore_name>/contexts/<context-id>")`
      *           Each of the above supported filter types can be combined together using
-     *           logical operators (`AND` & `OR`).
+     *           logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     *           is 5.
      *           For example: `display_name = "test" AND metadata.field1.bool_value = true`.
+     *     @type string $order_by
+     *           How the list of messages is ordered. Specify the values to order by and an
+     *           ordering operation. The default sorting order is ascending. To specify
+     *           descending order for a field, users append a " desc" suffix; for example:
+     *           "foo desc, bar".
+     *           Subfields are specified with a `.` character, such as foo.bar.
+     *           see https://google.aip.dev/132#ordering for more details.
      * }
      */
     public function __construct($data = NULL) {
@@ -180,7 +225,8 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A page token, received from a previous [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
+     * A page token, received from a previous
+     * [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
      * call. Provide this to retrieve the subsequent page.
      * When paginating, all other provided parameters must match the call that
      * provided the page token. (Otherwise the request will fail with
@@ -195,7 +241,8 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A page token, received from a previous [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
+     * A page token, received from a previous
+     * [MetadataService.ListArtifacts][google.cloud.aiplatform.v1.MetadataService.ListArtifacts]
      * call. Provide this to retrieve the subsequent page.
      * When paginating, all other provided parameters must match the call that
      * provided the page token. (Otherwise the request will fail with
@@ -229,6 +276,9 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *     To filter on metadata fields use traversal operation as follows:
      *     `metadata.<field_name>.<type_value>`.
      *     For example: `metadata.field_1.number_value = 10.0`
+     *     In case the field name contains special characters (such as colon), one
+     *     can embed it inside double quote.
+     *     For example: `metadata."field:1".number_value = 10.0`
      * *   **Context based filtering**:
      *     To filter Artifacts based on the contexts to which they belong, use the
      *     function operator with the full resource name
@@ -236,7 +286,8 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *     For example:
      *     `in_context("projects/<project_number>/locations/<location>/metadataStores/<metadatastore_name>/contexts/<context-id>")`
      * Each of the above supported filter types can be combined together using
-     * logical operators (`AND` & `OR`).
+     * logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     * is 5.
      * For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
@@ -263,6 +314,9 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *     To filter on metadata fields use traversal operation as follows:
      *     `metadata.<field_name>.<type_value>`.
      *     For example: `metadata.field_1.number_value = 10.0`
+     *     In case the field name contains special characters (such as colon), one
+     *     can embed it inside double quote.
+     *     For example: `metadata."field:1".number_value = 10.0`
      * *   **Context based filtering**:
      *     To filter Artifacts based on the contexts to which they belong, use the
      *     function operator with the full resource name
@@ -270,7 +324,8 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
      *     For example:
      *     `in_context("projects/<project_number>/locations/<location>/metadataStores/<metadatastore_name>/contexts/<context-id>")`
      * Each of the above supported filter types can be combined together using
-     * logical operators (`AND` & `OR`).
+     * logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     * is 5.
      * For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
@@ -281,6 +336,42 @@ class ListArtifactsRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->filter = $var;
+
+        return $this;
+    }
+
+    /**
+     * How the list of messages is ordered. Specify the values to order by and an
+     * ordering operation. The default sorting order is ascending. To specify
+     * descending order for a field, users append a " desc" suffix; for example:
+     * "foo desc, bar".
+     * Subfields are specified with a `.` character, such as foo.bar.
+     * see https://google.aip.dev/132#ordering for more details.
+     *
+     * Generated from protobuf field <code>string order_by = 5;</code>
+     * @return string
+     */
+    public function getOrderBy()
+    {
+        return $this->order_by;
+    }
+
+    /**
+     * How the list of messages is ordered. Specify the values to order by and an
+     * ordering operation. The default sorting order is ascending. To specify
+     * descending order for a field, users append a " desc" suffix; for example:
+     * "foo desc, bar".
+     * Subfields are specified with a `.` character, such as foo.bar.
+     * see https://google.aip.dev/132#ordering for more details.
+     *
+     * Generated from protobuf field <code>string order_by = 5;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setOrderBy($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->order_by = $var;
 
         return $this;
     }

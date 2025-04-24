@@ -21,19 +21,19 @@ class DataItem extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Timestamp when this DataItem was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this DataItem was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Optional. The labels with user-defined metadata to organize your DataItems.
      * Label keys and values can be no longer than 64 characters
@@ -49,20 +49,33 @@ class DataItem extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * Required. The data that the DataItem represents (for example, an image or a text
-     * snippet). The schema of the payload is stored in the parent Dataset's
-     * [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] dataItemSchemaUri field.
+     * Required. The data that the DataItem represents (for example, an image or a
+     * text snippet). The schema of the payload is stored in the parent Dataset's
+     * [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     * dataItemSchemaUri field.
      *
      * Generated from protobuf field <code>.google.protobuf.Value payload = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $payload = null;
+    protected $payload = null;
     /**
-     * Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform consistent read-modify-write updates. If not set,
+     * a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $etag = '';
+    protected $etag = '';
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzi = false;
 
     /**
      * Constructor.
@@ -87,12 +100,17 @@ class DataItem extends \Google\Protobuf\Internal\Message
      *           System reserved label keys are prefixed with "aiplatform.googleapis.com/"
      *           and are immutable.
      *     @type \Google\Protobuf\Value $payload
-     *           Required. The data that the DataItem represents (for example, an image or a text
-     *           snippet). The schema of the payload is stored in the parent Dataset's
-     *           [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] dataItemSchemaUri field.
+     *           Required. The data that the DataItem represents (for example, an image or a
+     *           text snippet). The schema of the payload is stored in the parent Dataset's
+     *           [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     *           dataItemSchemaUri field.
      *     @type string $etag
-     *           Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     *           "overwrite" update happens.
+     *           Optional. Used to perform consistent read-modify-write updates. If not set,
+     *           a blind "overwrite" update happens.
+     *     @type bool $satisfies_pzs
+     *           Output only. Reserved for future use.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -241,9 +259,10 @@ class DataItem extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The data that the DataItem represents (for example, an image or a text
-     * snippet). The schema of the payload is stored in the parent Dataset's
-     * [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] dataItemSchemaUri field.
+     * Required. The data that the DataItem represents (for example, an image or a
+     * text snippet). The schema of the payload is stored in the parent Dataset's
+     * [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     * dataItemSchemaUri field.
      *
      * Generated from protobuf field <code>.google.protobuf.Value payload = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\Value|null
@@ -264,9 +283,10 @@ class DataItem extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The data that the DataItem represents (for example, an image or a text
-     * snippet). The schema of the payload is stored in the parent Dataset's
-     * [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] dataItemSchemaUri field.
+     * Required. The data that the DataItem represents (for example, an image or a
+     * text snippet). The schema of the payload is stored in the parent Dataset's
+     * [metadata schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     * dataItemSchemaUri field.
      *
      * Generated from protobuf field <code>.google.protobuf.Value payload = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Protobuf\Value $var
@@ -281,8 +301,8 @@ class DataItem extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform consistent read-modify-write updates. If not set,
+     * a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -293,8 +313,8 @@ class DataItem extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform consistent read-modify-write updates. If not set,
+     * a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -304,6 +324,58 @@ class DataItem extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->etag = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return $this->satisfies_pzi;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
 
         return $this;
     }

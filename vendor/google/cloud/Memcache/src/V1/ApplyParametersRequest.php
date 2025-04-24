@@ -21,21 +21,42 @@ class ApplyParametersRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Nodes to which we should apply the instance-level parameter group.
+     * Nodes to which the instance-level parameter group is applied.
      *
      * Generated from protobuf field <code>repeated string node_ids = 2;</code>
      */
     private $node_ids;
     /**
      * Whether to apply instance-level parameter group to all nodes. If set to
-     * true, will explicitly restrict users from specifying any nodes, and apply
-     * parameter group updates to all nodes within the instance.
+     * true, users are restricted from specifying individual nodes, and
+     * `ApplyParameters` updates all nodes within the instance.
      *
      * Generated from protobuf field <code>bool apply_all = 3;</code>
      */
-    private $apply_all = false;
+    protected $apply_all = false;
+
+    /**
+     * @param string   $name     Required. Resource name of the Memcached instance for which parameter group updates
+     *                           should be applied. Please see
+     *                           {@see CloudMemcacheClient::instanceName()} for help formatting this field.
+     * @param string[] $nodeIds  Nodes to which the instance-level parameter group is applied.
+     * @param bool     $applyAll Whether to apply instance-level parameter group to all nodes. If set to
+     *                           true, users are restricted from specifying individual nodes, and
+     *                           `ApplyParameters` updates all nodes within the instance.
+     *
+     * @return \Google\Cloud\Memcache\V1\ApplyParametersRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, array $nodeIds, bool $applyAll): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setNodeIds($nodeIds)
+            ->setApplyAll($applyAll);
+    }
 
     /**
      * Constructor.
@@ -46,12 +67,12 @@ class ApplyParametersRequest extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *           Required. Resource name of the Memcached instance for which parameter group updates
      *           should be applied.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $node_ids
-     *           Nodes to which we should apply the instance-level parameter group.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $node_ids
+     *           Nodes to which the instance-level parameter group is applied.
      *     @type bool $apply_all
      *           Whether to apply instance-level parameter group to all nodes. If set to
-     *           true, will explicitly restrict users from specifying any nodes, and apply
-     *           parameter group updates to all nodes within the instance.
+     *           true, users are restricted from specifying individual nodes, and
+     *           `ApplyParameters` updates all nodes within the instance.
      * }
      */
     public function __construct($data = NULL) {
@@ -88,7 +109,7 @@ class ApplyParametersRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Nodes to which we should apply the instance-level parameter group.
+     * Nodes to which the instance-level parameter group is applied.
      *
      * Generated from protobuf field <code>repeated string node_ids = 2;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -99,10 +120,10 @@ class ApplyParametersRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Nodes to which we should apply the instance-level parameter group.
+     * Nodes to which the instance-level parameter group is applied.
      *
      * Generated from protobuf field <code>repeated string node_ids = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNodeIds($var)
@@ -115,8 +136,8 @@ class ApplyParametersRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Whether to apply instance-level parameter group to all nodes. If set to
-     * true, will explicitly restrict users from specifying any nodes, and apply
-     * parameter group updates to all nodes within the instance.
+     * true, users are restricted from specifying individual nodes, and
+     * `ApplyParameters` updates all nodes within the instance.
      *
      * Generated from protobuf field <code>bool apply_all = 3;</code>
      * @return bool
@@ -128,8 +149,8 @@ class ApplyParametersRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Whether to apply instance-level parameter group to all nodes. If set to
-     * true, will explicitly restrict users from specifying any nodes, and apply
-     * parameter group updates to all nodes within the instance.
+     * true, users are restricted from specifying individual nodes, and
+     * `ApplyParameters` updates all nodes within the instance.
      *
      * Generated from protobuf field <code>bool apply_all = 3;</code>
      * @param bool $var

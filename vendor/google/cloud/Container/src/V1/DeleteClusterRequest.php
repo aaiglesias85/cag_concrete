@@ -17,7 +17,7 @@ class DeleteClusterRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -48,7 +48,44 @@ class DeleteClusterRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 4;</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $projectId Deprecated. The Google Developers Console [project ID or project
+     *                          number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+     *                          This field has been deprecated and replaced by the name field.
+     * @param string $zone      Deprecated. The name of the Google Compute Engine
+     *                          [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+     *                          cluster resides. This field has been deprecated and replaced by the name
+     *                          field.
+     * @param string $clusterId Deprecated. The name of the cluster to delete.
+     *                          This field has been deprecated and replaced by the name field.
+     *
+     * @return \Google\Cloud\Container\V1\DeleteClusterRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, string $zone, string $clusterId): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setZone($zone)
+            ->setClusterId($clusterId);
+    }
+
+    /**
+     * @param string $name The name (project, location, cluster) of the cluster to delete.
+     *                     Specified in the format `projects/&#42;/locations/&#42;/clusters/*`.
+     *
+     * @return \Google\Cloud\Container\V1\DeleteClusterRequest
+     *
+     * @experimental
+     */
+    public static function buildFromName(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -58,7 +95,7 @@ class DeleteClusterRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Deprecated. The Google Developers Console [project ID or project
-     *           number](https://support.google.com/cloud/answer/6158840).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *           This field has been deprecated and replaced by the name field.
      *     @type string $zone
      *           Deprecated. The name of the Google Compute Engine
@@ -80,7 +117,7 @@ class DeleteClusterRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -95,7 +132,7 @@ class DeleteClusterRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>

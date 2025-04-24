@@ -21,19 +21,38 @@ class CreateNoteRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The ID to use for this note.
      *
      * Generated from protobuf field <code>string note_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $note_id = '';
+    protected $note_id = '';
     /**
      * The note to create.
      *
      * Generated from protobuf field <code>.grafeas.v1.Note note = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $note = null;
+    protected $note = null;
+
+    /**
+     * @param string           $parent The name of the project in the form of `projects/[PROJECT_ID]`, under which
+     *                                 the note is to be created. Please see
+     *                                 {@see GrafeasClient::projectName()} for help formatting this field.
+     * @param string           $noteId The ID to use for this note.
+     * @param \Grafeas\V1\Note $note   The note to create.
+     *
+     * @return \Grafeas\V1\CreateNoteRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $noteId, \Grafeas\V1\Note $note): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setNoteId($noteId)
+            ->setNote($note);
+    }
 
     /**
      * Constructor.

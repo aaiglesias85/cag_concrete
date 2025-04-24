@@ -24,46 +24,45 @@ class Entity extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.TextAnchor text_anchor = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $text_anchor = null;
+    protected $text_anchor = null;
     /**
      * Required. Entity type from a schema e.g. `Address`.
      *
      * Generated from protobuf field <code>string type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
-     * Optional. Text value in the document e.g. `1600 Amphitheatre Pkwy`. If
-     * the entity is not present in the document, this field will be empty.
+     * Optional. Text value of the entity e.g. `1600 Amphitheatre Pkwy`.
      *
      * Generated from protobuf field <code>string mention_text = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $mention_text = '';
+    protected $mention_text = '';
     /**
      * Optional. Deprecated.  Use `id` field instead.
      *
      * Generated from protobuf field <code>string mention_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $mention_id = '';
+    protected $mention_id = '';
     /**
-     * Optional. Confidence of detected Schema entity. Range [0, 1].
+     * Optional. Confidence of detected Schema entity. Range `[0, 1]`.
      *
      * Generated from protobuf field <code>float confidence = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $confidence = 0.0;
+    protected $confidence = 0.0;
     /**
      * Optional. Represents the provenance of this entity wrt. the location on
      * the page where it was found.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.PageAnchor page_anchor = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_anchor = null;
+    protected $page_anchor = null;
     /**
      * Optional. Canonical id. This will be a unique value in the entity list
      * for this document.
      *
      * Generated from protobuf field <code>string id = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Optional. Normalized entity value. Absent if the extracted value could
      * not be converted or the type (e.g. address) is not supported for certain
@@ -72,7 +71,7 @@ class Entity extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Entity.NormalizedValue normalized_value = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $normalized_value = null;
+    protected $normalized_value = null;
     /**
      * Optional. Entities can be nested to form a hierarchical data structure
      * representing the content in the document.
@@ -85,14 +84,14 @@ class Entity extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $provenance = null;
+    protected $provenance = null;
     /**
      * Optional. Whether the entity will be redacted for de-identification
      * purposes.
      *
      * Generated from protobuf field <code>bool redacted = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $redacted = false;
+    protected $redacted = false;
 
     /**
      * Constructor.
@@ -107,12 +106,11 @@ class Entity extends \Google\Protobuf\Internal\Message
      *     @type string $type
      *           Required. Entity type from a schema e.g. `Address`.
      *     @type string $mention_text
-     *           Optional. Text value in the document e.g. `1600 Amphitheatre Pkwy`. If
-     *           the entity is not present in the document, this field will be empty.
+     *           Optional. Text value of the entity e.g. `1600 Amphitheatre Pkwy`.
      *     @type string $mention_id
      *           Optional. Deprecated.  Use `id` field instead.
      *     @type float $confidence
-     *           Optional. Confidence of detected Schema entity. Range [0, 1].
+     *           Optional. Confidence of detected Schema entity. Range `[0, 1]`.
      *     @type \Google\Cloud\DocumentAI\V1\Document\PageAnchor $page_anchor
      *           Optional. Represents the provenance of this entity wrt. the location on
      *           the page where it was found.
@@ -124,7 +122,7 @@ class Entity extends \Google\Protobuf\Internal\Message
      *           not be converted or the type (e.g. address) is not supported for certain
      *           parsers. This field is also only populated for certain supported document
      *           types.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Entity[]|\Google\Protobuf\Internal\RepeatedField $properties
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Entity>|\Google\Protobuf\Internal\RepeatedField $properties
      *           Optional. Entities can be nested to form a hierarchical data structure
      *           representing the content in the document.
      *     @type \Google\Cloud\DocumentAI\V1\Document\Provenance $provenance
@@ -206,8 +204,7 @@ class Entity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Text value in the document e.g. `1600 Amphitheatre Pkwy`. If
-     * the entity is not present in the document, this field will be empty.
+     * Optional. Text value of the entity e.g. `1600 Amphitheatre Pkwy`.
      *
      * Generated from protobuf field <code>string mention_text = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -218,8 +215,7 @@ class Entity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Text value in the document e.g. `1600 Amphitheatre Pkwy`. If
-     * the entity is not present in the document, this field will be empty.
+     * Optional. Text value of the entity e.g. `1600 Amphitheatre Pkwy`.
      *
      * Generated from protobuf field <code>string mention_text = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -260,7 +256,7 @@ class Entity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Confidence of detected Schema entity. Range [0, 1].
+     * Optional. Confidence of detected Schema entity. Range `[0, 1]`.
      *
      * Generated from protobuf field <code>float confidence = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return float
@@ -271,7 +267,7 @@ class Entity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Confidence of detected Schema entity. Range [0, 1].
+     * Optional. Confidence of detected Schema entity. Range `[0, 1]`.
      *
      * Generated from protobuf field <code>float confidence = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param float $var
@@ -410,7 +406,7 @@ class Entity extends \Google\Protobuf\Internal\Message
      * representing the content in the document.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Entity properties = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Entity[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Entity>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setProperties($var)

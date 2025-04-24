@@ -21,7 +21,22 @@ class GetEventRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the event resource, in the form of:
+     *                     `projects/{project}/locations/{location}/channels/{channelId}/events/{eventId}`. Please see
+     *                     {@see LivestreamServiceClient::eventName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Video\LiveStream\V1\GetEventRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

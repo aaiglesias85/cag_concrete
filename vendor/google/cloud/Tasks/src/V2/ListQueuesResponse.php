@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues].
+ * Response message for
+ * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues].
  *
  * Generated from protobuf message <code>google.cloud.tasks.v2.ListQueuesResponse</code>
  */
@@ -24,14 +25,14 @@ class ListQueuesResponse extends \Google\Protobuf\Internal\Message
     /**
      * A token to retrieve next page of results.
      * To return the next page of results, call
-     * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value as the
-     * [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
+     * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value
+     * as the [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
      * If the next_page_token is empty, there are no more results.
      * The page token is valid for only 2 hours.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -39,13 +40,13 @@ class ListQueuesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Tasks\V2\Queue[]|\Google\Protobuf\Internal\RepeatedField $queues
+     *     @type array<\Google\Cloud\Tasks\V2\Queue>|\Google\Protobuf\Internal\RepeatedField $queues
      *           The list of queues.
      *     @type string $next_page_token
      *           A token to retrieve next page of results.
      *           To return the next page of results, call
-     *           [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value as the
-     *           [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
+     *           [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value
+     *           as the [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
      *           If the next_page_token is empty, there are no more results.
      *           The page token is valid for only 2 hours.
      * }
@@ -70,7 +71,7 @@ class ListQueuesResponse extends \Google\Protobuf\Internal\Message
      * The list of queues.
      *
      * Generated from protobuf field <code>repeated .google.cloud.tasks.v2.Queue queues = 1;</code>
-     * @param \Google\Cloud\Tasks\V2\Queue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Tasks\V2\Queue>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQueues($var)
@@ -84,8 +85,8 @@ class ListQueuesResponse extends \Google\Protobuf\Internal\Message
     /**
      * A token to retrieve next page of results.
      * To return the next page of results, call
-     * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value as the
-     * [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
+     * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value
+     * as the [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
      * If the next_page_token is empty, there are no more results.
      * The page token is valid for only 2 hours.
      *
@@ -100,8 +101,8 @@ class ListQueuesResponse extends \Google\Protobuf\Internal\Message
     /**
      * A token to retrieve next page of results.
      * To return the next page of results, call
-     * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value as the
-     * [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
+     * [ListQueues][google.cloud.tasks.v2.CloudTasks.ListQueues] with this value
+     * as the [page_token][google.cloud.tasks.v2.ListQueuesRequest.page_token].
      * If the next_page_token is empty, there are no more results.
      * The page token is valid for only 2 hours.
      *

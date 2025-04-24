@@ -31,8 +31,10 @@ class RecordKey extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Cloud\Dlp\V2\DatastoreKey $datastore_key
+     *           BigQuery key
      *     @type \Google\Cloud\Dlp\V2\BigQueryKey $big_query_key
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $id_values
+     *           Datastore key
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $id_values
      *           Values of identifying columns in the given row. Order of values matches
      *           the order of `identifying_fields` specified in the scanning request.
      * }
@@ -43,6 +45,8 @@ class RecordKey extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * BigQuery key
+     *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DatastoreKey datastore_key = 2;</code>
      * @return \Google\Cloud\Dlp\V2\DatastoreKey|null
      */
@@ -57,6 +61,8 @@ class RecordKey extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * BigQuery key
+     *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DatastoreKey datastore_key = 2;</code>
      * @param \Google\Cloud\Dlp\V2\DatastoreKey $var
      * @return $this
@@ -70,6 +76,8 @@ class RecordKey extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Datastore key
+     *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.BigQueryKey big_query_key = 3;</code>
      * @return \Google\Cloud\Dlp\V2\BigQueryKey|null
      */
@@ -84,6 +92,8 @@ class RecordKey extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Datastore key
+     *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.BigQueryKey big_query_key = 3;</code>
      * @param \Google\Cloud\Dlp\V2\BigQueryKey $var
      * @return $this
@@ -113,7 +123,7 @@ class RecordKey extends \Google\Protobuf\Internal\Message
      * the order of `identifying_fields` specified in the scanning request.
      *
      * Generated from protobuf field <code>repeated string id_values = 5;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setIdValues($var)

@@ -20,34 +20,83 @@ class Model extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
+    /**
+     * Output only. Immutable. The version ID of the model.
+     * A new version is committed when a new model version is uploaded or
+     * trained under an existing model id. It is an auto-incrementing decimal
+     * number in string representation.
+     *
+     * Generated from protobuf field <code>string version_id = 28 [(.google.api.field_behavior) = IMMUTABLE, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $version_id = '';
+    /**
+     * User provided version aliases so that a model version can be referenced via
+     * alias (i.e.
+     * `projects/{project}/locations/{location}/models/{model_id}&#64;{version_alias}`
+     * instead of auto-generated version id (i.e.
+     * `projects/{project}/locations/{location}/models/{model_id}&#64;{version_id})`.
+     * The format is [a-z][a-zA-Z0-9-]{0,126}[a-z0-9] to distinguish from
+     * version_id. A default version alias will be created for the first version
+     * of the model, and there must be exactly one default version alias for a
+     * model.
+     *
+     * Generated from protobuf field <code>repeated string version_aliases = 29;</code>
+     */
+    private $version_aliases;
+    /**
+     * Output only. Timestamp when this version was created.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp version_create_time = 31 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $version_create_time = null;
+    /**
+     * Output only. Timestamp when this version was most recently updated.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp version_update_time = 32 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $version_update_time = null;
     /**
      * Required. The display name of the Model.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * The description of the Model.
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
+    /**
+     * The description of this version.
+     *
+     * Generated from protobuf field <code>string version_description = 30;</code>
+     */
+    protected $version_description = '';
+    /**
+     * The default checkpoint id of a model version.
+     *
+     * Generated from protobuf field <code>string default_checkpoint_id = 53;</code>
+     */
+    protected $default_checkpoint_id = '';
     /**
      * The schemata that describe formats of the Model's predictions and
      * explanations as given and returned via
-     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] and [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * and
+     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PredictSchemata predict_schemata = 4;</code>
      */
-    private $predict_schemata = null;
+    protected $predict_schemata = null;
     /**
-     * Immutable. Points to a YAML file stored on Google Cloud Storage describing additional
-     * information about the Model, that is specific to it. Unset if the Model
-     * does not have any additional information.
-     * The schema is defined as an OpenAPI 3.0.2 [Schema
+     * Immutable. Points to a YAML file stored on Google Cloud Storage describing
+     * additional information about the Model, that is specific to it. Unset if
+     * the Model does not have any additional information. The schema is defined
+     * as an OpenAPI 3.0.2 [Schema
      * Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      * AutoML Models always have this field populated by Vertex AI, if no
      * additional metadata is needed, this field is set to an empty string.
@@ -57,58 +106,71 @@ class Model extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string metadata_schema_uri = 5 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $metadata_schema_uri = '';
+    protected $metadata_schema_uri = '';
     /**
-     * Immutable. An additional information about the Model; the schema of the metadata can
-     * be found in [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
+     * Immutable. An additional information about the Model; the schema of the
+     * metadata can be found in
+     * [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
      * Unset if the Model does not have any additional information.
      *
      * Generated from protobuf field <code>.google.protobuf.Value metadata = 6 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
     /**
-     * Output only. The formats in which this Model may be exported. If empty, this Model is
-     * not available for export.
+     * Output only. The formats in which this Model may be exported. If empty,
+     * this Model is not available for export.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Model.ExportFormat supported_export_formats = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
     private $supported_export_formats;
     /**
-     * Output only. The resource name of the TrainingPipeline that uploaded this Model, if
-     * any.
+     * Output only. The resource name of the TrainingPipeline that uploaded this
+     * Model, if any.
      *
      * Generated from protobuf field <code>string training_pipeline = 7 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
-    private $training_pipeline = '';
+    protected $training_pipeline = '';
     /**
-     * Input only. The specification of the container that is to be used when deploying
-     * this Model. The specification is ingested upon
-     * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel], and all binaries it contains are copied
-     * and stored internally by Vertex AI.
-     * Not present for AutoML Models.
+     * Optional. This field is populated if the model is produced by a pipeline
+     * job.
+     *
+     * Generated from protobuf field <code>string pipeline_job = 47 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     */
+    protected $pipeline_job = '';
+    /**
+     * Input only. The specification of the container that is to be used when
+     * deploying this Model. The specification is ingested upon
+     * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel],
+     * and all binaries it contains are copied and stored internally by Vertex AI.
+     * Not required for AutoML Models.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelContainerSpec container_spec = 9 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      */
-    private $container_spec = null;
+    protected $container_spec = null;
     /**
-     * Immutable. The path to the directory containing the Model artifact and any of its
-     * supporting files.
-     * Not present for AutoML Models.
+     * Immutable. The path to the directory containing the Model artifact and any
+     * of its supporting files. Not required for AutoML Models.
      *
      * Generated from protobuf field <code>string artifact_uri = 26 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $artifact_uri = '';
+    protected $artifact_uri = '';
     /**
-     * Output only. When this Model is deployed, its prediction resources are described by the
-     * `prediction_resources` field of the [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models] object.
-     * Because not all Models support all resource configuration types, the
-     * configuration types this Model supports are listed here. If no
+     * Output only. When this Model is deployed, its prediction resources are
+     * described by the `prediction_resources` field of the
+     * [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models]
+     * object. Because not all Models support all resource configuration types,
+     * the configuration types this Model supports are listed here. If no
      * configuration types are listed, the Model cannot be deployed to an
      * [Endpoint][google.cloud.aiplatform.v1.Endpoint] and does not support
-     * online predictions ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
-     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]). Such a Model can serve predictions by
-     * using a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it has at least one entry each in
-     * [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats] and
+     * online predictions
+     * ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
+     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]).
+     * Such a Model can serve predictions by using a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it
+     * has at least one entry each in
+     * [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats]
+     * and
      * [supported_output_storage_formats][google.cloud.aiplatform.v1.Model.supported_output_storage_formats].
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Model.DeploymentResourcesType supported_deployment_resources_types = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -116,9 +178,10 @@ class Model extends \Google\Protobuf\Internal\Message
     private $supported_deployment_resources_types;
     /**
      * Output only. The formats this Model supports in
-     * [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config]. If
-     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] exists, the instances
-     * should be given as per that schema.
+     * [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config].
+     * If
+     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     * exists, the instances should be given as per that schema.
      * The possible formats are:
      * * `jsonl`
      * The JSON Lines format, where each instance is a single line. Uses
@@ -126,10 +189,12 @@ class Model extends \Google\Protobuf\Internal\Message
      * * `csv`
      * The CSV format, where each instance is a single comma-separated line.
      * The first line in the file is the header, containing comma-separated field
-     * names. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     * names. Uses
+     * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      * * `tf-record`
      * The TFRecord format, where each instance is a single record in tfrecord
-     * syntax. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     * syntax. Uses
+     * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      * * `tf-record-gzip`
      * Similar to `tf-record`, but the file is gzipped. Uses
      * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
@@ -139,11 +204,16 @@ class Model extends \Google\Protobuf\Internal\Message
      * * `file-list`
      * Each line of the file is the location of an instance to process, uses
      * `gcs_source` field of the
-     * [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig] object.
+     * [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig]
+     * object.
      * If this Model doesn't support any of these formats it means it cannot be
-     * used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     * predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     * used with a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * However, if it has
+     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     * it could serve online predictions by using
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
      * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>repeated string supported_input_storage_formats = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -151,12 +221,14 @@ class Model extends \Google\Protobuf\Internal\Message
     private $supported_input_storage_formats;
     /**
      * Output only. The formats this Model supports in
-     * [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config]. If both
-     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] and
-     * [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri] exist, the predictions
-     * are returned together with their instances. In other words, the
-     * prediction has the original instance data first, followed
-     * by the actual prediction content (as per the schema).
+     * [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config].
+     * If both
+     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     * and
+     * [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri]
+     * exist, the predictions are returned together with their instances. In other
+     * words, the prediction has the original instance data first, followed by the
+     * actual prediction content (as per the schema).
      * The possible formats are:
      * * `jsonl`
      * The JSON Lines format, where each prediction is a single line. Uses
@@ -171,9 +243,13 @@ class Model extends \Google\Protobuf\Internal\Message
      * [BigQueryDestination][google.cloud.aiplatform.v1.BatchPredictionJob.OutputConfig.bigquery_destination]
      * .
      * If this Model doesn't support any of these formats it means it cannot be
-     * used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     * predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     * used with a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * However, if it has
+     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     * it could serve online predictions by using
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
      * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>repeated string supported_output_storage_formats = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -184,51 +260,60 @@ class Model extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this Model was most recently updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * Output only. The pointers to DeployedModels created from this Model. Note that
-     * Model could have been deployed to Endpoints in different Locations.
+     * Output only. The pointers to DeployedModels created from this Model. Note
+     * that Model could have been deployed to Endpoints in different Locations.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.DeployedModelRef deployed_models = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
     private $deployed_models;
     /**
      * The default explanation specification for this Model.
-     * The Model can be used for [requesting
-     * explanation][PredictionService.Explain] after being
-     * [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if it is populated.
-     * The Model can be used for [batch
-     * explanation][BatchPredictionJob.generate_explanation] if it is populated.
+     * The Model can be used for
+     * [requesting
+     * explanation][google.cloud.aiplatform.v1.PredictionService.Explain] after
+     * being [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if
+     * it is populated. The Model can be used for [batch
+     * explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     * if it is populated.
      * All fields of the explanation_spec can be overridden by
-     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model], or
-     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     * of
+     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model],
+     * or
+     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     * of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      * If the default explanation specification is not set for this Model, this
-     * Model can still be used for [requesting
-     * explanation][PredictionService.Explain] by setting
-     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model] and for [batch
-     * explanation][BatchPredictionJob.generate_explanation] by setting
-     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * Model can still be used for
+     * [requesting
+     * explanation][google.cloud.aiplatform.v1.PredictionService.Explain] by
+     * setting
+     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     * of
+     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model]
+     * and for [batch
+     * explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     * by setting
+     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     * of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationSpec explanation_spec = 23;</code>
      */
-    private $explanation_spec = null;
+    protected $explanation_spec = null;
     /**
      * Used to perform consistent read-modify-write updates. If not set, a blind
      * "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 16;</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
      * The labels with user-defined metadata to organize your Models.
      * Label keys and values can be no longer than 64 characters
@@ -240,12 +325,63 @@ class Model extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
+     * Stats of data used for training or evaluating the Model.
+     * Only populated when the Model is trained by a TrainingPipeline with
+     * [data_input_config][google.cloud.aiplatform.v1.TrainingPipeline.input_data_config].
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.DataStats data_stats = 21;</code>
+     */
+    protected $data_stats = null;
+    /**
      * Customer-managed encryption key spec for a Model. If set, this
      * Model and all sub-resources of this Model will be secured by this key.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 24;</code>
      */
-    private $encryption_spec = null;
+    protected $encryption_spec = null;
+    /**
+     * Output only. Source of a model. It can either be automl training pipeline,
+     * custom training pipeline, BigQuery ML, or saved and tuned from Genie or
+     * Model Garden.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelSourceInfo model_source_info = 38 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $model_source_info = null;
+    /**
+     * Output only. If this Model is a copy of another Model, this contains info
+     * about the original.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.OriginalModelInfo original_model_info = 34 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $original_model_info = null;
+    /**
+     * Output only. The resource name of the Artifact that was created in
+     * MetadataStore when creating the Model. The Artifact resource name pattern
+     * is
+     * `projects/{project}/locations/{location}/metadataStores/{metadata_store}/artifacts/{artifact}`.
+     *
+     * Generated from protobuf field <code>string metadata_artifact = 44 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $metadata_artifact = '';
+    /**
+     * Optional. User input field to specify the base model source. Currently it
+     * only supports specifing the Model Garden models and Genie models.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.BaseModelSource base_model_source = 50 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $base_model_source = null;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 51 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 52 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzi = false;
 
     /**
      * Constructor.
@@ -255,21 +391,46 @@ class Model extends \Google\Protobuf\Internal\Message
      *
      *     @type string $name
      *           The resource name of the Model.
+     *     @type string $version_id
+     *           Output only. Immutable. The version ID of the model.
+     *           A new version is committed when a new model version is uploaded or
+     *           trained under an existing model id. It is an auto-incrementing decimal
+     *           number in string representation.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $version_aliases
+     *           User provided version aliases so that a model version can be referenced via
+     *           alias (i.e.
+     *           `projects/{project}/locations/{location}/models/{model_id}&#64;{version_alias}`
+     *           instead of auto-generated version id (i.e.
+     *           `projects/{project}/locations/{location}/models/{model_id}&#64;{version_id})`.
+     *           The format is [a-z][a-zA-Z0-9-]{0,126}[a-z0-9] to distinguish from
+     *           version_id. A default version alias will be created for the first version
+     *           of the model, and there must be exactly one default version alias for a
+     *           model.
+     *     @type \Google\Protobuf\Timestamp $version_create_time
+     *           Output only. Timestamp when this version was created.
+     *     @type \Google\Protobuf\Timestamp $version_update_time
+     *           Output only. Timestamp when this version was most recently updated.
      *     @type string $display_name
      *           Required. The display name of the Model.
-     *           The name can be up to 128 characters long and can be consist of any UTF-8
+     *           The name can be up to 128 characters long and can consist of any UTF-8
      *           characters.
      *     @type string $description
      *           The description of the Model.
+     *     @type string $version_description
+     *           The description of this version.
+     *     @type string $default_checkpoint_id
+     *           The default checkpoint id of a model version.
      *     @type \Google\Cloud\AIPlatform\V1\PredictSchemata $predict_schemata
      *           The schemata that describe formats of the Model's predictions and
      *           explanations as given and returned via
-     *           [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] and [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
+     *           [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     *           and
+     *           [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *     @type string $metadata_schema_uri
-     *           Immutable. Points to a YAML file stored on Google Cloud Storage describing additional
-     *           information about the Model, that is specific to it. Unset if the Model
-     *           does not have any additional information.
-     *           The schema is defined as an OpenAPI 3.0.2 [Schema
+     *           Immutable. Points to a YAML file stored on Google Cloud Storage describing
+     *           additional information about the Model, that is specific to it. Unset if
+     *           the Model does not have any additional information. The schema is defined
+     *           as an OpenAPI 3.0.2 [Schema
      *           Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      *           AutoML Models always have this field populated by Vertex AI, if no
      *           additional metadata is needed, this field is set to an empty string.
@@ -277,42 +438,52 @@ class Model extends \Google\Protobuf\Internal\Message
      *           including the URI scheme, than the one given on input. The output URI will
      *           point to a location where the user only has a read access.
      *     @type \Google\Protobuf\Value $metadata
-     *           Immutable. An additional information about the Model; the schema of the metadata can
-     *           be found in [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
+     *           Immutable. An additional information about the Model; the schema of the
+     *           metadata can be found in
+     *           [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
      *           Unset if the Model does not have any additional information.
-     *     @type \Google\Cloud\AIPlatform\V1\Model\ExportFormat[]|\Google\Protobuf\Internal\RepeatedField $supported_export_formats
-     *           Output only. The formats in which this Model may be exported. If empty, this Model is
-     *           not available for export.
+     *     @type array<\Google\Cloud\AIPlatform\V1\Model\ExportFormat>|\Google\Protobuf\Internal\RepeatedField $supported_export_formats
+     *           Output only. The formats in which this Model may be exported. If empty,
+     *           this Model is not available for export.
      *     @type string $training_pipeline
-     *           Output only. The resource name of the TrainingPipeline that uploaded this Model, if
-     *           any.
+     *           Output only. The resource name of the TrainingPipeline that uploaded this
+     *           Model, if any.
+     *     @type string $pipeline_job
+     *           Optional. This field is populated if the model is produced by a pipeline
+     *           job.
      *     @type \Google\Cloud\AIPlatform\V1\ModelContainerSpec $container_spec
-     *           Input only. The specification of the container that is to be used when deploying
-     *           this Model. The specification is ingested upon
-     *           [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel], and all binaries it contains are copied
-     *           and stored internally by Vertex AI.
-     *           Not present for AutoML Models.
+     *           Input only. The specification of the container that is to be used when
+     *           deploying this Model. The specification is ingested upon
+     *           [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel],
+     *           and all binaries it contains are copied and stored internally by Vertex AI.
+     *           Not required for AutoML Models.
      *     @type string $artifact_uri
-     *           Immutable. The path to the directory containing the Model artifact and any of its
-     *           supporting files.
-     *           Not present for AutoML Models.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $supported_deployment_resources_types
-     *           Output only. When this Model is deployed, its prediction resources are described by the
-     *           `prediction_resources` field of the [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models] object.
-     *           Because not all Models support all resource configuration types, the
-     *           configuration types this Model supports are listed here. If no
+     *           Immutable. The path to the directory containing the Model artifact and any
+     *           of its supporting files. Not required for AutoML Models.
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $supported_deployment_resources_types
+     *           Output only. When this Model is deployed, its prediction resources are
+     *           described by the `prediction_resources` field of the
+     *           [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models]
+     *           object. Because not all Models support all resource configuration types,
+     *           the configuration types this Model supports are listed here. If no
      *           configuration types are listed, the Model cannot be deployed to an
      *           [Endpoint][google.cloud.aiplatform.v1.Endpoint] and does not support
-     *           online predictions ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
-     *           [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]). Such a Model can serve predictions by
-     *           using a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it has at least one entry each in
-     *           [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats] and
+     *           online predictions
+     *           ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     *           or
+     *           [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]).
+     *           Such a Model can serve predictions by using a
+     *           [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it
+     *           has at least one entry each in
+     *           [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats]
+     *           and
      *           [supported_output_storage_formats][google.cloud.aiplatform.v1.Model.supported_output_storage_formats].
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $supported_input_storage_formats
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $supported_input_storage_formats
      *           Output only. The formats this Model supports in
-     *           [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config]. If
-     *           [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] exists, the instances
-     *           should be given as per that schema.
+     *           [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config].
+     *           If
+     *           [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     *           exists, the instances should be given as per that schema.
      *           The possible formats are:
      *           * `jsonl`
      *           The JSON Lines format, where each instance is a single line. Uses
@@ -320,10 +491,12 @@ class Model extends \Google\Protobuf\Internal\Message
      *           * `csv`
      *           The CSV format, where each instance is a single comma-separated line.
      *           The first line in the file is the header, containing comma-separated field
-     *           names. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     *           names. Uses
+     *           [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      *           * `tf-record`
      *           The TFRecord format, where each instance is a single record in tfrecord
-     *           syntax. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     *           syntax. Uses
+     *           [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      *           * `tf-record-gzip`
      *           Similar to `tf-record`, but the file is gzipped. Uses
      *           [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
@@ -333,20 +506,27 @@ class Model extends \Google\Protobuf\Internal\Message
      *           * `file-list`
      *           Each line of the file is the location of an instance to process, uses
      *           `gcs_source` field of the
-     *           [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig] object.
+     *           [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig]
+     *           object.
      *           If this Model doesn't support any of these formats it means it cannot be
-     *           used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     *           [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     *           predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     *           used with a
+     *           [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     *           However, if it has
+     *           [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     *           it could serve online predictions by using
+     *           [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     *           or
      *           [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $supported_output_storage_formats
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $supported_output_storage_formats
      *           Output only. The formats this Model supports in
-     *           [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config]. If both
-     *           [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] and
-     *           [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri] exist, the predictions
-     *           are returned together with their instances. In other words, the
-     *           prediction has the original instance data first, followed
-     *           by the actual prediction content (as per the schema).
+     *           [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config].
+     *           If both
+     *           [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     *           and
+     *           [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri]
+     *           exist, the predictions are returned together with their instances. In other
+     *           words, the prediction has the original instance data first, followed by the
+     *           actual prediction content (as per the schema).
      *           The possible formats are:
      *           * `jsonl`
      *           The JSON Lines format, where each prediction is a single line. Uses
@@ -361,37 +541,50 @@ class Model extends \Google\Protobuf\Internal\Message
      *           [BigQueryDestination][google.cloud.aiplatform.v1.BatchPredictionJob.OutputConfig.bigquery_destination]
      *           .
      *           If this Model doesn't support any of these formats it means it cannot be
-     *           used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     *           [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     *           predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     *           used with a
+     *           [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     *           However, if it has
+     *           [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     *           it could serve online predictions by using
+     *           [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     *           or
      *           [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *     @type \Google\Protobuf\Timestamp $create_time
      *           Output only. Timestamp when this Model was uploaded into Vertex AI.
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Timestamp when this Model was most recently updated.
-     *     @type \Google\Cloud\AIPlatform\V1\DeployedModelRef[]|\Google\Protobuf\Internal\RepeatedField $deployed_models
-     *           Output only. The pointers to DeployedModels created from this Model. Note that
-     *           Model could have been deployed to Endpoints in different Locations.
+     *     @type array<\Google\Cloud\AIPlatform\V1\DeployedModelRef>|\Google\Protobuf\Internal\RepeatedField $deployed_models
+     *           Output only. The pointers to DeployedModels created from this Model. Note
+     *           that Model could have been deployed to Endpoints in different Locations.
      *     @type \Google\Cloud\AIPlatform\V1\ExplanationSpec $explanation_spec
      *           The default explanation specification for this Model.
-     *           The Model can be used for [requesting
-     *           explanation][PredictionService.Explain] after being
-     *           [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if it is populated.
-     *           The Model can be used for [batch
-     *           explanation][BatchPredictionJob.generate_explanation] if it is populated.
+     *           The Model can be used for
+     *           [requesting
+     *           explanation][google.cloud.aiplatform.v1.PredictionService.Explain] after
+     *           being [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if
+     *           it is populated. The Model can be used for [batch
+     *           explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     *           if it is populated.
      *           All fields of the explanation_spec can be overridden by
-     *           [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     *           [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model], or
-     *           [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     *           [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     *           [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     *           of
+     *           [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model],
+     *           or
+     *           [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     *           of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      *           If the default explanation specification is not set for this Model, this
-     *           Model can still be used for [requesting
-     *           explanation][PredictionService.Explain] by setting
-     *           [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     *           [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model] and for [batch
-     *           explanation][BatchPredictionJob.generate_explanation] by setting
-     *           [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     *           [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     *           Model can still be used for
+     *           [requesting
+     *           explanation][google.cloud.aiplatform.v1.PredictionService.Explain] by
+     *           setting
+     *           [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     *           of
+     *           [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model]
+     *           and for [batch
+     *           explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     *           by setting
+     *           [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     *           of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      *     @type string $etag
      *           Used to perform consistent read-modify-write updates. If not set, a blind
      *           "overwrite" update happens.
@@ -401,9 +594,32 @@ class Model extends \Google\Protobuf\Internal\Message
      *           (Unicode codepoints), can only contain lowercase letters, numeric
      *           characters, underscores and dashes. International characters are allowed.
      *           See https://goo.gl/xmQnxf for more information and examples of labels.
+     *     @type \Google\Cloud\AIPlatform\V1\Model\DataStats $data_stats
+     *           Stats of data used for training or evaluating the Model.
+     *           Only populated when the Model is trained by a TrainingPipeline with
+     *           [data_input_config][google.cloud.aiplatform.v1.TrainingPipeline.input_data_config].
      *     @type \Google\Cloud\AIPlatform\V1\EncryptionSpec $encryption_spec
      *           Customer-managed encryption key spec for a Model. If set, this
      *           Model and all sub-resources of this Model will be secured by this key.
+     *     @type \Google\Cloud\AIPlatform\V1\ModelSourceInfo $model_source_info
+     *           Output only. Source of a model. It can either be automl training pipeline,
+     *           custom training pipeline, BigQuery ML, or saved and tuned from Genie or
+     *           Model Garden.
+     *     @type \Google\Cloud\AIPlatform\V1\Model\OriginalModelInfo $original_model_info
+     *           Output only. If this Model is a copy of another Model, this contains info
+     *           about the original.
+     *     @type string $metadata_artifact
+     *           Output only. The resource name of the Artifact that was created in
+     *           MetadataStore when creating the Model. The Artifact resource name pattern
+     *           is
+     *           `projects/{project}/locations/{location}/metadataStores/{metadata_store}/artifacts/{artifact}`.
+     *     @type \Google\Cloud\AIPlatform\V1\Model\BaseModelSource $base_model_source
+     *           Optional. User input field to specify the base model source. Currently it
+     *           only supports specifing the Model Garden models and Genie models.
+     *     @type bool $satisfies_pzs
+     *           Output only. Reserved for future use.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -438,8 +654,154 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Output only. Immutable. The version ID of the model.
+     * A new version is committed when a new model version is uploaded or
+     * trained under an existing model id. It is an auto-incrementing decimal
+     * number in string representation.
+     *
+     * Generated from protobuf field <code>string version_id = 28 [(.google.api.field_behavior) = IMMUTABLE, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getVersionId()
+    {
+        return $this->version_id;
+    }
+
+    /**
+     * Output only. Immutable. The version ID of the model.
+     * A new version is committed when a new model version is uploaded or
+     * trained under an existing model id. It is an auto-incrementing decimal
+     * number in string representation.
+     *
+     * Generated from protobuf field <code>string version_id = 28 [(.google.api.field_behavior) = IMMUTABLE, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setVersionId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->version_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * User provided version aliases so that a model version can be referenced via
+     * alias (i.e.
+     * `projects/{project}/locations/{location}/models/{model_id}&#64;{version_alias}`
+     * instead of auto-generated version id (i.e.
+     * `projects/{project}/locations/{location}/models/{model_id}&#64;{version_id})`.
+     * The format is [a-z][a-zA-Z0-9-]{0,126}[a-z0-9] to distinguish from
+     * version_id. A default version alias will be created for the first version
+     * of the model, and there must be exactly one default version alias for a
+     * model.
+     *
+     * Generated from protobuf field <code>repeated string version_aliases = 29;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getVersionAliases()
+    {
+        return $this->version_aliases;
+    }
+
+    /**
+     * User provided version aliases so that a model version can be referenced via
+     * alias (i.e.
+     * `projects/{project}/locations/{location}/models/{model_id}&#64;{version_alias}`
+     * instead of auto-generated version id (i.e.
+     * `projects/{project}/locations/{location}/models/{model_id}&#64;{version_id})`.
+     * The format is [a-z][a-zA-Z0-9-]{0,126}[a-z0-9] to distinguish from
+     * version_id. A default version alias will be created for the first version
+     * of the model, and there must be exactly one default version alias for a
+     * model.
+     *
+     * Generated from protobuf field <code>repeated string version_aliases = 29;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setVersionAliases($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->version_aliases = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Timestamp when this version was created.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp version_create_time = 31 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Timestamp|null
+     */
+    public function getVersionCreateTime()
+    {
+        return $this->version_create_time;
+    }
+
+    public function hasVersionCreateTime()
+    {
+        return isset($this->version_create_time);
+    }
+
+    public function clearVersionCreateTime()
+    {
+        unset($this->version_create_time);
+    }
+
+    /**
+     * Output only. Timestamp when this version was created.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp version_create_time = 31 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Protobuf\Timestamp $var
+     * @return $this
+     */
+    public function setVersionCreateTime($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        $this->version_create_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Timestamp when this version was most recently updated.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp version_update_time = 32 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Timestamp|null
+     */
+    public function getVersionUpdateTime()
+    {
+        return $this->version_update_time;
+    }
+
+    public function hasVersionUpdateTime()
+    {
+        return isset($this->version_update_time);
+    }
+
+    public function clearVersionUpdateTime()
+    {
+        unset($this->version_update_time);
+    }
+
+    /**
+     * Output only. Timestamp when this version was most recently updated.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp version_update_time = 32 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Protobuf\Timestamp $var
+     * @return $this
+     */
+    public function setVersionUpdateTime($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        $this->version_update_time = $var;
+
+        return $this;
+    }
+
+    /**
      * Required. The display name of the Model.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -452,7 +814,7 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The display name of the Model.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -494,9 +856,63 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The description of this version.
+     *
+     * Generated from protobuf field <code>string version_description = 30;</code>
+     * @return string
+     */
+    public function getVersionDescription()
+    {
+        return $this->version_description;
+    }
+
+    /**
+     * The description of this version.
+     *
+     * Generated from protobuf field <code>string version_description = 30;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setVersionDescription($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->version_description = $var;
+
+        return $this;
+    }
+
+    /**
+     * The default checkpoint id of a model version.
+     *
+     * Generated from protobuf field <code>string default_checkpoint_id = 53;</code>
+     * @return string
+     */
+    public function getDefaultCheckpointId()
+    {
+        return $this->default_checkpoint_id;
+    }
+
+    /**
+     * The default checkpoint id of a model version.
+     *
+     * Generated from protobuf field <code>string default_checkpoint_id = 53;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDefaultCheckpointId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->default_checkpoint_id = $var;
+
+        return $this;
+    }
+
+    /**
      * The schemata that describe formats of the Model's predictions and
      * explanations as given and returned via
-     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] and [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * and
+     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PredictSchemata predict_schemata = 4;</code>
      * @return \Google\Cloud\AIPlatform\V1\PredictSchemata|null
@@ -519,7 +935,9 @@ class Model extends \Google\Protobuf\Internal\Message
     /**
      * The schemata that describe formats of the Model's predictions and
      * explanations as given and returned via
-     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] and [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * and
+     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PredictSchemata predict_schemata = 4;</code>
      * @param \Google\Cloud\AIPlatform\V1\PredictSchemata $var
@@ -534,10 +952,10 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. Points to a YAML file stored on Google Cloud Storage describing additional
-     * information about the Model, that is specific to it. Unset if the Model
-     * does not have any additional information.
-     * The schema is defined as an OpenAPI 3.0.2 [Schema
+     * Immutable. Points to a YAML file stored on Google Cloud Storage describing
+     * additional information about the Model, that is specific to it. Unset if
+     * the Model does not have any additional information. The schema is defined
+     * as an OpenAPI 3.0.2 [Schema
      * Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      * AutoML Models always have this field populated by Vertex AI, if no
      * additional metadata is needed, this field is set to an empty string.
@@ -554,10 +972,10 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. Points to a YAML file stored on Google Cloud Storage describing additional
-     * information about the Model, that is specific to it. Unset if the Model
-     * does not have any additional information.
-     * The schema is defined as an OpenAPI 3.0.2 [Schema
+     * Immutable. Points to a YAML file stored on Google Cloud Storage describing
+     * additional information about the Model, that is specific to it. Unset if
+     * the Model does not have any additional information. The schema is defined
+     * as an OpenAPI 3.0.2 [Schema
      * Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      * AutoML Models always have this field populated by Vertex AI, if no
      * additional metadata is needed, this field is set to an empty string.
@@ -578,8 +996,9 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. An additional information about the Model; the schema of the metadata can
-     * be found in [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
+     * Immutable. An additional information about the Model; the schema of the
+     * metadata can be found in
+     * [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
      * Unset if the Model does not have any additional information.
      *
      * Generated from protobuf field <code>.google.protobuf.Value metadata = 6 [(.google.api.field_behavior) = IMMUTABLE];</code>
@@ -601,8 +1020,9 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. An additional information about the Model; the schema of the metadata can
-     * be found in [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
+     * Immutable. An additional information about the Model; the schema of the
+     * metadata can be found in
+     * [metadata_schema][google.cloud.aiplatform.v1.Model.metadata_schema_uri].
      * Unset if the Model does not have any additional information.
      *
      * Generated from protobuf field <code>.google.protobuf.Value metadata = 6 [(.google.api.field_behavior) = IMMUTABLE];</code>
@@ -618,8 +1038,8 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The formats in which this Model may be exported. If empty, this Model is
-     * not available for export.
+     * Output only. The formats in which this Model may be exported. If empty,
+     * this Model is not available for export.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Model.ExportFormat supported_export_formats = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -630,11 +1050,11 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The formats in which this Model may be exported. If empty, this Model is
-     * not available for export.
+     * Output only. The formats in which this Model may be exported. If empty,
+     * this Model is not available for export.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Model.ExportFormat supported_export_formats = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\AIPlatform\V1\Model\ExportFormat[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Model\ExportFormat>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSupportedExportFormats($var)
@@ -646,8 +1066,8 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The resource name of the TrainingPipeline that uploaded this Model, if
-     * any.
+     * Output only. The resource name of the TrainingPipeline that uploaded this
+     * Model, if any.
      *
      * Generated from protobuf field <code>string training_pipeline = 7 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      * @return string
@@ -658,8 +1078,8 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The resource name of the TrainingPipeline that uploaded this Model, if
-     * any.
+     * Output only. The resource name of the TrainingPipeline that uploaded this
+     * Model, if any.
      *
      * Generated from protobuf field <code>string training_pipeline = 7 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -674,11 +1094,39 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Input only. The specification of the container that is to be used when deploying
-     * this Model. The specification is ingested upon
-     * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel], and all binaries it contains are copied
-     * and stored internally by Vertex AI.
-     * Not present for AutoML Models.
+     * Optional. This field is populated if the model is produced by a pipeline
+     * job.
+     *
+     * Generated from protobuf field <code>string pipeline_job = 47 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getPipelineJob()
+    {
+        return $this->pipeline_job;
+    }
+
+    /**
+     * Optional. This field is populated if the model is produced by a pipeline
+     * job.
+     *
+     * Generated from protobuf field <code>string pipeline_job = 47 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPipelineJob($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->pipeline_job = $var;
+
+        return $this;
+    }
+
+    /**
+     * Input only. The specification of the container that is to be used when
+     * deploying this Model. The specification is ingested upon
+     * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel],
+     * and all binaries it contains are copied and stored internally by Vertex AI.
+     * Not required for AutoML Models.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelContainerSpec container_spec = 9 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @return \Google\Cloud\AIPlatform\V1\ModelContainerSpec|null
@@ -699,11 +1147,11 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Input only. The specification of the container that is to be used when deploying
-     * this Model. The specification is ingested upon
-     * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel], and all binaries it contains are copied
-     * and stored internally by Vertex AI.
-     * Not present for AutoML Models.
+     * Input only. The specification of the container that is to be used when
+     * deploying this Model. The specification is ingested upon
+     * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel],
+     * and all binaries it contains are copied and stored internally by Vertex AI.
+     * Not required for AutoML Models.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelContainerSpec container_spec = 9 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @param \Google\Cloud\AIPlatform\V1\ModelContainerSpec $var
@@ -718,9 +1166,8 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. The path to the directory containing the Model artifact and any of its
-     * supporting files.
-     * Not present for AutoML Models.
+     * Immutable. The path to the directory containing the Model artifact and any
+     * of its supporting files. Not required for AutoML Models.
      *
      * Generated from protobuf field <code>string artifact_uri = 26 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return string
@@ -731,9 +1178,8 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. The path to the directory containing the Model artifact and any of its
-     * supporting files.
-     * Not present for AutoML Models.
+     * Immutable. The path to the directory containing the Model artifact and any
+     * of its supporting files. Not required for AutoML Models.
      *
      * Generated from protobuf field <code>string artifact_uri = 26 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @param string $var
@@ -748,16 +1194,22 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. When this Model is deployed, its prediction resources are described by the
-     * `prediction_resources` field of the [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models] object.
-     * Because not all Models support all resource configuration types, the
-     * configuration types this Model supports are listed here. If no
+     * Output only. When this Model is deployed, its prediction resources are
+     * described by the `prediction_resources` field of the
+     * [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models]
+     * object. Because not all Models support all resource configuration types,
+     * the configuration types this Model supports are listed here. If no
      * configuration types are listed, the Model cannot be deployed to an
      * [Endpoint][google.cloud.aiplatform.v1.Endpoint] and does not support
-     * online predictions ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
-     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]). Such a Model can serve predictions by
-     * using a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it has at least one entry each in
-     * [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats] and
+     * online predictions
+     * ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
+     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]).
+     * Such a Model can serve predictions by using a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it
+     * has at least one entry each in
+     * [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats]
+     * and
      * [supported_output_storage_formats][google.cloud.aiplatform.v1.Model.supported_output_storage_formats].
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Model.DeploymentResourcesType supported_deployment_resources_types = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -769,20 +1221,26 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. When this Model is deployed, its prediction resources are described by the
-     * `prediction_resources` field of the [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models] object.
-     * Because not all Models support all resource configuration types, the
-     * configuration types this Model supports are listed here. If no
+     * Output only. When this Model is deployed, its prediction resources are
+     * described by the `prediction_resources` field of the
+     * [Endpoint.deployed_models][google.cloud.aiplatform.v1.Endpoint.deployed_models]
+     * object. Because not all Models support all resource configuration types,
+     * the configuration types this Model supports are listed here. If no
      * configuration types are listed, the Model cannot be deployed to an
      * [Endpoint][google.cloud.aiplatform.v1.Endpoint] and does not support
-     * online predictions ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
-     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]). Such a Model can serve predictions by
-     * using a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it has at least one entry each in
-     * [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats] and
+     * online predictions
+     * ([PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
+     * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain]).
+     * Such a Model can serve predictions by using a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob], if it
+     * has at least one entry each in
+     * [supported_input_storage_formats][google.cloud.aiplatform.v1.Model.supported_input_storage_formats]
+     * and
      * [supported_output_storage_formats][google.cloud.aiplatform.v1.Model.supported_output_storage_formats].
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Model.DeploymentResourcesType supported_deployment_resources_types = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSupportedDeploymentResourcesTypes($var)
@@ -795,9 +1253,10 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. The formats this Model supports in
-     * [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config]. If
-     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] exists, the instances
-     * should be given as per that schema.
+     * [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config].
+     * If
+     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     * exists, the instances should be given as per that schema.
      * The possible formats are:
      * * `jsonl`
      * The JSON Lines format, where each instance is a single line. Uses
@@ -805,10 +1264,12 @@ class Model extends \Google\Protobuf\Internal\Message
      * * `csv`
      * The CSV format, where each instance is a single comma-separated line.
      * The first line in the file is the header, containing comma-separated field
-     * names. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     * names. Uses
+     * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      * * `tf-record`
      * The TFRecord format, where each instance is a single record in tfrecord
-     * syntax. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     * syntax. Uses
+     * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      * * `tf-record-gzip`
      * Similar to `tf-record`, but the file is gzipped. Uses
      * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
@@ -818,11 +1279,16 @@ class Model extends \Google\Protobuf\Internal\Message
      * * `file-list`
      * Each line of the file is the location of an instance to process, uses
      * `gcs_source` field of the
-     * [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig] object.
+     * [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig]
+     * object.
      * If this Model doesn't support any of these formats it means it cannot be
-     * used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     * predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     * used with a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * However, if it has
+     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     * it could serve online predictions by using
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
      * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>repeated string supported_input_storage_formats = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -835,9 +1301,10 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. The formats this Model supports in
-     * [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config]. If
-     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] exists, the instances
-     * should be given as per that schema.
+     * [BatchPredictionJob.input_config][google.cloud.aiplatform.v1.BatchPredictionJob.input_config].
+     * If
+     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     * exists, the instances should be given as per that schema.
      * The possible formats are:
      * * `jsonl`
      * The JSON Lines format, where each instance is a single line. Uses
@@ -845,10 +1312,12 @@ class Model extends \Google\Protobuf\Internal\Message
      * * `csv`
      * The CSV format, where each instance is a single comma-separated line.
      * The first line in the file is the header, containing comma-separated field
-     * names. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     * names. Uses
+     * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      * * `tf-record`
      * The TFRecord format, where each instance is a single record in tfrecord
-     * syntax. Uses [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
+     * syntax. Uses
+     * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
      * * `tf-record-gzip`
      * Similar to `tf-record`, but the file is gzipped. Uses
      * [GcsSource][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig.gcs_source].
@@ -858,15 +1327,20 @@ class Model extends \Google\Protobuf\Internal\Message
      * * `file-list`
      * Each line of the file is the location of an instance to process, uses
      * `gcs_source` field of the
-     * [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig] object.
+     * [InputConfig][google.cloud.aiplatform.v1.BatchPredictionJob.InputConfig]
+     * object.
      * If this Model doesn't support any of these formats it means it cannot be
-     * used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     * predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     * used with a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * However, if it has
+     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     * it could serve online predictions by using
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
      * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>repeated string supported_input_storage_formats = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSupportedInputStorageFormats($var)
@@ -879,12 +1353,14 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. The formats this Model supports in
-     * [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config]. If both
-     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] and
-     * [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri] exist, the predictions
-     * are returned together with their instances. In other words, the
-     * prediction has the original instance data first, followed
-     * by the actual prediction content (as per the schema).
+     * [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config].
+     * If both
+     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     * and
+     * [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri]
+     * exist, the predictions are returned together with their instances. In other
+     * words, the prediction has the original instance data first, followed by the
+     * actual prediction content (as per the schema).
      * The possible formats are:
      * * `jsonl`
      * The JSON Lines format, where each prediction is a single line. Uses
@@ -899,9 +1375,13 @@ class Model extends \Google\Protobuf\Internal\Message
      * [BigQueryDestination][google.cloud.aiplatform.v1.BatchPredictionJob.OutputConfig.bigquery_destination]
      * .
      * If this Model doesn't support any of these formats it means it cannot be
-     * used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     * predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     * used with a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * However, if it has
+     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     * it could serve online predictions by using
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
      * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>repeated string supported_output_storage_formats = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -914,12 +1394,14 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. The formats this Model supports in
-     * [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config]. If both
-     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri] and
-     * [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri] exist, the predictions
-     * are returned together with their instances. In other words, the
-     * prediction has the original instance data first, followed
-     * by the actual prediction content (as per the schema).
+     * [BatchPredictionJob.output_config][google.cloud.aiplatform.v1.BatchPredictionJob.output_config].
+     * If both
+     * [PredictSchemata.instance_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.instance_schema_uri]
+     * and
+     * [PredictSchemata.prediction_schema_uri][google.cloud.aiplatform.v1.PredictSchemata.prediction_schema_uri]
+     * exist, the predictions are returned together with their instances. In other
+     * words, the prediction has the original instance data first, followed by the
+     * actual prediction content (as per the schema).
      * The possible formats are:
      * * `jsonl`
      * The JSON Lines format, where each prediction is a single line. Uses
@@ -934,13 +1416,17 @@ class Model extends \Google\Protobuf\Internal\Message
      * [BigQueryDestination][google.cloud.aiplatform.v1.BatchPredictionJob.OutputConfig.bigquery_destination]
      * .
      * If this Model doesn't support any of these formats it means it cannot be
-     * used with a [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob]. However, if it has
-     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types], it could serve online
-     * predictions by using [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict] or
+     * used with a
+     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * However, if it has
+     * [supported_deployment_resources_types][google.cloud.aiplatform.v1.Model.supported_deployment_resources_types],
+     * it could serve online predictions by using
+     * [PredictionService.Predict][google.cloud.aiplatform.v1.PredictionService.Predict]
+     * or
      * [PredictionService.Explain][google.cloud.aiplatform.v1.PredictionService.Explain].
      *
      * Generated from protobuf field <code>repeated string supported_output_storage_formats = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSupportedOutputStorageFormats($var)
@@ -1024,8 +1510,8 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The pointers to DeployedModels created from this Model. Note that
-     * Model could have been deployed to Endpoints in different Locations.
+     * Output only. The pointers to DeployedModels created from this Model. Note
+     * that Model could have been deployed to Endpoints in different Locations.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.DeployedModelRef deployed_models = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -1036,11 +1522,11 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The pointers to DeployedModels created from this Model. Note that
-     * Model could have been deployed to Endpoints in different Locations.
+     * Output only. The pointers to DeployedModels created from this Model. Note
+     * that Model could have been deployed to Endpoints in different Locations.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.DeployedModelRef deployed_models = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\AIPlatform\V1\DeployedModelRef[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\DeployedModelRef>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDeployedModels($var)
@@ -1053,24 +1539,33 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * The default explanation specification for this Model.
-     * The Model can be used for [requesting
-     * explanation][PredictionService.Explain] after being
-     * [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if it is populated.
-     * The Model can be used for [batch
-     * explanation][BatchPredictionJob.generate_explanation] if it is populated.
+     * The Model can be used for
+     * [requesting
+     * explanation][google.cloud.aiplatform.v1.PredictionService.Explain] after
+     * being [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if
+     * it is populated. The Model can be used for [batch
+     * explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     * if it is populated.
      * All fields of the explanation_spec can be overridden by
-     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model], or
-     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     * of
+     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model],
+     * or
+     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     * of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      * If the default explanation specification is not set for this Model, this
-     * Model can still be used for [requesting
-     * explanation][PredictionService.Explain] by setting
-     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model] and for [batch
-     * explanation][BatchPredictionJob.generate_explanation] by setting
-     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * Model can still be used for
+     * [requesting
+     * explanation][google.cloud.aiplatform.v1.PredictionService.Explain] by
+     * setting
+     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     * of
+     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model]
+     * and for [batch
+     * explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     * by setting
+     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     * of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationSpec explanation_spec = 23;</code>
      * @return \Google\Cloud\AIPlatform\V1\ExplanationSpec|null
@@ -1092,24 +1587,33 @@ class Model extends \Google\Protobuf\Internal\Message
 
     /**
      * The default explanation specification for this Model.
-     * The Model can be used for [requesting
-     * explanation][PredictionService.Explain] after being
-     * [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if it is populated.
-     * The Model can be used for [batch
-     * explanation][BatchPredictionJob.generate_explanation] if it is populated.
+     * The Model can be used for
+     * [requesting
+     * explanation][google.cloud.aiplatform.v1.PredictionService.Explain] after
+     * being [deployed][google.cloud.aiplatform.v1.EndpointService.DeployModel] if
+     * it is populated. The Model can be used for [batch
+     * explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     * if it is populated.
      * All fields of the explanation_spec can be overridden by
-     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model], or
-     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     * of
+     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model],
+     * or
+     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     * of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      * If the default explanation specification is not set for this Model, this
-     * Model can still be used for [requesting
-     * explanation][PredictionService.Explain] by setting
-     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec] of
-     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model] and for [batch
-     * explanation][BatchPredictionJob.generate_explanation] by setting
-     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec] of
-     * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
+     * Model can still be used for
+     * [requesting
+     * explanation][google.cloud.aiplatform.v1.PredictionService.Explain] by
+     * setting
+     * [explanation_spec][google.cloud.aiplatform.v1.DeployedModel.explanation_spec]
+     * of
+     * [DeployModelRequest.deployed_model][google.cloud.aiplatform.v1.DeployModelRequest.deployed_model]
+     * and for [batch
+     * explanation][google.cloud.aiplatform.v1.BatchPredictionJob.generate_explanation]
+     * by setting
+     * [explanation_spec][google.cloud.aiplatform.v1.BatchPredictionJob.explanation_spec]
+     * of [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob].
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationSpec explanation_spec = 23;</code>
      * @param \Google\Cloud\AIPlatform\V1\ExplanationSpec $var
@@ -1186,6 +1690,46 @@ class Model extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Stats of data used for training or evaluating the Model.
+     * Only populated when the Model is trained by a TrainingPipeline with
+     * [data_input_config][google.cloud.aiplatform.v1.TrainingPipeline.input_data_config].
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.DataStats data_stats = 21;</code>
+     * @return \Google\Cloud\AIPlatform\V1\Model\DataStats|null
+     */
+    public function getDataStats()
+    {
+        return $this->data_stats;
+    }
+
+    public function hasDataStats()
+    {
+        return isset($this->data_stats);
+    }
+
+    public function clearDataStats()
+    {
+        unset($this->data_stats);
+    }
+
+    /**
+     * Stats of data used for training or evaluating the Model.
+     * Only populated when the Model is trained by a TrainingPipeline with
+     * [data_input_config][google.cloud.aiplatform.v1.TrainingPipeline.input_data_config].
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.DataStats data_stats = 21;</code>
+     * @param \Google\Cloud\AIPlatform\V1\Model\DataStats $var
+     * @return $this
+     */
+    public function setDataStats($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\Model\DataStats::class);
+        $this->data_stats = $var;
+
+        return $this;
+    }
+
+    /**
      * Customer-managed encryption key spec for a Model. If set, this
      * Model and all sub-resources of this Model will be secured by this key.
      *
@@ -1219,6 +1763,206 @@ class Model extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\EncryptionSpec::class);
         $this->encryption_spec = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Source of a model. It can either be automl training pipeline,
+     * custom training pipeline, BigQuery ML, or saved and tuned from Genie or
+     * Model Garden.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelSourceInfo model_source_info = 38 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\AIPlatform\V1\ModelSourceInfo|null
+     */
+    public function getModelSourceInfo()
+    {
+        return $this->model_source_info;
+    }
+
+    public function hasModelSourceInfo()
+    {
+        return isset($this->model_source_info);
+    }
+
+    public function clearModelSourceInfo()
+    {
+        unset($this->model_source_info);
+    }
+
+    /**
+     * Output only. Source of a model. It can either be automl training pipeline,
+     * custom training pipeline, BigQuery ML, or saved and tuned from Genie or
+     * Model Garden.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelSourceInfo model_source_info = 38 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\AIPlatform\V1\ModelSourceInfo $var
+     * @return $this
+     */
+    public function setModelSourceInfo($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\ModelSourceInfo::class);
+        $this->model_source_info = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. If this Model is a copy of another Model, this contains info
+     * about the original.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.OriginalModelInfo original_model_info = 34 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\AIPlatform\V1\Model\OriginalModelInfo|null
+     */
+    public function getOriginalModelInfo()
+    {
+        return $this->original_model_info;
+    }
+
+    public function hasOriginalModelInfo()
+    {
+        return isset($this->original_model_info);
+    }
+
+    public function clearOriginalModelInfo()
+    {
+        unset($this->original_model_info);
+    }
+
+    /**
+     * Output only. If this Model is a copy of another Model, this contains info
+     * about the original.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.OriginalModelInfo original_model_info = 34 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\AIPlatform\V1\Model\OriginalModelInfo $var
+     * @return $this
+     */
+    public function setOriginalModelInfo($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\Model\OriginalModelInfo::class);
+        $this->original_model_info = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The resource name of the Artifact that was created in
+     * MetadataStore when creating the Model. The Artifact resource name pattern
+     * is
+     * `projects/{project}/locations/{location}/metadataStores/{metadata_store}/artifacts/{artifact}`.
+     *
+     * Generated from protobuf field <code>string metadata_artifact = 44 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getMetadataArtifact()
+    {
+        return $this->metadata_artifact;
+    }
+
+    /**
+     * Output only. The resource name of the Artifact that was created in
+     * MetadataStore when creating the Model. The Artifact resource name pattern
+     * is
+     * `projects/{project}/locations/{location}/metadataStores/{metadata_store}/artifacts/{artifact}`.
+     *
+     * Generated from protobuf field <code>string metadata_artifact = 44 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setMetadataArtifact($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->metadata_artifact = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. User input field to specify the base model source. Currently it
+     * only supports specifing the Model Garden models and Genie models.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.BaseModelSource base_model_source = 50 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\AIPlatform\V1\Model\BaseModelSource|null
+     */
+    public function getBaseModelSource()
+    {
+        return $this->base_model_source;
+    }
+
+    public function hasBaseModelSource()
+    {
+        return isset($this->base_model_source);
+    }
+
+    public function clearBaseModelSource()
+    {
+        unset($this->base_model_source);
+    }
+
+    /**
+     * Optional. User input field to specify the base model source. Currently it
+     * only supports specifing the Model Garden models and Genie models.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Model.BaseModelSource base_model_source = 50 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\AIPlatform\V1\Model\BaseModelSource $var
+     * @return $this
+     */
+    public function setBaseModelSource($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\Model\BaseModelSource::class);
+        $this->base_model_source = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 51 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 51 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 52 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return $this->satisfies_pzi;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 52 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
 
         return $this;
     }

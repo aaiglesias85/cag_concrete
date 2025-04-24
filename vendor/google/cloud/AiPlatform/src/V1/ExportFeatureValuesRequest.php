@@ -9,32 +9,33 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [FeaturestoreService.ExportFeatureValues][google.cloud.aiplatform.v1.FeaturestoreService.ExportFeatureValues].
+ * Request message for
+ * [FeaturestoreService.ExportFeatureValues][google.cloud.aiplatform.v1.FeaturestoreService.ExportFeatureValues].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ExportFeatureValuesRequest</code>
  */
 class ExportFeatureValuesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the EntityType from which to export Feature values.
-     * Format:
+     * Required. The resource name of the EntityType from which to export Feature
+     * values. Format:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
      *
      * Generated from protobuf field <code>string entity_type = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $entity_type = '';
+    protected $entity_type = '';
     /**
      * Required. Specifies destination location and format.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeatureValueDestination destination = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $destination = null;
+    protected $destination = null;
     /**
      * Required. Selects Features to export values of.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeatureSelector feature_selector = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $feature_selector = null;
+    protected $feature_selector = null;
     /**
      * Per-Feature export settings.
      *
@@ -42,6 +43,22 @@ class ExportFeatureValuesRequest extends \Google\Protobuf\Internal\Message
      */
     private $settings;
     protected $mode;
+
+    /**
+     * @param string $entityType Required. The resource name of the EntityType from which to export Feature
+     *                           values. Format:
+     *                           `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     *                           Please see {@see FeaturestoreServiceClient::entityTypeName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ExportFeatureValuesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $entityType): self
+    {
+        return (new self())
+            ->setEntityType($entityType);
+    }
 
     /**
      * Constructor.
@@ -56,14 +73,14 @@ class ExportFeatureValuesRequest extends \Google\Protobuf\Internal\Message
      *           Exports all historical values of all entities of the EntityType within a
      *           time range
      *     @type string $entity_type
-     *           Required. The resource name of the EntityType from which to export Feature values.
-     *           Format:
+     *           Required. The resource name of the EntityType from which to export Feature
+     *           values. Format:
      *           `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
      *     @type \Google\Cloud\AIPlatform\V1\FeatureValueDestination $destination
      *           Required. Specifies destination location and format.
      *     @type \Google\Cloud\AIPlatform\V1\FeatureSelector $feature_selector
      *           Required. Selects Features to export values of.
-     *     @type \Google\Cloud\AIPlatform\V1\DestinationFeatureSetting[]|\Google\Protobuf\Internal\RepeatedField $settings
+     *     @type array<\Google\Cloud\AIPlatform\V1\DestinationFeatureSetting>|\Google\Protobuf\Internal\RepeatedField $settings
      *           Per-Feature export settings.
      * }
      */
@@ -139,8 +156,8 @@ class ExportFeatureValuesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the EntityType from which to export Feature values.
-     * Format:
+     * Required. The resource name of the EntityType from which to export Feature
+     * values. Format:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
      *
      * Generated from protobuf field <code>string entity_type = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -152,8 +169,8 @@ class ExportFeatureValuesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the EntityType from which to export Feature values.
-     * Format:
+     * Required. The resource name of the EntityType from which to export Feature
+     * values. Format:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
      *
      * Generated from protobuf field <code>string entity_type = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -255,7 +272,7 @@ class ExportFeatureValuesRequest extends \Google\Protobuf\Internal\Message
      * Per-Feature export settings.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.DestinationFeatureSetting settings = 6;</code>
-     * @param \Google\Cloud\AIPlatform\V1\DestinationFeatureSetting[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\DestinationFeatureSetting>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSettings($var)

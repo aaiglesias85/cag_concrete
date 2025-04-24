@@ -10,18 +10,20 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * A configuration for running
- * [Apache Spark SQL](http://spark.apache.org/sql/) queries as a batch workload.
+ * [Apache Spark SQL](https://spark.apache.org/sql/) queries as a batch
+ * workload.
  *
  * Generated from protobuf message <code>google.cloud.dataproc.v1.SparkSqlBatch</code>
  */
 class SparkSqlBatch extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The HCFS URI of the script that contains Spark SQL queries to execute.
+     * Required. The HCFS URI of the script that contains Spark SQL queries to
+     * execute.
      *
      * Generated from protobuf field <code>string query_file_uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $query_file_uri = '';
+    protected $query_file_uri = '';
     /**
      * Optional. Mapping of query variable names to values (equivalent to the
      * Spark SQL command: `SET name="value";`).
@@ -43,11 +45,12 @@ class SparkSqlBatch extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $query_file_uri
-     *           Required. The HCFS URI of the script that contains Spark SQL queries to execute.
+     *           Required. The HCFS URI of the script that contains Spark SQL queries to
+     *           execute.
      *     @type array|\Google\Protobuf\Internal\MapField $query_variables
      *           Optional. Mapping of query variable names to values (equivalent to the
      *           Spark SQL command: `SET name="value";`).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $jar_file_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $jar_file_uris
      *           Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.
      * }
      */
@@ -57,7 +60,8 @@ class SparkSqlBatch extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The HCFS URI of the script that contains Spark SQL queries to execute.
+     * Required. The HCFS URI of the script that contains Spark SQL queries to
+     * execute.
      *
      * Generated from protobuf field <code>string query_file_uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -68,7 +72,8 @@ class SparkSqlBatch extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The HCFS URI of the script that contains Spark SQL queries to execute.
+     * Required. The HCFS URI of the script that contains Spark SQL queries to
+     * execute.
      *
      * Generated from protobuf field <code>string query_file_uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -125,7 +130,7 @@ class SparkSqlBatch extends \Google\Protobuf\Internal\Message
      * Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.
      *
      * Generated from protobuf field <code>repeated string jar_file_uris = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setJarFileUris($var)

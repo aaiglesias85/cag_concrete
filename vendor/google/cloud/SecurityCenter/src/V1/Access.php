@@ -17,42 +17,96 @@ class Access extends \Google\Protobuf\Internal\Message
 {
     /**
      * Associated email, such as "foo&#64;google.com".
+     * The email address of the authenticated user or a service account acting on
+     * behalf of a third party principal making the request. For third party
+     * identity callers, the `principal_subject` field is populated instead of
+     * this field. For privacy reasons, the principal email address is sometimes
+     * redacted. For more information, see [Caller identities in audit
+     * logs](https://cloud.google.com/logging/docs/audit#user-id).
      *
      * Generated from protobuf field <code>string principal_email = 1;</code>
      */
-    private $principal_email = '';
+    protected $principal_email = '';
     /**
      * Caller's IP address, such as "1.1.1.1".
      *
      * Generated from protobuf field <code>string caller_ip = 2;</code>
      */
-    private $caller_ip = '';
+    protected $caller_ip = '';
     /**
      * The caller IP's geolocation, which identifies where the call came from.
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.Geolocation caller_ip_geo = 3;</code>
      */
-    private $caller_ip_geo = null;
+    protected $caller_ip_geo = null;
     /**
-     * What kind of user agent is associated, e.g. operating system shells,
-     * embedded or stand-alone applications, etc.
+     * Type of user agent associated with the finding. For example, an operating
+     * system shell or an embedded or standalone application.
      *
      * Generated from protobuf field <code>string user_agent_family = 4;</code>
      */
-    private $user_agent_family = '';
+    protected $user_agent_family = '';
+    /**
+     * The caller's user agent string associated with the finding.
+     *
+     * Generated from protobuf field <code>string user_agent = 12;</code>
+     */
+    protected $user_agent = '';
     /**
      * This is the API service that the service account made a call to, e.g.
      * "iam.googleapis.com"
      *
      * Generated from protobuf field <code>string service_name = 5;</code>
      */
-    private $service_name = '';
+    protected $service_name = '';
     /**
      * The method that the service account called, e.g. "SetIamPolicy".
      *
      * Generated from protobuf field <code>string method_name = 6;</code>
      */
-    private $method_name = '';
+    protected $method_name = '';
+    /**
+     * A string that represents the principal_subject that is associated with the
+     * identity. Unlike `principal_email`, `principal_subject` supports principals
+     * that aren't associated with email addresses, such as third party
+     * principals. For most identities, the format is
+     * `principal://iam.googleapis.com/{identity pool name}/subject/{subject}`.
+     * Some GKE identities, such as GKE_WORKLOAD, FREEFORM, and GKE_HUB_WORKLOAD,
+     * still use the legacy format `serviceAccount:{identity pool
+     * name}[{subject}]`.
+     *
+     * Generated from protobuf field <code>string principal_subject = 7;</code>
+     */
+    protected $principal_subject = '';
+    /**
+     * The name of the service account key that was used to create or exchange
+     * credentials when authenticating the service account that made the request.
+     * This is a scheme-less URI full resource name. For example:
+     * "//iam.googleapis.com/projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}".
+     *
+     * Generated from protobuf field <code>string service_account_key_name = 8;</code>
+     */
+    protected $service_account_key_name = '';
+    /**
+     * The identity delegation history of an authenticated service account that
+     * made the request. The `serviceAccountDelegationInfo[]` object contains
+     * information about the real authorities that try to access Google Cloud
+     * resources by delegating on a service account. When multiple authorities are
+     * present, they are guaranteed to be sorted based on the original ordering of
+     * the identity delegation events.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ServiceAccountDelegationInfo service_account_delegation_info = 9;</code>
+     */
+    private $service_account_delegation_info;
+    /**
+     * A string that represents a username. The username provided depends on the
+     * type of the finding and is likely not an IAM principal. For example, this
+     * can be a system username if the finding is related to a virtual machine, or
+     * it can be an application login username.
+     *
+     * Generated from protobuf field <code>string user_name = 11;</code>
+     */
+    protected $user_name = '';
 
     /**
      * Constructor.
@@ -62,18 +116,52 @@ class Access extends \Google\Protobuf\Internal\Message
      *
      *     @type string $principal_email
      *           Associated email, such as "foo&#64;google.com".
+     *           The email address of the authenticated user or a service account acting on
+     *           behalf of a third party principal making the request. For third party
+     *           identity callers, the `principal_subject` field is populated instead of
+     *           this field. For privacy reasons, the principal email address is sometimes
+     *           redacted. For more information, see [Caller identities in audit
+     *           logs](https://cloud.google.com/logging/docs/audit#user-id).
      *     @type string $caller_ip
      *           Caller's IP address, such as "1.1.1.1".
      *     @type \Google\Cloud\SecurityCenter\V1\Geolocation $caller_ip_geo
      *           The caller IP's geolocation, which identifies where the call came from.
      *     @type string $user_agent_family
-     *           What kind of user agent is associated, e.g. operating system shells,
-     *           embedded or stand-alone applications, etc.
+     *           Type of user agent associated with the finding. For example, an operating
+     *           system shell or an embedded or standalone application.
+     *     @type string $user_agent
+     *           The caller's user agent string associated with the finding.
      *     @type string $service_name
      *           This is the API service that the service account made a call to, e.g.
      *           "iam.googleapis.com"
      *     @type string $method_name
      *           The method that the service account called, e.g. "SetIamPolicy".
+     *     @type string $principal_subject
+     *           A string that represents the principal_subject that is associated with the
+     *           identity. Unlike `principal_email`, `principal_subject` supports principals
+     *           that aren't associated with email addresses, such as third party
+     *           principals. For most identities, the format is
+     *           `principal://iam.googleapis.com/{identity pool name}/subject/{subject}`.
+     *           Some GKE identities, such as GKE_WORKLOAD, FREEFORM, and GKE_HUB_WORKLOAD,
+     *           still use the legacy format `serviceAccount:{identity pool
+     *           name}[{subject}]`.
+     *     @type string $service_account_key_name
+     *           The name of the service account key that was used to create or exchange
+     *           credentials when authenticating the service account that made the request.
+     *           This is a scheme-less URI full resource name. For example:
+     *           "//iam.googleapis.com/projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}".
+     *     @type array<\Google\Cloud\SecurityCenter\V1\ServiceAccountDelegationInfo>|\Google\Protobuf\Internal\RepeatedField $service_account_delegation_info
+     *           The identity delegation history of an authenticated service account that
+     *           made the request. The `serviceAccountDelegationInfo[]` object contains
+     *           information about the real authorities that try to access Google Cloud
+     *           resources by delegating on a service account. When multiple authorities are
+     *           present, they are guaranteed to be sorted based on the original ordering of
+     *           the identity delegation events.
+     *     @type string $user_name
+     *           A string that represents a username. The username provided depends on the
+     *           type of the finding and is likely not an IAM principal. For example, this
+     *           can be a system username if the finding is related to a virtual machine, or
+     *           it can be an application login username.
      * }
      */
     public function __construct($data = NULL) {
@@ -83,6 +171,12 @@ class Access extends \Google\Protobuf\Internal\Message
 
     /**
      * Associated email, such as "foo&#64;google.com".
+     * The email address of the authenticated user or a service account acting on
+     * behalf of a third party principal making the request. For third party
+     * identity callers, the `principal_subject` field is populated instead of
+     * this field. For privacy reasons, the principal email address is sometimes
+     * redacted. For more information, see [Caller identities in audit
+     * logs](https://cloud.google.com/logging/docs/audit#user-id).
      *
      * Generated from protobuf field <code>string principal_email = 1;</code>
      * @return string
@@ -94,6 +188,12 @@ class Access extends \Google\Protobuf\Internal\Message
 
     /**
      * Associated email, such as "foo&#64;google.com".
+     * The email address of the authenticated user or a service account acting on
+     * behalf of a third party principal making the request. For third party
+     * identity callers, the `principal_subject` field is populated instead of
+     * this field. For privacy reasons, the principal email address is sometimes
+     * redacted. For more information, see [Caller identities in audit
+     * logs](https://cloud.google.com/logging/docs/audit#user-id).
      *
      * Generated from protobuf field <code>string principal_email = 1;</code>
      * @param string $var
@@ -170,8 +270,8 @@ class Access extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * What kind of user agent is associated, e.g. operating system shells,
-     * embedded or stand-alone applications, etc.
+     * Type of user agent associated with the finding. For example, an operating
+     * system shell or an embedded or standalone application.
      *
      * Generated from protobuf field <code>string user_agent_family = 4;</code>
      * @return string
@@ -182,8 +282,8 @@ class Access extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * What kind of user agent is associated, e.g. operating system shells,
-     * embedded or stand-alone applications, etc.
+     * Type of user agent associated with the finding. For example, an operating
+     * system shell or an embedded or standalone application.
      *
      * Generated from protobuf field <code>string user_agent_family = 4;</code>
      * @param string $var
@@ -193,6 +293,32 @@ class Access extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->user_agent_family = $var;
+
+        return $this;
+    }
+
+    /**
+     * The caller's user agent string associated with the finding.
+     *
+     * Generated from protobuf field <code>string user_agent = 12;</code>
+     * @return string
+     */
+    public function getUserAgent()
+    {
+        return $this->user_agent;
+    }
+
+    /**
+     * The caller's user agent string associated with the finding.
+     *
+     * Generated from protobuf field <code>string user_agent = 12;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setUserAgent($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->user_agent = $var;
 
         return $this;
     }
@@ -247,6 +373,146 @@ class Access extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->method_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * A string that represents the principal_subject that is associated with the
+     * identity. Unlike `principal_email`, `principal_subject` supports principals
+     * that aren't associated with email addresses, such as third party
+     * principals. For most identities, the format is
+     * `principal://iam.googleapis.com/{identity pool name}/subject/{subject}`.
+     * Some GKE identities, such as GKE_WORKLOAD, FREEFORM, and GKE_HUB_WORKLOAD,
+     * still use the legacy format `serviceAccount:{identity pool
+     * name}[{subject}]`.
+     *
+     * Generated from protobuf field <code>string principal_subject = 7;</code>
+     * @return string
+     */
+    public function getPrincipalSubject()
+    {
+        return $this->principal_subject;
+    }
+
+    /**
+     * A string that represents the principal_subject that is associated with the
+     * identity. Unlike `principal_email`, `principal_subject` supports principals
+     * that aren't associated with email addresses, such as third party
+     * principals. For most identities, the format is
+     * `principal://iam.googleapis.com/{identity pool name}/subject/{subject}`.
+     * Some GKE identities, such as GKE_WORKLOAD, FREEFORM, and GKE_HUB_WORKLOAD,
+     * still use the legacy format `serviceAccount:{identity pool
+     * name}[{subject}]`.
+     *
+     * Generated from protobuf field <code>string principal_subject = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPrincipalSubject($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->principal_subject = $var;
+
+        return $this;
+    }
+
+    /**
+     * The name of the service account key that was used to create or exchange
+     * credentials when authenticating the service account that made the request.
+     * This is a scheme-less URI full resource name. For example:
+     * "//iam.googleapis.com/projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}".
+     *
+     * Generated from protobuf field <code>string service_account_key_name = 8;</code>
+     * @return string
+     */
+    public function getServiceAccountKeyName()
+    {
+        return $this->service_account_key_name;
+    }
+
+    /**
+     * The name of the service account key that was used to create or exchange
+     * credentials when authenticating the service account that made the request.
+     * This is a scheme-less URI full resource name. For example:
+     * "//iam.googleapis.com/projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}".
+     *
+     * Generated from protobuf field <code>string service_account_key_name = 8;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setServiceAccountKeyName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->service_account_key_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * The identity delegation history of an authenticated service account that
+     * made the request. The `serviceAccountDelegationInfo[]` object contains
+     * information about the real authorities that try to access Google Cloud
+     * resources by delegating on a service account. When multiple authorities are
+     * present, they are guaranteed to be sorted based on the original ordering of
+     * the identity delegation events.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ServiceAccountDelegationInfo service_account_delegation_info = 9;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getServiceAccountDelegationInfo()
+    {
+        return $this->service_account_delegation_info;
+    }
+
+    /**
+     * The identity delegation history of an authenticated service account that
+     * made the request. The `serviceAccountDelegationInfo[]` object contains
+     * information about the real authorities that try to access Google Cloud
+     * resources by delegating on a service account. When multiple authorities are
+     * present, they are guaranteed to be sorted based on the original ordering of
+     * the identity delegation events.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ServiceAccountDelegationInfo service_account_delegation_info = 9;</code>
+     * @param array<\Google\Cloud\SecurityCenter\V1\ServiceAccountDelegationInfo>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setServiceAccountDelegationInfo($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\SecurityCenter\V1\ServiceAccountDelegationInfo::class);
+        $this->service_account_delegation_info = $arr;
+
+        return $this;
+    }
+
+    /**
+     * A string that represents a username. The username provided depends on the
+     * type of the finding and is likely not an IAM principal. For example, this
+     * can be a system username if the finding is related to a virtual machine, or
+     * it can be an application login username.
+     *
+     * Generated from protobuf field <code>string user_name = 11;</code>
+     * @return string
+     */
+    public function getUserName()
+    {
+        return $this->user_name;
+    }
+
+    /**
+     * A string that represents a username. The username provided depends on the
+     * type of the finding and is likely not an IAM principal. For example, this
+     * can be a system username if the finding is related to a virtual machine, or
+     * it can be an application login username.
+     *
+     * Generated from protobuf field <code>string user_name = 11;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setUserName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->user_name = $var;
 
         return $this;
     }

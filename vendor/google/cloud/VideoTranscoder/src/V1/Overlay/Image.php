@@ -9,19 +9,19 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Overlaid jpeg image.
+ * Overlaid image.
  *
  * Generated from protobuf message <code>google.cloud.video.transcoder.v1.Overlay.Image</code>
  */
 class Image extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. URI of the JPEG image in Cloud Storage. For example,
-     * `gs://bucket/inputs/image.jpeg`. JPEG is the only supported image type.
+     * Required. URI of the image in Cloud Storage. For example,
+     * `gs://bucket/inputs/image.png`. Only PNG and JPEG images are supported.
      *
      * Generated from protobuf field <code>string uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $uri = '';
+    protected $uri = '';
     /**
      * Normalized image resolution, based on output video resolution. Valid
      * values: `0.0`–`1.0`. To respect the original image aspect ratio, set
@@ -30,14 +30,14 @@ class Image extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.Overlay.NormalizedCoordinate resolution = 2;</code>
      */
-    private $resolution = null;
+    protected $resolution = null;
     /**
      * Target image opacity. Valid values are from  `1.0` (solid, default) to
      * `0.0` (transparent), exclusive. Set this to a value greater than `0.0`.
      *
      * Generated from protobuf field <code>double alpha = 3;</code>
      */
-    private $alpha = 0.0;
+    protected $alpha = 0.0;
 
     /**
      * Constructor.
@@ -46,8 +46,8 @@ class Image extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $uri
-     *           Required. URI of the JPEG image in Cloud Storage. For example,
-     *           `gs://bucket/inputs/image.jpeg`. JPEG is the only supported image type.
+     *           Required. URI of the image in Cloud Storage. For example,
+     *           `gs://bucket/inputs/image.png`. Only PNG and JPEG images are supported.
      *     @type \Google\Cloud\Video\Transcoder\V1\Overlay\NormalizedCoordinate $resolution
      *           Normalized image resolution, based on output video resolution. Valid
      *           values: `0.0`–`1.0`. To respect the original image aspect ratio, set
@@ -64,8 +64,8 @@ class Image extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. URI of the JPEG image in Cloud Storage. For example,
-     * `gs://bucket/inputs/image.jpeg`. JPEG is the only supported image type.
+     * Required. URI of the image in Cloud Storage. For example,
+     * `gs://bucket/inputs/image.png`. Only PNG and JPEG images are supported.
      *
      * Generated from protobuf field <code>string uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -76,8 +76,8 @@ class Image extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. URI of the JPEG image in Cloud Storage. For example,
-     * `gs://bucket/inputs/image.jpeg`. JPEG is the only supported image type.
+     * Required. URI of the image in Cloud Storage. For example,
+     * `gs://bucket/inputs/image.png`. Only PNG and JPEG images are supported.
      *
      * Generated from protobuf field <code>string uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

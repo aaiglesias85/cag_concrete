@@ -24,20 +24,38 @@ class ListTagsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of tags to return. Default is 10. Maximum limit is 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Pagination token that specifies the next page to return. If empty, the
      * first page is returned.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The name of the Data Catalog resource to list the tags of.
+     *
+     *                       The resource can be an [Entry][google.cloud.datacatalog.v1.Entry]
+     *                       or an [EntryGroup][google.cloud.datacatalog.v1.EntryGroup]
+     *                       (without `/entries/{entries}` at the end). Please see
+     *                       {@see DataCatalogClient::entryName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\ListTagsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

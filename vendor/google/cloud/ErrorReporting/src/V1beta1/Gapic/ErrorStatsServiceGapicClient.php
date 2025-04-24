@@ -29,7 +29,6 @@ namespace Google\Cloud\ErrorReporting\V1beta1\Gapic;
 use Google\ApiCore\ApiException;
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\GapicClientTrait;
-
 use Google\ApiCore\PathTemplate;
 use Google\ApiCore\RequestParamsHeaderDescriptor;
 use Google\ApiCore\RetrySettings;
@@ -45,10 +44,7 @@ use Google\Cloud\ErrorReporting\V1beta1\ListGroupStatsResponse;
 use Google\Cloud\ErrorReporting\V1beta1\QueryTimeRange;
 use Google\Cloud\ErrorReporting\V1beta1\ServiceContextFilter;
 use Google\Protobuf\Duration;
-
 use Google\Protobuf\Timestamp;
-
-
 
 /**
  * Service Description: An API for retrieving and managing error statistics as well as data for
@@ -73,34 +69,33 @@ use Google\Protobuf\Timestamp;
  * contained within formatted names that are returned by the API.
  *
  * @experimental
+ *
+ * @deprecated Please use the new service client {@see \Google\Cloud\ErrorReporting\V1beta1\Client\ErrorStatsServiceClient}.
  */
 class ErrorStatsServiceGapicClient
 {
     use GapicClientTrait;
 
-    /**
-     * The name of the service.
-     */
+    /** The name of the service. */
     const SERVICE_NAME = 'google.devtools.clouderrorreporting.v1beta1.ErrorStatsService';
 
     /**
      * The default address of the service.
+     *
+     * @deprecated SERVICE_ADDRESS_TEMPLATE should be used instead.
      */
     const SERVICE_ADDRESS = 'clouderrorreporting.googleapis.com';
 
-    /**
-     * The default port of the service.
-     */
+    /** The address template of the service. */
+    private const SERVICE_ADDRESS_TEMPLATE = 'clouderrorreporting.UNIVERSE_DOMAIN';
+
+    /** The default port of the service. */
     const DEFAULT_SERVICE_PORT = 443;
 
-    /**
-     * The name of the code generator, to be included in the agent header.
-     */
+    /** The name of the code generator, to be included in the agent header. */
     const CODEGEN_NAME = 'gapic';
 
-    /**
-     * The default scopes required by the service.
-     */
+    /** The default scopes required by the service. */
     public static $serviceScopes = [
         'https://www.googleapis.com/auth/cloud-platform',
     ];
@@ -214,9 +209,6 @@ class ErrorStatsServiceGapicClient
      * @param array $options {
      *     Optional. Options for configuring the service API wrapper.
      *
-     *     @type string $serviceAddress
-     *           **Deprecated**. This option will be removed in a future major release. Please
-     *           utilize the `$apiEndpoint` option instead.
      *     @type string $apiEndpoint
      *           The address of the API remote host. May optionally include the port, formatted
      *           as "<uri>:<port>". Default 'clouderrorreporting.googleapis.com:443'.
@@ -246,7 +238,7 @@ class ErrorStatsServiceGapicClient
      *           *Advanced usage*: Additionally, it is possible to pass in an already
      *           instantiated {@see \Google\ApiCore\Transport\TransportInterface} object. Note
      *           that when this object is provided, any settings in $transportConfig, and any
-     *           $serviceAddress setting, will be ignored.
+     *           $apiEndpoint setting, will be ignored.
      *     @type array $transportConfig
      *           Configuration options that will be used to construct the transport. Options for
      *           each supported transport type should be passed in a key for that transport. For
@@ -288,19 +280,24 @@ class ErrorStatsServiceGapicClient
      * ```
      *
      * @param string $projectName  Required. The resource name of the Google Cloud Platform project. Written
-     *                             as `projects/{projectID}`, where `{projectID}` is the
-     *                             [Google Cloud Platform project
-     *                             ID](https://support.google.com/cloud/answer/6158840).
+     *                             as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     *                             where `{projectID}` is the [Google Cloud Platform project
+     *                             ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     *                             a Cloud region.
      *
-     *                             Example: `projects/my-project-123`.
+     *                             Examples: `projects/my-project-123`,
+     *                             `projects/my-project-123/locations/global`.
+     *
+     *                             For a list of supported locations, see [Supported
+     *                             Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     *                             the default when unspecified.
      * @param array  $optionalArgs {
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\ErrorReporting\V1beta1\DeleteEventsResponse
@@ -348,12 +345,23 @@ class ErrorStatsServiceGapicClient
      * ```
      *
      * @param string $projectName  Required. The resource name of the Google Cloud Platform project. Written
-     *                             as `projects/{projectID}`, where `{projectID}` is the
-     *                             [Google Cloud Platform project
-     *                             ID](https://support.google.com/cloud/answer/6158840).
+     *                             as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     *                             where `{projectID}` is the [Google Cloud Platform project
+     *                             ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     *                             a Cloud region.
      *
-     *                             Example: `projects/my-project-123`.
+     *                             Examples: `projects/my-project-123`,
+     *                             `projects/my-project-123/locations/global`.
+     *
+     *                             For a list of supported locations, see [Supported
+     *                             Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     *                             the default when unspecified.
      * @param string $groupId      Required. The group for which events shall be returned.
+     *                             The `group_id` is a unique identifier for a particular error group. The
+     *                             identifier is derived from key parts of the error-log content and is
+     *                             treated as Service Data. For information about how Service Data
+     *                             is handled, see [Google Cloud Privacy
+     *                             Notice](https://cloud.google.com/terms/cloud-privacy-notice).
      * @param array  $optionalArgs {
      *     Optional.
      *
@@ -375,10 +383,9 @@ class ErrorStatsServiceGapicClient
      *           of values will be returned. Any page token used here must have
      *           been generated by a previous call to the API.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\PagedListResponse
@@ -442,32 +449,57 @@ class ErrorStatsServiceGapicClient
      * ```
      *
      * @param string $projectName  Required. The resource name of the Google Cloud Platform project. Written
-     *                             as `projects/{projectID}` or `projects/{projectNumber}`, where `{projectID}`
-     *                             and `{projectNumber}` can be found in the
-     *                             [Google Cloud Console](https://support.google.com/cloud/answer/6158840).
+     *                             as `projects/{projectID}` or `projects/{projectNumber}`, where
+     *                             `{projectID}` and `{projectNumber}` can be found in the
+     *                             [Google Cloud console](https://support.google.com/cloud/answer/6158840).
+     *                             It may also include a location, such as
+     *                             `projects/{projectID}/locations/{location}` where `{location}` is a cloud
+     *                             region.
      *
-     *                             Examples: `projects/my-project-123`, `projects/5551234`.
+     *                             Examples: `projects/my-project-123`, `projects/5551234`,
+     *                             `projects/my-project-123/locations/us-central1`,
+     *                             `projects/5551234/locations/us-central1`.
+     *
+     *                             For a list of supported locations, see [Supported
+     *                             Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     *                             the default when unspecified. Use `-` as a wildcard to request group stats
+     *                             from all regions.
      * @param array  $optionalArgs {
      *     Optional.
      *
      *     @type string[] $groupId
-     *           Optional. List all <code>ErrorGroupStats</code> with these IDs.
+     *           Optional. List all [ErrorGroupStats]
+     *           [google.devtools.clouderrorreporting.v1beta1.ErrorGroupStats] with these
+     *           IDs. The `group_id` is a unique identifier for a particular error group.
+     *           The identifier is derived from key parts of the error-log content and is
+     *           treated as Service Data. For information about how Service Data
+     *           is handled, see [Google Cloud Privacy Notice]
+     *           (https://cloud.google.com/terms/cloud-privacy-notice).
      *     @type ServiceContextFilter $serviceFilter
-     *           Optional. List only <code>ErrorGroupStats</code> which belong to a service
-     *           context that matches the filter.
-     *           Data for all service contexts is returned if this field is not specified.
+     *           Optional. List only [ErrorGroupStats]
+     *           [google.devtools.clouderrorreporting.v1beta1.ErrorGroupStats] which belong
+     *           to a service context that matches the filter. Data for all service contexts
+     *           is returned if this field is not specified.
      *     @type QueryTimeRange $timeRange
      *           Optional. List data for the given time range.
      *           If not set, a default time range is used. The field
-     *           <code>time_range_begin</code> in the response will specify the beginning
-     *           of this time range.
-     *           Only <code>ErrorGroupStats</code> with a non-zero count in the given time
-     *           range are returned, unless the request contains an explicit
-     *           <code>group_id</code> list. If a <code>group_id</code> list is given, also
-     *           <code>ErrorGroupStats</code> with zero occurrences are returned.
+     *           [time_range_begin]
+     *           [google.devtools.clouderrorreporting.v1beta1.ListGroupStatsResponse.time_range_begin]
+     *           in the response will specify the beginning of this time range. Only
+     *           [ErrorGroupStats]
+     *           [google.devtools.clouderrorreporting.v1beta1.ErrorGroupStats] with a
+     *           non-zero count in the given time range are returned, unless the request
+     *           contains an explicit [group_id]
+     *           [google.devtools.clouderrorreporting.v1beta1.ListGroupStatsRequest.group_id]
+     *           list. If a [group_id]
+     *           [google.devtools.clouderrorreporting.v1beta1.ListGroupStatsRequest.group_id]
+     *           list is given, also [ErrorGroupStats]
+     *           [google.devtools.clouderrorreporting.v1beta1.ErrorGroupStats] with zero
+     *           occurrences are returned.
      *     @type Duration $timedCountDuration
-     *           Optional. The preferred duration for a single returned `TimedCount`.
-     *           If not set, no timed counts are returned.
+     *           Optional. The preferred duration for a single returned [TimedCount]
+     *           [google.devtools.clouderrorreporting.v1beta1.TimedCount]. If not set, no
+     *           timed counts are returned.
      *     @type int $alignment
      *           Optional. The alignment of the timed counts to be returned.
      *           Default is `ALIGNMENT_EQUAL_AT_END`.
@@ -489,10 +521,9 @@ class ErrorStatsServiceGapicClient
      *           of values will be returned. Any page token used here must have
      *           been generated by a previous call to the API.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\PagedListResponse

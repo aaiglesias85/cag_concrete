@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A condition for determining whether a PubSub should be triggered.
+ * A condition for determining whether a Pub/Sub should be triggered.
  *
  * Generated from protobuf message <code>google.privacy.dlp.v2.DataProfilePubSubCondition</code>
  */
@@ -20,7 +20,7 @@ class DataProfilePubSubCondition extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DataProfilePubSubCondition.PubSubExpressions expressions = 1;</code>
      */
-    private $expressions = null;
+    protected $expressions = null;
 
     /**
      * Constructor.

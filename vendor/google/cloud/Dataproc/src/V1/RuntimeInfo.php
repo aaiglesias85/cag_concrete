@@ -16,24 +16,46 @@ use Google\Protobuf\Internal\GPBUtil;
 class RuntimeInfo extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. Map of remote access endpoints (such as web interfaces and APIs) to their
-     * URIs.
+     * Output only. Map of remote access endpoints (such as web interfaces and
+     * APIs) to their URIs.
      *
      * Generated from protobuf field <code>map<string, string> endpoints = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
     private $endpoints;
     /**
-     * Output only. A URI pointing to the location of the stdout and stderr of the workload.
+     * Output only. A URI pointing to the location of the stdout and stderr of the
+     * workload.
      *
      * Generated from protobuf field <code>string output_uri = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $output_uri = '';
+    protected $output_uri = '';
     /**
      * Output only. A URI pointing to the location of the diagnostics tarball.
      *
      * Generated from protobuf field <code>string diagnostic_output_uri = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $diagnostic_output_uri = '';
+    protected $diagnostic_output_uri = '';
+    /**
+     * Output only. Approximate workload resource usage, calculated when
+     * the workload completes (see [Dataproc Serverless pricing]
+     * (https://cloud.google.com/dataproc-serverless/pricing)).
+     * **Note:** This metric calculation may change in the future, for
+     * example, to capture cumulative workload resource
+     * consumption during workload execution (see the
+     * [Dataproc Serverless release notes]
+     * (https://cloud.google.com/dataproc-serverless/docs/release-notes)
+     * for announcements, changes, fixes
+     * and other Dataproc developments).
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.UsageMetrics approximate_usage = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $approximate_usage = null;
+    /**
+     * Output only. Snapshot of current workload resource usage.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.UsageSnapshot current_usage = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $current_usage = null;
 
     /**
      * Constructor.
@@ -42,12 +64,26 @@ class RuntimeInfo extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type array|\Google\Protobuf\Internal\MapField $endpoints
-     *           Output only. Map of remote access endpoints (such as web interfaces and APIs) to their
-     *           URIs.
+     *           Output only. Map of remote access endpoints (such as web interfaces and
+     *           APIs) to their URIs.
      *     @type string $output_uri
-     *           Output only. A URI pointing to the location of the stdout and stderr of the workload.
+     *           Output only. A URI pointing to the location of the stdout and stderr of the
+     *           workload.
      *     @type string $diagnostic_output_uri
      *           Output only. A URI pointing to the location of the diagnostics tarball.
+     *     @type \Google\Cloud\Dataproc\V1\UsageMetrics $approximate_usage
+     *           Output only. Approximate workload resource usage, calculated when
+     *           the workload completes (see [Dataproc Serverless pricing]
+     *           (https://cloud.google.com/dataproc-serverless/pricing)).
+     *           **Note:** This metric calculation may change in the future, for
+     *           example, to capture cumulative workload resource
+     *           consumption during workload execution (see the
+     *           [Dataproc Serverless release notes]
+     *           (https://cloud.google.com/dataproc-serverless/docs/release-notes)
+     *           for announcements, changes, fixes
+     *           and other Dataproc developments).
+     *     @type \Google\Cloud\Dataproc\V1\UsageSnapshot $current_usage
+     *           Output only. Snapshot of current workload resource usage.
      * }
      */
     public function __construct($data = NULL) {
@@ -56,8 +92,8 @@ class RuntimeInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Map of remote access endpoints (such as web interfaces and APIs) to their
-     * URIs.
+     * Output only. Map of remote access endpoints (such as web interfaces and
+     * APIs) to their URIs.
      *
      * Generated from protobuf field <code>map<string, string> endpoints = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -68,8 +104,8 @@ class RuntimeInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Map of remote access endpoints (such as web interfaces and APIs) to their
-     * URIs.
+     * Output only. Map of remote access endpoints (such as web interfaces and
+     * APIs) to their URIs.
      *
      * Generated from protobuf field <code>map<string, string> endpoints = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -84,7 +120,8 @@ class RuntimeInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A URI pointing to the location of the stdout and stderr of the workload.
+     * Output only. A URI pointing to the location of the stdout and stderr of the
+     * workload.
      *
      * Generated from protobuf field <code>string output_uri = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -95,7 +132,8 @@ class RuntimeInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A URI pointing to the location of the stdout and stderr of the workload.
+     * Output only. A URI pointing to the location of the stdout and stderr of the
+     * workload.
      *
      * Generated from protobuf field <code>string output_uri = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -131,6 +169,96 @@ class RuntimeInfo extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->diagnostic_output_uri = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Approximate workload resource usage, calculated when
+     * the workload completes (see [Dataproc Serverless pricing]
+     * (https://cloud.google.com/dataproc-serverless/pricing)).
+     * **Note:** This metric calculation may change in the future, for
+     * example, to capture cumulative workload resource
+     * consumption during workload execution (see the
+     * [Dataproc Serverless release notes]
+     * (https://cloud.google.com/dataproc-serverless/docs/release-notes)
+     * for announcements, changes, fixes
+     * and other Dataproc developments).
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.UsageMetrics approximate_usage = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\Dataproc\V1\UsageMetrics|null
+     */
+    public function getApproximateUsage()
+    {
+        return $this->approximate_usage;
+    }
+
+    public function hasApproximateUsage()
+    {
+        return isset($this->approximate_usage);
+    }
+
+    public function clearApproximateUsage()
+    {
+        unset($this->approximate_usage);
+    }
+
+    /**
+     * Output only. Approximate workload resource usage, calculated when
+     * the workload completes (see [Dataproc Serverless pricing]
+     * (https://cloud.google.com/dataproc-serverless/pricing)).
+     * **Note:** This metric calculation may change in the future, for
+     * example, to capture cumulative workload resource
+     * consumption during workload execution (see the
+     * [Dataproc Serverless release notes]
+     * (https://cloud.google.com/dataproc-serverless/docs/release-notes)
+     * for announcements, changes, fixes
+     * and other Dataproc developments).
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.UsageMetrics approximate_usage = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\Dataproc\V1\UsageMetrics $var
+     * @return $this
+     */
+    public function setApproximateUsage($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dataproc\V1\UsageMetrics::class);
+        $this->approximate_usage = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Snapshot of current workload resource usage.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.UsageSnapshot current_usage = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\Dataproc\V1\UsageSnapshot|null
+     */
+    public function getCurrentUsage()
+    {
+        return $this->current_usage;
+    }
+
+    public function hasCurrentUsage()
+    {
+        return isset($this->current_usage);
+    }
+
+    public function clearCurrentUsage()
+    {
+        unset($this->current_usage);
+    }
+
+    /**
+     * Output only. Snapshot of current workload resource usage.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.UsageSnapshot current_usage = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\Dataproc\V1\UsageSnapshot $var
+     * @return $this
+     */
+    public function setCurrentUsage($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dataproc\V1\UsageSnapshot::class);
+        $this->current_usage = $var;
 
         return $this;
     }

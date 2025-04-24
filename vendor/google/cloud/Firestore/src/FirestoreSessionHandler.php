@@ -17,8 +17,8 @@
 namespace Google\Cloud\Firestore;
 
 use Google\Cloud\Core\Exception\ServiceException;
-use SessionHandlerInterface;
 use Google\Cloud\Firestore\Connection\ConnectionInterface;
+use SessionHandlerInterface;
 
 /**
  * Custom session handler backed by Cloud Firestore.
@@ -117,6 +117,7 @@ class FirestoreSessionHandler implements SessionHandlerInterface
 
     /**
      * @var ConnectionInterface
+     * @internal
      */
     private $connection;
     /**
@@ -156,6 +157,8 @@ class FirestoreSessionHandler implements SessionHandlerInterface
      * Create a custom session handler backed by Cloud Firestore.
      *
      * @param ConnectionInterface $connection A Connection to Cloud Firestore.
+     *        This object is created by FirestoreClient,
+     *        and should not be instantiated outside of this client.
      * @param ValueMapper $valueMapper A Firestore Value Mapper.
      * @param string $projectId The current project id.
      * @param string $database The database id.

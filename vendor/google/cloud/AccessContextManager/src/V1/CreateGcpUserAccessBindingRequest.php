@@ -21,14 +21,31 @@ class CreateGcpUserAccessBindingRequest extends \Google\Protobuf\Internal\Messag
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. [GcpUserAccessBinding]
      * [google.identity.accesscontextmanager.v1.GcpUserAccessBinding]
      *
      * Generated from protobuf field <code>.google.identity.accesscontextmanager.v1.GcpUserAccessBinding gcp_user_access_binding = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $gcp_user_access_binding = null;
+    protected $gcp_user_access_binding = null;
+
+    /**
+     * @param string                                                        $parent               Required. Example: "organizations/256"
+     *                                                                                            Please see {@see AccessContextManagerClient::organizationName()} for help formatting this field.
+     * @param \Google\Identity\AccessContextManager\V1\GcpUserAccessBinding $gcpUserAccessBinding Required. [GcpUserAccessBinding]
+     *                                                                                            [google.identity.accesscontextmanager.v1.GcpUserAccessBinding]
+     *
+     * @return \Google\Identity\AccessContextManager\V1\CreateGcpUserAccessBindingRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Identity\AccessContextManager\V1\GcpUserAccessBinding $gcpUserAccessBinding): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setGcpUserAccessBinding($gcpUserAccessBinding);
+    }
 
     /**
      * Constructor.

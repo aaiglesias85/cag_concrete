@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Metadata for a VOD session.
+ * Metadata for a VOD session. The session expires 4 hours after its creation.
  *
  * Generated from protobuf message <code>google.cloud.video.stitcher.v1.VodSession</code>
  */
@@ -21,62 +21,81 @@ class VodSession extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Metadata of what was stitched into the content.
      *
      * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.Interstitials interstitials = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $interstitials = null;
+    protected $interstitials = null;
     /**
      * Output only. The playback URI of the stitched content.
      *
      * Generated from protobuf field <code>string play_uri = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $play_uri = '';
+    protected $play_uri = '';
     /**
-     * Required. URI of the media to stitch.
+     * URI of the media to stitch. For most use cases, you should create a
+     * [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     * rather than setting this field directly.
      *
-     * Generated from protobuf field <code>string source_uri = 5 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string source_uri = 5;</code>
      */
-    private $source_uri = '';
+    protected $source_uri = '';
     /**
-     * Required. Ad tag URI.
+     * Ad tag URI. For most use cases, you should create a
+     * [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     * rather than setting this field directly.
      *
-     * Generated from protobuf field <code>string ad_tag_uri = 6 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string ad_tag_uri = 6;</code>
      */
-    private $ad_tag_uri = '';
+    protected $ad_tag_uri = '';
     /**
-     * Key value pairs for ad tag macro replacement. If the
-     * specified ad tag URI has macros, this field provides the mapping
-     * to the value that will replace the macro in the ad tag URI.
-     * Macros are designated by square brackets.
-     * For example:
+     * Key value pairs for ad tag macro replacement, only available for VOD
+     * sessions that do not implement Google Ad manager ad insertion. If the
+     * specified ad tag URI has macros, this field provides the mapping to the
+     * value that will replace the macro in the ad tag URI.
+     * Macros are designated by square brackets, for example:
      *   Ad tag URI: `"https://doubleclick.google.com/ad/1?geo_id=[geoId]"`
      *   Ad tag macro map: `{"geoId": "123"}`
      *   Fully qualified ad tag:
-     *   `"`https://doubleclick.google.com/ad/1?geo_id=123"`
+     *   `"https://doubleclick.google.com/ad/1?geo_id=123"`
      *
      * Generated from protobuf field <code>map<string, string> ad_tag_macro_map = 7;</code>
      */
     private $ad_tag_macro_map;
     /**
-     * Indicates whether client side ad tracking is enabled. If client
-     * side ad tracking is enabled, then the client player is expected
-     * to trigger playback and activity events itself.
-     * If this is set to false, server side ad tracking is enabled,
-     * causing the Video Stitcher service will trigger playback events
-     * on behalf of the client player.
-     *
-     * Generated from protobuf field <code>bool client_ad_tracking = 8;</code>
-     */
-    private $client_ad_tracking = false;
-    /**
      * Additional options that affect the output of the manifest.
      *
      * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.ManifestOptions manifest_options = 9;</code>
      */
-    private $manifest_options = null;
+    protected $manifest_options = null;
+    /**
+     * Output only. The generated ID of the VodSession's source media.
+     *
+     * Generated from protobuf field <code>string asset_id = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $asset_id = '';
+    /**
+     * Required. Determines how the ad should be tracked.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.AdTracking ad_tracking = 11 [(.google.api.field_behavior) = REQUIRED];</code>
+     */
+    protected $ad_tracking = 0;
+    /**
+     * This field should be set with appropriate values if GAM is being used for
+     * ads.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.VodSession.GamSettings gam_settings = 13;</code>
+     */
+    protected $gam_settings = null;
+    /**
+     * The resource name of the VOD config for this session, in the form of
+     * `projects/{project}/locations/{location}/vodConfigs/{id}`.
+     *
+     * Generated from protobuf field <code>string vod_config = 14 [(.google.api.resource_reference) = {</code>
+     */
+    protected $vod_config = '';
 
     /**
      * Constructor.
@@ -92,28 +111,35 @@ class VodSession extends \Google\Protobuf\Internal\Message
      *     @type string $play_uri
      *           Output only. The playback URI of the stitched content.
      *     @type string $source_uri
-     *           Required. URI of the media to stitch.
+     *           URI of the media to stitch. For most use cases, you should create a
+     *           [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     *           rather than setting this field directly.
      *     @type string $ad_tag_uri
-     *           Required. Ad tag URI.
+     *           Ad tag URI. For most use cases, you should create a
+     *           [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     *           rather than setting this field directly.
      *     @type array|\Google\Protobuf\Internal\MapField $ad_tag_macro_map
-     *           Key value pairs for ad tag macro replacement. If the
-     *           specified ad tag URI has macros, this field provides the mapping
-     *           to the value that will replace the macro in the ad tag URI.
-     *           Macros are designated by square brackets.
-     *           For example:
+     *           Key value pairs for ad tag macro replacement, only available for VOD
+     *           sessions that do not implement Google Ad manager ad insertion. If the
+     *           specified ad tag URI has macros, this field provides the mapping to the
+     *           value that will replace the macro in the ad tag URI.
+     *           Macros are designated by square brackets, for example:
      *             Ad tag URI: `"https://doubleclick.google.com/ad/1?geo_id=[geoId]"`
      *             Ad tag macro map: `{"geoId": "123"}`
      *             Fully qualified ad tag:
-     *             `"`https://doubleclick.google.com/ad/1?geo_id=123"`
-     *     @type bool $client_ad_tracking
-     *           Indicates whether client side ad tracking is enabled. If client
-     *           side ad tracking is enabled, then the client player is expected
-     *           to trigger playback and activity events itself.
-     *           If this is set to false, server side ad tracking is enabled,
-     *           causing the Video Stitcher service will trigger playback events
-     *           on behalf of the client player.
+     *             `"https://doubleclick.google.com/ad/1?geo_id=123"`
      *     @type \Google\Cloud\Video\Stitcher\V1\ManifestOptions $manifest_options
      *           Additional options that affect the output of the manifest.
+     *     @type string $asset_id
+     *           Output only. The generated ID of the VodSession's source media.
+     *     @type int $ad_tracking
+     *           Required. Determines how the ad should be tracked.
+     *     @type \Google\Cloud\Video\Stitcher\V1\VodSession\GamSettings $gam_settings
+     *           This field should be set with appropriate values if GAM is being used for
+     *           ads.
+     *     @type string $vod_config
+     *           The resource name of the VOD config for this session, in the form of
+     *           `projects/{project}/locations/{location}/vodConfigs/{id}`.
      * }
      */
     public function __construct($data = NULL) {
@@ -212,9 +238,11 @@ class VodSession extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. URI of the media to stitch.
+     * URI of the media to stitch. For most use cases, you should create a
+     * [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     * rather than setting this field directly.
      *
-     * Generated from protobuf field <code>string source_uri = 5 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string source_uri = 5;</code>
      * @return string
      */
     public function getSourceUri()
@@ -223,9 +251,11 @@ class VodSession extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. URI of the media to stitch.
+     * URI of the media to stitch. For most use cases, you should create a
+     * [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     * rather than setting this field directly.
      *
-     * Generated from protobuf field <code>string source_uri = 5 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string source_uri = 5;</code>
      * @param string $var
      * @return $this
      */
@@ -238,9 +268,11 @@ class VodSession extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Ad tag URI.
+     * Ad tag URI. For most use cases, you should create a
+     * [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     * rather than setting this field directly.
      *
-     * Generated from protobuf field <code>string ad_tag_uri = 6 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string ad_tag_uri = 6;</code>
      * @return string
      */
     public function getAdTagUri()
@@ -249,9 +281,11 @@ class VodSession extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Ad tag URI.
+     * Ad tag URI. For most use cases, you should create a
+     * [VodConfig][google.cloud.video.stitcher.v1.VodConfig] with this information
+     * rather than setting this field directly.
      *
-     * Generated from protobuf field <code>string ad_tag_uri = 6 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string ad_tag_uri = 6;</code>
      * @param string $var
      * @return $this
      */
@@ -264,15 +298,15 @@ class VodSession extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Key value pairs for ad tag macro replacement. If the
-     * specified ad tag URI has macros, this field provides the mapping
-     * to the value that will replace the macro in the ad tag URI.
-     * Macros are designated by square brackets.
-     * For example:
+     * Key value pairs for ad tag macro replacement, only available for VOD
+     * sessions that do not implement Google Ad manager ad insertion. If the
+     * specified ad tag URI has macros, this field provides the mapping to the
+     * value that will replace the macro in the ad tag URI.
+     * Macros are designated by square brackets, for example:
      *   Ad tag URI: `"https://doubleclick.google.com/ad/1?geo_id=[geoId]"`
      *   Ad tag macro map: `{"geoId": "123"}`
      *   Fully qualified ad tag:
-     *   `"`https://doubleclick.google.com/ad/1?geo_id=123"`
+     *   `"https://doubleclick.google.com/ad/1?geo_id=123"`
      *
      * Generated from protobuf field <code>map<string, string> ad_tag_macro_map = 7;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -283,15 +317,15 @@ class VodSession extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Key value pairs for ad tag macro replacement. If the
-     * specified ad tag URI has macros, this field provides the mapping
-     * to the value that will replace the macro in the ad tag URI.
-     * Macros are designated by square brackets.
-     * For example:
+     * Key value pairs for ad tag macro replacement, only available for VOD
+     * sessions that do not implement Google Ad manager ad insertion. If the
+     * specified ad tag URI has macros, this field provides the mapping to the
+     * value that will replace the macro in the ad tag URI.
+     * Macros are designated by square brackets, for example:
      *   Ad tag URI: `"https://doubleclick.google.com/ad/1?geo_id=[geoId]"`
      *   Ad tag macro map: `{"geoId": "123"}`
      *   Fully qualified ad tag:
-     *   `"`https://doubleclick.google.com/ad/1?geo_id=123"`
+     *   `"https://doubleclick.google.com/ad/1?geo_id=123"`
      *
      * Generated from protobuf field <code>map<string, string> ad_tag_macro_map = 7;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -301,42 +335,6 @@ class VodSession extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->ad_tag_macro_map = $arr;
-
-        return $this;
-    }
-
-    /**
-     * Indicates whether client side ad tracking is enabled. If client
-     * side ad tracking is enabled, then the client player is expected
-     * to trigger playback and activity events itself.
-     * If this is set to false, server side ad tracking is enabled,
-     * causing the Video Stitcher service will trigger playback events
-     * on behalf of the client player.
-     *
-     * Generated from protobuf field <code>bool client_ad_tracking = 8;</code>
-     * @return bool
-     */
-    public function getClientAdTracking()
-    {
-        return $this->client_ad_tracking;
-    }
-
-    /**
-     * Indicates whether client side ad tracking is enabled. If client
-     * side ad tracking is enabled, then the client player is expected
-     * to trigger playback and activity events itself.
-     * If this is set to false, server side ad tracking is enabled,
-     * causing the Video Stitcher service will trigger playback events
-     * on behalf of the client player.
-     *
-     * Generated from protobuf field <code>bool client_ad_tracking = 8;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setClientAdTracking($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->client_ad_tracking = $var;
 
         return $this;
     }
@@ -373,6 +371,124 @@ class VodSession extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Video\Stitcher\V1\ManifestOptions::class);
         $this->manifest_options = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The generated ID of the VodSession's source media.
+     *
+     * Generated from protobuf field <code>string asset_id = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getAssetId()
+    {
+        return $this->asset_id;
+    }
+
+    /**
+     * Output only. The generated ID of the VodSession's source media.
+     *
+     * Generated from protobuf field <code>string asset_id = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAssetId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->asset_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Required. Determines how the ad should be tracked.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.AdTracking ad_tracking = 11 [(.google.api.field_behavior) = REQUIRED];</code>
+     * @return int
+     */
+    public function getAdTracking()
+    {
+        return $this->ad_tracking;
+    }
+
+    /**
+     * Required. Determines how the ad should be tracked.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.AdTracking ad_tracking = 11 [(.google.api.field_behavior) = REQUIRED];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setAdTracking($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Video\Stitcher\V1\AdTracking::class);
+        $this->ad_tracking = $var;
+
+        return $this;
+    }
+
+    /**
+     * This field should be set with appropriate values if GAM is being used for
+     * ads.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.VodSession.GamSettings gam_settings = 13;</code>
+     * @return \Google\Cloud\Video\Stitcher\V1\VodSession\GamSettings|null
+     */
+    public function getGamSettings()
+    {
+        return $this->gam_settings;
+    }
+
+    public function hasGamSettings()
+    {
+        return isset($this->gam_settings);
+    }
+
+    public function clearGamSettings()
+    {
+        unset($this->gam_settings);
+    }
+
+    /**
+     * This field should be set with appropriate values if GAM is being used for
+     * ads.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.VodSession.GamSettings gam_settings = 13;</code>
+     * @param \Google\Cloud\Video\Stitcher\V1\VodSession\GamSettings $var
+     * @return $this
+     */
+    public function setGamSettings($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Video\Stitcher\V1\VodSession\GamSettings::class);
+        $this->gam_settings = $var;
+
+        return $this;
+    }
+
+    /**
+     * The resource name of the VOD config for this session, in the form of
+     * `projects/{project}/locations/{location}/vodConfigs/{id}`.
+     *
+     * Generated from protobuf field <code>string vod_config = 14 [(.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getVodConfig()
+    {
+        return $this->vod_config;
+    }
+
+    /**
+     * The resource name of the VOD config for this session, in the form of
+     * `projects/{project}/locations/{location}/vodConfigs/{id}`.
+     *
+     * Generated from protobuf field <code>string vod_config = 14 [(.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setVodConfig($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->vod_config = $var;
 
         return $this;
     }

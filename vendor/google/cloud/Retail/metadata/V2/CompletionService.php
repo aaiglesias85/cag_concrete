@@ -23,8 +23,8 @@ class CompletionService
         \GPBMetadata\Google\Longrunning\Operations::initOnce();
         $pool->internalAddGeneratedFile(
             '
-˜
-/google/cloud/retail/v2/completion_service.protogoogle.cloud.retail.v2google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto#google/cloud/retail/v2/common.proto*google/cloud/retail/v2/import_config.proto#google/longrunning/operations.proto"Õ
+´
+/google/cloud/retail/v2/completion_service.protogoogle.cloud.retail.v2google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto#google/cloud/retail/v2/common.proto*google/cloud/retail/v2/import_config.proto#google/longrunning/operations.proto"É
 CompleteQueryRequest6
 catalog (	B%‡A˙A
 retail.googleapis.com/Catalog
@@ -34,11 +34,15 @@ visitor_id (	
 language_codes (	
 device_type (	
 dataset (	
-max_suggestions ("Ö
+max_suggestions ($
+enable_attribute_suggestions	 (
+entity
+ (	"ç
 CompleteQueryResponseZ
 completion_results (2>.google.cloud.retail.v2.CompleteQueryResponse.CompletionResult
-attribution_token (	_
-recent_search_results (2@.google.cloud.retail.v2.CompleteQueryResponse.RecentSearchResultÊ
+attribution_token (	c
+recent_search_results (2@.google.cloud.retail.v2.CompleteQueryResponse.RecentSearchResultB^
+attribute_results (2C.google.cloud.retail.v2.CompleteQueryResponse.AttributeResultsEntryÊ
 CompletionResult
 
 suggestion (	b
@@ -46,14 +50,19 @@ suggestion (	b
 attributes (2N.google.cloud.retail.v2.CompleteQueryResponse.CompletionResult.AttributesEntryZ
 AttributesEntry
 key (	6
-value (2\'.google.cloud.retail.v2.CustomAttribute:8+
+value (2\'.google.cloud.retail.v2.CustomAttribute:8/
 RecentSearchResult
-recent_search (	2≤
+recent_search (	:&
+AttributeResult
+suggestions (	v
+AttributeResultsEntry
+key (	L
+value (2=.google.cloud.retail.v2.CompleteQueryResponse.AttributeResult:82≤
 CompletionService≥
 CompleteQuery,.google.cloud.retail.v2.CompleteQueryRequest-.google.cloud.retail.v2.CompleteQueryResponse"EÇ”‰ì?=/v2/{catalog=projects/*/locations/*/catalogs/*}:completeQueryõ
-ImportCompletionData3.google.cloud.retail.v2.ImportCompletionDataRequest.google.longrunning.Operation"ÆÇ”‰ìI"D/v2/{parent=projects/*/locations/*/catalogs/*}/completionData:import:* A\\
-3google.cloud.retail.v2.ImportCompletionDataResponse%google.cloud.retail.v2.ImportMetadataI Aretail.googleapis.com“A.https://www.googleapis.com/auth/cloud-platformBÀ
-com.google.cloud.retail.v2BCompletionServiceProtoPZ<google.golang.org/genproto/googleapis/cloud/retail/v2;retail¢RETAIL™Google.Cloud.Retail.V2 Google\\Cloud\\Retail\\V2ÍGoogle::Cloud::Retail::V2bproto3'
+ImportCompletionData3.google.cloud.retail.v2.ImportCompletionDataRequest.google.longrunning.Operation"Æ A\\
+3google.cloud.retail.v2.ImportCompletionDataResponse%google.cloud.retail.v2.ImportMetadataÇ”‰ìI"D/v2/{parent=projects/*/locations/*/catalogs/*}/completionData:import:*I Aretail.googleapis.com“A.https://www.googleapis.com/auth/cloud-platformB¡
+com.google.cloud.retail.v2BCompletionServiceProtoPZ2cloud.google.com/go/retail/apiv2/retailpb;retailpb¢RETAIL™Google.Cloud.Retail.V2 Google\\Cloud\\Retail\\V2ÍGoogle::Cloud::Retail::V2bproto3'
         , true);
 
         static::$is_initialized = true;

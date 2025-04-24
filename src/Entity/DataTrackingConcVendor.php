@@ -4,104 +4,69 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * DataTrackingConcVendor
- *
- * @ORM\Table(name="data_tracking_conc_vendor")
- * @ORM\Entity(repositoryClass="App\Repository\DataTrackingConcVendorRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingConcVendorRepository')]
+#[ORM\Table(name: 'data_tracking_conc_vendor')]
 class DataTrackingConcVendor
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="conc_vendor", type="string", length=255, nullable=false)
-     */
-    private $concVendor;
+    #[ORM\Column(name: 'conc_vendor', type: 'string', length: 255, nullable: false)]
+    private ?string $concVendor;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="total_conc_used", type="float", nullable=false)
-     */
-    private $totalConcUsed;
+    #[ORM\Column(name: 'total_conc_used', type: 'float', nullable: false)]
+    private ?float $totalConcUsed;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="conc_price", type="float", nullable=false)
-     */
-    private $concPrice;
+    #[ORM\Column(name: 'conc_price', type: 'float', nullable: false)]
+    private ?float $concPrice;
 
+    #[ORM\ManyToOne(targetEntity: DataTracking::class)]
+    #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
+    private ?DataTracking $dataTracking;
 
-    /**
-     * @var DataTracking
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\DataTracking")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="data_tracking_id", referencedColumnName="id")
-     * })
-     */
-    private $dataTracking;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getConcVendor()
+    public function getConcVendor(): ?string
     {
         return $this->concVendor;
     }
 
-    public function setConcVendor($concVendor)
+    public function setConcVendor(?string $concVendor): void
     {
         $this->concVendor = $concVendor;
     }
 
-    public function getTotalConcUsed()
+    public function getTotalConcUsed(): ?float
     {
         return $this->totalConcUsed;
     }
 
-    public function setTotalConcUsed($totalConcUsed)
+    public function setTotalConcUsed(?float $totalConcUsed): void
     {
         $this->totalConcUsed = $totalConcUsed;
     }
 
-    public function getConcPrice()
+    public function getConcPrice(): ?float
     {
         return $this->concPrice;
     }
 
-    public function setConcPrice($concPrice)
+    public function setConcPrice(?float $concPrice): void
     {
         $this->concPrice = $concPrice;
     }
 
-    /**
-     * @return DataTracking
-     */
-    public function getDataTracking()
+    public function getDataTracking(): ?DataTracking
     {
         return $this->dataTracking;
     }
 
-    public function setDataTracking($dataTracking)
+    public function setDataTracking(?DataTracking $dataTracking): void
     {
         $this->dataTracking = $dataTracking;
     }

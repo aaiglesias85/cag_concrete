@@ -20,7 +20,7 @@ class TableModifiers extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp snapshot_time = 1;</code>
      */
-    private $snapshot_time = null;
+    protected $snapshot_time = null;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class TableModifiers extends \Google\Protobuf\Internal\Message
      */
     public function getSnapshotTime()
     {
-        return isset($this->snapshot_time) ? $this->snapshot_time : null;
+        return $this->snapshot_time;
     }
 
     public function hasSnapshotTime()
@@ -75,6 +75,4 @@ class TableModifiers extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(TableModifiers::class, \Google\Cloud\BigQuery\Storage\V1\ReadSession_TableModifiers::class);
 

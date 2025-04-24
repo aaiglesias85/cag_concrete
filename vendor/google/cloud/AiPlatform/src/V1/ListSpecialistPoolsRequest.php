@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools].
+ * Request message for
+ * [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListSpecialistPoolsRequest</code>
  */
@@ -21,28 +22,45 @@ class ListSpecialistPoolsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The standard list page size.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The standard list page token.
-     * Typically obtained by [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token] of
-     * the previous [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools] call. Return
-     * first page if empty.
+     * Typically obtained by
+     * [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token]
+     * of the previous
+     * [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools]
+     * call. Return first page if empty.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Mask specifying which fields to read. FieldMask represents a set of
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask read_mask = 4;</code>
      */
-    private $read_mask = null;
+    protected $read_mask = null;
+
+    /**
+     * @param string $parent Required. The name of the SpecialistPool's parent resource.
+     *                       Format: `projects/{project}/locations/{location}`
+     *                       Please see {@see SpecialistPoolServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListSpecialistPoolsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -57,9 +75,11 @@ class ListSpecialistPoolsRequest extends \Google\Protobuf\Internal\Message
      *           The standard list page size.
      *     @type string $page_token
      *           The standard list page token.
-     *           Typically obtained by [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token] of
-     *           the previous [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools] call. Return
-     *           first page if empty.
+     *           Typically obtained by
+     *           [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token]
+     *           of the previous
+     *           [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools]
+     *           call. Return first page if empty.
      *     @type \Google\Protobuf\FieldMask $read_mask
      *           Mask specifying which fields to read. FieldMask represents a set of
      * }
@@ -125,9 +145,11 @@ class ListSpecialistPoolsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * The standard list page token.
-     * Typically obtained by [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token] of
-     * the previous [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools] call. Return
-     * first page if empty.
+     * Typically obtained by
+     * [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token]
+     * of the previous
+     * [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools]
+     * call. Return first page if empty.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      * @return string
@@ -139,9 +161,11 @@ class ListSpecialistPoolsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * The standard list page token.
-     * Typically obtained by [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token] of
-     * the previous [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools] call. Return
-     * first page if empty.
+     * Typically obtained by
+     * [ListSpecialistPoolsResponse.next_page_token][google.cloud.aiplatform.v1.ListSpecialistPoolsResponse.next_page_token]
+     * of the previous
+     * [SpecialistPoolService.ListSpecialistPools][google.cloud.aiplatform.v1.SpecialistPoolService.ListSpecialistPools]
+     * call. Return first page if empty.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      * @param string $var

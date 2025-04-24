@@ -1,4 +1,24 @@
 <?php
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * GENERATED CODE WARNING
+ * This file was automatically generated - do not edit!
+ */
 
 return [
     'interfaces' => [
@@ -27,6 +47,21 @@ return [
             ],
         ],
         'google.cloud.video.livestream.v1.LivestreamService' => [
+            'CreateAsset' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*}/assets',
+                'body' => 'asset',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'asset_id',
+                ],
+            ],
             'CreateChannel' => [
                 'method' => 'post',
                 'uriTemplate' => '/v1/{parent=projects/*/locations/*}/channels',
@@ -40,6 +75,21 @@ return [
                 ],
                 'queryParams' => [
                     'channel_id',
+                ],
+            ],
+            'CreateClip' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*/channels/*}/clips',
+                'body' => 'clip',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'clip_id',
                 ],
             ],
             'CreateEvent' => [
@@ -72,9 +122,31 @@ return [
                     'input_id',
                 ],
             ],
+            'DeleteAsset' => [
+                'method' => 'delete',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/assets/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
             'DeleteChannel' => [
                 'method' => 'delete',
                 'uriTemplate' => '/v1/{name=projects/*/locations/*/channels/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'DeleteClip' => [
+                'method' => 'delete',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/channels/*/clips/*}',
                 'placeholders' => [
                     'name' => [
                         'getters' => [
@@ -105,9 +177,31 @@ return [
                     ],
                 ],
             ],
+            'GetAsset' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/assets/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
             'GetChannel' => [
                 'method' => 'get',
                 'uriTemplate' => '/v1/{name=projects/*/locations/*/channels/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'GetClip' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/channels/*/clips/*}',
                 'placeholders' => [
                     'name' => [
                         'getters' => [
@@ -138,9 +232,42 @@ return [
                     ],
                 ],
             ],
+            'GetPool' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/pools/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'ListAssets' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*}/assets',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
             'ListChannels' => [
                 'method' => 'get',
                 'uriTemplate' => '/v1/{parent=projects/*/locations/*}/channels',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
+            'ListClips' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*/channels/*}/clips',
                 'placeholders' => [
                     'parent' => [
                         'getters' => [
@@ -221,6 +348,19 @@ return [
                     ],
                 ],
             ],
+            'UpdatePool' => [
+                'method' => 'patch',
+                'uriTemplate' => '/v1/{pool.name=projects/*/locations/*/pools/*}',
+                'body' => 'pool',
+                'placeholders' => [
+                    'pool.name' => [
+                        'getters' => [
+                            'getPool',
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
         ],
         'google.longrunning.Operations' => [
             'CancelOperation' => [
@@ -270,4 +410,5 @@ return [
             ],
         ],
     ],
+    'numericEnums' => true,
 ];

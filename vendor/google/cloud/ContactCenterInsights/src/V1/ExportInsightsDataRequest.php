@@ -20,14 +20,14 @@ class ExportInsightsDataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * A filter to reduce results to a specific subset. Useful for exporting
      * conversations with specific properties.
      *
      * Generated from protobuf field <code>string filter = 3;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * A fully qualified KMS key name for BigQuery tables protected by CMEK.
      * Format:
@@ -35,14 +35,28 @@ class ExportInsightsDataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string kms_key = 4;</code>
      */
-    private $kms_key = '';
+    protected $kms_key = '';
     /**
      * Options for what to do if the destination table already exists.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ExportInsightsDataRequest.WriteDisposition write_disposition = 5;</code>
      */
-    private $write_disposition = 0;
+    protected $write_disposition = 0;
     protected $destination;
+
+    /**
+     * @param string $parent Required. The parent resource to export data from. Please see
+     *                       {@see ContactCenterInsightsClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\ContactCenterInsights\V1\ExportInsightsDataRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

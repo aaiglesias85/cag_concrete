@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/analytics-admin/v/stable)](https://packagist.org/packages/google/analytics-admin) [![Packagist](https://img.shields.io/packagist/dm/google/analytics-admin.svg)](https://packagist.org/packages/google/analytics-admin)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/analytics-admin/latest/analyticsadmin/readme)
+* [API documentation](https://cloud.google.com/php/docs/reference/analytics-admin/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -14,16 +14,10 @@ that project.
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/analytics-admin
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take advantage of the benefits offered by gRPC (such as streaming methods)
@@ -39,16 +33,23 @@ on authenticating your client. Once authenticated, you'll be ready to start maki
 ```php
 require 'vendor/autoload.php';
 
-use Google\Analytics\Admin\V1alpha\AnalyticsAdminServiceClient;
+use Google\Analytics\Admin\V1beta\Client\AnalyticsAdminServiceClient;
+use Google\Analytics\Admin\V1beta\ListAccountsRequest;
 
 $client = new AnalyticsAdminServiceClient();
 
-$accounts = $client->listAccounts();
+$request = new ListAccountsRequest();
+$accounts = $client->listAccounts($request);
 
 foreach ($accounts as $account) {
     print 'Found account: ' . $account->getName() . PHP_EOL;
 }
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

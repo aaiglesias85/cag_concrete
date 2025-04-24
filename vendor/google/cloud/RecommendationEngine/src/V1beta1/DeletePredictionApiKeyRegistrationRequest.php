@@ -21,7 +21,22 @@ class DeletePredictionApiKeyRegistrationRequest extends \Google\Protobuf\Interna
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The API key to unregister including full resource path.
+     *                     `projects/&#42;/locations/global/catalogs/default_catalog/eventStores/default_event_store/predictionApiKeyRegistrations/<YOUR_API_KEY>`
+     *                     Please see {@see PredictionApiKeyRegistryClient::predictionApiKeyRegistrationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\DeletePredictionApiKeyRegistrationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

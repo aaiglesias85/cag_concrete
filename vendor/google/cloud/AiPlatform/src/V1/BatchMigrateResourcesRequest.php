@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [MigrationService.BatchMigrateResources][google.cloud.aiplatform.v1.MigrationService.BatchMigrateResources].
+ * Request message for
+ * [MigrationService.BatchMigrateResources][google.cloud.aiplatform.v1.MigrationService.BatchMigrateResources].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.BatchMigrateResourcesRequest</code>
  */
@@ -21,7 +22,7 @@ class BatchMigrateResourcesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The request messages specifying the resources to migrate.
      * They must be in the same location as the destination.
@@ -32,6 +33,25 @@ class BatchMigrateResourcesRequest extends \Google\Protobuf\Internal\Message
     private $migrate_resource_requests;
 
     /**
+     * @param string                                               $parent                  Required. The location of the migrated resource will live in.
+     *                                                                                      Format: `projects/{project}/locations/{location}`
+     *                                                                                      Please see {@see MigrationServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\MigrateResourceRequest[] $migrateResourceRequests Required. The request messages specifying the resources to migrate.
+     *                                                                                      They must be in the same location as the destination.
+     *                                                                                      Up to 50 resources can be migrated in one batch.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\BatchMigrateResourcesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, array $migrateResourceRequests): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setMigrateResourceRequests($migrateResourceRequests);
+    }
+
+    /**
      * Constructor.
      *
      * @param array $data {
@@ -40,7 +60,7 @@ class BatchMigrateResourcesRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Required. The location of the migrated resource will live in.
      *           Format: `projects/{project}/locations/{location}`
-     *     @type \Google\Cloud\AIPlatform\V1\MigrateResourceRequest[]|\Google\Protobuf\Internal\RepeatedField $migrate_resource_requests
+     *     @type array<\Google\Cloud\AIPlatform\V1\MigrateResourceRequest>|\Google\Protobuf\Internal\RepeatedField $migrate_resource_requests
      *           Required. The request messages specifying the resources to migrate.
      *           They must be in the same location as the destination.
      *           Up to 50 resources can be migrated in one batch.
@@ -98,7 +118,7 @@ class BatchMigrateResourcesRequest extends \Google\Protobuf\Internal\Message
      * Up to 50 resources can be migrated in one batch.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.MigrateResourceRequest migrate_resource_requests = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\AIPlatform\V1\MigrateResourceRequest[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\MigrateResourceRequest>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMigrateResourceRequests($var)

@@ -21,11 +21,23 @@ class RouterNatRuleAction extends \Google\Protobuf\Internal\Message
      */
     private $source_nat_active_ips;
     /**
+     * A list of URLs of the subnetworks used as source ranges for this NAT Rule. These subnetworks must have purpose set to PRIVATE_NAT. This field is used for private NAT.
+     *
+     * Generated from protobuf field <code>repeated string source_nat_active_ranges = 190556269;</code>
+     */
+    private $source_nat_active_ranges;
+    /**
      * A list of URLs of the IP resources to be drained. These IPs must be valid static external IPs that have been assigned to the NAT. These IPs should be used for updating/patching a NAT rule only. This field is used for public NAT.
      *
      * Generated from protobuf field <code>repeated string source_nat_drain_ips = 340812451;</code>
      */
     private $source_nat_drain_ips;
+    /**
+     * A list of URLs of subnetworks representing source ranges to be drained. This is only supported on patch/update, and these subnetworks must have previously been used as active ranges in this NAT Rule. This field is used for private NAT.
+     *
+     * Generated from protobuf field <code>repeated string source_nat_drain_ranges = 84802815;</code>
+     */
+    private $source_nat_drain_ranges;
 
     /**
      * Constructor.
@@ -33,10 +45,14 @@ class RouterNatRuleAction extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $source_nat_active_ips
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $source_nat_active_ips
      *           A list of URLs of the IP resources used for this NAT rule. These IP addresses must be valid static external IP addresses assigned to the project. This field is used for public NAT.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $source_nat_drain_ips
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $source_nat_active_ranges
+     *           A list of URLs of the subnetworks used as source ranges for this NAT Rule. These subnetworks must have purpose set to PRIVATE_NAT. This field is used for private NAT.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $source_nat_drain_ips
      *           A list of URLs of the IP resources to be drained. These IPs must be valid static external IPs that have been assigned to the NAT. These IPs should be used for updating/patching a NAT rule only. This field is used for public NAT.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $source_nat_drain_ranges
+     *           A list of URLs of subnetworks representing source ranges to be drained. This is only supported on patch/update, and these subnetworks must have previously been used as active ranges in this NAT Rule. This field is used for private NAT.
      * }
      */
     public function __construct($data = NULL) {
@@ -59,13 +75,39 @@ class RouterNatRuleAction extends \Google\Protobuf\Internal\Message
      * A list of URLs of the IP resources used for this NAT rule. These IP addresses must be valid static external IP addresses assigned to the project. This field is used for public NAT.
      *
      * Generated from protobuf field <code>repeated string source_nat_active_ips = 210378229;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSourceNatActiveIps($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
         $this->source_nat_active_ips = $arr;
+
+        return $this;
+    }
+
+    /**
+     * A list of URLs of the subnetworks used as source ranges for this NAT Rule. These subnetworks must have purpose set to PRIVATE_NAT. This field is used for private NAT.
+     *
+     * Generated from protobuf field <code>repeated string source_nat_active_ranges = 190556269;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getSourceNatActiveRanges()
+    {
+        return $this->source_nat_active_ranges;
+    }
+
+    /**
+     * A list of URLs of the subnetworks used as source ranges for this NAT Rule. These subnetworks must have purpose set to PRIVATE_NAT. This field is used for private NAT.
+     *
+     * Generated from protobuf field <code>repeated string source_nat_active_ranges = 190556269;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setSourceNatActiveRanges($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->source_nat_active_ranges = $arr;
 
         return $this;
     }
@@ -85,13 +127,39 @@ class RouterNatRuleAction extends \Google\Protobuf\Internal\Message
      * A list of URLs of the IP resources to be drained. These IPs must be valid static external IPs that have been assigned to the NAT. These IPs should be used for updating/patching a NAT rule only. This field is used for public NAT.
      *
      * Generated from protobuf field <code>repeated string source_nat_drain_ips = 340812451;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSourceNatDrainIps($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
         $this->source_nat_drain_ips = $arr;
+
+        return $this;
+    }
+
+    /**
+     * A list of URLs of subnetworks representing source ranges to be drained. This is only supported on patch/update, and these subnetworks must have previously been used as active ranges in this NAT Rule. This field is used for private NAT.
+     *
+     * Generated from protobuf field <code>repeated string source_nat_drain_ranges = 84802815;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getSourceNatDrainRanges()
+    {
+        return $this->source_nat_drain_ranges;
+    }
+
+    /**
+     * A list of URLs of subnetworks representing source ranges to be drained. This is only supported on patch/update, and these subnetworks must have previously been used as active ranges in this NAT Rule. This field is used for private NAT.
+     *
+     * Generated from protobuf field <code>repeated string source_nat_drain_ranges = 84802815;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setSourceNatDrainRanges($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->source_nat_drain_ranges = $arr;
 
         return $this;
     }

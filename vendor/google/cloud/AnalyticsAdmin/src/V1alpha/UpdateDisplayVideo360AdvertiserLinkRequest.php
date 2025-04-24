@@ -20,15 +20,32 @@ class UpdateDisplayVideo360AdvertiserLinkRequest extends \Google\Protobuf\Intern
      *
      * Generated from protobuf field <code>.google.analytics.admin.v1alpha.DisplayVideo360AdvertiserLink display_video_360_advertiser_link = 1;</code>
      */
-    private $display_video_360_advertiser_link = null;
+    protected $display_video_360_advertiser_link = null;
     /**
-     * Required. The list of fields to be updated. Omitted fields will not be updated.
-     * To replace the entire entity, use one path with the string "*" to match
-     * all fields.
+     * Required. The list of fields to be updated. Omitted fields will not be
+     * updated. To replace the entire entity, use one path with the string "*" to
+     * match all fields.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Analytics\Admin\V1alpha\DisplayVideo360AdvertiserLink $displayVideo360AdvertiserLink The DisplayVideo360AdvertiserLink to update
+     * @param \Google\Protobuf\FieldMask                                    $updateMask                    Required. The list of fields to be updated. Omitted fields will not be
+     *                                                                                                     updated. To replace the entire entity, use one path with the string "*" to
+     *                                                                                                     match all fields.
+     *
+     * @return \Google\Analytics\Admin\V1alpha\UpdateDisplayVideo360AdvertiserLinkRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Analytics\Admin\V1alpha\DisplayVideo360AdvertiserLink $displayVideo360AdvertiserLink, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setDisplayVideo360AdvertiserLink($displayVideo360AdvertiserLink)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -39,9 +56,9 @@ class UpdateDisplayVideo360AdvertiserLinkRequest extends \Google\Protobuf\Intern
      *     @type \Google\Analytics\Admin\V1alpha\DisplayVideo360AdvertiserLink $display_video_360_advertiser_link
      *           The DisplayVideo360AdvertiserLink to update
      *     @type \Google\Protobuf\FieldMask $update_mask
-     *           Required. The list of fields to be updated. Omitted fields will not be updated.
-     *           To replace the entire entity, use one path with the string "*" to match
-     *           all fields.
+     *           Required. The list of fields to be updated. Omitted fields will not be
+     *           updated. To replace the entire entity, use one path with the string "*" to
+     *           match all fields.
      * }
      */
     public function __construct($data = NULL) {
@@ -86,9 +103,9 @@ class UpdateDisplayVideo360AdvertiserLinkRequest extends \Google\Protobuf\Intern
     }
 
     /**
-     * Required. The list of fields to be updated. Omitted fields will not be updated.
-     * To replace the entire entity, use one path with the string "*" to match
-     * all fields.
+     * Required. The list of fields to be updated. Omitted fields will not be
+     * updated. To replace the entire entity, use one path with the string "*" to
+     * match all fields.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\FieldMask|null
@@ -109,9 +126,9 @@ class UpdateDisplayVideo360AdvertiserLinkRequest extends \Google\Protobuf\Intern
     }
 
     /**
-     * Required. The list of fields to be updated. Omitted fields will not be updated.
-     * To replace the entire entity, use one path with the string "*" to match
-     * all fields.
+     * Required. The list of fields to be updated. Omitted fields will not be
+     * updated. To replace the entire entity, use one path with the string "*" to
+     * match all fields.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Protobuf\FieldMask $var

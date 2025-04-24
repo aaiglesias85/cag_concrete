@@ -20,20 +20,21 @@ class ComputeResources extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 disk_size_gb = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $disk_size_gb = 0;
+    protected $disk_size_gb = 0;
     /**
-     * Optional. Total number of nodes in the sessions created for this environment.
+     * Optional. Total number of nodes in the sessions created for this
+     * environment.
      *
      * Generated from protobuf field <code>int32 node_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $node_count = 0;
+    protected $node_count = 0;
     /**
      * Optional. Max configurable nodes.
      * If max_node_count > node_count, then auto-scaling is enabled.
      *
      * Generated from protobuf field <code>int32 max_node_count = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $max_node_count = 0;
+    protected $max_node_count = 0;
 
     /**
      * Constructor.
@@ -44,7 +45,8 @@ class ComputeResources extends \Google\Protobuf\Internal\Message
      *     @type int $disk_size_gb
      *           Optional. Size in GB of the disk. Default is 100 GB.
      *     @type int $node_count
-     *           Optional. Total number of nodes in the sessions created for this environment.
+     *           Optional. Total number of nodes in the sessions created for this
+     *           environment.
      *     @type int $max_node_count
      *           Optional. Max configurable nodes.
      *           If max_node_count > node_count, then auto-scaling is enabled.
@@ -82,7 +84,8 @@ class ComputeResources extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Total number of nodes in the sessions created for this environment.
+     * Optional. Total number of nodes in the sessions created for this
+     * environment.
      *
      * Generated from protobuf field <code>int32 node_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -93,7 +96,8 @@ class ComputeResources extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Total number of nodes in the sessions created for this environment.
+     * Optional. Total number of nodes in the sessions created for this
+     * environment.
      *
      * Generated from protobuf field <code>int32 node_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var

@@ -17,16 +17,25 @@
 
 namespace Google\Cloud\PubSub;
 
-use Google\Cloud\Core\ArrayTrait;
-use Google\Cloud\Core\Batch\BatchRunner;
-use Google\Cloud\Core\Batch\ClosureSerializerInterface;
+use Google\ApiCore\Serializer;
+use Google\Cloud\Core\ApiHelperTrait;
 use Google\Cloud\Core\Exception\NotFoundException;
-use Google\Cloud\Core\Iam\Iam;
+use Google\Cloud\Core\Iam\IamManager;
 use Google\Cloud\Core\Iterator\ItemIterator;
 use Google\Cloud\Core\Iterator\PageIterator;
-use Google\Cloud\PubSub\Connection\ConnectionInterface;
-use Google\Cloud\PubSub\Connection\IamTopic;
+use Google\Cloud\Core\RequestHandler;
+use Google\Cloud\PubSub\V1\Client\PublisherClient;
+use Google\Cloud\PubSub\V1\DeleteTopicRequest;
 use Google\Cloud\PubSub\V1\Encoding;
+use Google\Cloud\PubSub\V1\GetTopicRequest;
+use Google\Cloud\PubSub\V1\ListTopicSubscriptionsRequest;
+use Google\Cloud\PubSub\V1\MessageStoragePolicy;
+use Google\Cloud\PubSub\V1\PublishRequest;
+use Google\Cloud\PubSub\V1\PubsubMessage;
+use Google\Cloud\PubSub\V1\SchemaSettings;
+use Google\Cloud\PubSub\V1\Topic as TopicProto;
+use Google\Cloud\PubSub\V1\UpdateTopicRequest;
+use Google\Protobuf\FieldMask;
 use InvalidArgumentException;
 
 /**
@@ -36,7 +45,7 @@ use InvalidArgumentException;
  * ```
  * use Google\Cloud\PubSub\PubSubClient;
  *
- * $pubsub = new PubSubClient();
+ * $pubsub = new PubSubClient(['projectId' => 'my-awesome-project']);
  * $topic = $pubsub->topic('my-new-topic');
  * ```
  *
@@ -47,13 +56,24 @@ use InvalidArgumentException;
  */
 class Topic
 {
-    use ArrayTrait;
     use ResourceNameTrait;
+    use ApiHelperTrait;
+
+    const DEFAULT_COMPRESSION_BYTES_THRESHOLD = 240;
+
+    const DEFAULT_ENABLE_COMPRESSION = false;
+
+    private const COMPRESSION_HEADER_KEY = 'grpc-internal-encoding-request';
+
+    private const GZIP_COMPRESSION = 'gzip';
 
     /**
-     * @var ConnectionInterface A connection to the Google Cloud Platform API
+     * @internal
+     * The request handler that is responsible for sending a request and
+     * serializing responses into relevant classes.
      */
-    protected $connection;
+    private RequestHandler $requestHandler;
+    private Serializer $serializer;
 
     /**
      * @var string The project ID
@@ -86,22 +106,42 @@ class Topic
     private $clientConfig;
 
     /**
+     * @var bool
+     */
+    private $enableCompression;
+
+    /**
+     * @var int
+     */
+    private $compressionBytesThreshold;
+
+    /**
      * Create a PubSub topic.
      *
-     * @param ConnectionInterface $connection A connection to the Google Cloud
-     *        Platform service
+     * @param RequestHandler The request handler that is responsible for sending a request
+     * and serializing responses into relevant classes.
+     * @param Serializer $serializer The serializer instance to encode/decode messages.
      * @param string $projectId The project Id
      * @param string $name The topic name
      * @param bool $encode Whether messages should be base64 encoded.
      * @param array $info {
-     *     A [Topic](https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics
+     *        A [Topic](https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics
      *
-     *     @type string name The name of the topic.
-     *     @type array $labels Key value pairs used to organize your resources.
-     *     @type string $kmsKeyName The resource name of the Cloud KMS
-     *           CryptoKey to be used to protect access to messages published on this
-     *           topic. The expected format is
-     *           `projects/my-project/locations/kr-location/keyRings/my-kr/cryptoKeys/my-key`.
+     *        @type string name The name of the topic.
+     *        @type array $labels Key value pairs used to organize your resources.
+     *        @type string $kmsKeyName The resource name of the Cloud KMS
+     *              CryptoKey to be used to protect access to messages published on this
+     *              topic. The expected format is
+     *              `projects/my-project/locations/kr-location/keyRings/my-kr/cryptoKeys/my-key`.
+     *        @type bool $enableCompression Flag to enable compression of messages
+     *              before publishing. Set the flag to `true` to enable compression.
+     *              Defaults to `false`. Messsages are compressed if their total
+     *              size >= `compressionBytesThreshold`, whose default value has
+     *              been experimentally derived after performance evaluations.
+     *        @type int $compressionBytesThreshold The threshold byte size
+     *              above which messages are compressed. This only takes effect
+     *              if `enableCompression` is set to `true`. Defaults to `240`.
+     *              (This value is experiementally derived after performance evaluations.)
      * }
      *
      * @param array $clientConfig [optional] Configuration options for the
@@ -112,18 +152,29 @@ class Topic
      *        associated with this instance.
      */
     public function __construct(
-        ConnectionInterface $connection,
+        RequestHandler $requestHandler,
+        Serializer $serializer,
         $projectId,
         $name,
         $encode,
         array $info = [],
         array $clientConfig = []
     ) {
-        $this->connection = $connection;
+        $this->requestHandler = $requestHandler;
+        $this->serializer = $serializer;
         $this->projectId = $projectId;
         $this->encode = (bool) $encode;
         $this->info = $info;
         $this->clientConfig = $clientConfig;
+
+        if (isset($info['enableCompression']) && $info['enableCompression'] === true) {
+            $this->enableCompression = true;
+            $this->compressionBytesThreshold = $info['compressionBytesThreshold'] ??
+                self::DEFAULT_COMPRESSION_BYTES_THRESHOLD;
+        } else {
+            $this->enableCompression = self::DEFAULT_ENABLE_COMPRESSION;
+            $this->compressionBytesThreshold = self::DEFAULT_COMPRESSION_BYTES_THRESHOLD;
+        }
 
         // Accept either a simple name or a fully-qualified name.
         if ($this->isFullyQualifiedName('topic', $name)) {
@@ -180,25 +231,30 @@ class Topic
      *           allowed, and is not a valid configuration.
      *     @type string|Schema $schemaSettings.schema The name of a schema that
      *           messages published should be validated against, or an instance
-     *           of {@see Google\Cloud\PubSub\Schema}.
+     *           of {@see Schema}.
      *     @type string $schemaSettings.encoding The encoding of messages
      *           validated against schema. For allowed values, see constants
-     *           defined on {@see Google\Cloud\PubSub\V1\Encoding}.
+     *           defined on {@see Encoding}.
      * }
      *
      * @return array Topic information
      */
     public function create(array $options = [])
     {
-        if (isset($options['schemaSettings']['schema']) && $options['schemaSettings']['schema'] instanceof Schema) {
-            $options['schemaSettings']['schema'] = $options['schemaSettings']['schema']->name();
-        }
+        list($data, $optionalArgs) = $this->splitOptionalArgs($options);
+        $data['name'] = $this->name;
 
-        $this->info = $this->connection->createTopic([
-            'name' => $this->name
-        ] + $options);
+        $this->formatSchemaSettings($data);
+        $data = $this->convertDataToProtos($data, ['messageStoragePolicy' => MessageStoragePolicy::class]);
 
-        return $this->info;
+        $request = $this->serializer->decodeMessage(new TopicProto(), $data);
+
+        return $this->info = $this->requestHandler->sendRequest(
+            PublisherClient::class,
+            'createTopic',
+            $request,
+            $optionalArgs
+        );
     }
 
     /**
@@ -230,7 +286,7 @@ class Topic
      *
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/UpdateTopicRequest Update Topic
      *
-     * @param array $topic {
+     * @param array $data {
      *    The Topic data.
      *
      *     @type array $labels Key value pairs used to organize your resources.
@@ -247,10 +303,10 @@ class Topic
      *          allowed, and is not a valid configuration.
      *     @type string|Schema $schemaSettings.schema The name of a schema that
      *           messages published should be validated against, or an instance
-     *           of {@see Google\Cloud\PubSub\Schema}.
+     *           of {@see Schema}.
      *     @type string $schemaSettings.encoding The encoding of messages
      *           validated against schema. For allowed values, see constants
-     *           defined on {@see Google\Cloud\PubSub\V1\Encoding}.
+     *           defined on {@see V1\Encoding}.
      * }
      * @param array $options [optional] {
      *     Configuration options.
@@ -265,12 +321,12 @@ class Topic
      *
      * @return array The topic info.
      */
-    public function update(array $topic, array $options = [])
+    public function update(array $data, array $options = [])
     {
         $updateMaskPaths = $this->pluck('updateMask', $options, false) ?: [];
 
         if (!$updateMaskPaths) {
-            $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($topic));
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($data));
             foreach ($iterator as $leafValue) {
                 $excludes = ['name'];
                 $keys = [];
@@ -289,19 +345,31 @@ class Topic
             }
         }
 
-        if (isset($topic['schemaSettings']['schema'])) {
-            if ($topic['schemaSettings']['schema'] instanceof Schema) {
-                $topic['schemaSettings']['schema'] = $topic['schemaSettings']['schema']->name();
-            }
+        $maskPaths = [];
+        foreach ($updateMaskPaths as $path) {
+            $maskPaths[] = Serializer::toSnakeCase($path);
         }
 
-        return $this->info = $this->connection->updateTopic([
-            'name' => $this->name,
-            'topic' => [
-                'name' => $this->name,
-            ] + $topic,
-            'updateMask' => implode(',', $updateMaskPaths)
-        ] + $options);
+        $fieldMask = new FieldMask([
+            'paths' => $maskPaths
+        ]);
+
+        $data['name'] = $this->name;
+        $this->formatSchemaSettings($data);
+
+        $proto = $this->serializer->decodeMessage(new TopicProto(), $data);
+
+        $request = $this->serializer->decodeMessage(
+            new UpdateTopicRequest(),
+            ['topic' => $proto, 'updateMask' => $fieldMask]
+        );
+
+        return $this->info = $this->requestHandler->sendRequest(
+            PublisherClient::class,
+            'updateTopic',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -319,9 +387,15 @@ class Topic
      */
     public function delete(array $options = [])
     {
-        $this->connection->deleteTopic($options + [
-            'topic' => $this->name
-        ]);
+        $data = ['topic' => $this->name];
+        $request = $this->serializer->decodeMessage(new DeleteTopicRequest(), $data);
+
+        $this->requestHandler->sendRequest(
+            PublisherClient::class,
+            'deleteTopic',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -329,7 +403,7 @@ class Topic
      *
      * Service errors will NOT bubble up from this method. It will always return
      * a boolean value. If you want to check for errors, use
-     * {@see Google\Cloud\PubSub\Topic::info()}.
+     * {@see Topic::info()}.
      *
      * Example:
      * ```
@@ -361,7 +435,7 @@ class Topic
      * may find that Topic::exists() is a better fit for a true/false check.
      *
      * This method will use the previously cached result, if available. To force
-     * a refresh from the API, use {@see Google\Cloud\PubSub\Topic::reload()}.
+     * a refresh from the API, use {@see Topic::reload()}.
      *
      * Example:
      * ```
@@ -395,7 +469,7 @@ class Topic
      * may find that Topic::exists() is a better fit for a true/false check.
      *
      * This method will retrieve a new result from the API. To use a previously
-     * cached result, if one exists, use {@see Google\Cloud\PubSub\Topic::info()}.
+     * cached result, if one exists, use {@see Topic::info()}.
      *
      * Example:
      * ```
@@ -413,9 +487,15 @@ class Topic
      */
     public function reload(array $options = [])
     {
-        return $this->info = $this->connection->getTopic($options + [
-            'topic' => $this->name
-        ]);
+        $data = ['topic' => $this->name];
+        $request = $this->serializer->decodeMessage(new GetTopicRequest(), $data);
+
+        return $this->info = $this->requestHandler->sendRequest(
+            PublisherClient::class,
+            'getTopic',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -438,7 +518,7 @@ class Topic
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/publish Publish Message
      *
      * @param Message|array $message An instance of
-     *        {@see Google\Cloud\PubSub\Message}, or an array in the correct
+     *        {@see Message}, or an array in the correct
      *        [Message Format](https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage).
      * @param array $options [optional] Configuration Options
      * @return array A list of message IDs
@@ -480,20 +560,36 @@ class Topic
      *
      * @param Message[]|array[] $messages A list of messages. Each message must be in the correct
      *        [Message Format](https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage),
-     *        or be an instance of {@see Google\Cloud\PubSub\Message}.
+     *        or be an instance of {@see Message}.
      * @param array $options [optional] Configuration Options
      * @return array A list of message IDs.
      */
     public function publishBatch(array $messages, array $options = [])
     {
+        $totalMessagesSize = 0;
         foreach ($messages as &$message) {
             $message = $this->formatMessage($message);
+            $totalMessagesSize += strlen($message->serializeToString());
         }
 
-        return $this->connection->publishMessage($options + [
-            'topic' => $this->name,
-            'messages' => $messages
-        ]);
+        if ($this->enableCompression &&
+            $totalMessagesSize >= $this->compressionBytesThreshold) {
+            $headers = $options['headers'] ?? [];
+            $headers[self::COMPRESSION_HEADER_KEY] = [self::GZIP_COMPRESSION];
+            $options['headers'] = $headers;
+        }
+
+        $request = $this->serializer->decodeMessage(
+            new PublishRequest(),
+            ['topic' => $this->name, 'messages' => $messages]
+        );
+
+        return $this->requestHandler->sendRequest(
+            PublisherClient::class,
+            'publish',
+            $request,
+            $options
+        );
     }
 
     /**
@@ -518,6 +614,8 @@ class Topic
      *     @type bool $debugOutput Whether or not to output debug information.
      *           Please note debug output currently only applies in CLI based
      *           applications. **Defaults to** `false`.
+     *     @type resource $debugOutputResource A resource to output debug output
+     *           to. **Defaults to** Resource for `php://stderr`.
      *     @type array $batchOptions A set of options for a BatchJob.
      *           {@see \Google\Cloud\Core\Batch\BatchJob::__construct()} for
      *           more details.
@@ -540,8 +638,17 @@ class Topic
      *           responsible for serializing closures used in the
      *           `$clientConfig`. This is especially important when using the
      *           batch daemon. **Defaults to**
-     *           {@see Google\Cloud\Core\Batch\OpisClosureSerializer} if the
+     *           {@see \Google\Cloud\Core\Batch\OpisClosureSerializer} if the
      *           `opis/closure` library is installed.
+     *     @type bool $enableCompression Flag to enable compression of messages
+     *           before publishing. Set the flag to `true` to enable compression.
+     *           Defaults to `false`. Messsages are compressed if their total
+     *           size >= `compressionBytesThreshold`, whose default value has
+     *           been experimentally derived after performance evaluations.
+     *     @type int $compressionBytesThreshold The threshold byte size
+     *           above which messages are compressed. This only takes effect
+     *           if `enableCompression` is set to `true`. Defaults to `240`.
+     *           (This value is experiementally derived after performance evaluations.)
      * }
      * @return BatchPublisher
      * @experimental The experimental flag means that while we believe this method
@@ -570,14 +677,13 @@ class Topic
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/create Create Subscription
      *
      * @param string $name The subscription name
-     * @param array $options [optional] Please see {@see Google\Cloud\PubSub\Subscription::create()}
+     * @param array $options [optional] Please see {@see Subscription::create()}
      *        for configuration details.
      * @return Subscription
      */
     public function subscribe($name, array $options = [])
     {
         $subscription = $this->subscriptionFactory($name);
-
         $subscription->create($options);
 
         return $subscription;
@@ -628,15 +734,30 @@ class Topic
      */
     public function subscriptions(array $options = [])
     {
-        $resultLimit = $this->pluck('resultLimit', $options, false);
+        list($data, $optionalArgs) = $this->splitOptionalArgs($options);
+        $resultLimit = $this->pluck('resultLimit', $data, false);
+
+        $data['topic'] = $this->name;
+        $request = $this->serializer->decodeMessage(new ListTopicSubscriptionsRequest(), $data);
 
         return new ItemIterator(
             new PageIterator(
                 function ($subscription) {
                     return $this->subscriptionFactory($subscription);
                 },
-                [$this->connection, 'listSubscriptionsByTopic'],
-                $options + ['topic' => $this->name],
+                function ($callOptions) use ($optionalArgs, $request) {
+                    if (isset($callOptions['pageToken'])) {
+                        $request->setPageToken($callOptions['pageToken']);
+                    }
+
+                    return $this->requestHandler->sendRequest(
+                        PublisherClient::class,
+                        'listTopicSubscriptions',
+                        $request,
+                        $optionalArgs
+                    );
+                },
+                $options,
                 [
                     'itemsKey' => 'subscriptions',
                     'resultLimit' => $resultLimit
@@ -660,13 +781,12 @@ class Topic
      * @see https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/testIamPermissions Test Topic Permissions
      * @codingStandardsIgnoreEnd
      *
-     * @return Iam
+     * @return IamManager
      */
     public function iam()
     {
         if (!$this->iam) {
-            $iamConnection = new IamTopic($this->connection);
-            $this->iam = new Iam($iamConnection, $this->name);
+            $this->iam = new IamManager($this->requestHandler, $this->serializer, PublisherClient::class, $this->name);
         }
 
         return $this->iam;
@@ -685,7 +805,7 @@ class Topic
             'name' => $this->name,
             'projectId' => $this->projectId,
             'info' => $this->info,
-            'connection' => get_class($this->connection)
+            'requestHandler' => $this->requestHandler
         ];
     }
 
@@ -694,7 +814,7 @@ class Topic
      * base64_encode the data, and error if the input is too wrong to proceed.
      *
      * @param Message|array $message
-     * @return array The message data
+     * @return PubsubMessage The message protobuf object
      * @throws \InvalidArgumentException
      */
     private function formatMessage($message)
@@ -714,7 +834,30 @@ class Topic
             );
         }
 
-        return $message;
+        return $this->serializer->decodeMessage(
+            new PubsubMessage(),
+            $message
+        );
+    }
+
+    private function formatSchemaSettings(array &$data)
+    {
+        if (isset($data['schemaSettings'])) {
+            $enc = $data['schemaSettings']['encoding'] ?? Encoding::ENCODING_UNSPECIFIED;
+
+            if (is_string($enc)) {
+                $data['schemaSettings']['encoding'] = Encoding::value($enc);
+            }
+
+            if (isset($data['schemaSettings']['schema']) && $data['schemaSettings']['schema'] instanceof Schema) {
+                $data['schemaSettings']['schema'] = $data['schemaSettings']['schema']->name();
+            }
+
+            $data['schemaSettings'] = $this->serializer->decodeMessage(
+                new SchemaSettings(),
+                $data['schemaSettings']
+            );
+        }
     }
 
     /**
@@ -731,12 +874,14 @@ class Topic
     private function subscriptionFactory($name, array $info = [])
     {
         return new Subscription(
-            $this->connection,
+            $this->requestHandler,
+            $this->serializer,
             $this->projectId,
             $name,
             $this->name,
             $this->encode,
-            $info
+            $info,
+            $this->clientConfig
         );
     }
 }

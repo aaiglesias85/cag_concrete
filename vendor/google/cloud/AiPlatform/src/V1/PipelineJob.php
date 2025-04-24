@@ -20,70 +20,72 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The display name of the Pipeline.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. Pipeline creation time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Pipeline start time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * Output only. Pipeline end time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * Output only. Timestamp when this PipelineJob was most recently updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * The spec of the pipeline.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct pipeline_spec = 7;</code>
      */
-    private $pipeline_spec = null;
+    protected $pipeline_spec = null;
     /**
      * Output only. The detailed state of the job.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineState state = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. The details of pipeline run. Not available in the list view.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineJobDetail job_detail = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $job_detail = null;
+    protected $job_detail = null;
     /**
      * Output only. The error that occurred during pipeline execution.
      * Only populated when the pipeline's state is FAILED or CANCELLED.
      *
      * Generated from protobuf field <code>.google.rpc.Status error = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $error = null;
+    protected $error = null;
     /**
      * The labels with user-defined metadata to organize PipelineJob.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
      * See https://goo.gl/xmQnxf for more information and examples of labels.
+     * Note there is some reserved label key for Vertex AI Pipelines.
+     * - `vertex-ai-pipelines-run-billing-id`, user set value will get overrided.
      *
      * Generated from protobuf field <code>map<string, string> labels = 11;</code>
      */
@@ -93,14 +95,14 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig runtime_config = 12;</code>
      */
-    private $runtime_config = null;
+    protected $runtime_config = null;
     /**
      * Customer-managed encryption key spec for a pipelineJob. If set, this
      * PipelineJob and all of its sub-resources will be secured by this key.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 16;</code>
      */
-    private $encryption_spec = null;
+    protected $encryption_spec = null;
     /**
      * The service account that the pipeline workload runs as.
      * If not specified, the Compute Engine default service account in the project
@@ -112,39 +114,67 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 17;</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
      * The full name of the Compute Engine
-     * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the
+     * [network](/compute/docs/networks-and-firewalls#networks) to which the
      * Pipeline Job's workload should be peered. For example,
      * `projects/12345/global/networks/myVPC`.
-     * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     * [Format](/compute/docs/reference/rest/v1/networks/insert)
      * is of the form `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in `12345`, and {network} is a
      * network name.
      * Private services access must already be configured for the network.
-     * Pipeline job will apply the network configuration to the GCP resources
-     * being launched, if applied, such as Vertex AI
+     * Pipeline job will apply the network configuration to the Google Cloud
+     * resources being launched, if applied, such as Vertex AI
      * Training or Dataflow job. If left unspecified, the workload is not peered
      * with any network.
      *
      * Generated from protobuf field <code>string network = 18 [(.google.api.resource_reference) = {</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
-     * A template uri from where the [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec], if empty, will
-     * be downloaded.
+     * A list of names for the reserved ip ranges under the VPC network
+     * that can be used for this Pipeline Job's workload.
+     * If set, we will deploy the Pipeline Job's workload within the provided ip
+     * ranges. Otherwise, the job will be deployed to any ip ranges under the
+     * provided VPC network.
+     * Example: ['vertex-ai-ip-range'].
+     *
+     * Generated from protobuf field <code>repeated string reserved_ip_ranges = 25;</code>
+     */
+    private $reserved_ip_ranges;
+    /**
+     * A template uri from where the
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec],
+     * if empty, will be downloaded. Currently, only uri from Vertex Template
+     * Registry & Gallery is supported. Reference to
+     * https://cloud.google.com/vertex-ai/docs/pipelines/create-pipeline-template.
      *
      * Generated from protobuf field <code>string template_uri = 19;</code>
      */
-    private $template_uri = '';
+    protected $template_uri = '';
     /**
      * Output only. Pipeline template metadata. Will fill up fields if
-     * [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri] is from supported template registry.
+     * [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri]
+     * is from supported template registry.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineTemplateMetadata template_metadata = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $template_metadata = null;
+    protected $template_metadata = null;
+    /**
+     * Output only. The schedule resource name.
+     * Only returned if the Pipeline is created by Schedule API.
+     *
+     * Generated from protobuf field <code>string schedule_name = 22 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $schedule_name = '';
+    /**
+     * Optional. Whether to do component level validations before job creation.
+     *
+     * Generated from protobuf field <code>bool preflight_validations = 26 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $preflight_validations = false;
 
     /**
      * Constructor.
@@ -156,7 +186,7 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      *           Output only. The resource name of the PipelineJob.
      *     @type string $display_name
      *           The display name of the Pipeline.
-     *           The name can be up to 128 characters long and can be consist of any UTF-8
+     *           The name can be up to 128 characters long and can consist of any UTF-8
      *           characters.
      *     @type \Google\Protobuf\Timestamp $create_time
      *           Output only. Pipeline creation time.
@@ -181,6 +211,8 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      *           (Unicode codepoints), can only contain lowercase letters, numeric
      *           characters, underscores and dashes. International characters are allowed.
      *           See https://goo.gl/xmQnxf for more information and examples of labels.
+     *           Note there is some reserved label key for Vertex AI Pipelines.
+     *           - `vertex-ai-pipelines-run-billing-id`, user set value will get overrided.
      *     @type \Google\Cloud\AIPlatform\V1\PipelineJob\RuntimeConfig $runtime_config
      *           Runtime config of the pipeline.
      *     @type \Google\Cloud\AIPlatform\V1\EncryptionSpec $encryption_spec
@@ -196,24 +228,40 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      *           permission on this service account.
      *     @type string $network
      *           The full name of the Compute Engine
-     *           [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the
+     *           [network](/compute/docs/networks-and-firewalls#networks) to which the
      *           Pipeline Job's workload should be peered. For example,
      *           `projects/12345/global/networks/myVPC`.
-     *           [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     *           [Format](/compute/docs/reference/rest/v1/networks/insert)
      *           is of the form `projects/{project}/global/networks/{network}`.
      *           Where {project} is a project number, as in `12345`, and {network} is a
      *           network name.
      *           Private services access must already be configured for the network.
-     *           Pipeline job will apply the network configuration to the GCP resources
-     *           being launched, if applied, such as Vertex AI
+     *           Pipeline job will apply the network configuration to the Google Cloud
+     *           resources being launched, if applied, such as Vertex AI
      *           Training or Dataflow job. If left unspecified, the workload is not peered
      *           with any network.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $reserved_ip_ranges
+     *           A list of names for the reserved ip ranges under the VPC network
+     *           that can be used for this Pipeline Job's workload.
+     *           If set, we will deploy the Pipeline Job's workload within the provided ip
+     *           ranges. Otherwise, the job will be deployed to any ip ranges under the
+     *           provided VPC network.
+     *           Example: ['vertex-ai-ip-range'].
      *     @type string $template_uri
-     *           A template uri from where the [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec], if empty, will
-     *           be downloaded.
+     *           A template uri from where the
+     *           [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec],
+     *           if empty, will be downloaded. Currently, only uri from Vertex Template
+     *           Registry & Gallery is supported. Reference to
+     *           https://cloud.google.com/vertex-ai/docs/pipelines/create-pipeline-template.
      *     @type \Google\Cloud\AIPlatform\V1\PipelineTemplateMetadata $template_metadata
      *           Output only. Pipeline template metadata. Will fill up fields if
-     *           [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri] is from supported template registry.
+     *           [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri]
+     *           is from supported template registry.
+     *     @type string $schedule_name
+     *           Output only. The schedule resource name.
+     *           Only returned if the Pipeline is created by Schedule API.
+     *     @type bool $preflight_validations
+     *           Optional. Whether to do component level validations before job creation.
      * }
      */
     public function __construct($data = NULL) {
@@ -249,7 +297,7 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
 
     /**
      * The display name of the Pipeline.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
@@ -262,7 +310,7 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
 
     /**
      * The display name of the Pipeline.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
@@ -563,6 +611,8 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
      * See https://goo.gl/xmQnxf for more information and examples of labels.
+     * Note there is some reserved label key for Vertex AI Pipelines.
+     * - `vertex-ai-pipelines-run-billing-id`, user set value will get overrided.
      *
      * Generated from protobuf field <code>map<string, string> labels = 11;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -578,6 +628,8 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
      * See https://goo.gl/xmQnxf for more information and examples of labels.
+     * Note there is some reserved label key for Vertex AI Pipelines.
+     * - `vertex-ai-pipelines-run-billing-id`, user set value will get overrided.
      *
      * Generated from protobuf field <code>map<string, string> labels = 11;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -705,16 +757,16 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
 
     /**
      * The full name of the Compute Engine
-     * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the
+     * [network](/compute/docs/networks-and-firewalls#networks) to which the
      * Pipeline Job's workload should be peered. For example,
      * `projects/12345/global/networks/myVPC`.
-     * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     * [Format](/compute/docs/reference/rest/v1/networks/insert)
      * is of the form `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in `12345`, and {network} is a
      * network name.
      * Private services access must already be configured for the network.
-     * Pipeline job will apply the network configuration to the GCP resources
-     * being launched, if applied, such as Vertex AI
+     * Pipeline job will apply the network configuration to the Google Cloud
+     * resources being launched, if applied, such as Vertex AI
      * Training or Dataflow job. If left unspecified, the workload is not peered
      * with any network.
      *
@@ -728,16 +780,16 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
 
     /**
      * The full name of the Compute Engine
-     * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the
+     * [network](/compute/docs/networks-and-firewalls#networks) to which the
      * Pipeline Job's workload should be peered. For example,
      * `projects/12345/global/networks/myVPC`.
-     * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     * [Format](/compute/docs/reference/rest/v1/networks/insert)
      * is of the form `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in `12345`, and {network} is a
      * network name.
      * Private services access must already be configured for the network.
-     * Pipeline job will apply the network configuration to the GCP resources
-     * being launched, if applied, such as Vertex AI
+     * Pipeline job will apply the network configuration to the Google Cloud
+     * resources being launched, if applied, such as Vertex AI
      * Training or Dataflow job. If left unspecified, the workload is not peered
      * with any network.
      *
@@ -754,8 +806,47 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A template uri from where the [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec], if empty, will
-     * be downloaded.
+     * A list of names for the reserved ip ranges under the VPC network
+     * that can be used for this Pipeline Job's workload.
+     * If set, we will deploy the Pipeline Job's workload within the provided ip
+     * ranges. Otherwise, the job will be deployed to any ip ranges under the
+     * provided VPC network.
+     * Example: ['vertex-ai-ip-range'].
+     *
+     * Generated from protobuf field <code>repeated string reserved_ip_ranges = 25;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getReservedIpRanges()
+    {
+        return $this->reserved_ip_ranges;
+    }
+
+    /**
+     * A list of names for the reserved ip ranges under the VPC network
+     * that can be used for this Pipeline Job's workload.
+     * If set, we will deploy the Pipeline Job's workload within the provided ip
+     * ranges. Otherwise, the job will be deployed to any ip ranges under the
+     * provided VPC network.
+     * Example: ['vertex-ai-ip-range'].
+     *
+     * Generated from protobuf field <code>repeated string reserved_ip_ranges = 25;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setReservedIpRanges($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->reserved_ip_ranges = $arr;
+
+        return $this;
+    }
+
+    /**
+     * A template uri from where the
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec],
+     * if empty, will be downloaded. Currently, only uri from Vertex Template
+     * Registry & Gallery is supported. Reference to
+     * https://cloud.google.com/vertex-ai/docs/pipelines/create-pipeline-template.
      *
      * Generated from protobuf field <code>string template_uri = 19;</code>
      * @return string
@@ -766,8 +857,11 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A template uri from where the [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec], if empty, will
-     * be downloaded.
+     * A template uri from where the
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec],
+     * if empty, will be downloaded. Currently, only uri from Vertex Template
+     * Registry & Gallery is supported. Reference to
+     * https://cloud.google.com/vertex-ai/docs/pipelines/create-pipeline-template.
      *
      * Generated from protobuf field <code>string template_uri = 19;</code>
      * @param string $var
@@ -783,7 +877,8 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. Pipeline template metadata. Will fill up fields if
-     * [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri] is from supported template registry.
+     * [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri]
+     * is from supported template registry.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineTemplateMetadata template_metadata = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Cloud\AIPlatform\V1\PipelineTemplateMetadata|null
@@ -805,7 +900,8 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. Pipeline template metadata. Will fill up fields if
-     * [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri] is from supported template registry.
+     * [PipelineJob.template_uri][google.cloud.aiplatform.v1.PipelineJob.template_uri]
+     * is from supported template registry.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineTemplateMetadata template_metadata = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Cloud\AIPlatform\V1\PipelineTemplateMetadata $var
@@ -815,6 +911,60 @@ class PipelineJob extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\PipelineTemplateMetadata::class);
         $this->template_metadata = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The schedule resource name.
+     * Only returned if the Pipeline is created by Schedule API.
+     *
+     * Generated from protobuf field <code>string schedule_name = 22 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getScheduleName()
+    {
+        return $this->schedule_name;
+    }
+
+    /**
+     * Output only. The schedule resource name.
+     * Only returned if the Pipeline is created by Schedule API.
+     *
+     * Generated from protobuf field <code>string schedule_name = 22 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setScheduleName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->schedule_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Whether to do component level validations before job creation.
+     *
+     * Generated from protobuf field <code>bool preflight_validations = 26 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getPreflightValidations()
+    {
+        return $this->preflight_validations;
+    }
+
+    /**
+     * Optional. Whether to do component level validations before job creation.
+     *
+     * Generated from protobuf field <code>bool preflight_validations = 26 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setPreflightValidations($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->preflight_validations = $var;
 
         return $this;
     }

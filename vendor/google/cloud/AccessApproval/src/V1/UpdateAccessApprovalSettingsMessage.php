@@ -20,7 +20,7 @@ class UpdateAccessApprovalSettingsMessage extends \Google\Protobuf\Internal\Mess
      *
      * Generated from protobuf field <code>.google.cloud.accessapproval.v1.AccessApprovalSettings settings = 1;</code>
      */
-    private $settings = null;
+    protected $settings = null;
     /**
      * The update mask applies to the settings. Only the top level fields of
      * AccessApprovalSettings (notification_emails & enrolled_services) are
@@ -34,7 +34,31 @@ class UpdateAccessApprovalSettingsMessage extends \Google\Protobuf\Internal\Mess
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\AccessApproval\V1\AccessApprovalSettings $settings   The new AccessApprovalSettings.
+     * @param \Google\Protobuf\FieldMask                             $updateMask The update mask applies to the settings. Only the top level fields of
+     *                                                                           AccessApprovalSettings (notification_emails & enrolled_services) are
+     *                                                                           supported. For each field, if it is included, the currently stored value
+     *                                                                           will be entirely overwritten with the value of the field passed in this
+     *                                                                           request.
+     *
+     *                                                                           For the `FieldMask` definition, see
+     *                                                                           https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+     *                                                                           If this field is left unset, only the notification_emails field will be
+     *                                                                           updated.
+     *
+     * @return \Google\Cloud\AccessApproval\V1\UpdateAccessApprovalSettingsMessage
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\AccessApproval\V1\AccessApprovalSettings $settings, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setSettings($settings)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

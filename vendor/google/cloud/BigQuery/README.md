@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-bigquery/v/stable)](https://packagist.org/packages/google/cloud-bigquery) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-bigquery.svg)](https://packagist.org/packages/google/cloud-bigquery)
 
-* [API Documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-bigquery/latest)
+* [API Documentation](https://cloud.google.com/php/docs/reference/cloud-bigquery/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -16,16 +16,10 @@ Allows you to create, manage, share and query data.
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-bigquery
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 ### Authentication
@@ -62,6 +56,11 @@ foreach ($queryResults as $row) {
     print_r($row);
 }
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

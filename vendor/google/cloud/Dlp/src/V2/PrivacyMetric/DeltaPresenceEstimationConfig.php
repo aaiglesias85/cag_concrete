@@ -19,8 +19,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Fields considered to be quasi-identifiers. No two fields can have the
-     * same tag.
+     * Required. Fields considered to be quasi-identifiers. No two fields can
+     * have the same tag.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.QuasiId quasi_ids = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
@@ -32,7 +32,7 @@ class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string region_code = 2;</code>
      */
-    private $region_code = '';
+    protected $region_code = '';
     /**
      * Several auxiliary tables can be used in the analysis. Each custom_tag
      * used to tag a quasi-identifiers field must appear in exactly one
@@ -48,14 +48,14 @@ class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dlp\V2\QuasiId[]|\Google\Protobuf\Internal\RepeatedField $quasi_ids
-     *           Required. Fields considered to be quasi-identifiers. No two fields can have the
-     *           same tag.
+     *     @type array<\Google\Cloud\Dlp\V2\QuasiId>|\Google\Protobuf\Internal\RepeatedField $quasi_ids
+     *           Required. Fields considered to be quasi-identifiers. No two fields can
+     *           have the same tag.
      *     @type string $region_code
      *           ISO 3166-1 alpha-2 region code to use in the statistical modeling.
      *           Set if no column is tagged with a region-specific InfoType (like
      *           US_ZIP_5) or a region code.
-     *     @type \Google\Cloud\Dlp\V2\StatisticalTable[]|\Google\Protobuf\Internal\RepeatedField $auxiliary_tables
+     *     @type array<\Google\Cloud\Dlp\V2\StatisticalTable>|\Google\Protobuf\Internal\RepeatedField $auxiliary_tables
      *           Several auxiliary tables can be used in the analysis. Each custom_tag
      *           used to tag a quasi-identifiers field must appear in exactly one
      *           field of one auxiliary table.
@@ -67,8 +67,8 @@ class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Fields considered to be quasi-identifiers. No two fields can have the
-     * same tag.
+     * Required. Fields considered to be quasi-identifiers. No two fields can
+     * have the same tag.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.QuasiId quasi_ids = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -79,11 +79,11 @@ class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Fields considered to be quasi-identifiers. No two fields can have the
-     * same tag.
+     * Required. Fields considered to be quasi-identifiers. No two fields can
+     * have the same tag.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.QuasiId quasi_ids = 1 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\Dlp\V2\QuasiId[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\QuasiId>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuasiIds($var)
@@ -143,7 +143,7 @@ class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
      * field of one auxiliary table.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.StatisticalTable auxiliary_tables = 3;</code>
-     * @param \Google\Cloud\Dlp\V2\StatisticalTable[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\StatisticalTable>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAuxiliaryTables($var)
@@ -156,6 +156,4 @@ class DeltaPresenceEstimationConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(DeltaPresenceEstimationConfig::class, \Google\Cloud\Dlp\V2\PrivacyMetric_DeltaPresenceEstimationConfig::class);
 

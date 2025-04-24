@@ -16,20 +16,22 @@ use Google\Protobuf\Internal\GPBUtil;
 class RuntimeConfig extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Deprecated. Use [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values] instead. The runtime
-     * parameters of the PipelineJob. The parameters will be passed into
-     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders at runtime.
-     * This field is used by pipelines built using
-     * `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower, such as
-     * pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
+     * Deprecated. Use
+     * [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values]
+     * instead. The runtime parameters of the PipelineJob. The parameters will
+     * be passed into
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     * to replace the placeholders at runtime. This field is used by pipelines
+     * built using `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower,
+     * such as pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
      *
      * Generated from protobuf field <code>map<string, .google.cloud.aiplatform.v1.Value> parameters = 1 [deprecated = true];</code>
      * @deprecated
      */
     private $parameters;
     /**
-     * Required. A path in a Cloud Storage bucket, which will be treated as the root
-     * output directory of the pipeline. It is used by the system to
+     * Required. A path in a Cloud Storage bucket, which will be treated as the
+     * root output directory of the pipeline. It is used by the system to
      * generate the paths of output artifacts. The artifact paths are generated
      * with a sub-path pattern `{job_id}/{task_id}/{output_key}` under the
      * specified output directory. The service account specified in this
@@ -38,13 +40,15 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string gcs_output_directory = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $gcs_output_directory = '';
+    protected $gcs_output_directory = '';
     /**
      * The runtime parameters of the PipelineJob. The parameters will be
-     * passed into [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders
-     * at runtime. This field is used by pipelines built using
-     * `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as pipelines built
-     * using Kubeflow Pipelines SDK 1.9 or higher and the v2 DSL.
+     * passed into
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     * to replace the placeholders at runtime. This field is used by pipelines
+     * built using `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as
+     * pipelines built using Kubeflow Pipelines SDK 1.9 or higher and the v2
+     * DSL.
      *
      * Generated from protobuf field <code>map<string, .google.protobuf.Value> parameter_values = 3;</code>
      */
@@ -59,7 +63,14 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PipelineFailurePolicy failure_policy = 4;</code>
      */
-    private $failure_policy = 0;
+    protected $failure_policy = 0;
+    /**
+     * The runtime artifacts of the PipelineJob. The key will be the input
+     * artifact name and the value would be one of the InputArtifact.
+     *
+     * Generated from protobuf field <code>map<string, .google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.InputArtifact> input_artifacts = 5;</code>
+     */
+    private $input_artifacts;
 
     /**
      * Constructor.
@@ -68,15 +79,17 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type array|\Google\Protobuf\Internal\MapField $parameters
-     *           Deprecated. Use [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values] instead. The runtime
-     *           parameters of the PipelineJob. The parameters will be passed into
-     *           [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders at runtime.
-     *           This field is used by pipelines built using
-     *           `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower, such as
-     *           pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
+     *           Deprecated. Use
+     *           [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values]
+     *           instead. The runtime parameters of the PipelineJob. The parameters will
+     *           be passed into
+     *           [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     *           to replace the placeholders at runtime. This field is used by pipelines
+     *           built using `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower,
+     *           such as pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
      *     @type string $gcs_output_directory
-     *           Required. A path in a Cloud Storage bucket, which will be treated as the root
-     *           output directory of the pipeline. It is used by the system to
+     *           Required. A path in a Cloud Storage bucket, which will be treated as the
+     *           root output directory of the pipeline. It is used by the system to
      *           generate the paths of output artifacts. The artifact paths are generated
      *           with a sub-path pattern `{job_id}/{task_id}/{output_key}` under the
      *           specified output directory. The service account specified in this
@@ -84,10 +97,12 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
      *           permissions for this bucket.
      *     @type array|\Google\Protobuf\Internal\MapField $parameter_values
      *           The runtime parameters of the PipelineJob. The parameters will be
-     *           passed into [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders
-     *           at runtime. This field is used by pipelines built using
-     *           `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as pipelines built
-     *           using Kubeflow Pipelines SDK 1.9 or higher and the v2 DSL.
+     *           passed into
+     *           [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     *           to replace the placeholders at runtime. This field is used by pipelines
+     *           built using `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as
+     *           pipelines built using Kubeflow Pipelines SDK 1.9 or higher and the v2
+     *           DSL.
      *     @type int $failure_policy
      *           Represents the failure policy of a pipeline. Currently, the default of a
      *           pipeline is that the pipeline will continue to run until no more tasks
@@ -95,6 +110,9 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
      *           However, if a pipeline is set to PIPELINE_FAILURE_POLICY_FAIL_FAST, it
      *           will stop scheduling any new tasks when a task has failed. Any scheduled
      *           tasks will continue to completion.
+     *     @type array|\Google\Protobuf\Internal\MapField $input_artifacts
+     *           The runtime artifacts of the PipelineJob. The key will be the input
+     *           artifact name and the value would be one of the InputArtifact.
      * }
      */
     public function __construct($data = NULL) {
@@ -103,12 +121,14 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated. Use [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values] instead. The runtime
-     * parameters of the PipelineJob. The parameters will be passed into
-     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders at runtime.
-     * This field is used by pipelines built using
-     * `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower, such as
-     * pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
+     * Deprecated. Use
+     * [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values]
+     * instead. The runtime parameters of the PipelineJob. The parameters will
+     * be passed into
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     * to replace the placeholders at runtime. This field is used by pipelines
+     * built using `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower,
+     * such as pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
      *
      * Generated from protobuf field <code>map<string, .google.cloud.aiplatform.v1.Value> parameters = 1 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -121,12 +141,14 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated. Use [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values] instead. The runtime
-     * parameters of the PipelineJob. The parameters will be passed into
-     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders at runtime.
-     * This field is used by pipelines built using
-     * `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower, such as
-     * pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
+     * Deprecated. Use
+     * [RuntimeConfig.parameter_values][google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.parameter_values]
+     * instead. The runtime parameters of the PipelineJob. The parameters will
+     * be passed into
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     * to replace the placeholders at runtime. This field is used by pipelines
+     * built using `PipelineJob.pipeline_spec.schema_version` 2.0.0 or lower,
+     * such as pipelines built using Kubeflow Pipelines SDK 1.8 or lower.
      *
      * Generated from protobuf field <code>map<string, .google.cloud.aiplatform.v1.Value> parameters = 1 [deprecated = true];</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -143,8 +165,8 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. A path in a Cloud Storage bucket, which will be treated as the root
-     * output directory of the pipeline. It is used by the system to
+     * Required. A path in a Cloud Storage bucket, which will be treated as the
+     * root output directory of the pipeline. It is used by the system to
      * generate the paths of output artifacts. The artifact paths are generated
      * with a sub-path pattern `{job_id}/{task_id}/{output_key}` under the
      * specified output directory. The service account specified in this
@@ -160,8 +182,8 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. A path in a Cloud Storage bucket, which will be treated as the root
-     * output directory of the pipeline. It is used by the system to
+     * Required. A path in a Cloud Storage bucket, which will be treated as the
+     * root output directory of the pipeline. It is used by the system to
      * generate the paths of output artifacts. The artifact paths are generated
      * with a sub-path pattern `{job_id}/{task_id}/{output_key}` under the
      * specified output directory. The service account specified in this
@@ -182,10 +204,12 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * The runtime parameters of the PipelineJob. The parameters will be
-     * passed into [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders
-     * at runtime. This field is used by pipelines built using
-     * `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as pipelines built
-     * using Kubeflow Pipelines SDK 1.9 or higher and the v2 DSL.
+     * passed into
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     * to replace the placeholders at runtime. This field is used by pipelines
+     * built using `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as
+     * pipelines built using Kubeflow Pipelines SDK 1.9 or higher and the v2
+     * DSL.
      *
      * Generated from protobuf field <code>map<string, .google.protobuf.Value> parameter_values = 3;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -197,10 +221,12 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * The runtime parameters of the PipelineJob. The parameters will be
-     * passed into [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec] to replace the placeholders
-     * at runtime. This field is used by pipelines built using
-     * `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as pipelines built
-     * using Kubeflow Pipelines SDK 1.9 or higher and the v2 DSL.
+     * passed into
+     * [PipelineJob.pipeline_spec][google.cloud.aiplatform.v1.PipelineJob.pipeline_spec]
+     * to replace the placeholders at runtime. This field is used by pipelines
+     * built using `PipelineJob.pipeline_spec.schema_version` 2.1.0, such as
+     * pipelines built using Kubeflow Pipelines SDK 1.9 or higher and the v2
+     * DSL.
      *
      * Generated from protobuf field <code>map<string, .google.protobuf.Value> parameter_values = 3;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -246,6 +272,34 @@ class RuntimeConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Google\Cloud\AIPlatform\V1\PipelineFailurePolicy::class);
         $this->failure_policy = $var;
+
+        return $this;
+    }
+
+    /**
+     * The runtime artifacts of the PipelineJob. The key will be the input
+     * artifact name and the value would be one of the InputArtifact.
+     *
+     * Generated from protobuf field <code>map<string, .google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.InputArtifact> input_artifacts = 5;</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getInputArtifacts()
+    {
+        return $this->input_artifacts;
+    }
+
+    /**
+     * The runtime artifacts of the PipelineJob. The key will be the input
+     * artifact name and the value would be one of the InputArtifact.
+     *
+     * Generated from protobuf field <code>map<string, .google.cloud.aiplatform.v1.PipelineJob.RuntimeConfig.InputArtifact> input_artifacts = 5;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setInputArtifacts($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\AIPlatform\V1\PipelineJob\RuntimeConfig\InputArtifact::class);
+        $this->input_artifacts = $arr;
 
         return $this;
     }

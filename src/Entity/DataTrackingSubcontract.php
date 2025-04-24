@@ -4,173 +4,111 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * DataTrackingSubcontract
- *
- * @ORM\Table(name="data_tracking_subcontract")
- * @ORM\Entity(repositoryClass="App\Repository\DataTrackingSubcontractRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingSubcontractRepository')]
+#[ORM\Table(name: 'data_tracking_subcontract')]
 class DataTrackingSubcontract
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity", type="float", nullable=false)
-     */
-    private $quantity;
+    #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
+    private ?float $quantity;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
+    private ?float $price;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="notes", type="text", nullable=false)
-     */
-    private $notes;
+    #[ORM\Column(name: 'notes', type: 'text', nullable: false)]
+    private ?string $notes;
 
-    /**
-     * @var Item
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Item")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="item_id", referencedColumnName="item_id")
-     * })
-     */
-    private $item;
+    #[ORM\ManyToOne(targetEntity: Item::class)]
+    #[ORM\JoinColumn(name: 'item_id', referencedColumnName: 'item_id')]
+    private ?Item $item;
 
-    /**
-     * @var ProjectItem
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\ProjectItem")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_item_id", referencedColumnName="id")
-     * })
-     */
-    private $projectItem;
+    #[ORM\ManyToOne(targetEntity: ProjectItem::class)]
+    #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id')]
+    private ?ProjectItem $projectItem;
 
+    #[ORM\ManyToOne(targetEntity: DataTracking::class)]
+    #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
+    private ?DataTracking $dataTracking;
 
-    /**
-     * @var DataTracking
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\DataTracking")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="data_tracking_id", referencedColumnName="id")
-     * })
-     */
-    private $dataTracking;
+    #[ORM\ManyToOne(targetEntity: Subcontractor::class)]
+    #[ORM\JoinColumn(name: 'subcontractor_id', referencedColumnName: 'subcontractor_id')]
+    private ?Subcontractor $subcontractor;
 
-    /**
-     * @var Subcontractor
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Subcontractor")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="subcontractor_id", referencedColumnName="subcontractor_id")
-     * })
-     */
-    private $subcontractor;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getQuantity()
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
-    /**
-     * @return Item
-     */
-    public function getItem()
-    {
-        return $this->item;
-    }
-
-    public function setItem($item)
-    {
-        $this->item = $item;
-    }
-
-    /**
-     * @return DataTracking
-     */
-    public function getDataTracking()
-    {
-        return $this->dataTracking;
-    }
-
-    public function setDataTracking($dataTracking)
-    {
-        $this->dataTracking = $dataTracking;
-    }
-
-    public function getNotes()
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes($notes)
+    public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
     }
 
-    /**
-     * @return ProjectItem
-     */
-    public function getProjectItem()
+    public function getItem(): ?Item
+    {
+        return $this->item;
+    }
+
+    public function setItem(?Item $item): void
+    {
+        $this->item = $item;
+    }
+
+    public function getProjectItem(): ?ProjectItem
     {
         return $this->projectItem;
     }
 
-    public function setProjectItem($projectItem)
+    public function setProjectItem(?ProjectItem $projectItem): void
     {
         $this->projectItem = $projectItem;
     }
 
-    /**
-     * @return Subcontractor
-     */
-    public function getSubcontractor()
+    public function getDataTracking(): ?DataTracking
+    {
+        return $this->dataTracking;
+    }
+
+    public function setDataTracking(?DataTracking $dataTracking): void
+    {
+        $this->dataTracking = $dataTracking;
+    }
+
+    public function getSubcontractor(): ?Subcontractor
     {
         return $this->subcontractor;
     }
 
-    public function setSubcontractor($subcontractor)
+    public function setSubcontractor(?Subcontractor $subcontractor): void
     {
         $this->subcontractor = $subcontractor;
     }

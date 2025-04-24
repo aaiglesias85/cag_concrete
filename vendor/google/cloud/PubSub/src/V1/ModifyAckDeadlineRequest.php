@@ -36,11 +36,39 @@ class ModifyAckDeadlineRequest extends \Google\Protobuf\Internal\Message
      * delivery to another subscriber client. This typically results in an
      * increase in the rate of message redeliveries (that is, duplicates).
      * The minimum deadline you can specify is 0 seconds.
-     * The maximum deadline you can specify is 600 seconds (10 minutes).
+     * The maximum deadline you can specify in a single request is 600 seconds
+     * (10 minutes).
      *
      * Generated from protobuf field <code>int32 ack_deadline_seconds = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $ack_deadline_seconds = 0;
+
+    /**
+     * @param string   $subscription       Required. The name of the subscription.
+     *                                     Format is `projects/{project}/subscriptions/{sub}`. Please see
+     *                                     {@see SubscriberClient::subscriptionName()} for help formatting this field.
+     * @param string[] $ackIds             Required. List of acknowledgment IDs.
+     * @param int      $ackDeadlineSeconds Required. The new ack deadline with respect to the time this request was
+     *                                     sent to the Pub/Sub system. For example, if the value is 10, the new ack
+     *                                     deadline will expire 10 seconds after the `ModifyAckDeadline` call was
+     *                                     made. Specifying zero might immediately make the message available for
+     *                                     delivery to another subscriber client. This typically results in an
+     *                                     increase in the rate of message redeliveries (that is, duplicates).
+     *                                     The minimum deadline you can specify is 0 seconds.
+     *                                     The maximum deadline you can specify in a single request is 600 seconds
+     *                                     (10 minutes).
+     *
+     * @return \Google\Cloud\PubSub\V1\ModifyAckDeadlineRequest
+     *
+     * @experimental
+     */
+    public static function build(string $subscription, array $ackIds, int $ackDeadlineSeconds): self
+    {
+        return (new self())
+            ->setSubscription($subscription)
+            ->setAckIds($ackIds)
+            ->setAckDeadlineSeconds($ackDeadlineSeconds);
+    }
 
     /**
      * Constructor.
@@ -51,7 +79,7 @@ class ModifyAckDeadlineRequest extends \Google\Protobuf\Internal\Message
      *     @type string $subscription
      *           Required. The name of the subscription.
      *           Format is `projects/{project}/subscriptions/{sub}`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $ack_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $ack_ids
      *           Required. List of acknowledgment IDs.
      *     @type int $ack_deadline_seconds
      *           Required. The new ack deadline with respect to the time this request was
@@ -61,7 +89,8 @@ class ModifyAckDeadlineRequest extends \Google\Protobuf\Internal\Message
      *           delivery to another subscriber client. This typically results in an
      *           increase in the rate of message redeliveries (that is, duplicates).
      *           The minimum deadline you can specify is 0 seconds.
-     *           The maximum deadline you can specify is 600 seconds (10 minutes).
+     *           The maximum deadline you can specify in a single request is 600 seconds
+     *           (10 minutes).
      * }
      */
     public function __construct($data = NULL) {
@@ -112,7 +141,7 @@ class ModifyAckDeadlineRequest extends \Google\Protobuf\Internal\Message
      * Required. List of acknowledgment IDs.
      *
      * Generated from protobuf field <code>repeated string ack_ids = 4 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAckIds($var)
@@ -131,7 +160,8 @@ class ModifyAckDeadlineRequest extends \Google\Protobuf\Internal\Message
      * delivery to another subscriber client. This typically results in an
      * increase in the rate of message redeliveries (that is, duplicates).
      * The minimum deadline you can specify is 0 seconds.
-     * The maximum deadline you can specify is 600 seconds (10 minutes).
+     * The maximum deadline you can specify in a single request is 600 seconds
+     * (10 minutes).
      *
      * Generated from protobuf field <code>int32 ack_deadline_seconds = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return int
@@ -149,7 +179,8 @@ class ModifyAckDeadlineRequest extends \Google\Protobuf\Internal\Message
      * delivery to another subscriber client. This typically results in an
      * increase in the rate of message redeliveries (that is, duplicates).
      * The minimum deadline you can specify is 0 seconds.
-     * The maximum deadline you can specify is 600 seconds (10 minutes).
+     * The maximum deadline you can specify in a single request is 600 seconds
+     * (10 minutes).
      *
      * Generated from protobuf field <code>int32 ack_deadline_seconds = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param int $var

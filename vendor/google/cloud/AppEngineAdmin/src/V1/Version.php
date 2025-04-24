@@ -23,7 +23,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Relative name of the version within the service.  Example: `v1`.
      * Version names can contain only lowercase letters, numbers, or hyphens.
@@ -31,7 +31,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string id = 2;</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Before an application can receive email or XMPP messages, the application
      * must be configured to enable the service.
@@ -48,14 +48,14 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string instance_class = 7;</code>
      */
-    private $instance_class = '';
+    protected $instance_class = '';
     /**
      * Extra network settings.
      * Only applicable in the App Engine flexible environment.
      *
      * Generated from protobuf field <code>.google.appengine.v1.Network network = 8;</code>
      */
-    private $network = null;
+    protected $network = null;
     /**
      * The Google Compute Engine zones that are supported by this version in the
      * App Engine flexible environment. Deprecated.
@@ -69,39 +69,39 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.Resources resources = 9;</code>
      */
-    private $resources = null;
+    protected $resources = null;
     /**
      * Desired runtime. Example: `python27`.
      *
      * Generated from protobuf field <code>string runtime = 10;</code>
      */
-    private $runtime = '';
+    protected $runtime = '';
     /**
      * The channel of the runtime to use. Only available for some
      * runtimes. Defaults to the `default` channel.
      *
      * Generated from protobuf field <code>string runtime_channel = 117;</code>
      */
-    private $runtime_channel = '';
+    protected $runtime_channel = '';
     /**
      * Whether multiple requests can be dispatched to this version at once.
      *
      * Generated from protobuf field <code>bool threadsafe = 11;</code>
      */
-    private $threadsafe = false;
+    protected $threadsafe = false;
     /**
      * Whether to deploy this version in a container on a virtual machine.
      *
      * Generated from protobuf field <code>bool vm = 12;</code>
      */
-    private $vm = false;
+    protected $vm = false;
     /**
      * Allows App Engine second generation runtimes to access the legacy bundled
      * services.
      *
      * Generated from protobuf field <code>bool app_engine_apis = 128;</code>
      */
-    private $app_engine_apis = false;
+    protected $app_engine_apis = false;
     /**
      * Metadata settings that are supplied to this version to enable
      * beta runtime features.
@@ -115,7 +115,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string env = 14;</code>
      */
-    private $env = '';
+    protected $env = '';
     /**
      * Current serving status of this version. Only the versions with a
      * `SERVING` status create instances and can be billed.
@@ -123,21 +123,21 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.ServingStatus serving_status = 15;</code>
      */
-    private $serving_status = 0;
+    protected $serving_status = 0;
     /**
      * Email address of the user who created this version.
      * &#64;OutputOnly
      *
      * Generated from protobuf field <code>string created_by = 16;</code>
      */
-    private $created_by = '';
+    protected $created_by = '';
     /**
      * Time that this version was created.
      * &#64;OutputOnly
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 17;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Total size in bytes of all the files that are included in this version
      * and currently hosted on the App Engine disk.
@@ -145,7 +145,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 disk_usage_bytes = 18;</code>
      */
-    private $disk_usage_bytes = 0;
+    protected $disk_usage_bytes = 0;
     /**
      * The version of the API in the given runtime environment. Please see the
      * app.yaml reference for valid values at
@@ -153,13 +153,13 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string runtime_api_version = 21;</code>
      */
-    private $runtime_api_version = '';
+    protected $runtime_api_version = '';
     /**
      * The path or name of the app's main executable.
      *
      * Generated from protobuf field <code>string runtime_main_executable_path = 22;</code>
      */
-    private $runtime_main_executable_path = '';
+    protected $runtime_main_executable_path = '';
     /**
      * The identity that the deployed version will run as.
      * Admin API will use the App Engine Appspot service account as default if
@@ -167,7 +167,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 127;</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
      * An ordered list of URL-matching patterns that should be applied to incoming
      * requests. The first matching URL handles the request and other request
@@ -199,7 +199,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.ApiConfigHandler api_config = 103;</code>
      */
-    private $api_config = null;
+    protected $api_config = null;
     /**
      * Environment variables available to the application.
      * Only returned in `GET` requests if `view=FULL` is set.
@@ -223,7 +223,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration default_expiration = 105;</code>
      */
-    private $default_expiration = null;
+    protected $default_expiration = null;
     /**
      * Configures health checking for instances. Unhealthy instances are
      * stopped and replaced with new instances.
@@ -232,7 +232,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.HealthCheck health_check = 106;</code>
      */
-    private $health_check = null;
+    protected $health_check = null;
     /**
      * Configures readiness health checking for instances.
      * Unhealthy instances are not put into the backend traffic rotation.
@@ -240,7 +240,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.ReadinessCheck readiness_check = 112;</code>
      */
-    private $readiness_check = null;
+    protected $readiness_check = null;
     /**
      * Configures liveness health checking for instances.
      * Unhealthy instances are stopped and replaced with new instances
@@ -248,7 +248,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.LivenessCheck liveness_check = 113;</code>
      */
-    private $liveness_check = null;
+    protected $liveness_check = null;
     /**
      * Files that match this pattern will not be built into this version.
      * Only applicable for Go runtimes.
@@ -256,14 +256,14 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string nobuild_files_regex = 107;</code>
      */
-    private $nobuild_files_regex = '';
+    protected $nobuild_files_regex = '';
     /**
      * Code and application artifacts that make up this version.
      * Only returned in `GET` requests if `view=FULL` is set.
      *
      * Generated from protobuf field <code>.google.appengine.v1.Deployment deployment = 108;</code>
      */
-    private $deployment = null;
+    protected $deployment = null;
     /**
      * Serving URL for this version. Example:
      * "https://myversion-dot-myservice-dot-myapp.appspot.com"
@@ -271,7 +271,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string version_url = 109;</code>
      */
-    private $version_url = '';
+    protected $version_url = '';
     /**
      * Cloud Endpoints configuration.
      * If endpoints_api_service is set, the Cloud Endpoints Extensible Service
@@ -279,19 +279,19 @@ class Version extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.appengine.v1.EndpointsApiService endpoints_api_service = 110;</code>
      */
-    private $endpoints_api_service = null;
+    protected $endpoints_api_service = null;
     /**
      * The entrypoint for the application.
      *
      * Generated from protobuf field <code>.google.appengine.v1.Entrypoint entrypoint = 122;</code>
      */
-    private $entrypoint = null;
+    protected $entrypoint = null;
     /**
      * Enables VPC connectivity for standard apps.
      *
      * Generated from protobuf field <code>.google.appengine.v1.VpcAccessConnector vpc_access_connector = 121;</code>
      */
-    private $vpc_access_connector = null;
+    protected $vpc_access_connector = null;
     protected $scaling;
 
     /**
@@ -321,7 +321,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *           A service with manual scaling runs continuously, allowing you to perform
      *           complex initialization and rely on the state of its memory over time.
      *           Manually scaled versions are sometimes referred to as "backends".
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $inbound_services
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $inbound_services
      *           Before an application can receive email or XMPP messages, the application
      *           must be configured to enable the service.
      *     @type string $instance_class
@@ -333,7 +333,7 @@ class Version extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\AppEngine\V1\Network $network
      *           Extra network settings.
      *           Only applicable in the App Engine flexible environment.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $zones
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $zones
      *           The Google Compute Engine zones that are supported by this version in the
      *           App Engine flexible environment. Deprecated.
      *     @type \Google\Cloud\AppEngine\V1\Resources $resources
@@ -381,15 +381,15 @@ class Version extends \Google\Protobuf\Internal\Message
      *           The identity that the deployed version will run as.
      *           Admin API will use the App Engine Appspot service account as default if
      *           this field is neither provided in app.yaml file nor through CLI flag.
-     *     @type \Google\Cloud\AppEngine\V1\UrlMap[]|\Google\Protobuf\Internal\RepeatedField $handlers
+     *     @type array<\Google\Cloud\AppEngine\V1\UrlMap>|\Google\Protobuf\Internal\RepeatedField $handlers
      *           An ordered list of URL-matching patterns that should be applied to incoming
      *           requests. The first matching URL handles the request and other request
      *           handlers are not attempted.
      *           Only returned in `GET` requests if `view=FULL` is set.
-     *     @type \Google\Cloud\AppEngine\V1\ErrorHandler[]|\Google\Protobuf\Internal\RepeatedField $error_handlers
+     *     @type array<\Google\Cloud\AppEngine\V1\ErrorHandler>|\Google\Protobuf\Internal\RepeatedField $error_handlers
      *           Custom static error pages. Limited to 10KB per page.
      *           Only returned in `GET` requests if `view=FULL` is set.
-     *     @type \Google\Cloud\AppEngine\V1\Library[]|\Google\Protobuf\Internal\RepeatedField $libraries
+     *     @type array<\Google\Cloud\AppEngine\V1\Library>|\Google\Protobuf\Internal\RepeatedField $libraries
      *           Configuration for third-party Python runtime libraries that are required
      *           by the application.
      *           Only returned in `GET` requests if `view=FULL` is set.
@@ -632,7 +632,7 @@ class Version extends \Google\Protobuf\Internal\Message
      * must be configured to enable the service.
      *
      * Generated from protobuf field <code>repeated .google.appengine.v1.InboundServiceType inbound_services = 6;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInboundServices($var)
@@ -732,7 +732,7 @@ class Version extends \Google\Protobuf\Internal\Message
      * App Engine flexible environment. Deprecated.
      *
      * Generated from protobuf field <code>repeated string zones = 118;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setZones($var)
@@ -1204,7 +1204,7 @@ class Version extends \Google\Protobuf\Internal\Message
      * Only returned in `GET` requests if `view=FULL` is set.
      *
      * Generated from protobuf field <code>repeated .google.appengine.v1.UrlMap handlers = 100;</code>
-     * @param \Google\Cloud\AppEngine\V1\UrlMap[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AppEngine\V1\UrlMap>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setHandlers($var)
@@ -1232,7 +1232,7 @@ class Version extends \Google\Protobuf\Internal\Message
      * Only returned in `GET` requests if `view=FULL` is set.
      *
      * Generated from protobuf field <code>repeated .google.appengine.v1.ErrorHandler error_handlers = 101;</code>
-     * @param \Google\Cloud\AppEngine\V1\ErrorHandler[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AppEngine\V1\ErrorHandler>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrorHandlers($var)
@@ -1262,7 +1262,7 @@ class Version extends \Google\Protobuf\Internal\Message
      * Only returned in `GET` requests if `view=FULL` is set.
      *
      * Generated from protobuf field <code>repeated .google.appengine.v1.Library libraries = 102;</code>
-     * @param \Google\Cloud\AppEngine\V1\Library[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AppEngine\V1\Library>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLibraries($var)

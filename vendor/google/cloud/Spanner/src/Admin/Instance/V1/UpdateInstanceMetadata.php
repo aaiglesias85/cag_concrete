@@ -23,7 +23,8 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
      */
     private $instance = null;
     /**
-     * The time at which [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
+     * The time at which
+     * [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
      * request was received.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 2;</code>
@@ -43,6 +44,12 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 4;</code>
      */
     private $end_time = null;
+    /**
+     * The expected fulfillment period of this update operation.
+     *
+     * Generated from protobuf field <code>.google.spanner.admin.instance.v1.FulfillmentPeriod expected_fulfillment_period = 5;</code>
+     */
+    private $expected_fulfillment_period = 0;
 
     /**
      * Constructor.
@@ -53,7 +60,8 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Spanner\Admin\Instance\V1\Instance $instance
      *           The desired end state of the update.
      *     @type \Google\Protobuf\Timestamp $start_time
-     *           The time at which [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
+     *           The time at which
+     *           [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
      *           request was received.
      *     @type \Google\Protobuf\Timestamp $cancel_time
      *           The time at which this operation was cancelled. If set, this operation is
@@ -61,6 +69,8 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
      *           cannot be cancelled again.
      *     @type \Google\Protobuf\Timestamp $end_time
      *           The time at which this operation failed or was completed successfully.
+     *     @type int $expected_fulfillment_period
+     *           The expected fulfillment period of this update operation.
      * }
      */
     public function __construct($data = NULL) {
@@ -105,7 +115,8 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The time at which [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
+     * The time at which
+     * [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
      * request was received.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 2;</code>
@@ -127,7 +138,8 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The time at which [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
+     * The time at which
+     * [UpdateInstance][google.spanner.admin.instance.v1.InstanceAdmin.UpdateInstance]
      * request was received.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 2;</code>
@@ -214,6 +226,32 @@ class UpdateInstanceMetadata extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->end_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * The expected fulfillment period of this update operation.
+     *
+     * Generated from protobuf field <code>.google.spanner.admin.instance.v1.FulfillmentPeriod expected_fulfillment_period = 5;</code>
+     * @return int
+     */
+    public function getExpectedFulfillmentPeriod()
+    {
+        return $this->expected_fulfillment_period;
+    }
+
+    /**
+     * The expected fulfillment period of this update operation.
+     *
+     * Generated from protobuf field <code>.google.spanner.admin.instance.v1.FulfillmentPeriod expected_fulfillment_period = 5;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setExpectedFulfillmentPeriod($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Spanner\Admin\Instance\V1\FulfillmentPeriod::class);
+        $this->expected_fulfillment_period = $var;
 
         return $this;
     }

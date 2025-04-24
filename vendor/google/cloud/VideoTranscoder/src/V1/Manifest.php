@@ -21,15 +21,16 @@ class Manifest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string file_name = 1;</code>
      */
-    private $file_name = '';
+    protected $file_name = '';
     /**
-     * Required. Type of the manifest, can be `HLS` or `DASH`.
+     * Required. Type of the manifest.
      *
      * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.Manifest.ManifestType type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
-     * Required. List of user given `MuxStream.key`s that should appear in this manifest.
+     * Required. List of user given `MuxStream.key`s that should appear in this
+     * manifest.
      * When `Manifest.type` is `HLS`, a media manifest with name `MuxStream.key`
      * and `.m3u8` extension is generated for each element of the
      * `Manifest.mux_streams`.
@@ -37,6 +38,7 @@ class Manifest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated string mux_streams = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $mux_streams;
+    protected $manifest_config;
 
     /**
      * Constructor.
@@ -48,12 +50,15 @@ class Manifest extends \Google\Protobuf\Internal\Message
      *           The name of the generated file. The default is `manifest` with the
      *           extension suffix corresponding to the `Manifest.type`.
      *     @type int $type
-     *           Required. Type of the manifest, can be `HLS` or `DASH`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $mux_streams
-     *           Required. List of user given `MuxStream.key`s that should appear in this manifest.
+     *           Required. Type of the manifest.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $mux_streams
+     *           Required. List of user given `MuxStream.key`s that should appear in this
+     *           manifest.
      *           When `Manifest.type` is `HLS`, a media manifest with name `MuxStream.key`
      *           and `.m3u8` extension is generated for each element of the
      *           `Manifest.mux_streams`.
+     *     @type \Google\Cloud\Video\Transcoder\V1\Manifest\DashConfig $dash
+     *           `DASH` manifest configuration.
      * }
      */
     public function __construct($data = NULL) {
@@ -90,7 +95,7 @@ class Manifest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Type of the manifest, can be `HLS` or `DASH`.
+     * Required. Type of the manifest.
      *
      * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.Manifest.ManifestType type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return int
@@ -101,7 +106,7 @@ class Manifest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Type of the manifest, can be `HLS` or `DASH`.
+     * Required. Type of the manifest.
      *
      * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.Manifest.ManifestType type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param int $var
@@ -116,7 +121,8 @@ class Manifest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. List of user given `MuxStream.key`s that should appear in this manifest.
+     * Required. List of user given `MuxStream.key`s that should appear in this
+     * manifest.
      * When `Manifest.type` is `HLS`, a media manifest with name `MuxStream.key`
      * and `.m3u8` extension is generated for each element of the
      * `Manifest.mux_streams`.
@@ -130,13 +136,14 @@ class Manifest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. List of user given `MuxStream.key`s that should appear in this manifest.
+     * Required. List of user given `MuxStream.key`s that should appear in this
+     * manifest.
      * When `Manifest.type` is `HLS`, a media manifest with name `MuxStream.key`
      * and `.m3u8` extension is generated for each element of the
      * `Manifest.mux_streams`.
      *
      * Generated from protobuf field <code>repeated string mux_streams = 3 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMuxStreams($var)
@@ -145,6 +152,45 @@ class Manifest extends \Google\Protobuf\Internal\Message
         $this->mux_streams = $arr;
 
         return $this;
+    }
+
+    /**
+     * `DASH` manifest configuration.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.Manifest.DashConfig dash = 4;</code>
+     * @return \Google\Cloud\Video\Transcoder\V1\Manifest\DashConfig|null
+     */
+    public function getDash()
+    {
+        return $this->readOneof(4);
+    }
+
+    public function hasDash()
+    {
+        return $this->hasOneof(4);
+    }
+
+    /**
+     * `DASH` manifest configuration.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.Manifest.DashConfig dash = 4;</code>
+     * @param \Google\Cloud\Video\Transcoder\V1\Manifest\DashConfig $var
+     * @return $this
+     */
+    public function setDash($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Video\Transcoder\V1\Manifest\DashConfig::class);
+        $this->writeOneof(4, $var);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getManifestConfig()
+    {
+        return $this->whichOneof("manifest_config");
     }
 
 }

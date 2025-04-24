@@ -27,7 +27,27 @@ class ListVoicesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
+
+    /**
+     * @param string $languageCode Optional. Recommended.
+     *                             [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+     *                             If not specified, the API will return all supported voices.
+     *                             If specified, the ListVoices call will only return voices that can be used
+     *                             to synthesize this language_code. For example, if you specify `"en-NZ"`,
+     *                             all `"en-NZ"` voices will be returned. If you specify `"no"`, both
+     *                             `"no-\*"` (Norwegian) and `"nb-\*"` (Norwegian Bokmal) voices will be
+     *                             returned.
+     *
+     * @return \Google\Cloud\TextToSpeech\V1\ListVoicesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $languageCode): self
+    {
+        return (new self())
+            ->setLanguageCode($languageCode);
+    }
 
     /**
      * Constructor.

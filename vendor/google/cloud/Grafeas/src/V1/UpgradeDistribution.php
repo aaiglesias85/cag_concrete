@@ -23,7 +23,7 @@ class UpgradeDistribution extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string cpe_uri = 1;</code>
      */
-    private $cpe_uri = '';
+    protected $cpe_uri = '';
     /**
      * The operating system classification of this Upgrade, as specified by the
      * upstream operating system upgrade feed. For Windows the classification is
@@ -32,13 +32,13 @@ class UpgradeDistribution extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string classification = 2;</code>
      */
-    private $classification = '';
+    protected $classification = '';
     /**
      * The severity as specified by the upstream operating system.
      *
      * Generated from protobuf field <code>string severity = 3;</code>
      */
-    private $severity = '';
+    protected $severity = '';
     /**
      * The cve tied to this Upgrade.
      *
@@ -62,7 +62,7 @@ class UpgradeDistribution extends \Google\Protobuf\Internal\Message
      *           https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ff357803(v=vs.85)
      *     @type string $severity
      *           The severity as specified by the upstream operating system.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $cve
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $cve
      *           The cve tied to this Upgrade.
      * }
      */
@@ -172,7 +172,7 @@ class UpgradeDistribution extends \Google\Protobuf\Internal\Message
      * The cve tied to this Upgrade.
      *
      * Generated from protobuf field <code>repeated string cve = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCve($var)

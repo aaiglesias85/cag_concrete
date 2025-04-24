@@ -21,7 +21,7 @@ class Metadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.Pipeline pipeline = 1;</code>
      */
-    private $pipeline = null;
+    protected $pipeline = null;
     /**
      * The user-defined labels associated with this operation.
      *
@@ -40,26 +40,26 @@ class Metadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 4;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * The first time at which resources were allocated to execute the pipeline.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 5;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * The time at which execution was completed and resources were cleaned up.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 6;</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * The name of the Cloud Pub/Sub topic where notifications of operation status
      * changes are sent.
      *
      * Generated from protobuf field <code>string pub_sub_topic = 7;</code>
      */
-    private $pub_sub_topic = '';
+    protected $pub_sub_topic = '';
 
     /**
      * Constructor.
@@ -71,7 +71,7 @@ class Metadata extends \Google\Protobuf\Internal\Message
      *           The pipeline this operation represents.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           The user-defined labels associated with this operation.
-     *     @type \Google\Cloud\LifeSciences\V2beta\Event[]|\Google\Protobuf\Internal\RepeatedField $events
+     *     @type array<\Google\Cloud\LifeSciences\V2beta\Event>|\Google\Protobuf\Internal\RepeatedField $events
      *           The list of events that have happened so far during the execution of this
      *           operation.
      *     @type \Google\Protobuf\Timestamp $create_time
@@ -169,7 +169,7 @@ class Metadata extends \Google\Protobuf\Internal\Message
      * operation.
      *
      * Generated from protobuf field <code>repeated .google.cloud.lifesciences.v2beta.Event events = 3;</code>
-     * @param \Google\Cloud\LifeSciences\V2beta\Event[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\LifeSciences\V2beta\Event>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEvents($var)

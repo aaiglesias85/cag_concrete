@@ -4,152 +4,98 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * ProjectItem
- *
- * @ORM\Table(name="project_item")
- * @ORM\Entity(repositoryClass="App\Repository\ProjectItemRepository")
- */
+#[ORM\Table(name: "project_item")]
+#[ORM\Entity(repositoryClass: "App\Repository\ProjectItemRepository")]
 class ProjectItem
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    private ?int $id;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity", type="float", nullable=false)
-     */
-    private $quantity;
+    #[ORM\Column(name: "quantity", type: "float", nullable: true)]
+    private ?float $quantity;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: "price", type: "float", nullable: true)]
+    private ?float $price;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="yield_calculation", type="string", length=50, nullable=false)
-     */
-    private $yieldCalculation;
+    #[ORM\Column(name: "yield_calculation", type: "string", length: 50, nullable: true)]
+    private ?string $yieldCalculation;
 
-    /**
-     * @var Project
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_id", referencedColumnName="project_id")
-     * })
-     */
-    private $project;
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
+    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
+    private ?Project $project;
 
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Item")]
+    #[ORM\JoinColumn(name: "item_id", referencedColumnName: "item_id", nullable: true)]
+    private ?Item $item;
 
-    /**
-     * @var Item
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Item")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="item_id", referencedColumnName="item_id")
-     * })
-     */
-    private $item;
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Equation")]
+    #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
+    private ?Equation $equation;
 
-    /**
-     * @var Equation
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Equation")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="equation_id", referencedColumnName="equation_id")
-     * })
-     */
-    private $equation;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
-    /**
-     * @return Project
-     */
-    public function getProject()
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function setProject($project)
+    public function setProject(?Project $project): void
     {
         $this->project = $project;
     }
 
-    /**
-     * @return Item
-     */
-    public function getItem()
+    public function getItem(): ?Item
     {
         return $this->item;
     }
 
-    public function setItem($item)
+    public function setItem(?Item $item): void
     {
         $this->item = $item;
     }
 
-    public function getYieldCalculation()
+    public function getYieldCalculation(): ?string
     {
         return $this->yieldCalculation;
     }
 
-    public function setYieldCalculation($yieldCalculation)
+    public function setYieldCalculation(?string $yieldCalculation): void
     {
         $this->yieldCalculation = $yieldCalculation;
     }
 
-    /**
-     * @return Equation
-     */
-    public function getEquation()
+    public function getEquation(): ?Equation
     {
         return $this->equation;
     }
 
-    public function setEquation($equation)
+    public function setEquation(?Equation $equation): void
     {
         $this->equation = $equation;
     }
 
-    public function getQuantity()
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
     }
-
 }

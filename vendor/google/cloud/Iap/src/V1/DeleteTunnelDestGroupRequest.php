@@ -22,7 +22,23 @@ class DeleteTunnelDestGroupRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. Name of the TunnelDestGroup to delete.
+     *                     In the following format:
+     *                     `projects/{project_number/id}/iap_tunnel/locations/{location}/destGroups/{dest_group}`. Please see
+     *                     {@see IdentityAwareProxyAdminServiceClient::tunnelDestGroupName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Iap\V1\DeleteTunnelDestGroupRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

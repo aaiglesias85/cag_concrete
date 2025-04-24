@@ -25,7 +25,7 @@ class Cell extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 timestamp_micros = 1;</code>
      */
-    private $timestamp_micros = 0;
+    protected $timestamp_micros = 0;
     /**
      * The value stored in the cell.
      * May contain any byte string, including the empty string, up to 100MiB in
@@ -33,7 +33,7 @@ class Cell extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes value = 2;</code>
      */
-    private $value = '';
+    protected $value = '';
     /**
      * Labels applied to the cell by a [RowFilter][google.bigtable.v2.RowFilter].
      *
@@ -58,7 +58,7 @@ class Cell extends \Google\Protobuf\Internal\Message
      *           The value stored in the cell.
      *           May contain any byte string, including the empty string, up to 100MiB in
      *           length.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $labels
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $labels
      *           Labels applied to the cell by a [RowFilter][google.bigtable.v2.RowFilter].
      * }
      */
@@ -148,7 +148,7 @@ class Cell extends \Google\Protobuf\Internal\Message
      * Labels applied to the cell by a [RowFilter][google.bigtable.v2.RowFilter].
      *
      * Generated from protobuf field <code>repeated string labels = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLabels($var)

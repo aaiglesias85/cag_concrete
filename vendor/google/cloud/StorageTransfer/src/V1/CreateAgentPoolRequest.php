@@ -21,13 +21,13 @@ class CreateAgentPoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string project_id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
     /**
      * Required. The agent pool to create.
      *
      * Generated from protobuf field <code>.google.storagetransfer.v1.AgentPool agent_pool = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $agent_pool = null;
+    protected $agent_pool = null;
     /**
      * Required. The ID of the agent pool to create.
      * The `agent_pool_id` must meet the following requirements:
@@ -42,7 +42,37 @@ class CreateAgentPoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string agent_pool_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $agent_pool_id = '';
+    protected $agent_pool_id = '';
+
+    /**
+     * @param string                                     $projectId   Required. The ID of the Google Cloud project that owns the
+     *                                                                agent pool.
+     * @param \Google\Cloud\StorageTransfer\V1\AgentPool $agentPool   Required. The agent pool to create.
+     * @param string                                     $agentPoolId Required. The ID of the agent pool to create.
+     *
+     *                                                                The `agent_pool_id` must meet the following requirements:
+     *
+     *                                                                *   Length of 128 characters or less.
+     *                                                                *   Not start with the string `goog`.
+     *                                                                *   Start with a lowercase ASCII character, followed by:
+     *                                                                *   Zero or more: lowercase Latin alphabet characters, numerals,
+     *                                                                hyphens (`-`), periods (`.`), underscores (`_`), or tildes (`~`).
+     *                                                                *   One or more numerals or lowercase ASCII characters.
+     *
+     *                                                                As expressed by the regular expression:
+     *                                                                `^(?!goog)[a-z]([a-z0-9-._~]*[a-z0-9])?$`.
+     *
+     * @return \Google\Cloud\StorageTransfer\V1\CreateAgentPoolRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, \Google\Cloud\StorageTransfer\V1\AgentPool $agentPool, string $agentPoolId): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setAgentPool($agentPool)
+            ->setAgentPoolId($agentPoolId);
+    }
 
     /**
      * Constructor.

@@ -22,13 +22,13 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The product title for this service.
      *
      * Generated from protobuf field <code>string title = 2;</code>
      */
-    private $title = '';
+    protected $title = '';
     /**
      * A list of API interfaces exported by this service. Contains only the names,
      * versions, and method names of the interfaces.
@@ -42,25 +42,25 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.Documentation documentation = 6;</code>
      */
-    private $documentation = null;
+    protected $documentation = null;
     /**
      * Quota configuration.
      *
      * Generated from protobuf field <code>.google.api.Quota quota = 10;</code>
      */
-    private $quota = null;
+    protected $quota = null;
     /**
      * Auth configuration. Contains only the OAuth rules.
      *
      * Generated from protobuf field <code>.google.api.Authentication authentication = 11;</code>
      */
-    private $authentication = null;
+    protected $authentication = null;
     /**
      * Configuration controlling usage of this service.
      *
      * Generated from protobuf field <code>.google.api.Usage usage = 15;</code>
      */
-    private $usage = null;
+    protected $usage = null;
     /**
      * Configuration for network endpoints. Contains only the names and aliases
      * of the endpoints.
@@ -70,7 +70,8 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
     private $endpoints;
     /**
      * Defines the monitored resources used by this service. This is required
-     * by the [Service.monitoring][google.api.Service.monitoring] and [Service.logging][google.api.Service.logging] configurations.
+     * by the [Service.monitoring][google.api.Service.monitoring] and
+     * [Service.logging][google.api.Service.logging] configurations.
      *
      * Generated from protobuf field <code>repeated .google.api.MonitoredResourceDescriptor monitored_resources = 25;</code>
      */
@@ -81,7 +82,7 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.Monitoring monitoring = 28;</code>
      */
-    private $monitoring = null;
+    protected $monitoring = null;
 
     /**
      * Constructor.
@@ -95,7 +96,7 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      *           `calendar.googleapis.com`.
      *     @type string $title
      *           The product title for this service.
-     *     @type \Google\Protobuf\Api[]|\Google\Protobuf\Internal\RepeatedField $apis
+     *     @type array<\Google\Protobuf\Api>|\Google\Protobuf\Internal\RepeatedField $apis
      *           A list of API interfaces exported by this service. Contains only the names,
      *           versions, and method names of the interfaces.
      *     @type \Google\Api\Documentation $documentation
@@ -107,12 +108,13 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      *           Auth configuration. Contains only the OAuth rules.
      *     @type \Google\Api\Usage $usage
      *           Configuration controlling usage of this service.
-     *     @type \Google\Api\Endpoint[]|\Google\Protobuf\Internal\RepeatedField $endpoints
+     *     @type array<\Google\Api\Endpoint>|\Google\Protobuf\Internal\RepeatedField $endpoints
      *           Configuration for network endpoints. Contains only the names and aliases
      *           of the endpoints.
-     *     @type \Google\Api\MonitoredResourceDescriptor[]|\Google\Protobuf\Internal\RepeatedField $monitored_resources
+     *     @type array<\Google\Api\MonitoredResourceDescriptor>|\Google\Protobuf\Internal\RepeatedField $monitored_resources
      *           Defines the monitored resources used by this service. This is required
-     *           by the [Service.monitoring][google.api.Service.monitoring] and [Service.logging][google.api.Service.logging] configurations.
+     *           by the [Service.monitoring][google.api.Service.monitoring] and
+     *           [Service.logging][google.api.Service.logging] configurations.
      *     @type \Google\Api\Monitoring $monitoring
      *           Monitoring configuration.
      *           This should not include the 'producer_destinations' field.
@@ -196,7 +198,7 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      * versions, and method names of the interfaces.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Api apis = 3;</code>
-     * @param \Google\Protobuf\Api[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Protobuf\Api>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setApis($var)
@@ -370,7 +372,7 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
      * of the endpoints.
      *
      * Generated from protobuf field <code>repeated .google.api.Endpoint endpoints = 18;</code>
-     * @param \Google\Api\Endpoint[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Api\Endpoint>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEndpoints($var)
@@ -383,7 +385,8 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Defines the monitored resources used by this service. This is required
-     * by the [Service.monitoring][google.api.Service.monitoring] and [Service.logging][google.api.Service.logging] configurations.
+     * by the [Service.monitoring][google.api.Service.monitoring] and
+     * [Service.logging][google.api.Service.logging] configurations.
      *
      * Generated from protobuf field <code>repeated .google.api.MonitoredResourceDescriptor monitored_resources = 25;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -395,10 +398,11 @@ class ServiceConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Defines the monitored resources used by this service. This is required
-     * by the [Service.monitoring][google.api.Service.monitoring] and [Service.logging][google.api.Service.logging] configurations.
+     * by the [Service.monitoring][google.api.Service.monitoring] and
+     * [Service.logging][google.api.Service.logging] configurations.
      *
      * Generated from protobuf field <code>repeated .google.api.MonitoredResourceDescriptor monitored_resources = 25;</code>
-     * @param \Google\Api\MonitoredResourceDescriptor[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Api\MonitoredResourceDescriptor>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMonitoredResources($var)

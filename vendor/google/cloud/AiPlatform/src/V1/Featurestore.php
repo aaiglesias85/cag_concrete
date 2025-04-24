@@ -23,28 +23,29 @@ class Featurestore extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Timestamp when this Featurestore was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this Featurestore was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform consistent read-modify-write updates. If not set,
+     * a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
-     * Optional. The labels with user-defined metadata to organize your Featurestore.
+     * Optional. The labels with user-defined metadata to organize your
+     * Featurestore.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
@@ -58,25 +59,50 @@ class Featurestore extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * Optional. Config for online storage resources. If unset, the featurestore will
-     * not have an online store and cannot be used for online serving.
+     * Optional. Config for online storage resources. The field should not
+     * co-exist with the field of `OnlineStoreReplicationConfig`. If both of it
+     * and OnlineStoreReplicationConfig are unset, the feature store will not have
+     * an online store and cannot be used for online serving.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Featurestore.OnlineServingConfig online_serving_config = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $online_serving_config = null;
+    protected $online_serving_config = null;
     /**
      * Output only. State of the featurestore.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Featurestore.State state = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
-     * Optional. Customer-managed encryption key spec for data storage. If set, both of the
-     * online and offline data storage will be secured by this key.
+     * Optional. TTL in days for feature values that will be stored in online
+     * serving storage. The Feature Store online storage periodically removes
+     * obsolete feature values older than `online_storage_ttl_days` since the
+     * feature generation time. Note that `online_storage_ttl_days` should be less
+     * than or equal to `offline_storage_ttl_days` for each EntityType under a
+     * featurestore. If not set, default to 4000 days
+     *
+     * Generated from protobuf field <code>int32 online_storage_ttl_days = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $online_storage_ttl_days = 0;
+    /**
+     * Optional. Customer-managed encryption key spec for data storage. If set,
+     * both of the online and offline data storage will be secured by this key.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $encryption_spec = null;
+    protected $encryption_spec = null;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzi = false;
 
     /**
      * Constructor.
@@ -92,10 +118,11 @@ class Featurestore extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Timestamp when this Featurestore was last updated.
      *     @type string $etag
-     *           Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     *           "overwrite" update happens.
+     *           Optional. Used to perform consistent read-modify-write updates. If not set,
+     *           a blind "overwrite" update happens.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
-     *           Optional. The labels with user-defined metadata to organize your Featurestore.
+     *           Optional. The labels with user-defined metadata to organize your
+     *           Featurestore.
      *           Label keys and values can be no longer than 64 characters
      *           (Unicode codepoints), can only contain lowercase letters, numeric
      *           characters, underscores and dashes. International characters are allowed.
@@ -105,13 +132,26 @@ class Featurestore extends \Google\Protobuf\Internal\Message
      *           System reserved label keys are prefixed with "aiplatform.googleapis.com/"
      *           and are immutable.
      *     @type \Google\Cloud\AIPlatform\V1\Featurestore\OnlineServingConfig $online_serving_config
-     *           Optional. Config for online storage resources. If unset, the featurestore will
-     *           not have an online store and cannot be used for online serving.
+     *           Optional. Config for online storage resources. The field should not
+     *           co-exist with the field of `OnlineStoreReplicationConfig`. If both of it
+     *           and OnlineStoreReplicationConfig are unset, the feature store will not have
+     *           an online store and cannot be used for online serving.
      *     @type int $state
      *           Output only. State of the featurestore.
+     *     @type int $online_storage_ttl_days
+     *           Optional. TTL in days for feature values that will be stored in online
+     *           serving storage. The Feature Store online storage periodically removes
+     *           obsolete feature values older than `online_storage_ttl_days` since the
+     *           feature generation time. Note that `online_storage_ttl_days` should be less
+     *           than or equal to `offline_storage_ttl_days` for each EntityType under a
+     *           featurestore. If not set, default to 4000 days
      *     @type \Google\Cloud\AIPlatform\V1\EncryptionSpec $encryption_spec
-     *           Optional. Customer-managed encryption key spec for data storage. If set, both of the
-     *           online and offline data storage will be secured by this key.
+     *           Optional. Customer-managed encryption key spec for data storage. If set,
+     *           both of the online and offline data storage will be secured by this key.
+     *     @type bool $satisfies_pzs
+     *           Output only. Reserved for future use.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -220,8 +260,8 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform consistent read-modify-write updates. If not set,
+     * a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -232,8 +272,8 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Used to perform consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform consistent read-modify-write updates. If not set,
+     * a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -248,7 +288,8 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The labels with user-defined metadata to organize your Featurestore.
+     * Optional. The labels with user-defined metadata to organize your
+     * Featurestore.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
@@ -267,7 +308,8 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The labels with user-defined metadata to organize your Featurestore.
+     * Optional. The labels with user-defined metadata to organize your
+     * Featurestore.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
@@ -290,8 +332,10 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Config for online storage resources. If unset, the featurestore will
-     * not have an online store and cannot be used for online serving.
+     * Optional. Config for online storage resources. The field should not
+     * co-exist with the field of `OnlineStoreReplicationConfig`. If both of it
+     * and OnlineStoreReplicationConfig are unset, the feature store will not have
+     * an online store and cannot be used for online serving.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Featurestore.OnlineServingConfig online_serving_config = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Cloud\AIPlatform\V1\Featurestore\OnlineServingConfig|null
@@ -312,8 +356,10 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Config for online storage resources. If unset, the featurestore will
-     * not have an online store and cannot be used for online serving.
+     * Optional. Config for online storage resources. The field should not
+     * co-exist with the field of `OnlineStoreReplicationConfig`. If both of it
+     * and OnlineStoreReplicationConfig are unset, the feature store will not have
+     * an online store and cannot be used for online serving.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Featurestore.OnlineServingConfig online_serving_config = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Cloud\AIPlatform\V1\Featurestore\OnlineServingConfig $var
@@ -354,8 +400,44 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Customer-managed encryption key spec for data storage. If set, both of the
-     * online and offline data storage will be secured by this key.
+     * Optional. TTL in days for feature values that will be stored in online
+     * serving storage. The Feature Store online storage periodically removes
+     * obsolete feature values older than `online_storage_ttl_days` since the
+     * feature generation time. Note that `online_storage_ttl_days` should be less
+     * than or equal to `offline_storage_ttl_days` for each EntityType under a
+     * featurestore. If not set, default to 4000 days
+     *
+     * Generated from protobuf field <code>int32 online_storage_ttl_days = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return int
+     */
+    public function getOnlineStorageTtlDays()
+    {
+        return $this->online_storage_ttl_days;
+    }
+
+    /**
+     * Optional. TTL in days for feature values that will be stored in online
+     * serving storage. The Feature Store online storage periodically removes
+     * obsolete feature values older than `online_storage_ttl_days` since the
+     * feature generation time. Note that `online_storage_ttl_days` should be less
+     * than or equal to `offline_storage_ttl_days` for each EntityType under a
+     * featurestore. If not set, default to 4000 days
+     *
+     * Generated from protobuf field <code>int32 online_storage_ttl_days = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setOnlineStorageTtlDays($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->online_storage_ttl_days = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Customer-managed encryption key spec for data storage. If set,
+     * both of the online and offline data storage will be secured by this key.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Cloud\AIPlatform\V1\EncryptionSpec|null
@@ -376,8 +458,8 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Customer-managed encryption key spec for data storage. If set, both of the
-     * online and offline data storage will be secured by this key.
+     * Optional. Customer-managed encryption key spec for data storage. If set,
+     * both of the online and offline data storage will be secured by this key.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Cloud\AIPlatform\V1\EncryptionSpec $var
@@ -387,6 +469,58 @@ class Featurestore extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\EncryptionSpec::class);
         $this->encryption_spec = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return $this->satisfies_pzi;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
 
         return $this;
     }

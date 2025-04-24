@@ -21,13 +21,30 @@ class CreateDatasetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The dataset to be created.
      *
      * Generated from protobuf field <code>.google.cloud.datalabeling.v1beta1.Dataset dataset = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $dataset = null;
+    protected $dataset = null;
+
+    /**
+     * @param string                                     $parent  Required. Dataset resource parent, format:
+     *                                                            projects/{project_id}
+     *                                                            Please see {@see DataLabelingServiceClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\DataLabeling\V1beta1\Dataset $dataset Required. The dataset to be created.
+     *
+     * @return \Google\Cloud\DataLabeling\V1beta1\CreateDatasetRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\DataLabeling\V1beta1\Dataset $dataset): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setDataset($dataset);
+    }
 
     /**
      * Constructor.

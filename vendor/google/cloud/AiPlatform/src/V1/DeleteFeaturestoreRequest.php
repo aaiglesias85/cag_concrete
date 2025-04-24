@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [FeaturestoreService.DeleteFeaturestore][google.cloud.aiplatform.v1.FeaturestoreService.DeleteFeaturestore].
+ * Request message for
+ * [FeaturestoreService.DeleteFeaturestore][google.cloud.aiplatform.v1.FeaturestoreService.DeleteFeaturestore].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.DeleteFeaturestoreRequest</code>
  */
@@ -22,7 +23,7 @@ class DeleteFeaturestoreRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * If set to true, any EntityTypes and Features for this Featurestore will
      * also be deleted. (Otherwise, the request will only work if the Featurestore
@@ -30,7 +31,43 @@ class DeleteFeaturestoreRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool force = 2;</code>
      */
-    private $force = false;
+    protected $force = false;
+
+    /**
+     * @param string $name Required. The name of the Featurestore to be deleted.
+     *                     Format:
+     *                     `projects/{project}/locations/{location}/featurestores/{featurestore}`
+     *                     Please see {@see FeaturestoreServiceClient::featurestoreName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\DeleteFeaturestoreRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
+
+    /**
+     * @param string $name  Required. The name of the Featurestore to be deleted.
+     *                      Format:
+     *                      `projects/{project}/locations/{location}/featurestores/{featurestore}`
+     *                      Please see {@see FeaturestoreServiceClient::featurestoreName()} for help formatting this field.
+     * @param bool   $force If set to true, any EntityTypes and Features for this Featurestore will
+     *                      also be deleted. (Otherwise, the request will only work if the Featurestore
+     *                      has no EntityTypes.)
+     *
+     * @return \Google\Cloud\AIPlatform\V1\DeleteFeaturestoreRequest
+     *
+     * @experimental
+     */
+    public static function buildFromNameForce(string $name, bool $force): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setForce($force);
+    }
 
     /**
      * Constructor.

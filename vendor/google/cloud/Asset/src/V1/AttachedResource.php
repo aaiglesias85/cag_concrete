@@ -21,11 +21,11 @@ class AttachedResource extends \Google\Protobuf\Internal\Message
      * Example: `osconfig.googleapis.com/Inventory`
      * You can find the supported attached asset types of each resource in this
      * table:
-     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      *
      * Generated from protobuf field <code>string asset_type = 1;</code>
      */
-    private $asset_type = '';
+    protected $asset_type = '';
     /**
      * Versioned resource representations of this attached resource. This is
      * repeated because there could be multiple versions of the attached resource
@@ -46,8 +46,8 @@ class AttachedResource extends \Google\Protobuf\Internal\Message
      *           Example: `osconfig.googleapis.com/Inventory`
      *           You can find the supported attached asset types of each resource in this
      *           table:
-     *           `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
-     *     @type \Google\Cloud\Asset\V1\VersionedResource[]|\Google\Protobuf\Internal\RepeatedField $versioned_resources
+     *           `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
+     *     @type array<\Google\Cloud\Asset\V1\VersionedResource>|\Google\Protobuf\Internal\RepeatedField $versioned_resources
      *           Versioned resource representations of this attached resource. This is
      *           repeated because there could be multiple versions of the attached resource
      *           representations during version migration.
@@ -63,7 +63,7 @@ class AttachedResource extends \Google\Protobuf\Internal\Message
      * Example: `osconfig.googleapis.com/Inventory`
      * You can find the supported attached asset types of each resource in this
      * table:
-     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      *
      * Generated from protobuf field <code>string asset_type = 1;</code>
      * @return string
@@ -78,7 +78,7 @@ class AttachedResource extends \Google\Protobuf\Internal\Message
      * Example: `osconfig.googleapis.com/Inventory`
      * You can find the supported attached asset types of each resource in this
      * table:
-     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      *
      * Generated from protobuf field <code>string asset_type = 1;</code>
      * @param string $var
@@ -111,7 +111,7 @@ class AttachedResource extends \Google\Protobuf\Internal\Message
      * representations during version migration.
      *
      * Generated from protobuf field <code>repeated .google.cloud.asset.v1.VersionedResource versioned_resources = 3;</code>
-     * @param \Google\Cloud\Asset\V1\VersionedResource[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Asset\V1\VersionedResource>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVersionedResources($var)

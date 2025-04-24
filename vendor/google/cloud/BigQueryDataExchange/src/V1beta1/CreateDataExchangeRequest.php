@@ -9,21 +9,21 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Message for creating a DataExchange.
+ * Message for creating a data exchange.
  *
  * Generated from protobuf message <code>google.cloud.bigquery.dataexchange.v1beta1.CreateDataExchangeRequest</code>
  */
 class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The parent resource path of the DataExchange.
+     * Required. The parent resource path of the data exchange.
      * e.g. `projects/myproject/locations/US`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Required. The ID of the DataExchange to create.
+     * Required. The ID of the data exchange.
      * Must contain only Unicode letters, numbers (0-9), underscores (_).
      * Should not use characters that require URL-escaping, or characters
      * outside of ASCII, spaces.
@@ -31,13 +31,30 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string data_exchange_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $data_exchange_id = '';
+    protected $data_exchange_id = '';
     /**
-     * Required. The DataExchange to create.
+     * Required. The data exchange to create.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.dataexchange.v1beta1.DataExchange data_exchange = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $data_exchange = null;
+    protected $data_exchange = null;
+
+    /**
+     * @param string                                                   $parent       Required. The parent resource path of the data exchange.
+     *                                                                               e.g. `projects/myproject/locations/US`. Please see
+     *                                                                               {@see AnalyticsHubServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\BigQuery\DataExchange\V1beta1\DataExchange $dataExchange Required. The data exchange to create.
+     *
+     * @return \Google\Cloud\BigQuery\DataExchange\V1beta1\CreateDataExchangeRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\BigQuery\DataExchange\V1beta1\DataExchange $dataExchange): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setDataExchange($dataExchange);
+    }
 
     /**
      * Constructor.
@@ -46,16 +63,16 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The parent resource path of the DataExchange.
+     *           Required. The parent resource path of the data exchange.
      *           e.g. `projects/myproject/locations/US`.
      *     @type string $data_exchange_id
-     *           Required. The ID of the DataExchange to create.
+     *           Required. The ID of the data exchange.
      *           Must contain only Unicode letters, numbers (0-9), underscores (_).
      *           Should not use characters that require URL-escaping, or characters
      *           outside of ASCII, spaces.
      *           Max length: 100 bytes.
      *     @type \Google\Cloud\BigQuery\DataExchange\V1beta1\DataExchange $data_exchange
-     *           Required. The DataExchange to create.
+     *           Required. The data exchange to create.
      * }
      */
     public function __construct($data = NULL) {
@@ -64,7 +81,7 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent resource path of the DataExchange.
+     * Required. The parent resource path of the data exchange.
      * e.g. `projects/myproject/locations/US`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -76,7 +93,7 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent resource path of the DataExchange.
+     * Required. The parent resource path of the data exchange.
      * e.g. `projects/myproject/locations/US`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -92,7 +109,7 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID of the DataExchange to create.
+     * Required. The ID of the data exchange.
      * Must contain only Unicode letters, numbers (0-9), underscores (_).
      * Should not use characters that require URL-escaping, or characters
      * outside of ASCII, spaces.
@@ -107,7 +124,7 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID of the DataExchange to create.
+     * Required. The ID of the data exchange.
      * Must contain only Unicode letters, numbers (0-9), underscores (_).
      * Should not use characters that require URL-escaping, or characters
      * outside of ASCII, spaces.
@@ -126,7 +143,7 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The DataExchange to create.
+     * Required. The data exchange to create.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.dataexchange.v1beta1.DataExchange data_exchange = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\BigQuery\DataExchange\V1beta1\DataExchange|null
@@ -147,7 +164,7 @@ class CreateDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The DataExchange to create.
+     * Required. The data exchange to create.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.dataexchange.v1beta1.DataExchange data_exchange = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\BigQuery\DataExchange\V1beta1\DataExchange $var

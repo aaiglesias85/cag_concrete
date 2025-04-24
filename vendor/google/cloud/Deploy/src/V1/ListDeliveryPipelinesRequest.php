@@ -16,12 +16,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListDeliveryPipelinesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The parent, which owns this collection of pipelines. Format must be
-     * projects/{project_id}/locations/{location_name}.
+     * Required. The parent, which owns this collection of pipelines. Format must
+     * be `projects/{project_id}/locations/{location_name}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of pipelines to return. The service may return
      * fewer than this value. If unspecified, at most 50 pipelines will
@@ -30,7 +30,7 @@ class ListDeliveryPipelinesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * A page token, received from a previous `ListDeliveryPipelines` call.
      * Provide this to retrieve the subsequent page.
@@ -39,20 +39,35 @@ class ListDeliveryPipelinesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Filter pipelines to be returned. See https://google.aip.dev/160 for more
      * details.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Field to sort by. See https://google.aip.dev/132#ordering for more details.
      *
      * Generated from protobuf field <code>string order_by = 5;</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
+
+    /**
+     * @param string $parent Required. The parent, which owns this collection of pipelines. Format must
+     *                       be `projects/{project_id}/locations/{location_name}`. Please see
+     *                       {@see CloudDeployClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Deploy\V1\ListDeliveryPipelinesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -61,8 +76,8 @@ class ListDeliveryPipelinesRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The parent, which owns this collection of pipelines. Format must be
-     *           projects/{project_id}/locations/{location_name}.
+     *           Required. The parent, which owns this collection of pipelines. Format must
+     *           be `projects/{project_id}/locations/{location_name}`.
      *     @type int $page_size
      *           The maximum number of pipelines to return. The service may return
      *           fewer than this value. If unspecified, at most 50 pipelines will
@@ -86,8 +101,8 @@ class ListDeliveryPipelinesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent, which owns this collection of pipelines. Format must be
-     * projects/{project_id}/locations/{location_name}.
+     * Required. The parent, which owns this collection of pipelines. Format must
+     * be `projects/{project_id}/locations/{location_name}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -98,8 +113,8 @@ class ListDeliveryPipelinesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent, which owns this collection of pipelines. Format must be
-     * projects/{project_id}/locations/{location_name}.
+     * Required. The parent, which owns this collection of pipelines. Format must
+     * be `projects/{project_id}/locations/{location_name}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

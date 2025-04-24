@@ -23,7 +23,7 @@ class Cloudscheduler
         \GPBMetadata\Google\Protobuf\FieldMask::initOnce();
         $pool->internalAddGeneratedFile(
             '
-
+€
 .google/cloud/scheduler/v1/cloudscheduler.protogoogle.cloud.scheduler.v1google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto#google/cloud/scheduler/v1/job.protogoogle/protobuf/empty.proto google/protobuf/field_mask.proto"s
 ListJobsRequest9
 parent (	B)àAúA#!cloudscheduler.googleapis.com/Job
@@ -38,10 +38,10 @@ page_token (	"Y
 !cloudscheduler.googleapis.com/Job"
 CreateJobRequest9
 parent (	B)àAúA#!cloudscheduler.googleapis.com/Job0
-job (2.google.cloud.scheduler.v1.JobBàA"z
+job (2.google.cloud.scheduler.v1.JobBàA"u
 UpdateJobRequest0
-job (2.google.cloud.scheduler.v1.JobBàA4
-update_mask (2.google.protobuf.FieldMaskBàA"K
+job (2.google.cloud.scheduler.v1.JobBàA/
+update_mask (2.google.protobuf.FieldMask"K
 DeleteJobRequest7
 name (	B)àAúA#
 !cloudscheduler.googleapis.com/Job"J
@@ -56,16 +56,16 @@ page_token (	"Y
 !cloudscheduler.googleapis.com/Job2³
 
 CloudSchedulerž
-ListJobs*.google.cloud.scheduler.v1.ListJobsRequest+.google.cloud.scheduler.v1.ListJobsResponse"9‚Óä“*(/v1/{parent=projects/*/locations/*}/jobsÚAparent‹
-GetJob(.google.cloud.scheduler.v1.GetJobRequest.google.cloud.scheduler.v1.Job"7‚Óä“*(/v1/{name=projects/*/locations/*/jobs/*}ÚAnameœ
-	CreateJob+.google.cloud.scheduler.v1.CreateJobRequest.google.cloud.scheduler.v1.Job"B‚Óä“/"(/v1/{parent=projects/*/locations/*}/jobs:jobÚA
-parent,job¥
-	UpdateJob+.google.cloud.scheduler.v1.UpdateJobRequest.google.cloud.scheduler.v1.Job"K‚Óä“32,/v1/{job.name=projects/*/locations/*/jobs/*}:jobÚAjob,update_mask‰
-	DeleteJob+.google.cloud.scheduler.v1.DeleteJobRequest.google.protobuf.Empty"7‚Óä“**(/v1/{name=projects/*/locations/*/jobs/*}ÚAname˜
-PauseJob*.google.cloud.scheduler.v1.PauseJobRequest.google.cloud.scheduler.v1.Job"@‚Óä“3"./v1/{name=projects/*/locations/*/jobs/*}:pause:*ÚAname›
-	ResumeJob+.google.cloud.scheduler.v1.ResumeJobRequest.google.cloud.scheduler.v1.Job"A‚Óä“4"//v1/{name=projects/*/locations/*/jobs/*}:resume:*ÚAname’
-RunJob(.google.cloud.scheduler.v1.RunJobRequest.google.cloud.scheduler.v1.Job">‚Óä“1",/v1/{name=projects/*/locations/*/jobs/*}:run:*ÚAnameQÊAcloudscheduler.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformB
-com.google.cloud.scheduler.v1BSchedulerProtoPZBgoogle.golang.org/genproto/googleapis/cloud/scheduler/v1;scheduler¢	SCHEDULERbproto3'
+ListJobs*.google.cloud.scheduler.v1.ListJobsRequest+.google.cloud.scheduler.v1.ListJobsResponse"9ÚAparent‚Óä“*(/v1/{parent=projects/*/locations/*}/jobs‹
+GetJob(.google.cloud.scheduler.v1.GetJobRequest.google.cloud.scheduler.v1.Job"7ÚAname‚Óä“*(/v1/{name=projects/*/locations/*/jobs/*}œ
+	CreateJob+.google.cloud.scheduler.v1.CreateJobRequest.google.cloud.scheduler.v1.Job"BÚA
+parent,job‚Óä“/"(/v1/{parent=projects/*/locations/*}/jobs:job¥
+	UpdateJob+.google.cloud.scheduler.v1.UpdateJobRequest.google.cloud.scheduler.v1.Job"KÚAjob,update_mask‚Óä“32,/v1/{job.name=projects/*/locations/*/jobs/*}:job‰
+	DeleteJob+.google.cloud.scheduler.v1.DeleteJobRequest.google.protobuf.Empty"7ÚAname‚Óä“**(/v1/{name=projects/*/locations/*/jobs/*}˜
+PauseJob*.google.cloud.scheduler.v1.PauseJobRequest.google.cloud.scheduler.v1.Job"@ÚAname‚Óä“3"./v1/{name=projects/*/locations/*/jobs/*}:pause:*›
+	ResumeJob+.google.cloud.scheduler.v1.ResumeJobRequest.google.cloud.scheduler.v1.Job"AÚAname‚Óä“4"//v1/{name=projects/*/locations/*/jobs/*}:resume:*’
+RunJob(.google.cloud.scheduler.v1.RunJobRequest.google.cloud.scheduler.v1.Job">ÚAname‚Óä“1",/v1/{name=projects/*/locations/*/jobs/*}:run:*QÊAcloudscheduler.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformBz
+com.google.cloud.scheduler.v1BSchedulerProtoPZ;cloud.google.com/go/scheduler/apiv1/schedulerpb;schedulerpb¢	SCHEDULERbproto3'
         , true);
 
         static::$is_initialized = true;

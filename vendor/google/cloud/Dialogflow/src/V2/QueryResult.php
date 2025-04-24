@@ -27,7 +27,7 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string query_text = 1;</code>
      */
-    private $query_text = '';
+    protected $query_text = '';
     /**
      * The language that was triggered during intent detection.
      * See [Language
@@ -36,45 +36,43 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 15;</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * The Speech recognition confidence between 0.0 and 1.0. A higher number
      * indicates an estimated greater likelihood that the recognized words are
      * correct. The default of 0.0 is a sentinel value indicating that confidence
      * was not set.
      * This field is not guaranteed to be accurate or set. In particular this
-     * field isn't set for StreamingDetectIntent since the streaming endpoint has
-     * separate confidence estimates per portion of the audio in
+     * field isn't set for [StreamingDetectIntent][] since the streaming endpoint
+     * has separate confidence estimates per portion of the audio in
      * StreamingRecognitionResult.
      *
      * Generated from protobuf field <code>float speech_recognition_confidence = 2;</code>
      */
-    private $speech_recognition_confidence = 0.0;
+    protected $speech_recognition_confidence = 0.0;
     /**
      * The action name from the matched intent.
      *
      * Generated from protobuf field <code>string action = 3;</code>
      */
-    private $action = '';
+    protected $action = '';
     /**
      * The collection of extracted parameters.
      * Depending on your protocol or client library language, this is a
      * map, associative array, symbol table, dictionary, or JSON object
      * composed of a collection of (MapKey, MapValue) pairs:
-     * -   MapKey type: string
-     * -   MapKey value: parameter name
-     * -   MapValue type:
-     *     -   If parameter's entity type is a composite entity: map
-     *     -   Else: depending on parameter value type, could be one of string,
-     *         number, boolean, null, list or map
-     * -   MapValue value:
-     *     -   If parameter's entity type is a composite entity:
-     *         map from composite entity property names to property values
-     *     -   Else: parameter value
+     * * MapKey type: string
+     * * MapKey value: parameter name
+     * * MapValue type: If parameter's entity type is a composite entity then use
+     * map, otherwise, depending on the parameter value type, it could be one of
+     * string, number, boolean, null, list or map.
+     * * MapValue value: If parameter's entity type is a composite entity then use
+     * map from composite entity property names to property values, otherwise,
+     * use parameter value.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct parameters = 4;</code>
      */
-    private $parameters = null;
+    protected $parameters = null;
     /**
      * This field is set to:
      * - `false` if the matched intent has required parameters and not all of
@@ -84,21 +82,22 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool all_required_params_present = 5;</code>
      */
-    private $all_required_params_present = false;
+    protected $all_required_params_present = false;
     /**
      * Indicates whether the conversational query triggers a cancellation for slot
-     * filling.
+     * filling. For more information, see the [cancel slot filling
+     * documentation](https://cloud.google.com/dialogflow/es/docs/intents-actions-parameters#cancel).
      *
      * Generated from protobuf field <code>bool cancels_slot_filling = 21;</code>
      */
-    private $cancels_slot_filling = false;
+    protected $cancels_slot_filling = false;
     /**
      * The text to be pronounced to the user or shown on the screen.
      * Note: This is a legacy field, `fulfillment_messages` should be preferred.
      *
      * Generated from protobuf field <code>string fulfillment_text = 6;</code>
      */
-    private $fulfillment_text = '';
+    protected $fulfillment_text = '';
     /**
      * The collection of rich messages to present to the user.
      *
@@ -111,14 +110,14 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string webhook_source = 8;</code>
      */
-    private $webhook_source = '';
+    protected $webhook_source = '';
     /**
      * If the query was fulfilled by a webhook call, this field is set to the
      * value of the `payload` field returned in the webhook response.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct webhook_payload = 9;</code>
      */
-    private $webhook_payload = null;
+    protected $webhook_payload = null;
     /**
      * The collection of output contexts. If applicable,
      * `output_contexts.parameters` contains entries with name
@@ -135,7 +134,7 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Intent intent = 11;</code>
      */
-    private $intent = null;
+    protected $intent = null;
     /**
      * The intent detection confidence. Values range from 0.0
      * (completely uncertain) to 1.0 (completely certain).
@@ -148,7 +147,7 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float intent_detection_confidence = 12;</code>
      */
-    private $intent_detection_confidence = 0.0;
+    protected $intent_detection_confidence = 0.0;
     /**
      * Free-form diagnostic information for the associated detect intent request.
      * The fields of this data can change without notice, so you should not write
@@ -159,14 +158,14 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Struct diagnostic_info = 14;</code>
      */
-    private $diagnostic_info = null;
+    protected $diagnostic_info = null;
     /**
      * The sentiment analysis result, which depends on the
      * `sentiment_analysis_request_config` specified in the request.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.SentimentAnalysisResult sentiment_analysis_result = 17;</code>
      */
-    private $sentiment_analysis_result = null;
+    protected $sentiment_analysis_result = null;
 
     /**
      * Constructor.
@@ -194,8 +193,8 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *           correct. The default of 0.0 is a sentinel value indicating that confidence
      *           was not set.
      *           This field is not guaranteed to be accurate or set. In particular this
-     *           field isn't set for StreamingDetectIntent since the streaming endpoint has
-     *           separate confidence estimates per portion of the audio in
+     *           field isn't set for [StreamingDetectIntent][] since the streaming endpoint
+     *           has separate confidence estimates per portion of the audio in
      *           StreamingRecognitionResult.
      *     @type string $action
      *           The action name from the matched intent.
@@ -204,16 +203,14 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *           Depending on your protocol or client library language, this is a
      *           map, associative array, symbol table, dictionary, or JSON object
      *           composed of a collection of (MapKey, MapValue) pairs:
-     *           -   MapKey type: string
-     *           -   MapKey value: parameter name
-     *           -   MapValue type:
-     *               -   If parameter's entity type is a composite entity: map
-     *               -   Else: depending on parameter value type, could be one of string,
-     *                   number, boolean, null, list or map
-     *           -   MapValue value:
-     *               -   If parameter's entity type is a composite entity:
-     *                   map from composite entity property names to property values
-     *               -   Else: parameter value
+     *           * MapKey type: string
+     *           * MapKey value: parameter name
+     *           * MapValue type: If parameter's entity type is a composite entity then use
+     *           map, otherwise, depending on the parameter value type, it could be one of
+     *           string, number, boolean, null, list or map.
+     *           * MapValue value: If parameter's entity type is a composite entity then use
+     *           map from composite entity property names to property values, otherwise,
+     *           use parameter value.
      *     @type bool $all_required_params_present
      *           This field is set to:
      *           - `false` if the matched intent has required parameters and not all of
@@ -222,11 +219,12 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *              matched intent doesn't contain any required parameters.
      *     @type bool $cancels_slot_filling
      *           Indicates whether the conversational query triggers a cancellation for slot
-     *           filling.
+     *           filling. For more information, see the [cancel slot filling
+     *           documentation](https://cloud.google.com/dialogflow/es/docs/intents-actions-parameters#cancel).
      *     @type string $fulfillment_text
      *           The text to be pronounced to the user or shown on the screen.
      *           Note: This is a legacy field, `fulfillment_messages` should be preferred.
-     *     @type \Google\Cloud\Dialogflow\V2\Intent\Message[]|\Google\Protobuf\Internal\RepeatedField $fulfillment_messages
+     *     @type array<\Google\Cloud\Dialogflow\V2\Intent\Message>|\Google\Protobuf\Internal\RepeatedField $fulfillment_messages
      *           The collection of rich messages to present to the user.
      *     @type string $webhook_source
      *           If the query was fulfilled by a webhook call, this field is set to the
@@ -234,7 +232,7 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Struct $webhook_payload
      *           If the query was fulfilled by a webhook call, this field is set to the
      *           value of the `payload` field returned in the webhook response.
-     *     @type \Google\Cloud\Dialogflow\V2\Context[]|\Google\Protobuf\Internal\RepeatedField $output_contexts
+     *     @type array<\Google\Cloud\Dialogflow\V2\Context>|\Google\Protobuf\Internal\RepeatedField $output_contexts
      *           The collection of output contexts. If applicable,
      *           `output_contexts.parameters` contains entries with name
      *           `<parameter name>.original` containing the original parameter values
@@ -347,8 +345,8 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      * correct. The default of 0.0 is a sentinel value indicating that confidence
      * was not set.
      * This field is not guaranteed to be accurate or set. In particular this
-     * field isn't set for StreamingDetectIntent since the streaming endpoint has
-     * separate confidence estimates per portion of the audio in
+     * field isn't set for [StreamingDetectIntent][] since the streaming endpoint
+     * has separate confidence estimates per portion of the audio in
      * StreamingRecognitionResult.
      *
      * Generated from protobuf field <code>float speech_recognition_confidence = 2;</code>
@@ -365,8 +363,8 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      * correct. The default of 0.0 is a sentinel value indicating that confidence
      * was not set.
      * This field is not guaranteed to be accurate or set. In particular this
-     * field isn't set for StreamingDetectIntent since the streaming endpoint has
-     * separate confidence estimates per portion of the audio in
+     * field isn't set for [StreamingDetectIntent][] since the streaming endpoint
+     * has separate confidence estimates per portion of the audio in
      * StreamingRecognitionResult.
      *
      * Generated from protobuf field <code>float speech_recognition_confidence = 2;</code>
@@ -412,16 +410,14 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      * Depending on your protocol or client library language, this is a
      * map, associative array, symbol table, dictionary, or JSON object
      * composed of a collection of (MapKey, MapValue) pairs:
-     * -   MapKey type: string
-     * -   MapKey value: parameter name
-     * -   MapValue type:
-     *     -   If parameter's entity type is a composite entity: map
-     *     -   Else: depending on parameter value type, could be one of string,
-     *         number, boolean, null, list or map
-     * -   MapValue value:
-     *     -   If parameter's entity type is a composite entity:
-     *         map from composite entity property names to property values
-     *     -   Else: parameter value
+     * * MapKey type: string
+     * * MapKey value: parameter name
+     * * MapValue type: If parameter's entity type is a composite entity then use
+     * map, otherwise, depending on the parameter value type, it could be one of
+     * string, number, boolean, null, list or map.
+     * * MapValue value: If parameter's entity type is a composite entity then use
+     * map from composite entity property names to property values, otherwise,
+     * use parameter value.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct parameters = 4;</code>
      * @return \Google\Protobuf\Struct|null
@@ -446,16 +442,14 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      * Depending on your protocol or client library language, this is a
      * map, associative array, symbol table, dictionary, or JSON object
      * composed of a collection of (MapKey, MapValue) pairs:
-     * -   MapKey type: string
-     * -   MapKey value: parameter name
-     * -   MapValue type:
-     *     -   If parameter's entity type is a composite entity: map
-     *     -   Else: depending on parameter value type, could be one of string,
-     *         number, boolean, null, list or map
-     * -   MapValue value:
-     *     -   If parameter's entity type is a composite entity:
-     *         map from composite entity property names to property values
-     *     -   Else: parameter value
+     * * MapKey type: string
+     * * MapKey value: parameter name
+     * * MapValue type: If parameter's entity type is a composite entity then use
+     * map, otherwise, depending on the parameter value type, it could be one of
+     * string, number, boolean, null, list or map.
+     * * MapValue value: If parameter's entity type is a composite entity then use
+     * map from composite entity property names to property values, otherwise,
+     * use parameter value.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct parameters = 4;</code>
      * @param \Google\Protobuf\Struct $var
@@ -505,7 +499,8 @@ class QueryResult extends \Google\Protobuf\Internal\Message
 
     /**
      * Indicates whether the conversational query triggers a cancellation for slot
-     * filling.
+     * filling. For more information, see the [cancel slot filling
+     * documentation](https://cloud.google.com/dialogflow/es/docs/intents-actions-parameters#cancel).
      *
      * Generated from protobuf field <code>bool cancels_slot_filling = 21;</code>
      * @return bool
@@ -517,7 +512,8 @@ class QueryResult extends \Google\Protobuf\Internal\Message
 
     /**
      * Indicates whether the conversational query triggers a cancellation for slot
-     * filling.
+     * filling. For more information, see the [cancel slot filling
+     * documentation](https://cloud.google.com/dialogflow/es/docs/intents-actions-parameters#cancel).
      *
      * Generated from protobuf field <code>bool cancels_slot_filling = 21;</code>
      * @param bool $var
@@ -574,7 +570,7 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      * The collection of rich messages to present to the user.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.Intent.Message fulfillment_messages = 7;</code>
-     * @param \Google\Cloud\Dialogflow\V2\Intent\Message[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\Intent\Message>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFulfillmentMessages($var)
@@ -672,7 +668,7 @@ class QueryResult extends \Google\Protobuf\Internal\Message
      * before the query.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.Context output_contexts = 10;</code>
-     * @param \Google\Cloud\Dialogflow\V2\Context[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\Context>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOutputContexts($var)

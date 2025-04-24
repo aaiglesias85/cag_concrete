@@ -16,7 +16,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class GetGlobalOrganizationOperationRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Name of the Operations resource to return.
+     * Name of the Operations resource to return, or its unique numeric identifier.
      *
      * Generated from protobuf field <code>string operation = 52090215 [(.google.api.field_behavior) = REQUIRED, (.google.cloud.operation_response_field) = "name"];</code>
      */
@@ -29,13 +29,26 @@ class GetGlobalOrganizationOperationRequest extends \Google\Protobuf\Internal\Me
     private $parent_id = null;
 
     /**
+     * @param string $operation Name of the Operations resource to return, or its unique numeric identifier.
+     *
+     * @return \Google\Cloud\Compute\V1\GetGlobalOrganizationOperationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $operation): self
+    {
+        return (new self())
+            ->setOperation($operation);
+    }
+
+    /**
      * Constructor.
      *
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
      *     @type string $operation
-     *           Name of the Operations resource to return.
+     *           Name of the Operations resource to return, or its unique numeric identifier.
      *     @type string $parent_id
      *           Parent ID for this request.
      * }
@@ -46,7 +59,7 @@ class GetGlobalOrganizationOperationRequest extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Name of the Operations resource to return.
+     * Name of the Operations resource to return, or its unique numeric identifier.
      *
      * Generated from protobuf field <code>string operation = 52090215 [(.google.api.field_behavior) = REQUIRED, (.google.cloud.operation_response_field) = "name"];</code>
      * @return string
@@ -57,7 +70,7 @@ class GetGlobalOrganizationOperationRequest extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Name of the Operations resource to return.
+     * Name of the Operations resource to return, or its unique numeric identifier.
      *
      * Generated from protobuf field <code>string operation = 52090215 [(.google.api.field_behavior) = REQUIRED, (.google.cloud.operation_response_field) = "name"];</code>
      * @param string $var

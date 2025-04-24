@@ -17,11 +17,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class ExportTaxonomiesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Resource name of the project that the exported taxonomies belong to.
+     * Required. Resource name of the project that the exported taxonomies belong
+     * to.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. Resource names of the taxonomies to export.
      *
@@ -37,8 +38,9 @@ class ExportTaxonomiesRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. Resource name of the project that the exported taxonomies belong to.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $taxonomies
+     *           Required. Resource name of the project that the exported taxonomies belong
+     *           to.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $taxonomies
      *           Required. Resource names of the taxonomies to export.
      *     @type bool $serialized_taxonomies
      *           Serialized export taxonomies that contain all the policy
@@ -51,7 +53,8 @@ class ExportTaxonomiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of the project that the exported taxonomies belong to.
+     * Required. Resource name of the project that the exported taxonomies belong
+     * to.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -62,7 +65,8 @@ class ExportTaxonomiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of the project that the exported taxonomies belong to.
+     * Required. Resource name of the project that the exported taxonomies belong
+     * to.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -91,7 +95,7 @@ class ExportTaxonomiesRequest extends \Google\Protobuf\Internal\Message
      * Required. Resource names of the taxonomies to export.
      *
      * Generated from protobuf field <code>repeated string taxonomies = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTaxonomies($var)

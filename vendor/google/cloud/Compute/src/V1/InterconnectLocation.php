@@ -28,6 +28,20 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
      */
     private $availability_zone = null;
     /**
+     * [Output only] List of features available at this InterconnectLocation, which can take one of the following values: - IF_MACSEC
+     * Check the AvailableFeatures enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>repeated string available_features = 496344307;</code>
+     */
+    private $available_features;
+    /**
+     * [Output only] List of link types available at this InterconnectLocation, which can take one of the following values: - LINK_TYPE_ETHERNET_10G_LR - LINK_TYPE_ETHERNET_100G_LR
+     * Check the AvailableLinkTypes enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>repeated string available_link_types = 509504298;</code>
+     */
+    private $available_link_types;
+    /**
      * [Output Only] Metropolitan area designator that indicates which city an interconnect is located. For example: "Chicago, IL", "Amsterdam, Netherlands".
      *
      * Generated from protobuf field <code>optional string city = 3053931;</code>
@@ -108,7 +122,7 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
      */
     private $status = null;
     /**
-     * [Output Only] Set to true for locations that support physical zone separation. Defaults to false if the field is not present.
+     * [Output Only] Reserved for future use.
      *
      * Generated from protobuf field <code>optional bool supports_pzs = 83983214;</code>
      */
@@ -124,6 +138,12 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
      *           [Output Only] The postal address of the Point of Presence, each line in the address is separated by a newline character.
      *     @type string $availability_zone
      *           [Output Only] Availability zone for this InterconnectLocation. Within a metropolitan area (metro), maintenance will not be simultaneously scheduled in more than one availability zone. Example: "zone1" or "zone2".
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $available_features
+     *           [Output only] List of features available at this InterconnectLocation, which can take one of the following values: - IF_MACSEC
+     *           Check the AvailableFeatures enum for the list of possible values.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $available_link_types
+     *           [Output only] List of link types available at this InterconnectLocation, which can take one of the following values: - LINK_TYPE_ETHERNET_10G_LR - LINK_TYPE_ETHERNET_100G_LR
+     *           Check the AvailableLinkTypes enum for the list of possible values.
      *     @type string $city
      *           [Output Only] Metropolitan area designator that indicates which city an interconnect is located. For example: "Chicago, IL", "Amsterdam, Netherlands".
      *     @type string $continent
@@ -145,7 +165,7 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
      *           [Output Only] Name of the resource.
      *     @type string $peeringdb_facility_id
      *           [Output Only] The peeringdb identifier for this facility (corresponding with a netfac type in peeringdb).
-     *     @type \Google\Cloud\Compute\V1\InterconnectLocationRegionInfo[]|\Google\Protobuf\Internal\RepeatedField $region_infos
+     *     @type array<\Google\Cloud\Compute\V1\InterconnectLocationRegionInfo>|\Google\Protobuf\Internal\RepeatedField $region_infos
      *           [Output Only] A list of InterconnectLocation.RegionInfo objects, that describe parameters pertaining to the relation between this InterconnectLocation and various Google Cloud regions.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
@@ -153,7 +173,7 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
      *           [Output Only] The status of this InterconnectLocation, which can take one of the following values: - CLOSED: The InterconnectLocation is closed and is unavailable for provisioning new Interconnects. - AVAILABLE: The InterconnectLocation is available for provisioning new Interconnects.
      *           Check the Status enum for the list of possible values.
      *     @type bool $supports_pzs
-     *           [Output Only] Set to true for locations that support physical zone separation. Defaults to false if the field is not present.
+     *           [Output Only] Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -229,6 +249,62 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->availability_zone = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output only] List of features available at this InterconnectLocation, which can take one of the following values: - IF_MACSEC
+     * Check the AvailableFeatures enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>repeated string available_features = 496344307;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAvailableFeatures()
+    {
+        return $this->available_features;
+    }
+
+    /**
+     * [Output only] List of features available at this InterconnectLocation, which can take one of the following values: - IF_MACSEC
+     * Check the AvailableFeatures enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>repeated string available_features = 496344307;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAvailableFeatures($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->available_features = $arr;
+
+        return $this;
+    }
+
+    /**
+     * [Output only] List of link types available at this InterconnectLocation, which can take one of the following values: - LINK_TYPE_ETHERNET_10G_LR - LINK_TYPE_ETHERNET_100G_LR
+     * Check the AvailableLinkTypes enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>repeated string available_link_types = 509504298;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAvailableLinkTypes()
+    {
+        return $this->available_link_types;
+    }
+
+    /**
+     * [Output only] List of link types available at this InterconnectLocation, which can take one of the following values: - LINK_TYPE_ETHERNET_10G_LR - LINK_TYPE_ETHERNET_100G_LR
+     * Check the AvailableLinkTypes enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>repeated string available_link_types = 509504298;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAvailableLinkTypes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->available_link_types = $arr;
 
         return $this;
     }
@@ -610,7 +686,7 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
      * [Output Only] A list of InterconnectLocation.RegionInfo objects, that describe parameters pertaining to the relation between this InterconnectLocation and various Google Cloud regions.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.InterconnectLocationRegionInfo region_infos = 312194170;</code>
-     * @param \Google\Cloud\Compute\V1\InterconnectLocationRegionInfo[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\InterconnectLocationRegionInfo>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRegionInfos($var)
@@ -696,7 +772,7 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] Set to true for locations that support physical zone separation. Defaults to false if the field is not present.
+     * [Output Only] Reserved for future use.
      *
      * Generated from protobuf field <code>optional bool supports_pzs = 83983214;</code>
      * @return bool
@@ -717,7 +793,7 @@ class InterconnectLocation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] Set to true for locations that support physical zone separation. Defaults to false if the field is not present.
+     * [Output Only] Reserved for future use.
      *
      * Generated from protobuf field <code>optional bool supports_pzs = 83983214;</code>
      * @param bool $var

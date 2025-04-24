@@ -4,179 +4,122 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Invoice
- *
- * @ORM\Table(name="invoice")
- * @ORM\Entity(repositoryClass="App\Repository\InvoiceRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\InvoiceRepository')]
+#[ORM\Table(name: 'invoice')]
 class Invoice
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="invoice_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $invoiceId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'invoice_id', type: 'integer')]
+    private ?int $invoiceId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="number", type="string", length=50, nullable=false)
-     */
-    private $number;
+    #[ORM\Column(name: 'number', type: 'string', length: 50, nullable: false)]
+    private ?string $number;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="start_date", type="date", nullable=false)
-     */
-    private $startDate;
+    #[ORM\Column(name: 'start_date', type: 'date', nullable: false)]
+    private ?\DateTimeInterface $startDate;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="end_date", type="date", nullable=false)
-     */
-    private $endDate;
+    #[ORM\Column(name: 'end_date', type: 'date', nullable: false)]
+    private ?\DateTimeInterface $endDate;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="notes", type="text", nullable=false)
-     */
-    private $notes;
+    #[ORM\Column(name: 'notes', type: 'text', nullable: false)]
+    private ?string $notes;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="paid", type="boolean", nullable=false)
-     */
-    private $paid;
+    #[ORM\Column(name: 'paid', type: 'boolean', nullable: false)]
+    private ?bool $paid;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt;
 
-    /**
-     * @var Project
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_id", referencedColumnName="project_id")
-     * })
-     */
-    private $project;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
+    private ?Project $project;
 
-    /**
-     * Get invoiceId
-     *
-     * @return integer
-     */
-    public function getInvoiceId()
+    public function getInvoiceId(): ?int
     {
         return $this->invoiceId;
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTimeInterface $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
 
-    public function getNumber()
+    public function getNumber(): ?string
     {
         return $this->number;
     }
 
-    public function setNumber($number)
+    public function setNumber(?string $number): void
     {
         $this->number = $number;
     }
 
-    /**
-     * @return Project
-     */
-    public function getProject()
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function setProject($project)
+    public function setProject(?Project $project): void
     {
         $this->project = $project;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getStartDate()
+    public function getStartDate(): ?\DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function setStartDate($startDate)
+    public function setStartDate(?\DateTimeInterface $startDate): void
     {
         $this->startDate = $startDate;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getEndDate()
+    public function getEndDate(): ?\DateTimeInterface
     {
         return $this->endDate;
     }
 
-    public function setEndDate($endDate)
+    public function setEndDate(?\DateTimeInterface $endDate): void
     {
         $this->endDate = $endDate;
     }
 
-    public function getNotes()
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes($notes)
+    public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
     }
 
-    public function getPaid()
+    public function getPaid(): ?bool
     {
         return $this->paid;
     }
 
-    public function setPaid($paid): void
+    public function setPaid(?bool $paid): void
     {
         $this->paid = $paid;
     }
-
 }

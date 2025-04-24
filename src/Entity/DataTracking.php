@@ -2,392 +2,285 @@
 
 namespace App\Entity;
 
+use App\Entity\Inspector;
+use App\Entity\OverheadPrice;
+use App\Entity\Project;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * DataTracking
- *
- * @ORM\Table(name="data_tracking")
- * @ORM\Entity(repositoryClass="App\Repository\DataTrackingRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingRepository')]
+#[ORM\Table(name: 'data_tracking')]
 class DataTracking
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
-     */
-    private $date;
+    #[ORM\Column(name: 'date', type: 'date', nullable: false)]
+    private ?\DateTimeInterface $date;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="station_number", type="string", length=255, nullable=false)
-     */
-    private $stationNumber;
+    #[ORM\Column(name: 'station_number', type: 'string', length: 255, nullable: false)]
+    private ?string $stationNumber;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="measured_by", type="string", length=255, nullable=false)
-     */
-    private $measuredBy;
+    #[ORM\Column(name: 'measured_by', type: 'string', length: 255, nullable: false)]
+    private ?string $measuredBy;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="crew_lead", type="string", length=255, nullable=false)
-     */
-    private $crewLead;
+    #[ORM\Column(name: 'crew_lead', type: 'string', length: 255, nullable: false)]
+    private ?string $crewLead;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="notes", type="string", length=255, nullable=false)
-     */
-    private $notes;
+    #[ORM\Column(name: 'notes', type: 'string', length: 255, nullable: false)]
+    private ?string $notes;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="other_materials", type="string", length=255, nullable=false)
-     */
-    private $otherMaterials;
+    #[ORM\Column(name: 'other_materials', type: 'string', length: 255, nullable: false)]
+    private ?string $otherMaterials;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="conc_vendor", type="string", length=255, nullable=false)
-     */
-    private $concVendor;
+    #[ORM\Column(name: 'conc_vendor', type: 'string', length: 255, nullable: false)]
+    private ?string $concVendor;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="total_conc_used", type="float", nullable=false)
-     */
-    private $totalConcUsed;
+    #[ORM\Column(name: 'total_conc_used', type: 'float', nullable: false)]
+    private ?float $totalConcUsed;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="conc_price", type="float", nullable=false)
-     */
-    private $concPrice;
+    #[ORM\Column(name: 'conc_price', type: 'float', nullable: false)]
+    private ?float $concPrice;
 
+    #[ORM\Column(name: 'total_stamps', type: 'float', nullable: false)]
+    private ?float $totalStamps;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="total_stamps", type="float", nullable=false)
-     */
-    private $totalStamps;
+    #[ORM\Column(name: 'total_people', type: 'float', nullable: false)]
+    private ?float $totalPeople;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="total_people", type="float", nullable=false)
-     */
-    private $totalPeople;
+    #[ORM\Column(name: 'overhead_price', type: 'float', nullable: false)]
+    private ?float $overheadPrice;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="overhead_price", type="float", nullable=false)
-     */
-    private $overheadPrice;
+    #[ORM\Column(name: 'color_used', type: 'float', nullable: false)]
+    private ?float $colorUsed;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="color_used", type="float", nullable=false)
-     */
-    private $colorUsed;
+    #[ORM\Column(name: 'color_price', type: 'float', nullable: false)]
+    private ?float $colorPrice;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="color_price", type="float", nullable=false)
-     */
-    private $colorPrice;
+    #[ORM\Column(name: 'pending', type: 'boolean', nullable: false)]
+    private ?bool $pending;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="pending", type="boolean", nullable=false)
-     */
-    private $pending;
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
+    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
+    private ?Project $project;
 
-    /**
-     * @var Project
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_id", referencedColumnName="project_id")
-     * })
-     */
-    private $project;
+    #[ORM\ManyToOne(targetEntity: Inspector::class)]
+    #[ORM\JoinColumn(name: 'inspector_id', referencedColumnName: 'inspector_id')]
+    private ?Inspector $inspector;
 
+    #[ORM\ManyToOne(targetEntity: OverheadPrice::class)]
+    #[ORM\JoinColumn(name: 'overhead_price_id', referencedColumnName: 'overhead_id')]
+    private ?OverheadPrice $overhead;
 
-    /**
-     * @var Inspector
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Inspector")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="inspector_id", referencedColumnName="inspector_id")
-     * })
-     */
-    private $inspector;
-
-    /**
-     * @var OverheadPrice
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\OverheadPrice")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="overhead_price_id", referencedColumnName="overhead_id")
-     * })
-     */
-    private $overhead;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDate(): \DateTime
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): void
+    public function setDate(?\DateTimeInterface $date): void
     {
         $this->date = $date;
     }
 
-    /**
-     * @return Project
-     */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    public function setProject($project)
-    {
-        $this->project = $project;
-    }
-
-    /**
-     * @return Inspector
-     */
-    public function getInspector()
-    {
-        return $this->inspector;
-    }
-
-    public function setInspector($inspector)
-    {
-        $this->inspector = $inspector;
-    }
-
-    public function getCreatedAt(): \DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): \DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getStationNumber()
+    public function getStationNumber(): ?string
     {
         return $this->stationNumber;
     }
 
-    public function setStationNumber($station_number)
+    public function setStationNumber(?string $stationNumber): void
     {
-        $this->stationNumber = $station_number;
+        $this->stationNumber = $stationNumber;
     }
 
-    public function getMeasuredBy()
+    public function getMeasuredBy(): ?string
     {
         return $this->measuredBy;
     }
 
-    public function setMeasuredBy($measured_by)
+    public function setMeasuredBy(?string $measuredBy): void
     {
-        $this->measuredBy = $measured_by;
+        $this->measuredBy = $measuredBy;
     }
 
-    public function getConcVendor()
-    {
-        return $this->concVendor;
-    }
-
-    public function setConcVendor($conc_vendor)
-    {
-        $this->concVendor = $conc_vendor;
-    }
-
-    public function getCrewLead()
+    public function getCrewLead(): ?string
     {
         return $this->crewLead;
     }
 
-    public function setCrewLead($crew_lead)
+    public function setCrewLead(?string $crewLead): void
     {
-        $this->crewLead = $crew_lead;
+        $this->crewLead = $crewLead;
     }
 
-    public function getNotes()
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes($notes)
+    public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
     }
 
-    public function getOtherMaterials()
+    public function getOtherMaterials(): ?string
     {
         return $this->otherMaterials;
     }
 
-    public function setOtherMaterials($other_materials)
+    public function setOtherMaterials(?string $otherMaterials): void
     {
-        $this->otherMaterials = $other_materials;
+        $this->otherMaterials = $otherMaterials;
     }
 
-    public function getTotalConcUsed()
+    public function getConcVendor(): ?string
+    {
+        return $this->concVendor;
+    }
+
+    public function setConcVendor(?string $concVendor): void
+    {
+        $this->concVendor = $concVendor;
+    }
+
+    public function getTotalConcUsed(): ?float
     {
         return $this->totalConcUsed;
     }
 
-    public function setTotalConcUsed($totalConcUsed)
+    public function setTotalConcUsed(?float $totalConcUsed): void
     {
         $this->totalConcUsed = $totalConcUsed;
     }
 
-    public function getTotalStamps()
-    {
-        return $this->totalStamps;
-    }
-
-    public function setTotalStamps($total_stamps)
-    {
-        $this->totalStamps = $total_stamps;
-    }
-
-    public function getConcPrice()
+    public function getConcPrice(): ?float
     {
         return $this->concPrice;
     }
 
-    public function setConcPrice($concPrice)
+    public function setConcPrice(?float $concPrice): void
     {
         $this->concPrice = $concPrice;
     }
 
-    public function getTotalPeople()
+    public function getTotalStamps(): ?float
+    {
+        return $this->totalStamps;
+    }
+
+    public function setTotalStamps(?float $totalStamps): void
+    {
+        $this->totalStamps = $totalStamps;
+    }
+
+    public function getTotalPeople(): ?float
     {
         return $this->totalPeople;
     }
 
-    public function setTotalPeople($totalPeople)
+    public function setTotalPeople(?float $totalPeople): void
     {
         $this->totalPeople = $totalPeople;
     }
 
-    public function getOverheadPrice()
+    public function getOverheadPrice(): ?float
     {
         return $this->overheadPrice;
     }
 
-    public function setOverheadPrice( $overheadPrice)
+    public function setOverheadPrice(?float $overheadPrice): void
     {
         $this->overheadPrice = $overheadPrice;
     }
 
-    /**
-     * @return OverheadPrice
-     */
-    public function getOverhead()
-    {
-        return $this->overhead;
-    }
-
-    public function setOverhead($overhead)
-    {
-        $this->overhead = $overhead;
-    }
-
-    public function getColorPrice()
-    {
-        return $this->colorPrice;
-    }
-
-    public function setColorPrice( $colorPrice)
-    {
-        $this->colorPrice = $colorPrice;
-    }
-
-    public function getColorUsed()
+    public function getColorUsed(): ?float
     {
         return $this->colorUsed;
     }
 
-    public function setColorUsed( $colorUsed)
+    public function setColorUsed(?float $colorUsed): void
     {
         $this->colorUsed = $colorUsed;
     }
 
-    public function getPending()
+    public function getColorPrice(): ?float
+    {
+        return $this->colorPrice;
+    }
+
+    public function setColorPrice(?float $colorPrice): void
+    {
+        $this->colorPrice = $colorPrice;
+    }
+
+    public function getPending(): ?bool
     {
         return $this->pending;
     }
 
-    public function setPending($pending)
+    public function setPending(?bool $pending): void
     {
         $this->pending = $pending;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): void
+    {
+        $this->project = $project;
+    }
+
+    public function getInspector(): ?Inspector
+    {
+        return $this->inspector;
+    }
+
+    public function setInspector(?Inspector $inspector): void
+    {
+        $this->inspector = $inspector;
+    }
+
+    public function getOverhead(): ?OverheadPrice
+    {
+        return $this->overhead;
+    }
+
+    public function setOverhead(?OverheadPrice $overhead): void
+    {
+        $this->overhead = $overhead;
     }
 }

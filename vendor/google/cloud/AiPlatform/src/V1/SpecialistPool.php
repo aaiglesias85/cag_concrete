@@ -25,22 +25,22 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The user-defined name of the SpecialistPool.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      * This field should be unique on project-level.
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. The number of managers in this SpecialistPool.
      *
      * Generated from protobuf field <code>int32 specialist_managers_count = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $specialist_managers_count = 0;
+    protected $specialist_managers_count = 0;
     /**
      * The email addresses of the managers in the SpecialistPool.
      *
@@ -70,16 +70,16 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
      *           Required. The resource name of the SpecialistPool.
      *     @type string $display_name
      *           Required. The user-defined name of the SpecialistPool.
-     *           The name can be up to 128 characters long and can be consist of any UTF-8
+     *           The name can be up to 128 characters long and can consist of any UTF-8
      *           characters.
      *           This field should be unique on project-level.
      *     @type int $specialist_managers_count
      *           Output only. The number of managers in this SpecialistPool.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $specialist_manager_emails
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $specialist_manager_emails
      *           The email addresses of the managers in the SpecialistPool.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $pending_data_labeling_jobs
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $pending_data_labeling_jobs
      *           Output only. The resource name of the pending data labeling jobs.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $specialist_worker_emails
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $specialist_worker_emails
      *           The email addresses of workers in the SpecialistPool.
      * }
      */
@@ -116,7 +116,7 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The user-defined name of the SpecialistPool.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      * This field should be unique on project-level.
      *
@@ -130,7 +130,7 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The user-defined name of the SpecialistPool.
-     * The name can be up to 128 characters long and can be consist of any UTF-8
+     * The name can be up to 128 characters long and can consist of any UTF-8
      * characters.
      * This field should be unique on project-level.
      *
@@ -187,7 +187,7 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
      * The email addresses of the managers in the SpecialistPool.
      *
      * Generated from protobuf field <code>repeated string specialist_manager_emails = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSpecialistManagerEmails($var)
@@ -213,7 +213,7 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
      * Output only. The resource name of the pending data labeling jobs.
      *
      * Generated from protobuf field <code>repeated string pending_data_labeling_jobs = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPendingDataLabelingJobs($var)
@@ -239,7 +239,7 @@ class SpecialistPool extends \Google\Protobuf\Internal\Message
      * The email addresses of workers in the SpecialistPool.
      *
      * Generated from protobuf field <code>repeated string specialist_worker_emails = 7;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSpecialistWorkerEmails($var)

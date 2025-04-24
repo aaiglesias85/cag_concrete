@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Participants.SuggestArticles][google.cloud.dialogflow.v2.Participants.SuggestArticles].
+ * The request message for
+ * [Participants.SuggestArticles][google.cloud.dialogflow.v2.Participants.SuggestArticles].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.SuggestArticlesRequest</code>
  */
@@ -22,7 +23,7 @@ class SuggestArticlesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. The name of the latest conversation message to compile suggestion
      * for. If empty, it will be the latest message of the conversation.
@@ -31,21 +32,38 @@ class SuggestArticlesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string latest_message = 2 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      */
-    private $latest_message = '';
+    protected $latest_message = '';
     /**
      * Optional. Max number of messages prior to and including
-     * [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message] to use as context
-     * when compiling the suggestion. By default 20 and at most 50.
+     * [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message]
+     * to use as context when compiling the suggestion. By default 20 and at
+     * most 50.
      *
      * Generated from protobuf field <code>int32 context_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $context_size = 0;
+    protected $context_size = 0;
     /**
      * Parameters for a human assist query.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AssistQueryParameters assist_query_params = 4;</code>
      */
-    private $assist_query_params = null;
+    protected $assist_query_params = null;
+
+    /**
+     * @param string $parent Required. The name of the participant to fetch suggestion for.
+     *                       Format: `projects/<Project ID>/locations/<Location
+     *                       ID>/conversations/<Conversation ID>/participants/<Participant ID>`. Please see
+     *                       {@see ParticipantsClient::participantName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\SuggestArticlesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -64,8 +82,9 @@ class SuggestArticlesRequest extends \Google\Protobuf\Internal\Message
      *           ID>/conversations/<Conversation ID>/messages/<Message ID>`.
      *     @type int $context_size
      *           Optional. Max number of messages prior to and including
-     *           [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message] to use as context
-     *           when compiling the suggestion. By default 20 and at most 50.
+     *           [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message]
+     *           to use as context when compiling the suggestion. By default 20 and at
+     *           most 50.
      *     @type \Google\Cloud\Dialogflow\V2\AssistQueryParameters $assist_query_params
      *           Parameters for a human assist query.
      * }
@@ -139,8 +158,9 @@ class SuggestArticlesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. Max number of messages prior to and including
-     * [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message] to use as context
-     * when compiling the suggestion. By default 20 and at most 50.
+     * [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message]
+     * to use as context when compiling the suggestion. By default 20 and at
+     * most 50.
      *
      * Generated from protobuf field <code>int32 context_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -152,8 +172,9 @@ class SuggestArticlesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. Max number of messages prior to and including
-     * [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message] to use as context
-     * when compiling the suggestion. By default 20 and at most 50.
+     * [latest_message][google.cloud.dialogflow.v2.SuggestArticlesRequest.latest_message]
+     * to use as context when compiling the suggestion. By default 20 and at
+     * most 50.
      *
      * Generated from protobuf field <code>int32 context_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var

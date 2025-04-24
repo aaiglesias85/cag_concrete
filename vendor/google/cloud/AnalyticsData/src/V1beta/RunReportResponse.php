@@ -64,19 +64,19 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 row_count = 7;</code>
      */
-    private $row_count = 0;
+    protected $row_count = 0;
     /**
      * Metadata for the report.
      *
      * Generated from protobuf field <code>.google.analytics.data.v1beta.ResponseMetaData metadata = 8;</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
     /**
-     * This Analytics Property's quota state including this request.
+     * This Google Analytics property's quota state including this request.
      *
      * Generated from protobuf field <code>.google.analytics.data.v1beta.PropertyQuota property_quota = 9;</code>
      */
-    private $property_quota = null;
+    protected $property_quota = null;
     /**
      * Identifies what kind of resource this message is. This `kind` is always the
      * fixed string "analyticsData#runReport". Useful to distinguish between
@@ -84,7 +84,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string kind = 10;</code>
      */
-    private $kind = '';
+    protected $kind = '';
 
     /**
      * Constructor.
@@ -92,19 +92,19 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Analytics\Data\V1beta\DimensionHeader[]|\Google\Protobuf\Internal\RepeatedField $dimension_headers
+     *     @type array<\Google\Analytics\Data\V1beta\DimensionHeader>|\Google\Protobuf\Internal\RepeatedField $dimension_headers
      *           Describes dimension columns. The number of DimensionHeaders and ordering of
      *           DimensionHeaders matches the dimensions present in rows.
-     *     @type \Google\Analytics\Data\V1beta\MetricHeader[]|\Google\Protobuf\Internal\RepeatedField $metric_headers
+     *     @type array<\Google\Analytics\Data\V1beta\MetricHeader>|\Google\Protobuf\Internal\RepeatedField $metric_headers
      *           Describes metric columns. The number of MetricHeaders and ordering of
      *           MetricHeaders matches the metrics present in rows.
-     *     @type \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $rows
+     *     @type array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $rows
      *           Rows of dimension value combinations and metric values in the report.
-     *     @type \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $totals
+     *     @type array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $totals
      *           If requested, the totaled values of metrics.
-     *     @type \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $maximums
+     *     @type array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $maximums
      *           If requested, the maximum values of metrics.
-     *     @type \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $minimums
+     *     @type array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $minimums
      *           If requested, the minimum values of metrics.
      *     @type int $row_count
      *           The total number of rows in the query result. `rowCount` is independent of
@@ -117,7 +117,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      *     @type \Google\Analytics\Data\V1beta\ResponseMetaData $metadata
      *           Metadata for the report.
      *     @type \Google\Analytics\Data\V1beta\PropertyQuota $property_quota
-     *           This Analytics Property's quota state including this request.
+     *           This Google Analytics property's quota state including this request.
      *     @type string $kind
      *           Identifies what kind of resource this message is. This `kind` is always the
      *           fixed string "analyticsData#runReport". Useful to distinguish between
@@ -146,7 +146,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * DimensionHeaders matches the dimensions present in rows.
      *
      * Generated from protobuf field <code>repeated .google.analytics.data.v1beta.DimensionHeader dimension_headers = 1;</code>
-     * @param \Google\Analytics\Data\V1beta\DimensionHeader[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Analytics\Data\V1beta\DimensionHeader>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDimensionHeaders($var)
@@ -174,7 +174,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * MetricHeaders matches the metrics present in rows.
      *
      * Generated from protobuf field <code>repeated .google.analytics.data.v1beta.MetricHeader metric_headers = 2;</code>
-     * @param \Google\Analytics\Data\V1beta\MetricHeader[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Analytics\Data\V1beta\MetricHeader>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMetricHeaders($var)
@@ -200,7 +200,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * Rows of dimension value combinations and metric values in the report.
      *
      * Generated from protobuf field <code>repeated .google.analytics.data.v1beta.Row rows = 3;</code>
-     * @param \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRows($var)
@@ -226,7 +226,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * If requested, the totaled values of metrics.
      *
      * Generated from protobuf field <code>repeated .google.analytics.data.v1beta.Row totals = 4;</code>
-     * @param \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTotals($var)
@@ -252,7 +252,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * If requested, the maximum values of metrics.
      *
      * Generated from protobuf field <code>repeated .google.analytics.data.v1beta.Row maximums = 5;</code>
-     * @param \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMaximums($var)
@@ -278,7 +278,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
      * If requested, the minimum values of metrics.
      *
      * Generated from protobuf field <code>repeated .google.analytics.data.v1beta.Row minimums = 6;</code>
-     * @param \Google\Analytics\Data\V1beta\Row[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Analytics\Data\V1beta\Row>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMinimums($var)
@@ -364,7 +364,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * This Analytics Property's quota state including this request.
+     * This Google Analytics property's quota state including this request.
      *
      * Generated from protobuf field <code>.google.analytics.data.v1beta.PropertyQuota property_quota = 9;</code>
      * @return \Google\Analytics\Data\V1beta\PropertyQuota|null
@@ -385,7 +385,7 @@ class RunReportResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * This Analytics Property's quota state including this request.
+     * This Google Analytics property's quota state including this request.
      *
      * Generated from protobuf field <code>.google.analytics.data.v1beta.PropertyQuota property_quota = 9;</code>
      * @param \Google\Analytics\Data\V1beta\PropertyQuota $var

@@ -22,7 +22,7 @@ class CreateMicrosoftAdDomainRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The fully qualified domain name.
      * e.g. mydomain.myorganization.com, with the following restrictions:
@@ -38,13 +38,43 @@ class CreateMicrosoftAdDomainRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string domain_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $domain_name = '';
+    protected $domain_name = '';
     /**
      * Required. A Managed Identity domain resource.
      *
      * Generated from protobuf field <code>.google.cloud.managedidentities.v1.Domain domain = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $domain = null;
+    protected $domain = null;
+
+    /**
+     * @param string                                    $parent     Required. The resource project name and location using the form:
+     *                                                              `projects/{project_id}/locations/global`
+     *                                                              Please see {@see ManagedIdentitiesServiceClient::locationName()} for help formatting this field.
+     * @param string                                    $domainName Required. The fully qualified domain name.
+     *                                                              e.g. mydomain.myorganization.com, with the following restrictions:
+     *
+     *                                                              * Must contain only lowercase letters, numbers, periods and hyphens.
+     *                                                              * Must start with a letter.
+     *                                                              * Must contain between 2-64 characters.
+     *                                                              * Must end with a number or a letter.
+     *                                                              * Must not start with period.
+     *                                                              * First segement length (mydomain form example above) shouldn't exceed
+     *                                                              15 chars.
+     *                                                              * The last segment cannot be fully numeric.
+     *                                                              * Must be unique within the customer project.
+     * @param \Google\Cloud\ManagedIdentities\V1\Domain $domain     Required. A Managed Identity domain resource.
+     *
+     * @return \Google\Cloud\ManagedIdentities\V1\CreateMicrosoftAdDomainRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $domainName, \Google\Cloud\ManagedIdentities\V1\Domain $domain): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setDomainName($domainName)
+            ->setDomain($domain);
+    }
 
     /**
      * Constructor.

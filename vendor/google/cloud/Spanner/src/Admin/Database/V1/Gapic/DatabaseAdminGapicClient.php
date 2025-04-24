@@ -27,7 +27,6 @@ namespace Google\Cloud\Spanner\Admin\Database\V1\Gapic;
 use Google\ApiCore\ApiException;
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\GapicClientTrait;
-
 use Google\ApiCore\LongRunning\OperationsClient;
 use Google\ApiCore\OperationResponse;
 use Google\ApiCore\PathTemplate;
@@ -42,38 +41,51 @@ use Google\Cloud\Iam\V1\Policy;
 use Google\Cloud\Iam\V1\SetIamPolicyRequest;
 use Google\Cloud\Iam\V1\TestIamPermissionsRequest;
 use Google\Cloud\Iam\V1\TestIamPermissionsResponse;
+use Google\Cloud\Spanner\Admin\Database\V1\AddSplitPointsRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\AddSplitPointsResponse;
 use Google\Cloud\Spanner\Admin\Database\V1\Backup;
+use Google\Cloud\Spanner\Admin\Database\V1\BackupSchedule;
 use Google\Cloud\Spanner\Admin\Database\V1\CopyBackupEncryptionConfig;
 use Google\Cloud\Spanner\Admin\Database\V1\CopyBackupMetadata;
 use Google\Cloud\Spanner\Admin\Database\V1\CopyBackupRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\CreateBackupEncryptionConfig;
 use Google\Cloud\Spanner\Admin\Database\V1\CreateBackupMetadata;
 use Google\Cloud\Spanner\Admin\Database\V1\CreateBackupRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\CreateBackupScheduleRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\CreateDatabaseMetadata;
 use Google\Cloud\Spanner\Admin\Database\V1\CreateDatabaseRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\Database;
 use Google\Cloud\Spanner\Admin\Database\V1\DeleteBackupRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\DeleteBackupScheduleRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\DropDatabaseRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\EncryptionConfig;
 use Google\Cloud\Spanner\Admin\Database\V1\GetBackupRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\GetBackupScheduleRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\GetDatabaseDdlRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\GetDatabaseDdlResponse;
 use Google\Cloud\Spanner\Admin\Database\V1\GetDatabaseRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\ListBackupOperationsRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\ListBackupOperationsResponse;
+use Google\Cloud\Spanner\Admin\Database\V1\ListBackupSchedulesRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\ListBackupSchedulesResponse;
 use Google\Cloud\Spanner\Admin\Database\V1\ListBackupsRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\ListBackupsResponse;
 use Google\Cloud\Spanner\Admin\Database\V1\ListDatabaseOperationsRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\ListDatabaseOperationsResponse;
+use Google\Cloud\Spanner\Admin\Database\V1\ListDatabaseRolesRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\ListDatabaseRolesResponse;
 use Google\Cloud\Spanner\Admin\Database\V1\ListDatabasesRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\ListDatabasesResponse;
-
 use Google\Cloud\Spanner\Admin\Database\V1\RestoreDatabaseEncryptionConfig;
 use Google\Cloud\Spanner\Admin\Database\V1\RestoreDatabaseMetadata;
 use Google\Cloud\Spanner\Admin\Database\V1\RestoreDatabaseRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\SplitPoints;
 use Google\Cloud\Spanner\Admin\Database\V1\UpdateBackupRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\UpdateBackupScheduleRequest;
 use Google\Cloud\Spanner\Admin\Database\V1\UpdateDatabaseDdlMetadata;
 use Google\Cloud\Spanner\Admin\Database\V1\UpdateDatabaseDdlRequest;
+use Google\Cloud\Spanner\Admin\Database\V1\UpdateDatabaseMetadata;
+use Google\Cloud\Spanner\Admin\Database\V1\UpdateDatabaseRequest;
 use Google\LongRunning\Operation;
 use Google\Protobuf\FieldMask;
 use Google\Protobuf\GPBEmpty;
@@ -85,7 +97,7 @@ use Google\Protobuf\Timestamp;
  * The Cloud Spanner Database Admin API can be used to:
  * * create, drop, and list databases
  * * update the schema of pre-existing databases
- * * create, delete and list backups for a database
+ * * create, delete, copy and list backups for a database
  * * restore a database from an existing backup
  *
  * This class provides the ability to make remote calls to the backing service through method
@@ -94,36 +106,9 @@ use Google\Protobuf\Timestamp;
  * ```
  * $databaseAdminClient = new DatabaseAdminClient();
  * try {
- *     $formattedParent = $databaseAdminClient->instanceName('[PROJECT]', '[INSTANCE]');
- *     $backupId = 'backup_id';
- *     $formattedSourceBackup = $databaseAdminClient->backupName('[PROJECT]', '[INSTANCE]', '[BACKUP]');
- *     $expireTime = new Timestamp();
- *     $operationResponse = $databaseAdminClient->copyBackup($formattedParent, $backupId, $formattedSourceBackup, $expireTime);
- *     $operationResponse->pollUntilComplete();
- *     if ($operationResponse->operationSucceeded()) {
- *         $result = $operationResponse->getResult();
- *     // doSomethingWith($result)
- *     } else {
- *         $error = $operationResponse->getError();
- *         // handleError($error)
- *     }
- *     // Alternatively:
- *     // start the operation, keep the operation name, and resume later
- *     $operationResponse = $databaseAdminClient->copyBackup($formattedParent, $backupId, $formattedSourceBackup, $expireTime);
- *     $operationName = $operationResponse->getName();
- *     // ... do other work
- *     $newOperationResponse = $databaseAdminClient->resumeOperation($operationName, 'copyBackup');
- *     while (!$newOperationResponse->isDone()) {
- *         // ... do other work
- *         $newOperationResponse->reload();
- *     }
- *     if ($newOperationResponse->operationSucceeded()) {
- *         $result = $newOperationResponse->getResult();
- *     // doSomethingWith($result)
- *     } else {
- *         $error = $newOperationResponse->getError();
- *         // handleError($error)
- *     }
+ *     $formattedDatabase = $databaseAdminClient->databaseName('[PROJECT]', '[INSTANCE]', '[DATABASE]');
+ *     $splitPoints = [];
+ *     $response = $databaseAdminClient->addSplitPoints($formattedDatabase, $splitPoints);
  * } finally {
  *     $databaseAdminClient->close();
  * }
@@ -133,34 +118,33 @@ use Google\Protobuf\Timestamp;
  * assist with these names, this class includes a format method for each type of
  * name, and additionally a parseName method to extract the individual identifiers
  * contained within formatted names that are returned by the API.
+ *
+ * @deprecated Please use the new service client {@see \Google\Cloud\Spanner\Admin\Database\V1\Client\DatabaseAdminClient}.
  */
 class DatabaseAdminGapicClient
 {
     use GapicClientTrait;
 
-    /**
-     * The name of the service.
-     */
+    /** The name of the service. */
     const SERVICE_NAME = 'google.spanner.admin.database.v1.DatabaseAdmin';
 
     /**
      * The default address of the service.
+     *
+     * @deprecated SERVICE_ADDRESS_TEMPLATE should be used instead.
      */
     const SERVICE_ADDRESS = 'spanner.googleapis.com';
 
-    /**
-     * The default port of the service.
-     */
+    /** The address template of the service. */
+    private const SERVICE_ADDRESS_TEMPLATE = 'spanner.UNIVERSE_DOMAIN';
+
+    /** The default port of the service. */
     const DEFAULT_SERVICE_PORT = 443;
 
-    /**
-     * The name of the code generator, to be included in the agent header.
-     */
+    /** The name of the code generator, to be included in the agent header. */
     const CODEGEN_NAME = 'gapic';
 
-    /**
-     * The default scopes required by the service.
-     */
+    /** The default scopes required by the service. */
     public static $serviceScopes = [
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/spanner.admin',
@@ -168,11 +152,17 @@ class DatabaseAdminGapicClient
 
     private static $backupNameTemplate;
 
+    private static $backupScheduleNameTemplate;
+
     private static $cryptoKeyNameTemplate;
+
+    private static $cryptoKeyVersionNameTemplate;
 
     private static $databaseNameTemplate;
 
     private static $instanceNameTemplate;
+
+    private static $instancePartitionNameTemplate;
 
     private static $pathTemplateMap;
 
@@ -214,6 +204,17 @@ class DatabaseAdminGapicClient
         return self::$backupNameTemplate;
     }
 
+    private static function getBackupScheduleNameTemplate()
+    {
+        if (self::$backupScheduleNameTemplate == null) {
+            self::$backupScheduleNameTemplate = new PathTemplate(
+                'projects/{project}/instances/{instance}/databases/{database}/backupSchedules/{schedule}'
+            );
+        }
+
+        return self::$backupScheduleNameTemplate;
+    }
+
     private static function getCryptoKeyNameTemplate()
     {
         if (self::$cryptoKeyNameTemplate == null) {
@@ -223,6 +224,17 @@ class DatabaseAdminGapicClient
         }
 
         return self::$cryptoKeyNameTemplate;
+    }
+
+    private static function getCryptoKeyVersionNameTemplate()
+    {
+        if (self::$cryptoKeyVersionNameTemplate == null) {
+            self::$cryptoKeyVersionNameTemplate = new PathTemplate(
+                'projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}/cryptoKeyVersions/{crypto_key_version}'
+            );
+        }
+
+        return self::$cryptoKeyVersionNameTemplate;
     }
 
     private static function getDatabaseNameTemplate()
@@ -247,14 +259,28 @@ class DatabaseAdminGapicClient
         return self::$instanceNameTemplate;
     }
 
+    private static function getInstancePartitionNameTemplate()
+    {
+        if (self::$instancePartitionNameTemplate == null) {
+            self::$instancePartitionNameTemplate = new PathTemplate(
+                'projects/{project}/instances/{instance}/instancePartitions/{instance_partition}'
+            );
+        }
+
+        return self::$instancePartitionNameTemplate;
+    }
+
     private static function getPathTemplateMap()
     {
         if (self::$pathTemplateMap == null) {
             self::$pathTemplateMap = [
                 'backup' => self::getBackupNameTemplate(),
+                'backupSchedule' => self::getBackupScheduleNameTemplate(),
                 'cryptoKey' => self::getCryptoKeyNameTemplate(),
+                'cryptoKeyVersion' => self::getCryptoKeyVersionNameTemplate(),
                 'database' => self::getDatabaseNameTemplate(),
                 'instance' => self::getInstanceNameTemplate(),
+                'instancePartition' => self::getInstancePartitionNameTemplate(),
             ];
         }
 
@@ -281,6 +307,31 @@ class DatabaseAdminGapicClient
     }
 
     /**
+     * Formats a string containing the fully-qualified path to represent a
+     * backup_schedule resource.
+     *
+     * @param string $project
+     * @param string $instance
+     * @param string $database
+     * @param string $schedule
+     *
+     * @return string The formatted backup_schedule resource.
+     */
+    public static function backupScheduleName(
+        $project,
+        $instance,
+        $database,
+        $schedule
+    ) {
+        return self::getBackupScheduleNameTemplate()->render([
+            'project' => $project,
+            'instance' => $instance,
+            'database' => $database,
+            'schedule' => $schedule,
+        ]);
+    }
+
+    /**
      * Formats a string containing the fully-qualified path to represent a crypto_key
      * resource.
      *
@@ -302,6 +353,34 @@ class DatabaseAdminGapicClient
             'location' => $location,
             'key_ring' => $keyRing,
             'crypto_key' => $cryptoKey,
+        ]);
+    }
+
+    /**
+     * Formats a string containing the fully-qualified path to represent a
+     * crypto_key_version resource.
+     *
+     * @param string $project
+     * @param string $location
+     * @param string $keyRing
+     * @param string $cryptoKey
+     * @param string $cryptoKeyVersion
+     *
+     * @return string The formatted crypto_key_version resource.
+     */
+    public static function cryptoKeyVersionName(
+        $project,
+        $location,
+        $keyRing,
+        $cryptoKey,
+        $cryptoKeyVersion
+    ) {
+        return self::getCryptoKeyVersionNameTemplate()->render([
+            'project' => $project,
+            'location' => $location,
+            'key_ring' => $keyRing,
+            'crypto_key' => $cryptoKey,
+            'crypto_key_version' => $cryptoKeyVersion,
         ]);
     }
 
@@ -342,13 +421,38 @@ class DatabaseAdminGapicClient
     }
 
     /**
+     * Formats a string containing the fully-qualified path to represent a
+     * instance_partition resource.
+     *
+     * @param string $project
+     * @param string $instance
+     * @param string $instancePartition
+     *
+     * @return string The formatted instance_partition resource.
+     */
+    public static function instancePartitionName(
+        $project,
+        $instance,
+        $instancePartition
+    ) {
+        return self::getInstancePartitionNameTemplate()->render([
+            'project' => $project,
+            'instance' => $instance,
+            'instance_partition' => $instancePartition,
+        ]);
+    }
+
+    /**
      * Parses a formatted name string and returns an associative array of the components in the name.
      * The following name formats are supported:
      * Template: Pattern
      * - backup: projects/{project}/instances/{instance}/backups/{backup}
+     * - backupSchedule: projects/{project}/instances/{instance}/databases/{database}/backupSchedules/{schedule}
      * - cryptoKey: projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}
+     * - cryptoKeyVersion: projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}/cryptoKeyVersions/{crypto_key_version}
      * - database: projects/{project}/instances/{instance}/databases/{database}
      * - instance: projects/{project}/instances/{instance}
+     * - instancePartition: projects/{project}/instances/{instance}/instancePartitions/{instance_partition}
      *
      * The optional $template argument can be supplied to specify a particular pattern,
      * and must match one of the templates listed above. If no $template argument is
@@ -430,9 +534,6 @@ class DatabaseAdminGapicClient
      * @param array $options {
      *     Optional. Options for configuring the service API wrapper.
      *
-     *     @type string $serviceAddress
-     *           **Deprecated**. This option will be removed in a future major release. Please
-     *           utilize the `$apiEndpoint` option instead.
      *     @type string $apiEndpoint
      *           The address of the API remote host. May optionally include the port, formatted
      *           as "<uri>:<port>". Default 'spanner.googleapis.com:443'.
@@ -462,7 +563,7 @@ class DatabaseAdminGapicClient
      *           *Advanced usage*: Additionally, it is possible to pass in an already
      *           instantiated {@see \Google\ApiCore\Transport\TransportInterface} object. Note
      *           that when this object is provided, any settings in $transportConfig, and any
-     *           $serviceAddress setting, will be ignored.
+     *           $apiEndpoint setting, will be ignored.
      *     @type array $transportConfig
      *           Configuration options that will be used to construct the transport. Options for
      *           each supported transport type should be passed in a key for that transport. For
@@ -489,6 +590,72 @@ class DatabaseAdminGapicClient
     }
 
     /**
+     * Adds split points to specified tables, indexes of a database.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $formattedDatabase = $databaseAdminClient->databaseName('[PROJECT]', '[INSTANCE]', '[DATABASE]');
+     *     $splitPoints = [];
+     *     $response = $databaseAdminClient->addSplitPoints($formattedDatabase, $splitPoints);
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param string        $database     Required. The database on whose tables/indexes split points are to be
+     *                                    added. Values are of the form
+     *                                    `projects/<project>/instances/<instance>/databases/<database>`.
+     * @param SplitPoints[] $splitPoints  Required. The split points to add.
+     * @param array         $optionalArgs {
+     *     Optional.
+     *
+     *     @type string $initiator
+     *           Optional. A user-supplied tag associated with the split points.
+     *           For example, "intital_data_load", "special_event_1".
+     *           Defaults to "CloudAddSplitPointsAPI" if not specified.
+     *           The length of the tag must not exceed 50 characters,else will be trimmed.
+     *           Only valid UTF8 characters are allowed.
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\AddSplitPointsResponse
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function addSplitPoints(
+        $database,
+        $splitPoints,
+        array $optionalArgs = []
+    ) {
+        $request = new AddSplitPointsRequest();
+        $requestParamHeaders = [];
+        $request->setDatabase($database);
+        $request->setSplitPoints($splitPoints);
+        $requestParamHeaders['database'] = $database;
+        if (isset($optionalArgs['initiator'])) {
+            $request->setInitiator($optionalArgs['initiator']);
+        }
+
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->startCall(
+            'AddSplitPoints',
+            AddSplitPointsResponse::class,
+            $optionalArgs,
+            $request
+        )->wait();
+    }
+
+    /**
      * Starts copying a Cloud Spanner Backup.
      * The returned backup [long-running operation][google.longrunning.Operation]
      * will have a name of the format
@@ -498,9 +665,10 @@ class DatabaseAdminGapicClient
      * The [metadata][google.longrunning.Operation.metadata] field type is
      * [CopyBackupMetadata][google.spanner.admin.database.v1.CopyBackupMetadata].
      * The [response][google.longrunning.Operation.response] field type is
-     * [Backup][google.spanner.admin.database.v1.Backup], if successful. Cancelling the returned operation will stop the
-     * copying and delete the backup.
-     * Concurrent CopyBackup requests can run on the same source backup.
+     * [Backup][google.spanner.admin.database.v1.Backup], if successful.
+     * Cancelling the returned operation will stop the copying and delete the
+     * destination backup. Concurrent CopyBackup requests can run on the same
+     * source backup.
      *
      * Sample code:
      * ```
@@ -514,7 +682,7 @@ class DatabaseAdminGapicClient
      *     $operationResponse->pollUntilComplete();
      *     if ($operationResponse->operationSucceeded()) {
      *         $result = $operationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $operationResponse->getError();
      *         // handleError($error)
@@ -531,7 +699,7 @@ class DatabaseAdminGapicClient
      *     }
      *     if ($newOperationResponse->operationSucceeded()) {
      *         $result = $newOperationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $newOperationResponse->getError();
      *         // handleError($error)
@@ -541,8 +709,8 @@ class DatabaseAdminGapicClient
      * }
      * ```
      *
-     * @param string    $parent       Required. The name of the destination instance that will contain the backup copy.
-     *                                Values are of the form: `projects/<project>/instances/<instance>`.
+     * @param string    $parent       Required. The name of the destination instance that will contain the backup
+     *                                copy. Values are of the form: `projects/<project>/instances/<instance>`.
      * @param string    $backupId     Required. The id of the backup copy.
      *                                The `backup_id` appended to `parent` forms the full backup_uri of the form
      *                                `projects/<project>/instances/<instance>/backups/<backup>`.
@@ -561,16 +729,15 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type CopyBackupEncryptionConfig $encryptionConfig
-     *           Optional. The encryption configuration used to encrypt the backup. If this field is
-     *           not specified, the backup will use the same
-     *           encryption configuration as the source backup by default, namely
-     *           [encryption_type][google.spanner.admin.database.v1.CopyBackupEncryptionConfig.encryption_type] =
-     *           `USE_CONFIG_DEFAULT_OR_BACKUP_ENCRYPTION`.
+     *           Optional. The encryption configuration used to encrypt the backup. If this
+     *           field is not specified, the backup will use the same encryption
+     *           configuration as the source backup by default, namely
+     *           [encryption_type][google.spanner.admin.database.v1.CopyBackupEncryptionConfig.encryption_type]
+     *           = `USE_CONFIG_DEFAULT_OR_BACKUP_ENCRYPTION`.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\OperationResponse
@@ -616,12 +783,12 @@ class DatabaseAdminGapicClient
      * `projects/<project>/instances/<instance>/backups/<backup>/operations/<operation_id>`
      * and can be used to track creation of the backup. The
      * [metadata][google.longrunning.Operation.metadata] field type is
-     * [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata]. The
-     * [response][google.longrunning.Operation.response] field type is
-     * [Backup][google.spanner.admin.database.v1.Backup], if successful. Cancelling the returned operation will stop the
-     * creation and delete the backup.
-     * There can be only one pending backup creation per database. Backup creation
-     * of different databases can run concurrently.
+     * [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata].
+     * The [response][google.longrunning.Operation.response] field type is
+     * [Backup][google.spanner.admin.database.v1.Backup], if successful.
+     * Cancelling the returned operation will stop the creation and delete the
+     * backup. There can be only one pending backup creation per database. Backup
+     * creation of different databases can run concurrently.
      *
      * Sample code:
      * ```
@@ -634,7 +801,7 @@ class DatabaseAdminGapicClient
      *     $operationResponse->pollUntilComplete();
      *     if ($operationResponse->operationSucceeded()) {
      *         $result = $operationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $operationResponse->getError();
      *         // handleError($error)
@@ -651,7 +818,7 @@ class DatabaseAdminGapicClient
      *     }
      *     if ($newOperationResponse->operationSucceeded()) {
      *         $result = $newOperationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $newOperationResponse->getError();
      *         // handleError($error)
@@ -675,16 +842,15 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type CreateBackupEncryptionConfig $encryptionConfig
-     *           Optional. The encryption configuration used to encrypt the backup. If this field is
-     *           not specified, the backup will use the same
-     *           encryption configuration as the database by default, namely
-     *           [encryption_type][google.spanner.admin.database.v1.CreateBackupEncryptionConfig.encryption_type] =
-     *           `USE_DATABASE_ENCRYPTION`.
+     *           Optional. The encryption configuration used to encrypt the backup. If this
+     *           field is not specified, the backup will use the same encryption
+     *           configuration as the database by default, namely
+     *           [encryption_type][google.spanner.admin.database.v1.CreateBackupEncryptionConfig.encryption_type]
+     *           = `USE_DATABASE_ENCRYPTION`.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\OperationResponse
@@ -722,13 +888,73 @@ class DatabaseAdminGapicClient
     }
 
     /**
+     * Creates a new backup schedule.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $formattedParent = $databaseAdminClient->databaseName('[PROJECT]', '[INSTANCE]', '[DATABASE]');
+     *     $backupScheduleId = 'backup_schedule_id';
+     *     $backupSchedule = new BackupSchedule();
+     *     $response = $databaseAdminClient->createBackupSchedule($formattedParent, $backupScheduleId, $backupSchedule);
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param string         $parent           Required. The name of the database that this backup schedule applies to.
+     * @param string         $backupScheduleId Required. The Id to use for the backup schedule. The `backup_schedule_id`
+     *                                         appended to `parent` forms the full backup schedule name of the form
+     *                                         `projects/<project>/instances/<instance>/databases/<database>/backupSchedules/<backup_schedule_id>`.
+     * @param BackupSchedule $backupSchedule   Required. The backup schedule to create.
+     * @param array          $optionalArgs     {
+     *     Optional.
+     *
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\BackupSchedule
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function createBackupSchedule(
+        $parent,
+        $backupScheduleId,
+        $backupSchedule,
+        array $optionalArgs = []
+    ) {
+        $request = new CreateBackupScheduleRequest();
+        $requestParamHeaders = [];
+        $request->setParent($parent);
+        $request->setBackupScheduleId($backupScheduleId);
+        $request->setBackupSchedule($backupSchedule);
+        $requestParamHeaders['parent'] = $parent;
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->startCall(
+            'CreateBackupSchedule',
+            BackupSchedule::class,
+            $optionalArgs,
+            $request
+        )->wait();
+    }
+
+    /**
      * Creates a new Cloud Spanner database and starts to prepare it for serving.
      * The returned [long-running operation][google.longrunning.Operation] will
      * have a name of the format `<database_name>/operations/<operation_id>` and
      * can be used to track preparation of the database. The
      * [metadata][google.longrunning.Operation.metadata] field type is
-     * [CreateDatabaseMetadata][google.spanner.admin.database.v1.CreateDatabaseMetadata]. The
-     * [response][google.longrunning.Operation.response] field type is
+     * [CreateDatabaseMetadata][google.spanner.admin.database.v1.CreateDatabaseMetadata].
+     * The [response][google.longrunning.Operation.response] field type is
      * [Database][google.spanner.admin.database.v1.Database], if successful.
      *
      * Sample code:
@@ -741,7 +967,7 @@ class DatabaseAdminGapicClient
      *     $operationResponse->pollUntilComplete();
      *     if ($operationResponse->operationSucceeded()) {
      *         $result = $operationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $operationResponse->getError();
      *         // handleError($error)
@@ -758,7 +984,7 @@ class DatabaseAdminGapicClient
      *     }
      *     if ($newOperationResponse->operationSucceeded()) {
      *         $result = $newOperationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $newOperationResponse->getError();
      *         // handleError($error)
@@ -784,17 +1010,32 @@ class DatabaseAdminGapicClient
      *           statements execute atomically with the creation of the database:
      *           if there is an error in any statement, the database is not created.
      *     @type EncryptionConfig $encryptionConfig
-     *           Optional. The encryption configuration for the database. If this field is not
-     *           specified, Cloud Spanner will encrypt/decrypt all data at rest using
+     *           Optional. The encryption configuration for the database. If this field is
+     *           not specified, Cloud Spanner will encrypt/decrypt all data at rest using
      *           Google default encryption.
      *     @type int $databaseDialect
      *           Optional. The dialect of the Cloud Spanner Database.
      *           For allowed values, use constants defined on {@see \Google\Cloud\Spanner\Admin\Database\V1\DatabaseDialect}
+     *     @type string $protoDescriptors
+     *           Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements in
+     *           'extra_statements' above.
+     *           Contains a protobuf-serialized
+     *           [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto).
+     *           To generate it, [install](https://grpc.io/docs/protoc-installation/) and
+     *           run `protoc` with --include_imports and --descriptor_set_out. For example,
+     *           to generate for moon/shot/app.proto, run
+     *           ```
+     *           $protoc  --proto_path=/app_path --proto_path=/lib_path \
+     *           --include_imports \
+     *           --descriptor_set_out=descriptors.data \
+     *           moon/shot/app.proto
+     *           ```
+     *           For more details, see protobuffer [self
+     *           description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\OperationResponse
@@ -823,6 +1064,10 @@ class DatabaseAdminGapicClient
             $request->setDatabaseDialect($optionalArgs['databaseDialect']);
         }
 
+        if (isset($optionalArgs['protoDescriptors'])) {
+            $request->setProtoDescriptors($optionalArgs['protoDescriptors']);
+        }
+
         $requestParams = new RequestParamsHeaderDescriptor(
             $requestParamHeaders
         );
@@ -838,7 +1083,8 @@ class DatabaseAdminGapicClient
     }
 
     /**
-     * Deletes a pending or completed [Backup][google.spanner.admin.database.v1.Backup].
+     * Deletes a pending or completed
+     * [Backup][google.spanner.admin.database.v1.Backup].
      *
      * Sample code:
      * ```
@@ -858,10 +1104,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @throws ApiException if the remote call fails
@@ -880,6 +1125,54 @@ class DatabaseAdminGapicClient
             : $requestParams->getHeader();
         return $this->startCall(
             'DeleteBackup',
+            GPBEmpty::class,
+            $optionalArgs,
+            $request
+        )->wait();
+    }
+
+    /**
+     * Deletes a backup schedule.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $formattedName = $databaseAdminClient->backupScheduleName('[PROJECT]', '[INSTANCE]', '[DATABASE]', '[SCHEDULE]');
+     *     $databaseAdminClient->deleteBackupSchedule($formattedName);
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param string $name         Required. The name of the schedule to delete.
+     *                             Values are of the form
+     *                             `projects/<project>/instances/<instance>/databases/<database>/backupSchedules/<backup_schedule_id>`.
+     * @param array  $optionalArgs {
+     *     Optional.
+     *
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function deleteBackupSchedule($name, array $optionalArgs = [])
+    {
+        $request = new DeleteBackupScheduleRequest();
+        $requestParamHeaders = [];
+        $request->setName($name);
+        $requestParamHeaders['name'] = $name;
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->startCall(
+            'DeleteBackupSchedule',
             GPBEmpty::class,
             $optionalArgs,
             $request
@@ -909,10 +1202,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @throws ApiException if the remote call fails
@@ -938,7 +1230,8 @@ class DatabaseAdminGapicClient
     }
 
     /**
-     * Gets metadata on a pending or completed [Backup][google.spanner.admin.database.v1.Backup].
+     * Gets metadata on a pending or completed
+     * [Backup][google.spanner.admin.database.v1.Backup].
      *
      * Sample code:
      * ```
@@ -958,10 +1251,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Spanner\Admin\Database\V1\Backup
@@ -989,6 +1281,56 @@ class DatabaseAdminGapicClient
     }
 
     /**
+     * Gets backup schedule for the input schedule name.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $formattedName = $databaseAdminClient->backupScheduleName('[PROJECT]', '[INSTANCE]', '[DATABASE]', '[SCHEDULE]');
+     *     $response = $databaseAdminClient->getBackupSchedule($formattedName);
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param string $name         Required. The name of the schedule to retrieve.
+     *                             Values are of the form
+     *                             `projects/<project>/instances/<instance>/databases/<database>/backupSchedules/<backup_schedule_id>`.
+     * @param array  $optionalArgs {
+     *     Optional.
+     *
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\BackupSchedule
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function getBackupSchedule($name, array $optionalArgs = [])
+    {
+        $request = new GetBackupScheduleRequest();
+        $requestParamHeaders = [];
+        $request->setName($name);
+        $requestParamHeaders['name'] = $name;
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->startCall(
+            'GetBackupSchedule',
+            BackupSchedule::class,
+            $optionalArgs,
+            $request
+        )->wait();
+    }
+
+    /**
      * Gets the state of a Cloud Spanner database.
      *
      * Sample code:
@@ -1008,10 +1350,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Spanner\Admin\Database\V1\Database
@@ -1061,10 +1402,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Spanner\Admin\Database\V1\GetDatabaseDdlResponse
@@ -1121,10 +1461,9 @@ class DatabaseAdminGapicClient
      *           OPTIONAL: A `GetPolicyOptions` object for specifying options to
      *           `GetIamPolicy`.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Iam\V1\Policy
@@ -1210,7 +1549,9 @@ class DatabaseAdminGapicClient
      *           * `name` - The name of the long-running operation
      *           * `done` - False if the operation is in progress, else true.
      *           * `metadata.&#64;type` - the type of metadata. For example, the type string
-     *           for [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata] is
+     *           for
+     *           [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata]
+     *           is
      *           `type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata`.
      *           * `metadata.<field_name>` - any field in metadata.value.
      *           `metadata.&#64;type` must be specified first if filtering on metadata
@@ -1228,14 +1569,15 @@ class DatabaseAdminGapicClient
      *           * `done:true` - The operation is complete.
      *           * `(metadata.&#64;type=type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata) AND` \
      *           `metadata.database:prod` - Returns operations where:
-     *           * The operation's metadata type is [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata].
-     *           * The database the backup was taken from has a name containing the
-     *           string "prod".
+     *           * The operation's metadata type is
+     *           [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata].
+     *           * The source database name of backup contains the string "prod".
      *           * `(metadata.&#64;type=type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata) AND` \
      *           `(metadata.name:howl) AND` \
      *           `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` \
      *           `(error:*)` - Returns operations where:
-     *           * The operation's metadata type is [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata].
+     *           * The operation's metadata type is
+     *           [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata].
      *           * The backup name contains the string "howl".
      *           * The operation started before 2018-03-28T14:50:00Z.
      *           * The operation resulted in an error.
@@ -1243,9 +1585,9 @@ class DatabaseAdminGapicClient
      *           `(metadata.source_backup:test) AND` \
      *           `(metadata.progress.start_time < \"2022-01-18T14:50:00Z\") AND` \
      *           `(error:*)` - Returns operations where:
-     *           * The operation's metadata type is [CopyBackupMetadata][google.spanner.admin.database.v1.CopyBackupMetadata].
-     *           * The source backup of the copied backup name contains the string
-     *           "test".
+     *           * The operation's metadata type is
+     *           [CopyBackupMetadata][google.spanner.admin.database.v1.CopyBackupMetadata].
+     *           * The source backup name contains the string "test".
      *           * The operation started before 2022-01-18T14:50:00Z.
      *           * The operation resulted in an error.
      *           * `((metadata.&#64;type=type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata) AND` \
@@ -1255,12 +1597,13 @@ class DatabaseAdminGapicClient
      *           `(metadata.source_backup:test_bkp)) AND` \
      *           `(error:*)` - Returns operations where:
      *           * The operation's metadata matches either of criteria:
-     *           * The operation's metadata type is [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata] AND the
-     *           database the backup was taken from has name containing string
+     *           * The operation's metadata type is
+     *           [CreateBackupMetadata][google.spanner.admin.database.v1.CreateBackupMetadata]
+     *           AND the source database name of the backup contains the string
      *           "test_db"
-     *           * The operation's metadata type is [CopyBackupMetadata][google.spanner.admin.database.v1.CopyBackupMetadata] AND the
-     *           backup the backup was copied from has name containing string
-     *           "test_bkp"
+     *           * The operation's metadata type is
+     *           [CopyBackupMetadata][google.spanner.admin.database.v1.CopyBackupMetadata]
+     *           AND the source backup name contains the string "test_bkp"
      *           * The operation resulted in an error.
      *     @type int $pageSize
      *           The maximum number of resources contained in the underlying API
@@ -1272,10 +1615,9 @@ class DatabaseAdminGapicClient
      *           of values will be returned. Any page token used here must have
      *           been generated by a previous call to the API.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\PagedListResponse
@@ -1310,6 +1652,85 @@ class DatabaseAdminGapicClient
             'ListBackupOperations',
             $optionalArgs,
             ListBackupOperationsResponse::class,
+            $request
+        );
+    }
+
+    /**
+     * Lists all the backup schedules for the database.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $formattedParent = $databaseAdminClient->databaseName('[PROJECT]', '[INSTANCE]', '[DATABASE]');
+     *     // Iterate over pages of elements
+     *     $pagedResponse = $databaseAdminClient->listBackupSchedules($formattedParent);
+     *     foreach ($pagedResponse->iteratePages() as $page) {
+     *         foreach ($page as $element) {
+     *             // doSomethingWith($element);
+     *         }
+     *     }
+     *     // Alternatively:
+     *     // Iterate through all elements
+     *     $pagedResponse = $databaseAdminClient->listBackupSchedules($formattedParent);
+     *     foreach ($pagedResponse->iterateAllElements() as $element) {
+     *         // doSomethingWith($element);
+     *     }
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param string $parent       Required. Database is the parent resource whose backup schedules should be
+     *                             listed. Values are of the form
+     *                             projects/<project>/instances/<instance>/databases/<database>
+     * @param array  $optionalArgs {
+     *     Optional.
+     *
+     *     @type int $pageSize
+     *           The maximum number of resources contained in the underlying API
+     *           response. The API may return fewer values in a page, even if
+     *           there are additional values to be retrieved.
+     *     @type string $pageToken
+     *           A page token is used to specify a page of values to be returned.
+     *           If no page token is specified (the default), the first page
+     *           of values will be returned. Any page token used here must have
+     *           been generated by a previous call to the API.
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\ApiCore\PagedListResponse
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function listBackupSchedules($parent, array $optionalArgs = [])
+    {
+        $request = new ListBackupSchedulesRequest();
+        $requestParamHeaders = [];
+        $request->setParent($parent);
+        $requestParamHeaders['parent'] = $parent;
+        if (isset($optionalArgs['pageSize'])) {
+            $request->setPageSize($optionalArgs['pageSize']);
+        }
+
+        if (isset($optionalArgs['pageToken'])) {
+            $request->setPageToken($optionalArgs['pageToken']);
+        }
+
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->getPagedListResponse(
+            'ListBackupSchedules',
+            $optionalArgs,
+            ListBackupSchedulesResponse::class,
             $request
         );
     }
@@ -1356,7 +1777,9 @@ class DatabaseAdminGapicClient
      *           must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
      *           Colon `:` is the contains operator. Filter rules are not case sensitive.
      *
-     *           The following fields in the [Backup][google.spanner.admin.database.v1.Backup] are eligible for filtering:
+     *           The following fields in the
+     *           [Backup][google.spanner.admin.database.v1.Backup] are eligible for
+     *           filtering:
      *
      *           * `name`
      *           * `database`
@@ -1365,6 +1788,7 @@ class DatabaseAdminGapicClient
      *           * `expire_time`  (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *           * `version_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *           * `size_bytes`
+     *           * `backup_schedules`
      *
      *           You can combine multiple expressions by enclosing each expression in
      *           parentheses. By default, expressions are combined with AND logic, but
@@ -1383,6 +1807,8 @@ class DatabaseAdminGapicClient
      *           * `expire_time < \"2018-03-28T14:50:00Z\"`
      *           - The backup `expire_time` is before 2018-03-28T14:50:00Z.
      *           * `size_bytes > 10000000000` - The backup's size is greater than 10GB
+     *           * `backup_schedules:daily`
+     *           - The backup is created from a schedule with "daily" in its name.
      *     @type int $pageSize
      *           The maximum number of resources contained in the underlying API
      *           response. The API may return fewer values in a page, even if
@@ -1393,10 +1819,9 @@ class DatabaseAdminGapicClient
      *           of values will be returned. Any page token used here must have
      *           been generated by a previous call to the API.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\PagedListResponse
@@ -1488,7 +1913,9 @@ class DatabaseAdminGapicClient
      *           * `name` - The name of the long-running operation
      *           * `done` - False if the operation is in progress, else true.
      *           * `metadata.&#64;type` - the type of metadata. For example, the type string
-     *           for [RestoreDatabaseMetadata][google.spanner.admin.database.v1.RestoreDatabaseMetadata] is
+     *           for
+     *           [RestoreDatabaseMetadata][google.spanner.admin.database.v1.RestoreDatabaseMetadata]
+     *           is
      *           `type.googleapis.com/google.spanner.admin.database.v1.RestoreDatabaseMetadata`.
      *           * `metadata.<field_name>` - any field in metadata.value.
      *           `metadata.&#64;type` must be specified first, if filtering on metadata
@@ -1510,7 +1937,8 @@ class DatabaseAdminGapicClient
      *           `(metadata.name:restored_howl) AND` \
      *           `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` \
      *           `(error:*)` - Return operations where:
-     *           * The operation's metadata type is [RestoreDatabaseMetadata][google.spanner.admin.database.v1.RestoreDatabaseMetadata].
+     *           * The operation's metadata type is
+     *           [RestoreDatabaseMetadata][google.spanner.admin.database.v1.RestoreDatabaseMetadata].
      *           * The database is restored from a backup.
      *           * The backup name contains "backup_howl".
      *           * The restored database's name contains "restored_howl".
@@ -1526,10 +1954,9 @@ class DatabaseAdminGapicClient
      *           of values will be returned. Any page token used here must have
      *           been generated by a previous call to the API.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\PagedListResponse
@@ -1564,6 +1991,85 @@ class DatabaseAdminGapicClient
             'ListDatabaseOperations',
             $optionalArgs,
             ListDatabaseOperationsResponse::class,
+            $request
+        );
+    }
+
+    /**
+     * Lists Cloud Spanner database roles.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $formattedParent = $databaseAdminClient->databaseName('[PROJECT]', '[INSTANCE]', '[DATABASE]');
+     *     // Iterate over pages of elements
+     *     $pagedResponse = $databaseAdminClient->listDatabaseRoles($formattedParent);
+     *     foreach ($pagedResponse->iteratePages() as $page) {
+     *         foreach ($page as $element) {
+     *             // doSomethingWith($element);
+     *         }
+     *     }
+     *     // Alternatively:
+     *     // Iterate through all elements
+     *     $pagedResponse = $databaseAdminClient->listDatabaseRoles($formattedParent);
+     *     foreach ($pagedResponse->iterateAllElements() as $element) {
+     *         // doSomethingWith($element);
+     *     }
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param string $parent       Required. The database whose roles should be listed.
+     *                             Values are of the form
+     *                             `projects/<project>/instances/<instance>/databases/<database>`.
+     * @param array  $optionalArgs {
+     *     Optional.
+     *
+     *     @type int $pageSize
+     *           The maximum number of resources contained in the underlying API
+     *           response. The API may return fewer values in a page, even if
+     *           there are additional values to be retrieved.
+     *     @type string $pageToken
+     *           A page token is used to specify a page of values to be returned.
+     *           If no page token is specified (the default), the first page
+     *           of values will be returned. Any page token used here must have
+     *           been generated by a previous call to the API.
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\ApiCore\PagedListResponse
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function listDatabaseRoles($parent, array $optionalArgs = [])
+    {
+        $request = new ListDatabaseRolesRequest();
+        $requestParamHeaders = [];
+        $request->setParent($parent);
+        $requestParamHeaders['parent'] = $parent;
+        if (isset($optionalArgs['pageSize'])) {
+            $request->setPageSize($optionalArgs['pageSize']);
+        }
+
+        if (isset($optionalArgs['pageToken'])) {
+            $request->setPageToken($optionalArgs['pageToken']);
+        }
+
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->getPagedListResponse(
+            'ListDatabaseRoles',
+            $optionalArgs,
+            ListDatabaseRolesResponse::class,
             $request
         );
     }
@@ -1609,10 +2115,9 @@ class DatabaseAdminGapicClient
      *           of values will be returned. Any page token used here must have
      *           been generated by a previous call to the API.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\PagedListResponse
@@ -1676,7 +2181,7 @@ class DatabaseAdminGapicClient
      *     $operationResponse->pollUntilComplete();
      *     if ($operationResponse->operationSucceeded()) {
      *         $result = $operationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $operationResponse->getError();
      *         // handleError($error)
@@ -1693,7 +2198,7 @@ class DatabaseAdminGapicClient
      *     }
      *     if ($newOperationResponse->operationSucceeded()) {
      *         $result = $newOperationResponse->getResult();
-     *     // doSomethingWith($result)
+     *         // doSomethingWith($result)
      *     } else {
      *         $error = $newOperationResponse->getError();
      *         // handleError($error)
@@ -1719,17 +2224,16 @@ class DatabaseAdminGapicClient
      *           Name of the backup from which to restore.  Values are of the form
      *           `projects/<project>/instances/<instance>/backups/<backup>`.
      *     @type RestoreDatabaseEncryptionConfig $encryptionConfig
-     *           Optional. An encryption configuration describing the encryption type and key
-     *           resources in Cloud KMS used to encrypt/decrypt the database to restore to.
-     *           If this field is not specified, the restored database will use
-     *           the same encryption configuration as the backup by default, namely
-     *           [encryption_type][google.spanner.admin.database.v1.RestoreDatabaseEncryptionConfig.encryption_type] =
-     *           `USE_CONFIG_DEFAULT_OR_BACKUP_ENCRYPTION`.
+     *           Optional. An encryption configuration describing the encryption type and
+     *           key resources in Cloud KMS used to encrypt/decrypt the database to restore
+     *           to. If this field is not specified, the restored database will use the same
+     *           encryption configuration as the backup by default, namely
+     *           [encryption_type][google.spanner.admin.database.v1.RestoreDatabaseEncryptionConfig.encryption_type]
+     *           = `USE_CONFIG_DEFAULT_OR_BACKUP_ENCRYPTION`.
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\OperationResponse
@@ -1805,10 +2309,9 @@ class DatabaseAdminGapicClient
      *
      *           `paths: "bindings, etag"`
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Iam\V1\Policy
@@ -1874,10 +2377,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Iam\V1\TestIamPermissionsResponse
@@ -1909,7 +2411,8 @@ class DatabaseAdminGapicClient
     }
 
     /**
-     * Updates a pending or completed [Backup][google.spanner.admin.database.v1.Backup].
+     * Updates a pending or completed
+     * [Backup][google.spanner.admin.database.v1.Backup].
      *
      * Sample code:
      * ```
@@ -1936,10 +2439,9 @@ class DatabaseAdminGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\Spanner\Admin\Database\V1\Backup
@@ -1968,13 +2470,193 @@ class DatabaseAdminGapicClient
     }
 
     /**
+     * Updates a backup schedule.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $backupSchedule = new BackupSchedule();
+     *     $updateMask = new FieldMask();
+     *     $response = $databaseAdminClient->updateBackupSchedule($backupSchedule, $updateMask);
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param BackupSchedule $backupSchedule Required. The backup schedule to update. `backup_schedule.name`, and the
+     *                                       fields to be updated as specified by `update_mask` are required. Other
+     *                                       fields are ignored.
+     * @param FieldMask      $updateMask     Required. A mask specifying which fields in the BackupSchedule resource
+     *                                       should be updated. This mask is relative to the BackupSchedule resource,
+     *                                       not to the request message. The field mask must always be
+     *                                       specified; this prevents any future fields from being erased
+     *                                       accidentally.
+     * @param array          $optionalArgs   {
+     *     Optional.
+     *
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\BackupSchedule
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function updateBackupSchedule(
+        $backupSchedule,
+        $updateMask,
+        array $optionalArgs = []
+    ) {
+        $request = new UpdateBackupScheduleRequest();
+        $requestParamHeaders = [];
+        $request->setBackupSchedule($backupSchedule);
+        $request->setUpdateMask($updateMask);
+        $requestParamHeaders[
+            'backup_schedule.name'
+        ] = $backupSchedule->getName();
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->startCall(
+            'UpdateBackupSchedule',
+            BackupSchedule::class,
+            $optionalArgs,
+            $request
+        )->wait();
+    }
+
+    /**
+     * Updates a Cloud Spanner database. The returned
+     * [long-running operation][google.longrunning.Operation] can be used to track
+     * the progress of updating the database. If the named database does not
+     * exist, returns `NOT_FOUND`.
+     *
+     * While the operation is pending:
+     *
+     * * The database's
+     * [reconciling][google.spanner.admin.database.v1.Database.reconciling]
+     * field is set to true.
+     * * Cancelling the operation is best-effort. If the cancellation succeeds,
+     * the operation metadata's
+     * [cancel_time][google.spanner.admin.database.v1.UpdateDatabaseMetadata.cancel_time]
+     * is set, the updates are reverted, and the operation terminates with a
+     * `CANCELLED` status.
+     * * New UpdateDatabase requests will return a `FAILED_PRECONDITION` error
+     * until the pending operation is done (returns successfully or with
+     * error).
+     * * Reading the database via the API continues to give the pre-request
+     * values.
+     *
+     * Upon completion of the returned operation:
+     *
+     * * The new values are in effect and readable via the API.
+     * * The database's
+     * [reconciling][google.spanner.admin.database.v1.Database.reconciling]
+     * field becomes false.
+     *
+     * The returned [long-running operation][google.longrunning.Operation] will
+     * have a name of the format
+     * `projects/<project>/instances/<instance>/databases/<database>/operations/<operation_id>`
+     * and can be used to track the database modification. The
+     * [metadata][google.longrunning.Operation.metadata] field type is
+     * [UpdateDatabaseMetadata][google.spanner.admin.database.v1.UpdateDatabaseMetadata].
+     * The [response][google.longrunning.Operation.response] field type is
+     * [Database][google.spanner.admin.database.v1.Database], if successful.
+     *
+     * Sample code:
+     * ```
+     * $databaseAdminClient = new DatabaseAdminClient();
+     * try {
+     *     $database = new Database();
+     *     $updateMask = new FieldMask();
+     *     $operationResponse = $databaseAdminClient->updateDatabase($database, $updateMask);
+     *     $operationResponse->pollUntilComplete();
+     *     if ($operationResponse->operationSucceeded()) {
+     *         $result = $operationResponse->getResult();
+     *         // doSomethingWith($result)
+     *     } else {
+     *         $error = $operationResponse->getError();
+     *         // handleError($error)
+     *     }
+     *     // Alternatively:
+     *     // start the operation, keep the operation name, and resume later
+     *     $operationResponse = $databaseAdminClient->updateDatabase($database, $updateMask);
+     *     $operationName = $operationResponse->getName();
+     *     // ... do other work
+     *     $newOperationResponse = $databaseAdminClient->resumeOperation($operationName, 'updateDatabase');
+     *     while (!$newOperationResponse->isDone()) {
+     *         // ... do other work
+     *         $newOperationResponse->reload();
+     *     }
+     *     if ($newOperationResponse->operationSucceeded()) {
+     *         $result = $newOperationResponse->getResult();
+     *         // doSomethingWith($result)
+     *     } else {
+     *         $error = $newOperationResponse->getError();
+     *         // handleError($error)
+     *     }
+     * } finally {
+     *     $databaseAdminClient->close();
+     * }
+     * ```
+     *
+     * @param Database  $database     Required. The database to update.
+     *                                The `name` field of the database is of the form
+     *                                `projects/<project>/instances/<instance>/databases/<database>`.
+     * @param FieldMask $updateMask   Required. The list of fields to update. Currently, only
+     *                                `enable_drop_protection` field can be updated.
+     * @param array     $optionalArgs {
+     *     Optional.
+     *
+     *     @type RetrySettings|array $retrySettings
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
+     * }
+     *
+     * @return \Google\ApiCore\OperationResponse
+     *
+     * @throws ApiException if the remote call fails
+     */
+    public function updateDatabase(
+        $database,
+        $updateMask,
+        array $optionalArgs = []
+    ) {
+        $request = new UpdateDatabaseRequest();
+        $requestParamHeaders = [];
+        $request->setDatabase($database);
+        $request->setUpdateMask($updateMask);
+        $requestParamHeaders['database.name'] = $database->getName();
+        $requestParams = new RequestParamsHeaderDescriptor(
+            $requestParamHeaders
+        );
+        $optionalArgs['headers'] = isset($optionalArgs['headers'])
+            ? array_merge($requestParams->getHeader(), $optionalArgs['headers'])
+            : $requestParams->getHeader();
+        return $this->startOperationsCall(
+            'UpdateDatabase',
+            $optionalArgs,
+            $request,
+            $this->getOperationsClient()
+        )->wait();
+    }
+
+    /**
      * Updates the schema of a Cloud Spanner database by
      * creating/altering/dropping tables, columns, indexes, etc. The returned
      * [long-running operation][google.longrunning.Operation] will have a name of
      * the format `<database_name>/operations/<operation_id>` and can be used to
      * track execution of the schema change(s). The
      * [metadata][google.longrunning.Operation.metadata] field type is
-     * [UpdateDatabaseDdlMetadata][google.spanner.admin.database.v1.UpdateDatabaseDdlMetadata].  The operation has no response.
+     * [UpdateDatabaseDdlMetadata][google.spanner.admin.database.v1.UpdateDatabaseDdlMetadata].
+     * The operation has no response.
      *
      * Sample code:
      * ```
@@ -2024,23 +2706,39 @@ class DatabaseAdminGapicClient
      *
      *           Specifying an explicit operation ID simplifies determining
      *           whether the statements were executed in the event that the
-     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] call is replayed,
-     *           or the return value is otherwise lost: the [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database] and
-     *           `operation_id` fields can be combined to form the
+     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     *           call is replayed, or the return value is otherwise lost: the
+     *           [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database]
+     *           and `operation_id` fields can be combined to form the
      *           [name][google.longrunning.Operation.name] of the resulting
-     *           [longrunning.Operation][google.longrunning.Operation]: `<database>/operations/<operation_id>`.
+     *           [longrunning.Operation][google.longrunning.Operation]:
+     *           `<database>/operations/<operation_id>`.
      *
      *           `operation_id` should be unique within the database, and must be
      *           a valid identifier: `[a-z][a-z0-9_]*`. Note that
      *           automatically-generated operation IDs always begin with an
      *           underscore. If the named operation already exists,
-     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] returns
-     *           `ALREADY_EXISTS`.
+     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     *           returns `ALREADY_EXISTS`.
+     *     @type string $protoDescriptors
+     *           Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements.
+     *           Contains a protobuf-serialized
+     *           [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto).
+     *           To generate it, [install](https://grpc.io/docs/protoc-installation/) and
+     *           run `protoc` with --include_imports and --descriptor_set_out. For example,
+     *           to generate for moon/shot/app.proto, run
+     *           ```
+     *           $protoc  --proto_path=/app_path --proto_path=/lib_path \
+     *           --include_imports \
+     *           --descriptor_set_out=descriptors.data \
+     *           moon/shot/app.proto
+     *           ```
+     *           For more details, see protobuffer [self
+     *           description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\ApiCore\OperationResponse
@@ -2059,6 +2757,10 @@ class DatabaseAdminGapicClient
         $requestParamHeaders['database'] = $database;
         if (isset($optionalArgs['operationId'])) {
             $request->setOperationId($optionalArgs['operationId']);
+        }
+
+        if (isset($optionalArgs['protoDescriptors'])) {
+            $request->setProtoDescriptors($optionalArgs['protoDescriptors']);
         }
 
         $requestParams = new RequestParamsHeaderDescriptor(

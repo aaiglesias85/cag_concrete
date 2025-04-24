@@ -21,19 +21,19 @@ class CallAnnotation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 channel_tag = 1;</code>
      */
-    private $channel_tag = 0;
+    protected $channel_tag = 0;
     /**
      * The boundary in the conversation where the annotation starts, inclusive.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.AnnotationBoundary annotation_start_boundary = 4;</code>
      */
-    private $annotation_start_boundary = null;
+    protected $annotation_start_boundary = null;
     /**
      * The boundary in the conversation where the annotation ends, inclusive.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.AnnotationBoundary annotation_end_boundary = 5;</code>
      */
-    private $annotation_end_boundary = null;
+    protected $annotation_end_boundary = null;
     protected $data;
 
     /**
@@ -56,6 +56,8 @@ class CallAnnotation extends \Google\Protobuf\Internal\Message
      *           Data specifying an intent match.
      *     @type \Google\Cloud\ContactCenterInsights\V1\PhraseMatchData $phrase_match_data
      *           Data specifying a phrase match.
+     *     @type \Google\Cloud\ContactCenterInsights\V1\IssueMatchData $issue_match_data
+     *           Data specifying an issue match.
      *     @type int $channel_tag
      *           The channel of the audio where the annotation occurs. For single-channel
      *           audio, this field is not populated.
@@ -283,6 +285,37 @@ class CallAnnotation extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\PhraseMatchData::class);
         $this->writeOneof(17, $var);
+
+        return $this;
+    }
+
+    /**
+     * Data specifying an issue match.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.IssueMatchData issue_match_data = 18;</code>
+     * @return \Google\Cloud\ContactCenterInsights\V1\IssueMatchData|null
+     */
+    public function getIssueMatchData()
+    {
+        return $this->readOneof(18);
+    }
+
+    public function hasIssueMatchData()
+    {
+        return $this->hasOneof(18);
+    }
+
+    /**
+     * Data specifying an issue match.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.IssueMatchData issue_match_data = 18;</code>
+     * @param \Google\Cloud\ContactCenterInsights\V1\IssueMatchData $var
+     * @return $this
+     */
+    public function setIssueMatchData($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\IssueMatchData::class);
+        $this->writeOneof(18, $var);
 
         return $this;
     }

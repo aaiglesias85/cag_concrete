@@ -21,14 +21,25 @@ class ListBudgetsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
+    /**
+     * Optional. Set the scope of the budgets to be returned, in the format of the
+     * resource name. The scope of a budget is the cost that it tracks, such as
+     * costs for a single project, or the costs for all projects in a folder. Only
+     * project scope (in the format of "projects/project-id" or "projects/123") is
+     * supported in this field. When this field is set to a project's resource
+     * name, the budgets returned are tracking the costs for that project.
+     *
+     * Generated from protobuf field <code>string scope = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $scope = '';
     /**
      * Optional. The maximum number of budgets to return per page.
      * The default and maximum value are 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The value returned by the last `ListBudgetsResponse` which
      * indicates that this is a continuation of a prior `ListBudgets` call,
@@ -36,7 +47,22 @@ class ListBudgetsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. Name of billing account to list budgets under. Values
+     *                       are of the form `billingAccounts/{billingAccountId}`. Please see
+     *                       {@see BudgetServiceClient::billingAccountName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Billing\Budgets\V1\ListBudgetsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -47,6 +73,13 @@ class ListBudgetsRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Required. Name of billing account to list budgets under. Values
      *           are of the form `billingAccounts/{billingAccountId}`.
+     *     @type string $scope
+     *           Optional. Set the scope of the budgets to be returned, in the format of the
+     *           resource name. The scope of a budget is the cost that it tracks, such as
+     *           costs for a single project, or the costs for all projects in a folder. Only
+     *           project scope (in the format of "projects/project-id" or "projects/123") is
+     *           supported in this field. When this field is set to a project's resource
+     *           name, the budgets returned are tracking the costs for that project.
      *     @type int $page_size
      *           Optional. The maximum number of budgets to return per page.
      *           The default and maximum value are 100.
@@ -85,6 +118,42 @@ class ListBudgetsRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->parent = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Set the scope of the budgets to be returned, in the format of the
+     * resource name. The scope of a budget is the cost that it tracks, such as
+     * costs for a single project, or the costs for all projects in a folder. Only
+     * project scope (in the format of "projects/project-id" or "projects/123") is
+     * supported in this field. When this field is set to a project's resource
+     * name, the budgets returned are tracking the costs for that project.
+     *
+     * Generated from protobuf field <code>string scope = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
+    /**
+     * Optional. Set the scope of the budgets to be returned, in the format of the
+     * resource name. The scope of a budget is the cost that it tracks, such as
+     * costs for a single project, or the costs for all projects in a folder. Only
+     * project scope (in the format of "projects/project-id" or "projects/123") is
+     * supported in this field. When this field is set to a project's resource
+     * name, the budgets returned are tracking the costs for that project.
+     *
+     * Generated from protobuf field <code>string scope = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setScope($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->scope = $var;
 
         return $this;
     }

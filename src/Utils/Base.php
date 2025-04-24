@@ -10,21 +10,29 @@ use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\Unit;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class Base
 {
     private $container;
     private $containerBag;
     public $mailer;
+    public $security;
 
-    public function __construct(ContainerInterface $container, \Swift_Mailer $mailer, ContainerBagInterface $containerBag)
+    public function __construct(ContainerInterface $container,
+                                MailerInterface $mailer,
+                                ContainerBagInterface $containerBag,
+                                Security $security)
     {
         $this->container = $container;
         $this->mailer = $mailer;
         $this->containerBag = $containerBag;
+        $this->security = $security;
     }
 
     //doctrine manager
@@ -38,22 +46,9 @@ class Base
     }
 
     // user
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
-        if (!$this->container->has('security.token_storage')) {
-            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
-        }
-
-        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
-        }
-
-        if (!\is_object($user = $token->getUser())) {
-            // e.g. anonymous authentication
-            return;
-        }
-
-        return $user;
+        return $this->security->getUser();
     }
 
     //Generates a URL from the given parameters.
@@ -160,9 +155,9 @@ class Base
 
         $ruta = $this->generateUrl('home');
         if (substr_count($ruta, 'index.php') > 0) {
-            $ruta = $this->generateUrl('home') . '../';
+            $ruta = $this->generateUrl('home') . '../../';
         } else {
-            $ruta = $this->generateUrl('home');
+            $ruta = $this->generateUrl('home'). '../';;
         }
 
         $direccion_url = "http" . $s . "://" . $_SERVER['HTTP_HOST'] . $ruta;

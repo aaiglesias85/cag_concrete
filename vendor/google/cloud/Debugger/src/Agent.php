@@ -20,8 +20,8 @@ namespace Google\Cloud\Debugger;
 use Google\Cloud\Core\ArrayTrait;
 use Google\Cloud\Core\Batch\BatchDaemonTrait;
 use Google\Cloud\Core\Batch\BatchTrait;
-use Google\Cloud\Core\ExponentialBackoff;
 use Google\Cloud\Core\Exception\ServiceException;
+use Google\Cloud\Core\ExponentialBackoff;
 use Google\Cloud\Core\SysvTrait;
 use Google\Cloud\Debugger\BreakpointStorage\BreakpointStorageInterface;
 use Google\Cloud\Debugger\BreakpointStorage\FileBreakpointStorage;
@@ -40,6 +40,7 @@ use Psr\Log\LoggerInterface;
  *
  * $agent = new Agent();
  * ```
+ * @deprecated see https://cloud.google.com/stackdriver/docs/deprecations/debugger-deprecation
  */
 class Agent
 {
@@ -151,9 +152,7 @@ class Agent
             'identifier' => 'stackdriver-debugger',
             'batchMethod' => 'insertBatch'
         ]);
-        $this->logger = isset($options['logger'])
-            ? $options['logger']
-            : $this->defaultLogger();
+        $this->logger = $options['logger'] ?? $this->defaultLogger();
 
         if (empty($breakpoints)) {
             return;
@@ -177,6 +176,7 @@ class Agent
 
             switch ($breakpoint->action()) {
                 case Breakpoint::ACTION_CAPTURE:
+                case 'CAPTURE':
                     stackdriver_debugger_add_snapshot(
                         $sourceLocation->path(),
                         $sourceLocation->line(),
@@ -191,6 +191,7 @@ class Agent
                     );
                     break;
                 case Breakpoint::ACTION_LOG:
+                case 'LOG':
                     stackdriver_debugger_add_logpoint(
                         $sourceLocation->path(),
                         $sourceLocation->line(),

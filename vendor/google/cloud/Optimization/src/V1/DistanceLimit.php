@@ -24,7 +24,7 @@ class DistanceLimit extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>optional int64 max_meters = 1;</code>
      */
-    private $max_meters = null;
+    protected $max_meters = null;
     /**
      * A soft limit not enforcing a maximum distance limit, but when violated
      * results in a cost which adds up to other costs defined in the model,
@@ -34,10 +34,22 @@ class DistanceLimit extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>optional int64 soft_max_meters = 2;</code>
      */
-    private $soft_max_meters = null;
+    protected $soft_max_meters = null;
     /**
-     * Cost per kilometer incurred if `soft_max_meters` limit is violated. The
-     * additional cost is 0 if the distance is under the limit, otherwise the
+     * Cost per kilometer incurred, increasing up to `soft_max_meters`, with
+     * formula:
+     * ```
+     *   min(distance_meters, soft_max_meters) / 1000.0 *
+     *   cost_per_kilometer_below_soft_max.
+     * ```
+     * This cost is not supported in `route_distance_limit`.
+     *
+     * Generated from protobuf field <code>optional double cost_per_kilometer_below_soft_max = 4;</code>
+     */
+    protected $cost_per_kilometer_below_soft_max = null;
+    /**
+     * Cost per kilometer incurred if distance is above `soft_max_meters` limit.
+     * The additional cost is 0 if the distance is under the limit, otherwise the
      * formula used to compute the cost is the following:
      * ```
      *   (distance_meters - soft_max_meters) / 1000.0 *
@@ -47,7 +59,7 @@ class DistanceLimit extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>optional double cost_per_kilometer_above_soft_max = 3;</code>
      */
-    private $cost_per_kilometer_above_soft_max = null;
+    protected $cost_per_kilometer_above_soft_max = null;
 
     /**
      * Constructor.
@@ -64,9 +76,17 @@ class DistanceLimit extends \Google\Protobuf\Internal\Message
      *           with the same unit.
      *           If defined soft_max_meters must be less than max_meters and must be
      *           nonnegative.
+     *     @type float $cost_per_kilometer_below_soft_max
+     *           Cost per kilometer incurred, increasing up to `soft_max_meters`, with
+     *           formula:
+     *           ```
+     *             min(distance_meters, soft_max_meters) / 1000.0 *
+     *             cost_per_kilometer_below_soft_max.
+     *           ```
+     *           This cost is not supported in `route_distance_limit`.
      *     @type float $cost_per_kilometer_above_soft_max
-     *           Cost per kilometer incurred if `soft_max_meters` limit is violated. The
-     *           additional cost is 0 if the distance is under the limit, otherwise the
+     *           Cost per kilometer incurred if distance is above `soft_max_meters` limit.
+     *           The additional cost is 0 if the distance is under the limit, otherwise the
      *           formula used to compute the cost is the following:
      *           ```
      *             (distance_meters - soft_max_meters) / 1000.0 *
@@ -163,8 +183,56 @@ class DistanceLimit extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Cost per kilometer incurred if `soft_max_meters` limit is violated. The
-     * additional cost is 0 if the distance is under the limit, otherwise the
+     * Cost per kilometer incurred, increasing up to `soft_max_meters`, with
+     * formula:
+     * ```
+     *   min(distance_meters, soft_max_meters) / 1000.0 *
+     *   cost_per_kilometer_below_soft_max.
+     * ```
+     * This cost is not supported in `route_distance_limit`.
+     *
+     * Generated from protobuf field <code>optional double cost_per_kilometer_below_soft_max = 4;</code>
+     * @return float
+     */
+    public function getCostPerKilometerBelowSoftMax()
+    {
+        return isset($this->cost_per_kilometer_below_soft_max) ? $this->cost_per_kilometer_below_soft_max : 0.0;
+    }
+
+    public function hasCostPerKilometerBelowSoftMax()
+    {
+        return isset($this->cost_per_kilometer_below_soft_max);
+    }
+
+    public function clearCostPerKilometerBelowSoftMax()
+    {
+        unset($this->cost_per_kilometer_below_soft_max);
+    }
+
+    /**
+     * Cost per kilometer incurred, increasing up to `soft_max_meters`, with
+     * formula:
+     * ```
+     *   min(distance_meters, soft_max_meters) / 1000.0 *
+     *   cost_per_kilometer_below_soft_max.
+     * ```
+     * This cost is not supported in `route_distance_limit`.
+     *
+     * Generated from protobuf field <code>optional double cost_per_kilometer_below_soft_max = 4;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setCostPerKilometerBelowSoftMax($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->cost_per_kilometer_below_soft_max = $var;
+
+        return $this;
+    }
+
+    /**
+     * Cost per kilometer incurred if distance is above `soft_max_meters` limit.
+     * The additional cost is 0 if the distance is under the limit, otherwise the
      * formula used to compute the cost is the following:
      * ```
      *   (distance_meters - soft_max_meters) / 1000.0 *
@@ -191,8 +259,8 @@ class DistanceLimit extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Cost per kilometer incurred if `soft_max_meters` limit is violated. The
-     * additional cost is 0 if the distance is under the limit, otherwise the
+     * Cost per kilometer incurred if distance is above `soft_max_meters` limit.
+     * The additional cost is 0 if the distance is under the limit, otherwise the
      * formula used to compute the cost is the following:
      * ```
      *   (distance_meters - soft_max_meters) / 1000.0 *

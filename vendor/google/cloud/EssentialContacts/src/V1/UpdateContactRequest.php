@@ -21,7 +21,7 @@ class UpdateContactRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.essentialcontacts.v1.Contact contact = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $contact = null;
+    protected $contact = null;
     /**
      * Optional. The update mask applied to the resource. For the `FieldMask`
      * definition, see
@@ -29,7 +29,25 @@ class UpdateContactRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\EssentialContacts\V1\Contact $contact    Required. The contact resource to replace the existing saved contact. Note:
+     *                                                               the email address of the contact cannot be modified.
+     * @param \Google\Protobuf\FieldMask                 $updateMask Optional. The update mask applied to the resource. For the `FieldMask`
+     *                                                               definition, see
+     *                                                               https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+     *
+     * @return \Google\Cloud\EssentialContacts\V1\UpdateContactRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\EssentialContacts\V1\Contact $contact, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setContact($contact)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

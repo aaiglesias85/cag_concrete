@@ -25,10 +25,94 @@ class Component
      * Generated from protobuf enum <code>SYSTEM_COMPONENTS = 1;</code>
      */
     const SYSTEM_COMPONENTS = 1;
+    /**
+     * kube-apiserver
+     *
+     * Generated from protobuf enum <code>APISERVER = 3;</code>
+     */
+    const APISERVER = 3;
+    /**
+     * kube-scheduler
+     *
+     * Generated from protobuf enum <code>SCHEDULER = 4;</code>
+     */
+    const SCHEDULER = 4;
+    /**
+     * kube-controller-manager
+     *
+     * Generated from protobuf enum <code>CONTROLLER_MANAGER = 5;</code>
+     */
+    const CONTROLLER_MANAGER = 5;
+    /**
+     * Storage
+     *
+     * Generated from protobuf enum <code>STORAGE = 7;</code>
+     */
+    const STORAGE = 7;
+    /**
+     * Horizontal Pod Autoscaling
+     *
+     * Generated from protobuf enum <code>HPA = 8;</code>
+     */
+    const HPA = 8;
+    /**
+     * Pod
+     *
+     * Generated from protobuf enum <code>POD = 9;</code>
+     */
+    const POD = 9;
+    /**
+     * DaemonSet
+     *
+     * Generated from protobuf enum <code>DAEMONSET = 10;</code>
+     */
+    const DAEMONSET = 10;
+    /**
+     * Deployment
+     *
+     * Generated from protobuf enum <code>DEPLOYMENT = 11;</code>
+     */
+    const DEPLOYMENT = 11;
+    /**
+     * Statefulset
+     *
+     * Generated from protobuf enum <code>STATEFULSET = 12;</code>
+     */
+    const STATEFULSET = 12;
+    /**
+     * CADVISOR
+     *
+     * Generated from protobuf enum <code>CADVISOR = 13;</code>
+     */
+    const CADVISOR = 13;
+    /**
+     * KUBELET
+     *
+     * Generated from protobuf enum <code>KUBELET = 14;</code>
+     */
+    const KUBELET = 14;
+    /**
+     * NVIDIA Data Center GPU Manager (DCGM)
+     *
+     * Generated from protobuf enum <code>DCGM = 15;</code>
+     */
+    const DCGM = 15;
 
     private static $valueToName = [
         self::COMPONENT_UNSPECIFIED => 'COMPONENT_UNSPECIFIED',
         self::SYSTEM_COMPONENTS => 'SYSTEM_COMPONENTS',
+        self::APISERVER => 'APISERVER',
+        self::SCHEDULER => 'SCHEDULER',
+        self::CONTROLLER_MANAGER => 'CONTROLLER_MANAGER',
+        self::STORAGE => 'STORAGE',
+        self::HPA => 'HPA',
+        self::POD => 'POD',
+        self::DAEMONSET => 'DAEMONSET',
+        self::DEPLOYMENT => 'DEPLOYMENT',
+        self::STATEFULSET => 'STATEFULSET',
+        self::CADVISOR => 'CADVISOR',
+        self::KUBELET => 'KUBELET',
+        self::DCGM => 'DCGM',
     ];
 
     public static function name($value)
@@ -52,6 +136,4 @@ class Component
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Component::class, \Google\Cloud\Container\V1\MonitoringComponentConfig_Component::class);
 

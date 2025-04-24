@@ -32,7 +32,7 @@ class ListUptimeCheckIpsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -40,7 +40,7 @@ class ListUptimeCheckIpsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Monitoring\V3\UptimeCheckIp[]|\Google\Protobuf\Internal\RepeatedField $uptime_check_ips
+     *     @type array<\Google\Cloud\Monitoring\V3\UptimeCheckIp>|\Google\Protobuf\Internal\RepeatedField $uptime_check_ips
      *           The returned list of IP addresses (including region and location) that the
      *           checkers run from.
      *     @type string $next_page_token
@@ -74,7 +74,7 @@ class ListUptimeCheckIpsResponse extends \Google\Protobuf\Internal\Message
      * checkers run from.
      *
      * Generated from protobuf field <code>repeated .google.monitoring.v3.UptimeCheckIp uptime_check_ips = 1;</code>
-     * @param \Google\Cloud\Monitoring\V3\UptimeCheckIp[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Monitoring\V3\UptimeCheckIp>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUptimeCheckIps($var)

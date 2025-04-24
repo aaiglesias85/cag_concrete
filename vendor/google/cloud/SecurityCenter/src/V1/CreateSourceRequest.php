@@ -17,18 +17,36 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Required. Resource name of the new source's parent. Its format should be
-     * "organizations/[organization_id]".
+     * `organizations/[organization_id]`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Required. The Source being created, only the display_name and description will be
-     * used. All other fields will be ignored.
+     * Required. The Source being created, only the display_name and description
+     * will be used. All other fields will be ignored.
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.Source source = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $source = null;
+    protected $source = null;
+
+    /**
+     * @param string                                 $parent Required. Resource name of the new source's parent. Its format should be
+     *                                                       `organizations/[organization_id]`. Please see
+     *                                                       {@see SecurityCenterClient::organizationName()} for help formatting this field.
+     * @param \Google\Cloud\SecurityCenter\V1\Source $source Required. The Source being created, only the display_name and description
+     *                                                       will be used. All other fields will be ignored.
+     *
+     * @return \Google\Cloud\SecurityCenter\V1\CreateSourceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\SecurityCenter\V1\Source $source): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setSource($source);
+    }
 
     /**
      * Constructor.
@@ -38,10 +56,10 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $parent
      *           Required. Resource name of the new source's parent. Its format should be
-     *           "organizations/[organization_id]".
+     *           `organizations/[organization_id]`.
      *     @type \Google\Cloud\SecurityCenter\V1\Source $source
-     *           Required. The Source being created, only the display_name and description will be
-     *           used. All other fields will be ignored.
+     *           Required. The Source being created, only the display_name and description
+     *           will be used. All other fields will be ignored.
      * }
      */
     public function __construct($data = NULL) {
@@ -51,7 +69,7 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. Resource name of the new source's parent. Its format should be
-     * "organizations/[organization_id]".
+     * `organizations/[organization_id]`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -63,7 +81,7 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. Resource name of the new source's parent. Its format should be
-     * "organizations/[organization_id]".
+     * `organizations/[organization_id]`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -78,8 +96,8 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The Source being created, only the display_name and description will be
-     * used. All other fields will be ignored.
+     * Required. The Source being created, only the display_name and description
+     * will be used. All other fields will be ignored.
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.Source source = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\SecurityCenter\V1\Source|null
@@ -100,8 +118,8 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The Source being created, only the display_name and description will be
-     * used. All other fields will be ignored.
+     * Required. The Source being created, only the display_name and description
+     * will be used. All other fields will be ignored.
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.Source source = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\SecurityCenter\V1\Source $var

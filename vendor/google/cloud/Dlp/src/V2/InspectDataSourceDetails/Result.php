@@ -20,13 +20,13 @@ class Result extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 processed_bytes = 1;</code>
      */
-    private $processed_bytes = 0;
+    protected $processed_bytes = 0;
     /**
      * Estimate of the number of bytes to process.
      *
      * Generated from protobuf field <code>int64 total_estimated_bytes = 2;</code>
      */
-    private $total_estimated_bytes = 0;
+    protected $total_estimated_bytes = 0;
     /**
      * Statistics of how many instances of each info type were found during
      * inspect job.
@@ -35,11 +35,18 @@ class Result extends \Google\Protobuf\Internal\Message
      */
     private $info_type_stats;
     /**
+     * Number of rows scanned after sampling and time filtering (applicable for
+     * row based stores such as BigQuery).
+     *
+     * Generated from protobuf field <code>int64 num_rows_processed = 5;</code>
+     */
+    protected $num_rows_processed = 0;
+    /**
      * Statistics related to the processing of hybrid inspect.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.HybridInspectStatistics hybrid_stats = 7;</code>
      */
-    private $hybrid_stats = null;
+    protected $hybrid_stats = null;
 
     /**
      * Constructor.
@@ -51,9 +58,12 @@ class Result extends \Google\Protobuf\Internal\Message
      *           Total size in bytes that were processed.
      *     @type int|string $total_estimated_bytes
      *           Estimate of the number of bytes to process.
-     *     @type \Google\Cloud\Dlp\V2\InfoTypeStats[]|\Google\Protobuf\Internal\RepeatedField $info_type_stats
+     *     @type array<\Google\Cloud\Dlp\V2\InfoTypeStats>|\Google\Protobuf\Internal\RepeatedField $info_type_stats
      *           Statistics of how many instances of each info type were found during
      *           inspect job.
+     *     @type int|string $num_rows_processed
+     *           Number of rows scanned after sampling and time filtering (applicable for
+     *           row based stores such as BigQuery).
      *     @type \Google\Cloud\Dlp\V2\HybridInspectStatistics $hybrid_stats
      *           Statistics related to the processing of hybrid inspect.
      * }
@@ -132,13 +142,41 @@ class Result extends \Google\Protobuf\Internal\Message
      * inspect job.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.InfoTypeStats info_type_stats = 3;</code>
-     * @param \Google\Cloud\Dlp\V2\InfoTypeStats[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\InfoTypeStats>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInfoTypeStats($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Dlp\V2\InfoTypeStats::class);
         $this->info_type_stats = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Number of rows scanned after sampling and time filtering (applicable for
+     * row based stores such as BigQuery).
+     *
+     * Generated from protobuf field <code>int64 num_rows_processed = 5;</code>
+     * @return int|string
+     */
+    public function getNumRowsProcessed()
+    {
+        return $this->num_rows_processed;
+    }
+
+    /**
+     * Number of rows scanned after sampling and time filtering (applicable for
+     * row based stores such as BigQuery).
+     *
+     * Generated from protobuf field <code>int64 num_rows_processed = 5;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setNumRowsProcessed($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->num_rows_processed = $var;
 
         return $this;
     }
@@ -181,6 +219,4 @@ class Result extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Result::class, \Google\Cloud\Dlp\V2\InspectDataSourceDetails_Result::class);
 

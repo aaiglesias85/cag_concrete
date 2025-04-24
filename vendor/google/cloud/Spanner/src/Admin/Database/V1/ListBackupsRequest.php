@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [ListBackups][google.spanner.admin.database.v1.DatabaseAdmin.ListBackups].
+ * The request for
+ * [ListBackups][google.spanner.admin.database.v1.DatabaseAdmin.ListBackups].
  *
  * Generated from protobuf message <code>google.spanner.admin.database.v1.ListBackupsRequest</code>
  */
@@ -29,7 +30,9 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      * The value must be a string, a number, or a boolean. The comparison operator
      * must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
      * Colon `:` is the contains operator. Filter rules are not case sensitive.
-     * The following fields in the [Backup][google.spanner.admin.database.v1.Backup] are eligible for filtering:
+     * The following fields in the
+     * [Backup][google.spanner.admin.database.v1.Backup] are eligible for
+     * filtering:
      *   * `name`
      *   * `database`
      *   * `state`
@@ -37,6 +40,7 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *   * `expire_time`  (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *   * `version_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *   * `size_bytes`
+     *   * `backup_schedules`
      * You can combine multiple expressions by enclosing each expression in
      * parentheses. By default, expressions are combined with AND logic, but
      * you can specify AND, OR, and NOT logic explicitly.
@@ -52,6 +56,8 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *   * `expire_time < \"2018-03-28T14:50:00Z\"`
      *          - The backup `expire_time` is before 2018-03-28T14:50:00Z.
      *   * `size_bytes > 10000000000` - The backup's size is greater than 10GB
+     *   * `backup_schedules:daily`
+     *          - The backup is created from a schedule with "daily" in its name.
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      */
@@ -65,13 +71,29 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
     private $page_size = 0;
     /**
      * If non-empty, `page_token` should contain a
-     * [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token] from a
-     * previous [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse] to the same `parent` and with the same
-     * `filter`.
+     * [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token]
+     * from a previous
+     * [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse]
+     * to the same `parent` and with the same `filter`.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      */
     private $page_token = '';
+
+    /**
+     * @param string $parent Required. The instance to list backups from.  Values are of the
+     *                       form `projects/<project>/instances/<instance>`. Please see
+     *                       {@see DatabaseAdminClient::instanceName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\ListBackupsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -89,7 +111,9 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *           The value must be a string, a number, or a boolean. The comparison operator
      *           must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
      *           Colon `:` is the contains operator. Filter rules are not case sensitive.
-     *           The following fields in the [Backup][google.spanner.admin.database.v1.Backup] are eligible for filtering:
+     *           The following fields in the
+     *           [Backup][google.spanner.admin.database.v1.Backup] are eligible for
+     *           filtering:
      *             * `name`
      *             * `database`
      *             * `state`
@@ -97,6 +121,7 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *             * `expire_time`  (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *             * `version_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *             * `size_bytes`
+     *             * `backup_schedules`
      *           You can combine multiple expressions by enclosing each expression in
      *           parentheses. By default, expressions are combined with AND logic, but
      *           you can specify AND, OR, and NOT logic explicitly.
@@ -112,14 +137,17 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *             * `expire_time < \"2018-03-28T14:50:00Z\"`
      *                    - The backup `expire_time` is before 2018-03-28T14:50:00Z.
      *             * `size_bytes > 10000000000` - The backup's size is greater than 10GB
+     *             * `backup_schedules:daily`
+     *                    - The backup is created from a schedule with "daily" in its name.
      *     @type int $page_size
      *           Number of backups to be returned in the response. If 0 or
      *           less, defaults to the server's maximum allowed page size.
      *     @type string $page_token
      *           If non-empty, `page_token` should contain a
-     *           [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token] from a
-     *           previous [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse] to the same `parent` and with the same
-     *           `filter`.
+     *           [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token]
+     *           from a previous
+     *           [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse]
+     *           to the same `parent` and with the same `filter`.
      * }
      */
     public function __construct($data = NULL) {
@@ -162,7 +190,9 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      * The value must be a string, a number, or a boolean. The comparison operator
      * must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
      * Colon `:` is the contains operator. Filter rules are not case sensitive.
-     * The following fields in the [Backup][google.spanner.admin.database.v1.Backup] are eligible for filtering:
+     * The following fields in the
+     * [Backup][google.spanner.admin.database.v1.Backup] are eligible for
+     * filtering:
      *   * `name`
      *   * `database`
      *   * `state`
@@ -170,6 +200,7 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *   * `expire_time`  (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *   * `version_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *   * `size_bytes`
+     *   * `backup_schedules`
      * You can combine multiple expressions by enclosing each expression in
      * parentheses. By default, expressions are combined with AND logic, but
      * you can specify AND, OR, and NOT logic explicitly.
@@ -185,6 +216,8 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *   * `expire_time < \"2018-03-28T14:50:00Z\"`
      *          - The backup `expire_time` is before 2018-03-28T14:50:00Z.
      *   * `size_bytes > 10000000000` - The backup's size is greater than 10GB
+     *   * `backup_schedules:daily`
+     *          - The backup is created from a schedule with "daily" in its name.
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      * @return string
@@ -201,7 +234,9 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      * The value must be a string, a number, or a boolean. The comparison operator
      * must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
      * Colon `:` is the contains operator. Filter rules are not case sensitive.
-     * The following fields in the [Backup][google.spanner.admin.database.v1.Backup] are eligible for filtering:
+     * The following fields in the
+     * [Backup][google.spanner.admin.database.v1.Backup] are eligible for
+     * filtering:
      *   * `name`
      *   * `database`
      *   * `state`
@@ -209,6 +244,7 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *   * `expire_time`  (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *   * `version_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
      *   * `size_bytes`
+     *   * `backup_schedules`
      * You can combine multiple expressions by enclosing each expression in
      * parentheses. By default, expressions are combined with AND logic, but
      * you can specify AND, OR, and NOT logic explicitly.
@@ -224,6 +260,8 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
      *   * `expire_time < \"2018-03-28T14:50:00Z\"`
      *          - The backup `expire_time` is before 2018-03-28T14:50:00Z.
      *   * `size_bytes > 10000000000` - The backup's size is greater than 10GB
+     *   * `backup_schedules:daily`
+     *          - The backup is created from a schedule with "daily" in its name.
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      * @param string $var
@@ -267,9 +305,10 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * If non-empty, `page_token` should contain a
-     * [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token] from a
-     * previous [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse] to the same `parent` and with the same
-     * `filter`.
+     * [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token]
+     * from a previous
+     * [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse]
+     * to the same `parent` and with the same `filter`.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      * @return string
@@ -281,9 +320,10 @@ class ListBackupsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * If non-empty, `page_token` should contain a
-     * [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token] from a
-     * previous [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse] to the same `parent` and with the same
-     * `filter`.
+     * [next_page_token][google.spanner.admin.database.v1.ListBackupsResponse.next_page_token]
+     * from a previous
+     * [ListBackupsResponse][google.spanner.admin.database.v1.ListBackupsResponse]
+     * to the same `parent` and with the same `filter`.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      * @param string $var

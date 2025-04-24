@@ -16,16 +16,20 @@ class File
         }
         $pool->internalAddGeneratedFile(
             '
-°
-)google/cloud/securitycenter/v1/file.protogoogle.cloud.securitycenter.v1"s
+¬
+)google/cloud/securitycenter/v1/file.protogoogle.cloud.securitycenter.v1"ð
 File
 path (	
 size (
 sha256 (	
 hashed_size (
 partially_hashed (
-contents (	Bå
-"com.google.cloud.securitycenter.v1B	FileProtoPZLgoogle.golang.org/genproto/googleapis/cloud/securitycenter/v1;securitycenterªGoogle.Cloud.SecurityCenter.V1ÊGoogle\\Cloud\\SecurityCenter\\V1ê!Google::Cloud::SecurityCenter::V1bproto3'
+contents (	@
+	disk_path (2-.google.cloud.securitycenter.v1.File.DiskPath9
+DiskPath
+partition_uuid (	
+relative_path (	Bã
+"com.google.cloud.securitycenter.v1B	FileProtoPZJcloud.google.com/go/securitycenter/apiv1/securitycenterpb;securitycenterpbªGoogle.Cloud.SecurityCenter.V1ÊGoogle\\Cloud\\SecurityCenter\\V1ê!Google::Cloud::SecurityCenter::V1bproto3'
         , true);
 
         static::$is_initialized = true;

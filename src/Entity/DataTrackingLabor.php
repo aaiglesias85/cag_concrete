@@ -4,151 +4,98 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * DataTrackingLabor
- *
- * @ORM\Table(name="data_tracking_labor")
- * @ORM\Entity(repositoryClass="App\Repository\DataTrackingLaborRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingLaborRepository')]
+#[ORM\Table(name: 'data_tracking_labor')]
 class DataTrackingLabor
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="hours", type="float", nullable=false)
-     */
-    private $hours;
+    #[ORM\Column(name: 'hours', type: 'float', nullable: false)]
+    private ?float $hours;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="hourly_rate", type="float", nullable=false)
-     */
-    private $hourlyRate;
+    #[ORM\Column(name: 'hourly_rate', type: 'float', nullable: false)]
+    private ?float $hourlyRate;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="role", type="string", length=255, nullable=false)
-     */
-    private $role;
+    #[ORM\Column(name: 'role', type: 'string', length: 255, nullable: false)]
+    private ?string $role;
 
-    /**
-     * @var Employee
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Employee")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="employee_id", referencedColumnName="employee_id")
-     * })
-     */
-    private $employee;
+    #[ORM\ManyToOne(targetEntity: Employee::class)]
+    #[ORM\JoinColumn(name: 'employee_id', referencedColumnName: 'employee_id')]
+    private ?Employee $employee;
 
-    /**
-     * @var SubcontractorEmployee
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\SubcontractorEmployee")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="subcontractor_employee_id", referencedColumnName="subcontractor_employee_id")
-     * })
-     */
-    private $employeeSubcontractor;
+    #[ORM\ManyToOne(targetEntity: SubcontractorEmployee::class)]
+    #[ORM\JoinColumn(name: 'subcontractor_employee_id', referencedColumnName: 'subcontractor_employee_id')]
+    private ?SubcontractorEmployee $employeeSubcontractor;
 
+    #[ORM\ManyToOne(targetEntity: DataTracking::class)]
+    #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
+    private ?DataTracking $dataTracking;
 
-    /**
-     * @var DataTracking
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\DataTracking")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="data_tracking_id", referencedColumnName="id")
-     * })
-     */
-    private $dataTracking;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getHours()
+    public function getHours(): ?float
     {
         return $this->hours;
     }
 
-    public function setHours($hours)
+    public function setHours(?float $hours): void
     {
         $this->hours = $hours;
     }
 
-    public function getHourlyRate()
+    public function getHourlyRate(): ?float
     {
         return $this->hourlyRate;
     }
 
-    public function setHourlyRate($hourlyRate)
+    public function setHourlyRate(?float $hourlyRate): void
     {
         $this->hourlyRate = $hourlyRate;
     }
 
-    /**
-     * @return Employee
-     */
-    public function getEmployee()
-    {
-        return $this->employee;
-    }
-
-    public function setEmployee($employee)
-    {
-        $this->employee = $employee;
-    }
-
-    /**
-     * @return DataTracking
-     */
-    public function getDataTracking()
-    {
-        return $this->dataTracking;
-    }
-
-    public function setDataTracking($dataTracking)
-    {
-        $this->dataTracking = $dataTracking;
-    }
-
-    public function getRole()
+    public function getRole(): ?string
     {
         return $this->role;
     }
 
-    public function setRole($role)
+    public function setRole(?string $role): void
     {
         $this->role = $role;
     }
 
-    /**
-     * @return SubcontractorEmployee
-     */
-    public function getEmployeeSubcontractor()
+    public function getEmployee(): ?Employee
+    {
+        return $this->employee;
+    }
+
+    public function setEmployee(?Employee $employee): void
+    {
+        $this->employee = $employee;
+    }
+
+    public function getEmployeeSubcontractor(): ?SubcontractorEmployee
     {
         return $this->employeeSubcontractor;
     }
 
-    public function setEmployeeSubcontractor($employeeSubcontractor)
+    public function setEmployeeSubcontractor(?SubcontractorEmployee $employeeSubcontractor): void
     {
         $this->employeeSubcontractor = $employeeSubcontractor;
+    }
+
+    public function getDataTracking(): ?DataTracking
+    {
+        return $this->dataTracking;
+    }
+
+    public function setDataTracking(?DataTracking $dataTracking): void
+    {
+        $this->dataTracking = $dataTracking;
     }
 }

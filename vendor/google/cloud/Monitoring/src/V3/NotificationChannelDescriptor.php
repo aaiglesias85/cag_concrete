@@ -24,7 +24,7 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 6;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The type of notification channel, such as "email" and "sms". To view the
      * full list of channels, see
@@ -34,14 +34,14 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string type = 1;</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
      * A human-readable name for the notification channel type.  This
      * form of the name is suitable for a user interface.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * A human-readable description of the notification channel
      * type. The description may include a description of the properties
@@ -49,7 +49,7 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * The set of labels that must be defined to identify a particular
      * channel of the corresponding type. Each label includes a
@@ -71,7 +71,7 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.LaunchStage launch_stage = 7;</code>
      */
-    private $launch_stage = 0;
+    protected $launch_stage = 0;
 
     /**
      * Constructor.
@@ -96,11 +96,11 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      *           A human-readable description of the notification channel
      *           type. The description may include a description of the properties
      *           of the channel and pointers to external documentation.
-     *     @type \Google\Api\LabelDescriptor[]|\Google\Protobuf\Internal\RepeatedField $labels
+     *     @type array<\Google\Api\LabelDescriptor>|\Google\Protobuf\Internal\RepeatedField $labels
      *           The set of labels that must be defined to identify a particular
      *           channel of the corresponding type. Each label includes a
      *           description for how that field should be populated.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $supported_tiers
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $supported_tiers
      *           The tiers that support this notification channel; the project service tier
      *           must be one of the supported_tiers.
      *     @type int $launch_stage
@@ -253,7 +253,7 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      * description for how that field should be populated.
      *
      * Generated from protobuf field <code>repeated .google.api.LabelDescriptor labels = 4;</code>
-     * @param \Google\Api\LabelDescriptor[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Api\LabelDescriptor>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLabels($var)
@@ -283,7 +283,7 @@ class NotificationChannelDescriptor extends \Google\Protobuf\Internal\Message
      * must be one of the supported_tiers.
      *
      * Generated from protobuf field <code>repeated .google.monitoring.v3.ServiceTier supported_tiers = 5 [deprecated = true];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */

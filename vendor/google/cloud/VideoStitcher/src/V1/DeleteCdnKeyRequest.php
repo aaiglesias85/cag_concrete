@@ -21,7 +21,22 @@ class DeleteCdnKeyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the CDN key to be deleted, in the form of
+     *                     `projects/{project_number}/locations/{location}/cdnKeys/{id}`. Please see
+     *                     {@see VideoStitcherServiceClient::cdnKeyName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Video\Stitcher\V1\DeleteCdnKeyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

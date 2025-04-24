@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Represents an Instance Template resource. You can use instance templates to create VM instances and managed instance groups. For more information, read Instance Templates.
+ * Represents an Instance Template resource. Google Compute Engine has two Instance Template resources: * [Global](/compute/docs/reference/rest/v1/instanceTemplates) * [Regional](https://cloud.google.com/compute/docs/reference/rest/v1/regionInstanceTemplates) You can reuse a global instance template in different regions whereas you can use a regional instance template in a specified region only. If you want to reduce cross-region dependency or achieve data residency, use a regional instance template. To create VMs, managed instance groups, and reservations, you can use either global or regional instance templates. For more information, read Instance Templates.
  *
  * Generated from protobuf message <code>google.cloud.compute.v1.InstanceTemplate</code>
  */
@@ -52,6 +52,12 @@ class InstanceTemplate extends \Google\Protobuf\Internal\Message
      */
     private $properties = null;
     /**
+     * [Output Only] URL of the region where the instance template resides. Only applicable for regional resources.
+     *
+     * Generated from protobuf field <code>optional string region = 138946292;</code>
+     */
+    private $region = null;
+    /**
      * [Output Only] The URL for this instance template. The server defines this URL.
      *
      * Generated from protobuf field <code>optional string self_link = 456214797;</code>
@@ -88,6 +94,8 @@ class InstanceTemplate extends \Google\Protobuf\Internal\Message
      *           Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
      *     @type \Google\Cloud\Compute\V1\InstanceProperties $properties
      *           The instance properties for this instance template.
+     *     @type string $region
+     *           [Output Only] URL of the region where the instance template resides. Only applicable for regional resources.
      *     @type string $self_link
      *           [Output Only] The URL for this instance template. The server defines this URL.
      *     @type string $source_instance
@@ -313,6 +321,42 @@ class InstanceTemplate extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\InstanceProperties::class);
         $this->properties = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] URL of the region where the instance template resides. Only applicable for regional resources.
+     *
+     * Generated from protobuf field <code>optional string region = 138946292;</code>
+     * @return string
+     */
+    public function getRegion()
+    {
+        return isset($this->region) ? $this->region : '';
+    }
+
+    public function hasRegion()
+    {
+        return isset($this->region);
+    }
+
+    public function clearRegion()
+    {
+        unset($this->region);
+    }
+
+    /**
+     * [Output Only] URL of the region where the instance template resides. Only applicable for regional resources.
+     *
+     * Generated from protobuf field <code>optional string region = 138946292;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setRegion($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->region = $var;
 
         return $this;
     }

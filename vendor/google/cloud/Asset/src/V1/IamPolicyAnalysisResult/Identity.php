@@ -16,27 +16,26 @@ use Google\Protobuf\Internal\GPBUtil;
 class Identity extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The identity name in any form of members appear in
+     * The identity of members, formatted as appear in an
      * [IAM policy
-     * binding](https://cloud.google.com/iam/reference/rest/v1/Binding), such
-     * as:
+     * binding](https://cloud.google.com/iam/reference/rest/v1/Binding). For
+     * example, they might be formatted like the following:
      * - user:foo&#64;google.com
      * - group:group1&#64;google.com
      * - serviceAccount:s1&#64;prj1.iam.gserviceaccount.com
      * - projectOwner:some_project_id
      * - domain:google.com
      * - allUsers
-     * - etc.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The analysis state of this identity.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.IamPolicyAnalysisState analysis_state = 2;</code>
      */
-    private $analysis_state = null;
+    protected $analysis_state = null;
 
     /**
      * Constructor.
@@ -45,17 +44,16 @@ class Identity extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           The identity name in any form of members appear in
+     *           The identity of members, formatted as appear in an
      *           [IAM policy
-     *           binding](https://cloud.google.com/iam/reference/rest/v1/Binding), such
-     *           as:
+     *           binding](https://cloud.google.com/iam/reference/rest/v1/Binding). For
+     *           example, they might be formatted like the following:
      *           - user:foo&#64;google.com
      *           - group:group1&#64;google.com
      *           - serviceAccount:s1&#64;prj1.iam.gserviceaccount.com
      *           - projectOwner:some_project_id
      *           - domain:google.com
      *           - allUsers
-     *           - etc.
      *     @type \Google\Cloud\Asset\V1\IamPolicyAnalysisState $analysis_state
      *           The analysis state of this identity.
      * }
@@ -66,17 +64,16 @@ class Identity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The identity name in any form of members appear in
+     * The identity of members, formatted as appear in an
      * [IAM policy
-     * binding](https://cloud.google.com/iam/reference/rest/v1/Binding), such
-     * as:
+     * binding](https://cloud.google.com/iam/reference/rest/v1/Binding). For
+     * example, they might be formatted like the following:
      * - user:foo&#64;google.com
      * - group:group1&#64;google.com
      * - serviceAccount:s1&#64;prj1.iam.gserviceaccount.com
      * - projectOwner:some_project_id
      * - domain:google.com
      * - allUsers
-     * - etc.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @return string
@@ -87,17 +84,16 @@ class Identity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The identity name in any form of members appear in
+     * The identity of members, formatted as appear in an
      * [IAM policy
-     * binding](https://cloud.google.com/iam/reference/rest/v1/Binding), such
-     * as:
+     * binding](https://cloud.google.com/iam/reference/rest/v1/Binding). For
+     * example, they might be formatted like the following:
      * - user:foo&#64;google.com
      * - group:group1&#64;google.com
      * - serviceAccount:s1&#64;prj1.iam.gserviceaccount.com
      * - projectOwner:some_project_id
      * - domain:google.com
      * - allUsers
-     * - etc.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @param string $var
@@ -149,6 +145,4 @@ class Identity extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Identity::class, \Google\Cloud\Asset\V1\IamPolicyAnalysisResult_Identity::class);
 

@@ -17,18 +17,35 @@ class GetServiceRolloutRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Required. The name of the service.  See the
-     * [overview](https://cloud.google.com/service-infrastructure/docs/overview) for naming requirements.  For
-     * example: `example.googleapis.com`.
+     * [overview](https://cloud.google.com/service-management/overview) for naming
+     * requirements.  For example: `example.googleapis.com`.
      *
      * Generated from protobuf field <code>string service_name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $service_name = '';
+    protected $service_name = '';
     /**
      * Required. The id of the rollout resource.
      *
      * Generated from protobuf field <code>string rollout_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $rollout_id = '';
+    protected $rollout_id = '';
+
+    /**
+     * @param string $serviceName Required. The name of the service.  See the
+     *                            [overview](https://cloud.google.com/service-management/overview) for naming
+     *                            requirements.  For example: `example.googleapis.com`.
+     * @param string $rolloutId   Required. The id of the rollout resource.
+     *
+     * @return \Google\Cloud\ServiceManagement\V1\GetServiceRolloutRequest
+     *
+     * @experimental
+     */
+    public static function build(string $serviceName, string $rolloutId): self
+    {
+        return (new self())
+            ->setServiceName($serviceName)
+            ->setRolloutId($rolloutId);
+    }
 
     /**
      * Constructor.
@@ -38,8 +55,8 @@ class GetServiceRolloutRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $service_name
      *           Required. The name of the service.  See the
-     *           [overview](https://cloud.google.com/service-infrastructure/docs/overview) for naming requirements.  For
-     *           example: `example.googleapis.com`.
+     *           [overview](https://cloud.google.com/service-management/overview) for naming
+     *           requirements.  For example: `example.googleapis.com`.
      *     @type string $rollout_id
      *           Required. The id of the rollout resource.
      * }
@@ -51,8 +68,8 @@ class GetServiceRolloutRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The name of the service.  See the
-     * [overview](https://cloud.google.com/service-infrastructure/docs/overview) for naming requirements.  For
-     * example: `example.googleapis.com`.
+     * [overview](https://cloud.google.com/service-management/overview) for naming
+     * requirements.  For example: `example.googleapis.com`.
      *
      * Generated from protobuf field <code>string service_name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -64,8 +81,8 @@ class GetServiceRolloutRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The name of the service.  See the
-     * [overview](https://cloud.google.com/service-infrastructure/docs/overview) for naming requirements.  For
-     * example: `example.googleapis.com`.
+     * [overview](https://cloud.google.com/service-management/overview) for naming
+     * requirements.  For example: `example.googleapis.com`.
      *
      * Generated from protobuf field <code>string service_name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

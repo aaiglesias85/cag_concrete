@@ -32,7 +32,7 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 max_step_count = 1;</code>
      */
-    private $max_step_count = 0;
+    protected $max_step_count = 0;
     /**
      * Minimum number of steps for a trial to complete. Trials which do not have
      * a measurement with step_count > min_step_count won't be considered for
@@ -44,7 +44,7 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 min_step_count = 2;</code>
      */
-    private $min_step_count = 0;
+    protected $min_step_count = 0;
     /**
      * The minimal number of measurements in a Trial.  Early-stopping checks
      * will not trigger if less than min_measurement_count+1 completed trials or
@@ -53,7 +53,7 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 min_measurement_count = 3;</code>
      */
-    private $min_measurement_count = 0;
+    protected $min_measurement_count = 0;
     /**
      * The hyper-parameter name used in the tuning job that stands for learning
      * rate. Leave it blank if learning rate is not in a parameter in tuning.
@@ -62,7 +62,7 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string learning_rate_parameter_name = 4;</code>
      */
-    private $learning_rate_parameter_name = '';
+    protected $learning_rate_parameter_name = '';
     /**
      * This bool determines whether or not the rule is applied based on
      * elapsed_secs or steps. If use_elapsed_duration==false, the early stopping
@@ -74,7 +74,19 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool use_elapsed_duration = 5;</code>
      */
-    private $use_elapsed_duration = false;
+    protected $use_elapsed_duration = false;
+    /**
+     * ConvexAutomatedStoppingSpec by default only updates the trials that needs
+     * to be early stopped using a newly trained auto-regressive model. When
+     * this flag is set to True, all stopped trials from the beginning are
+     * potentially updated in terms of their `final_measurement`. Also, note
+     * that the training logic of autoregressive models is different in this
+     * case. Enabling this option has shown better results and this may be the
+     * default option in the future.
+     *
+     * Generated from protobuf field <code>optional bool update_all_stopped_trials = 6;</code>
+     */
+    protected $update_all_stopped_trials = null;
 
     /**
      * Constructor.
@@ -113,6 +125,14 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
      *           instead of steps. Also, in this case, the parameters max_num_steps and
      *           min_num_steps are overloaded to contain max_elapsed_seconds and
      *           min_elapsed_seconds.
+     *     @type bool $update_all_stopped_trials
+     *           ConvexAutomatedStoppingSpec by default only updates the trials that needs
+     *           to be early stopped using a newly trained auto-regressive model. When
+     *           this flag is set to True, all stopped trials from the beginning are
+     *           potentially updated in terms of their `final_measurement`. Also, note
+     *           that the training logic of autoregressive models is different in this
+     *           case. Enabling this option has shown better results and this may be the
+     *           default option in the future.
      * }
      */
     public function __construct($data = NULL) {
@@ -288,6 +308,54 @@ class ConvexAutomatedStoppingSpec extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->use_elapsed_duration = $var;
+
+        return $this;
+    }
+
+    /**
+     * ConvexAutomatedStoppingSpec by default only updates the trials that needs
+     * to be early stopped using a newly trained auto-regressive model. When
+     * this flag is set to True, all stopped trials from the beginning are
+     * potentially updated in terms of their `final_measurement`. Also, note
+     * that the training logic of autoregressive models is different in this
+     * case. Enabling this option has shown better results and this may be the
+     * default option in the future.
+     *
+     * Generated from protobuf field <code>optional bool update_all_stopped_trials = 6;</code>
+     * @return bool
+     */
+    public function getUpdateAllStoppedTrials()
+    {
+        return isset($this->update_all_stopped_trials) ? $this->update_all_stopped_trials : false;
+    }
+
+    public function hasUpdateAllStoppedTrials()
+    {
+        return isset($this->update_all_stopped_trials);
+    }
+
+    public function clearUpdateAllStoppedTrials()
+    {
+        unset($this->update_all_stopped_trials);
+    }
+
+    /**
+     * ConvexAutomatedStoppingSpec by default only updates the trials that needs
+     * to be early stopped using a newly trained auto-regressive model. When
+     * this flag is set to True, all stopped trials from the beginning are
+     * potentially updated in terms of their `final_measurement`. Also, note
+     * that the training logic of autoregressive models is different in this
+     * case. Enabling this option has shown better results and this may be the
+     * default option in the future.
+     *
+     * Generated from protobuf field <code>optional bool update_all_stopped_trials = 6;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setUpdateAllStoppedTrials($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->update_all_stopped_trials = $var;
 
         return $this;
     }

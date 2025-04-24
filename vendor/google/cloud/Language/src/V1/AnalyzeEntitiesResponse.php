@@ -24,11 +24,12 @@ class AnalyzeEntitiesResponse extends \Google\Protobuf\Internal\Message
     /**
      * The language of the text, which will be the same as the language specified
      * in the request or, if not specified, the automatically-detected language.
-     * See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     * See [Document.language][google.cloud.language.v1.Document.language] field
+     * for more details.
      *
      * Generated from protobuf field <code>string language = 2;</code>
      */
-    private $language = '';
+    protected $language = '';
 
     /**
      * Constructor.
@@ -36,12 +37,13 @@ class AnalyzeEntitiesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Language\V1\Entity[]|\Google\Protobuf\Internal\RepeatedField $entities
+     *     @type array<\Google\Cloud\Language\V1\Entity>|\Google\Protobuf\Internal\RepeatedField $entities
      *           The recognized entities in the input document.
      *     @type string $language
      *           The language of the text, which will be the same as the language specified
      *           in the request or, if not specified, the automatically-detected language.
-     *           See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     *           See [Document.language][google.cloud.language.v1.Document.language] field
+     *           for more details.
      * }
      */
     public function __construct($data = NULL) {
@@ -64,7 +66,7 @@ class AnalyzeEntitiesResponse extends \Google\Protobuf\Internal\Message
      * The recognized entities in the input document.
      *
      * Generated from protobuf field <code>repeated .google.cloud.language.v1.Entity entities = 1;</code>
-     * @param \Google\Cloud\Language\V1\Entity[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Language\V1\Entity>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEntities($var)
@@ -78,7 +80,8 @@ class AnalyzeEntitiesResponse extends \Google\Protobuf\Internal\Message
     /**
      * The language of the text, which will be the same as the language specified
      * in the request or, if not specified, the automatically-detected language.
-     * See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     * See [Document.language][google.cloud.language.v1.Document.language] field
+     * for more details.
      *
      * Generated from protobuf field <code>string language = 2;</code>
      * @return string
@@ -91,7 +94,8 @@ class AnalyzeEntitiesResponse extends \Google\Protobuf\Internal\Message
     /**
      * The language of the text, which will be the same as the language specified
      * in the request or, if not specified, the automatically-detected language.
-     * See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     * See [Document.language][google.cloud.language.v1.Document.language] field
+     * for more details.
      *
      * Generated from protobuf field <code>string language = 2;</code>
      * @param string $var

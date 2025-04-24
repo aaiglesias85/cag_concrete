@@ -22,12 +22,11 @@ class UserEventService
         \GPBMetadata\Google\Cloud\Recommendationengine\V1Beta1\UserEvent::initOnce();
         \GPBMetadata\Google\Longrunning\Operations::initOnce();
         \GPBMetadata\Google\Protobuf\Timestamp::initOnce();
-        \GPBMetadata\Google\Type\Date::initOnce();
         \GPBMetadata\Google\Api\Client::initOnce();
         $pool->internalAddGeneratedFile(
             '
-©
-Bgoogle/cloud/recommendationengine/v1beta1/user_event_service.proto)google.cloud.recommendationengine.v1beta1google/api/field_behavior.protogoogle/api/httpbody.protogoogle/api/resource.proto6google/cloud/recommendationengine/v1beta1/import.proto:google/cloud/recommendationengine/v1beta1/user_event.proto#google/longrunning/operations.protogoogle/protobuf/timestamp.protogoogle/type/date.protogoogle/api/client.proto"‰
+•
+Bgoogle/cloud/recommendationengine/v1beta1/user_event_service.proto)google.cloud.recommendationengine.v1beta1google/api/field_behavior.protogoogle/api/httpbody.protogoogle/api/resource.proto6google/cloud/recommendationengine/v1beta1/import.proto:google/cloud/recommendationengine/v1beta1/user_event.proto#google/longrunning/operations.protogoogle/protobuf/timestamp.protogoogle/api/client.proto"‰
 PurgeUserEventsRequestF
 parent (	B6àAúA0
 .recommendationengine.googleapis.com/EventStore
@@ -62,15 +61,15 @@ page_token (	BàA
 user_events (24.google.cloud.recommendationengine.v1beta1.UserEvent
 next_page_token (	2Ø
 UserEventService„
-WriteUserEvent@.google.cloud.recommendationengine.v1beta1.WriteUserEventRequest4.google.cloud.recommendationengine.v1beta1.UserEvent"z‚Óä“`"R/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:write:
-user_eventÚAparent,user_eventæ
-CollectUserEventB.google.cloud.recommendationengine.v1beta1.CollectUserEventRequest.google.api.HttpBody"x‚Óä“VT/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:collectÚAparent,user_event,uri,etsû
-ListUserEvents@.google.cloud.recommendationengine.v1beta1.ListUserEventsRequestA.google.cloud.recommendationengine.v1beta1.ListUserEventsResponse"d‚Óä“NL/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEventsÚAparent,filteró
-PurgeUserEventsA.google.cloud.recommendationengine.v1beta1.PurgeUserEventsRequest.google.longrunning.Operation"ý‚Óä“W"R/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:purge:*ÊA†
-Agoogle.cloud.recommendationengine.v1beta1.PurgeUserEventsResponseAgoogle.cloud.recommendationengine.v1beta1.PurgeUserEventsMetadataÚAparent,filter,force†
-ImportUserEventsB.google.cloud.recommendationengine.v1beta1.ImportUserEventsRequest.google.longrunning.Operation"Ž‚Óä“X"S/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:import:*ÊA~
-Bgoogle.cloud.recommendationengine.v1beta1.ImportUserEventsResponse8google.cloud.recommendationengine.v1beta1.ImportMetadataÚA,parent,request_id,input_config,errors_configWÊA#recommendationengine.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformBŸ
--com.google.cloud.recommendationengine.v1beta1PZ]google.golang.org/genproto/googleapis/cloud/recommendationengine/v1beta1;recommendationengine¢RECAIª)Google.Cloud.RecommendationEngine.V1Beta1Ê)Google\\Cloud\\RecommendationEngine\\V1beta1ê,Google::Cloud::RecommendationEngine::V1beta1bproto3'
+WriteUserEvent@.google.cloud.recommendationengine.v1beta1.WriteUserEventRequest4.google.cloud.recommendationengine.v1beta1.UserEvent"zÚAparent,user_event‚Óä“`"R/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:write:
+user_eventæ
+CollectUserEventB.google.cloud.recommendationengine.v1beta1.CollectUserEventRequest.google.api.HttpBody"xÚAparent,user_event,uri,ets‚Óä“VT/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:collectû
+ListUserEvents@.google.cloud.recommendationengine.v1beta1.ListUserEventsRequestA.google.cloud.recommendationengine.v1beta1.ListUserEventsResponse"dÚAparent,filter‚Óä“NL/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEventsó
+PurgeUserEventsA.google.cloud.recommendationengine.v1beta1.PurgeUserEventsRequest.google.longrunning.Operation"ýÊA†
+Agoogle.cloud.recommendationengine.v1beta1.PurgeUserEventsResponseAgoogle.cloud.recommendationengine.v1beta1.PurgeUserEventsMetadataÚAparent,filter,force‚Óä“W"R/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:purge:*†
+ImportUserEventsB.google.cloud.recommendationengine.v1beta1.ImportUserEventsRequest.google.longrunning.Operation"ŽÊA~
+Bgoogle.cloud.recommendationengine.v1beta1.ImportUserEventsResponse8google.cloud.recommendationengine.v1beta1.ImportMetadataÚA,parent,request_id,input_config,errors_config‚Óä“X"S/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/userEvents:import:*WÊA#recommendationengine.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformB£
+-com.google.cloud.recommendationengine.v1beta1PZacloud.google.com/go/recommendationengine/apiv1beta1/recommendationenginepb;recommendationenginepb¢RECAIª)Google.Cloud.RecommendationEngine.V1Beta1Ê)Google\\Cloud\\RecommendationEngine\\V1beta1ê,Google::Cloud::RecommendationEngine::V1beta1bproto3'
         , true);
 
         static::$is_initialized = true;

@@ -1,4 +1,3 @@
-
 # Templates
 
 This document will describe how pagination can be rendered, extended and used in
@@ -30,6 +29,7 @@ Same for sorting link template:
 $paginator = $this->get('knp_paginator');
 $pagination = $paginator->paginate($target, $page);
 $pagination->setTemplate('my_pagination.html.twig');
+$pagination->setRelLinksTemplate('my_rel_links.html.twig');
 $pagination->setSortableTemplate('my_sortable.html.twig');
 ```
 
@@ -53,7 +53,7 @@ or by specifying path to your custom template that is located under your project
 
 ## Other useful parameters
 
-By default when render method is triggered, pagination renders the template
+By default, when render method is triggered, pagination renders the template
 with standard arguments provided:
 
 - pagination parameters, like pages in range, current page and so on..
@@ -98,6 +98,31 @@ $pagination->setCustomParameters([
     'span_class' => 'whatever',
 ]);
 ```
+
+If you want to use the template with the same parameters everywhere, create your own
+template and let extend it from the provided template.
+
+Here's an example of how to achieve that
+
+```yaml
+knp_paginator:
+    template:
+        pagination: 'pagination.html.twig'
+```
+
+And in your template
+
+```twig
+{% set align = 'left' %}
+{% set size = 'large' %}
+{% set style = 'bottom' %}
+
+{% extends '@KnpPaginator/Pagination/twitter_bootstrap_v5_pagination.html.twig' %}
+```
+
+Alternatively, you can override the original template in your `templates/bundles/`
+by following Symfony's [overriding rules](https://symfony.com/doc/current/bundles/override.html#templates).
+
 
 ### You can also change the page range
 

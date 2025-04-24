@@ -9,33 +9,48 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Message for requesting list of DataExchanges.
+ * Message for requesting the list of data exchanges.
  *
  * Generated from protobuf message <code>google.cloud.bigquery.dataexchange.v1beta1.ListDataExchangesRequest</code>
  */
 class ListDataExchangesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The parent resource path of the DataExchanges.
+     * Required. The parent resource path of the data exchanges.
      * e.g. `projects/myproject/locations/US`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of results to return in a single response page. Leverage
      * the page tokens to iterate through the entire collection.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Page token, returned by a previous call, to request the next page of
      * results.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The parent resource path of the data exchanges.
+     *                       e.g. `projects/myproject/locations/US`. Please see
+     *                       {@see AnalyticsHubServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\BigQuery\DataExchange\V1beta1\ListDataExchangesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -44,7 +59,7 @@ class ListDataExchangesRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The parent resource path of the DataExchanges.
+     *           Required. The parent resource path of the data exchanges.
      *           e.g. `projects/myproject/locations/US`.
      *     @type int $page_size
      *           The maximum number of results to return in a single response page. Leverage
@@ -60,7 +75,7 @@ class ListDataExchangesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent resource path of the DataExchanges.
+     * Required. The parent resource path of the data exchanges.
      * e.g. `projects/myproject/locations/US`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -72,7 +87,7 @@ class ListDataExchangesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent resource path of the DataExchanges.
+     * Required. The parent resource path of the data exchanges.
      * e.g. `projects/myproject/locations/US`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>

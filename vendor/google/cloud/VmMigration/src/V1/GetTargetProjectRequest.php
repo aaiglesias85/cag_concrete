@@ -20,7 +20,21 @@ class GetTargetProjectRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The TargetProject name. Please see
+     *                     {@see VmMigrationClient::targetProjectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\VMMigration\V1\GetTargetProjectRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

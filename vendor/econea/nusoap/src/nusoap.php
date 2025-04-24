@@ -98,7 +98,7 @@ class nusoap_base
      * @var string
      * @access private
      */
-    var $version = '0.9.11';
+    var $version = '0.9.17';
     /**
      * CVS revision for HTTP headers.
      *
@@ -1242,16 +1242,13 @@ class nusoap_xmlschema extends nusoap_base
             // Set the options for parsing the XML data.
             xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, 0);
 
-            // Set the object for the parser.
-            xml_set_object($this->parser, $this);
-
             // Set the element handlers for the parser.
             if ($type == "schema") {
-                xml_set_element_handler($this->parser, 'schemaStartElement', 'schemaEndElement');
-                xml_set_character_data_handler($this->parser, 'schemaCharacterData');
+                xml_set_element_handler($this->parser, [$this, 'schemaStartElement'], [$this, 'schemaEndElement']);
+                xml_set_character_data_handler($this->parser, [$this, 'schemaCharacterData']);
             } elseif ($type == "xml") {
-                xml_set_element_handler($this->parser, 'xmlStartElement', 'xmlEndElement');
-                xml_set_character_data_handler($this->parser, 'xmlCharacterData');
+                xml_set_element_handler($this->parser, [$this, 'xmlStartElement'], [$this, 'xmlEndElement']);
+                xml_set_character_data_handler($this->parser, [$this, 'xmlCharacterData']);
             }
 
             // Parse the XML file.
@@ -2821,7 +2818,9 @@ class soap_transport_http extends nusoap_base
             'HTTP/1.0 401',
             'HTTP/1.1 401',
             'HTTP/1.0 200 Connection established',
-            'HTTP/1.1 200 Connection established');
+            'HTTP/1.0 200 Connection Established',
+            'HTTP/1.1 200 Connection established',
+            'HTTP/1.1 200 Connection Established');
         foreach ($skipHeaders as $hd) {
             $prefix = substr($data, 0, strlen($hd));
             if ($prefix == $hd) {
@@ -3266,7 +3265,7 @@ class soap_transport_http extends nusoap_base
         $http_reason = count($arr) > 2 ? $arr[2] : '';
 
         // see if we need to resend the request with http digest authentication
-        if (isset($this->incoming_headers['location']) && ($http_status == 301 || $http_status == 302)) {
+        if (isset($this->incoming_headers['location']) && ($http_status == 301 || $http_status == 302 || $http_status == 307)) {
             $this->debug("Got $http_status $http_reason with Location: " . $this->incoming_headers['location']);
             $this->setURL($this->incoming_headers['location']);
             $this->tryagain = true;
@@ -3842,7 +3841,7 @@ class nusoap_server extends nusoap_base
                 }
             } elseif ($this->wsdl) {
                 $this->debug("In service, serialize WSDL");
-                header("Content-Type: text/xml; charset=ISO-8859-1\r\n");
+                header("Content-Type: text/xml; charset={$this->soap_defencoding}\r\n");
                 print $this->wsdl->serialize($this->debug_flag);
                 if ($this->debug_flag) {
                     $this->debug('wsdl:');
@@ -3851,7 +3850,7 @@ class nusoap_server extends nusoap_base
                 }
             } else {
                 $this->debug("In service, there is no WSDL");
-                header("Content-Type: text/html; charset=ISO-8859-1\r\n");
+                header("Content-Type: text/html; charset={$this->soap_defencoding}\r\n");
                 print "This service does not provide WSDL";
             }
         } elseif ($this->wsdl) {
@@ -3859,7 +3858,7 @@ class nusoap_server extends nusoap_base
             print $this->wsdl->webDescription();
         } else {
             $this->debug("In service, no Web description");
-            header("Content-Type: text/html; charset=ISO-8859-1\r\n");
+            header("Content-Type: text/html; charset={$this->soap_defencoding}\r\n");
             print "This service does not provide a Web description";
         }
     }
@@ -4463,8 +4462,12 @@ class nusoap_server extends nusoap_base
             $this->debug('methodname: ' . $this->methodname . ' methodURI: ' . $this->methodURI);
 
             // get/set custom response tag name
-            $outputMessage = $this->wsdl->getOperationData($this->methodname)['output']['message'];
-            $this->responseTagName = $outputMessage;
+            $opData = $this->wsdl->getOperationData($this->methodname);
+	    if (!isset($opData['output']['name'])) {
+		$this->debug('No output name in WSDL for operation ' . $this->methodname);
+		$this->setError('Operation ' . $this->methodname . ' not present in WSDL');
+		return false;
+	    }
             $this->debug('responseTagName: ' . $this->responseTagName . ' methodURI: ' . $this->methodURI);
 
             $this->debug('calling parser->get_soapbody()');
@@ -4646,7 +4649,7 @@ class nusoap_server extends nusoap_base
     {
         global $HTTP_SERVER_VARS;
 
-        if (isset($_SERVER)) {
+        if (isset($_SERVER['SERVER_NAME'])) {
             $SERVER_NAME = $_SERVER['SERVER_NAME'];
             $SERVER_PORT = $_SERVER['SERVER_PORT'];
             $SCRIPT_NAME = $_SERVER['SCRIPT_NAME'];
@@ -4692,6 +4695,7 @@ class nusoap_server extends nusoap_base
 
         $this->wsdl = new wsdl;
         $this->wsdl->serviceName = $serviceName;
+        $this->wsdl->soap_defencoding = $this->soap_defencoding;
         $this->wsdl->endpoint = $endpoint;
         $this->wsdl->namespaces['tns'] = $namespace;
         $this->wsdl->namespaces['soap'] = 'http://schemas.xmlsoap.org/wsdl/soap/';
@@ -4995,11 +4999,9 @@ class wsdl extends nusoap_base
         // Set the options for parsing the XML data.
         // xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
         xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, 0);
-        // Set the object for the parser.
-        xml_set_object($this->parser, $this);
         // Set the element handlers for the parser.
-        xml_set_element_handler($this->parser, 'start_element', 'end_element');
-        xml_set_character_data_handler($this->parser, 'character_data');
+        xml_set_element_handler($this->parser, [$this, 'start_element'], [$this, 'end_element']);
+        xml_set_character_data_handler($this->parser, [$this, 'character_data']);
         // Parse the XML file.
         if (!xml_parse($this->parser, $wsdl_string, true)) {
             // Display an error message.
@@ -5517,7 +5519,7 @@ class wsdl extends nusoap_base
             $PHP_SELF = '';
         }
 
-        $b = '
+        $b = '<!DOCTYPE html>
 		<html><head><title>NuSOAP: ' . $this->serviceName . '</title>
 		<style type="text/css">
 		    body    { font-family: arial; color: #000000; background-color: #ffffff; margin: 0px 0px 0px 0px; }
@@ -5538,12 +5540,11 @@ class wsdl extends nusoap_base
 			padding-top: 10px; padding-bottom: 10px;}
 		    .hidden {
 			position: absolute; visibility: hidden; z-index: 200; left: 250px; top: 100px;
-			font-family: arial; overflow: hidden; width: 600;
-			padding: 20px; font-size: 10px; background-color: #999999;
-			layer-background-color:#FFFFFF; }
-		    a,a:active  { color: charcoal; font-weight: bold; }
+			font-family: arial; overflow: hidden; width: 600px;
+			padding: 20px; font-size: 10px; background-color: #999999; }
+		    a,a:active  { color: #36454f; font-weight: bold; }
 		    a:visited   { color: #666666; font-weight: bold; }
-		    a:hover     { color: cc3300; font-weight: bold; }
+		    a:hover     { color: #cc3300; font-weight: bold; }
 		</style>
 		<script language="JavaScript" type="text/javascript">
 		<!--
@@ -5601,13 +5602,13 @@ class wsdl extends nusoap_base
 				Click on an operation name to view it&apos;s details.</p>
 				<ul>';
         foreach ($this->getOperations() as $op => $data) {
-            $b .= "<li><a href='#' onclick=\"popout();popup('$op')\">$op</a></li>";
+            $b .= "<li><a href='#' onclick=\"popout();popup('$op')\">$op</a>";
             // create hidden div
             $b .= "<div id='$op' class='hidden'>
-				    <a href='#' onclick='popout()'><font color='#ffffff'>Close</font></a><br><br>";
+				    <a href='#' onclick='popout()'><span style=\"color: #ffffff\">Close</span></a><br><br>";
             foreach ($data as $donnie => $marie) { // loop through opdata
                 if ($donnie == 'input' || $donnie == 'output') { // show input/output data
-                    $b .= "<font color='white'>" . ucfirst($donnie) . ':</font><br>';
+                    $b .= '<span style="color: white">' . ucfirst($donnie) . ':</span><br>';
                     foreach ($marie as $captain => $tenille) { // loop through data
                         if ($captain == 'parts') { // loop thru parts
                             $b .= "&nbsp;&nbsp;$captain:<br>";
@@ -5621,13 +5622,13 @@ class wsdl extends nusoap_base
                         }
                     }
                 } else {
-                    $b .= "<font color='white'>" . ucfirst($donnie) . ":</font> $marie<br>";
+                    $b .= '<span style="color: white">' . ucfirst($donnie) . ":</span> $marie<br>";
                 }
             }
-            $b .= '</div>';
+            $b .= '</div></li>';
         }
         $b .= '
-				<ul>
+				</ul>
 			</div>
 		</div></body></html>';
         return $b;
@@ -5642,7 +5643,7 @@ class wsdl extends nusoap_base
      */
     function serialize($debug = 0)
     {
-        $xml = '<?xml version="1.0" encoding="ISO-8859-1"?>';
+        $xml = '<?xml version="1.0" encoding="' . $this->soap_defencoding . '"?>';
         $xml .= "\n<definitions";
         foreach ($this->namespaces as $k => $v) {
             $xml .= " xmlns:$k=\"$v\"";
@@ -6065,7 +6066,7 @@ class wsdl extends nusoap_base
             }
             $attrs = $value->attributes;
             $value = $value->value;
-            $this->debug("in serializeType: soapval overrides value to $value");
+            $this->debug("in serializeType: soapval overrides value to " . $this->varDump($value));
             if ($attrs) {
                 if (!is_array($value)) {
                     $value['!'] = $value;
@@ -6803,11 +6804,9 @@ class nusoap_parser extends nusoap_base
             //xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
             xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, 0);
             xml_parser_set_option($this->parser, XML_OPTION_TARGET_ENCODING, $this->xml_encoding);
-            // Set the object for the parser.
-            xml_set_object($this->parser, $this);
             // Set the element handlers for the parser.
-            xml_set_element_handler($this->parser, 'start_element', 'end_element');
-            xml_set_character_data_handler($this->parser, 'character_data');
+            xml_set_element_handler($this->parser, [$this, 'start_element'], [$this, 'end_element']);
+            xml_set_character_data_handler($this->parser, [$this, 'character_data']);
             $parseErrors = array();
             $chunkSize = 4096;
             for($pointer = 0; $pointer < strlen($xml) && empty($parseErrors); $pointer += $chunkSize) {
@@ -6840,7 +6839,7 @@ class nusoap_parser extends nusoap_base
                 $substrXml = $xml;
                 foreach($this->attachments as $key => $attachment) {
                     $startPos = max(
-                        stripos($substrXml, $attachment['boundaryStr']),
+                        isset($attachment['boundaryStr']) ? stripos($substrXml, $attachment['boundaryStr']) : false,
                         (array_key_exists('Content-Type', $attachment) ? stripos($substrXml, $attachment['Content-Type']) : 0),
                         (array_key_exists('Content-Id', $attachment) ? stripos($substrXml, $attachment['Content-Id']) : 0),
                         (array_key_exists('Content-Transfer-Encoding', $attachment) ? stripos($substrXml, $attachment['Content-Transfer-Encoding']) : 0)
@@ -6865,9 +6864,8 @@ class nusoap_parser extends nusoap_base
                     $this->parser = xml_parser_create($this->xml_encoding);
                     xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, 0);
                     xml_parser_set_option($this->parser, XML_OPTION_TARGET_ENCODING, $this->xml_encoding);
-                    xml_set_object($this->parser, $this);
-                    xml_set_element_handler($this->parser, 'start_element', 'end_element');
-                    xml_set_character_data_handler($this->parser, 'character_data');
+                    xml_set_element_handler($this->parser, [$this, 'start_element'], [$this, 'end_element']);
+                    xml_set_character_data_handler($this->parser, [$this, 'character_data']);
 
                     if(!empty($attachment['content'])) {
                         $content = $attachment['content'];

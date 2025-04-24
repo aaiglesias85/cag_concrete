@@ -22,15 +22,24 @@ class Scope
     const PBDEFAULT = 0;
     /**
      * Certificates with scope EDGE_CACHE are special-purposed certificates,
-     * served from non-core Google data centers.
+     * served from Edge Points of Presence.
+     * See https://cloud.google.com/vpc/docs/edge-locations.
      *
      * Generated from protobuf enum <code>EDGE_CACHE = 1;</code>
      */
     const EDGE_CACHE = 1;
+    /**
+     * Certificates with ALL_REGIONS scope are served from all Google Cloud
+     * regions. See https://cloud.google.com/compute/docs/regions-zones.
+     *
+     * Generated from protobuf enum <code>ALL_REGIONS = 2;</code>
+     */
+    const ALL_REGIONS = 2;
 
     private static $valueToName = [
-        self::PBDEFAULT => 'PBDEFAULT',
+        self::PBDEFAULT => 'DEFAULT',
         self::EDGE_CACHE => 'EDGE_CACHE',
+        self::ALL_REGIONS => 'ALL_REGIONS',
     ];
 
     public static function name($value)
@@ -47,8 +56,12 @@ class Scope
     {
         $const = __CLASS__ . '::' . strtoupper($name);
         if (!defined($const)) {
-            throw new UnexpectedValueException(sprintf(
-                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+            $pbconst =  __CLASS__. '::PB' . strtoupper($name);
+            if (!defined($pbconst)) {
+                throw new UnexpectedValueException(sprintf(
+                        'Enum %s has no value defined for name %s', __CLASS__, $name));
+            }
+            return constant($pbconst);
         }
         return constant($const);
     }

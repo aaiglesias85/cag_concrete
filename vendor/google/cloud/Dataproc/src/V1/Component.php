@@ -20,11 +20,11 @@ class Component
      */
     const COMPONENT_UNSPECIFIED = 0;
     /**
-     * The Anaconda python distribution. The Anaconda component is not supported
-     * in the Dataproc
-     * <a
-     * href="/dataproc/docs/concepts/versioning/dataproc-release-2.0">2.0
-     * image</a>. The 2.0 image is pre-installed with Miniconda.
+     * The Anaconda component is no longer supported or applicable to
+     * [supported Dataproc on Compute Engine image versions]
+     * (https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-version-clusters#supported-dataproc-image-versions).
+     * It cannot be activated on clusters created with supported Dataproc on
+     * Compute Engine image versions.
      *
      * Generated from protobuf enum <code>ANACONDA = 5;</code>
      */
@@ -60,6 +60,12 @@ class Component
      */
     const HIVE_WEBHCAT = 3;
     /**
+     * Hudi.
+     *
+     * Generated from protobuf enum <code>HUDI = 18;</code>
+     */
+    const HUDI = 18;
+    /**
      * The Jupyter Notebook.
      *
      * Generated from protobuf enum <code>JUPYTER = 1;</code>
@@ -71,6 +77,12 @@ class Component
      * Generated from protobuf enum <code>PRESTO = 6;</code>
      */
     const PRESTO = 6;
+    /**
+     * The Trino query engine.
+     *
+     * Generated from protobuf enum <code>TRINO = 17;</code>
+     */
+    const TRINO = 17;
     /**
      * The Ranger service.
      *
@@ -104,8 +116,10 @@ class Component
         self::FLINK => 'FLINK',
         self::HBASE => 'HBASE',
         self::HIVE_WEBHCAT => 'HIVE_WEBHCAT',
+        self::HUDI => 'HUDI',
         self::JUPYTER => 'JUPYTER',
         self::PRESTO => 'PRESTO',
+        self::TRINO => 'TRINO',
         self::RANGER => 'RANGER',
         self::SOLR => 'SOLR',
         self::ZEPPELIN => 'ZEPPELIN',

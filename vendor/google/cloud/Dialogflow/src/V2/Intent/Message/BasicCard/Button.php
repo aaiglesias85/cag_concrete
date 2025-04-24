@@ -20,13 +20,13 @@ class Button extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string title = 1;</code>
      */
-    private $title = '';
+    protected $title = '';
     /**
      * Required. Action to take when a user taps on the button.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Intent.Message.BasicCard.Button.OpenUriAction open_uri_action = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $open_uri_action = null;
+    protected $open_uri_action = null;
 
     /**
      * Constructor.
@@ -109,6 +109,4 @@ class Button extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Button::class, \Google\Cloud\Dialogflow\V2\Intent_Message_BasicCard_Button::class);
 

@@ -22,6 +22,13 @@ class MachineType extends \Google\Protobuf\Internal\Message
      */
     private $accelerators;
     /**
+     * [Output Only] The architecture of the machine type.
+     * Check the Architecture enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string architecture = 302803283;</code>
+     */
+    private $architecture = null;
+    /**
      * [Output Only] Creation timestamp in RFC3339 text format.
      *
      * Generated from protobuf field <code>optional string creation_timestamp = 30525366;</code>
@@ -118,8 +125,11 @@ class MachineType extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Compute\V1\Accelerators[]|\Google\Protobuf\Internal\RepeatedField $accelerators
+     *     @type array<\Google\Cloud\Compute\V1\Accelerators>|\Google\Protobuf\Internal\RepeatedField $accelerators
      *           [Output Only] A list of accelerator configurations assigned to this machine type.
+     *     @type string $architecture
+     *           [Output Only] The architecture of the machine type.
+     *           Check the Architecture enum for the list of possible values.
      *     @type string $creation_timestamp
      *           [Output Only] Creation timestamp in RFC3339 text format.
      *     @type \Google\Cloud\Compute\V1\DeprecationStatus $deprecated
@@ -144,7 +154,7 @@ class MachineType extends \Google\Protobuf\Internal\Message
      *           [Output Only] The amount of physical memory available to the instance, defined in MB.
      *     @type string $name
      *           [Output Only] Name of the resource.
-     *     @type \Google\Cloud\Compute\V1\ScratchDisks[]|\Google\Protobuf\Internal\RepeatedField $scratch_disks
+     *     @type array<\Google\Cloud\Compute\V1\ScratchDisks>|\Google\Protobuf\Internal\RepeatedField $scratch_disks
      *           [Output Only] A list of extended scratch disks assigned to the instance.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
@@ -172,13 +182,51 @@ class MachineType extends \Google\Protobuf\Internal\Message
      * [Output Only] A list of accelerator configurations assigned to this machine type.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.Accelerators accelerators = 269577064;</code>
-     * @param \Google\Cloud\Compute\V1\Accelerators[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\Accelerators>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAccelerators($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Compute\V1\Accelerators::class);
         $this->accelerators = $arr;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] The architecture of the machine type.
+     * Check the Architecture enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string architecture = 302803283;</code>
+     * @return string
+     */
+    public function getArchitecture()
+    {
+        return isset($this->architecture) ? $this->architecture : '';
+    }
+
+    public function hasArchitecture()
+    {
+        return isset($this->architecture);
+    }
+
+    public function clearArchitecture()
+    {
+        unset($this->architecture);
+    }
+
+    /**
+     * [Output Only] The architecture of the machine type.
+     * Check the Architecture enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string architecture = 302803283;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setArchitecture($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->architecture = $var;
 
         return $this;
     }
@@ -630,7 +678,7 @@ class MachineType extends \Google\Protobuf\Internal\Message
      * [Output Only] A list of extended scratch disks assigned to the instance.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.ScratchDisks scratch_disks = 480778481;</code>
-     * @param \Google\Cloud\Compute\V1\ScratchDisks[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\ScratchDisks>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setScratchDisks($var)

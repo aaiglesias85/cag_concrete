@@ -24,7 +24,7 @@ class Location extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.Range byte_range = 1;</code>
      */
-    private $byte_range = null;
+    protected $byte_range = null;
     /**
      * Unicode character offsets delimiting the finding.
      * These are relative to the finding's containing element.
@@ -32,7 +32,7 @@ class Location extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.Range codepoint_range = 2;</code>
      */
-    private $codepoint_range = null;
+    protected $codepoint_range = null;
     /**
      * List of nested objects pointing to the precise location of the finding
      * within the file or record.
@@ -45,7 +45,7 @@ class Location extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.Container container = 8;</code>
      */
-    private $container = null;
+    protected $container = null;
 
     /**
      * Constructor.
@@ -63,7 +63,7 @@ class Location extends \Google\Protobuf\Internal\Message
      *           Unicode character offsets delimiting the finding.
      *           These are relative to the finding's containing element.
      *           Provided when the content is text.
-     *     @type \Google\Cloud\Dlp\V2\ContentLocation[]|\Google\Protobuf\Internal\RepeatedField $content_locations
+     *     @type array<\Google\Cloud\Dlp\V2\ContentLocation>|\Google\Protobuf\Internal\RepeatedField $content_locations
      *           List of nested objects pointing to the precise location of the finding
      *           within the file or record.
      *     @type \Google\Cloud\Dlp\V2\Container $container
@@ -176,7 +176,7 @@ class Location extends \Google\Protobuf\Internal\Message
      * within the file or record.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.ContentLocation content_locations = 7;</code>
-     * @param \Google\Cloud\Dlp\V2\ContentLocation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\ContentLocation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setContentLocations($var)

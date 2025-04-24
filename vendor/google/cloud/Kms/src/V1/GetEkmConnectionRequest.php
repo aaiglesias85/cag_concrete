@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [KeyManagementService.GetEkmConnection][].
+ * Request message for
+ * [EkmService.GetEkmConnection][google.cloud.kms.v1.EkmService.GetEkmConnection].
  *
  * Generated from protobuf message <code>google.cloud.kms.v1.GetEkmConnectionRequest</code>
  */
@@ -21,7 +22,22 @@ class GetEkmConnectionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The [name][google.cloud.kms.v1.EkmConnection.name] of the
+     *                     [EkmConnection][google.cloud.kms.v1.EkmConnection] to get. Please see
+     *                     {@see EkmServiceClient::ekmConnectionName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Kms\V1\GetEkmConnectionRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

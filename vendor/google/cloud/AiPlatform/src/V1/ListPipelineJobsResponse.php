@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [PipelineService.ListPipelineJobs][google.cloud.aiplatform.v1.PipelineService.ListPipelineJobs]
+ * Response message for
+ * [PipelineService.ListPipelineJobs][google.cloud.aiplatform.v1.PipelineService.ListPipelineJobs]
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListPipelineJobsResponse</code>
  */
@@ -23,11 +24,13 @@ class ListPipelineJobsResponse extends \Google\Protobuf\Internal\Message
     private $pipeline_jobs;
     /**
      * A token to retrieve the next page of results.
-     * Pass to [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,11 +38,13 @@ class ListPipelineJobsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\PipelineJob[]|\Google\Protobuf\Internal\RepeatedField $pipeline_jobs
+     *     @type array<\Google\Cloud\AIPlatform\V1\PipelineJob>|\Google\Protobuf\Internal\RepeatedField $pipeline_jobs
      *           List of PipelineJobs in the requested page.
      *     @type string $next_page_token
      *           A token to retrieve the next page of results.
-     *           Pass to [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token] to obtain that page.
+     *           Pass to
+     *           [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token]
+     *           to obtain that page.
      * }
      */
     public function __construct($data = NULL) {
@@ -62,7 +67,7 @@ class ListPipelineJobsResponse extends \Google\Protobuf\Internal\Message
      * List of PipelineJobs in the requested page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PipelineJob pipeline_jobs = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\PipelineJob[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\PipelineJob>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPipelineJobs($var)
@@ -75,7 +80,9 @@ class ListPipelineJobsResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * A token to retrieve the next page of results.
-     * Pass to [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @return string
@@ -87,7 +94,9 @@ class ListPipelineJobsResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * A token to retrieve the next page of results.
-     * Pass to [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListPipelineJobsRequest.page_token][google.cloud.aiplatform.v1.ListPipelineJobsRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @param string $var

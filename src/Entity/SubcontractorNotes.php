@@ -4,86 +4,56 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * SubcontractorNotes
- *
- * @ORM\Table(name="subcontractor_notes")
- * @ORM\Entity(repositoryClass="App\Repository\SubcontractorNotesRepository")
- */
+#[ORM\Table(name: "subcontractor_notes")]
+#[ORM\Entity(repositoryClass: "App\Repository\SubcontractorNotesRepository")]
 class SubcontractorNotes
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    private ?int $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="notes", type="text", nullable=false)
-     */
-    private $notes;
+    #[ORM\Column(name: "notes", type: "text", nullable: true)]
+    private ?string $notes;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="date", nullable=false)
-     */
-    private $date;
+    #[ORM\Column(name: "date", type: "date", nullable: true)]
+    private ?\DateTime $date;
 
-    /**
-     * @var Subcontractor
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Subcontractor")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="subcontractor_id", referencedColumnName="subcontractor_id")
-     * })
-     */
-    private $subcontractor;
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Subcontractor")]
+    #[ORM\JoinColumn(name: "subcontractor_id", referencedColumnName: "subcontractor_id", nullable: true)]
+    private ?Subcontractor $subcontractor;
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNotes()
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes($notes)
+    public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
     }
 
-    public function getDate(): \DateTime
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): void
+    public function setDate(?\DateTime $date): void
     {
         $this->date = $date;
     }
 
-    /**
-     * @return Subcontractor
-     */
-    public function getSubcontractor()
+    public function getSubcontractor(): ?Subcontractor
     {
         return $this->subcontractor;
     }
 
-    public function setSubcontractor($subcontractor)
+    public function setSubcontractor(?Subcontractor $subcontractor): void
     {
         $this->subcontractor = $subcontractor;
     }

@@ -24,13 +24,32 @@ class UpdateGatewayRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Required. Gateway resource.
      *
      * Generated from protobuf field <code>.google.cloud.apigateway.v1.Gateway gateway = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $gateway = null;
+    protected $gateway = null;
+
+    /**
+     * @param \Google\Cloud\ApiGateway\V1\Gateway $gateway    Required. Gateway resource.
+     * @param \Google\Protobuf\FieldMask          $updateMask Field mask is used to specify the fields to be overwritten in the
+     *                                                        Gateway resource by the update.
+     *                                                        The fields specified in the update_mask are relative to the resource, not
+     *                                                        the full request. A field will be overwritten if it is in the mask. If the
+     *                                                        user does not provide a mask then all fields will be overwritten.
+     *
+     * @return \Google\Cloud\ApiGateway\V1\UpdateGatewayRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\ApiGateway\V1\Gateway $gateway, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setGateway($gateway)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

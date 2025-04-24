@@ -46,8 +46,8 @@ class ConditionCombinerType
 
     private static $valueToName = [
         self::COMBINE_UNSPECIFIED => 'COMBINE_UNSPECIFIED',
-        self::PBAND => 'PBAND',
-        self::PBOR => 'PBOR',
+        self::PBAND => 'AND',
+        self::PBOR => 'OR',
         self::AND_WITH_MATCHING_RESOURCE => 'AND_WITH_MATCHING_RESOURCE',
     ];
 
@@ -65,13 +65,15 @@ class ConditionCombinerType
     {
         $const = __CLASS__ . '::' . strtoupper($name);
         if (!defined($const)) {
-            throw new UnexpectedValueException(sprintf(
-                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+            $pbconst =  __CLASS__. '::PB' . strtoupper($name);
+            if (!defined($pbconst)) {
+                throw new UnexpectedValueException(sprintf(
+                        'Enum %s has no value defined for name %s', __CLASS__, $name));
+            }
+            return constant($pbconst);
         }
         return constant($const);
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ConditionCombinerType::class, \Google\Cloud\Monitoring\V3\AlertPolicy_ConditionCombinerType::class);
 

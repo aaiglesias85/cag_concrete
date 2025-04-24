@@ -16,16 +16,18 @@ use Google\Protobuf\Internal\GPBUtil;
 class BigQueryDestination extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The BigQuery dataset in format "projects/projectId/datasets/datasetId",
-     * to which the analysis results should be exported. If this dataset does
-     * not exist, the export call will return an INVALID_ARGUMENT error.
+     * Required. The BigQuery dataset in format
+     * "projects/projectId/datasets/datasetId", to which the analysis results
+     * should be exported. If this dataset does not exist, the export call will
+     * return an INVALID_ARGUMENT error.
      *
      * Generated from protobuf field <code>string dataset = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $dataset = '';
+    protected $dataset = '';
     /**
-     * Required. The prefix of the BigQuery tables to which the analysis results will be
-     * written. Tables will be created based on this table_prefix if not exist:
+     * Required. The prefix of the BigQuery tables to which the analysis results
+     * will be written. Tables will be created based on this table_prefix if not
+     * exist:
      * * <table_prefix>_analysis table will contain export operation's metadata.
      * * <table_prefix>_analysis_result will contain all the
      *   [IamPolicyAnalysisResult][google.cloud.asset.v1.IamPolicyAnalysisResult].
@@ -34,16 +36,16 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string table_prefix = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $table_prefix = '';
+    protected $table_prefix = '';
     /**
      * The partition key for BigQuery partitioned table.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.IamPolicyAnalysisOutputConfig.BigQueryDestination.PartitionKey partition_key = 3;</code>
      */
-    private $partition_key = 0;
+    protected $partition_key = 0;
     /**
-     * Optional. Specifies the action that occurs if the destination table or partition
-     * already exists. The following values are supported:
+     * Optional. Specifies the action that occurs if the destination table or
+     * partition already exists. The following values are supported:
      * * WRITE_TRUNCATE: If the table or partition already exists, BigQuery
      * overwrites the entire table or all the partitions data.
      * * WRITE_APPEND: If the table or partition already exists, BigQuery
@@ -56,7 +58,7 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string write_disposition = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $write_disposition = '';
+    protected $write_disposition = '';
 
     /**
      * Constructor.
@@ -65,12 +67,14 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $dataset
-     *           Required. The BigQuery dataset in format "projects/projectId/datasets/datasetId",
-     *           to which the analysis results should be exported. If this dataset does
-     *           not exist, the export call will return an INVALID_ARGUMENT error.
+     *           Required. The BigQuery dataset in format
+     *           "projects/projectId/datasets/datasetId", to which the analysis results
+     *           should be exported. If this dataset does not exist, the export call will
+     *           return an INVALID_ARGUMENT error.
      *     @type string $table_prefix
-     *           Required. The prefix of the BigQuery tables to which the analysis results will be
-     *           written. Tables will be created based on this table_prefix if not exist:
+     *           Required. The prefix of the BigQuery tables to which the analysis results
+     *           will be written. Tables will be created based on this table_prefix if not
+     *           exist:
      *           * <table_prefix>_analysis table will contain export operation's metadata.
      *           * <table_prefix>_analysis_result will contain all the
      *             [IamPolicyAnalysisResult][google.cloud.asset.v1.IamPolicyAnalysisResult].
@@ -79,8 +83,8 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
      *     @type int $partition_key
      *           The partition key for BigQuery partitioned table.
      *     @type string $write_disposition
-     *           Optional. Specifies the action that occurs if the destination table or partition
-     *           already exists. The following values are supported:
+     *           Optional. Specifies the action that occurs if the destination table or
+     *           partition already exists. The following values are supported:
      *           * WRITE_TRUNCATE: If the table or partition already exists, BigQuery
      *           overwrites the entire table or all the partitions data.
      *           * WRITE_APPEND: If the table or partition already exists, BigQuery
@@ -98,9 +102,10 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BigQuery dataset in format "projects/projectId/datasets/datasetId",
-     * to which the analysis results should be exported. If this dataset does
-     * not exist, the export call will return an INVALID_ARGUMENT error.
+     * Required. The BigQuery dataset in format
+     * "projects/projectId/datasets/datasetId", to which the analysis results
+     * should be exported. If this dataset does not exist, the export call will
+     * return an INVALID_ARGUMENT error.
      *
      * Generated from protobuf field <code>string dataset = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -111,9 +116,10 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BigQuery dataset in format "projects/projectId/datasets/datasetId",
-     * to which the analysis results should be exported. If this dataset does
-     * not exist, the export call will return an INVALID_ARGUMENT error.
+     * Required. The BigQuery dataset in format
+     * "projects/projectId/datasets/datasetId", to which the analysis results
+     * should be exported. If this dataset does not exist, the export call will
+     * return an INVALID_ARGUMENT error.
      *
      * Generated from protobuf field <code>string dataset = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -128,8 +134,9 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The prefix of the BigQuery tables to which the analysis results will be
-     * written. Tables will be created based on this table_prefix if not exist:
+     * Required. The prefix of the BigQuery tables to which the analysis results
+     * will be written. Tables will be created based on this table_prefix if not
+     * exist:
      * * <table_prefix>_analysis table will contain export operation's metadata.
      * * <table_prefix>_analysis_result will contain all the
      *   [IamPolicyAnalysisResult][google.cloud.asset.v1.IamPolicyAnalysisResult].
@@ -145,8 +152,9 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The prefix of the BigQuery tables to which the analysis results will be
-     * written. Tables will be created based on this table_prefix if not exist:
+     * Required. The prefix of the BigQuery tables to which the analysis results
+     * will be written. Tables will be created based on this table_prefix if not
+     * exist:
      * * <table_prefix>_analysis table will contain export operation's metadata.
      * * <table_prefix>_analysis_result will contain all the
      *   [IamPolicyAnalysisResult][google.cloud.asset.v1.IamPolicyAnalysisResult].
@@ -192,8 +200,8 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Specifies the action that occurs if the destination table or partition
-     * already exists. The following values are supported:
+     * Optional. Specifies the action that occurs if the destination table or
+     * partition already exists. The following values are supported:
      * * WRITE_TRUNCATE: If the table or partition already exists, BigQuery
      * overwrites the entire table or all the partitions data.
      * * WRITE_APPEND: If the table or partition already exists, BigQuery
@@ -213,8 +221,8 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Specifies the action that occurs if the destination table or partition
-     * already exists. The following values are supported:
+     * Optional. Specifies the action that occurs if the destination table or
+     * partition already exists. The following values are supported:
      * * WRITE_TRUNCATE: If the table or partition already exists, BigQuery
      * overwrites the entire table or all the partitions data.
      * * WRITE_APPEND: If the table or partition already exists, BigQuery
@@ -239,6 +247,4 @@ class BigQueryDestination extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(BigQueryDestination::class, \Google\Cloud\Asset\V1\IamPolicyAnalysisOutputConfig_BigQueryDestination::class);
 

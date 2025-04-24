@@ -20,21 +20,21 @@ class IncompatibleDataSchema extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string table = 1;</code>
      */
-    private $table = '';
+    protected $table = '';
     /**
      * The existing and expected schema of the table. The schema is provided as
      * a JSON formatted structure listing columns and data types.
      *
      * Generated from protobuf field <code>string existing_schema = 2;</code>
      */
-    private $existing_schema = '';
+    protected $existing_schema = '';
     /**
      * The new and incompatible schema within the table. The schema is provided
      * as a JSON formatted structured listing columns and data types.
      *
      * Generated from protobuf field <code>string new_schema = 3;</code>
      */
-    private $new_schema = '';
+    protected $new_schema = '';
     /**
      * The list of data locations sampled and used for format/schema
      * inference.
@@ -47,7 +47,7 @@ class IncompatibleDataSchema extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Action.IncompatibleDataSchema.SchemaChange schema_change = 5;</code>
      */
-    private $schema_change = 0;
+    protected $schema_change = 0;
 
     /**
      * Constructor.
@@ -63,7 +63,7 @@ class IncompatibleDataSchema extends \Google\Protobuf\Internal\Message
      *     @type string $new_schema
      *           The new and incompatible schema within the table. The schema is provided
      *           as a JSON formatted structured listing columns and data types.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $sampled_data_locations
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $sampled_data_locations
      *           The list of data locations sampled and used for format/schema
      *           inference.
      *     @type int $schema_change
@@ -174,7 +174,7 @@ class IncompatibleDataSchema extends \Google\Protobuf\Internal\Message
      * inference.
      *
      * Generated from protobuf field <code>repeated string sampled_data_locations = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSampledDataLocations($var)

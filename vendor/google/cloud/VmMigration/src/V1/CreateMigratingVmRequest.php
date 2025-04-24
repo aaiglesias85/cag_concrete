@@ -20,19 +20,19 @@ class CreateMigratingVmRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The migratingVm identifier.
      *
      * Generated from protobuf field <code>string migrating_vm_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $migrating_vm_id = '';
+    protected $migrating_vm_id = '';
     /**
      * Required. The create request body.
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.MigratingVm migrating_vm = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $migrating_vm = null;
+    protected $migrating_vm = null;
     /**
      * A request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -48,7 +48,25 @@ class CreateMigratingVmRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4;</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                                   $parent        Required. The MigratingVm's parent. Please see
+     *                                                                {@see VmMigrationClient::sourceName()} for help formatting this field.
+     * @param \Google\Cloud\VMMigration\V1\MigratingVm $migratingVm   Required. The create request body.
+     * @param string                                   $migratingVmId Required. The migratingVm identifier.
+     *
+     * @return \Google\Cloud\VMMigration\V1\CreateMigratingVmRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\VMMigration\V1\MigratingVm $migratingVm, string $migratingVmId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setMigratingVm($migratingVm)
+            ->setMigratingVmId($migratingVmId);
+    }
 
     /**
      * Constructor.

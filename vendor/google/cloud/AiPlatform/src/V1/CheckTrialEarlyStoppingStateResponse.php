@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [VizierService.CheckTrialEarlyStoppingState][google.cloud.aiplatform.v1.VizierService.CheckTrialEarlyStoppingState].
+ * Response message for
+ * [VizierService.CheckTrialEarlyStoppingState][google.cloud.aiplatform.v1.VizierService.CheckTrialEarlyStoppingState].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CheckTrialEarlyStoppingStateResponse</code>
  */
@@ -20,7 +21,7 @@ class CheckTrialEarlyStoppingStateResponse extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>bool should_stop = 1;</code>
      */
-    private $should_stop = false;
+    protected $should_stop = false;
 
     /**
      * Constructor.

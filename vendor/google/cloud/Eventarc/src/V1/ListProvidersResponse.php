@@ -22,12 +22,12 @@ class ListProvidersResponse extends \Google\Protobuf\Internal\Message
      */
     private $providers;
     /**
-     * A page token that can be sent to ListProviders to request the next page.
+     * A page token that can be sent to `ListProviders` to request the next page.
      * If this is empty, then there are no more pages.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * Unreachable resources, if any.
      *
@@ -41,12 +41,12 @@ class ListProvidersResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Eventarc\V1\Provider[]|\Google\Protobuf\Internal\RepeatedField $providers
+     *     @type array<\Google\Cloud\Eventarc\V1\Provider>|\Google\Protobuf\Internal\RepeatedField $providers
      *           The requested providers, up to the number specified in `page_size`.
      *     @type string $next_page_token
-     *           A page token that can be sent to ListProviders to request the next page.
+     *           A page token that can be sent to `ListProviders` to request the next page.
      *           If this is empty, then there are no more pages.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $unreachable
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unreachable
      *           Unreachable resources, if any.
      * }
      */
@@ -70,7 +70,7 @@ class ListProvidersResponse extends \Google\Protobuf\Internal\Message
      * The requested providers, up to the number specified in `page_size`.
      *
      * Generated from protobuf field <code>repeated .google.cloud.eventarc.v1.Provider providers = 1;</code>
-     * @param \Google\Cloud\Eventarc\V1\Provider[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Eventarc\V1\Provider>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setProviders($var)
@@ -82,7 +82,7 @@ class ListProvidersResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A page token that can be sent to ListProviders to request the next page.
+     * A page token that can be sent to `ListProviders` to request the next page.
      * If this is empty, then there are no more pages.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
@@ -94,7 +94,7 @@ class ListProvidersResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A page token that can be sent to ListProviders to request the next page.
+     * A page token that can be sent to `ListProviders` to request the next page.
      * If this is empty, then there are no more pages.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
@@ -124,7 +124,7 @@ class ListProvidersResponse extends \Google\Protobuf\Internal\Message
      * Unreachable resources, if any.
      *
      * Generated from protobuf field <code>repeated string unreachable = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUnreachable($var)

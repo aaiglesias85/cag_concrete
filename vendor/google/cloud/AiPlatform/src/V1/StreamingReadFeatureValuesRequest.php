@@ -10,7 +10,7 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * Request message for
- * [FeaturestoreOnlineServingService.StreamingFeatureValuesRead][].
+ * [FeaturestoreOnlineServingService.StreamingReadFeatureValues][google.cloud.aiplatform.v1.FeaturestoreOnlineServingService.StreamingReadFeatureValues].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.StreamingReadFeatureValuesRequest</code>
  */
@@ -26,22 +26,41 @@ class StreamingReadFeatureValuesRequest extends \Google\Protobuf\Internal\Messag
      *
      * Generated from protobuf field <code>string entity_type = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $entity_type = '';
+    protected $entity_type = '';
     /**
-     * Required. IDs of entities to read Feature values of. The maximum number of IDs is
-     * 100. For example, for a machine learning model predicting user clicks on a
-     * website, an entity ID could be `user_123`.
+     * Required. IDs of entities to read Feature values of. The maximum number of
+     * IDs is 100. For example, for a machine learning model predicting user
+     * clicks on a website, an entity ID could be `user_123`.
      *
      * Generated from protobuf field <code>repeated string entity_ids = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $entity_ids;
     /**
-     * Required. Selector choosing Features of the target EntityType. Feature IDs will be
-     * deduplicated.
+     * Required. Selector choosing Features of the target EntityType. Feature IDs
+     * will be deduplicated.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeatureSelector feature_selector = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $feature_selector = null;
+    protected $feature_selector = null;
+
+    /**
+     * @param string $entityType Required. The resource name of the entities' type.
+     *                           Value format:
+     *                           `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entityType}`.
+     *                           For example,
+     *                           for a machine learning model predicting user clicks on a website, an
+     *                           EntityType ID could be `user`. Please see
+     *                           {@see FeaturestoreOnlineServingServiceClient::entityTypeName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\StreamingReadFeatureValuesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $entityType): self
+    {
+        return (new self())
+            ->setEntityType($entityType);
+    }
 
     /**
      * Constructor.
@@ -56,13 +75,13 @@ class StreamingReadFeatureValuesRequest extends \Google\Protobuf\Internal\Messag
      *           For example,
      *           for a machine learning model predicting user clicks on a website, an
      *           EntityType ID could be `user`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $entity_ids
-     *           Required. IDs of entities to read Feature values of. The maximum number of IDs is
-     *           100. For example, for a machine learning model predicting user clicks on a
-     *           website, an entity ID could be `user_123`.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $entity_ids
+     *           Required. IDs of entities to read Feature values of. The maximum number of
+     *           IDs is 100. For example, for a machine learning model predicting user
+     *           clicks on a website, an entity ID could be `user_123`.
      *     @type \Google\Cloud\AIPlatform\V1\FeatureSelector $feature_selector
-     *           Required. Selector choosing Features of the target EntityType. Feature IDs will be
-     *           deduplicated.
+     *           Required. Selector choosing Features of the target EntityType. Feature IDs
+     *           will be deduplicated.
      * }
      */
     public function __construct($data = NULL) {
@@ -107,9 +126,9 @@ class StreamingReadFeatureValuesRequest extends \Google\Protobuf\Internal\Messag
     }
 
     /**
-     * Required. IDs of entities to read Feature values of. The maximum number of IDs is
-     * 100. For example, for a machine learning model predicting user clicks on a
-     * website, an entity ID could be `user_123`.
+     * Required. IDs of entities to read Feature values of. The maximum number of
+     * IDs is 100. For example, for a machine learning model predicting user
+     * clicks on a website, an entity ID could be `user_123`.
      *
      * Generated from protobuf field <code>repeated string entity_ids = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -120,12 +139,12 @@ class StreamingReadFeatureValuesRequest extends \Google\Protobuf\Internal\Messag
     }
 
     /**
-     * Required. IDs of entities to read Feature values of. The maximum number of IDs is
-     * 100. For example, for a machine learning model predicting user clicks on a
-     * website, an entity ID could be `user_123`.
+     * Required. IDs of entities to read Feature values of. The maximum number of
+     * IDs is 100. For example, for a machine learning model predicting user
+     * clicks on a website, an entity ID could be `user_123`.
      *
      * Generated from protobuf field <code>repeated string entity_ids = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEntityIds($var)
@@ -137,8 +156,8 @@ class StreamingReadFeatureValuesRequest extends \Google\Protobuf\Internal\Messag
     }
 
     /**
-     * Required. Selector choosing Features of the target EntityType. Feature IDs will be
-     * deduplicated.
+     * Required. Selector choosing Features of the target EntityType. Feature IDs
+     * will be deduplicated.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeatureSelector feature_selector = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\AIPlatform\V1\FeatureSelector|null
@@ -159,8 +178,8 @@ class StreamingReadFeatureValuesRequest extends \Google\Protobuf\Internal\Messag
     }
 
     /**
-     * Required. Selector choosing Features of the target EntityType. Feature IDs will be
-     * deduplicated.
+     * Required. Selector choosing Features of the target EntityType. Feature IDs
+     * will be deduplicated.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeatureSelector feature_selector = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\AIPlatform\V1\FeatureSelector $var

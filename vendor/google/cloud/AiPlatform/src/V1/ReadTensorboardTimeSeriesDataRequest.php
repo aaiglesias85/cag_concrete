@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [TensorboardService.ReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1.TensorboardService.ReadTensorboardTimeSeriesData].
+ * Request message for
+ * [TensorboardService.ReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1.TensorboardService.ReadTensorboardTimeSeriesData].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ReadTensorboardTimeSeriesDataRequest</code>
  */
@@ -22,7 +23,7 @@ class ReadTensorboardTimeSeriesDataRequest extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>string tensorboard_time_series = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $tensorboard_time_series = '';
+    protected $tensorboard_time_series = '';
     /**
      * The maximum number of TensorboardTimeSeries' data to return.
      * This value should be a positive integer.
@@ -30,13 +31,29 @@ class ReadTensorboardTimeSeriesDataRequest extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>int32 max_data_points = 2;</code>
      */
-    private $max_data_points = 0;
+    protected $max_data_points = 0;
     /**
      * Reads the TensorboardTimeSeries' data that match the filter expression.
      *
      * Generated from protobuf field <code>string filter = 3;</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $tensorboardTimeSeries Required. The resource name of the TensorboardTimeSeries to read data from.
+     *                                      Format:
+     *                                      `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
+     *                                      Please see {@see TensorboardServiceClient::tensorboardTimeSeriesName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ReadTensorboardTimeSeriesDataRequest
+     *
+     * @experimental
+     */
+    public static function build(string $tensorboardTimeSeries): self
+    {
+        return (new self())
+            ->setTensorboardTimeSeries($tensorboardTimeSeries);
+    }
 
     /**
      * Constructor.

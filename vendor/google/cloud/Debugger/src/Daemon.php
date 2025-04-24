@@ -19,13 +19,11 @@ namespace Google\Cloud\Debugger;
 
 use Google\Cloud\Core\Batch\ClosureSerializerInterface;
 use Google\Cloud\Core\Batch\SimpleJobTrait;
-use Google\Cloud\Core\Batch\SerializableClientTrait;
-use Google\Cloud\Core\SysvTrait;
-use Google\Cloud\Core\Report\MetadataProviderInterface;
-use Google\Cloud\Core\Report\MetadataProviderUtils;
 use Google\Cloud\Core\Exception\ConflictException;
 use Google\Cloud\Core\Exception\ServiceException;
 use Google\Cloud\Core\ExponentialBackoff;
+use Google\Cloud\Core\Report\MetadataProviderInterface;
+use Google\Cloud\Core\Report\MetadataProviderUtils;
 use Google\Cloud\Debugger\BreakpointStorage\BreakpointStorageInterface;
 use Google\Cloud\Debugger\BreakpointStorage\FileBreakpointStorage;
 use Google\Cloud\Debugger\BreakpointStorage\SysvBreakpointStorage;
@@ -43,6 +41,7 @@ use Google\Cloud\Debugger\BreakpointStorage\SysvBreakpointStorage;
  * $daemon = new Daemon();
  * $daemon->run();
  * ```
+ * @deprecated see https://cloud.google.com/stackdriver/docs/deprecations/debugger-deprecation
  */
 class Daemon
 {
@@ -94,7 +93,7 @@ class Daemon
      *            **Defaults to** the current working directory.
      *      @type array $clientConfig The options to instantiate the default
      *            DebuggerClient.
-     *            {@see Google\Cloud\Debugger\DebuggerClient::__construct()}
+     *            {@see \Google\Cloud\Debugger\DebuggerClient::__construct()}
      *            for the available options.
      *      @type array $sourceContext The source code identifier. **Defaults
      *            to** values autodetected from the environment.
@@ -119,7 +118,7 @@ class Daemon
      *            responsible for serializing closures used in the
      *            `$clientConfig`. This is especially important when using the
      *            batch daemon. **Defaults to**
-     *            {@see Google\Cloud\Core\Batch\OpisClosureSerializer} if the
+     *            {@see \Google\Cloud\Core\Batch\OpisClosureSerializer} if the
      *            `opis/closure` library is installed.
      *      @type bool $register Whether to start the worker in the background
      *            using the BatchRunner. **Defaults to** false.
@@ -173,7 +172,7 @@ class Daemon
      * $daemon->run();
      * ```
      */
-    public function run(DebuggerClient $client = null, $asDaemon = true)
+    public function run(?DebuggerClient $client = null, $asDaemon = true)
     {
         $client = $client ?: $this->defaultClient();
         $extSourceContexts = $this->extSourceContext ? [$this->extSourceContext] : [];
@@ -274,7 +273,7 @@ class Daemon
         return new DebuggerClient($this->getUnwrappedClientConfig());
     }
 
-    private function defaultLabels(MetadataProviderInterface $metadataProvider = null)
+    private function defaultLabels(?MetadataProviderInterface $metadataProvider = null)
     {
         $metadataProvider = $metadataProvider ?: MetadataProviderUtils::autoSelect($_SERVER);
         $labels = [];

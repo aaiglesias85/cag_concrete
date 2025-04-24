@@ -20,19 +20,19 @@ class GenerateSshScriptRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string migration_job = 1 [(.google.api.resource_reference) = {</code>
      */
-    private $migration_job = '';
+    protected $migration_job = '';
     /**
      * Required. Bastion VM Instance name to use or to create.
      *
      * Generated from protobuf field <code>string vm = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $vm = '';
+    protected $vm = '';
     /**
-     * The port that will be open on the bastion host
+     * The port that will be open on the bastion host.
      *
      * Generated from protobuf field <code>int32 vm_port = 3;</code>
      */
-    private $vm_port = 0;
+    protected $vm_port = 0;
     protected $vm_config;
 
     /**
@@ -50,7 +50,7 @@ class GenerateSshScriptRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\CloudDms\V1\VmSelectionConfig $vm_selection_config
      *           The VM selection configuration
      *     @type int $vm_port
-     *           The port that will be open on the bastion host
+     *           The port that will be open on the bastion host.
      * }
      */
     public function __construct($data = NULL) {
@@ -173,7 +173,7 @@ class GenerateSshScriptRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The port that will be open on the bastion host
+     * The port that will be open on the bastion host.
      *
      * Generated from protobuf field <code>int32 vm_port = 3;</code>
      * @return int
@@ -184,7 +184,7 @@ class GenerateSshScriptRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The port that will be open on the bastion host
+     * The port that will be open on the bastion host.
      *
      * Generated from protobuf field <code>int32 vm_port = 3;</code>
      * @param int $var

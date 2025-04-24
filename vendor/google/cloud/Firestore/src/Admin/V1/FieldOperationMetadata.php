@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Metadata for [google.longrunning.Operation][google.longrunning.Operation] results from
+ * Metadata for [google.longrunning.Operation][google.longrunning.Operation]
+ * results from
  * [FirestoreAdmin.UpdateField][google.firestore.admin.v1.FirestoreAdmin.UpdateField].
  *
  * Generated from protobuf message <code>google.firestore.admin.v1.FieldOperationMetadata</code>
@@ -37,8 +38,9 @@ class FieldOperationMetadata extends \Google\Protobuf\Internal\Message
      */
     private $field = '';
     /**
-     * A list of [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta], which describe the intent of this
-     * operation.
+     * A list of
+     * [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta],
+     * which describe the intent of this operation.
      *
      * Generated from protobuf field <code>repeated .google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta index_config_deltas = 4;</code>
      */
@@ -82,9 +84,10 @@ class FieldOperationMetadata extends \Google\Protobuf\Internal\Message
      *     @type string $field
      *           The field resource that this operation is acting on. For example:
      *           `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_path}`
-     *     @type \Google\Cloud\Firestore\Admin\V1\FieldOperationMetadata\IndexConfigDelta[]|\Google\Protobuf\Internal\RepeatedField $index_config_deltas
-     *           A list of [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta], which describe the intent of this
-     *           operation.
+     *     @type array<\Google\Cloud\Firestore\Admin\V1\FieldOperationMetadata\IndexConfigDelta>|\Google\Protobuf\Internal\RepeatedField $index_config_deltas
+     *           A list of
+     *           [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta],
+     *           which describe the intent of this operation.
      *     @type int $state
      *           The state of the operation.
      *     @type \Google\Cloud\Firestore\Admin\V1\Progress $progress_documents
@@ -203,8 +206,9 @@ class FieldOperationMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A list of [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta], which describe the intent of this
-     * operation.
+     * A list of
+     * [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta],
+     * which describe the intent of this operation.
      *
      * Generated from protobuf field <code>repeated .google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta index_config_deltas = 4;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -215,11 +219,12 @@ class FieldOperationMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A list of [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta], which describe the intent of this
-     * operation.
+     * A list of
+     * [IndexConfigDelta][google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta],
+     * which describe the intent of this operation.
      *
      * Generated from protobuf field <code>repeated .google.firestore.admin.v1.FieldOperationMetadata.IndexConfigDelta index_config_deltas = 4;</code>
-     * @param \Google\Cloud\Firestore\Admin\V1\FieldOperationMetadata\IndexConfigDelta[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Firestore\Admin\V1\FieldOperationMetadata\IndexConfigDelta>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setIndexConfigDeltas($var)

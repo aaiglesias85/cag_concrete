@@ -28,7 +28,7 @@ class LDiversityConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId sensitive_attribute = 2;</code>
      */
-    private $sensitive_attribute = null;
+    protected $sensitive_attribute = null;
 
     /**
      * Constructor.
@@ -36,7 +36,7 @@ class LDiversityConfig extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dlp\V2\FieldId[]|\Google\Protobuf\Internal\RepeatedField $quasi_ids
+     *     @type array<\Google\Cloud\Dlp\V2\FieldId>|\Google\Protobuf\Internal\RepeatedField $quasi_ids
      *           Set of quasi-identifiers indicating how equivalence classes are
      *           defined for the l-diversity computation. When multiple fields are
      *           specified, they are considered a single composite key.
@@ -68,7 +68,7 @@ class LDiversityConfig extends \Google\Protobuf\Internal\Message
      * specified, they are considered a single composite key.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.FieldId quasi_ids = 1;</code>
-     * @param \Google\Cloud\Dlp\V2\FieldId[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\FieldId>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuasiIds($var)
@@ -117,6 +117,4 @@ class LDiversityConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(LDiversityConfig::class, \Google\Cloud\Dlp\V2\PrivacyMetric_LDiversityConfig::class);
 

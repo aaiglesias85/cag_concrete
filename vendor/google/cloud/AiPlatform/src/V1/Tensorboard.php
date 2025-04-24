@@ -10,7 +10,7 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * Tensorboard is a physical database that stores users' training metrics.
- * A default Tensorboard is provided in each region of a GCP project.
+ * A default Tensorboard is provided in each region of a Google Cloud project.
  * If needed users can also create extra Tensorboards in their projects.
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.Tensorboard</code>
@@ -24,19 +24,19 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. User provided name of this Tensorboard.
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Description of this Tensorboard.
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Customer-managed encryption key spec for a Tensorboard. If set, this
      * Tensorboard and all sub-resources of this Tensorboard will be secured by
@@ -44,32 +44,32 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 11;</code>
      */
-    private $encryption_spec = null;
+    protected $encryption_spec = null;
     /**
-     * Output only. Consumer project Cloud Storage path prefix used to store blob data, which
-     * can either be a bucket or directory. Does not end with a '/'.
+     * Output only. Consumer project Cloud Storage path prefix used to store blob
+     * data, which can either be a bucket or directory. Does not end with a '/'.
      *
      * Generated from protobuf field <code>string blob_storage_path_prefix = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $blob_storage_path_prefix = '';
+    protected $blob_storage_path_prefix = '';
     /**
      * Output only. The number of Runs stored in this Tensorboard.
      *
      * Generated from protobuf field <code>int32 run_count = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $run_count = 0;
+    protected $run_count = 0;
     /**
      * Output only. Timestamp when this Tensorboard was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this Tensorboard was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * The labels with user-defined metadata to organize your Tensorboards.
      * Label keys and values can be no longer than 64 characters
@@ -90,7 +90,29 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 9;</code>
      */
-    private $etag = '';
+    protected $etag = '';
+    /**
+     * Used to indicate if the TensorBoard instance is the default one.
+     * Each project & region can have at most one default TensorBoard instance.
+     * Creation of a default TensorBoard instance and updating an existing
+     * TensorBoard instance to be default will mark all other TensorBoard
+     * instances (if any) as non default.
+     *
+     * Generated from protobuf field <code>bool is_default = 12;</code>
+     */
+    protected $is_default = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzi = false;
 
     /**
      * Constructor.
@@ -111,8 +133,8 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
      *           Tensorboard and all sub-resources of this Tensorboard will be secured by
      *           this key.
      *     @type string $blob_storage_path_prefix
-     *           Output only. Consumer project Cloud Storage path prefix used to store blob data, which
-     *           can either be a bucket or directory. Does not end with a '/'.
+     *           Output only. Consumer project Cloud Storage path prefix used to store blob
+     *           data, which can either be a bucket or directory. Does not end with a '/'.
      *     @type int $run_count
      *           Output only. The number of Runs stored in this Tensorboard.
      *     @type \Google\Protobuf\Timestamp $create_time
@@ -132,6 +154,16 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
      *     @type string $etag
      *           Used to perform a consistent read-modify-write updates. If not set, a blind
      *           "overwrite" update happens.
+     *     @type bool $is_default
+     *           Used to indicate if the TensorBoard instance is the default one.
+     *           Each project & region can have at most one default TensorBoard instance.
+     *           Creation of a default TensorBoard instance and updating an existing
+     *           TensorBoard instance to be default will mark all other TensorBoard
+     *           instances (if any) as non default.
+     *     @type bool $satisfies_pzs
+     *           Output only. Reserved for future use.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -262,8 +294,8 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Consumer project Cloud Storage path prefix used to store blob data, which
-     * can either be a bucket or directory. Does not end with a '/'.
+     * Output only. Consumer project Cloud Storage path prefix used to store blob
+     * data, which can either be a bucket or directory. Does not end with a '/'.
      *
      * Generated from protobuf field <code>string blob_storage_path_prefix = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -274,8 +306,8 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Consumer project Cloud Storage path prefix used to store blob data, which
-     * can either be a bucket or directory. Does not end with a '/'.
+     * Output only. Consumer project Cloud Storage path prefix used to store blob
+     * data, which can either be a bucket or directory. Does not end with a '/'.
      *
      * Generated from protobuf field <code>string blob_storage_path_prefix = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -453,6 +485,92 @@ class Tensorboard extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->etag = $var;
+
+        return $this;
+    }
+
+    /**
+     * Used to indicate if the TensorBoard instance is the default one.
+     * Each project & region can have at most one default TensorBoard instance.
+     * Creation of a default TensorBoard instance and updating an existing
+     * TensorBoard instance to be default will mark all other TensorBoard
+     * instances (if any) as non default.
+     *
+     * Generated from protobuf field <code>bool is_default = 12;</code>
+     * @return bool
+     */
+    public function getIsDefault()
+    {
+        return $this->is_default;
+    }
+
+    /**
+     * Used to indicate if the TensorBoard instance is the default one.
+     * Each project & region can have at most one default TensorBoard instance.
+     * Creation of a default TensorBoard instance and updating an existing
+     * TensorBoard instance to be default will mark all other TensorBoard
+     * instances (if any) as non default.
+     *
+     * Generated from protobuf field <code>bool is_default = 12;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setIsDefault($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->is_default = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return $this->satisfies_pzi;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
 
         return $this;
     }

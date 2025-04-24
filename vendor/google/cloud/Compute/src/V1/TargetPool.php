@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Represents a Target Pool resource. Target pools are used for network TCP/UDP load balancing. A target pool references member instances, an associated legacy HttpHealthCheck resource, and, optionally, a backup target pool. For more information, read Using target pools.
+ * Represents a Target Pool resource. Target pools are used with external passthrough Network Load Balancers. A target pool references member instances, an associated legacy HttpHealthCheck resource, and, optionally, a backup target pool. For more information, read Using target pools.
  *
  * Generated from protobuf message <code>google.cloud.compute.v1.TargetPool</code>
  */
@@ -76,6 +76,12 @@ class TargetPool extends \Google\Protobuf\Internal\Message
      */
     private $region = null;
     /**
+     * [Output Only] The resource URL for the security policy associated with this target pool.
+     *
+     * Generated from protobuf field <code>optional string security_policy = 171082513;</code>
+     */
+    private $security_policy = null;
+    /**
      * [Output Only] Server-defined URL for the resource.
      *
      * Generated from protobuf field <code>optional string self_link = 456214797;</code>
@@ -103,11 +109,11 @@ class TargetPool extends \Google\Protobuf\Internal\Message
      *           An optional description of this resource. Provide this property when you create the resource.
      *     @type float $failover_ratio
      *           This field is applicable only when the containing target pool is serving a forwarding rule as the primary pool (i.e., not as a backup pool to some other target pool). The value of the field must be in [0, 1]. If set, backupPool must also be set. They together define the fallback behavior of the primary target pool: if the ratio of the healthy instances in the primary pool is at or below this number, traffic arriving at the load-balanced IP will be directed to the backup pool. In case where failoverRatio is not set or all the instances in the backup pool are unhealthy, the traffic will be directed back to the primary pool in the "force" mode, where traffic will be spread to the healthy instances with the best effort, or to all instances when no instance is healthy.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $health_checks
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $health_checks
      *           The URL of the HttpHealthCheck resource. A member instance in this pool is considered healthy if and only if the health checks pass. Only legacy HttpHealthChecks are supported. Only one health check may be specified.
      *     @type int|string $id
      *           [Output Only] The unique identifier for the resource. This identifier is defined by the server.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $instances
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $instances
      *           A list of resource URLs to the virtual machine instances serving this pool. They must live in zones contained in the same region as this pool.
      *     @type string $kind
      *           [Output Only] Type of the resource. Always compute#targetPool for target pools.
@@ -115,6 +121,8 @@ class TargetPool extends \Google\Protobuf\Internal\Message
      *           Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
      *     @type string $region
      *           [Output Only] URL of the region where the target pool resides.
+     *     @type string $security_policy
+     *           [Output Only] The resource URL for the security policy associated with this target pool.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
      *     @type string $session_affinity
@@ -286,7 +294,7 @@ class TargetPool extends \Google\Protobuf\Internal\Message
      * The URL of the HttpHealthCheck resource. A member instance in this pool is considered healthy if and only if the health checks pass. Only legacy HttpHealthChecks are supported. Only one health check may be specified.
      *
      * Generated from protobuf field <code>repeated string health_checks = 448370606;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setHealthChecks($var)
@@ -348,7 +356,7 @@ class TargetPool extends \Google\Protobuf\Internal\Message
      * A list of resource URLs to the virtual machine instances serving this pool. They must live in zones contained in the same region as this pool.
      *
      * Generated from protobuf field <code>repeated string instances = 29097598;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInstances($var)
@@ -463,6 +471,42 @@ class TargetPool extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->region = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] The resource URL for the security policy associated with this target pool.
+     *
+     * Generated from protobuf field <code>optional string security_policy = 171082513;</code>
+     * @return string
+     */
+    public function getSecurityPolicy()
+    {
+        return isset($this->security_policy) ? $this->security_policy : '';
+    }
+
+    public function hasSecurityPolicy()
+    {
+        return isset($this->security_policy);
+    }
+
+    public function clearSecurityPolicy()
+    {
+        unset($this->security_policy);
+    }
+
+    /**
+     * [Output Only] The resource URL for the security policy associated with this target pool.
+     *
+     * Generated from protobuf field <code>optional string security_policy = 171082513;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSecurityPolicy($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->security_policy = $var;
 
         return $this;
     }

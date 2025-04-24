@@ -20,13 +20,13 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 cpu_count = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $cpu_count = 0;
+    protected $cpu_count = 0;
     /**
      * Required. Memory size in MiB for each Memcached node.
      *
      * Generated from protobuf field <code>int32 memory_size_mb = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $memory_size_mb = 0;
+    protected $memory_size_mb = 0;
 
     /**
      * Constructor.
@@ -99,6 +99,4 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(NodeConfig::class, \Google\Cloud\Memcache\V1\Instance_NodeConfig::class);
 

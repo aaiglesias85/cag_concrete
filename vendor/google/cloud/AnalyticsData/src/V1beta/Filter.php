@@ -16,12 +16,15 @@ use Google\Protobuf\Internal\GPBUtil;
 class Filter extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The dimension name or metric name. Must be a name defined in dimensions
-     * or metrics.
+     * The dimension name or metric name.
+     * In most methods, dimensions & metrics can be used for the first time in
+     * this field. However in a RunPivotReportRequest, this field must be
+     * additionally specified by name in the RunPivotReportRequest's dimensions or
+     * metrics.
      *
      * Generated from protobuf field <code>string field_name = 1;</code>
      */
-    private $field_name = '';
+    protected $field_name = '';
     protected $one_filter;
 
     /**
@@ -31,8 +34,11 @@ class Filter extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $field_name
-     *           The dimension name or metric name. Must be a name defined in dimensions
-     *           or metrics.
+     *           The dimension name or metric name.
+     *           In most methods, dimensions & metrics can be used for the first time in
+     *           this field. However in a RunPivotReportRequest, this field must be
+     *           additionally specified by name in the RunPivotReportRequest's dimensions or
+     *           metrics.
      *     @type \Google\Analytics\Data\V1beta\Filter\StringFilter $string_filter
      *           Strings related filter.
      *     @type \Google\Analytics\Data\V1beta\Filter\InListFilter $in_list_filter
@@ -41,6 +47,8 @@ class Filter extends \Google\Protobuf\Internal\Message
      *           A filter for numeric or date values.
      *     @type \Google\Analytics\Data\V1beta\Filter\BetweenFilter $between_filter
      *           A filter for two values.
+     *     @type \Google\Analytics\Data\V1beta\Filter\EmptyFilter $empty_filter
+     *           A filter for empty values such as "(not set)" and "" values.
      * }
      */
     public function __construct($data = NULL) {
@@ -49,8 +57,11 @@ class Filter extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The dimension name or metric name. Must be a name defined in dimensions
-     * or metrics.
+     * The dimension name or metric name.
+     * In most methods, dimensions & metrics can be used for the first time in
+     * this field. However in a RunPivotReportRequest, this field must be
+     * additionally specified by name in the RunPivotReportRequest's dimensions or
+     * metrics.
      *
      * Generated from protobuf field <code>string field_name = 1;</code>
      * @return string
@@ -61,8 +72,11 @@ class Filter extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The dimension name or metric name. Must be a name defined in dimensions
-     * or metrics.
+     * The dimension name or metric name.
+     * In most methods, dimensions & metrics can be used for the first time in
+     * this field. However in a RunPivotReportRequest, this field must be
+     * additionally specified by name in the RunPivotReportRequest's dimensions or
+     * metrics.
      *
      * Generated from protobuf field <code>string field_name = 1;</code>
      * @param string $var
@@ -196,6 +210,37 @@ class Filter extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Analytics\Data\V1beta\Filter\BetweenFilter::class);
         $this->writeOneof(6, $var);
+
+        return $this;
+    }
+
+    /**
+     * A filter for empty values such as "(not set)" and "" values.
+     *
+     * Generated from protobuf field <code>.google.analytics.data.v1beta.Filter.EmptyFilter empty_filter = 8;</code>
+     * @return \Google\Analytics\Data\V1beta\Filter\EmptyFilter|null
+     */
+    public function getEmptyFilter()
+    {
+        return $this->readOneof(8);
+    }
+
+    public function hasEmptyFilter()
+    {
+        return $this->hasOneof(8);
+    }
+
+    /**
+     * A filter for empty values such as "(not set)" and "" values.
+     *
+     * Generated from protobuf field <code>.google.analytics.data.v1beta.Filter.EmptyFilter empty_filter = 8;</code>
+     * @param \Google\Analytics\Data\V1beta\Filter\EmptyFilter $var
+     * @return $this
+     */
+    public function setEmptyFilter($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Analytics\Data\V1beta\Filter\EmptyFilter::class);
+        $this->writeOneof(8, $var);
 
         return $this;
     }

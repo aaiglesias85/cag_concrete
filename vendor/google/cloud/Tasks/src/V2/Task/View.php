@@ -28,7 +28,8 @@ class View
      * The basic view omits fields which can be large or can contain
      * sensitive data.
      * This view does not include the
-     * [body in AppEngineHttpRequest][google.cloud.tasks.v2.AppEngineHttpRequest.body].
+     * [body in
+     * AppEngineHttpRequest][google.cloud.tasks.v2.AppEngineHttpRequest.body].
      * Bodies are desirable to return only when needed, because they
      * can be large and because of the sensitivity of the data that you
      * choose to store in it.
@@ -73,6 +74,4 @@ class View
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(View::class, \Google\Cloud\Tasks\V2\Task_View::class);
 

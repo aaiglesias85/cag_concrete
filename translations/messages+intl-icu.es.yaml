@@ -1,0 +1,822 @@
+message:
+  success: La operación se realizó correctamente
+  exception: Ha ocurrido un error interno, por favor intente de nuevo
+  favorito_agregado: Se ha agregado el favorito correctamente
+  favorito_eliminado: Se ha eliminado el favorito correctamente
+  calificacion_agregada: Se ha agregado la calificación correctamente
+  calificacion_eliminada: Se ha eliminado la calificación correctamente
+  email_no_reply: Este mensaje se ha generado automáticamente, por favor no responder
+
+error:
+  email_repetido: La dirección electrónica ya está asignada a otro usuario
+  email_incorrecto: La dirección electrónica es incorrecta
+  no_existe_registro: No existe el registro solicitado
+  cliente_sin_puntos_necesarios: El cliente no cuenta con los puntos necesarios para consumir el canje
+  cliente_sin_puntos_necesarios_tango: El cliente no cuenta con el saldo necesario para consumir el canje en tango
+  no_pudo_subir_archivo: No se pudo subir el archivo
+  no_tiene_cliente_canje: No tienes clientes con canjes
+  empresa_sin_programa: La empresa seleccionada no tiene programa, por favor seleccione otra
+  formato_mp4: El formato del video debe ser mp4
+  seleccinar_video: Debe seleccionar el archivo de video
+  rut_repetido: >-
+    {organizer_gender,select,
+       female {El rut ingresado pertenece a otra {name}}
+       male {El rut ingresado pertenece a otro {name}}
+       other {El rut ingresado pertenece a otro {name}}
+    }
+  dni_repetido: >-
+    {organizer_gender,select,
+       female {El DNI ingresado pertenece a otra {name}}
+       male {El DNI ingresado pertenece a otro {name}}
+       other {El DNI ingresado pertenece a otro {name}}
+    }
+  producto_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene productos asociados}
+       male {No se pudo eliminar el {name}, porque tiene productos asociados}
+       other {No se pudo eliminar el {name}, porque tiene productos asociados}
+    }
+  servicio_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene servicios asociados}
+       male {No se pudo eliminar el {name}, porque tiene servicios asociados}
+       other {No se pudo eliminar el {name}, porque tiene servicios asociados}
+    }
+  beneficio_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene beneficios asociados}
+       male {No se pudo eliminar el {name}, porque tiene beneficios asociados}
+       other {No se pudo eliminar el {name}, porque tiene beneficios asociados}
+    }
+  comercio_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene comercios asociados}
+       male {No se pudo eliminar el {name}, porque tiene comercios asociados}
+       other {No se pudo eliminar el {name}, porque tiene comercios asociados}
+    }
+  usuario_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene usuarios asociados}
+       male {No se pudo eliminar el {name}, porque tiene usuarios asociados}
+       other {No se pudo eliminar el {name}, porque tiene usuarios asociados}
+    }
+  campanna_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene campañas asociados}
+       male {No se pudo eliminar el {name}, porque tiene campañas asociados}
+       other {No se pudo eliminar el {name}, porque tiene campañas asociados}
+    }
+  abono_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene abonos de clientes asociados}
+       male {No se pudo eliminar el {name}, porque tiene abonos de clientes asociados}
+       other {No se pudo eliminar el {name}, porque tiene abonos de clientes asociados}
+    }
+  no_pudo_actualizar: >-
+    {organizer_gender,select,
+       female {No se pudo actualizar la {name} seleccionada}
+       male {No se pudo actualizar el {name} seleccionado}
+       other {No se pudo actualizar el {name} seleccionado}
+    }
+  existe_nombre: >-
+    {organizer_gender,select,
+       female {El nombre de la {name} está en uso, por favor ingrese otro.}
+       male {El nombre del {name} está en uso, por favor ingrese otro.}
+       other {El nombre {name} está en uso, por favor ingrese otro.}
+    }
+  existe_descripcion: >-
+    {organizer_gender,select,
+       female {La descripción de la {name} está en uso, por favor ingrese otro.}
+       male {La descripción del {name} está en uso, por favor ingrese otro.}
+       other {La descripción {name} está en uso, por favor ingrese otro.}
+    }
+  existe_color: >-
+    {organizer_gender,select,
+       female {El color de la {name} está en uso, por favor ingrese otro.}
+       male {El color del {name} está en uso, por favor ingrese otro.}
+       other {El color {name} está en uso, por favor ingrese otro.}
+    }
+  existe_codigo: >-
+    {organizer_gender,select,
+       female {El codigo de la {name} está en uso, por favor ingrese otro.}
+       male {El codigo del {name} está en uso, por favor ingrese otro.}
+       other {El codigo {name} está en uso, por favor ingrese otro.}
+    }
+  padre_ella_misma: >-
+    {organizer_gender,select,
+       female {Una {name} no puede ser padre de ella misma.}
+       male {Un {name} no puede ser padre de el mismo.}
+       other {Un {name} no puede ser padre de el mismo.}
+    }
+  favorito_salvar: >-
+    {organizer_gender,select,
+       female {No se pudo salvar la {name} favorita}
+       male {No se pudo salvar el {name} favorito}
+       other {No se pudo salvar el {name} favorito}
+    }
+  favorito_eliminar: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name} favorita}
+       male {No se pudo eliminar el {name} favorito}
+       other {No se pudo eliminar el {name} favorito}
+    }
+  calificacion_salvar: >-
+    {organizer_gender,select,
+       female {No se pudo salvar la calificación de la {name}}
+       male {No se pudo salvar la calificación del {name}}
+       other {No se pudo salvar la calificación del {name}}
+    }
+  calificacion_eliminar: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la calificación de la {name}}
+       male {No se pudo eliminar la calificación del {name}}
+       other {No se pudo eliminar la calificación del {name}}
+    }
+  no_existe: >-
+    {organizer_gender,select,
+       female {No existe la {name} solicitada}
+       male {No existe el {name} solicitado}
+       other {No existe el {name} solicitado}
+    }
+  no_pudo_eliminar: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name} solicitado}
+       male {No se pudo eliminar el {name} solicitado}
+       other {No se pudo eliminar el {name} solicitado}
+    }
+  mandante_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene mandantes asociados}
+       male {No se pudo eliminar el {name}, porque tiene mandantes asociados}
+       other {No se pudo eliminar el {name}, porque tiene mandantes asociados}
+    }
+  cliente_asociado: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene clientes asociados}
+       male {No se pudo eliminar el {name}, porque tiene clientes asociados}
+       other {No se pudo eliminar el {name}, porque tiene clientes asociados}
+    }
+  sucursal_asociada: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene sucrusales asociadas}
+       male {No se pudo eliminar el {name}, porque tiene sucursales asociadas}
+       other {No se pudo eliminar el {name}, porque tiene sucursales asociadas}
+    }
+  proyeccion_detalle_asociada: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene detalles de proyecciones de indicadores asociadas}
+       male {No se pudo eliminar el {name}, porque tiene detalles de proyecciones de indicadores asociadas}
+       other {No se pudo eliminar el {name}, porque tiene detalles de proyecciones de indicadores asociadas}
+    }
+  variacion_producto_asociada: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque tiene variaciones de productos asociadas}
+       male {No se pudo eliminar el {name}, porque tiene variaciones de productos asociadas}
+       other {No se pudo eliminar el {name}, porque tiene variaciones de productos asociadas}
+    }
+  cotizado_por_cliente: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque ha sido cotizado por un cliente}
+       male {No se pudo eliminar el {name}, porque ha sido cotizado por un cliente}
+       other {No se pudo eliminar el {name}, porque ha sido cotizado por un cliente}
+    }
+  caragado_a_cliente: >-
+    {organizer_gender,select,
+       female {No se pudo eliminar la {name}, porque ha sido cargado a un cliente}
+       male {No se pudo eliminar el {name}, porque ha sido cargado a un cliente}
+       other {No se pudo eliminar el {name}, porque ha sido cargado a un cliente}
+    }
+  directorio_sin_permiso: El directorio uploads no tiene permisos de escritura
+  zip_invalido: El .zip seleccionado no es válido
+  excel_invalido: Verifica que el archivo selecciondo sea un documento excel válido
+  no_existe_link: No existe el link solicitado
+  no_existe_programa: No existe el programa, por favor seleccione otro.
+  analisis_plantilla_abono:
+    rut_cliente_invalido: El rut del cliente no es válido
+    rut_supervisor_invalido: El rut del supervisor no es válido
+    rut_supervisor_inexistente: El rut del supervisor no corresponde a un usuario existente
+    no_existe_mandante: No existe el mandante seleccionado
+    no_existe_establecimiento_matriz: No existe un establecimiento matriz para el mandante seleccionado
+    email_no_valido: El email del cliente no es válido
+    nombre_no_valido: El nombre del cliente no es válido
+    apellidop_no_valido: El apellido paterno del cliente no es válido
+    apellidom_no_valido: El apellido materno del cliente no es válido
+    establecimiento_no_valido: El establecimiento del cliente no es válido
+    email_asignado: La email ingresado ya está asignado a otro usuario
+    ingresar_monto: Debe ingresar el monto a cargar
+    ingresar_indicador: Debe ingresar el indicador al cual le desea cargar el monto
+    ingresar_concepto: Debe ingresar el concepto al cual le desea cargar el monto
+    ingresar_punto: Debe ingresar los puntos a cargar o restar
+    no_pudo_analizar: No se pudo analizar los abonos, porque el rut o dv estan vacios, y en ausencia debe introducirse el código y este está vacio y en usencia debe introducirse el pasaporte y este está vacio
+    advertencia_analizar: Pero atención no se pudo analizar todass las filas de abonos porque el rut o dv estan vacios, y en ausencia debe introducirse el código o el pasaporte que tambien están vacios
+  no_pertenece_tango: El mandante al que pertenece no posee un registro en tango
+  usuario_sin_mandante: El usuario logueado no pertenece a ningun mandante
+  no_existe_cliente: No existe el cliente solicitado
+  no_existe_concepto_codigo: No existe el concepto con el código solicitado
+  no_puede_asignar_puntos_asimismo: No se puede asignar puntos a si mismo
+  no_existe_usuario: No existe el usuario solicitado
+
+template:
+  saludo: Estimado(a)
+  telefono: Teléfono
+  email: Email
+  nombre: Nombre
+  apellidos: Apellidos
+  dni: Dni
+  cliente: Cliente
+  fecha: Fecha
+  puntos: Puntos
+  descuento: descuento
+  despedida: Gracias por preferirnos
+  no_reply: Este mensaje se ha generado automáticamente, por favor no responder
+
+login:
+  message:
+    forgot_pass: El proceso de recuperación de contraseña se ha iniciado con éxito, en unos momentos recibira un correo a la dirección ingresada
+  error:
+    logout: No se pudo cerrar la sesión
+    codigo_activacion: Su ID de verificación es incorrecto, intente registrarse nuevamente
+    activar_registro: El código ingresado no es correcto
+    reenviar_codigo: No se pudo enviar su código de verificación, intente nuevamente en 30 segundos
+    recuperar_password: No se ha encontrado ninguna cuenta, con la información que has proporcionado
+  autenticar:
+    usuario_bloqueado: Su usuario ha sido bloqueado, por favor contacte con su administrador
+    error_login: Los datos de acceso son incorrectos
+  recuperar_password:
+    asunto: Notificación de Recuperación de Contraseña
+    contenido: Estimado usuario, se ha generado una nueva contraseña de acceso a nuestro sistema
+    contenido2: Al ingresar se solicitará que cambie la contraseña, por razones de seguridad
+    contenido3: Su nueva contraseña es
+  registro:
+    asunto: Registro de Usuario, Zoon Lite
+    saludo: Estimado(a)
+    contenido: Para completar tu registro en nuestro sitio debes ingresar el código de activación que se muestra mas abajo
+    contenido1: Una vez dentro del sistema deberá completar la información de su perfil
+    contenido2: Código de Activación
+    contenido3: O ir a la siguiente dirección
+    contenido4: Ir al enlace
+    contenido5: Gracias por preferirnos
+
+entity:
+  conversion: >-
+    {capital_case, select,
+      mayuscula {Conversion}
+      minuscula {conversion}
+      other {Conversion}
+    }
+  mandante: >-
+    {capital_case,select,
+      mayuscula {Mandante}
+      minuscula {mandante}
+      other {Mandante}
+    }
+  marca: >-
+    {capital_case, select,
+      mayuscula {Marca}
+      minuscula {marca}
+      other {Marca}
+    }
+  funcion: >-
+    {capital_case,select,
+      mayuscula {Función}
+      minuscula {función}
+      other {Función}
+    }
+  beneficio: >-
+    {capital_case,select,
+      mayuscula {Beneficio}
+      minuscula {beneficio}
+      other {Beneficio}
+    }
+  producto: >-
+    {capital_case,select,
+      mayuscula {Producto}
+      minuscula {producto}
+      other {Producto}
+    }
+  servicio: >-
+    {capital_case,select,
+      mayuscula {Servicio}
+      minuscula {servicio}
+      other {Servicio}
+    }
+  industria: >-
+    {capital_case,select,
+      mayuscula {Industria}
+      minuscula {industria}
+      other {Industria}
+    }
+  usuario: >-
+    {capital_case,select,
+      mayuscula {Usuario}
+      minuscula {usuario}
+      other {Usuario}
+    }
+  comercio: >-
+    {capital_case,select,
+      mayuscula {Comercio}
+      minuscula {comercio}
+      other {Comercio}
+    }
+  departamento: >-
+    {capital_case,select,
+      mayuscula {Departamento}
+      minuscula {departamento}
+      other {Departamento}
+    }
+  cargo: >-
+    {capital_case,select,
+      mayuscula {Cargo}
+      minuscula {cargo}
+      other {Cargo}
+    }
+  categoria: >-
+    {capital_case,select,
+      mayuscula {Categoria}
+      minuscula {categoria}
+      other {Categoria}
+    }
+  centro_comercial: >-
+    {capital_case,select,
+      mayuscula {Centro Comercial}
+      minuscula {centro comercial}
+      other {Centro Comercial}
+    }
+  modulo: >-
+    {capital_case,select,
+      mayuscula {Módulol}
+      minuscula {módulo}
+      other {Módulo}
+    }
+  cupon: >-
+    {capital_case,select,
+      mayuscula {Cupón}
+      minuscula {cupón}
+      other {Cupón}
+    }
+  pais: >-
+    {capital_case,select,
+      mayuscula {Pais}
+      minuscula {pais}
+      other {Pais}
+    }
+  sucursal: >-
+    {capital_case,select,
+      mayuscula {Sucursal}
+      minuscula {sucursal}
+      other {Sucursal}
+    }
+  establecimiento: >-
+    {capital_case,select,
+      mayuscula {Establecimiento}
+      minuscula {establecimiento}
+      other {Establecimiento}
+    }
+  canje: >-
+    {capital_case,select,
+      mayuscula {Canje}
+      minuscula {canje}
+      other {Canje}
+    }
+  caracteristica: >-
+    {capital_case,select,
+      mayuscula {Característica}
+      minuscula {característica}
+      other {Característica}
+    }
+  color: >-
+    {capital_case,select,
+      mayuscula {Color}
+      minuscula {color}
+      other {Color}
+    }
+  talla: >-
+    {capital_case,select,
+      mayuscula {Talla}
+      minuscula {talla}
+      other {Talla}
+    }
+  concepto_abono: >-
+    {capital_case,select,
+      mayuscula {Concepto de Abono}
+      minuscula {concepto de abono}
+      other {Concepto de Abono}
+    }
+  motivo_inconformidad: >-
+    {capital_case,select,
+      mayuscula {Motivo de Inconformidad}
+      minuscula {motivo de inconformidad}
+      other {Motivo de Inconformidad}
+    }
+  faq: >-
+    {capital_case,select,
+      mayuscula {FAQ}
+      minuscula {faq}
+      other {FAQ}
+    }
+  segmento: >-
+    {capital_case,select,
+      mayuscula {Segmento}
+      minuscula {segmento}
+      other {Segmento}
+    }
+  slider: >-
+    {capital_case,select,
+      mayuscula {Slider}
+      minuscula {slider}
+      other {Slider}
+    }
+  solicitud_campanna: >-
+    {capital_case,select,
+      mayuscula {Solicitud de Campaña}
+      minuscula {solicitud de campaña}
+      other {Solicitud de Campaña}
+    }
+  campanna: >-
+    {capital_case,select,
+      mayuscula {Campaña}
+      minuscula {campaña}
+      other {Campaña}
+    }
+  termino_condicion_plataforma: >-
+    {capital_case,select,
+      mayuscula {Término y Condicion de la Plataforma}
+      minuscula {término y condicion de la plataforma}
+      other {Término y Condicion de la Plataforma}
+    }
+  indicador: >-
+    {capital_case,select,
+      mayuscula {Indicador}
+      minuscula {indicador}
+      other {Indicador}
+    }
+  concepto: >-
+    {capital_case,select,
+      mayuscula {Concepto}
+      minuscula {concepto}
+      other {Concepto}
+    }
+  beneficio_interno: >-
+    {capital_case,select,
+      mayuscula {Beneficio Interno}
+      minuscula {beneficio interno}
+      other {Beneficio Interno}
+    }
+  tipo_punto: >-
+    {capital_case,select,
+      mayuscula {Tipo Punto}
+      minuscula {tipo punto}
+      other {Tipo Punto}
+    }
+  lenguaje: >-
+    {capital_case,select,
+      mayuscula {Lenguaje}
+      minuscula {lenguaje}
+      other {Lenguaje}
+    }
+  variacion_producto: >-
+    {capital_case,select,
+      mayuscula {Variación del producto}
+      minuscula {variación del producto}
+      other {Variación del producto}
+    }
+  tag: >-
+    {capital_case,select,
+      mayuscula {Tag}
+      minuscula {tag}
+      other {Tag}
+    }
+
+tabla:
+  titulo_accion:
+    editar_registro: Editar registro
+    detalle_registro: Detalle registro
+    eliminar_registro: Eliminar registro
+    copiar_url_registro: Copiar url para registro
+    clonar_registro: Clonar registro
+    aprobar_rechazar_canje: Aprobar/Rechazar canje
+    activar_desactivar_registro: Activar/Inactivar registro
+    agregar_modulo: Agregar modulo
+    detalle_recepcion: Detalles recepción
+    devolver_puntos: Devolver puntos
+    eliminar_canje: Eliminar canje
+    historial: Historial
+    detalle_cuenta: Detalle de cuenta
+    agregar_servicio: Agregar servicio
+    puntos: Puntos
+    subir_nivel: Subir un nivel
+    bajar_nivel: Bajar un nivel
+    agregar_monto: Agregar monto
+    ver_monto: Ver montos
+    agregar_puntos: Agregar puntos
+    quitar_puntos: Quitar puntos
+    ver_cuenta_corriente: Ver cuenta corriente
+    agregar_producto: Agregar producto
+    publicar_despublicar_registro: Publicar/Despublicar registro
+administrar:
+  conversion:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las conversiones, porque no fueron encontradas
+      eliminar_advertencia: Pero atención no se pudo eliminar todas las conversiones seleccionadas porque no fueron encontradas
+  marca:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las marcas, porque tienen información relevante asociada
+      eliminar_advertencia: Pero atención no se pudo eliminar todas las marcas seleccionadas porque tienen informacion relevante asociada
+  mandante:
+    error:
+      sin_programas: El mandante debe tener al menos un programa.
+      no_existe: No se pudo eliminar las empresas, porque no existen
+      no_existe_invitacion: No existe la invitacion solicitada
+    invitacion_comercio:
+      asunto: El mandante {name} lo ha invitado a que se una a su programa
+      contenido: Se ha generado una invitación en nuestro sistema.
+      contenido_aceptar_invitacion: Si desea aceptar dicha invitación visite.
+      contenido_rechazar_invitacion: Si desea rechazarla dicha invitación visite
+      titulo_link_aceptar: Aceptar Invitación.
+      titulo_link_rechazar: Rechazar Invitación.
+    aceptar_invitacion:
+      asunto: Registro de Usuario, Zoon
+      contenido: Se ha registrado un usuario a su nombre en nuestro sistema
+      contenido2: Para acceder al sistema visite
+      contenido3: Use como credenciales las siguientes, email
+      contenido4: y la contraseña
+      contenido5: Gracias por aceptarnos
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas las empresas seleccionadas porque no existen
+  industria:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las industrias, porque tienen mandantes asociadas
+      eliminar_advertencia: Pero atención no se pudo eliminar todas las industrias seleccionadas porque tienen mandantes asociadas
+  usuario:
+    accion:
+      agregar_usuario: Agregar usuario
+    error:
+      no_pudo_eliminar: No se pudo eliminar los usuarios, porque tiene la sesión abierta o tiene información asociada
+      eliminar_advertencia: Pero atención no se pudo eliminar todos los usuarios seleccionados porque tiene la sesión abierta o tiene información asociada
+      sesion_abierta: No se pudo eliminar el usuario, porque tiene la sesión abierta
+      canje_relacionado: No se pudo eliminar el usuario, porque se encuentra relacionado con un canje
+      cliente_relacionado: No se pudo eliminar el usuario, porque tiene clientes relacionados
+      activar_desactivar_usuario: No se pudo activar/desactivar el usuario solicitado
+      desactivar_sesion_abierta: No se puede desactivar el usuario, porque tiene la sesión abierta
+      actualizar_datos: No se pudo actualizar los datos del usuario actual
+      contrasenna_actual: La contraseña actual ingresada no es correcta
+      no_pudo_importar: No se pudo importar los usuarios, porque la columna email o perfil está vacia o el perfil no existe
+      no_pudo_importar_segmento: No se pudo importar los usuarios, porque la columna rut o segmento está vacia o el usuario o segmento no existe
+      advertencia_importar: Pero atención no se pudo importar todos los usuarios porque la columna email o perfil está vacia o el perfil no existe
+      advertencia_importar_segmento: Pero atención no se pudo importar todos los usuarios porque la columna rut o segmento está vacia o el usuario o segmento no existe
+      usuario_referido_relacionado: No se pudo eliminar el usuario, porque se encuentra relacionado con usuarios referidos
+  comercio:
+    error:
+      no_existe_codigo: No existe el codigo solicitado
+      no_existe_marca_comercio: No existe la marca de comercio solicitada
+      importar_rut_vacio: No se pudo importar los comercios, porque el rut está vacio
+      no_pudo_eliminar: No se pudo eliminar los comercios, porque están asociados a un servicio, producto, beneficio o usuario
+      no_existe_sucursal: No existe la sucursal de comercio solicitada
+      no_existe_marca_sucursal: No existe la marca de sucursal solicitado
+      importar_sucursales: No se pudo importar las sucursales, porque la columna comercio está vacia, no existe el comercio o la sucursal no es online y las columnas calles o comunas están vacias
+    message:
+      importar_advertencia: Pero atención no se pudo importar todos los comercios porque tienen el rut esta vacio
+      eliminar_advertencia: Pero atención no se pudo eliminar todas los comercios seleccionados porque están asociados a un servicio, producto, beneficio o usuario
+      importar_sucursales_advertencia: Pero atención no se pudo importar todas las sucursales porque la columna comercio está vacia, no existe el comercio o la sucursal no es online y las columnas calles o comunas están vacias
+  departamento:
+    error:
+      no_pudo_eliminar: No se pudo eliminar el departamento, porque tiene subdepartamentos con usuarios asociados
+  cargo:
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los cargos seleccionados porque tienen usuarios asociados
+  rubro_comercio:
+    error:
+      no_pudo_eliminar_relacionada_comercio: No se pudo eliminar la categoría, porque se encuentra relacionada con un comercio
+      no_pudo_eliminar_subrubro_relacionado_comercio: No se pudo eliminar la categoría, porque tiene subcategorías con comercios asociados
+  centro_comercial:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los centros, porque están asociados a un servicio, producto o beneficio
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los centros seleccionados porque están asociados a un servicio, producto o beneficio
+  pais:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los paises, porque tienen mandantes o estabalecimiento o clientes asociados
+      eliminar_advertencia: Pero atención no se pudo eliminar todos las paises seleccionadas porque tienen mandantes o estabalecimiento o clientes asociados
+      existe_codigo: El código del país esta en uso, por favor ingrese otro
+      establecimiento_relacionado: No se pudo eliminar el país, porque tiene establecimientos relacionados
+      centro_comercial_relacionado: No se pudo eliminar el país, porque tiene centros comerciales relacionados
+  perfil:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los perfiles, porque tienen usuarios asociados
+      nombre_en_uso: El nombre del perfil está en uso, por favor ingrese otro
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los perfiles seleccionados porque tienen usuarios asociados
+  motivo_inconformidad:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los motivos, porque esta relacionado con la recepción de un canje o no existen
+      canje_recepcion_relacionado: No se pudo eliminar el motivo de inconformidad, porque esta relacionado con la recepcion de un canje
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los motivos seleccionados porque está relacionado con la recepción de un canje o no existen
+  faq:
+    error:
+      existe_pregunta: Ya existe la pregunta ingresada
+      no_pudo_eliminar: No se pudo eliminar los faqs, porque no existen
+      no_existe: No se existe la pregunta frecuente solicitada
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los faqs seleccionados porque está relacionado con la recepción de un canje o no existen
+  segmento:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los segmentos porque están relacionados con un usuario, un beneficio, un producto o un servicio
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los segmentos seleccionadas porque están relacionados con usuarios, un beneficio, un producto o un servicio
+  slider:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los sliders, porque no existen
+      no_existe: No se existe el slider solicitado
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los sliders seleccionados porque no existen
+  termino_condicion_plataforma:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los términos y condiciones de la plataforma, porque no existe
+      no_existe: No se existe los términos y condiciones solicitado
+      no_pudo_actualizar: No se pudo actualizar los términos y condiciones de la plataforma solicitado
+      terminos_activos: Ya tiene unos términos y condiciones activos
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los términos y condiciones de la plataforma seleccionados porque no existen
+  concepto:
+    agregar_concepto: Agregar concepto
+    error:
+      interaccion_en_uso: La interacción del concepto está en uso, por favor ingrese otro
+      eliminar_multiple: No se pudo eliminar los conceptos, porque stán asociadas a abonos de clientes o no existen
+      codigo_en_uso: El código del concepto esta en uso, por favor ingrese otro
+      abono_asociado: No se pudo eliminar el concepto, porque están asociadas a abonos de clientes
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los conceptos seleccionados porque stán asociadas a abonos de clientes o no existen
+  lenguaje:
+    error:
+      eliminar_multiple: No se pudo eliminar los lenguajes, porque tiene programas, caracteristicas, centros comerciales, comercios, conceptos de abonos, marcas, colores, tallas o segmentos asociados
+      existe_bandera: La bandera del lenguaje está en uso, por favor seleccione otra
+      programa_asociado: No se pudo eliminar el lenguaje, porque tiene programas asociados
+      traducciones_asociado: No se pudo eliminar el lenguaje, porque tiene traducciones de idiomas asociados
+      no_existe_traduccion: No existe la traducción solicitada
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los lenguajes seleccionadas porque tiene programas, caracteristicas,centros comerciales, comercios, conceptos de abonos, marcas, colores, tallas o segmentos asociados
+  tag:
+    error:
+      existe_tag: Ya existe la tag ingresada
+      no_pudo_eliminar: No se pudo eliminar la tag, porque no existen o estan relacionada con beneficios
+      no_existe: No se existe la tag solicitada
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los tags seleccionados porque está relacionado con beneficio o no existen
+
+beneficio:
+  error:
+    no_pudo_eliminar: No se pudo eliminar los beneficios, porque estan relacionados con campañas o no existen
+    no_pudo_importar: No se pudo importar los beneficios, porque el comercio, marca o nombre estan vacio o el establecimiento o la marca no existen o la marca para el comercio no existe
+  message:
+    advertencia_eliminar: Pero atención no se pudo eliminar todos los beneficios seleccionadas porque estan relacionado con campañas o no existen beneficio
+    advertencia_importar: Pero atención no se pudo importar todos los beneficios porque el comercio, marca o nombre estan vacio, o el establecimiento o la marca no existen, o la marca para el comercio no existe
+  categoria_beneficio:
+    error:
+      subcategoria_beneficio_asociada: No se pudo eliminar la categoria, porque tiene subcategorías con beneficios asociados
+      subcategoria_servicio_asociada: No se pudo eliminar la categoria, porque tiene subcategorías con servicios asociados
+  beneficio_interno:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los beneficios internos, porque no existen
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los beneficios internos seleccionados porque no existen
+  reporte:
+    excel_titulo: Toyota con Beneficios
+    excel_titulo_historico: Toyota con Beneficios Histórico
+
+catalogo:
+  cupon_beneficio:
+    email:
+      asunto: Cupón de Beneficio
+      contenido1: Se ha generado el siguiente cupón de beneficio
+      contenido2: Escaneado este QR el comercio verifica la validez de tu descuento
+    error:
+      cupon_canjeado: El cupón ya ha sido canjeado
+      cupon_no_pertenece_comercio: El cupón no pertenece a tu comercio
+      maxima_descargas: Se ha llegado al maximo de descargas permitidos
+    pdf:
+      message1: Escaneado este QR el comercio
+      message2: verifica la validez de tu descuento
+
+puntos:
+  modulo:
+    error:
+      eliminar: No se pudo eliminar los módulos, porque han sido cargados o solicitados a un cliente
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los módulos seleccionados porque han sido cargados o solicitados a un cliente
+  canje:
+    notificacion:
+      asunto: Solicitud de Canje No
+      contenido_aprobado: Su canje ha sido Aprobado
+      contenido_rechazado: Su canje ha sido Rechazado
+      contenido2: Datos del canje
+      contenido3: Módulo
+      contenido4: Item
+      contenido5: Fecha
+      contenido6: Estado
+      contenido7: Motivo
+      contenido8: Comentario
+      contenido9: Puntos a Consumir
+      contenido10: Puntos no consumidos
+      aprobado: Aprobado
+      rechazado: Rechazado
+  categoria_producto:
+    error:
+      subcategoria_producto_asociado: No se pudo eliminar la categoria, porque tiene subcategorías con productos asociados
+  caracteristica_producto:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las características, porque están asociadas a un producto
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas las características seleccionadas porque están asociadas a un producto
+  color_producto:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los colores, porque están asociadas a una variación de producto
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los colores seleccionados porque están asociados a una variación de producto
+  talla_producto:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las tallas, porque están asociadas a una variación de producto
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas las tallas seleccionadas porque están asociadas a una variación de producto
+  concepto_abono:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los conceptos de abonos, porque tienen abonos asociados
+      abono_asociado: No se pudo eliminar el concepto, porque están asociadas a abonos de clientes
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todos los conceptos de abonos seleccionados porque tienen abonos asociados
+  servicio:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los servicios, porque han sido cargados o cotizados a un cliente
+      no_pudo_importar: No se pudo importar los servicios, porque el nombre está vacio, o la empresa no existe o no tiene programa, o los servicios ya pertenecen a la empresa
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los servicios seleccionadas porque han sido cargados o cotizados a un cliente
+      advertencia_importar: Pero atención no se pudo importar todos los servicios porque el nombre esta vacio, o la empresa no existe o no tiene programa, o los servicios ya pertenecen a la empresa
+  tipo_punto:
+    accion:
+      agregar_tipo: Agregar tipo de puntos
+    error:
+      no_pudo_eliminar: No se pudo eliminar el tipo de punto seleccionado, porque está asociado a empresas
+      no_pudo_eliminar_multiple: No se pudo eliminar los tipos de puntos seleccionados, porque estan asociados a empresas o a clientes o no existen
+    message:
+      advertencia_eliminar: Pero atencion no se pudo eliminar los tipos de puntos seleccionados, porque estan asociados a empresas o a clientes o no existen
+  producto:
+    error:
+      no_pudo_importar: No se pudo importar los productos, porque el nombre está vacio, o la empresa no existe o no tiene programa en el lenguaje actual, o los productos ya pertenecen a la empresa
+      no_pudo_eliminar: No se pudo eliminar los productos, porque han sido cargados o cotizados a un cliente o esta relacionada con campañas
+    message:
+      advertencia_importar: Pero atención no se pudo importar todos los productos porque el nombre esta vacio o la empresa no existe o los productos ya pertenecen a la empresa
+      advertencia_eliminar: No se pudo eliminar los productos, porque han sido cargados o cotizados a un cliente o esta relacionada con campañas
+  reporte:
+    excel_titulo: Toyota con Puntos
+    excel_titulo_historico: Toyota con Puntos Histórico
+
+campannas:
+  solicitud_campanna:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las solcitudes, porque no existen
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas las solcitudes seleccionadas porque no existen
+  campannas_referido:
+    error:
+      no_pudo_eliminar: No se pudo eliminar las campañas, porque porque no existen
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas las campañas seleccionadas porque no existen
+  indicador:
+    error:
+      no_pudo_eliminar: No se pudo eliminar los indicadores porque estan relacionados con alguna meta
+      no_pudo_eliminar_single: No se pudo eliminar el indicador, porque se encuentra relacionado con una meta
+    message:
+      advertencia_eliminar: Pero atención no se pudo eliminar todas los indicadores seleccionados porque estan relacionados con alguna meta
+  validacion:
+    campanna_producto_cargado: No se puede eliminar la campaña porque tiene productos cargados a clientes
+    campanna_producto_cotizado: No se puede eliminar la campaña porque tiene productos cotizados por clientes
+    no_pudo_eliminar: No se pudo eliminar las campañas, porque porque no existen o tiene productos cargados a clientes o cotizados por clientes
+    advertencia_eliminar: Pero atención no se pudo eliminar todas las campañas seleccionadas porque no existen o tiene productos cargados a clientes o cotizados por clientes
+
+
+configuracion_sesion:
+  programa: Programa Inicial
+  abono: Carga Masiva
+  establecimiento: Matriz
+  message:
+    salvar_usuario: Se ha creado el usuario y ha sido invitado al sistema para que disfrute de los beneficios y descuentos
+    importar_usuario: Se han importado los usuarios y han sido invitados al sistema para que disfruten de los beneficios y descuentos
+  error:
+    no_pudo_importar: No se pudo importar los usuarios porque la columna email esta vacia o los email ya pertenece a otros usuarios
+    advertencia_importar: Pero atención no se pudo importar todos los usuarios porque la columna email está vacia o ya pertenece a otro usuario
+  email_registro_usuario:
+    asunto: Usuario creado en el Sistema Zoon Lite
+    contenido1: Se le ha creado un usuario con su email
+    contenido2: Y contraseña
+    contenido3: Para acceder lo puede realizar accediendo a la siguiente dirección
+
+dashboard:
+  titulo_chart_canje: Puntos
+  titulo_chart_beneficio: Beneficios
+  titulo_chart_general: Puntos/Beneficios
+
+referrals_landing:
+  error:
+    no_existe_campanna: No existe la campaña referida
+    existe_referido: Usted ya ha sido referido
+    existe_referido2: Advocate de referencia

@@ -9,8 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * EnvironmentVariable is a name-value pair to store environment variables for
- * Process.
+ * A name-value pair representing an environment variable used in an operating
+ * system process.
  *
  * Generated from protobuf message <code>google.cloud.securitycenter.v1.EnvironmentVariable</code>
  */
@@ -21,13 +21,13 @@ class EnvironmentVariable extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Environment variable value as a JSON encoded string.
      *
      * Generated from protobuf field <code>string val = 2;</code>
      */
-    private $val = '';
+    protected $val = '';
 
     /**
      * Constructor.

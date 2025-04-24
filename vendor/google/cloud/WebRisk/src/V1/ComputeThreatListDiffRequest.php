@@ -16,11 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class ComputeThreatListDiffRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The threat list to update. Only a single ThreatType should be specified.
+     * Required. The threat list to update. Only a single ThreatType should be
+     * specified per request. If you want to handle multiple ThreatTypes, you must
+     * make one request per ThreatType.
      *
      * Generated from protobuf field <code>.google.cloud.webrisk.v1.ThreatType threat_type = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $threat_type = 0;
+    protected $threat_type = 0;
     /**
      * The current version token of the client for the requested list (the
      * client version that was received from the last successful diff).
@@ -30,13 +32,37 @@ class ComputeThreatListDiffRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes version_token = 2;</code>
      */
-    private $version_token = '';
+    protected $version_token = '';
     /**
      * Required. The constraints associated with this request.
      *
      * Generated from protobuf field <code>.google.cloud.webrisk.v1.ComputeThreatListDiffRequest.Constraints constraints = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $constraints = null;
+    protected $constraints = null;
+
+    /**
+     * @param int                                                               $threatType   Required. The threat list to update. Only a single ThreatType should be
+     *                                                                                        specified per request. If you want to handle multiple ThreatTypes, you must
+     *                                                                                        make one request per ThreatType.
+     *                                                                                        For allowed values, use constants defined on {@see \Google\Cloud\WebRisk\V1\ThreatType}
+     * @param string                                                            $versionToken The current version token of the client for the requested list (the
+     *                                                                                        client version that was received from the last successful diff).
+     *                                                                                        If the client does not have a version token (this is the first time calling
+     *                                                                                        ComputeThreatListDiff), this may be left empty and a full database
+     *                                                                                        snapshot will be returned.
+     * @param \Google\Cloud\WebRisk\V1\ComputeThreatListDiffRequest\Constraints $constraints  Required. The constraints associated with this request.
+     *
+     * @return \Google\Cloud\WebRisk\V1\ComputeThreatListDiffRequest
+     *
+     * @experimental
+     */
+    public static function build(int $threatType, string $versionToken, \Google\Cloud\WebRisk\V1\ComputeThreatListDiffRequest\Constraints $constraints): self
+    {
+        return (new self())
+            ->setThreatType($threatType)
+            ->setVersionToken($versionToken)
+            ->setConstraints($constraints);
+    }
 
     /**
      * Constructor.
@@ -45,7 +71,9 @@ class ComputeThreatListDiffRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $threat_type
-     *           Required. The threat list to update. Only a single ThreatType should be specified.
+     *           Required. The threat list to update. Only a single ThreatType should be
+     *           specified per request. If you want to handle multiple ThreatTypes, you must
+     *           make one request per ThreatType.
      *     @type string $version_token
      *           The current version token of the client for the requested list (the
      *           client version that was received from the last successful diff).
@@ -62,7 +90,9 @@ class ComputeThreatListDiffRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The threat list to update. Only a single ThreatType should be specified.
+     * Required. The threat list to update. Only a single ThreatType should be
+     * specified per request. If you want to handle multiple ThreatTypes, you must
+     * make one request per ThreatType.
      *
      * Generated from protobuf field <code>.google.cloud.webrisk.v1.ThreatType threat_type = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return int
@@ -73,7 +103,9 @@ class ComputeThreatListDiffRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The threat list to update. Only a single ThreatType should be specified.
+     * Required. The threat list to update. Only a single ThreatType should be
+     * specified per request. If you want to handle multiple ThreatTypes, you must
+     * make one request per ThreatType.
      *
      * Generated from protobuf field <code>.google.cloud.webrisk.v1.ThreatType threat_type = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param int $var

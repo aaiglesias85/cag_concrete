@@ -20,29 +20,50 @@ class Type
      */
     const TYPE_UNSPECIFIED = 0;
     /**
-     * Run article suggestion model.
+     * Run article suggestion model for chat.
      *
      * Generated from protobuf enum <code>ARTICLE_SUGGESTION = 1;</code>
      */
     const ARTICLE_SUGGESTION = 1;
     /**
-     * Run FAQ model.
+     * Run FAQ model for chat.
      *
      * Generated from protobuf enum <code>FAQ = 2;</code>
      */
     const FAQ = 2;
     /**
-     * Run smart reply model.
+     * Run smart reply model for chat.
      *
      * Generated from protobuf enum <code>SMART_REPLY = 3;</code>
      */
     const SMART_REPLY = 3;
+    /**
+     * Run conversation summarization model for chat.
+     *
+     * Generated from protobuf enum <code>CONVERSATION_SUMMARIZATION = 8;</code>
+     */
+    const CONVERSATION_SUMMARIZATION = 8;
+    /**
+     * Run knowledge search with text input from agent or text generated query.
+     *
+     * Generated from protobuf enum <code>KNOWLEDGE_SEARCH = 14;</code>
+     */
+    const KNOWLEDGE_SEARCH = 14;
+    /**
+     * Run knowledge assist with automatic query generation.
+     *
+     * Generated from protobuf enum <code>KNOWLEDGE_ASSIST = 15;</code>
+     */
+    const KNOWLEDGE_ASSIST = 15;
 
     private static $valueToName = [
         self::TYPE_UNSPECIFIED => 'TYPE_UNSPECIFIED',
         self::ARTICLE_SUGGESTION => 'ARTICLE_SUGGESTION',
         self::FAQ => 'FAQ',
         self::SMART_REPLY => 'SMART_REPLY',
+        self::CONVERSATION_SUMMARIZATION => 'CONVERSATION_SUMMARIZATION',
+        self::KNOWLEDGE_SEARCH => 'KNOWLEDGE_SEARCH',
+        self::KNOWLEDGE_ASSIST => 'KNOWLEDGE_ASSIST',
     ];
 
     public static function name($value)
@@ -66,6 +87,4 @@ class Type
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Type::class, \Google\Cloud\Dialogflow\V2\SuggestionFeature_Type::class);
 

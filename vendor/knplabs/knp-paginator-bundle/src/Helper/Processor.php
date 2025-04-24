@@ -15,28 +15,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class Processor
 {
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $router;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(UrlGeneratorInterface $router, TranslatorInterface $translator)
-    {
-        $this->router = $router;
-        $this->translator = $translator;
+    public function __construct(
+        private readonly UrlGeneratorInterface $router,
+        private readonly TranslatorInterface $translator
+    ) {
     }
 
     /**
      * Generates pagination template data.
      *
-     * @param SlidingPaginationInterface<mixed> $pagination
-     * @param array<string, mixed>              $queryParams
-     * @param array<string, mixed>              $viewParams
+     * @param SlidingPaginationInterface<mixed, mixed> $pagination
+     * @param array<string, mixed>                     $queryParams
+     * @param array<string, mixed>                     $viewParams
      *
      * @return array<string, mixed>
      */
@@ -46,6 +36,7 @@ final class Processor
 
         $data['route'] = $pagination->getRoute();
         $data['query'] = \array_merge($pagination->getParams(), $queryParams);
+        $data['options'] = $pagination->getPaginatorOptions();
 
         return \array_merge(
             $pagination->getPaginatorOptions() ?? [], // options given to paginator when paginated
@@ -63,11 +54,11 @@ final class Processor
      *
      * $key examples: "article.title" or "['article.title', 'article.subtitle']"
      *
-     * @param SlidingPaginationInterface<mixed> $pagination
-     * @param string|array<string, mixed>       $title
-     * @param string|array<string, mixed>       $key
-     * @param array<string, mixed>              $options
-     * @param array<string, mixed>              $params
+     * @param SlidingPaginationInterface<mixed, mixed> $pagination
+     * @param string|array<string, mixed>              $title
+     * @param string|array<string, mixed>              $key
+     * @param array<string, mixed>                     $options
+     * @param array<string, mixed>                     $params
      *
      * @return array<string, mixed>
      */
@@ -162,10 +153,10 @@ final class Processor
      *
      * $key example: "article.title"
      *
-     * @param SlidingPaginationInterface<mixed> $pagination
-     * @param array<string, mixed>              $fields
-     * @param array<string, mixed>              $options
-     * @param array<string, mixed>              $params
+     * @param SlidingPaginationInterface<mixed, mixed> $pagination
+     * @param array<string, mixed>                     $fields
+     * @param array<string, mixed>                     $options
+     * @param array<string, mixed>                     $params
      *
      * @return array<string, mixed>
      */
@@ -199,7 +190,7 @@ final class Processor
         return \array_merge(
             $pagination->getPaginatorOptions() ?? [],
             $pagination->getCustomParameters() ?? [],
-            \compact('fields', 'action', 'filterFieldName', 'filterValueName', 'selectedField', 'selectedValue', 'options')
+            \compact('fields', 'action', 'filterFieldName', 'filterValueName', 'selectedField', 'selectedValue', 'options', 'params')
         );
     }
 }

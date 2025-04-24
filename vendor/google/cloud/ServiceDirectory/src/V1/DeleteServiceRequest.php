@@ -21,7 +21,21 @@ class DeleteServiceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the service to delete. Please see
+     *                     {@see RegistrationServiceClient::serviceName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\ServiceDirectory\V1\DeleteServiceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

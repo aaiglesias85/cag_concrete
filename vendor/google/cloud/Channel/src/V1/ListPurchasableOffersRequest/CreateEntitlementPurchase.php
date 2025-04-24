@@ -21,7 +21,14 @@ class CreateEntitlementPurchase extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string sku = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $sku = '';
+    protected $sku = '';
+    /**
+     * Optional. Billing account that the result should be restricted to.
+     * Format: accounts/{account_id}/billingAccounts/{billing_account_id}.
+     *
+     * Generated from protobuf field <code>string billing_account = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $billing_account = '';
 
     /**
      * Constructor.
@@ -32,6 +39,9 @@ class CreateEntitlementPurchase extends \Google\Protobuf\Internal\Message
      *     @type string $sku
      *           Required. SKU that the result should be restricted to.
      *           Format: products/{product_id}/skus/{sku_id}.
+     *     @type string $billing_account
+     *           Optional. Billing account that the result should be restricted to.
+     *           Format: accounts/{account_id}/billingAccounts/{billing_account_id}.
      * }
      */
     public function __construct($data = NULL) {
@@ -67,8 +77,34 @@ class CreateEntitlementPurchase extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * Optional. Billing account that the result should be restricted to.
+     * Format: accounts/{account_id}/billingAccounts/{billing_account_id}.
+     *
+     * Generated from protobuf field <code>string billing_account = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getBillingAccount()
+    {
+        return $this->billing_account;
+    }
+
+    /**
+     * Optional. Billing account that the result should be restricted to.
+     * Format: accounts/{account_id}/billingAccounts/{billing_account_id}.
+     *
+     * Generated from protobuf field <code>string billing_account = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setBillingAccount($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->billing_account = $var;
+
+        return $this;
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(CreateEntitlementPurchase::class, \Google\Cloud\Channel\V1\ListPurchasableOffersRequest_CreateEntitlementPurchase::class);
 

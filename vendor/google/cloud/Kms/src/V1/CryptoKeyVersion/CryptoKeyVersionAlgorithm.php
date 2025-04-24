@@ -15,29 +15,29 @@ use UnexpectedValueException;
  * algorithm is usable with
  * [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
  * [ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT].
- * Algorithms beginning with "RSA_SIGN_" are usable with
+ * Algorithms beginning with `RSA_SIGN_` are usable with
  * [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
  * [ASYMMETRIC_SIGN][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN].
- * The fields in the name after "RSA_SIGN_" correspond to the following
+ * The fields in the name after `RSA_SIGN_` correspond to the following
  * parameters: padding algorithm, modulus bit length, and digest algorithm.
  * For PSS, the salt length used is equal to the length of digest
  * algorithm. For example,
  * [RSA_SIGN_PSS_2048_SHA256][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm.RSA_SIGN_PSS_2048_SHA256]
  * will use PSS with a salt length of 256 bits or 32 bytes.
- * Algorithms beginning with "RSA_DECRYPT_" are usable with
+ * Algorithms beginning with `RSA_DECRYPT_` are usable with
  * [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
  * [ASYMMETRIC_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ASYMMETRIC_DECRYPT].
- * The fields in the name after "RSA_DECRYPT_" correspond to the following
+ * The fields in the name after `RSA_DECRYPT_` correspond to the following
  * parameters: padding algorithm, modulus bit length, and digest algorithm.
- * Algorithms beginning with "EC_SIGN_" are usable with
+ * Algorithms beginning with `EC_SIGN_` are usable with
  * [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
  * [ASYMMETRIC_SIGN][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN].
- * The fields in the name after "EC_SIGN_" correspond to the following
+ * The fields in the name after `EC_SIGN_` correspond to the following
  * parameters: elliptic curve, digest algorithm.
- * Algorithms beginning with "HMAC_" are usable with
+ * Algorithms beginning with `HMAC_` are usable with
  * [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
  * [MAC][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.MAC].
- * The suffix following "HMAC_" corresponds to the hash algorithm being used
+ * The suffix following `HMAC_` corresponds to the hash algorithm being used
  * (eg. SHA256).
  * For more information, see [Key purposes and algorithms]
  * (https://cloud.google.com/kms/docs/algorithms).
@@ -58,6 +58,42 @@ class CryptoKeyVersionAlgorithm
      * Generated from protobuf enum <code>GOOGLE_SYMMETRIC_ENCRYPTION = 1;</code>
      */
     const GOOGLE_SYMMETRIC_ENCRYPTION = 1;
+    /**
+     * AES-GCM (Galois Counter Mode) using 128-bit keys.
+     *
+     * Generated from protobuf enum <code>AES_128_GCM = 41;</code>
+     */
+    const AES_128_GCM = 41;
+    /**
+     * AES-GCM (Galois Counter Mode) using 256-bit keys.
+     *
+     * Generated from protobuf enum <code>AES_256_GCM = 19;</code>
+     */
+    const AES_256_GCM = 19;
+    /**
+     * AES-CBC (Cipher Block Chaining Mode) using 128-bit keys.
+     *
+     * Generated from protobuf enum <code>AES_128_CBC = 42;</code>
+     */
+    const AES_128_CBC = 42;
+    /**
+     * AES-CBC (Cipher Block Chaining Mode) using 256-bit keys.
+     *
+     * Generated from protobuf enum <code>AES_256_CBC = 43;</code>
+     */
+    const AES_256_CBC = 43;
+    /**
+     * AES-CTR (Counter Mode) using 128-bit keys.
+     *
+     * Generated from protobuf enum <code>AES_128_CTR = 44;</code>
+     */
+    const AES_128_CTR = 44;
+    /**
+     * AES-CTR (Counter Mode) using 256-bit keys.
+     *
+     * Generated from protobuf enum <code>AES_256_CTR = 45;</code>
+     */
+    const AES_256_CTR = 45;
     /**
      * RSASSA-PSS 2048 bit key with a SHA256 digest.
      *
@@ -168,12 +204,16 @@ class CryptoKeyVersionAlgorithm
     const RSA_DECRYPT_OAEP_4096_SHA1 = 39;
     /**
      * ECDSA on the NIST P-256 curve with a SHA256 digest.
+     * Other hash functions can also be used:
+     * https://cloud.google.com/kms/docs/create-validate-signatures#ecdsa_support_for_other_hash_algorithms
      *
      * Generated from protobuf enum <code>EC_SIGN_P256_SHA256 = 12;</code>
      */
     const EC_SIGN_P256_SHA256 = 12;
     /**
      * ECDSA on the NIST P-384 curve with a SHA384 digest.
+     * Other hash functions can also be used:
+     * https://cloud.google.com/kms/docs/create-validate-signatures#ecdsa_support_for_other_hash_algorithms
      *
      * Generated from protobuf enum <code>EC_SIGN_P384_SHA384 = 13;</code>
      */
@@ -181,10 +221,18 @@ class CryptoKeyVersionAlgorithm
     /**
      * ECDSA on the non-NIST secp256k1 curve. This curve is only supported for
      * HSM protection level.
+     * Other hash functions can also be used:
+     * https://cloud.google.com/kms/docs/create-validate-signatures#ecdsa_support_for_other_hash_algorithms
      *
      * Generated from protobuf enum <code>EC_SIGN_SECP256K1_SHA256 = 31;</code>
      */
     const EC_SIGN_SECP256K1_SHA256 = 31;
+    /**
+     * EdDSA on the Curve25519 in pure mode (taking data as input).
+     *
+     * Generated from protobuf enum <code>EC_SIGN_ED25519 = 40;</code>
+     */
+    const EC_SIGN_ED25519 = 40;
     /**
      * HMAC-SHA256 signing with a 256 bit key.
      *
@@ -192,15 +240,59 @@ class CryptoKeyVersionAlgorithm
      */
     const HMAC_SHA256 = 32;
     /**
+     * HMAC-SHA1 signing with a 160 bit key.
+     *
+     * Generated from protobuf enum <code>HMAC_SHA1 = 33;</code>
+     */
+    const HMAC_SHA1 = 33;
+    /**
+     * HMAC-SHA384 signing with a 384 bit key.
+     *
+     * Generated from protobuf enum <code>HMAC_SHA384 = 34;</code>
+     */
+    const HMAC_SHA384 = 34;
+    /**
+     * HMAC-SHA512 signing with a 512 bit key.
+     *
+     * Generated from protobuf enum <code>HMAC_SHA512 = 35;</code>
+     */
+    const HMAC_SHA512 = 35;
+    /**
+     * HMAC-SHA224 signing with a 224 bit key.
+     *
+     * Generated from protobuf enum <code>HMAC_SHA224 = 36;</code>
+     */
+    const HMAC_SHA224 = 36;
+    /**
      * Algorithm representing symmetric encryption by an external key manager.
      *
      * Generated from protobuf enum <code>EXTERNAL_SYMMETRIC_ENCRYPTION = 18;</code>
      */
     const EXTERNAL_SYMMETRIC_ENCRYPTION = 18;
+    /**
+     * The post-quantum Module-Lattice-Based Digital Signature Algorithm, at
+     * security level 3. Randomized version.
+     *
+     * Generated from protobuf enum <code>PQ_SIGN_ML_DSA_65 = 56;</code>
+     */
+    const PQ_SIGN_ML_DSA_65 = 56;
+    /**
+     * The post-quantum stateless hash-based digital signature algorithm, at
+     * security level 1. Randomized version.
+     *
+     * Generated from protobuf enum <code>PQ_SIGN_SLH_DSA_SHA2_128S = 57;</code>
+     */
+    const PQ_SIGN_SLH_DSA_SHA2_128S = 57;
 
     private static $valueToName = [
         self::CRYPTO_KEY_VERSION_ALGORITHM_UNSPECIFIED => 'CRYPTO_KEY_VERSION_ALGORITHM_UNSPECIFIED',
         self::GOOGLE_SYMMETRIC_ENCRYPTION => 'GOOGLE_SYMMETRIC_ENCRYPTION',
+        self::AES_128_GCM => 'AES_128_GCM',
+        self::AES_256_GCM => 'AES_256_GCM',
+        self::AES_128_CBC => 'AES_128_CBC',
+        self::AES_256_CBC => 'AES_256_CBC',
+        self::AES_128_CTR => 'AES_128_CTR',
+        self::AES_256_CTR => 'AES_256_CTR',
         self::RSA_SIGN_PSS_2048_SHA256 => 'RSA_SIGN_PSS_2048_SHA256',
         self::RSA_SIGN_PSS_3072_SHA256 => 'RSA_SIGN_PSS_3072_SHA256',
         self::RSA_SIGN_PSS_4096_SHA256 => 'RSA_SIGN_PSS_4096_SHA256',
@@ -222,8 +314,15 @@ class CryptoKeyVersionAlgorithm
         self::EC_SIGN_P256_SHA256 => 'EC_SIGN_P256_SHA256',
         self::EC_SIGN_P384_SHA384 => 'EC_SIGN_P384_SHA384',
         self::EC_SIGN_SECP256K1_SHA256 => 'EC_SIGN_SECP256K1_SHA256',
+        self::EC_SIGN_ED25519 => 'EC_SIGN_ED25519',
         self::HMAC_SHA256 => 'HMAC_SHA256',
+        self::HMAC_SHA1 => 'HMAC_SHA1',
+        self::HMAC_SHA384 => 'HMAC_SHA384',
+        self::HMAC_SHA512 => 'HMAC_SHA512',
+        self::HMAC_SHA224 => 'HMAC_SHA224',
         self::EXTERNAL_SYMMETRIC_ENCRYPTION => 'EXTERNAL_SYMMETRIC_ENCRYPTION',
+        self::PQ_SIGN_ML_DSA_65 => 'PQ_SIGN_ML_DSA_65',
+        self::PQ_SIGN_SLH_DSA_SHA2_128S => 'PQ_SIGN_SLH_DSA_SHA2_128S',
     ];
 
     public static function name($value)
@@ -247,6 +346,4 @@ class CryptoKeyVersionAlgorithm
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(CryptoKeyVersionAlgorithm::class, \Google\Cloud\Kms\V1\CryptoKeyVersion_CryptoKeyVersionAlgorithm::class);
 

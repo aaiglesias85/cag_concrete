@@ -17,8 +17,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The Cloud resource that will parent the new Policy. Must be in one of the
-     * following forms:
+     * Required. The Google Cloud resource that will parent the new policy. Must
+     * be in one of the following forms:
      * * `projects/{project_number}`
      * * `projects/{project_id}`
      * * `folders/{folder_id}`
@@ -26,13 +26,35 @@ class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Required. `Policy` to create.
+     * Required. Policy to create.
      *
      * Generated from protobuf field <code>.google.cloud.orgpolicy.v2.Policy policy = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $policy = null;
+    protected $policy = null;
+
+    /**
+     * @param string                            $parent Required. The Google Cloud resource that will parent the new policy. Must
+     *                                                  be in one of the following forms:
+     *
+     *                                                  * `projects/{project_number}`
+     *                                                  * `projects/{project_id}`
+     *                                                  * `folders/{folder_id}`
+     *                                                  * `organizations/{organization_id}`
+     *                                                  Please see {@see OrgPolicyClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\OrgPolicy\V2\Policy $policy Required. Policy to create.
+     *
+     * @return \Google\Cloud\OrgPolicy\V2\CreatePolicyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\OrgPolicy\V2\Policy $policy): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setPolicy($policy);
+    }
 
     /**
      * Constructor.
@@ -41,14 +63,14 @@ class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The Cloud resource that will parent the new Policy. Must be in one of the
-     *           following forms:
+     *           Required. The Google Cloud resource that will parent the new policy. Must
+     *           be in one of the following forms:
      *           * `projects/{project_number}`
      *           * `projects/{project_id}`
      *           * `folders/{folder_id}`
      *           * `organizations/{organization_id}`
      *     @type \Google\Cloud\OrgPolicy\V2\Policy $policy
-     *           Required. `Policy` to create.
+     *           Required. Policy to create.
      * }
      */
     public function __construct($data = NULL) {
@@ -57,8 +79,8 @@ class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The Cloud resource that will parent the new Policy. Must be in one of the
-     * following forms:
+     * Required. The Google Cloud resource that will parent the new policy. Must
+     * be in one of the following forms:
      * * `projects/{project_number}`
      * * `projects/{project_id}`
      * * `folders/{folder_id}`
@@ -73,8 +95,8 @@ class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The Cloud resource that will parent the new Policy. Must be in one of the
-     * following forms:
+     * Required. The Google Cloud resource that will parent the new policy. Must
+     * be in one of the following forms:
      * * `projects/{project_number}`
      * * `projects/{project_id}`
      * * `folders/{folder_id}`
@@ -93,7 +115,7 @@ class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. `Policy` to create.
+     * Required. Policy to create.
      *
      * Generated from protobuf field <code>.google.cloud.orgpolicy.v2.Policy policy = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\OrgPolicy\V2\Policy|null
@@ -114,7 +136,7 @@ class CreatePolicyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. `Policy` to create.
+     * Required. Policy to create.
      *
      * Generated from protobuf field <code>.google.cloud.orgpolicy.v2.Policy policy = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\OrgPolicy\V2\Policy $var

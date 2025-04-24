@@ -44,8 +44,10 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
     private $accesses;
     /**
      * Resource edges of the graph starting from the policy attached
-     * resource to any descendant resources. The [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node] contains
-     * the full resource name of a parent resource and [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
+     * resource to any descendant resources. The
+     * [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node]
+     * contains the full resource name of a parent resource and
+     * [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
      * contains the full resource name of a child resource. This field is
      * present only if the output_resource_edges option is enabled in request.
      *
@@ -58,7 +60,7 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.ConditionEvaluation condition_evaluation = 4;</code>
      */
-    private $condition_evaluation = null;
+    protected $condition_evaluation = null;
 
     /**
      * Constructor.
@@ -66,18 +68,20 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Resource[]|\Google\Protobuf\Internal\RepeatedField $resources
+     *     @type array<\Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Resource>|\Google\Protobuf\Internal\RepeatedField $resources
      *           The resources that match one of the following conditions:
      *           - The resource_selector, if it is specified in request;
      *           - Otherwise, resources reachable from the policy attached resource.
-     *     @type \Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Access[]|\Google\Protobuf\Internal\RepeatedField $accesses
+     *     @type array<\Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Access>|\Google\Protobuf\Internal\RepeatedField $accesses
      *           The accesses that match one of the following conditions:
      *           - The access_selector, if it is specified in request;
      *           - Otherwise, access specifiers reachable from the policy binding's role.
-     *     @type \Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Edge[]|\Google\Protobuf\Internal\RepeatedField $resource_edges
+     *     @type array<\Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Edge>|\Google\Protobuf\Internal\RepeatedField $resource_edges
      *           Resource edges of the graph starting from the policy attached
-     *           resource to any descendant resources. The [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node] contains
-     *           the full resource name of a parent resource and [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
+     *           resource to any descendant resources. The
+     *           [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node]
+     *           contains the full resource name of a parent resource and
+     *           [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
      *           contains the full resource name of a child resource. This field is
      *           present only if the output_resource_edges option is enabled in request.
      *     @type \Google\Cloud\Asset\V1\ConditionEvaluation $condition_evaluation
@@ -109,7 +113,7 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
      * - Otherwise, resources reachable from the policy attached resource.
      *
      * Generated from protobuf field <code>repeated .google.cloud.asset.v1.IamPolicyAnalysisResult.Resource resources = 1;</code>
-     * @param \Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Resource[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Resource>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResources($var)
@@ -139,7 +143,7 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
      * - Otherwise, access specifiers reachable from the policy binding's role.
      *
      * Generated from protobuf field <code>repeated .google.cloud.asset.v1.IamPolicyAnalysisResult.Access accesses = 2;</code>
-     * @param \Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Access[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Access>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAccesses($var)
@@ -152,8 +156,10 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
 
     /**
      * Resource edges of the graph starting from the policy attached
-     * resource to any descendant resources. The [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node] contains
-     * the full resource name of a parent resource and [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
+     * resource to any descendant resources. The
+     * [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node]
+     * contains the full resource name of a parent resource and
+     * [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
      * contains the full resource name of a child resource. This field is
      * present only if the output_resource_edges option is enabled in request.
      *
@@ -167,13 +173,15 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
 
     /**
      * Resource edges of the graph starting from the policy attached
-     * resource to any descendant resources. The [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node] contains
-     * the full resource name of a parent resource and [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
+     * resource to any descendant resources. The
+     * [Edge.source_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.source_node]
+     * contains the full resource name of a parent resource and
+     * [Edge.target_node][google.cloud.asset.v1.IamPolicyAnalysisResult.Edge.target_node]
      * contains the full resource name of a child resource. This field is
      * present only if the output_resource_edges option is enabled in request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.asset.v1.IamPolicyAnalysisResult.Edge resource_edges = 3;</code>
-     * @param \Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Edge[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Asset\V1\IamPolicyAnalysisResult\Edge>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResourceEdges($var)
@@ -224,6 +232,4 @@ class AccessControlList extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(AccessControlList::class, \Google\Cloud\Asset\V1\IamPolicyAnalysisResult_AccessControlList::class);
 

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Next ID: 8
+ * The objective configuration for model monitoring, including the information
+ * needed to detect anomalies for one particular model.
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig</code>
  */
@@ -21,25 +22,25 @@ class ModelMonitoringObjectiveConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig.TrainingDataset training_dataset = 1;</code>
      */
-    private $training_dataset = null;
+    protected $training_dataset = null;
     /**
      * The config for skew between training data and prediction data.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig.TrainingPredictionSkewDetectionConfig training_prediction_skew_detection_config = 2;</code>
      */
-    private $training_prediction_skew_detection_config = null;
+    protected $training_prediction_skew_detection_config = null;
     /**
      * The config for drift of prediction data.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig.PredictionDriftDetectionConfig prediction_drift_detection_config = 3;</code>
      */
-    private $prediction_drift_detection_config = null;
+    protected $prediction_drift_detection_config = null;
     /**
      * The config for integrating with Vertex Explainable AI.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig.ExplanationConfig explanation_config = 5;</code>
      */
-    private $explanation_config = null;
+    protected $explanation_config = null;
 
     /**
      * Constructor.

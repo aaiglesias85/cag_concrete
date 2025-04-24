@@ -10,7 +10,7 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * An insight along with the information used to derive the insight. The insight
- * may have associated recomendations as well.
+ * may have associated recommendations as well.
  *
  * Generated from protobuf message <code>google.cloud.recommender.v1.Insight</code>
  */
@@ -21,14 +21,14 @@ class Insight extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Free-form human readable summary in English. The maximum length is 500
      * characters.
      *
      * Generated from protobuf field <code>string description = 2;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Fully qualified resource names that this insight is targeting.
      *
@@ -40,20 +40,20 @@ class Insight extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string insight_subtype = 10;</code>
      */
-    private $insight_subtype = '';
+    protected $insight_subtype = '';
     /**
      * A struct of custom fields to explain the insight.
      * Example: "grantedPermissionsCount": "1000"
      *
      * Generated from protobuf field <code>.google.protobuf.Struct content = 3;</code>
      */
-    private $content = null;
+    protected $content = null;
     /**
      * Timestamp of the latest data used to generate the insight.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_refresh_time = 4;</code>
      */
-    private $last_refresh_time = null;
+    protected $last_refresh_time = null;
     /**
      * Observation period that led to the insight. The source data used to
      * generate the insight ends at last_refresh_time and begins at
@@ -61,32 +61,32 @@ class Insight extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration observation_period = 5;</code>
      */
-    private $observation_period = null;
+    protected $observation_period = null;
     /**
      * Information state and metadata.
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.InsightStateInfo state_info = 6;</code>
      */
-    private $state_info = null;
+    protected $state_info = null;
     /**
      * Category being targeted by the insight.
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.Insight.Category category = 7;</code>
      */
-    private $category = 0;
+    protected $category = 0;
     /**
      * Insight's severity.
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.Insight.Severity severity = 15;</code>
      */
-    private $severity = 0;
+    protected $severity = 0;
     /**
      * Fingerprint of the Insight. Provides optimistic locking when updating
      * states.
      *
      * Generated from protobuf field <code>string etag = 11;</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
      * Recommendations derived from this insight.
      *
@@ -105,7 +105,7 @@ class Insight extends \Google\Protobuf\Internal\Message
      *     @type string $description
      *           Free-form human readable summary in English. The maximum length is 500
      *           characters.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $target_resources
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $target_resources
      *           Fully qualified resource names that this insight is targeting.
      *     @type string $insight_subtype
      *           Insight subtype. Insight content schema will be stable for a given subtype.
@@ -127,7 +127,7 @@ class Insight extends \Google\Protobuf\Internal\Message
      *     @type string $etag
      *           Fingerprint of the Insight. Provides optimistic locking when updating
      *           states.
-     *     @type \Google\Cloud\Recommender\V1\Insight\RecommendationReference[]|\Google\Protobuf\Internal\RepeatedField $associated_recommendations
+     *     @type array<\Google\Cloud\Recommender\V1\Insight\RecommendationReference>|\Google\Protobuf\Internal\RepeatedField $associated_recommendations
      *           Recommendations derived from this insight.
      * }
      */
@@ -205,7 +205,7 @@ class Insight extends \Google\Protobuf\Internal\Message
      * Fully qualified resource names that this insight is targeting.
      *
      * Generated from protobuf field <code>repeated string target_resources = 9;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTargetResources($var)
@@ -487,7 +487,7 @@ class Insight extends \Google\Protobuf\Internal\Message
      * Recommendations derived from this insight.
      *
      * Generated from protobuf field <code>repeated .google.cloud.recommender.v1.Insight.RecommendationReference associated_recommendations = 8;</code>
-     * @param \Google\Cloud\Recommender\V1\Insight\RecommendationReference[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Recommender\V1\Insight\RecommendationReference>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAssociatedRecommendations($var)

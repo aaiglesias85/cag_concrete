@@ -16,18 +16,33 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListInstancesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The unique name of the project for which a list of instances is requested.
-     * Values are of the form `projects/{project}`.
+     * Required. The unique name of the project for which a list of instances is
+     * requested. Values are of the form `projects/{project}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * DEPRECATED: This field is unused and ignored.
      *
      * Generated from protobuf field <code>string page_token = 2;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The unique name of the project for which a list of instances is
+     *                       requested. Values are of the form `projects/{project}`. Please see
+     *                       {@see BigtableInstanceAdminClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Bigtable\Admin\V2\ListInstancesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -36,8 +51,8 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The unique name of the project for which a list of instances is requested.
-     *           Values are of the form `projects/{project}`.
+     *           Required. The unique name of the project for which a list of instances is
+     *           requested. Values are of the form `projects/{project}`.
      *     @type string $page_token
      *           DEPRECATED: This field is unused and ignored.
      * }
@@ -48,8 +63,8 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The unique name of the project for which a list of instances is requested.
-     * Values are of the form `projects/{project}`.
+     * Required. The unique name of the project for which a list of instances is
+     * requested. Values are of the form `projects/{project}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -60,8 +75,8 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The unique name of the project for which a list of instances is requested.
-     * Values are of the form `projects/{project}`.
+     * Required. The unique name of the project for which a list of instances is
+     * requested. Values are of the form `projects/{project}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

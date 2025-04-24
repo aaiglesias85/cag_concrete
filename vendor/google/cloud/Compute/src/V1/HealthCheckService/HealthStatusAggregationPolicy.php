@@ -7,7 +7,7 @@ namespace Google\Cloud\Compute\V1\HealthCheckService;
 use UnexpectedValueException;
 
 /**
- * Optional. Policy for how the results from multiple health checks for the same endpoint are aggregated. Defaults to NO_AGGREGATION if unspecified. - NO_AGGREGATION. An EndpointHealth message is returned for each pair in the health check service. - AND. If any health check of an endpoint reports UNHEALTHY, then UNHEALTHY is the HealthState of the endpoint. If all health checks report HEALTHY, the HealthState of the endpoint is HEALTHY. .
+ * Optional. Policy for how the results from multiple health checks for the same endpoint are aggregated. Defaults to NO_AGGREGATION if unspecified. - NO_AGGREGATION. An EndpointHealth message is returned for each pair in the health check service. - AND. If any health check of an endpoint reports UNHEALTHY, then UNHEALTHY is the HealthState of the endpoint. If all health checks report HEALTHY, the HealthState of the endpoint is HEALTHY. . This is only allowed with regional HealthCheckService.
  *
  * Protobuf type <code>google.cloud.compute.v1.HealthCheckService.HealthStatusAggregationPolicy</code>
  */
@@ -34,7 +34,7 @@ class HealthStatusAggregationPolicy
 
     private static $valueToName = [
         self::UNDEFINED_HEALTH_STATUS_AGGREGATION_POLICY => 'UNDEFINED_HEALTH_STATUS_AGGREGATION_POLICY',
-        self::PBAND => 'PBAND',
+        self::PBAND => 'AND',
         self::NO_AGGREGATION => 'NO_AGGREGATION',
     ];
 
@@ -52,8 +52,12 @@ class HealthStatusAggregationPolicy
     {
         $const = __CLASS__ . '::' . strtoupper($name);
         if (!defined($const)) {
-            throw new UnexpectedValueException(sprintf(
-                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+            $pbconst =  __CLASS__. '::PB' . strtoupper($name);
+            if (!defined($pbconst)) {
+                throw new UnexpectedValueException(sprintf(
+                        'Enum %s has no value defined for name %s', __CLASS__, $name));
+            }
+            return constant($pbconst);
         }
         return constant($const);
     }

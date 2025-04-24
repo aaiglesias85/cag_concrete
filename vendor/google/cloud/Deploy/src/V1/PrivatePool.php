@@ -16,12 +16,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class PrivatePool extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Resource name of the Cloud Build worker pool to use. The format is
-     * `projects/{project}/locations/{location}/workerPools/{pool}`.
+     * Required. Resource name of the Cloud Build worker pool to use. The format
+     * is `projects/{project}/locations/{location}/workerPools/{pool}`.
      *
      * Generated from protobuf field <code>string worker_pool = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $worker_pool = '';
+    protected $worker_pool = '';
     /**
      * Optional. Google service account to use for execution. If unspecified,
      * the project execution service account
@@ -29,16 +29,16 @@ class PrivatePool extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
-     * Optional. Cloud Storage location where execution outputs should be stored. This can
-     * either be a bucket ("gs://my-bucket") or a path within a bucket
+     * Optional. Cloud Storage location where execution outputs should be stored.
+     * This can either be a bucket ("gs://my-bucket") or a path within a bucket
      * ("gs://my-bucket/my-dir").
      * If unspecified, a default bucket located in the same region will be used.
      *
      * Generated from protobuf field <code>string artifact_storage = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $artifact_storage = '';
+    protected $artifact_storage = '';
 
     /**
      * Constructor.
@@ -47,15 +47,15 @@ class PrivatePool extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $worker_pool
-     *           Required. Resource name of the Cloud Build worker pool to use. The format is
-     *           `projects/{project}/locations/{location}/workerPools/{pool}`.
+     *           Required. Resource name of the Cloud Build worker pool to use. The format
+     *           is `projects/{project}/locations/{location}/workerPools/{pool}`.
      *     @type string $service_account
      *           Optional. Google service account to use for execution. If unspecified,
      *           the project execution service account
      *           (<PROJECT_NUMBER>-compute&#64;developer.gserviceaccount.com) will be used.
      *     @type string $artifact_storage
-     *           Optional. Cloud Storage location where execution outputs should be stored. This can
-     *           either be a bucket ("gs://my-bucket") or a path within a bucket
+     *           Optional. Cloud Storage location where execution outputs should be stored.
+     *           This can either be a bucket ("gs://my-bucket") or a path within a bucket
      *           ("gs://my-bucket/my-dir").
      *           If unspecified, a default bucket located in the same region will be used.
      * }
@@ -66,8 +66,8 @@ class PrivatePool extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of the Cloud Build worker pool to use. The format is
-     * `projects/{project}/locations/{location}/workerPools/{pool}`.
+     * Required. Resource name of the Cloud Build worker pool to use. The format
+     * is `projects/{project}/locations/{location}/workerPools/{pool}`.
      *
      * Generated from protobuf field <code>string worker_pool = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -78,8 +78,8 @@ class PrivatePool extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of the Cloud Build worker pool to use. The format is
-     * `projects/{project}/locations/{location}/workerPools/{pool}`.
+     * Required. Resource name of the Cloud Build worker pool to use. The format
+     * is `projects/{project}/locations/{location}/workerPools/{pool}`.
      *
      * Generated from protobuf field <code>string worker_pool = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -124,8 +124,8 @@ class PrivatePool extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage location where execution outputs should be stored. This can
-     * either be a bucket ("gs://my-bucket") or a path within a bucket
+     * Optional. Cloud Storage location where execution outputs should be stored.
+     * This can either be a bucket ("gs://my-bucket") or a path within a bucket
      * ("gs://my-bucket/my-dir").
      * If unspecified, a default bucket located in the same region will be used.
      *
@@ -138,8 +138,8 @@ class PrivatePool extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage location where execution outputs should be stored. This can
-     * either be a bucket ("gs://my-bucket") or a path within a bucket
+     * Optional. Cloud Storage location where execution outputs should be stored.
+     * This can either be a bucket ("gs://my-bucket") or a path within a bucket
      * ("gs://my-bucket/my-dir").
      * If unspecified, a default bucket located in the same region will be used.
      *

@@ -21,7 +21,7 @@ class Suggestion extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string title = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $title = '';
+    protected $title = '';
 
     /**
      * Constructor.
@@ -66,6 +66,4 @@ class Suggestion extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Suggestion::class, \Google\Cloud\Dialogflow\V2\Intent_Message_Suggestion::class);
 

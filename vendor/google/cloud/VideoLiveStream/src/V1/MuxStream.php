@@ -16,11 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class MuxStream extends \Google\Protobuf\Internal\Message
 {
     /**
-     * A unique key for this multiplexed stream.
+     * A unique key for this multiplexed stream. The key must be 1-63
+     * characters in length. The key must begin and end with a letter (regardless
+     * of case) or a number, but can contain dashes or underscores in between.
      *
      * Generated from protobuf field <code>string key = 1;</code>
      */
-    private $key = '';
+    protected $key = '';
     /**
      * The container format. The default is `fmp4`.
      * Supported container formats:
@@ -29,10 +31,11 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string container = 3;</code>
      */
-    private $container = '';
+    protected $container = '';
     /**
-     * List of `ElementaryStream` [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed in this
-     * stream.
+     * List of `ElementaryStream`
+     * [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed
+     * in this stream.
      * - For `fmp4` container, must contain either one video or one audio stream.
      * - For `ts` container, must contain exactly one audio stream and up to one
      * video stream.
@@ -45,7 +48,14 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.video.livestream.v1.SegmentSettings segment_settings = 5;</code>
      */
-    private $segment_settings = null;
+    protected $segment_settings = null;
+    /**
+     * Identifier of the encryption configuration to use. If omitted, output
+     * will be unencrypted.
+     *
+     * Generated from protobuf field <code>string encryption_id = 6;</code>
+     */
+    protected $encryption_id = '';
 
     /**
      * Constructor.
@@ -54,20 +64,26 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $key
-     *           A unique key for this multiplexed stream.
+     *           A unique key for this multiplexed stream. The key must be 1-63
+     *           characters in length. The key must begin and end with a letter (regardless
+     *           of case) or a number, but can contain dashes or underscores in between.
      *     @type string $container
      *           The container format. The default is `fmp4`.
      *           Supported container formats:
      *           - `fmp4` - the corresponding file extension is `.m4s`
      *           - `ts` - the corresponding file extension is `.ts`
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $elementary_streams
-     *           List of `ElementaryStream` [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed in this
-     *           stream.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $elementary_streams
+     *           List of `ElementaryStream`
+     *           [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed
+     *           in this stream.
      *           - For `fmp4` container, must contain either one video or one audio stream.
      *           - For `ts` container, must contain exactly one audio stream and up to one
      *           video stream.
      *     @type \Google\Cloud\Video\LiveStream\V1\SegmentSettings $segment_settings
      *           Segment settings for `fmp4` and `ts`.
+     *     @type string $encryption_id
+     *           Identifier of the encryption configuration to use. If omitted, output
+     *           will be unencrypted.
      * }
      */
     public function __construct($data = NULL) {
@@ -76,7 +92,9 @@ class MuxStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A unique key for this multiplexed stream.
+     * A unique key for this multiplexed stream. The key must be 1-63
+     * characters in length. The key must begin and end with a letter (regardless
+     * of case) or a number, but can contain dashes or underscores in between.
      *
      * Generated from protobuf field <code>string key = 1;</code>
      * @return string
@@ -87,7 +105,9 @@ class MuxStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A unique key for this multiplexed stream.
+     * A unique key for this multiplexed stream. The key must be 1-63
+     * characters in length. The key must begin and end with a letter (regardless
+     * of case) or a number, but can contain dashes or underscores in between.
      *
      * Generated from protobuf field <code>string key = 1;</code>
      * @param string $var
@@ -134,8 +154,9 @@ class MuxStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of `ElementaryStream` [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed in this
-     * stream.
+     * List of `ElementaryStream`
+     * [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed
+     * in this stream.
      * - For `fmp4` container, must contain either one video or one audio stream.
      * - For `ts` container, must contain exactly one audio stream and up to one
      * video stream.
@@ -149,14 +170,15 @@ class MuxStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of `ElementaryStream` [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed in this
-     * stream.
+     * List of `ElementaryStream`
+     * [key][google.cloud.video.livestream.v1.ElementaryStream.key]s multiplexed
+     * in this stream.
      * - For `fmp4` container, must contain either one video or one audio stream.
      * - For `ts` container, must contain exactly one audio stream and up to one
      * video stream.
      *
      * Generated from protobuf field <code>repeated string elementary_streams = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setElementaryStreams($var)
@@ -199,6 +221,34 @@ class MuxStream extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Video\LiveStream\V1\SegmentSettings::class);
         $this->segment_settings = $var;
+
+        return $this;
+    }
+
+    /**
+     * Identifier of the encryption configuration to use. If omitted, output
+     * will be unencrypted.
+     *
+     * Generated from protobuf field <code>string encryption_id = 6;</code>
+     * @return string
+     */
+    public function getEncryptionId()
+    {
+        return $this->encryption_id;
+    }
+
+    /**
+     * Identifier of the encryption configuration to use. If omitted, output
+     * will be unencrypted.
+     *
+     * Generated from protobuf field <code>string encryption_id = 6;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setEncryptionId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->encryption_id = $var;
 
         return $this;
     }

@@ -20,13 +20,29 @@ class CreateIssueModelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The issue model to create.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.IssueModel issue_model = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $issue_model = null;
+    protected $issue_model = null;
+
+    /**
+     * @param string                                            $parent     Required. The parent resource of the issue model. Please see
+     *                                                                      {@see ContactCenterInsightsClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\ContactCenterInsights\V1\IssueModel $issueModel Required. The issue model to create.
+     *
+     * @return \Google\Cloud\ContactCenterInsights\V1\CreateIssueModelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\ContactCenterInsights\V1\IssueModel $issueModel): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setIssueModel($issueModel);
+    }
 
     /**
      * Constructor.

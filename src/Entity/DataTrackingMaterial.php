@@ -4,110 +4,70 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * DataTrackingMaterial
- *
- * @ORM\Table(name="data_tracking_material")
- * @ORM\Entity(repositoryClass="App\Repository\DataTrackingMaterialRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingMaterialRepository')]
+#[ORM\Table(name: 'data_tracking_material')]
 class DataTrackingMaterial
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity", type="float", nullable=false)
-     */
-    private $quantity;
+    #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
+    private ?float $quantity;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
+    private ?float $price;
 
-    /**
-     * @var Material
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Material")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="material_id", referencedColumnName="material_id")
-     * })
-     */
-    private $material;
+    #[ORM\ManyToOne(targetEntity: Material::class)]
+    #[ORM\JoinColumn(name: 'material_id', referencedColumnName: 'material_id')]
+    private ?Material $material;
 
+    #[ORM\ManyToOne(targetEntity: DataTracking::class)]
+    #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
+    private ?DataTracking $dataTracking;
 
-    /**
-     * @var DataTracking
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\DataTracking")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="data_tracking_id", referencedColumnName="id")
-     * })
-     */
-    private $dataTracking;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getQuantity()
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
-    /**
-     * @return Material
-     */
-    public function getMaterial()
+    public function getMaterial(): ?Material
     {
         return $this->material;
     }
 
-    public function setMaterial($material)
+    public function setMaterial(?Material $material): void
     {
         $this->material = $material;
     }
 
-    /**
-     * @return DataTracking
-     */
-    public function getDataTracking()
+    public function getDataTracking(): ?DataTracking
     {
         return $this->dataTracking;
     }
 
-    public function setDataTracking($dataTracking)
+    public function setDataTracking(?DataTracking $dataTracking): void
     {
         $this->dataTracking = $dataTracking;
     }

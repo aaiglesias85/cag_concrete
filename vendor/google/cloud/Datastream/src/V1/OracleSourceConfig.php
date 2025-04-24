@@ -20,13 +20,29 @@ class OracleSourceConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleRdbms include_objects = 1;</code>
      */
-    private $include_objects = null;
+    protected $include_objects = null;
     /**
      * Oracle objects to exclude from the stream.
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleRdbms exclude_objects = 2;</code>
      */
-    private $exclude_objects = null;
+    protected $exclude_objects = null;
+    /**
+     * Maximum number of concurrent CDC tasks. The number should be non-negative.
+     * If not set (or set to 0), the system's default value is used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_cdc_tasks = 3;</code>
+     */
+    protected $max_concurrent_cdc_tasks = 0;
+    /**
+     * Maximum number of concurrent backfill tasks. The number should be
+     * non-negative. If not set (or set to 0), the system's default value is used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_backfill_tasks = 4;</code>
+     */
+    protected $max_concurrent_backfill_tasks = 0;
+    protected $large_objects_handling;
+    protected $cdc_method;
 
     /**
      * Constructor.
@@ -38,6 +54,20 @@ class OracleSourceConfig extends \Google\Protobuf\Internal\Message
      *           Oracle objects to include in the stream.
      *     @type \Google\Cloud\Datastream\V1\OracleRdbms $exclude_objects
      *           Oracle objects to exclude from the stream.
+     *     @type int $max_concurrent_cdc_tasks
+     *           Maximum number of concurrent CDC tasks. The number should be non-negative.
+     *           If not set (or set to 0), the system's default value is used.
+     *     @type int $max_concurrent_backfill_tasks
+     *           Maximum number of concurrent backfill tasks. The number should be
+     *           non-negative. If not set (or set to 0), the system's default value is used.
+     *     @type \Google\Cloud\Datastream\V1\OracleSourceConfig\DropLargeObjects $drop_large_objects
+     *           Drop large object values.
+     *     @type \Google\Cloud\Datastream\V1\OracleSourceConfig\StreamLargeObjects $stream_large_objects
+     *           Stream large object values.
+     *     @type \Google\Cloud\Datastream\V1\OracleSourceConfig\LogMiner $log_miner
+     *           Use LogMiner.
+     *     @type \Google\Cloud\Datastream\V1\OracleSourceConfig\BinaryLogParser $binary_log_parser
+     *           Use Binary Log Parser.
      * }
      */
     public function __construct($data = NULL) {
@@ -115,6 +145,202 @@ class OracleSourceConfig extends \Google\Protobuf\Internal\Message
         $this->exclude_objects = $var;
 
         return $this;
+    }
+
+    /**
+     * Maximum number of concurrent CDC tasks. The number should be non-negative.
+     * If not set (or set to 0), the system's default value is used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_cdc_tasks = 3;</code>
+     * @return int
+     */
+    public function getMaxConcurrentCdcTasks()
+    {
+        return $this->max_concurrent_cdc_tasks;
+    }
+
+    /**
+     * Maximum number of concurrent CDC tasks. The number should be non-negative.
+     * If not set (or set to 0), the system's default value is used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_cdc_tasks = 3;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setMaxConcurrentCdcTasks($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->max_concurrent_cdc_tasks = $var;
+
+        return $this;
+    }
+
+    /**
+     * Maximum number of concurrent backfill tasks. The number should be
+     * non-negative. If not set (or set to 0), the system's default value is used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_backfill_tasks = 4;</code>
+     * @return int
+     */
+    public function getMaxConcurrentBackfillTasks()
+    {
+        return $this->max_concurrent_backfill_tasks;
+    }
+
+    /**
+     * Maximum number of concurrent backfill tasks. The number should be
+     * non-negative. If not set (or set to 0), the system's default value is used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_backfill_tasks = 4;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setMaxConcurrentBackfillTasks($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->max_concurrent_backfill_tasks = $var;
+
+        return $this;
+    }
+
+    /**
+     * Drop large object values.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.DropLargeObjects drop_large_objects = 100;</code>
+     * @return \Google\Cloud\Datastream\V1\OracleSourceConfig\DropLargeObjects|null
+     */
+    public function getDropLargeObjects()
+    {
+        return $this->readOneof(100);
+    }
+
+    public function hasDropLargeObjects()
+    {
+        return $this->hasOneof(100);
+    }
+
+    /**
+     * Drop large object values.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.DropLargeObjects drop_large_objects = 100;</code>
+     * @param \Google\Cloud\Datastream\V1\OracleSourceConfig\DropLargeObjects $var
+     * @return $this
+     */
+    public function setDropLargeObjects($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\OracleSourceConfig\DropLargeObjects::class);
+        $this->writeOneof(100, $var);
+
+        return $this;
+    }
+
+    /**
+     * Stream large object values.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.StreamLargeObjects stream_large_objects = 102;</code>
+     * @return \Google\Cloud\Datastream\V1\OracleSourceConfig\StreamLargeObjects|null
+     */
+    public function getStreamLargeObjects()
+    {
+        return $this->readOneof(102);
+    }
+
+    public function hasStreamLargeObjects()
+    {
+        return $this->hasOneof(102);
+    }
+
+    /**
+     * Stream large object values.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.StreamLargeObjects stream_large_objects = 102;</code>
+     * @param \Google\Cloud\Datastream\V1\OracleSourceConfig\StreamLargeObjects $var
+     * @return $this
+     */
+    public function setStreamLargeObjects($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\OracleSourceConfig\StreamLargeObjects::class);
+        $this->writeOneof(102, $var);
+
+        return $this;
+    }
+
+    /**
+     * Use LogMiner.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.LogMiner log_miner = 103;</code>
+     * @return \Google\Cloud\Datastream\V1\OracleSourceConfig\LogMiner|null
+     */
+    public function getLogMiner()
+    {
+        return $this->readOneof(103);
+    }
+
+    public function hasLogMiner()
+    {
+        return $this->hasOneof(103);
+    }
+
+    /**
+     * Use LogMiner.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.LogMiner log_miner = 103;</code>
+     * @param \Google\Cloud\Datastream\V1\OracleSourceConfig\LogMiner $var
+     * @return $this
+     */
+    public function setLogMiner($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\OracleSourceConfig\LogMiner::class);
+        $this->writeOneof(103, $var);
+
+        return $this;
+    }
+
+    /**
+     * Use Binary Log Parser.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.BinaryLogParser binary_log_parser = 104;</code>
+     * @return \Google\Cloud\Datastream\V1\OracleSourceConfig\BinaryLogParser|null
+     */
+    public function getBinaryLogParser()
+    {
+        return $this->readOneof(104);
+    }
+
+    public function hasBinaryLogParser()
+    {
+        return $this->hasOneof(104);
+    }
+
+    /**
+     * Use Binary Log Parser.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.OracleSourceConfig.BinaryLogParser binary_log_parser = 104;</code>
+     * @param \Google\Cloud\Datastream\V1\OracleSourceConfig\BinaryLogParser $var
+     * @return $this
+     */
+    public function setBinaryLogParser($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\OracleSourceConfig\BinaryLogParser::class);
+        $this->writeOneof(104, $var);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLargeObjectsHandling()
+    {
+        return $this->whichOneof("large_objects_handling");
+    }
+
+    /**
+     * @return string
+     */
+    public function getCdcMethod()
+    {
+        return $this->whichOneof("cdc_method");
     }
 
 }

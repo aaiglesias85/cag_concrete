@@ -22,14 +22,14 @@ class SplitReadStreamResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.storage.v1.ReadStream primary_stream = 1;</code>
      */
-    private $primary_stream = null;
+    protected $primary_stream = null;
     /**
      * Remainder stream, which contains the tail of |original_stream|. An empty
      * value indicates that the original stream can no longer be split.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.storage.v1.ReadStream remainder_stream = 2;</code>
      */
-    private $remainder_stream = null;
+    protected $remainder_stream = null;
 
     /**
      * Constructor.
@@ -61,7 +61,7 @@ class SplitReadStreamResponse extends \Google\Protobuf\Internal\Message
      */
     public function getPrimaryStream()
     {
-        return isset($this->primary_stream) ? $this->primary_stream : null;
+        return $this->primary_stream;
     }
 
     public function hasPrimaryStream()
@@ -100,7 +100,7 @@ class SplitReadStreamResponse extends \Google\Protobuf\Internal\Message
      */
     public function getRemainderStream()
     {
-        return isset($this->remainder_stream) ? $this->remainder_stream : null;
+        return $this->remainder_stream;
     }
 
     public function hasRemainderStream()

@@ -83,6 +83,20 @@ class NextHopType
      * Generated from protobuf enum <code>NEXT_HOP_ILB = 10;</code>
      */
     const NEXT_HOP_ILB = 10;
+    /**
+     * Next hop is a
+     * [router appliance
+     * instance](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/ra-overview).
+     *
+     * Generated from protobuf enum <code>NEXT_HOP_ROUTER_APPLIANCE = 11;</code>
+     */
+    const NEXT_HOP_ROUTER_APPLIANCE = 11;
+    /**
+     * Next hop is an NCC hub.
+     *
+     * Generated from protobuf enum <code>NEXT_HOP_NCC_HUB = 12;</code>
+     */
+    const NEXT_HOP_NCC_HUB = 12;
 
     private static $valueToName = [
         self::NEXT_HOP_TYPE_UNSPECIFIED => 'NEXT_HOP_TYPE_UNSPECIFIED',
@@ -96,6 +110,8 @@ class NextHopType
         self::NEXT_HOP_INTERNET_GATEWAY => 'NEXT_HOP_INTERNET_GATEWAY',
         self::NEXT_HOP_BLACKHOLE => 'NEXT_HOP_BLACKHOLE',
         self::NEXT_HOP_ILB => 'NEXT_HOP_ILB',
+        self::NEXT_HOP_ROUTER_APPLIANCE => 'NEXT_HOP_ROUTER_APPLIANCE',
+        self::NEXT_HOP_NCC_HUB => 'NEXT_HOP_NCC_HUB',
     ];
 
     public static function name($value)
@@ -119,6 +135,4 @@ class NextHopType
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(NextHopType::class, \Google\Cloud\NetworkManagement\V1\RouteInfo_NextHopType::class);
 

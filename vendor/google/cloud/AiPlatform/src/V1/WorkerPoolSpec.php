@@ -20,13 +20,13 @@ class WorkerPoolSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.MachineSpec machine_spec = 1 [(.google.api.field_behavior) = OPTIONAL, (.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $machine_spec = null;
+    protected $machine_spec = null;
     /**
      * Optional. The number of worker replicas to use for this worker pool.
      *
      * Generated from protobuf field <code>int64 replica_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $replica_count = 0;
+    protected $replica_count = 0;
     /**
      * Optional. List of NFS mount spec.
      *
@@ -38,7 +38,7 @@ class WorkerPoolSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DiskSpec disk_spec = 5;</code>
      */
-    private $disk_spec = null;
+    protected $disk_spec = null;
     protected $task;
 
     /**
@@ -55,7 +55,7 @@ class WorkerPoolSpec extends \Google\Protobuf\Internal\Message
      *           Optional. Immutable. The specification of a single machine.
      *     @type int|string $replica_count
      *           Optional. The number of worker replicas to use for this worker pool.
-     *     @type \Google\Cloud\AIPlatform\V1\NfsMount[]|\Google\Protobuf\Internal\RepeatedField $nfs_mounts
+     *     @type array<\Google\Cloud\AIPlatform\V1\NfsMount>|\Google\Protobuf\Internal\RepeatedField $nfs_mounts
      *           Optional. List of NFS mount spec.
      *     @type \Google\Cloud\AIPlatform\V1\DiskSpec $disk_spec
      *           Disk spec.
@@ -205,7 +205,7 @@ class WorkerPoolSpec extends \Google\Protobuf\Internal\Message
      * Optional. List of NFS mount spec.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.NfsMount nfs_mounts = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\AIPlatform\V1\NfsMount[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\NfsMount>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNfsMounts($var)

@@ -20,7 +20,7 @@ class PubSubExpressions extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DataProfilePubSubCondition.PubSubExpressions.PubSubLogicalOperator logical_operator = 1;</code>
      */
-    private $logical_operator = 0;
+    protected $logical_operator = 0;
     /**
      * Conditions to apply to the expression.
      *
@@ -36,7 +36,7 @@ class PubSubExpressions extends \Google\Protobuf\Internal\Message
      *
      *     @type int $logical_operator
      *           The operator to apply to the collection of conditions.
-     *     @type \Google\Cloud\Dlp\V2\DataProfilePubSubCondition\PubSubCondition[]|\Google\Protobuf\Internal\RepeatedField $conditions
+     *     @type array<\Google\Cloud\Dlp\V2\DataProfilePubSubCondition\PubSubCondition>|\Google\Protobuf\Internal\RepeatedField $conditions
      *           Conditions to apply to the expression.
      * }
      */
@@ -86,7 +86,7 @@ class PubSubExpressions extends \Google\Protobuf\Internal\Message
      * Conditions to apply to the expression.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.DataProfilePubSubCondition.PubSubCondition conditions = 2;</code>
-     * @param \Google\Cloud\Dlp\V2\DataProfilePubSubCondition\PubSubCondition[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\DataProfilePubSubCondition\PubSubCondition>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConditions($var)
@@ -99,6 +99,4 @@ class PubSubExpressions extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(PubSubExpressions::class, \Google\Cloud\Dlp\V2\DataProfilePubSubCondition_PubSubExpressions::class);
 

@@ -17,7 +17,7 @@ class ListOperationsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the parent field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -41,7 +41,42 @@ class ListOperationsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 4;</code>
      */
-    private $parent = '';
+    protected $parent = '';
+
+    /**
+     * @param string $projectId Deprecated. The Google Developers Console [project ID or project
+     *                          number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+     *                          This field has been deprecated and replaced by the parent field.
+     * @param string $zone      Deprecated. The name of the Google Compute Engine
+     *                          [zone](https://cloud.google.com/compute/docs/zones#available) to return
+     *                          operations for, or `-` for all zones. This field has been deprecated and
+     *                          replaced by the parent field.
+     *
+     * @return \Google\Cloud\Container\V1\ListOperationsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, string $zone): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setZone($zone);
+    }
+
+    /**
+     * @param string $parent The parent (project and location) where the operations will be listed.
+     *                       Specified in the format `projects/&#42;/locations/*`.
+     *                       Location "-" matches all zones and all regions.
+     *
+     * @return \Google\Cloud\Container\V1\ListOperationsRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParent(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -51,7 +86,7 @@ class ListOperationsRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Deprecated. The Google Developers Console [project ID or project
-     *           number](https://support.google.com/cloud/answer/6158840).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *           This field has been deprecated and replaced by the parent field.
      *     @type string $zone
      *           Deprecated. The name of the Google Compute Engine
@@ -71,7 +106,7 @@ class ListOperationsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the parent field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -86,7 +121,7 @@ class ListOperationsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the parent field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>

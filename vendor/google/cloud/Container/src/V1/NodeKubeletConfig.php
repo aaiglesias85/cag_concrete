@@ -27,7 +27,7 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string cpu_manager_policy = 1;</code>
      */
-    private $cpu_manager_policy = '';
+    protected $cpu_manager_policy = '';
     /**
      * Enable CPU CFS quota enforcement for containers that specify CPU limits.
      * This option is enabled by default which makes kubelet use CFS quota
@@ -40,7 +40,7 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue cpu_cfs_quota = 2;</code>
      */
-    private $cpu_cfs_quota = null;
+    protected $cpu_cfs_quota = null;
     /**
      * Set the CPU CFS quota period value 'cpu.cfs_period_us'.
      * The string must be a sequence of decimal numbers, each with optional
@@ -50,7 +50,22 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string cpu_cfs_quota_period = 3;</code>
      */
-    private $cpu_cfs_quota_period = '';
+    protected $cpu_cfs_quota_period = '';
+    /**
+     * Set the Pod PID limits. See
+     * https://kubernetes.io/docs/concepts/policy/pid-limiting/#pod-pid-limits
+     * Controls the maximum number of processes allowed to run in a pod. The value
+     * must be greater than or equal to 1024 and less than 4194304.
+     *
+     * Generated from protobuf field <code>int64 pod_pids_limit = 4;</code>
+     */
+    protected $pod_pids_limit = 0;
+    /**
+     * Enable or disable Kubelet read only port.
+     *
+     * Generated from protobuf field <code>optional bool insecure_kubelet_readonly_port_enabled = 7;</code>
+     */
+    protected $insecure_kubelet_readonly_port_enabled = null;
 
     /**
      * Constructor.
@@ -82,6 +97,13 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
      *           fraction and a unit suffix, such as "300ms".
      *           Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
      *           The value must be a positive duration.
+     *     @type int|string $pod_pids_limit
+     *           Set the Pod PID limits. See
+     *           https://kubernetes.io/docs/concepts/policy/pid-limiting/#pod-pid-limits
+     *           Controls the maximum number of processes allowed to run in a pod. The value
+     *           must be greater than or equal to 1024 and less than 4194304.
+     *     @type bool $insecure_kubelet_readonly_port_enabled
+     *           Enable or disable Kubelet read only port.
      * }
      */
     public function __construct($data = NULL) {
@@ -172,7 +194,7 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.BoolValue cpu_cfs_quota = 2;</code>
      * @return bool|null
      */
-    public function getCpuCfsQuotaValue()
+    public function getCpuCfsQuotaUnwrapped()
     {
         return $this->readWrapperValue("cpu_cfs_quota");
     }
@@ -215,7 +237,7 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
      * @param bool|null $var
      * @return $this
      */
-    public function setCpuCfsQuotaValue($var)
+    public function setCpuCfsQuotaUnwrapped($var)
     {
         $this->writeWrapperValue("cpu_cfs_quota", $var);
         return $this;}
@@ -250,6 +272,74 @@ class NodeKubeletConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->cpu_cfs_quota_period = $var;
+
+        return $this;
+    }
+
+    /**
+     * Set the Pod PID limits. See
+     * https://kubernetes.io/docs/concepts/policy/pid-limiting/#pod-pid-limits
+     * Controls the maximum number of processes allowed to run in a pod. The value
+     * must be greater than or equal to 1024 and less than 4194304.
+     *
+     * Generated from protobuf field <code>int64 pod_pids_limit = 4;</code>
+     * @return int|string
+     */
+    public function getPodPidsLimit()
+    {
+        return $this->pod_pids_limit;
+    }
+
+    /**
+     * Set the Pod PID limits. See
+     * https://kubernetes.io/docs/concepts/policy/pid-limiting/#pod-pid-limits
+     * Controls the maximum number of processes allowed to run in a pod. The value
+     * must be greater than or equal to 1024 and less than 4194304.
+     *
+     * Generated from protobuf field <code>int64 pod_pids_limit = 4;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setPodPidsLimit($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->pod_pids_limit = $var;
+
+        return $this;
+    }
+
+    /**
+     * Enable or disable Kubelet read only port.
+     *
+     * Generated from protobuf field <code>optional bool insecure_kubelet_readonly_port_enabled = 7;</code>
+     * @return bool
+     */
+    public function getInsecureKubeletReadonlyPortEnabled()
+    {
+        return isset($this->insecure_kubelet_readonly_port_enabled) ? $this->insecure_kubelet_readonly_port_enabled : false;
+    }
+
+    public function hasInsecureKubeletReadonlyPortEnabled()
+    {
+        return isset($this->insecure_kubelet_readonly_port_enabled);
+    }
+
+    public function clearInsecureKubeletReadonlyPortEnabled()
+    {
+        unset($this->insecure_kubelet_readonly_port_enabled);
+    }
+
+    /**
+     * Enable or disable Kubelet read only port.
+     *
+     * Generated from protobuf field <code>optional bool insecure_kubelet_readonly_port_enabled = 7;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setInsecureKubeletReadonlyPortEnabled($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->insecure_kubelet_readonly_port_enabled = $var;
 
         return $this;
     }

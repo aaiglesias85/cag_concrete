@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [IndexService.UpdateIndex][google.cloud.aiplatform.v1.IndexService.UpdateIndex].
+ * Request message for
+ * [IndexService.UpdateIndex][google.cloud.aiplatform.v1.IndexService.UpdateIndex].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.UpdateIndexRequest</code>
  */
@@ -20,14 +21,32 @@ class UpdateIndexRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Index index = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $index = null;
+    protected $index = null;
     /**
      * The update mask applies to the resource.
-     * For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
+     * For the `FieldMask` definition, see
+     * [google.protobuf.FieldMask][google.protobuf.FieldMask].
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\AIPlatform\V1\Index $index      Required. The Index which updates the resource on the server.
+     * @param \Google\Protobuf\FieldMask        $updateMask The update mask applies to the resource.
+     *                                                      For the `FieldMask` definition, see
+     *                                                      [google.protobuf.FieldMask][google.protobuf.FieldMask].
+     *
+     * @return \Google\Cloud\AIPlatform\V1\UpdateIndexRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\AIPlatform\V1\Index $index, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setIndex($index)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -39,7 +58,8 @@ class UpdateIndexRequest extends \Google\Protobuf\Internal\Message
      *           Required. The Index which updates the resource on the server.
      *     @type \Google\Protobuf\FieldMask $update_mask
      *           The update mask applies to the resource.
-     *           For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
+     *           For the `FieldMask` definition, see
+     *           [google.protobuf.FieldMask][google.protobuf.FieldMask].
      * }
      */
     public function __construct($data = NULL) {
@@ -85,7 +105,8 @@ class UpdateIndexRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * The update mask applies to the resource.
-     * For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
+     * For the `FieldMask` definition, see
+     * [google.protobuf.FieldMask][google.protobuf.FieldMask].
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      * @return \Google\Protobuf\FieldMask|null
@@ -107,7 +128,8 @@ class UpdateIndexRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * The update mask applies to the resource.
-     * For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
+     * For the `FieldMask` definition, see
+     * [google.protobuf.FieldMask][google.protobuf.FieldMask].
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      * @param \Google\Protobuf\FieldMask $var

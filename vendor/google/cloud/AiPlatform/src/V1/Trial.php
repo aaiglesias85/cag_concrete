@@ -22,19 +22,19 @@ class Trial extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. The identifier of the Trial assigned by the service.
      *
      * Generated from protobuf field <code>string id = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Output only. The detailed state of the Trial.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Trial.State state = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. The parameters of the Trial.
      *
@@ -46,7 +46,7 @@ class Trial extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Measurement final_measurement = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $final_measurement = null;
+    protected $final_measurement = null;
     /**
      * Output only. A list of measurements that are strictly lexicographically
      * ordered by their induced tuples (steps, elapsed_duration).
@@ -60,17 +60,18 @@ class Trial extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
-     * Output only. Time when the Trial's status changed to `SUCCEEDED` or `INFEASIBLE`.
+     * Output only. Time when the Trial's status changed to `SUCCEEDED` or
+     * `INFEASIBLE`.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
-     * Output only. The identifier of the client that originally requested this Trial.
-     * Each client is identified by a unique client_id. When a client
-     * asks for a suggestion, Vertex AI Vizier will assign it a Trial. The client
+     * Output only. The identifier of the client that originally requested this
+     * Trial. Each client is identified by a unique client_id. When a client asks
+     * for a suggestion, Vertex AI Vizier will assign it a Trial. The client
      * should evaluate the Trial, complete it, and report back to Vertex AI
      * Vizier. If suggestion is asked again by same client_id before the Trial is
      * completed, the same Trial will be returned. Multiple clients with
@@ -79,28 +80,30 @@ class Trial extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string client_id = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $client_id = '';
+    protected $client_id = '';
     /**
      * Output only. A human readable string describing why the Trial is
      * infeasible. This is set only if Trial state is `INFEASIBLE`.
      *
      * Generated from protobuf field <code>string infeasible_reason = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $infeasible_reason = '';
+    protected $infeasible_reason = '';
     /**
      * Output only. The CustomJob name linked to the Trial.
      * It's set for a HyperparameterTuningJob's Trial.
      *
      * Generated from protobuf field <code>string custom_job = 11 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
-    private $custom_job = '';
+    protected $custom_job = '';
     /**
      * Output only. URIs for accessing [interactive
      * shells](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      * (one URI for each training node). Only available if this trial is part of
-     * a [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob] and the job's
-     * [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access] field
-     * is `true`.
+     * a
+     * [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob]
+     * and the job's
+     * [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access]
+     * field is `true`.
      * The keys are names of each node used for the trial; for example,
      * `workerpool0-0` for the primary node, `workerpool1-0` for the first node in
      * the second worker pool, and `workerpool1-1` for the second node in the
@@ -123,22 +126,23 @@ class Trial extends \Google\Protobuf\Internal\Message
      *           Output only. The identifier of the Trial assigned by the service.
      *     @type int $state
      *           Output only. The detailed state of the Trial.
-     *     @type \Google\Cloud\AIPlatform\V1\Trial\Parameter[]|\Google\Protobuf\Internal\RepeatedField $parameters
+     *     @type array<\Google\Cloud\AIPlatform\V1\Trial\Parameter>|\Google\Protobuf\Internal\RepeatedField $parameters
      *           Output only. The parameters of the Trial.
      *     @type \Google\Cloud\AIPlatform\V1\Measurement $final_measurement
      *           Output only. The final measurement containing the objective value.
-     *     @type \Google\Cloud\AIPlatform\V1\Measurement[]|\Google\Protobuf\Internal\RepeatedField $measurements
+     *     @type array<\Google\Cloud\AIPlatform\V1\Measurement>|\Google\Protobuf\Internal\RepeatedField $measurements
      *           Output only. A list of measurements that are strictly lexicographically
      *           ordered by their induced tuples (steps, elapsed_duration).
      *           These are used for early stopping computations.
      *     @type \Google\Protobuf\Timestamp $start_time
      *           Output only. Time when the Trial was started.
      *     @type \Google\Protobuf\Timestamp $end_time
-     *           Output only. Time when the Trial's status changed to `SUCCEEDED` or `INFEASIBLE`.
+     *           Output only. Time when the Trial's status changed to `SUCCEEDED` or
+     *           `INFEASIBLE`.
      *     @type string $client_id
-     *           Output only. The identifier of the client that originally requested this Trial.
-     *           Each client is identified by a unique client_id. When a client
-     *           asks for a suggestion, Vertex AI Vizier will assign it a Trial. The client
+     *           Output only. The identifier of the client that originally requested this
+     *           Trial. Each client is identified by a unique client_id. When a client asks
+     *           for a suggestion, Vertex AI Vizier will assign it a Trial. The client
      *           should evaluate the Trial, complete it, and report back to Vertex AI
      *           Vizier. If suggestion is asked again by same client_id before the Trial is
      *           completed, the same Trial will be returned. Multiple clients with
@@ -154,9 +158,11 @@ class Trial extends \Google\Protobuf\Internal\Message
      *           Output only. URIs for accessing [interactive
      *           shells](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      *           (one URI for each training node). Only available if this trial is part of
-     *           a [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob] and the job's
-     *           [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access] field
-     *           is `true`.
+     *           a
+     *           [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob]
+     *           and the job's
+     *           [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access]
+     *           field is `true`.
      *           The keys are names of each node used for the trial; for example,
      *           `workerpool0-0` for the primary node, `workerpool1-0` for the first node in
      *           the second worker pool, and `workerpool1-1` for the second node in the
@@ -262,7 +268,7 @@ class Trial extends \Google\Protobuf\Internal\Message
      * Output only. The parameters of the Trial.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Trial.Parameter parameters = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\AIPlatform\V1\Trial\Parameter[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Trial\Parameter>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setParameters($var)
@@ -328,7 +334,7 @@ class Trial extends \Google\Protobuf\Internal\Message
      * These are used for early stopping computations.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Measurement measurements = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\AIPlatform\V1\Measurement[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Measurement>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMeasurements($var)
@@ -376,7 +382,8 @@ class Trial extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Time when the Trial's status changed to `SUCCEEDED` or `INFEASIBLE`.
+     * Output only. Time when the Trial's status changed to `SUCCEEDED` or
+     * `INFEASIBLE`.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -397,7 +404,8 @@ class Trial extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Time when the Trial's status changed to `SUCCEEDED` or `INFEASIBLE`.
+     * Output only. Time when the Trial's status changed to `SUCCEEDED` or
+     * `INFEASIBLE`.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var
@@ -412,9 +420,9 @@ class Trial extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The identifier of the client that originally requested this Trial.
-     * Each client is identified by a unique client_id. When a client
-     * asks for a suggestion, Vertex AI Vizier will assign it a Trial. The client
+     * Output only. The identifier of the client that originally requested this
+     * Trial. Each client is identified by a unique client_id. When a client asks
+     * for a suggestion, Vertex AI Vizier will assign it a Trial. The client
      * should evaluate the Trial, complete it, and report back to Vertex AI
      * Vizier. If suggestion is asked again by same client_id before the Trial is
      * completed, the same Trial will be returned. Multiple clients with
@@ -430,9 +438,9 @@ class Trial extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The identifier of the client that originally requested this Trial.
-     * Each client is identified by a unique client_id. When a client
-     * asks for a suggestion, Vertex AI Vizier will assign it a Trial. The client
+     * Output only. The identifier of the client that originally requested this
+     * Trial. Each client is identified by a unique client_id. When a client asks
+     * for a suggestion, Vertex AI Vizier will assign it a Trial. The client
      * should evaluate the Trial, complete it, and report back to Vertex AI
      * Vizier. If suggestion is asked again by same client_id before the Trial is
      * completed, the same Trial will be returned. Multiple clients with
@@ -511,9 +519,11 @@ class Trial extends \Google\Protobuf\Internal\Message
      * Output only. URIs for accessing [interactive
      * shells](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      * (one URI for each training node). Only available if this trial is part of
-     * a [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob] and the job's
-     * [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access] field
-     * is `true`.
+     * a
+     * [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob]
+     * and the job's
+     * [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access]
+     * field is `true`.
      * The keys are names of each node used for the trial; for example,
      * `workerpool0-0` for the primary node, `workerpool1-0` for the first node in
      * the second worker pool, and `workerpool1-1` for the second node in the
@@ -532,9 +542,11 @@ class Trial extends \Google\Protobuf\Internal\Message
      * Output only. URIs for accessing [interactive
      * shells](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      * (one URI for each training node). Only available if this trial is part of
-     * a [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob] and the job's
-     * [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access] field
-     * is `true`.
+     * a
+     * [HyperparameterTuningJob][google.cloud.aiplatform.v1.HyperparameterTuningJob]
+     * and the job's
+     * [trial_job_spec.enable_web_access][google.cloud.aiplatform.v1.CustomJobSpec.enable_web_access]
+     * field is `true`.
      * The keys are names of each node used for the trial; for example,
      * `workerpool0-0` for the primary node, `workerpool1-0` for the first node in
      * the second worker pool, and `workerpool1-1` for the second node in the

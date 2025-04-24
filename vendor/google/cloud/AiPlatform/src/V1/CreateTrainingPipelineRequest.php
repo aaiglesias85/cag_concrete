@@ -9,25 +9,43 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [PipelineService.CreateTrainingPipeline][google.cloud.aiplatform.v1.PipelineService.CreateTrainingPipeline].
+ * Request message for
+ * [PipelineService.CreateTrainingPipeline][google.cloud.aiplatform.v1.PipelineService.CreateTrainingPipeline].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateTrainingPipelineRequest</code>
  */
 class CreateTrainingPipelineRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the Location to create the TrainingPipeline in.
-     * Format: `projects/{project}/locations/{location}`
+     * Required. The resource name of the Location to create the TrainingPipeline
+     * in. Format: `projects/{project}/locations/{location}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The TrainingPipeline to create.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.TrainingPipeline training_pipeline = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $training_pipeline = null;
+    protected $training_pipeline = null;
+
+    /**
+     * @param string                                       $parent           Required. The resource name of the Location to create the TrainingPipeline
+     *                                                                       in. Format: `projects/{project}/locations/{location}`
+     *                                                                       Please see {@see PipelineServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\TrainingPipeline $trainingPipeline Required. The TrainingPipeline to create.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\CreateTrainingPipelineRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AIPlatform\V1\TrainingPipeline $trainingPipeline): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setTrainingPipeline($trainingPipeline);
+    }
 
     /**
      * Constructor.
@@ -36,8 +54,8 @@ class CreateTrainingPipelineRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The resource name of the Location to create the TrainingPipeline in.
-     *           Format: `projects/{project}/locations/{location}`
+     *           Required. The resource name of the Location to create the TrainingPipeline
+     *           in. Format: `projects/{project}/locations/{location}`
      *     @type \Google\Cloud\AIPlatform\V1\TrainingPipeline $training_pipeline
      *           Required. The TrainingPipeline to create.
      * }
@@ -48,8 +66,8 @@ class CreateTrainingPipelineRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the Location to create the TrainingPipeline in.
-     * Format: `projects/{project}/locations/{location}`
+     * Required. The resource name of the Location to create the TrainingPipeline
+     * in. Format: `projects/{project}/locations/{location}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -60,8 +78,8 @@ class CreateTrainingPipelineRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the Location to create the TrainingPipeline in.
-     * Format: `projects/{project}/locations/{location}`
+     * Required. The resource name of the Location to create the TrainingPipeline
+     * in. Format: `projects/{project}/locations/{location}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

@@ -27,13 +27,13 @@ class InstantiateInlineWorkflowTemplateRequest extends \Google\Protobuf\Internal
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The workflow template to instantiate.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.WorkflowTemplate template = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $template = null;
+    protected $template = null;
     /**
      * Optional. A tag that prevents multiple concurrent workflow
      * instances with the same tag from running. This mitigates risk of
@@ -45,7 +45,32 @@ class InstantiateInlineWorkflowTemplateRequest extends \Google\Protobuf\Internal
      *
      * Generated from protobuf field <code>string request_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                                     $parent   Required. The resource name of the region or location, as described
+     *                                                             in https://cloud.google.com/apis/design/resource_names.
+     *
+     *                                                             * For `projects.regions.workflowTemplates,instantiateinline`, the resource
+     *                                                             name of the region has the following format:
+     *                                                             `projects/{project_id}/regions/{region}`
+     *
+     *                                                             * For `projects.locations.workflowTemplates.instantiateinline`, the
+     *                                                             resource name of the location has the following format:
+     *                                                             `projects/{project_id}/locations/{location}`
+     *                                                             Please see {@see WorkflowTemplateServiceClient::regionName()} for help formatting this field.
+     * @param \Google\Cloud\Dataproc\V1\WorkflowTemplate $template Required. The workflow template to instantiate.
+     *
+     * @return \Google\Cloud\Dataproc\V1\InstantiateInlineWorkflowTemplateRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dataproc\V1\WorkflowTemplate $template): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setTemplate($template);
+    }
 
     /**
      * Constructor.

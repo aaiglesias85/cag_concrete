@@ -16,6 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class Project extends \Google\Protobuf\Internal\Message
 {
     /**
+     * [Output Only] The Cloud Armor tier for this project. It can be one of the following values: CA_STANDARD, CA_ENTERPRISE_PAYGO. If this field is not specified, it is assumed to be CA_STANDARD.
+     * Check the CloudArmorTier enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string cloud_armor_tier = 4427052;</code>
+     */
+    private $cloud_armor_tier = null;
+    /**
      * Metadata key/value pairs available to all instances contained in this project. See Custom metadata for more information.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.Metadata common_instance_metadata = 185794117;</code>
@@ -47,7 +54,7 @@ class Project extends \Google\Protobuf\Internal\Message
      */
     private $description = null;
     /**
-     * Restricted features enabled for use on this project.
+     * An optional list of restricted features enabled for use on this project.
      *
      * Generated from protobuf field <code>repeated string enabled_features = 469017467;</code>
      */
@@ -83,11 +90,18 @@ class Project extends \Google\Protobuf\Internal\Message
      */
     private $self_link = null;
     /**
-     * The naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
+     * An optional naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.UsageExportLocation usage_export_location = 347543874;</code>
      */
     private $usage_export_location = null;
+    /**
+     * [Output Only] Default internal DNS setting used by VMs running in this project.
+     * Check the VmDnsSetting enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string vm_dns_setting = 58856370;</code>
+     */
+    private $vm_dns_setting = null;
     /**
      * [Output Only] The role this project has in a shared VPC configuration. Currently, only projects with the host role, which is specified by the value HOST, are differentiated.
      * Check the XpnProjectStatus enum for the list of possible values.
@@ -102,6 +116,9 @@ class Project extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type string $cloud_armor_tier
+     *           [Output Only] The Cloud Armor tier for this project. It can be one of the following values: CA_STANDARD, CA_ENTERPRISE_PAYGO. If this field is not specified, it is assumed to be CA_STANDARD.
+     *           Check the CloudArmorTier enum for the list of possible values.
      *     @type \Google\Cloud\Compute\V1\Metadata $common_instance_metadata
      *           Metadata key/value pairs available to all instances contained in this project. See Custom metadata for more information.
      *     @type string $creation_timestamp
@@ -113,20 +130,23 @@ class Project extends \Google\Protobuf\Internal\Message
      *           [Output Only] Default service account used by VMs running in this project.
      *     @type string $description
      *           An optional textual description of the resource.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $enabled_features
-     *           Restricted features enabled for use on this project.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $enabled_features
+     *           An optional list of restricted features enabled for use on this project.
      *     @type int|string $id
      *           [Output Only] The unique identifier for the resource. This identifier is defined by the server. This is *not* the project ID, and is just a unique ID used by Compute Engine to identify resources.
      *     @type string $kind
      *           [Output Only] Type of the resource. Always compute#project for projects.
      *     @type string $name
      *           The project ID. For example: my-example-project. Use the project ID to make requests to Compute Engine.
-     *     @type \Google\Cloud\Compute\V1\Quota[]|\Google\Protobuf\Internal\RepeatedField $quotas
+     *     @type array<\Google\Cloud\Compute\V1\Quota>|\Google\Protobuf\Internal\RepeatedField $quotas
      *           [Output Only] Quotas assigned to this project.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
      *     @type \Google\Cloud\Compute\V1\UsageExportLocation $usage_export_location
-     *           The naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
+     *           An optional naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
+     *     @type string $vm_dns_setting
+     *           [Output Only] Default internal DNS setting used by VMs running in this project.
+     *           Check the VmDnsSetting enum for the list of possible values.
      *     @type string $xpn_project_status
      *           [Output Only] The role this project has in a shared VPC configuration. Currently, only projects with the host role, which is specified by the value HOST, are differentiated.
      *           Check the XpnProjectStatus enum for the list of possible values.
@@ -135,6 +155,44 @@ class Project extends \Google\Protobuf\Internal\Message
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Cloud\Compute\V1\Compute::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * [Output Only] The Cloud Armor tier for this project. It can be one of the following values: CA_STANDARD, CA_ENTERPRISE_PAYGO. If this field is not specified, it is assumed to be CA_STANDARD.
+     * Check the CloudArmorTier enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string cloud_armor_tier = 4427052;</code>
+     * @return string
+     */
+    public function getCloudArmorTier()
+    {
+        return isset($this->cloud_armor_tier) ? $this->cloud_armor_tier : '';
+    }
+
+    public function hasCloudArmorTier()
+    {
+        return isset($this->cloud_armor_tier);
+    }
+
+    public function clearCloudArmorTier()
+    {
+        unset($this->cloud_armor_tier);
+    }
+
+    /**
+     * [Output Only] The Cloud Armor tier for this project. It can be one of the following values: CA_STANDARD, CA_ENTERPRISE_PAYGO. If this field is not specified, it is assumed to be CA_STANDARD.
+     * Check the CloudArmorTier enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string cloud_armor_tier = 4427052;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCloudArmorTier($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->cloud_armor_tier = $var;
+
+        return $this;
     }
 
     /**
@@ -320,7 +378,7 @@ class Project extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Restricted features enabled for use on this project.
+     * An optional list of restricted features enabled for use on this project.
      *
      * Generated from protobuf field <code>repeated string enabled_features = 469017467;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -331,10 +389,10 @@ class Project extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Restricted features enabled for use on this project.
+     * An optional list of restricted features enabled for use on this project.
      *
      * Generated from protobuf field <code>repeated string enabled_features = 469017467;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEnabledFeatures($var)
@@ -468,7 +526,7 @@ class Project extends \Google\Protobuf\Internal\Message
      * [Output Only] Quotas assigned to this project.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.Quota quotas = 125341947;</code>
-     * @param \Google\Cloud\Compute\V1\Quota[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\Quota>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuotas($var)
@@ -516,7 +574,7 @@ class Project extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
+     * An optional naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.UsageExportLocation usage_export_location = 347543874;</code>
      * @return \Google\Cloud\Compute\V1\UsageExportLocation|null
@@ -537,7 +595,7 @@ class Project extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
+     * An optional naming prefix for daily usage reports and the Google Cloud Storage bucket where they are stored.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.UsageExportLocation usage_export_location = 347543874;</code>
      * @param \Google\Cloud\Compute\V1\UsageExportLocation $var
@@ -547,6 +605,44 @@ class Project extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\UsageExportLocation::class);
         $this->usage_export_location = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] Default internal DNS setting used by VMs running in this project.
+     * Check the VmDnsSetting enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string vm_dns_setting = 58856370;</code>
+     * @return string
+     */
+    public function getVmDnsSetting()
+    {
+        return isset($this->vm_dns_setting) ? $this->vm_dns_setting : '';
+    }
+
+    public function hasVmDnsSetting()
+    {
+        return isset($this->vm_dns_setting);
+    }
+
+    public function clearVmDnsSetting()
+    {
+        unset($this->vm_dns_setting);
+    }
+
+    /**
+     * [Output Only] Default internal DNS setting used by VMs running in this project.
+     * Check the VmDnsSetting enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string vm_dns_setting = 58856370;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setVmDnsSetting($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->vm_dns_setting = $var;
 
         return $this;
     }

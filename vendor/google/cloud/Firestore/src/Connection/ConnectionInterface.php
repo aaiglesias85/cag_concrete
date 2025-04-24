@@ -19,6 +19,8 @@ namespace Google\Cloud\Firestore\Connection;
 
 /**
  * Represents a connection to Cloud Firestore.
+ *
+ * @internal
  */
 interface ConnectionInterface
 {
@@ -40,6 +42,11 @@ interface ConnectionInterface
     /**
      * @param array $args
      */
+    public function batchWrite(array $args);
+
+    /**
+     * @param array $args
+     */
     public function listCollectionIds(array $args);
 
     /**
@@ -56,4 +63,9 @@ interface ConnectionInterface
      * @param array $args
      */
     public function runQuery(array $args);
+
+    /**
+     * @param array $args
+     */
+    public function runAggregationQuery(array $args);
 }

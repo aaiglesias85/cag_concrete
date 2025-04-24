@@ -19,6 +19,8 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      * The Linux kernel parameters to be applied to the nodes and all pods running
      * on the nodes.
      * The following parameters are supported.
+     * net.core.busy_poll
+     * net.core.busy_read
      * net.core.netdev_max_backlog
      * net.core.rmem_max
      * net.core.wmem_default
@@ -28,10 +30,25 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      * net.ipv4.tcp_rmem
      * net.ipv4.tcp_wmem
      * net.ipv4.tcp_tw_reuse
+     * kernel.shmmni
+     * kernel.shmmax
+     * kernel.shmall
      *
      * Generated from protobuf field <code>map<string, string> sysctls = 1;</code>
      */
     private $sysctls;
+    /**
+     * cgroup_mode specifies the cgroup mode to be used on the node.
+     *
+     * Generated from protobuf field <code>.google.container.v1.LinuxNodeConfig.CgroupMode cgroup_mode = 2;</code>
+     */
+    protected $cgroup_mode = 0;
+    /**
+     * Optional. Amounts for 2M and 1G hugepages
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.LinuxNodeConfig.HugepagesConfig hugepages = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $hugepages = null;
 
     /**
      * Constructor.
@@ -43,6 +60,8 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      *           The Linux kernel parameters to be applied to the nodes and all pods running
      *           on the nodes.
      *           The following parameters are supported.
+     *           net.core.busy_poll
+     *           net.core.busy_read
      *           net.core.netdev_max_backlog
      *           net.core.rmem_max
      *           net.core.wmem_default
@@ -52,6 +71,13 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      *           net.ipv4.tcp_rmem
      *           net.ipv4.tcp_wmem
      *           net.ipv4.tcp_tw_reuse
+     *           kernel.shmmni
+     *           kernel.shmmax
+     *           kernel.shmall
+     *     @type int $cgroup_mode
+     *           cgroup_mode specifies the cgroup mode to be used on the node.
+     *     @type \Google\Cloud\Container\V1\LinuxNodeConfig\HugepagesConfig $hugepages
+     *           Optional. Amounts for 2M and 1G hugepages
      * }
      */
     public function __construct($data = NULL) {
@@ -63,6 +89,8 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      * The Linux kernel parameters to be applied to the nodes and all pods running
      * on the nodes.
      * The following parameters are supported.
+     * net.core.busy_poll
+     * net.core.busy_read
      * net.core.netdev_max_backlog
      * net.core.rmem_max
      * net.core.wmem_default
@@ -72,6 +100,9 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      * net.ipv4.tcp_rmem
      * net.ipv4.tcp_wmem
      * net.ipv4.tcp_tw_reuse
+     * kernel.shmmni
+     * kernel.shmmax
+     * kernel.shmall
      *
      * Generated from protobuf field <code>map<string, string> sysctls = 1;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -85,6 +116,8 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      * The Linux kernel parameters to be applied to the nodes and all pods running
      * on the nodes.
      * The following parameters are supported.
+     * net.core.busy_poll
+     * net.core.busy_read
      * net.core.netdev_max_backlog
      * net.core.rmem_max
      * net.core.wmem_default
@@ -94,6 +127,9 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
      * net.ipv4.tcp_rmem
      * net.ipv4.tcp_wmem
      * net.ipv4.tcp_tw_reuse
+     * kernel.shmmni
+     * kernel.shmmax
+     * kernel.shmall
      *
      * Generated from protobuf field <code>map<string, string> sysctls = 1;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -103,6 +139,68 @@ class LinuxNodeConfig extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->sysctls = $arr;
+
+        return $this;
+    }
+
+    /**
+     * cgroup_mode specifies the cgroup mode to be used on the node.
+     *
+     * Generated from protobuf field <code>.google.container.v1.LinuxNodeConfig.CgroupMode cgroup_mode = 2;</code>
+     * @return int
+     */
+    public function getCgroupMode()
+    {
+        return $this->cgroup_mode;
+    }
+
+    /**
+     * cgroup_mode specifies the cgroup mode to be used on the node.
+     *
+     * Generated from protobuf field <code>.google.container.v1.LinuxNodeConfig.CgroupMode cgroup_mode = 2;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setCgroupMode($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Container\V1\LinuxNodeConfig\CgroupMode::class);
+        $this->cgroup_mode = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Amounts for 2M and 1G hugepages
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.LinuxNodeConfig.HugepagesConfig hugepages = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Container\V1\LinuxNodeConfig\HugepagesConfig|null
+     */
+    public function getHugepages()
+    {
+        return $this->hugepages;
+    }
+
+    public function hasHugepages()
+    {
+        return isset($this->hugepages);
+    }
+
+    public function clearHugepages()
+    {
+        unset($this->hugepages);
+    }
+
+    /**
+     * Optional. Amounts for 2M and 1G hugepages
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.LinuxNodeConfig.HugepagesConfig hugepages = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Container\V1\LinuxNodeConfig\HugepagesConfig $var
+     * @return $this
+     */
+    public function setHugepages($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\LinuxNodeConfig\HugepagesConfig::class);
+        $this->hugepages = $var;
 
         return $this;
     }

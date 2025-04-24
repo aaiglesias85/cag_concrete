@@ -20,19 +20,19 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The source identifier.
      *
      * Generated from protobuf field <code>string source_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $source_id = '';
+    protected $source_id = '';
     /**
      * Required. The create request body.
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.Source source = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $source = null;
+    protected $source = null;
     /**
      * A request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -48,7 +48,25 @@ class CreateSourceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4;</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                              $parent   Required. The Source's parent. Please see
+     *                                                      {@see VmMigrationClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\VMMigration\V1\Source $source   Required. The create request body.
+     * @param string                              $sourceId Required. The source identifier.
+     *
+     * @return \Google\Cloud\VMMigration\V1\CreateSourceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\VMMigration\V1\Source $source, string $sourceId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setSource($source)
+            ->setSourceId($sourceId);
+    }
 
     /**
      * Constructor.

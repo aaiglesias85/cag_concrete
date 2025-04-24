@@ -23,44 +23,46 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * User provided name of this TensorboardExperiment.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Description of this TensorboardExperiment.
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. Timestamp when this TensorboardExperiment was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this TensorboardExperiment was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * The labels with user-defined metadata to organize your Datasets.
-     * Label keys and values can be no longer than 64 characters
+     * The labels with user-defined metadata to organize your
+     * TensorboardExperiment.
+     * Label keys and values cannot be longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
      * No more than 64 user labels can be associated with one Dataset (System
      * labels are excluded).
      * See https://goo.gl/xmQnxf for more information and examples of labels.
-     * System reserved label keys are prefixed with "aiplatform.googleapis.com/"
-     * and are immutable. Following system labels exist for each Dataset:
-     * * "aiplatform.googleapis.com/dataset_metadata_schema":
-     *   - output only, its value is the
-     *   [metadata_schema's][metadata_schema_uri] title.
+     * System reserved label keys are prefixed with `aiplatform.googleapis.com/`
+     * and are immutable. The following system labels exist for each Dataset:
+     * * `aiplatform.googleapis.com/dataset_metadata_schema`: output only. Its
+     *    value is the
+     *    [metadata_schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     *    title.
      *
      * Generated from protobuf field <code>map<string, string> labels = 6;</code>
      */
@@ -71,13 +73,14 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 7;</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
-     * Immutable. Source of the TensorboardExperiment. Example: a custom training job.
+     * Immutable. Source of the TensorboardExperiment. Example: a custom training
+     * job.
      *
      * Generated from protobuf field <code>string source = 8 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $source = '';
+    protected $source = '';
 
     /**
      * Constructor.
@@ -98,23 +101,26 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Timestamp when this TensorboardExperiment was last updated.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
-     *           The labels with user-defined metadata to organize your Datasets.
-     *           Label keys and values can be no longer than 64 characters
+     *           The labels with user-defined metadata to organize your
+     *           TensorboardExperiment.
+     *           Label keys and values cannot be longer than 64 characters
      *           (Unicode codepoints), can only contain lowercase letters, numeric
      *           characters, underscores and dashes. International characters are allowed.
      *           No more than 64 user labels can be associated with one Dataset (System
      *           labels are excluded).
      *           See https://goo.gl/xmQnxf for more information and examples of labels.
-     *           System reserved label keys are prefixed with "aiplatform.googleapis.com/"
-     *           and are immutable. Following system labels exist for each Dataset:
-     *           * "aiplatform.googleapis.com/dataset_metadata_schema":
-     *             - output only, its value is the
-     *             [metadata_schema's][metadata_schema_uri] title.
+     *           System reserved label keys are prefixed with `aiplatform.googleapis.com/`
+     *           and are immutable. The following system labels exist for each Dataset:
+     *           * `aiplatform.googleapis.com/dataset_metadata_schema`: output only. Its
+     *              value is the
+     *              [metadata_schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     *              title.
      *     @type string $etag
      *           Used to perform consistent read-modify-write updates. If not set, a blind
      *           "overwrite" update happens.
      *     @type string $source
-     *           Immutable. Source of the TensorboardExperiment. Example: a custom training job.
+     *           Immutable. Source of the TensorboardExperiment. Example: a custom training
+     *           job.
      * }
      */
     public function __construct($data = NULL) {
@@ -277,18 +283,20 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The labels with user-defined metadata to organize your Datasets.
-     * Label keys and values can be no longer than 64 characters
+     * The labels with user-defined metadata to organize your
+     * TensorboardExperiment.
+     * Label keys and values cannot be longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
      * No more than 64 user labels can be associated with one Dataset (System
      * labels are excluded).
      * See https://goo.gl/xmQnxf for more information and examples of labels.
-     * System reserved label keys are prefixed with "aiplatform.googleapis.com/"
-     * and are immutable. Following system labels exist for each Dataset:
-     * * "aiplatform.googleapis.com/dataset_metadata_schema":
-     *   - output only, its value is the
-     *   [metadata_schema's][metadata_schema_uri] title.
+     * System reserved label keys are prefixed with `aiplatform.googleapis.com/`
+     * and are immutable. The following system labels exist for each Dataset:
+     * * `aiplatform.googleapis.com/dataset_metadata_schema`: output only. Its
+     *    value is the
+     *    [metadata_schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     *    title.
      *
      * Generated from protobuf field <code>map<string, string> labels = 6;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -299,18 +307,20 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The labels with user-defined metadata to organize your Datasets.
-     * Label keys and values can be no longer than 64 characters
+     * The labels with user-defined metadata to organize your
+     * TensorboardExperiment.
+     * Label keys and values cannot be longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
      * No more than 64 user labels can be associated with one Dataset (System
      * labels are excluded).
      * See https://goo.gl/xmQnxf for more information and examples of labels.
-     * System reserved label keys are prefixed with "aiplatform.googleapis.com/"
-     * and are immutable. Following system labels exist for each Dataset:
-     * * "aiplatform.googleapis.com/dataset_metadata_schema":
-     *   - output only, its value is the
-     *   [metadata_schema's][metadata_schema_uri] title.
+     * System reserved label keys are prefixed with `aiplatform.googleapis.com/`
+     * and are immutable. The following system labels exist for each Dataset:
+     * * `aiplatform.googleapis.com/dataset_metadata_schema`: output only. Its
+     *    value is the
+     *    [metadata_schema's][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri]
+     *    title.
      *
      * Generated from protobuf field <code>map<string, string> labels = 6;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -353,7 +363,8 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. Source of the TensorboardExperiment. Example: a custom training job.
+     * Immutable. Source of the TensorboardExperiment. Example: a custom training
+     * job.
      *
      * Generated from protobuf field <code>string source = 8 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return string
@@ -364,7 +375,8 @@ class TensorboardExperiment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. Source of the TensorboardExperiment. Example: a custom training job.
+     * Immutable. Source of the TensorboardExperiment. Example: a custom training
+     * job.
      *
      * Generated from protobuf field <code>string source = 8 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @param string $var

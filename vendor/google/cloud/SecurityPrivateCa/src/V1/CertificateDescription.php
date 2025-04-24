@@ -9,8 +9,10 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A [CertificateDescription][google.cloud.security.privateca.v1.CertificateDescription] describes an X.509 certificate or CSR that has
- * been issued, as an alternative to using ASN.1 / X.509.
+ * A
+ * [CertificateDescription][google.cloud.security.privateca.v1.CertificateDescription]
+ * describes an X.509 certificate or CSR that has been issued, as an alternative
+ * to using ASN.1 / X.509.
  *
  * Generated from protobuf message <code>google.cloud.security.privateca.v1.CertificateDescription</code>
  */
@@ -22,33 +24,33 @@ class CertificateDescription extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.CertificateDescription.SubjectDescription subject_description = 1;</code>
      */
-    private $subject_description = null;
+    protected $subject_description = null;
     /**
      * Describes some of the technical X.509 fields in a certificate.
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.X509Parameters x509_description = 2;</code>
      */
-    private $x509_description = null;
+    protected $x509_description = null;
     /**
      * The public key that corresponds to an issued certificate.
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.PublicKey public_key = 3;</code>
      */
-    private $public_key = null;
+    protected $public_key = null;
     /**
      * Provides a means of identifiying certificates that contain a particular
      * public key, per https://tools.ietf.org/html/rfc5280#section-4.2.1.2.
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.CertificateDescription.KeyId subject_key_id = 4;</code>
      */
-    private $subject_key_id = null;
+    protected $subject_key_id = null;
     /**
      * Identifies the subject_key_id of the parent certificate, per
      * https://tools.ietf.org/html/rfc5280#section-4.2.1.1
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.CertificateDescription.KeyId authority_key_id = 5;</code>
      */
-    private $authority_key_id = null;
+    protected $authority_key_id = null;
     /**
      * Describes a list of locations to obtain CRL information, i.e.
      * the DistributionPoint.fullName described by
@@ -69,7 +71,7 @@ class CertificateDescription extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.CertificateDescription.CertificateFingerprint cert_fingerprint = 8;</code>
      */
-    private $cert_fingerprint = null;
+    protected $cert_fingerprint = null;
 
     /**
      * Constructor.
@@ -90,11 +92,11 @@ class CertificateDescription extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Security\PrivateCA\V1\CertificateDescription\KeyId $authority_key_id
      *           Identifies the subject_key_id of the parent certificate, per
      *           https://tools.ietf.org/html/rfc5280#section-4.2.1.1
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $crl_distribution_points
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $crl_distribution_points
      *           Describes a list of locations to obtain CRL information, i.e.
      *           the DistributionPoint.fullName described by
      *           https://tools.ietf.org/html/rfc5280#section-4.2.1.13
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $aia_issuing_certificate_urls
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $aia_issuing_certificate_urls
      *           Describes lists of issuer CA certificate URLs that appear in the
      *           "Authority Information Access" extension in the certificate.
      *     @type \Google\Cloud\Security\PrivateCA\V1\CertificateDescription\CertificateFingerprint $cert_fingerprint
@@ -311,7 +313,7 @@ class CertificateDescription extends \Google\Protobuf\Internal\Message
      * https://tools.ietf.org/html/rfc5280#section-4.2.1.13
      *
      * Generated from protobuf field <code>repeated string crl_distribution_points = 6;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCrlDistributionPoints($var)
@@ -339,7 +341,7 @@ class CertificateDescription extends \Google\Protobuf\Internal\Message
      * "Authority Information Access" extension in the certificate.
      *
      * Generated from protobuf field <code>repeated string aia_issuing_certificate_urls = 7;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAiaIssuingCertificateUrls($var)

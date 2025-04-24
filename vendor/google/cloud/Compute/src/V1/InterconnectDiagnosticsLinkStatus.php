@@ -37,6 +37,19 @@ class InterconnectDiagnosticsLinkStatus extends \Google\Protobuf\Internal\Messag
      */
     private $lacp_status = null;
     /**
+     * Describes the status of MACsec encryption on this link.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InterconnectDiagnosticsMacsecStatus macsec = 528867490;</code>
+     */
+    private $macsec = null;
+    /**
+     * The operational status of the link.
+     * Check the OperationalStatus enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string operational_status = 201070847;</code>
+     */
+    private $operational_status = null;
+    /**
      * An InterconnectDiagnostics.LinkOpticalPower object, describing the current value and status of the received light level.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.InterconnectDiagnosticsLinkOpticalPower receiving_optical_power = 244717279;</code>
@@ -55,13 +68,18 @@ class InterconnectDiagnosticsLinkStatus extends \Google\Protobuf\Internal\Messag
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Compute\V1\InterconnectDiagnosticsARPEntry[]|\Google\Protobuf\Internal\RepeatedField $arp_caches
+     *     @type array<\Google\Cloud\Compute\V1\InterconnectDiagnosticsARPEntry>|\Google\Protobuf\Internal\RepeatedField $arp_caches
      *           A list of InterconnectDiagnostics.ARPEntry objects, describing the ARP neighbor entries seen on this link. This will be empty if the link is bundled
      *     @type string $circuit_id
      *           The unique ID for this link assigned during turn up by Google.
      *     @type string $google_demarc
      *           The Demarc address assigned by Google and provided in the LoA.
      *     @type \Google\Cloud\Compute\V1\InterconnectDiagnosticsLinkLACPStatus $lacp_status
+     *     @type \Google\Cloud\Compute\V1\InterconnectDiagnosticsMacsecStatus $macsec
+     *           Describes the status of MACsec encryption on this link.
+     *     @type string $operational_status
+     *           The operational status of the link.
+     *           Check the OperationalStatus enum for the list of possible values.
      *     @type \Google\Cloud\Compute\V1\InterconnectDiagnosticsLinkOpticalPower $receiving_optical_power
      *           An InterconnectDiagnostics.LinkOpticalPower object, describing the current value and status of the received light level.
      *     @type \Google\Cloud\Compute\V1\InterconnectDiagnosticsLinkOpticalPower $transmitting_optical_power
@@ -88,7 +106,7 @@ class InterconnectDiagnosticsLinkStatus extends \Google\Protobuf\Internal\Messag
      * A list of InterconnectDiagnostics.ARPEntry objects, describing the ARP neighbor entries seen on this link. This will be empty if the link is bundled
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.InterconnectDiagnosticsARPEntry arp_caches = 414591761;</code>
-     * @param \Google\Cloud\Compute\V1\InterconnectDiagnosticsARPEntry[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\InterconnectDiagnosticsARPEntry>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArpCaches($var)
@@ -199,6 +217,80 @@ class InterconnectDiagnosticsLinkStatus extends \Google\Protobuf\Internal\Messag
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\InterconnectDiagnosticsLinkLACPStatus::class);
         $this->lacp_status = $var;
+
+        return $this;
+    }
+
+    /**
+     * Describes the status of MACsec encryption on this link.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InterconnectDiagnosticsMacsecStatus macsec = 528867490;</code>
+     * @return \Google\Cloud\Compute\V1\InterconnectDiagnosticsMacsecStatus|null
+     */
+    public function getMacsec()
+    {
+        return $this->macsec;
+    }
+
+    public function hasMacsec()
+    {
+        return isset($this->macsec);
+    }
+
+    public function clearMacsec()
+    {
+        unset($this->macsec);
+    }
+
+    /**
+     * Describes the status of MACsec encryption on this link.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InterconnectDiagnosticsMacsecStatus macsec = 528867490;</code>
+     * @param \Google\Cloud\Compute\V1\InterconnectDiagnosticsMacsecStatus $var
+     * @return $this
+     */
+    public function setMacsec($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\InterconnectDiagnosticsMacsecStatus::class);
+        $this->macsec = $var;
+
+        return $this;
+    }
+
+    /**
+     * The operational status of the link.
+     * Check the OperationalStatus enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string operational_status = 201070847;</code>
+     * @return string
+     */
+    public function getOperationalStatus()
+    {
+        return isset($this->operational_status) ? $this->operational_status : '';
+    }
+
+    public function hasOperationalStatus()
+    {
+        return isset($this->operational_status);
+    }
+
+    public function clearOperationalStatus()
+    {
+        unset($this->operational_status);
+    }
+
+    /**
+     * The operational status of the link.
+     * Check the OperationalStatus enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string operational_status = 201070847;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setOperationalStatus($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->operational_status = $var;
 
         return $this;
     }

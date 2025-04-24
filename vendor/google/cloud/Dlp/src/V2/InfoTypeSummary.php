@@ -20,7 +20,14 @@ class InfoTypeSummary extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.InfoType info_type = 1;</code>
      */
-    private $info_type = null;
+    protected $info_type = null;
+    /**
+     * Not populated for predicted infotypes.
+     *
+     * Generated from protobuf field <code>int32 estimated_prevalence = 2 [deprecated = true];</code>
+     * @deprecated
+     */
+    protected $estimated_prevalence = 0;
 
     /**
      * Constructor.
@@ -30,6 +37,8 @@ class InfoTypeSummary extends \Google\Protobuf\Internal\Message
      *
      *     @type \Google\Cloud\Dlp\V2\InfoType $info_type
      *           The infoType.
+     *     @type int $estimated_prevalence
+     *           Not populated for predicted infotypes.
      * }
      */
     public function __construct($data = NULL) {
@@ -69,6 +78,36 @@ class InfoTypeSummary extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Dlp\V2\InfoType::class);
         $this->info_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Not populated for predicted infotypes.
+     *
+     * Generated from protobuf field <code>int32 estimated_prevalence = 2 [deprecated = true];</code>
+     * @return int
+     * @deprecated
+     */
+    public function getEstimatedPrevalence()
+    {
+        @trigger_error('estimated_prevalence is deprecated.', E_USER_DEPRECATED);
+        return $this->estimated_prevalence;
+    }
+
+    /**
+     * Not populated for predicted infotypes.
+     *
+     * Generated from protobuf field <code>int32 estimated_prevalence = 2 [deprecated = true];</code>
+     * @param int $var
+     * @return $this
+     * @deprecated
+     */
+    public function setEstimatedPrevalence($var)
+    {
+        @trigger_error('estimated_prevalence is deprecated.', E_USER_DEPRECATED);
+        GPBUtil::checkInt32($var);
+        $this->estimated_prevalence = $var;
 
         return $this;
     }

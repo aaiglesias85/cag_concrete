@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A configuration for running an [Apache Spark](http://spark.apache.org/)
+ * A configuration for running an [Apache Spark](https://spark.apache.org/)
  * batch workload.
  *
  * Generated from protobuf message <code>google.cloud.dataproc.v1.SparkBatch</code>
@@ -57,19 +57,19 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
      *     @type string $main_jar_file_uri
      *           Optional. The HCFS URI of the jar file that contains the main class.
      *     @type string $main_class
-     *           Optional. The name of the driver main class. The jar file that contains the class
-     *           must be in the classpath or specified in `jar_file_uris`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $args
+     *           Optional. The name of the driver main class. The jar file that contains
+     *           the class must be in the classpath or specified in `jar_file_uris`.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $args
      *           Optional. The arguments to pass to the driver. Do not include arguments
      *           that can be set as batch properties, such as `--conf`, since a collision
      *           can occur that causes an incorrect batch submission.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $jar_file_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $jar_file_uris
      *           Optional. HCFS URIs of jar files to add to the classpath of the
      *           Spark driver and tasks.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $file_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $file_uris
      *           Optional. HCFS URIs of files to be placed in the working directory of
      *           each executor.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $archive_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $archive_uris
      *           Optional. HCFS URIs of archives to be extracted into the working directory
      *           of each executor. Supported file types:
      *           `.jar`, `.tar`, `.tar.gz`, `.tgz`, and `.zip`.
@@ -112,8 +112,8 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The name of the driver main class. The jar file that contains the class
-     * must be in the classpath or specified in `jar_file_uris`.
+     * Optional. The name of the driver main class. The jar file that contains
+     * the class must be in the classpath or specified in `jar_file_uris`.
      *
      * Generated from protobuf field <code>string main_class = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -129,8 +129,8 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The name of the driver main class. The jar file that contains the class
-     * must be in the classpath or specified in `jar_file_uris`.
+     * Optional. The name of the driver main class. The jar file that contains
+     * the class must be in the classpath or specified in `jar_file_uris`.
      *
      * Generated from protobuf field <code>string main_class = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -163,7 +163,7 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
      * can occur that causes an incorrect batch submission.
      *
      * Generated from protobuf field <code>repeated string args = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArgs($var)
@@ -191,7 +191,7 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
      * Spark driver and tasks.
      *
      * Generated from protobuf field <code>repeated string jar_file_uris = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setJarFileUris($var)
@@ -219,7 +219,7 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
      * each executor.
      *
      * Generated from protobuf field <code>repeated string file_uris = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFileUris($var)
@@ -249,7 +249,7 @@ class SparkBatch extends \Google\Protobuf\Internal\Message
      * `.jar`, `.tar`, `.tar.gz`, `.tgz`, and `.zip`.
      *
      * Generated from protobuf field <code>repeated string archive_uris = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArchiveUris($var)

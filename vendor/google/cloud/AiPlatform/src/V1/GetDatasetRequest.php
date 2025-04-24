@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [DatasetService.GetDataset][google.cloud.aiplatform.v1.DatasetService.GetDataset].
+ * Request message for
+ * [DatasetService.GetDataset][google.cloud.aiplatform.v1.DatasetService.GetDataset].
+ * Next ID: 4
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.GetDatasetRequest</code>
  */
@@ -20,13 +22,27 @@ class GetDatasetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Mask specifying which fields to read.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask read_mask = 2;</code>
      */
-    private $read_mask = null;
+    protected $read_mask = null;
+
+    /**
+     * @param string $name Required. The name of the Dataset resource. Please see
+     *                     {@see DatasetServiceClient::datasetName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\GetDatasetRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

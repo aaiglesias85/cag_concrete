@@ -20,13 +20,30 @@ class UpdateMeasurementProtocolSecretRequest extends \Google\Protobuf\Internal\M
      *
      * Generated from protobuf field <code>.google.analytics.admin.v1alpha.MeasurementProtocolSecret measurement_protocol_secret = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $measurement_protocol_secret = null;
+    protected $measurement_protocol_secret = null;
     /**
-     * The list of fields to be updated. Omitted fields will not be updated.
+     * Required. The list of fields to be updated. Omitted fields will not be
+     * updated.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Analytics\Admin\V1alpha\MeasurementProtocolSecret $measurementProtocolSecret Required. The measurement protocol secret to update.
+     * @param \Google\Protobuf\FieldMask                                $updateMask                Required. The list of fields to be updated. Omitted fields will not be
+     *                                                                                             updated.
+     *
+     * @return \Google\Analytics\Admin\V1alpha\UpdateMeasurementProtocolSecretRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Analytics\Admin\V1alpha\MeasurementProtocolSecret $measurementProtocolSecret, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setMeasurementProtocolSecret($measurementProtocolSecret)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -37,7 +54,8 @@ class UpdateMeasurementProtocolSecretRequest extends \Google\Protobuf\Internal\M
      *     @type \Google\Analytics\Admin\V1alpha\MeasurementProtocolSecret $measurement_protocol_secret
      *           Required. The measurement protocol secret to update.
      *     @type \Google\Protobuf\FieldMask $update_mask
-     *           The list of fields to be updated. Omitted fields will not be updated.
+     *           Required. The list of fields to be updated. Omitted fields will not be
+     *           updated.
      * }
      */
     public function __construct($data = NULL) {
@@ -82,9 +100,10 @@ class UpdateMeasurementProtocolSecretRequest extends \Google\Protobuf\Internal\M
     }
 
     /**
-     * The list of fields to be updated. Omitted fields will not be updated.
+     * Required. The list of fields to be updated. Omitted fields will not be
+     * updated.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\FieldMask|null
      */
     public function getUpdateMask()
@@ -103,9 +122,10 @@ class UpdateMeasurementProtocolSecretRequest extends \Google\Protobuf\Internal\M
     }
 
     /**
-     * The list of fields to be updated. Omitted fields will not be updated.
+     * Required. The list of fields to be updated. Omitted fields will not be
+     * updated.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Protobuf\FieldMask $var
      * @return $this
      */

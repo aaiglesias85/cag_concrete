@@ -27,13 +27,38 @@ class CreateAutoscalingPolicyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The autoscaling policy to create.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.AutoscalingPolicy policy = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $policy = null;
+    protected $policy = null;
+
+    /**
+     * @param string                                      $parent Required. The "resource name" of the region or location, as described
+     *                                                            in https://cloud.google.com/apis/design/resource_names.
+     *
+     *                                                            * For `projects.regions.autoscalingPolicies.create`, the resource name
+     *                                                            of the region has the following format:
+     *                                                            `projects/{project_id}/regions/{region}`
+     *
+     *                                                            * For `projects.locations.autoscalingPolicies.create`, the resource name
+     *                                                            of the location has the following format:
+     *                                                            `projects/{project_id}/locations/{location}`
+     *                                                            Please see {@see AutoscalingPolicyServiceClient::regionName()} for help formatting this field.
+     * @param \Google\Cloud\Dataproc\V1\AutoscalingPolicy $policy Required. The autoscaling policy to create.
+     *
+     * @return \Google\Cloud\Dataproc\V1\CreateAutoscalingPolicyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dataproc\V1\AutoscalingPolicy $policy): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setPolicy($policy);
+    }
 
     /**
      * Constructor.

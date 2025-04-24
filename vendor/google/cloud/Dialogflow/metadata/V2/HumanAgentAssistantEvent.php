@@ -17,13 +17,13 @@ class HumanAgentAssistantEvent
         \GPBMetadata\Google\Cloud\Dialogflow\V2\Participant::initOnce();
         $pool->internalAddGeneratedFile(
             '
-£
+š
 <google/cloud/dialogflow/v2/human_agent_assistant_event.protogoogle.cloud.dialogflow.v2"
 HumanAgentAssistantEvent
 conversation (	
 participant (	H
-suggestion_results (2,.google.cloud.dialogflow.v2.SuggestionResultB¬
-com.google.cloud.dialogflow.v2BHumanAgentAssistantEventProtoPZDgoogle.golang.org/genproto/googleapis/cloud/dialogflow/v2;dialogflowø¢DFªGoogle.Cloud.Dialogflow.V2bproto3'
+suggestion_results (2,.google.cloud.dialogflow.v2.SuggestionResultB£
+com.google.cloud.dialogflow.v2BHumanAgentAssistantEventProtoPZ>cloud.google.com/go/dialogflow/apiv2/dialogflowpb;dialogflowpb¢DFªGoogle.Cloud.Dialogflow.V2bproto3'
         , true);
 
         static::$is_initialized = true;

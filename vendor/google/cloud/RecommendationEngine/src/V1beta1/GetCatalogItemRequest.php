@@ -21,7 +21,22 @@ class GetCatalogItemRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. Full resource name of catalog item, such as
+     *                     `projects/&#42;/locations/global/catalogs/default_catalog/catalogitems/some_catalog_item_id`. Please see
+     *                     {@see CatalogServiceClient::catalogItemPathName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\GetCatalogItemRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

@@ -42,6 +42,7 @@ class Routine
 
     /**
      * @var ConnectionInterface
+     * @internal
      */
     private $connection;
 
@@ -57,6 +58,8 @@ class Routine
 
     /**
      * @param ConnectionInterface $connection A connection to the BigQuery API.
+     *        This object is created by BigQueryClient,
+     *        and should not be instantiated outside of this client.
      * @param string $id The routine ID.
      * @param string $datasetId The dataset ID.
      * @param string $projectId The project ID.
@@ -97,7 +100,7 @@ class Routine
      *
      * If the value is not already cached, a service call will be made. To force
      * a refresh of the cached value, use
-     * {@see Google\Cloud\BigQuery\Routine::reload()}.
+     * {@see Routine::reload()}.
      *
      * Example:
      * ```
@@ -118,7 +121,7 @@ class Routine
      *
      * This method will always trigger a service request. To make use of a
      * cached representation of the resource, see
-     * {@see Google\Cloud\BigQuery\Routine::info()}.
+     * {@see Routine::info()}.
      *
      * Example:
      * ```

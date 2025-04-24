@@ -8,6 +8,11 @@ use UnexpectedValueException;
 
 /**
  * Health state of the network endpoint determined based on the health checks configured.
+ * Additional supported values which may be not listed in the enum directly due to technical reasons:
+ * DRAINING
+ * HEALTHY
+ * UNHEALTHY
+ * UNKNOWN
  *
  * Protobuf type <code>google.cloud.compute.v1.HealthStatusForNetworkEndpoint.HealthState</code>
  */

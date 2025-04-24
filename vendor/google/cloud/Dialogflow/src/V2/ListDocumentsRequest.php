@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [Documents.ListDocuments][google.cloud.dialogflow.v2.Documents.ListDocuments].
+ * Request message for
+ * [Documents.ListDocuments][google.cloud.dialogflow.v2.Documents.ListDocuments].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListDocumentsRequest</code>
  */
@@ -22,20 +23,20 @@ class ListDocumentsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of items to return in a single page. By
      * default 10 and at most 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The next_page_token value returned from a previous list request.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * The filter expression used to filter documents returned by the list method.
      * The expression has the following syntax:
@@ -55,7 +56,23 @@ class ListDocumentsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $parent Required. The knowledge base to list all documents for.
+     *                       Format: `projects/<Project ID>/locations/<Location
+     *                       ID>/knowledgeBases/<Knowledge Base ID>`. Please see
+     *                       {@see DocumentsClient::knowledgeBaseName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\ListDocumentsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

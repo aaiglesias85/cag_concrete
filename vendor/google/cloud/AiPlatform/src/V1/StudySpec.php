@@ -32,21 +32,28 @@ class StudySpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.StudySpec.Algorithm algorithm = 3;</code>
      */
-    private $algorithm = 0;
+    protected $algorithm = 0;
     /**
      * The observation noise level of the study.
      * Currently only supported by the Vertex AI Vizier service. Not supported by
-     * HyperparamterTuningJob or TrainingPipeline.
+     * HyperparameterTuningJob or TrainingPipeline.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.StudySpec.ObservationNoise observation_noise = 6;</code>
      */
-    private $observation_noise = 0;
+    protected $observation_noise = 0;
     /**
      * Describe which measurement selection type will be used
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.StudySpec.MeasurementSelectionType measurement_selection_type = 7;</code>
      */
-    private $measurement_selection_type = 0;
+    protected $measurement_selection_type = 0;
+    /**
+     * Conditions for automated stopping of a Study. Enable automated stopping by
+     * configuring at least one condition.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.aiplatform.v1.StudySpec.StudyStoppingConfig study_stopping_config = 11;</code>
+     */
+    protected $study_stopping_config = null;
     protected $automated_stopping_spec;
 
     /**
@@ -61,18 +68,21 @@ class StudySpec extends \Google\Protobuf\Internal\Message
      *           The automated early stopping spec using median rule.
      *     @type \Google\Cloud\AIPlatform\V1\StudySpec\ConvexAutomatedStoppingSpec $convex_automated_stopping_spec
      *           The automated early stopping spec using convex stopping rule.
-     *     @type \Google\Cloud\AIPlatform\V1\StudySpec\MetricSpec[]|\Google\Protobuf\Internal\RepeatedField $metrics
+     *     @type array<\Google\Cloud\AIPlatform\V1\StudySpec\MetricSpec>|\Google\Protobuf\Internal\RepeatedField $metrics
      *           Required. Metric specs for the Study.
-     *     @type \Google\Cloud\AIPlatform\V1\StudySpec\ParameterSpec[]|\Google\Protobuf\Internal\RepeatedField $parameters
+     *     @type array<\Google\Cloud\AIPlatform\V1\StudySpec\ParameterSpec>|\Google\Protobuf\Internal\RepeatedField $parameters
      *           Required. The set of parameters to tune.
      *     @type int $algorithm
      *           The search algorithm specified for the Study.
      *     @type int $observation_noise
      *           The observation noise level of the study.
      *           Currently only supported by the Vertex AI Vizier service. Not supported by
-     *           HyperparamterTuningJob or TrainingPipeline.
+     *           HyperparameterTuningJob or TrainingPipeline.
      *     @type int $measurement_selection_type
      *           Describe which measurement selection type will be used
+     *     @type \Google\Cloud\AIPlatform\V1\StudySpec\StudyStoppingConfig $study_stopping_config
+     *           Conditions for automated stopping of a Study. Enable automated stopping by
+     *           configuring at least one condition.
      * }
      */
     public function __construct($data = NULL) {
@@ -188,7 +198,7 @@ class StudySpec extends \Google\Protobuf\Internal\Message
      * Required. Metric specs for the Study.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.StudySpec.MetricSpec metrics = 1 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\AIPlatform\V1\StudySpec\MetricSpec[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\StudySpec\MetricSpec>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMetrics($var)
@@ -214,7 +224,7 @@ class StudySpec extends \Google\Protobuf\Internal\Message
      * Required. The set of parameters to tune.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.StudySpec.ParameterSpec parameters = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\AIPlatform\V1\StudySpec\ParameterSpec[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\StudySpec\ParameterSpec>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setParameters($var)
@@ -254,7 +264,7 @@ class StudySpec extends \Google\Protobuf\Internal\Message
     /**
      * The observation noise level of the study.
      * Currently only supported by the Vertex AI Vizier service. Not supported by
-     * HyperparamterTuningJob or TrainingPipeline.
+     * HyperparameterTuningJob or TrainingPipeline.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.StudySpec.ObservationNoise observation_noise = 6;</code>
      * @return int
@@ -267,7 +277,7 @@ class StudySpec extends \Google\Protobuf\Internal\Message
     /**
      * The observation noise level of the study.
      * Currently only supported by the Vertex AI Vizier service. Not supported by
-     * HyperparamterTuningJob or TrainingPipeline.
+     * HyperparameterTuningJob or TrainingPipeline.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.StudySpec.ObservationNoise observation_noise = 6;</code>
      * @param int $var
@@ -303,6 +313,44 @@ class StudySpec extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Google\Cloud\AIPlatform\V1\StudySpec\MeasurementSelectionType::class);
         $this->measurement_selection_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Conditions for automated stopping of a Study. Enable automated stopping by
+     * configuring at least one condition.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.aiplatform.v1.StudySpec.StudyStoppingConfig study_stopping_config = 11;</code>
+     * @return \Google\Cloud\AIPlatform\V1\StudySpec\StudyStoppingConfig|null
+     */
+    public function getStudyStoppingConfig()
+    {
+        return $this->study_stopping_config;
+    }
+
+    public function hasStudyStoppingConfig()
+    {
+        return isset($this->study_stopping_config);
+    }
+
+    public function clearStudyStoppingConfig()
+    {
+        unset($this->study_stopping_config);
+    }
+
+    /**
+     * Conditions for automated stopping of a Study. Enable automated stopping by
+     * configuring at least one condition.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.aiplatform.v1.StudySpec.StudyStoppingConfig study_stopping_config = 11;</code>
+     * @param \Google\Cloud\AIPlatform\V1\StudySpec\StudyStoppingConfig $var
+     * @return $this
+     */
+    public function setStudyStoppingConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\StudySpec\StudyStoppingConfig::class);
+        $this->study_stopping_config = $var;
 
         return $this;
     }

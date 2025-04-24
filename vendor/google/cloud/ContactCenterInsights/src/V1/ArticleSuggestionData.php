@@ -20,13 +20,13 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string title = 1;</code>
      */
-    private $title = '';
+    protected $title = '';
     /**
      * Article URI.
      *
      * Generated from protobuf field <code>string uri = 2;</code>
      */
-    private $uri = '';
+    protected $uri = '';
     /**
      * The system's confidence score that this article is a good match for this
      * conversation, ranging from 0.0 (completely uncertain) to 1.0 (completely
@@ -34,7 +34,7 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float confidence_score = 3;</code>
      */
-    private $confidence_score = 0.0;
+    protected $confidence_score = 0.0;
     /**
      * Map that contains metadata about the Article Suggestion and the document
      * that it originates from.
@@ -43,13 +43,13 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
      */
     private $metadata;
     /**
-     * Name of the query record.
+     * The name of the answer record.
      * Format:
-     * projects/{project}/locations/{location}/queryRecords/{query_record}
+     * projects/{project}/locations/{location}/answerRecords/{answer_record}
      *
      * Generated from protobuf field <code>string query_record = 5;</code>
      */
-    private $query_record = '';
+    protected $query_record = '';
     /**
      * The knowledge document that this answer was extracted from.
      * Format:
@@ -57,7 +57,7 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string source = 6;</code>
      */
-    private $source = '';
+    protected $source = '';
 
     /**
      * Constructor.
@@ -77,9 +77,9 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
      *           Map that contains metadata about the Article Suggestion and the document
      *           that it originates from.
      *     @type string $query_record
-     *           Name of the query record.
+     *           The name of the answer record.
      *           Format:
-     *           projects/{project}/locations/{location}/queryRecords/{query_record}
+     *           projects/{project}/locations/{location}/answerRecords/{answer_record}
      *     @type string $source
      *           The knowledge document that this answer was extracted from.
      *           Format:
@@ -202,9 +202,9 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the query record.
+     * The name of the answer record.
      * Format:
-     * projects/{project}/locations/{location}/queryRecords/{query_record}
+     * projects/{project}/locations/{location}/answerRecords/{answer_record}
      *
      * Generated from protobuf field <code>string query_record = 5;</code>
      * @return string
@@ -215,9 +215,9 @@ class ArticleSuggestionData extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the query record.
+     * The name of the answer record.
      * Format:
-     * projects/{project}/locations/{location}/queryRecords/{query_record}
+     * projects/{project}/locations/{location}/answerRecords/{answer_record}
      *
      * Generated from protobuf field <code>string query_record = 5;</code>
      * @param string $var

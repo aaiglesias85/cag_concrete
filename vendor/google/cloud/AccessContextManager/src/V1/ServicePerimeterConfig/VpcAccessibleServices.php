@@ -22,7 +22,7 @@ class VpcAccessibleServices extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enable_restriction = 1;</code>
      */
-    private $enable_restriction = false;
+    protected $enable_restriction = false;
     /**
      * The list of APIs usable within the Service Perimeter. Must be empty
      * unless 'enable_restriction' is True. You can specify a list of individual
@@ -42,7 +42,7 @@ class VpcAccessibleServices extends \Google\Protobuf\Internal\Message
      *     @type bool $enable_restriction
      *           Whether to restrict API calls within the Service Perimeter to the list of
      *           APIs specified in 'allowed_services'.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $allowed_services
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $allowed_services
      *           The list of APIs usable within the Service Perimeter. Must be empty
      *           unless 'enable_restriction' is True. You can specify a list of individual
      *           services, as well as include the 'RESTRICTED-SERVICES' value, which
@@ -103,7 +103,7 @@ class VpcAccessibleServices extends \Google\Protobuf\Internal\Message
      * automatically includes all of the services protected by the perimeter.
      *
      * Generated from protobuf field <code>repeated string allowed_services = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAllowedServices($var)
@@ -116,6 +116,4 @@ class VpcAccessibleServices extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(VpcAccessibleServices::class, \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig_VpcAccessibleServices::class);
 

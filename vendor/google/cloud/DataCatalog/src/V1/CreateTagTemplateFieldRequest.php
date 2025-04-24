@@ -22,7 +22,7 @@ class CreateTagTemplateFieldRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The ID of the tag template field to create.
      * Note: Adding a required field to an existing template is *not* allowed.
@@ -33,13 +33,39 @@ class CreateTagTemplateFieldRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string tag_template_field_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $tag_template_field_id = '';
+    protected $tag_template_field_id = '';
     /**
      * Required. The tag template field to create.
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.TagTemplateField tag_template_field = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $tag_template_field = null;
+    protected $tag_template_field = null;
+
+    /**
+     * @param string                                        $parent             Required. The name of the project and the template location
+     *                                                                          [region](https://cloud.google.com/data-catalog/docs/concepts/regions). Please see
+     *                                                                          {@see DataCatalogClient::tagTemplateName()} for help formatting this field.
+     * @param string                                        $tagTemplateFieldId Required. The ID of the tag template field to create.
+     *
+     *                                                                          Note: Adding a required field to an existing template is *not* allowed.
+     *
+     *                                                                          Field IDs can contain letters (both uppercase and lowercase), numbers
+     *                                                                          (0-9), underscores (_) and dashes (-). Field IDs must be at least 1
+     *                                                                          character long and at most 128 characters long. Field IDs must also be
+     *                                                                          unique within their template.
+     * @param \Google\Cloud\DataCatalog\V1\TagTemplateField $tagTemplateField   Required. The tag template field to create.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\CreateTagTemplateFieldRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $tagTemplateFieldId, \Google\Cloud\DataCatalog\V1\TagTemplateField $tagTemplateField): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setTagTemplateFieldId($tagTemplateFieldId)
+            ->setTagTemplateField($tagTemplateField);
+    }
 
     /**
      * Constructor.

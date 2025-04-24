@@ -25,13 +25,28 @@ class UpdateProjectRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.resourcemanager.v3.Project project = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $project = null;
+    protected $project = null;
     /**
      * Optional. An update mask to selectively update fields.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\ResourceManager\V3\Project $project    Required. The new definition of the project.
+     * @param \Google\Protobuf\FieldMask               $updateMask Optional. An update mask to selectively update fields.
+     *
+     * @return \Google\Cloud\ResourceManager\V3\UpdateProjectRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\ResourceManager\V3\Project $project, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setProject($project)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

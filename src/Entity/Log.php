@@ -4,206 +4,100 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Log
- *
- * @ORM\Table(name="log")
- * @ORM\Entity(repositoryClass="App\Repository\LogRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\LogRepository')]
+#[ORM\Table(name: 'log')]
 class Log
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'log_id', type: 'integer')]
+    private ?int $logId;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="log_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $logId;
+    #[ORM\Column(name: 'operation', type: 'string', length: 255, nullable: false)]
+    private ?string $operacion;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="operation", type="string", length=255, nullable=false)
-     */
-    private $operacion;
+    #[ORM\Column(name: 'category', type: 'string', length: 255, nullable: false)]
+    private ?string $categoria;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="category", type="string", length=255, nullable=false)
-     */
-    private $categoria;
+    #[ORM\Column(name: 'description', type: 'text', nullable: false)]
+    private ?string $descripcion;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=false)
-     */
-    private $descripcion;
+    #[ORM\Column(name: 'ip', type: 'string', length: 50, nullable: false)]
+    private ?string $ip;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="ip", type="string", length=50, nullable=false)
-     */
-    private $ip;
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    private ?\DateTime $fecha;
 
-    /**
-     * @var datetime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
-     */
-    private $fecha;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Usuario')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
+    private ?Usuario $usuario;
 
-    /**
-     * @var Usuario
-     *
-     * @ORM\ManyToOne(targetEntity="Usuario")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
-     * })
-     */
-    private $usuario;
-
-    /**
-     * Get logId
-     *
-     * @return integer
-     */
-    public function getLogId()
+    public function getLogId(): ?int
     {
         return $this->logId;
     }
 
-    /**
-     * Set operacion
-     *
-     * @param string $operacion
-     * @return Log
-     */
-    public function setOperacion($operacion)
+    public function setOperacion(?string $operacion): self
     {
         $this->operacion = $operacion;
-
         return $this;
     }
 
-    /**
-     * Get operacion
-     *
-     * @return string
-     */
-    public function getOperacion()
+    public function getOperacion(): ?string
     {
         return $this->operacion;
     }
 
-    /**
-     * Set categoria
-     *
-     * @param string $categoria
-     * @return Log
-     */
-    public function setCategoria($categoria)
+    public function setCategoria(?string $categoria): self
     {
         $this->categoria = $categoria;
-
         return $this;
     }
 
-    /**
-     * Get categoria
-     *
-     * @return string
-     */
-    public function getCategoria()
+    public function getCategoria(): ?string
     {
         return $this->categoria;
     }
 
-    /**
-     * Set descripcion
-     *
-     * @param string $descripcion
-     * @return Log
-     */
-    public function setDescripcion($descripcion)
+    public function setDescripcion(?string $descripcion): self
     {
         $this->descripcion = $descripcion;
-
         return $this;
     }
 
-    /**
-     * Get descripcion
-     *
-     * @return string
-     */
-    public function getDescripcion()
+    public function getDescripcion(): ?string
     {
         return $this->descripcion;
     }
 
-    /**
-     * Set ip
-     *
-     * @param string $ip
-     * @return Log
-     */
-    public function setIp($ip)
+    public function setIp(?string $ip): self
     {
         $this->ip = $ip;
-
         return $this;
     }
 
-    /**
-     * Get ip
-     *
-     * @return string
-     */
-    public function getIp()
+    public function getIp(): ?string
     {
         return $this->ip;
     }
 
-    /**
-     * Set fecha
-     *
-     * @param datetime $fecha
-     * @return Log
-     */
-    public function setFecha($fecha)
+    public function setFecha(?\DateTime $fecha): self
     {
         $this->fecha = $fecha;
-
         return $this;
     }
 
-    /**
-     * Get fecha
-     *
-     * @return datetime
-     */
-    public function getFecha()
+    public function getFecha(): ?\DateTime
     {
         return $this->fecha;
     }
 
-    /**
-     * @return Usuario
-     */
-    public function getUsuario(): Usuario
+    public function getUsuario(): ?Usuario
     {
         return $this->usuario;
     }
 
-    /**
-     * @param Usuario $usuario
-     */
-    public function setUsuario(Usuario $usuario): void
+    public function setUsuario(?Usuario $usuario): void
     {
         $this->usuario = $usuario;
     }

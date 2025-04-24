@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [VizierService.ListTrials][google.cloud.aiplatform.v1.VizierService.ListTrials].
+ * Response message for
+ * [VizierService.ListTrials][google.cloud.aiplatform.v1.VizierService.ListTrials].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListTrialsResponse</code>
  */
@@ -28,7 +29,7 @@ class ListTrialsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -36,7 +37,7 @@ class ListTrialsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\Trial[]|\Google\Protobuf\Internal\RepeatedField $trials
+     *     @type array<\Google\Cloud\AIPlatform\V1\Trial>|\Google\Protobuf\Internal\RepeatedField $trials
      *           The Trials associated with the Study.
      *     @type string $next_page_token
      *           Pass this token as the `page_token` field of the request for a
@@ -64,7 +65,7 @@ class ListTrialsResponse extends \Google\Protobuf\Internal\Message
      * The Trials associated with the Study.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Trial trials = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\Trial[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Trial>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTrials($var)

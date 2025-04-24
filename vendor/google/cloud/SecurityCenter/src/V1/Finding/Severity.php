@@ -26,7 +26,8 @@ class Severity
      * exploitable, and results in the direct ability to execute arbitrary code,
      * exfiltrate data, and otherwise gain additional access and privileges to
      * cloud resources and workloads. Examples include publicly accessible
-     * unprotected user data, public SSH access with weak or no passwords, etc.
+     * unprotected user data and public SSH access with weak or no
+     * passwords.
      * Threat:
      * Indicates a threat that is able to access, modify, or delete data or
      * execute unauthorized code within existing resources.
@@ -110,6 +111,4 @@ class Severity
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Severity::class, \Google\Cloud\SecurityCenter\V1\Finding_Severity::class);
 

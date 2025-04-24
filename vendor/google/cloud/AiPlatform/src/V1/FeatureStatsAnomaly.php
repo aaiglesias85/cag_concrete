@@ -27,12 +27,13 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      * Feature importance score, only populated when cross-feature monitoring is
      * enabled. For now only used to represent feature attribution score within
      * range [0, 1] for
-     * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW] and
+     * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW]
+     * and
      * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT].
      *
      * Generated from protobuf field <code>double score = 1;</code>
      */
-    private $score = 0.0;
+    protected $score = 0.0;
     /**
      * Path of the stats file for current feature values in Cloud Storage bucket.
      * Format: gs://<bucket_name>/<object_name>/stats.
@@ -42,7 +43,7 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string stats_uri = 3;</code>
      */
-    private $stats_uri = '';
+    protected $stats_uri = '';
     /**
      * Path of the anomaly file for current feature values in Cloud Storage
      * bucket.
@@ -55,7 +56,7 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string anomaly_uri = 4;</code>
      */
-    private $anomaly_uri = '';
+    protected $anomaly_uri = '';
     /**
      * Deviation from the current stats to baseline stats.
      *   1. For categorical feature, the distribution distance is calculated by
@@ -65,7 +66,7 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double distribution_deviation = 5;</code>
      */
-    private $distribution_deviation = 0.0;
+    protected $distribution_deviation = 0.0;
     /**
      * This is the threshold used when detecting anomalies.
      * The threshold can be changed by user, so this one might be different from
@@ -73,7 +74,7 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double anomaly_detection_threshold = 9;</code>
      */
-    private $anomaly_detection_threshold = 0.0;
+    protected $anomaly_detection_threshold = 0.0;
     /**
      * The start timestamp of window where stats were generated.
      * For objectives where time window doesn't make sense (e.g. Featurestore
@@ -82,7 +83,7 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 7;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * The end timestamp of window where stats were generated.
      * For objectives where time window doesn't make sense (e.g. Featurestore
@@ -91,7 +92,7 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 8;</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
 
     /**
      * Constructor.
@@ -103,7 +104,8 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      *           Feature importance score, only populated when cross-feature monitoring is
      *           enabled. For now only used to represent feature attribution score within
      *           range [0, 1] for
-     *           [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW] and
+     *           [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW]
+     *           and
      *           [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT].
      *     @type string $stats_uri
      *           Path of the stats file for current feature values in Cloud Storage bucket.
@@ -151,7 +153,8 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      * Feature importance score, only populated when cross-feature monitoring is
      * enabled. For now only used to represent feature attribution score within
      * range [0, 1] for
-     * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW] and
+     * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW]
+     * and
      * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT].
      *
      * Generated from protobuf field <code>double score = 1;</code>
@@ -166,7 +169,8 @@ class FeatureStatsAnomaly extends \Google\Protobuf\Internal\Message
      * Feature importance score, only populated when cross-feature monitoring is
      * enabled. For now only used to represent feature attribution score within
      * range [0, 1] for
-     * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW] and
+     * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_SKEW]
+     * and
      * [ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT][google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType.FEATURE_ATTRIBUTION_DRIFT].
      *
      * Generated from protobuf field <code>double score = 1;</code>

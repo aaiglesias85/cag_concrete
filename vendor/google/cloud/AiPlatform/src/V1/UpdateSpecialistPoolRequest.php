@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [SpecialistPoolService.UpdateSpecialistPool][google.cloud.aiplatform.v1.SpecialistPoolService.UpdateSpecialistPool].
+ * Request message for
+ * [SpecialistPoolService.UpdateSpecialistPool][google.cloud.aiplatform.v1.SpecialistPoolService.UpdateSpecialistPool].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.UpdateSpecialistPoolRequest</code>
  */
@@ -20,13 +21,28 @@ class UpdateSpecialistPoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.SpecialistPool specialist_pool = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $specialist_pool = null;
+    protected $specialist_pool = null;
     /**
      * Required. The update mask applies to the resource.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\AIPlatform\V1\SpecialistPool $specialistPool Required. The SpecialistPool which replaces the resource on the server.
+     * @param \Google\Protobuf\FieldMask                 $updateMask     Required. The update mask applies to the resource.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\UpdateSpecialistPoolRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\AIPlatform\V1\SpecialistPool $specialistPool, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setSpecialistPool($specialistPool)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

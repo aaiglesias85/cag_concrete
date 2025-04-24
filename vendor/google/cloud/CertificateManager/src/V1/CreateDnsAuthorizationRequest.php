@@ -16,24 +16,43 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreateDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The parent resource of the dns authorization. Must be in the format
-     * `projects/&#42;&#47;locations/&#42;`.
+     * Required. The parent resource of the dns authorization. Must be in the
+     * format `projects/&#42;&#47;locations/&#42;`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. A user-provided name of the dns authorization.
      *
      * Generated from protobuf field <code>string dns_authorization_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $dns_authorization_id = '';
+    protected $dns_authorization_id = '';
     /**
      * Required. A definition of the dns authorization to create.
      *
      * Generated from protobuf field <code>.google.cloud.certificatemanager.v1.DnsAuthorization dns_authorization = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $dns_authorization = null;
+    protected $dns_authorization = null;
+
+    /**
+     * @param string                                               $parent             Required. The parent resource of the dns authorization. Must be in the
+     *                                                                                 format `projects/&#42;/locations/*`. Please see
+     *                                                                                 {@see CertificateManagerClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\CertificateManager\V1\DnsAuthorization $dnsAuthorization   Required. A definition of the dns authorization to create.
+     * @param string                                               $dnsAuthorizationId Required. A user-provided name of the dns authorization.
+     *
+     * @return \Google\Cloud\CertificateManager\V1\CreateDnsAuthorizationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\CertificateManager\V1\DnsAuthorization $dnsAuthorization, string $dnsAuthorizationId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setDnsAuthorization($dnsAuthorization)
+            ->setDnsAuthorizationId($dnsAuthorizationId);
+    }
 
     /**
      * Constructor.
@@ -42,8 +61,8 @@ class CreateDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The parent resource of the dns authorization. Must be in the format
-     *           `projects/&#42;&#47;locations/&#42;`.
+     *           Required. The parent resource of the dns authorization. Must be in the
+     *           format `projects/&#42;&#47;locations/&#42;`.
      *     @type string $dns_authorization_id
      *           Required. A user-provided name of the dns authorization.
      *     @type \Google\Cloud\CertificateManager\V1\DnsAuthorization $dns_authorization
@@ -56,8 +75,8 @@ class CreateDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent resource of the dns authorization. Must be in the format
-     * `projects/&#42;&#47;locations/&#42;`.
+     * Required. The parent resource of the dns authorization. Must be in the
+     * format `projects/&#42;&#47;locations/&#42;`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -68,8 +87,8 @@ class CreateDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent resource of the dns authorization. Must be in the format
-     * `projects/&#42;&#47;locations/&#42;`.
+     * Required. The parent resource of the dns authorization. Must be in the
+     * format `projects/&#42;&#47;locations/&#42;`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

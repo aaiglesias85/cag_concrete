@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-error-reporting/v/stable)](https://packagist.org/packages/google/cloud-error-reporting) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-error-reporting.svg)](https://packagist.org/packages/google/cloud-error-reporting)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-error-reporting/latest)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-error-reporting/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -16,16 +16,10 @@ Stackdriver Error Reporting counts, analyzes and aggregates the crashes in your 
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-error-reporting
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take advantage of the benefits offered by gRPC (such as streaming methods)
@@ -37,6 +31,29 @@ Please see our [Authentication guide](https://github.com/googleapis/google-cloud
 on authenticating your client. Once authenticated, you'll be ready to start making requests.
 
 ### Sample
+
+```php
+Google\ApiCore\ApiException;
+Google\Cloud\ErrorReporting\V1beta1\Client\ErrorGroupServiceClient;
+Google\Cloud\ErrorReporting\V1beta1\ErrorGroup;
+Google\Cloud\ErrorReporting\V1beta1\GetGroupRequest;
+
+// Create a client.
+$errorGroupServiceClient = new ErrorGroupServiceClient();
+
+// Prepare the request message.
+$request = (new GetGroupRequest())
+    ->setGroupName($formattedGroupName);
+
+// Call the API and handle any network failures.
+try {
+    /** @var ErrorGroup $response */
+    $response = $errorGroupServiceClient->getGroup($request);
+    printf('Response data: %s' . PHP_EOL, $response->serializeToJsonString());
+} catch (ApiException $ex) {
+    printf('Call failed with message: %s' . PHP_EOL, $ex->getMessage());
+}
+```
 
 The Stackdriver Error Reporting client provides APIs allowing you to easily configure your application to send errors and exceptions automatically to Stackdriver, or to manually report and manage errors and statistics.
 
@@ -82,6 +99,11 @@ try {
     $reportErrorsServiceClient->close();
 }
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

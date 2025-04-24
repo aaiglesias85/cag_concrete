@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [DropDatabase][google.spanner.admin.database.v1.DatabaseAdmin.DropDatabase].
+ * The request for
+ * [DropDatabase][google.spanner.admin.database.v1.DatabaseAdmin.DropDatabase].
  *
  * Generated from protobuf message <code>google.spanner.admin.database.v1.DropDatabaseRequest</code>
  */
@@ -21,6 +22,20 @@ class DropDatabaseRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string database = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
     private $database = '';
+
+    /**
+     * @param string $database Required. The database to be dropped. Please see
+     *                         {@see DatabaseAdminClient::databaseName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\DropDatabaseRequest
+     *
+     * @experimental
+     */
+    public static function build(string $database): self
+    {
+        return (new self())
+            ->setDatabase($database);
+    }
 
     /**
      * Constructor.

@@ -28,13 +28,13 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      */
     private $description = null;
     /**
-     * Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     * Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported if the subnet purpose field is set to REGIONAL_MANAGED_PROXY.
      *
      * Generated from protobuf field <code>optional bool enable_flow_logs = 151544420;</code>
      */
     private $enable_flow_logs = null;
     /**
-     * [Output Only] The external IPv6 address range that is assigned to this subnetwork.
+     * The external IPv6 address range that is owned by this subnetwork.
      *
      * Generated from protobuf field <code>optional string external_ipv6_prefix = 139299190;</code>
      */
@@ -58,7 +58,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      */
     private $id = null;
     /**
-     * [Output Only] The internal IPv6 address range that is assigned to this subnetwork.
+     * The internal IPv6 address range that is owned by this subnetwork.
      *
      * Generated from protobuf field <code>optional string internal_ipv6_prefix = 506270056;</code>
      */
@@ -69,6 +69,12 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string ip_cidr_range = 98117322;</code>
      */
     private $ip_cidr_range = null;
+    /**
+     * Reference to the source of IP, like a PublicDelegatedPrefix (PDP) for BYOIP. The PDP must be a sub-PDP in EXTERNAL_IPV6_SUBNETWORK_CREATION mode. Use one of the following formats to specify a sub-PDP when creating a dual stack subnetwork with external access using BYOIP: - Full resource URL, as in https://www.googleapis.com/compute/v1/projects/projectId/regions/region /publicDelegatedPrefixes/sub-pdp-name - Partial URL, as in - projects/projectId/regions/region/publicDelegatedPrefixes/ sub-pdp-name - regions/region/publicDelegatedPrefixes/sub-pdp-name 
+     *
+     * Generated from protobuf field <code>optional string ip_collection = 176818358;</code>
+     */
+    private $ip_collection = null;
     /**
      * The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation or the first time the subnet is updated into IPV4_IPV6 dual stack.
      * Check the Ipv6AccessType enum for the list of possible values.
@@ -82,6 +88,13 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string ipv6_cidr_range = 273141258;</code>
      */
     private $ipv6_cidr_range = null;
+    /**
+     * [Output Only] Possible endpoints of this subnetwork. It can be one of the following: - VM_ONLY: The subnetwork can be used for creating instances and IPv6 addresses with VM endpoint type. Such a subnetwork gets external IPv6 ranges from a public delegated prefix and cannot be used to create NetLb. - VM_AND_FR: The subnetwork can be used for creating both VM instances and Forwarding Rules. It can also be used to reserve IPv6 addresses with both VM and FR endpoint types. Such a subnetwork gets its IPv6 range from Google IP Pool directly.
+     * Check the Ipv6GceEndpoint enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string ipv6_gce_endpoint = 320382307;</code>
+     */
+    private $ipv6_gce_endpoint = null;
     /**
      * [Output Only] Type of the resource. Always compute#subnetwork for Subnetwork resources.
      *
@@ -120,7 +133,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      */
     private $private_ipv6_google_access = null;
     /**
-     * The purpose of the resource. This field can be either PRIVATE_RFC_1918 or INTERNAL_HTTPS_LOAD_BALANCER. A subnetwork with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing. If unspecified, the purpose defaults to PRIVATE_RFC_1918. The enableFlowLogs field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     * The purpose of the resource. This field can be either PRIVATE, GLOBAL_MANAGED_PROXY, REGIONAL_MANAGED_PROXY, PEER_MIGRATION, PRIVATE_SERVICE_CONNECT or PRIVATE_NAT. PRIVATE is the default purpose for user-created subnets or subnets that are automatically created in auto mode networks. Subnets with purpose set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY are user-created subnetworks that are reserved for Envoy-based load balancers. A subnet with purpose set to PRIVATE_SERVICE_CONNECT is used to publish services using Private Service Connect. A subnet with purpose set to PEER_MIGRATION is used for subnet migration from one peered VPC to another. A subnet with purpose set to PRIVATE_NAT is used for Private NAT IP address by Private NAT Gateway. If unspecified, the subnet purpose defaults to PRIVATE. The enableFlowLogs field isn't supported if the subnet purpose field is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY.
      * Check the Purpose enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string purpose = 316407070;</code>
@@ -133,7 +146,13 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      */
     private $region = null;
     /**
-     * The role of subnetwork. Currently, this field is only used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
+     * The URL of the reserved internal range.
+     *
+     * Generated from protobuf field <code>optional string reserved_internal_range = 286248754;</code>
+     */
+    private $reserved_internal_range = null;
+    /**
+     * The role of subnetwork. Currently, this field is only used when purpose is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Envoy-based load balancers in a region. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
      * Check the Role enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string role = 3506294;</code>
@@ -177,9 +196,9 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      *     @type string $description
      *           An optional description of this resource. Provide this property when you create the resource. This field can be set only at resource creation time.
      *     @type bool $enable_flow_logs
-     *           Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     *           Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported if the subnet purpose field is set to REGIONAL_MANAGED_PROXY.
      *     @type string $external_ipv6_prefix
-     *           [Output Only] The external IPv6 address range that is assigned to this subnetwork.
+     *           The external IPv6 address range that is owned by this subnetwork.
      *     @type string $fingerprint
      *           Fingerprint of this resource. A hash of the contents stored in this object. This field is used in optimistic locking. This field will be ignored when inserting a Subnetwork. An up-to-date fingerprint must be provided in order to update the Subnetwork, otherwise the request will fail with error 412 conditionNotMet. To see the latest fingerprint, make a get() request to retrieve a Subnetwork.
      *     @type string $gateway_address
@@ -187,14 +206,19 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      *     @type int|string $id
      *           [Output Only] The unique identifier for the resource. This identifier is defined by the server.
      *     @type string $internal_ipv6_prefix
-     *           [Output Only] The internal IPv6 address range that is assigned to this subnetwork.
+     *           The internal IPv6 address range that is owned by this subnetwork.
      *     @type string $ip_cidr_range
      *           The range of internal addresses that are owned by this subnetwork. Provide this property when you create the subnetwork. For example, 10.0.0.0/8 or 100.64.0.0/10. Ranges must be unique and non-overlapping within a network. Only IPv4 is supported. This field is set at resource creation time. The range can be any range listed in the Valid ranges list. The range can be expanded after creation using expandIpCidrRange.
+     *     @type string $ip_collection
+     *           Reference to the source of IP, like a PublicDelegatedPrefix (PDP) for BYOIP. The PDP must be a sub-PDP in EXTERNAL_IPV6_SUBNETWORK_CREATION mode. Use one of the following formats to specify a sub-PDP when creating a dual stack subnetwork with external access using BYOIP: - Full resource URL, as in https://www.googleapis.com/compute/v1/projects/projectId/regions/region /publicDelegatedPrefixes/sub-pdp-name - Partial URL, as in - projects/projectId/regions/region/publicDelegatedPrefixes/ sub-pdp-name - regions/region/publicDelegatedPrefixes/sub-pdp-name 
      *     @type string $ipv6_access_type
      *           The access type of IPv6 address this subnet holds. It's immutable and can only be specified during creation or the first time the subnet is updated into IPV4_IPV6 dual stack.
      *           Check the Ipv6AccessType enum for the list of possible values.
      *     @type string $ipv6_cidr_range
      *           [Output Only] This field is for internal use.
+     *     @type string $ipv6_gce_endpoint
+     *           [Output Only] Possible endpoints of this subnetwork. It can be one of the following: - VM_ONLY: The subnetwork can be used for creating instances and IPv6 addresses with VM endpoint type. Such a subnetwork gets external IPv6 ranges from a public delegated prefix and cannot be used to create NetLb. - VM_AND_FR: The subnetwork can be used for creating both VM instances and Forwarding Rules. It can also be used to reserve IPv6 addresses with both VM and FR endpoint types. Such a subnetwork gets its IPv6 range from Google IP Pool directly.
+     *           Check the Ipv6GceEndpoint enum for the list of possible values.
      *     @type string $kind
      *           [Output Only] Type of the resource. Always compute#subnetwork for Subnetwork resources.
      *     @type \Google\Cloud\Compute\V1\SubnetworkLogConfig $log_config
@@ -209,14 +233,16 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      *           This field is for internal use. This field can be both set at resource creation time and updated using patch.
      *           Check the PrivateIpv6GoogleAccess enum for the list of possible values.
      *     @type string $purpose
-     *           The purpose of the resource. This field can be either PRIVATE_RFC_1918 or INTERNAL_HTTPS_LOAD_BALANCER. A subnetwork with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing. If unspecified, the purpose defaults to PRIVATE_RFC_1918. The enableFlowLogs field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     *           The purpose of the resource. This field can be either PRIVATE, GLOBAL_MANAGED_PROXY, REGIONAL_MANAGED_PROXY, PEER_MIGRATION, PRIVATE_SERVICE_CONNECT or PRIVATE_NAT. PRIVATE is the default purpose for user-created subnets or subnets that are automatically created in auto mode networks. Subnets with purpose set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY are user-created subnetworks that are reserved for Envoy-based load balancers. A subnet with purpose set to PRIVATE_SERVICE_CONNECT is used to publish services using Private Service Connect. A subnet with purpose set to PEER_MIGRATION is used for subnet migration from one peered VPC to another. A subnet with purpose set to PRIVATE_NAT is used for Private NAT IP address by Private NAT Gateway. If unspecified, the subnet purpose defaults to PRIVATE. The enableFlowLogs field isn't supported if the subnet purpose field is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY.
      *           Check the Purpose enum for the list of possible values.
      *     @type string $region
      *           URL of the region where the Subnetwork resides. This field can be set only at resource creation time.
+     *     @type string $reserved_internal_range
+     *           The URL of the reserved internal range.
      *     @type string $role
-     *           The role of subnetwork. Currently, this field is only used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
+     *           The role of subnetwork. Currently, this field is only used when purpose is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Envoy-based load balancers in a region. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
      *           Check the Role enum for the list of possible values.
-     *     @type \Google\Cloud\Compute\V1\SubnetworkSecondaryRange[]|\Google\Protobuf\Internal\RepeatedField $secondary_ip_ranges
+     *     @type array<\Google\Cloud\Compute\V1\SubnetworkSecondaryRange>|\Google\Protobuf\Internal\RepeatedField $secondary_ip_ranges
      *           An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges. This field can be updated with a patch request.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
@@ -306,7 +332,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     * Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported if the subnet purpose field is set to REGIONAL_MANAGED_PROXY.
      *
      * Generated from protobuf field <code>optional bool enable_flow_logs = 151544420;</code>
      * @return bool
@@ -327,7 +353,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     * Whether to enable flow logging for this subnetwork. If this field is not explicitly set, it will not appear in get listings. If not set the default behavior is determined by the org policy, if there is no org policy specified, then it will default to disabled. This field isn't supported if the subnet purpose field is set to REGIONAL_MANAGED_PROXY.
      *
      * Generated from protobuf field <code>optional bool enable_flow_logs = 151544420;</code>
      * @param bool $var
@@ -342,7 +368,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] The external IPv6 address range that is assigned to this subnetwork.
+     * The external IPv6 address range that is owned by this subnetwork.
      *
      * Generated from protobuf field <code>optional string external_ipv6_prefix = 139299190;</code>
      * @return string
@@ -363,7 +389,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] The external IPv6 address range that is assigned to this subnetwork.
+     * The external IPv6 address range that is owned by this subnetwork.
      *
      * Generated from protobuf field <code>optional string external_ipv6_prefix = 139299190;</code>
      * @param string $var
@@ -486,7 +512,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] The internal IPv6 address range that is assigned to this subnetwork.
+     * The internal IPv6 address range that is owned by this subnetwork.
      *
      * Generated from protobuf field <code>optional string internal_ipv6_prefix = 506270056;</code>
      * @return string
@@ -507,7 +533,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] The internal IPv6 address range that is assigned to this subnetwork.
+     * The internal IPv6 address range that is owned by this subnetwork.
      *
      * Generated from protobuf field <code>optional string internal_ipv6_prefix = 506270056;</code>
      * @param string $var
@@ -553,6 +579,42 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->ip_cidr_range = $var;
+
+        return $this;
+    }
+
+    /**
+     * Reference to the source of IP, like a PublicDelegatedPrefix (PDP) for BYOIP. The PDP must be a sub-PDP in EXTERNAL_IPV6_SUBNETWORK_CREATION mode. Use one of the following formats to specify a sub-PDP when creating a dual stack subnetwork with external access using BYOIP: - Full resource URL, as in https://www.googleapis.com/compute/v1/projects/projectId/regions/region /publicDelegatedPrefixes/sub-pdp-name - Partial URL, as in - projects/projectId/regions/region/publicDelegatedPrefixes/ sub-pdp-name - regions/region/publicDelegatedPrefixes/sub-pdp-name 
+     *
+     * Generated from protobuf field <code>optional string ip_collection = 176818358;</code>
+     * @return string
+     */
+    public function getIpCollection()
+    {
+        return isset($this->ip_collection) ? $this->ip_collection : '';
+    }
+
+    public function hasIpCollection()
+    {
+        return isset($this->ip_collection);
+    }
+
+    public function clearIpCollection()
+    {
+        unset($this->ip_collection);
+    }
+
+    /**
+     * Reference to the source of IP, like a PublicDelegatedPrefix (PDP) for BYOIP. The PDP must be a sub-PDP in EXTERNAL_IPV6_SUBNETWORK_CREATION mode. Use one of the following formats to specify a sub-PDP when creating a dual stack subnetwork with external access using BYOIP: - Full resource URL, as in https://www.googleapis.com/compute/v1/projects/projectId/regions/region /publicDelegatedPrefixes/sub-pdp-name - Partial URL, as in - projects/projectId/regions/region/publicDelegatedPrefixes/ sub-pdp-name - regions/region/publicDelegatedPrefixes/sub-pdp-name 
+     *
+     * Generated from protobuf field <code>optional string ip_collection = 176818358;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setIpCollection($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ip_collection = $var;
 
         return $this;
     }
@@ -627,6 +689,44 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->ipv6_cidr_range = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] Possible endpoints of this subnetwork. It can be one of the following: - VM_ONLY: The subnetwork can be used for creating instances and IPv6 addresses with VM endpoint type. Such a subnetwork gets external IPv6 ranges from a public delegated prefix and cannot be used to create NetLb. - VM_AND_FR: The subnetwork can be used for creating both VM instances and Forwarding Rules. It can also be used to reserve IPv6 addresses with both VM and FR endpoint types. Such a subnetwork gets its IPv6 range from Google IP Pool directly.
+     * Check the Ipv6GceEndpoint enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string ipv6_gce_endpoint = 320382307;</code>
+     * @return string
+     */
+    public function getIpv6GceEndpoint()
+    {
+        return isset($this->ipv6_gce_endpoint) ? $this->ipv6_gce_endpoint : '';
+    }
+
+    public function hasIpv6GceEndpoint()
+    {
+        return isset($this->ipv6_gce_endpoint);
+    }
+
+    public function clearIpv6GceEndpoint()
+    {
+        unset($this->ipv6_gce_endpoint);
+    }
+
+    /**
+     * [Output Only] Possible endpoints of this subnetwork. It can be one of the following: - VM_ONLY: The subnetwork can be used for creating instances and IPv6 addresses with VM endpoint type. Such a subnetwork gets external IPv6 ranges from a public delegated prefix and cannot be used to create NetLb. - VM_AND_FR: The subnetwork can be used for creating both VM instances and Forwarding Rules. It can also be used to reserve IPv6 addresses with both VM and FR endpoint types. Such a subnetwork gets its IPv6 range from Google IP Pool directly.
+     * Check the Ipv6GceEndpoint enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string ipv6_gce_endpoint = 320382307;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setIpv6GceEndpoint($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ipv6_gce_endpoint = $var;
 
         return $this;
     }
@@ -850,7 +950,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The purpose of the resource. This field can be either PRIVATE_RFC_1918 or INTERNAL_HTTPS_LOAD_BALANCER. A subnetwork with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing. If unspecified, the purpose defaults to PRIVATE_RFC_1918. The enableFlowLogs field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     * The purpose of the resource. This field can be either PRIVATE, GLOBAL_MANAGED_PROXY, REGIONAL_MANAGED_PROXY, PEER_MIGRATION, PRIVATE_SERVICE_CONNECT or PRIVATE_NAT. PRIVATE is the default purpose for user-created subnets or subnets that are automatically created in auto mode networks. Subnets with purpose set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY are user-created subnetworks that are reserved for Envoy-based load balancers. A subnet with purpose set to PRIVATE_SERVICE_CONNECT is used to publish services using Private Service Connect. A subnet with purpose set to PEER_MIGRATION is used for subnet migration from one peered VPC to another. A subnet with purpose set to PRIVATE_NAT is used for Private NAT IP address by Private NAT Gateway. If unspecified, the subnet purpose defaults to PRIVATE. The enableFlowLogs field isn't supported if the subnet purpose field is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY.
      * Check the Purpose enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string purpose = 316407070;</code>
@@ -872,7 +972,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The purpose of the resource. This field can be either PRIVATE_RFC_1918 or INTERNAL_HTTPS_LOAD_BALANCER. A subnetwork with purpose set to INTERNAL_HTTPS_LOAD_BALANCER is a user-created subnetwork that is reserved for Internal HTTP(S) Load Balancing. If unspecified, the purpose defaults to PRIVATE_RFC_1918. The enableFlowLogs field isn't supported with the purpose field set to INTERNAL_HTTPS_LOAD_BALANCER.
+     * The purpose of the resource. This field can be either PRIVATE, GLOBAL_MANAGED_PROXY, REGIONAL_MANAGED_PROXY, PEER_MIGRATION, PRIVATE_SERVICE_CONNECT or PRIVATE_NAT. PRIVATE is the default purpose for user-created subnets or subnets that are automatically created in auto mode networks. Subnets with purpose set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY are user-created subnetworks that are reserved for Envoy-based load balancers. A subnet with purpose set to PRIVATE_SERVICE_CONNECT is used to publish services using Private Service Connect. A subnet with purpose set to PEER_MIGRATION is used for subnet migration from one peered VPC to another. A subnet with purpose set to PRIVATE_NAT is used for Private NAT IP address by Private NAT Gateway. If unspecified, the subnet purpose defaults to PRIVATE. The enableFlowLogs field isn't supported if the subnet purpose field is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY.
      * Check the Purpose enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string purpose = 316407070;</code>
@@ -924,7 +1024,43 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The role of subnetwork. Currently, this field is only used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
+     * The URL of the reserved internal range.
+     *
+     * Generated from protobuf field <code>optional string reserved_internal_range = 286248754;</code>
+     * @return string
+     */
+    public function getReservedInternalRange()
+    {
+        return isset($this->reserved_internal_range) ? $this->reserved_internal_range : '';
+    }
+
+    public function hasReservedInternalRange()
+    {
+        return isset($this->reserved_internal_range);
+    }
+
+    public function clearReservedInternalRange()
+    {
+        unset($this->reserved_internal_range);
+    }
+
+    /**
+     * The URL of the reserved internal range.
+     *
+     * Generated from protobuf field <code>optional string reserved_internal_range = 286248754;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setReservedInternalRange($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->reserved_internal_range = $var;
+
+        return $this;
+    }
+
+    /**
+     * The role of subnetwork. Currently, this field is only used when purpose is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Envoy-based load balancers in a region. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
      * Check the Role enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string role = 3506294;</code>
@@ -946,7 +1082,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The role of subnetwork. Currently, this field is only used when purpose = INTERNAL_HTTPS_LOAD_BALANCER. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Internal HTTP(S) Load Balancing. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
+     * The role of subnetwork. Currently, this field is only used when purpose is set to GLOBAL_MANAGED_PROXY or REGIONAL_MANAGED_PROXY. The value can be set to ACTIVE or BACKUP. An ACTIVE subnetwork is one that is currently being used for Envoy-based load balancers in a region. A BACKUP subnetwork is one that is ready to be promoted to ACTIVE or is currently draining. This field can be updated with a patch request.
      * Check the Role enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string role = 3506294;</code>
@@ -976,7 +1112,7 @@ class Subnetwork extends \Google\Protobuf\Internal\Message
      * An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges. This field can be updated with a patch request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.SubnetworkSecondaryRange secondary_ip_ranges = 136658915;</code>
-     * @param \Google\Cloud\Compute\V1\SubnetworkSecondaryRange[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\SubnetworkSecondaryRange>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSecondaryIpRanges($var)

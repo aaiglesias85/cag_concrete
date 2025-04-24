@@ -22,26 +22,26 @@ class EntityAnnotation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string mid = 1;</code>
      */
-    private $mid = '';
+    protected $mid = '';
     /**
      * The language code for the locale in which the entity textual
      * `description` is expressed.
      *
      * Generated from protobuf field <code>string locale = 2;</code>
      */
-    private $locale = '';
+    protected $locale = '';
     /**
      * Entity textual description, expressed in its `locale` language.
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Overall score of the result. Range [0, 1].
      *
      * Generated from protobuf field <code>float score = 4;</code>
      */
-    private $score = 0.0;
+    protected $score = 0.0;
     /**
      * **Deprecated. Use `score` instead.**
      * The accuracy of the entity detection in an image.
@@ -62,14 +62,14 @@ class EntityAnnotation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float topicality = 6;</code>
      */
-    private $topicality = 0.0;
+    protected $topicality = 0.0;
     /**
      * Image region to which this entity belongs. Not produced
      * for `LABEL_DETECTION` features.
      *
      * Generated from protobuf field <code>.google.cloud.vision.v1.BoundingPoly bounding_poly = 7;</code>
      */
-    private $bounding_poly = null;
+    protected $bounding_poly = null;
     /**
      * The location information for the detected entity. Multiple
      * `LocationInfo` elements can be present because one location may
@@ -120,13 +120,13 @@ class EntityAnnotation extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Vision\V1\BoundingPoly $bounding_poly
      *           Image region to which this entity belongs. Not produced
      *           for `LABEL_DETECTION` features.
-     *     @type \Google\Cloud\Vision\V1\LocationInfo[]|\Google\Protobuf\Internal\RepeatedField $locations
+     *     @type array<\Google\Cloud\Vision\V1\LocationInfo>|\Google\Protobuf\Internal\RepeatedField $locations
      *           The location information for the detected entity. Multiple
      *           `LocationInfo` elements can be present because one location may
      *           indicate the location of the scene in the image, and another location
      *           may indicate the location of the place where the image was taken.
      *           Location information is usually present for landmarks.
-     *     @type \Google\Cloud\Vision\V1\Property[]|\Google\Protobuf\Internal\RepeatedField $properties
+     *     @type array<\Google\Cloud\Vision\V1\Property>|\Google\Protobuf\Internal\RepeatedField $properties
      *           Some entities may have optional user-supplied `Property` (name/value)
      *           fields, such a score or string that qualifies the entity.
      * }
@@ -379,7 +379,7 @@ class EntityAnnotation extends \Google\Protobuf\Internal\Message
      * Location information is usually present for landmarks.
      *
      * Generated from protobuf field <code>repeated .google.cloud.vision.v1.LocationInfo locations = 8;</code>
-     * @param \Google\Cloud\Vision\V1\LocationInfo[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Vision\V1\LocationInfo>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLocations($var)
@@ -407,7 +407,7 @@ class EntityAnnotation extends \Google\Protobuf\Internal\Message
      * fields, such a score or string that qualifies the entity.
      *
      * Generated from protobuf field <code>repeated .google.cloud.vision.v1.Property properties = 9;</code>
-     * @param \Google\Cloud\Vision\V1\Property[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Vision\V1\Property>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setProperties($var)

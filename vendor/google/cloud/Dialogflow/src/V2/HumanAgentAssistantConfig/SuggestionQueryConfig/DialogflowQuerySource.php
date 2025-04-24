@@ -17,14 +17,20 @@ use Google\Protobuf\Internal\GPBUtil;
 class DialogflowQuerySource extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The name of a Dialogflow virtual agent used for end user side intent
-     * detection and suggestion. Format: `projects/<Project Number/
+     * Required. The name of a Dialogflow virtual agent used for end user side
+     * intent detection and suggestion. Format: `projects/<Project
      * ID>/locations/<Location ID>/agent`. When multiple agents are allowed in
      * the same Dialogflow project.
      *
      * Generated from protobuf field <code>string agent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $agent = '';
+    protected $agent = '';
+    /**
+     * Optional. The Dialogflow assist configuration for human agent.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.HumanAgentAssistantConfig.SuggestionQueryConfig.DialogflowQuerySource.HumanAgentSideConfig human_agent_side_config = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $human_agent_side_config = null;
 
     /**
      * Constructor.
@@ -33,10 +39,12 @@ class DialogflowQuerySource extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $agent
-     *           Required. The name of a Dialogflow virtual agent used for end user side intent
-     *           detection and suggestion. Format: `projects/<Project Number/
+     *           Required. The name of a Dialogflow virtual agent used for end user side
+     *           intent detection and suggestion. Format: `projects/<Project
      *           ID>/locations/<Location ID>/agent`. When multiple agents are allowed in
      *           the same Dialogflow project.
+     *     @type \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig\SuggestionQueryConfig\DialogflowQuerySource\HumanAgentSideConfig $human_agent_side_config
+     *           Optional. The Dialogflow assist configuration for human agent.
      * }
      */
     public function __construct($data = NULL) {
@@ -45,8 +53,8 @@ class DialogflowQuerySource extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of a Dialogflow virtual agent used for end user side intent
-     * detection and suggestion. Format: `projects/<Project Number/
+     * Required. The name of a Dialogflow virtual agent used for end user side
+     * intent detection and suggestion. Format: `projects/<Project
      * ID>/locations/<Location ID>/agent`. When multiple agents are allowed in
      * the same Dialogflow project.
      *
@@ -59,8 +67,8 @@ class DialogflowQuerySource extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of a Dialogflow virtual agent used for end user side intent
-     * detection and suggestion. Format: `projects/<Project Number/
+     * Required. The name of a Dialogflow virtual agent used for end user side
+     * intent detection and suggestion. Format: `projects/<Project
      * ID>/locations/<Location ID>/agent`. When multiple agents are allowed in
      * the same Dialogflow project.
      *
@@ -76,8 +84,42 @@ class DialogflowQuerySource extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * Optional. The Dialogflow assist configuration for human agent.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.HumanAgentAssistantConfig.SuggestionQueryConfig.DialogflowQuerySource.HumanAgentSideConfig human_agent_side_config = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig\SuggestionQueryConfig\DialogflowQuerySource\HumanAgentSideConfig|null
+     */
+    public function getHumanAgentSideConfig()
+    {
+        return $this->human_agent_side_config;
+    }
+
+    public function hasHumanAgentSideConfig()
+    {
+        return isset($this->human_agent_side_config);
+    }
+
+    public function clearHumanAgentSideConfig()
+    {
+        unset($this->human_agent_side_config);
+    }
+
+    /**
+     * Optional. The Dialogflow assist configuration for human agent.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.HumanAgentAssistantConfig.SuggestionQueryConfig.DialogflowQuerySource.HumanAgentSideConfig human_agent_side_config = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig\SuggestionQueryConfig\DialogflowQuerySource\HumanAgentSideConfig $var
+     * @return $this
+     */
+    public function setHumanAgentSideConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig\SuggestionQueryConfig\DialogflowQuerySource\HumanAgentSideConfig::class);
+        $this->human_agent_side_config = $var;
+
+        return $this;
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(DialogflowQuerySource::class, \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig_SuggestionQueryConfig_DialogflowQuerySource::class);
 

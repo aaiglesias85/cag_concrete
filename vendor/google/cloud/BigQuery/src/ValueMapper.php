@@ -46,20 +46,21 @@ class ValueMapper
     const TYPE_STRUCT = 'STRUCT';
     const TYPE_RECORD = 'RECORD';
     const TYPE_GEOGRAPHY = 'GEOGRAPHY';
+    const TYPE_JSON = 'JSON';
 
     const DATETIME_FORMAT = 'Y-m-d H:i:s.u';
     const DATETIME_FORMAT_INSERT = 'Y-m-d\TH:i:s.u';
 
     /**
      * @var bool $returnInt64AsObject If true, 64 bit integers will be returned
-     *      as a {@see Google\Cloud\Core\Int64} object for 32 bit platform
+     *      as a {@see Int64} object for 32 bit platform
      *      compatibility.
      */
     private $returnInt64AsObject;
 
     /**
      * @param bool $returnInt64AsObject If true, 64 bit integers will be
-     *        returned as a {@see Google\Cloud\Core\Int64} object for 32 bit
+     *        returned as a {@see Int64} object for 32 bit
      *        platform compatibility.
      */
     public function __construct($returnInt64AsObject)
@@ -118,6 +119,8 @@ class ValueMapper
                 return $this->recordFromBigQuery($value, $schema['fields']);
             case self::TYPE_GEOGRAPHY:
                 return new Geography((string) $value);
+            case self::TYPE_JSON:
+                return new Json($value);
             default:
                 throw new \InvalidArgumentException(sprintf(
                     'Unrecognized value type %s. Please ensure you are using the latest version of google/cloud.',
@@ -334,7 +337,7 @@ class ValueMapper
 
     /**
      * Converts a timestamp in string format received from BigQuery to a
-     * {@see Google\Cloud\BigQuery\Timestamp}.
+     * {@see Timestamp}.
      *
      * @param string $value The timestamp.
      * @return Timestamp
@@ -357,9 +360,7 @@ class ValueMapper
 
         $parts = explode('.', $value);
         $unixTimestamp = $parts[0];
-        $microSeconds = isset($parts[1])
-            ? $parts[1]
-            : 0;
+        $microSeconds = $parts[1] ?? 0;
 
         $dateTime = new \DateTime("@$unixTimestamp");
 

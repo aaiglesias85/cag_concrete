@@ -20,13 +20,14 @@ class FontSize extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float size = 1;</code>
      */
-    private $size = 0.0;
+    protected $size = 0.0;
     /**
-     * Unit for the font size. Follows CSS naming (in, px, pt, etc.).
+     * Unit for the font size. Follows CSS naming (such as `in`, `px`, and
+     * `pt`).
      *
      * Generated from protobuf field <code>string unit = 2;</code>
      */
-    private $unit = '';
+    protected $unit = '';
 
     /**
      * Constructor.
@@ -37,7 +38,8 @@ class FontSize extends \Google\Protobuf\Internal\Message
      *     @type float $size
      *           Font size for the text.
      *     @type string $unit
-     *           Unit for the font size. Follows CSS naming (in, px, pt, etc.).
+     *           Unit for the font size. Follows CSS naming (such as `in`, `px`, and
+     *           `pt`).
      * }
      */
     public function __construct($data = NULL) {
@@ -72,7 +74,8 @@ class FontSize extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Unit for the font size. Follows CSS naming (in, px, pt, etc.).
+     * Unit for the font size. Follows CSS naming (such as `in`, `px`, and
+     * `pt`).
      *
      * Generated from protobuf field <code>string unit = 2;</code>
      * @return string
@@ -83,7 +86,8 @@ class FontSize extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Unit for the font size. Follows CSS naming (in, px, pt, etc.).
+     * Unit for the font size. Follows CSS naming (such as `in`, `px`, and
+     * `pt`).
      *
      * Generated from protobuf field <code>string unit = 2;</code>
      * @param string $var

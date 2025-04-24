@@ -21,31 +21,44 @@ class Features extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool extract_syntax = 1;</code>
      */
-    private $extract_syntax = false;
+    protected $extract_syntax = false;
     /**
      * Extract entities.
      *
      * Generated from protobuf field <code>bool extract_entities = 2;</code>
      */
-    private $extract_entities = false;
+    protected $extract_entities = false;
     /**
      * Extract document-level sentiment.
      *
      * Generated from protobuf field <code>bool extract_document_sentiment = 3;</code>
      */
-    private $extract_document_sentiment = false;
+    protected $extract_document_sentiment = false;
     /**
      * Extract entities and their associated sentiment.
      *
      * Generated from protobuf field <code>bool extract_entity_sentiment = 4;</code>
      */
-    private $extract_entity_sentiment = false;
+    protected $extract_entity_sentiment = false;
     /**
      * Classify the full document into categories.
      *
      * Generated from protobuf field <code>bool classify_text = 6;</code>
      */
-    private $classify_text = false;
+    protected $classify_text = false;
+    /**
+     * Moderate the document for harmful and sensitive categories.
+     *
+     * Generated from protobuf field <code>bool moderate_text = 11;</code>
+     */
+    protected $moderate_text = false;
+    /**
+     * The model options to use for classification. Defaults to v1 options
+     * if not specified. Only used if `classify_text` is set to true.
+     *
+     * Generated from protobuf field <code>.google.cloud.language.v1.ClassificationModelOptions classification_model_options = 10;</code>
+     */
+    protected $classification_model_options = null;
 
     /**
      * Constructor.
@@ -63,6 +76,11 @@ class Features extends \Google\Protobuf\Internal\Message
      *           Extract entities and their associated sentiment.
      *     @type bool $classify_text
      *           Classify the full document into categories.
+     *     @type bool $moderate_text
+     *           Moderate the document for harmful and sensitive categories.
+     *     @type \Google\Cloud\Language\V1\ClassificationModelOptions $classification_model_options
+     *           The model options to use for classification. Defaults to v1 options
+     *           if not specified. Only used if `classify_text` is set to true.
      * }
      */
     public function __construct($data = NULL) {
@@ -200,8 +218,70 @@ class Features extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * Moderate the document for harmful and sensitive categories.
+     *
+     * Generated from protobuf field <code>bool moderate_text = 11;</code>
+     * @return bool
+     */
+    public function getModerateText()
+    {
+        return $this->moderate_text;
+    }
+
+    /**
+     * Moderate the document for harmful and sensitive categories.
+     *
+     * Generated from protobuf field <code>bool moderate_text = 11;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setModerateText($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->moderate_text = $var;
+
+        return $this;
+    }
+
+    /**
+     * The model options to use for classification. Defaults to v1 options
+     * if not specified. Only used if `classify_text` is set to true.
+     *
+     * Generated from protobuf field <code>.google.cloud.language.v1.ClassificationModelOptions classification_model_options = 10;</code>
+     * @return \Google\Cloud\Language\V1\ClassificationModelOptions|null
+     */
+    public function getClassificationModelOptions()
+    {
+        return $this->classification_model_options;
+    }
+
+    public function hasClassificationModelOptions()
+    {
+        return isset($this->classification_model_options);
+    }
+
+    public function clearClassificationModelOptions()
+    {
+        unset($this->classification_model_options);
+    }
+
+    /**
+     * The model options to use for classification. Defaults to v1 options
+     * if not specified. Only used if `classify_text` is set to true.
+     *
+     * Generated from protobuf field <code>.google.cloud.language.v1.ClassificationModelOptions classification_model_options = 10;</code>
+     * @param \Google\Cloud\Language\V1\ClassificationModelOptions $var
+     * @return $this
+     */
+    public function setClassificationModelOptions($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Language\V1\ClassificationModelOptions::class);
+        $this->classification_model_options = $var;
+
+        return $this;
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Features::class, \Google\Cloud\Language\V1\AnnotateTextRequest_Features::class);
 

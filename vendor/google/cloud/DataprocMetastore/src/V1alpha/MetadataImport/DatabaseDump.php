@@ -29,7 +29,7 @@ class DatabaseDump extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string gcs_uri = 2;</code>
      */
-    private $gcs_uri = '';
+    protected $gcs_uri = '';
     /**
      * The name of the source database.
      *
@@ -38,11 +38,12 @@ class DatabaseDump extends \Google\Protobuf\Internal\Message
      */
     protected $source_database = '';
     /**
-     * Optional. The type of the database dump. If unspecified, defaults to `MYSQL`.
+     * Optional. The type of the database dump. If unspecified, defaults to
+     * `MYSQL`.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1alpha.DatabaseDumpSpec.Type type = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $type = 0;
+    protected $type = 0;
 
     /**
      * Constructor.
@@ -58,7 +59,8 @@ class DatabaseDump extends \Google\Protobuf\Internal\Message
      *     @type string $source_database
      *           The name of the source database.
      *     @type int $type
-     *           Optional. The type of the database dump. If unspecified, defaults to `MYSQL`.
+     *           Optional. The type of the database dump. If unspecified, defaults to
+     *           `MYSQL`.
      * }
      */
     public function __construct($data = NULL) {
@@ -155,7 +157,8 @@ class DatabaseDump extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The type of the database dump. If unspecified, defaults to `MYSQL`.
+     * Optional. The type of the database dump. If unspecified, defaults to
+     * `MYSQL`.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1alpha.DatabaseDumpSpec.Type type = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -166,7 +169,8 @@ class DatabaseDump extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The type of the database dump. If unspecified, defaults to `MYSQL`.
+     * Optional. The type of the database dump. If unspecified, defaults to
+     * `MYSQL`.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1alpha.DatabaseDumpSpec.Type type = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -182,6 +186,4 @@ class DatabaseDump extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(DatabaseDump::class, \Google\Cloud\Metastore\V1alpha\MetadataImport_DatabaseDump::class);
 

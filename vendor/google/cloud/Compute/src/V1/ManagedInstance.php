@@ -54,6 +54,12 @@ class ManagedInstance extends \Google\Protobuf\Internal\Message
      */
     private $last_attempt = null;
     /**
+     * [Output Only] The name of the instance. The name always exists even if the instance has not yet been created.
+     *
+     * Generated from protobuf field <code>optional string name = 3373707;</code>
+     */
+    private $name = null;
+    /**
      * [Output Only] Preserved state applied from per-instance config for this instance.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.PreservedState preserved_state_from_config = 98661858;</code>
@@ -65,6 +71,12 @@ class ManagedInstance extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.PreservedState preserved_state_from_policy = 470783954;</code>
      */
     private $preserved_state_from_policy = null;
+    /**
+     * [Output Only] Instance properties selected for this instance resulting from InstanceFlexibilityPolicy.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.ManagedInstancePropertiesFromFlexibilityPolicy properties_from_flexibility_policy = 155525825;</code>
+     */
+    private $properties_from_flexibility_policy = null;
     /**
      * [Output Only] Intended version of this instance.
      *
@@ -85,17 +97,21 @@ class ManagedInstance extends \Google\Protobuf\Internal\Message
      *           [Output only] The unique identifier for this resource. This field is empty when instance does not exist.
      *     @type string $instance
      *           [Output Only] The URL of the instance. The URL can exist even if the instance has not yet been created.
-     *     @type \Google\Cloud\Compute\V1\ManagedInstanceInstanceHealth[]|\Google\Protobuf\Internal\RepeatedField $instance_health
+     *     @type array<\Google\Cloud\Compute\V1\ManagedInstanceInstanceHealth>|\Google\Protobuf\Internal\RepeatedField $instance_health
      *           [Output Only] Health state of the instance per health-check.
      *     @type string $instance_status
      *           [Output Only] The status of the instance. This field is empty when the instance does not exist.
      *           Check the InstanceStatus enum for the list of possible values.
      *     @type \Google\Cloud\Compute\V1\ManagedInstanceLastAttempt $last_attempt
      *           [Output Only] Information about the last attempt to create or delete the instance.
+     *     @type string $name
+     *           [Output Only] The name of the instance. The name always exists even if the instance has not yet been created.
      *     @type \Google\Cloud\Compute\V1\PreservedState $preserved_state_from_config
      *           [Output Only] Preserved state applied from per-instance config for this instance.
      *     @type \Google\Cloud\Compute\V1\PreservedState $preserved_state_from_policy
      *           [Output Only] Preserved state generated based on stateful policy for this instance.
+     *     @type \Google\Cloud\Compute\V1\ManagedInstancePropertiesFromFlexibilityPolicy $properties_from_flexibility_policy
+     *           [Output Only] Instance properties selected for this instance resulting from InstanceFlexibilityPolicy.
      *     @type \Google\Cloud\Compute\V1\ManagedInstanceVersion $version
      *           [Output Only] Intended version of this instance.
      * }
@@ -230,7 +246,7 @@ class ManagedInstance extends \Google\Protobuf\Internal\Message
      * [Output Only] Health state of the instance per health-check.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.ManagedInstanceInstanceHealth instance_health = 382667078;</code>
-     * @param \Google\Cloud\Compute\V1\ManagedInstanceInstanceHealth[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\ManagedInstanceInstanceHealth>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInstanceHealth($var)
@@ -316,6 +332,42 @@ class ManagedInstance extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * [Output Only] The name of the instance. The name always exists even if the instance has not yet been created.
+     *
+     * Generated from protobuf field <code>optional string name = 3373707;</code>
+     * @return string
+     */
+    public function getName()
+    {
+        return isset($this->name) ? $this->name : '';
+    }
+
+    public function hasName()
+    {
+        return isset($this->name);
+    }
+
+    public function clearName()
+    {
+        unset($this->name);
+    }
+
+    /**
+     * [Output Only] The name of the instance. The name always exists even if the instance has not yet been created.
+     *
+     * Generated from protobuf field <code>optional string name = 3373707;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->name = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] Preserved state applied from per-instance config for this instance.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.PreservedState preserved_state_from_config = 98661858;</code>
@@ -383,6 +435,42 @@ class ManagedInstance extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\PreservedState::class);
         $this->preserved_state_from_policy = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] Instance properties selected for this instance resulting from InstanceFlexibilityPolicy.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.ManagedInstancePropertiesFromFlexibilityPolicy properties_from_flexibility_policy = 155525825;</code>
+     * @return \Google\Cloud\Compute\V1\ManagedInstancePropertiesFromFlexibilityPolicy|null
+     */
+    public function getPropertiesFromFlexibilityPolicy()
+    {
+        return $this->properties_from_flexibility_policy;
+    }
+
+    public function hasPropertiesFromFlexibilityPolicy()
+    {
+        return isset($this->properties_from_flexibility_policy);
+    }
+
+    public function clearPropertiesFromFlexibilityPolicy()
+    {
+        unset($this->properties_from_flexibility_policy);
+    }
+
+    /**
+     * [Output Only] Instance properties selected for this instance resulting from InstanceFlexibilityPolicy.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.ManagedInstancePropertiesFromFlexibilityPolicy properties_from_flexibility_policy = 155525825;</code>
+     * @param \Google\Cloud\Compute\V1\ManagedInstancePropertiesFromFlexibilityPolicy $var
+     * @return $this
+     */
+    public function setPropertiesFromFlexibilityPolicy($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\ManagedInstancePropertiesFromFlexibilityPolicy::class);
+        $this->properties_from_flexibility_policy = $var;
 
         return $this;
     }

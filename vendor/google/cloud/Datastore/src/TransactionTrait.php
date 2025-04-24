@@ -17,6 +17,7 @@
 
 namespace Google\Cloud\Datastore;
 
+use Google\Cloud\Datastore\Query\AggregationQuery;
 use Google\Cloud\Datastore\Query\QueryInterface;
 
 /**
@@ -74,8 +75,8 @@ trait TransactionTrait
      *     Configuration Options
      *
      *     @type string $className The name of the class to return results as.
-     *           Must be a subclass of {@see Google\Cloud\Datastore\Entity}.
-     *           If not set, {@see Google\Cloud\Datastore\Entity} will be used.
+     *           Must be a subclass of {@see \Google\Cloud\Datastore\Entity}.
+     *           If not set, {@see \Google\Cloud\Datastore\Entity} will be used.
      * }
      * @return EntityInterface|null
      */
@@ -110,18 +111,18 @@ trait TransactionTrait
      *     Configuration Options
      *
      *     @type string|array $className If a string, the name of the class to return results as.
-     *           Must be a subclass of {@see Google\Cloud\Datastore\Entity}.
-     *           If not set, {@see Google\Cloud\Datastore\Entity} will be used.
+     *           Must be a subclass of {@see \Google\Cloud\Datastore\Entity}.
+     *           If not set, {@see \Google\Cloud\Datastore\Entity} will be used.
      *           If an array is given, it must be an associative array, where
      *           the key is a Kind and the value is the name of a subclass of
-     *           {@see Google\Cloud\Datastore\Entity}.
+     *           {@see \Google\Cloud\Datastore\Entity}.
      *     @type bool $sort If set to true, results in each set will be sorted
      *           to match the order given in $keys. **Defaults to** `false`.
      * }
      * @return array Returns an array with keys [`found`, `missing`, and `deferred`].
      *         Members of `found` will be instance of
-     *         {@see Google\Cloud\Datastore\Entity}. Members of `missing` and
-     *         `deferred` will be instance of {@see Google\Cloud\Datastore\Key}.
+     *         {@see \Google\Cloud\Datastore\Entity}. Members of `missing` and
+     *         `deferred` will be instance of {@see \Google\Cloud\Datastore\Key}.
      */
     public function lookupBatch(array $keys, array $options = [])
     {
@@ -147,14 +148,42 @@ trait TransactionTrait
      *     Configuration Options
      *
      *     @type string $className The name of the class to return results as.
-     *           Must be a subclass of {@see Google\Cloud\Datastore\Entity}.
-     *           If not set, {@see Google\Cloud\Datastore\Entity} will be used.
+     *           Must be a subclass of {@see \Google\Cloud\Datastore\Entity}.
+     *           If not set, {@see \Google\Cloud\Datastore\Entity} will be used.
      * }
      * @return EntityIterator<EntityInterface>
      */
     public function runQuery(QueryInterface $query, array $options = [])
     {
         return $this->operation->runQuery($query, $options + [
+            'transaction' => $this->transactionId
+        ]);
+    }
+
+    /**
+     * Run an Aggregation query and return aggregation results inside a Transaction.
+     *
+     * Example:
+     * ```
+     * $results = $transaction->runAggregationQuery($query);
+     *
+     * echo $results->get('total');
+     * ```
+     *
+     * @param AggregationQuery $query The AggregationQuery object.
+     * @param array $options [optional] {
+     *     Configuration Options
+     *
+     *     @type string $readConsistency See
+     *           [ReadConsistency](https://cloud.google.com/datastore/reference/rest/v1/ReadOptions#ReadConsistency).
+     *     @type string $databaseId ID of the database to which the entities belong.
+     *     @type Timestamp $readTime Reads entities as they were at the given timestamp.
+     * }
+     * @return AggregationQueryResult
+     */
+    public function runAggregationQuery(AggregationQuery $query, array $options = [])
+    {
+        return $this->operation->runAggregationQuery($query, $options + [
             'transaction' => $this->transactionId
         ]);
     }

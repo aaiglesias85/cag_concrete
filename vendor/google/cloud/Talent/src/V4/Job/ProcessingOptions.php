@@ -21,7 +21,7 @@ class ProcessingOptions extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool disable_street_address_resolution = 1;</code>
      */
-    private $disable_street_address_resolution = false;
+    protected $disable_street_address_resolution = false;
     /**
      * Option for job HTML content sanitization. Applied fields are:
      * * description
@@ -31,11 +31,12 @@ class ProcessingOptions extends \Google\Protobuf\Internal\Message
      * * responsibilities
      * HTML tags in these fields may be stripped if sanitiazation isn't
      * disabled.
-     * Defaults to [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
+     * Defaults to
+     * [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
      *
      * Generated from protobuf field <code>.google.cloud.talent.v4.HtmlSanitization html_sanitization = 2;</code>
      */
-    private $html_sanitization = 0;
+    protected $html_sanitization = 0;
 
     /**
      * Constructor.
@@ -55,7 +56,8 @@ class ProcessingOptions extends \Google\Protobuf\Internal\Message
      *           * responsibilities
      *           HTML tags in these fields may be stripped if sanitiazation isn't
      *           disabled.
-     *           Defaults to [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
+     *           Defaults to
+     *           [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
      * }
      */
     public function __construct($data = NULL) {
@@ -100,7 +102,8 @@ class ProcessingOptions extends \Google\Protobuf\Internal\Message
      * * responsibilities
      * HTML tags in these fields may be stripped if sanitiazation isn't
      * disabled.
-     * Defaults to [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
+     * Defaults to
+     * [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
      *
      * Generated from protobuf field <code>.google.cloud.talent.v4.HtmlSanitization html_sanitization = 2;</code>
      * @return int
@@ -119,7 +122,8 @@ class ProcessingOptions extends \Google\Protobuf\Internal\Message
      * * responsibilities
      * HTML tags in these fields may be stripped if sanitiazation isn't
      * disabled.
-     * Defaults to [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
+     * Defaults to
+     * [HtmlSanitization.SIMPLE_FORMATTING_ONLY][google.cloud.talent.v4.HtmlSanitization.SIMPLE_FORMATTING_ONLY].
      *
      * Generated from protobuf field <code>.google.cloud.talent.v4.HtmlSanitization html_sanitization = 2;</code>
      * @param int $var

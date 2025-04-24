@@ -9,44 +9,61 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * Properties of the provided event token.
+ *
  * Generated from protobuf message <code>google.cloud.recaptchaenterprise.v1.TokenProperties</code>
  */
 class TokenProperties extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Whether the provided user response token is valid. When valid = false, the
-     * reason could be specified in invalid_reason or it could also be due to
-     * a user failing to solve a challenge or a sitekey mismatch (i.e the sitekey
-     * used to generate the token was different than the one specified in the
-     * assessment).
+     * Output only. Whether the provided user response token is valid. When valid
+     * = false, the reason could be specified in invalid_reason or it could also
+     * be due to a user failing to solve a challenge or a sitekey mismatch (i.e
+     * the sitekey used to generate the token was different than the one specified
+     * in the assessment).
      *
-     * Generated from protobuf field <code>bool valid = 1;</code>
+     * Generated from protobuf field <code>bool valid = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $valid = false;
+    protected $valid = false;
     /**
-     * Reason associated with the response when valid = false.
+     * Output only. Reason associated with the response when valid = false.
      *
-     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TokenProperties.InvalidReason invalid_reason = 2;</code>
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TokenProperties.InvalidReason invalid_reason = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $invalid_reason = 0;
+    protected $invalid_reason = 0;
     /**
-     * The timestamp corresponding to the generation of the token.
+     * Output only. The timestamp corresponding to the generation of the token.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
-     * The hostname of the page on which the token was generated.
+     * Output only. The hostname of the page on which the token was generated (Web
+     * keys only).
      *
-     * Generated from protobuf field <code>string hostname = 4;</code>
+     * Generated from protobuf field <code>string hostname = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $hostname = '';
+    protected $hostname = '';
     /**
-     * Action name provided at token generation.
+     * Output only. The name of the Android package with which the token was
+     * generated (Android keys only).
      *
-     * Generated from protobuf field <code>string action = 5;</code>
+     * Generated from protobuf field <code>string android_package_name = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $action = '';
+    protected $android_package_name = '';
+    /**
+     * Output only. The ID of the iOS bundle with which the token was generated
+     * (iOS keys only).
+     *
+     * Generated from protobuf field <code>string ios_bundle_id = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $ios_bundle_id = '';
+    /**
+     * Output only. Action name provided at token generation.
+     *
+     * Generated from protobuf field <code>string action = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $action = '';
 
     /**
      * Constructor.
@@ -55,19 +72,26 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type bool $valid
-     *           Whether the provided user response token is valid. When valid = false, the
-     *           reason could be specified in invalid_reason or it could also be due to
-     *           a user failing to solve a challenge or a sitekey mismatch (i.e the sitekey
-     *           used to generate the token was different than the one specified in the
-     *           assessment).
+     *           Output only. Whether the provided user response token is valid. When valid
+     *           = false, the reason could be specified in invalid_reason or it could also
+     *           be due to a user failing to solve a challenge or a sitekey mismatch (i.e
+     *           the sitekey used to generate the token was different than the one specified
+     *           in the assessment).
      *     @type int $invalid_reason
-     *           Reason associated with the response when valid = false.
+     *           Output only. Reason associated with the response when valid = false.
      *     @type \Google\Protobuf\Timestamp $create_time
-     *           The timestamp corresponding to the generation of the token.
+     *           Output only. The timestamp corresponding to the generation of the token.
      *     @type string $hostname
-     *           The hostname of the page on which the token was generated.
+     *           Output only. The hostname of the page on which the token was generated (Web
+     *           keys only).
+     *     @type string $android_package_name
+     *           Output only. The name of the Android package with which the token was
+     *           generated (Android keys only).
+     *     @type string $ios_bundle_id
+     *           Output only. The ID of the iOS bundle with which the token was generated
+     *           (iOS keys only).
      *     @type string $action
-     *           Action name provided at token generation.
+     *           Output only. Action name provided at token generation.
      * }
      */
     public function __construct($data = NULL) {
@@ -76,13 +100,13 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Whether the provided user response token is valid. When valid = false, the
-     * reason could be specified in invalid_reason or it could also be due to
-     * a user failing to solve a challenge or a sitekey mismatch (i.e the sitekey
-     * used to generate the token was different than the one specified in the
-     * assessment).
+     * Output only. Whether the provided user response token is valid. When valid
+     * = false, the reason could be specified in invalid_reason or it could also
+     * be due to a user failing to solve a challenge or a sitekey mismatch (i.e
+     * the sitekey used to generate the token was different than the one specified
+     * in the assessment).
      *
-     * Generated from protobuf field <code>bool valid = 1;</code>
+     * Generated from protobuf field <code>bool valid = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return bool
      */
     public function getValid()
@@ -91,13 +115,13 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Whether the provided user response token is valid. When valid = false, the
-     * reason could be specified in invalid_reason or it could also be due to
-     * a user failing to solve a challenge or a sitekey mismatch (i.e the sitekey
-     * used to generate the token was different than the one specified in the
-     * assessment).
+     * Output only. Whether the provided user response token is valid. When valid
+     * = false, the reason could be specified in invalid_reason or it could also
+     * be due to a user failing to solve a challenge or a sitekey mismatch (i.e
+     * the sitekey used to generate the token was different than the one specified
+     * in the assessment).
      *
-     * Generated from protobuf field <code>bool valid = 1;</code>
+     * Generated from protobuf field <code>bool valid = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param bool $var
      * @return $this
      */
@@ -110,9 +134,9 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reason associated with the response when valid = false.
+     * Output only. Reason associated with the response when valid = false.
      *
-     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TokenProperties.InvalidReason invalid_reason = 2;</code>
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TokenProperties.InvalidReason invalid_reason = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return int
      */
     public function getInvalidReason()
@@ -121,9 +145,9 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reason associated with the response when valid = false.
+     * Output only. Reason associated with the response when valid = false.
      *
-     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TokenProperties.InvalidReason invalid_reason = 2;</code>
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TokenProperties.InvalidReason invalid_reason = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param int $var
      * @return $this
      */
@@ -136,9 +160,9 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The timestamp corresponding to the generation of the token.
+     * Output only. The timestamp corresponding to the generation of the token.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
      */
     public function getCreateTime()
@@ -157,9 +181,9 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The timestamp corresponding to the generation of the token.
+     * Output only. The timestamp corresponding to the generation of the token.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var
      * @return $this
      */
@@ -172,9 +196,10 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The hostname of the page on which the token was generated.
+     * Output only. The hostname of the page on which the token was generated (Web
+     * keys only).
      *
-     * Generated from protobuf field <code>string hostname = 4;</code>
+     * Generated from protobuf field <code>string hostname = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getHostname()
@@ -183,9 +208,10 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The hostname of the page on which the token was generated.
+     * Output only. The hostname of the page on which the token was generated (Web
+     * keys only).
      *
-     * Generated from protobuf field <code>string hostname = 4;</code>
+     * Generated from protobuf field <code>string hostname = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -198,9 +224,65 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Action name provided at token generation.
+     * Output only. The name of the Android package with which the token was
+     * generated (Android keys only).
      *
-     * Generated from protobuf field <code>string action = 5;</code>
+     * Generated from protobuf field <code>string android_package_name = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getAndroidPackageName()
+    {
+        return $this->android_package_name;
+    }
+
+    /**
+     * Output only. The name of the Android package with which the token was
+     * generated (Android keys only).
+     *
+     * Generated from protobuf field <code>string android_package_name = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAndroidPackageName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->android_package_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The ID of the iOS bundle with which the token was generated
+     * (iOS keys only).
+     *
+     * Generated from protobuf field <code>string ios_bundle_id = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getIosBundleId()
+    {
+        return $this->ios_bundle_id;
+    }
+
+    /**
+     * Output only. The ID of the iOS bundle with which the token was generated
+     * (iOS keys only).
+     *
+     * Generated from protobuf field <code>string ios_bundle_id = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setIosBundleId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ios_bundle_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Action name provided at token generation.
+     *
+     * Generated from protobuf field <code>string action = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getAction()
@@ -209,9 +291,9 @@ class TokenProperties extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Action name provided at token generation.
+     * Output only. Action name provided at token generation.
      *
-     * Generated from protobuf field <code>string action = 5;</code>
+     * Generated from protobuf field <code>string action = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */

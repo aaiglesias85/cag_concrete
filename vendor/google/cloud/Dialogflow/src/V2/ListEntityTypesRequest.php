@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [EntityTypes.ListEntityTypes][google.cloud.dialogflow.v2.EntityTypes.ListEntityTypes].
+ * The request message for
+ * [EntityTypes.ListEntityTypes][google.cloud.dialogflow.v2.EntityTypes.ListEntityTypes].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListEntityTypesRequest</code>
  */
@@ -21,7 +22,7 @@ class ListEntityTypesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. The language used to access language-specific data.
      * If not specified, the agent's default language is used.
@@ -31,20 +32,56 @@ class ListEntityTypesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * Optional. The maximum number of items to return in a single page. By
      * default 100 and at most 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The next_page_token value returned from a previous list request.
      *
      * Generated from protobuf field <code>string page_token = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The agent to list all entity types from.
+     *                       Format: `projects/<Project ID>/agent`. Please see
+     *                       {@see EntityTypesClient::agentName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\ListEntityTypesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
+
+    /**
+     * @param string $parent       Required. The agent to list all entity types from.
+     *                             Format: `projects/<Project ID>/agent`. Please see
+     *                             {@see EntityTypesClient::agentName()} for help formatting this field.
+     * @param string $languageCode Optional. The language used to access language-specific data.
+     *                             If not specified, the agent's default language is used.
+     *                             For more information, see
+     *                             [Multilingual intent and entity
+     *                             data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+     *
+     * @return \Google\Cloud\Dialogflow\V2\ListEntityTypesRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParentLanguageCode(string $parent, string $languageCode): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setLanguageCode($languageCode);
+    }
 
     /**
      * Constructor.

@@ -10,7 +10,7 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * Configuration of the timespan of the items to include in scanning.
- * Currently only supported when inspecting Google Cloud Storage and BigQuery.
+ * Currently only supported when inspecting Cloud Storage and BigQuery.
  *
  * Generated from protobuf message <code>google.privacy.dlp.v2.StorageConfig.TimespanConfig</code>
  */
@@ -22,18 +22,18 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 1;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * Exclude files, tables, or rows newer than this value.
      * If not set, no upper time limit is applied.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2;</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * Specification of the field containing the timestamp of scanned items.
      * Used for data sources like Datastore and BigQuery.
-     * For BigQuery:
+     * **For BigQuery**
      * If this value is not specified and the table was modified between the
      * given start and end times, the entire table will be scanned. If this
      * value is specified, then rows are filtered based on the given start and
@@ -41,24 +41,44 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      * skipped.
      * Valid data types of the provided BigQuery column are: `INTEGER`, `DATE`,
      * `TIMESTAMP`, and `DATETIME`.
-     * For Datastore:
+     * If your BigQuery table is [partitioned at ingestion
+     * time](https://cloud.google.com/bigquery/docs/partitioned-tables#ingestion_time),
+     * you can use any of the following pseudo-columns as your timestamp field.
+     * When used with Cloud DLP, these pseudo-column names are case sensitive.
+     * - `_PARTITIONTIME`
+     * - `_PARTITIONDATE`
+     * - `_PARTITION_LOAD_TIME`
+     * **For Datastore**
      * If this value is specified, then entities are filtered based on the given
      * start and end times. If an entity does not contain the provided timestamp
      * property or contains empty or invalid values, then it is included.
      * Valid data types of the provided timestamp property are: `TIMESTAMP`.
+     * See the
+     * [known
+     * issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#bq-timespan)
+     * related to this operation.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId timestamp_field = 3;</code>
      */
-    private $timestamp_field = null;
+    protected $timestamp_field = null;
     /**
      * When the job is started by a JobTrigger we will automatically figure out
      * a valid start_time to avoid scanning files that have not been modified
      * since the last time the JobTrigger executed. This will be based on the
-     * time of the execution of the last run of the JobTrigger.
+     * time of the execution of the last run of the JobTrigger or the timespan
+     * end_time used in the last run of the JobTrigger.
+     * **For BigQuery**
+     * Inspect jobs triggered by automatic population will scan data that is at
+     * least three hours old when the job starts. This is because streaming
+     * buffer rows are not read during inspection and reading up to the current
+     * timestamp will result in skipped rows.
+     * See the [known
+     * issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#recently-streamed-data)
+     * related to this operation.
      *
      * Generated from protobuf field <code>bool enable_auto_population_of_timespan_config = 4;</code>
      */
-    private $enable_auto_population_of_timespan_config = false;
+    protected $enable_auto_population_of_timespan_config = false;
 
     /**
      * Constructor.
@@ -75,7 +95,7 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Dlp\V2\FieldId $timestamp_field
      *           Specification of the field containing the timestamp of scanned items.
      *           Used for data sources like Datastore and BigQuery.
-     *           For BigQuery:
+     *           **For BigQuery**
      *           If this value is not specified and the table was modified between the
      *           given start and end times, the entire table will be scanned. If this
      *           value is specified, then rows are filtered based on the given start and
@@ -83,16 +103,36 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      *           skipped.
      *           Valid data types of the provided BigQuery column are: `INTEGER`, `DATE`,
      *           `TIMESTAMP`, and `DATETIME`.
-     *           For Datastore:
+     *           If your BigQuery table is [partitioned at ingestion
+     *           time](https://cloud.google.com/bigquery/docs/partitioned-tables#ingestion_time),
+     *           you can use any of the following pseudo-columns as your timestamp field.
+     *           When used with Cloud DLP, these pseudo-column names are case sensitive.
+     *           - `_PARTITIONTIME`
+     *           - `_PARTITIONDATE`
+     *           - `_PARTITION_LOAD_TIME`
+     *           **For Datastore**
      *           If this value is specified, then entities are filtered based on the given
      *           start and end times. If an entity does not contain the provided timestamp
      *           property or contains empty or invalid values, then it is included.
      *           Valid data types of the provided timestamp property are: `TIMESTAMP`.
+     *           See the
+     *           [known
+     *           issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#bq-timespan)
+     *           related to this operation.
      *     @type bool $enable_auto_population_of_timespan_config
      *           When the job is started by a JobTrigger we will automatically figure out
      *           a valid start_time to avoid scanning files that have not been modified
      *           since the last time the JobTrigger executed. This will be based on the
-     *           time of the execution of the last run of the JobTrigger.
+     *           time of the execution of the last run of the JobTrigger or the timespan
+     *           end_time used in the last run of the JobTrigger.
+     *           **For BigQuery**
+     *           Inspect jobs triggered by automatic population will scan data that is at
+     *           least three hours old when the job starts. This is because streaming
+     *           buffer rows are not read during inspection and reading up to the current
+     *           timestamp will result in skipped rows.
+     *           See the [known
+     *           issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#recently-streamed-data)
+     *           related to this operation.
      * }
      */
     public function __construct($data = NULL) {
@@ -179,7 +219,7 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
     /**
      * Specification of the field containing the timestamp of scanned items.
      * Used for data sources like Datastore and BigQuery.
-     * For BigQuery:
+     * **For BigQuery**
      * If this value is not specified and the table was modified between the
      * given start and end times, the entire table will be scanned. If this
      * value is specified, then rows are filtered based on the given start and
@@ -187,11 +227,22 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      * skipped.
      * Valid data types of the provided BigQuery column are: `INTEGER`, `DATE`,
      * `TIMESTAMP`, and `DATETIME`.
-     * For Datastore:
+     * If your BigQuery table is [partitioned at ingestion
+     * time](https://cloud.google.com/bigquery/docs/partitioned-tables#ingestion_time),
+     * you can use any of the following pseudo-columns as your timestamp field.
+     * When used with Cloud DLP, these pseudo-column names are case sensitive.
+     * - `_PARTITIONTIME`
+     * - `_PARTITIONDATE`
+     * - `_PARTITION_LOAD_TIME`
+     * **For Datastore**
      * If this value is specified, then entities are filtered based on the given
      * start and end times. If an entity does not contain the provided timestamp
      * property or contains empty or invalid values, then it is included.
      * Valid data types of the provided timestamp property are: `TIMESTAMP`.
+     * See the
+     * [known
+     * issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#bq-timespan)
+     * related to this operation.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId timestamp_field = 3;</code>
      * @return \Google\Cloud\Dlp\V2\FieldId|null
@@ -214,7 +265,7 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
     /**
      * Specification of the field containing the timestamp of scanned items.
      * Used for data sources like Datastore and BigQuery.
-     * For BigQuery:
+     * **For BigQuery**
      * If this value is not specified and the table was modified between the
      * given start and end times, the entire table will be scanned. If this
      * value is specified, then rows are filtered based on the given start and
@@ -222,11 +273,22 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      * skipped.
      * Valid data types of the provided BigQuery column are: `INTEGER`, `DATE`,
      * `TIMESTAMP`, and `DATETIME`.
-     * For Datastore:
+     * If your BigQuery table is [partitioned at ingestion
+     * time](https://cloud.google.com/bigquery/docs/partitioned-tables#ingestion_time),
+     * you can use any of the following pseudo-columns as your timestamp field.
+     * When used with Cloud DLP, these pseudo-column names are case sensitive.
+     * - `_PARTITIONTIME`
+     * - `_PARTITIONDATE`
+     * - `_PARTITION_LOAD_TIME`
+     * **For Datastore**
      * If this value is specified, then entities are filtered based on the given
      * start and end times. If an entity does not contain the provided timestamp
      * property or contains empty or invalid values, then it is included.
      * Valid data types of the provided timestamp property are: `TIMESTAMP`.
+     * See the
+     * [known
+     * issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#bq-timespan)
+     * related to this operation.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId timestamp_field = 3;</code>
      * @param \Google\Cloud\Dlp\V2\FieldId $var
@@ -244,7 +306,16 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      * When the job is started by a JobTrigger we will automatically figure out
      * a valid start_time to avoid scanning files that have not been modified
      * since the last time the JobTrigger executed. This will be based on the
-     * time of the execution of the last run of the JobTrigger.
+     * time of the execution of the last run of the JobTrigger or the timespan
+     * end_time used in the last run of the JobTrigger.
+     * **For BigQuery**
+     * Inspect jobs triggered by automatic population will scan data that is at
+     * least three hours old when the job starts. This is because streaming
+     * buffer rows are not read during inspection and reading up to the current
+     * timestamp will result in skipped rows.
+     * See the [known
+     * issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#recently-streamed-data)
+     * related to this operation.
      *
      * Generated from protobuf field <code>bool enable_auto_population_of_timespan_config = 4;</code>
      * @return bool
@@ -258,7 +329,16 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
      * When the job is started by a JobTrigger we will automatically figure out
      * a valid start_time to avoid scanning files that have not been modified
      * since the last time the JobTrigger executed. This will be based on the
-     * time of the execution of the last run of the JobTrigger.
+     * time of the execution of the last run of the JobTrigger or the timespan
+     * end_time used in the last run of the JobTrigger.
+     * **For BigQuery**
+     * Inspect jobs triggered by automatic population will scan data that is at
+     * least three hours old when the job starts. This is because streaming
+     * buffer rows are not read during inspection and reading up to the current
+     * timestamp will result in skipped rows.
+     * See the [known
+     * issue](https://cloud.google.com/sensitive-data-protection/docs/known-issues#recently-streamed-data)
+     * related to this operation.
      *
      * Generated from protobuf field <code>bool enable_auto_population_of_timespan_config = 4;</code>
      * @param bool $var
@@ -274,6 +354,4 @@ class TimespanConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(TimespanConfig::class, \Google\Cloud\Dlp\V2\StorageConfig_TimespanConfig::class);
 

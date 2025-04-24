@@ -21,6 +21,12 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      */
     private $accelerators;
     /**
+     * Node resources that are reserved by all instances.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InstanceConsumptionInfo consumed_resources = 334527118;</code>
+     */
+    private $consumed_resources = null;
+    /**
      * CPU overcommit.
      * Check the CpuOvercommitType enum for the list of possible values.
      *
@@ -33,6 +39,12 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.LocalDisk disks = 95594102;</code>
      */
     private $disks;
+    /**
+     * Instance data that shows consumed resources on the node.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.compute.v1.InstanceConsumptionData instance_consumption_data = 84715576;</code>
+     */
+    private $instance_consumption_data;
     /**
      * Instances scheduled on this node.
      *
@@ -76,6 +88,18 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string status = 181260274;</code>
      */
     private $status = null;
+    /**
+     * Total amount of available resources on the node.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InstanceConsumptionInfo total_resources = 97406698;</code>
+     */
+    private $total_resources = null;
+    /**
+     * [Output Only] The information about an upcoming maintenance event.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.UpcomingMaintenance upcoming_maintenance = 227348592;</code>
+     */
+    private $upcoming_maintenance = null;
 
     /**
      * Constructor.
@@ -83,14 +107,18 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Compute\V1\AcceleratorConfig[]|\Google\Protobuf\Internal\RepeatedField $accelerators
+     *     @type array<\Google\Cloud\Compute\V1\AcceleratorConfig>|\Google\Protobuf\Internal\RepeatedField $accelerators
      *           Accelerators for this node.
+     *     @type \Google\Cloud\Compute\V1\InstanceConsumptionInfo $consumed_resources
+     *           Node resources that are reserved by all instances.
      *     @type string $cpu_overcommit_type
      *           CPU overcommit.
      *           Check the CpuOvercommitType enum for the list of possible values.
-     *     @type \Google\Cloud\Compute\V1\LocalDisk[]|\Google\Protobuf\Internal\RepeatedField $disks
+     *     @type array<\Google\Cloud\Compute\V1\LocalDisk>|\Google\Protobuf\Internal\RepeatedField $disks
      *           Local disk configurations.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $instances
+     *     @type array<\Google\Cloud\Compute\V1\InstanceConsumptionData>|\Google\Protobuf\Internal\RepeatedField $instance_consumption_data
+     *           Instance data that shows consumed resources on the node.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $instances
      *           Instances scheduled on this node.
      *     @type string $name
      *           The name of the node.
@@ -105,6 +133,10 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      *     @type string $status
      *           
      *           Check the Status enum for the list of possible values.
+     *     @type \Google\Cloud\Compute\V1\InstanceConsumptionInfo $total_resources
+     *           Total amount of available resources on the node.
+     *     @type \Google\Cloud\Compute\V1\UpcomingMaintenance $upcoming_maintenance
+     *           [Output Only] The information about an upcoming maintenance event.
      * }
      */
     public function __construct($data = NULL) {
@@ -127,13 +159,49 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      * Accelerators for this node.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.AcceleratorConfig accelerators = 269577064;</code>
-     * @param \Google\Cloud\Compute\V1\AcceleratorConfig[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\AcceleratorConfig>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAccelerators($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Compute\V1\AcceleratorConfig::class);
         $this->accelerators = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Node resources that are reserved by all instances.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InstanceConsumptionInfo consumed_resources = 334527118;</code>
+     * @return \Google\Cloud\Compute\V1\InstanceConsumptionInfo|null
+     */
+    public function getConsumedResources()
+    {
+        return $this->consumed_resources;
+    }
+
+    public function hasConsumedResources()
+    {
+        return isset($this->consumed_resources);
+    }
+
+    public function clearConsumedResources()
+    {
+        unset($this->consumed_resources);
+    }
+
+    /**
+     * Node resources that are reserved by all instances.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InstanceConsumptionInfo consumed_resources = 334527118;</code>
+     * @param \Google\Cloud\Compute\V1\InstanceConsumptionInfo $var
+     * @return $this
+     */
+    public function setConsumedResources($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\InstanceConsumptionInfo::class);
+        $this->consumed_resources = $var;
 
         return $this;
     }
@@ -191,13 +259,39 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      * Local disk configurations.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.LocalDisk disks = 95594102;</code>
-     * @param \Google\Cloud\Compute\V1\LocalDisk[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\LocalDisk>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDisks($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Compute\V1\LocalDisk::class);
         $this->disks = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Instance data that shows consumed resources on the node.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.compute.v1.InstanceConsumptionData instance_consumption_data = 84715576;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getInstanceConsumptionData()
+    {
+        return $this->instance_consumption_data;
+    }
+
+    /**
+     * Instance data that shows consumed resources on the node.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.compute.v1.InstanceConsumptionData instance_consumption_data = 84715576;</code>
+     * @param array<\Google\Cloud\Compute\V1\InstanceConsumptionData>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setInstanceConsumptionData($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Compute\V1\InstanceConsumptionData::class);
+        $this->instance_consumption_data = $arr;
 
         return $this;
     }
@@ -217,7 +311,7 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
      * Instances scheduled on this node.
      *
      * Generated from protobuf field <code>repeated string instances = 29097598;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInstances($var)
@@ -442,6 +536,78 @@ class NodeGroupNode extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->status = $var;
+
+        return $this;
+    }
+
+    /**
+     * Total amount of available resources on the node.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InstanceConsumptionInfo total_resources = 97406698;</code>
+     * @return \Google\Cloud\Compute\V1\InstanceConsumptionInfo|null
+     */
+    public function getTotalResources()
+    {
+        return $this->total_resources;
+    }
+
+    public function hasTotalResources()
+    {
+        return isset($this->total_resources);
+    }
+
+    public function clearTotalResources()
+    {
+        unset($this->total_resources);
+    }
+
+    /**
+     * Total amount of available resources on the node.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.InstanceConsumptionInfo total_resources = 97406698;</code>
+     * @param \Google\Cloud\Compute\V1\InstanceConsumptionInfo $var
+     * @return $this
+     */
+    public function setTotalResources($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\InstanceConsumptionInfo::class);
+        $this->total_resources = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] The information about an upcoming maintenance event.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.UpcomingMaintenance upcoming_maintenance = 227348592;</code>
+     * @return \Google\Cloud\Compute\V1\UpcomingMaintenance|null
+     */
+    public function getUpcomingMaintenance()
+    {
+        return $this->upcoming_maintenance;
+    }
+
+    public function hasUpcomingMaintenance()
+    {
+        return isset($this->upcoming_maintenance);
+    }
+
+    public function clearUpcomingMaintenance()
+    {
+        unset($this->upcoming_maintenance);
+    }
+
+    /**
+     * [Output Only] The information about an upcoming maintenance event.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.UpcomingMaintenance upcoming_maintenance = 227348592;</code>
+     * @param \Google\Cloud\Compute\V1\UpcomingMaintenance $var
+     * @return $this
+     */
+    public function setUpcomingMaintenance($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\UpcomingMaintenance::class);
+        $this->upcoming_maintenance = $var;
 
         return $this;
     }

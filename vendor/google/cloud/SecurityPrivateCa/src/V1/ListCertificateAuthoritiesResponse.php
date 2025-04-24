@@ -17,7 +17,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListCertificateAuthoritiesResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The list of [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
+     * The list of
+     * [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
      *
      * Generated from protobuf field <code>repeated .google.cloud.security.privateca.v1.CertificateAuthority certificate_authorities = 1;</code>
      */
@@ -29,7 +30,7 @@ class ListCertificateAuthoritiesResponse extends \Google\Protobuf\Internal\Messa
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * A list of locations (e.g. "us-west1") that could not be reached.
      *
@@ -43,13 +44,14 @@ class ListCertificateAuthoritiesResponse extends \Google\Protobuf\Internal\Messa
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Security\PrivateCA\V1\CertificateAuthority[]|\Google\Protobuf\Internal\RepeatedField $certificate_authorities
-     *           The list of [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
+     *     @type array<\Google\Cloud\Security\PrivateCA\V1\CertificateAuthority>|\Google\Protobuf\Internal\RepeatedField $certificate_authorities
+     *           The list of
+     *           [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
      *     @type string $next_page_token
      *           A token to retrieve next page of results. Pass this value in
      *           [ListCertificateAuthoritiesRequest.next_page_token][] to retrieve the next
      *           page of results.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $unreachable
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unreachable
      *           A list of locations (e.g. "us-west1") that could not be reached.
      * }
      */
@@ -59,7 +61,8 @@ class ListCertificateAuthoritiesResponse extends \Google\Protobuf\Internal\Messa
     }
 
     /**
-     * The list of [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
+     * The list of
+     * [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
      *
      * Generated from protobuf field <code>repeated .google.cloud.security.privateca.v1.CertificateAuthority certificate_authorities = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -70,10 +73,11 @@ class ListCertificateAuthoritiesResponse extends \Google\Protobuf\Internal\Messa
     }
 
     /**
-     * The list of [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
+     * The list of
+     * [CertificateAuthorities][google.cloud.security.privateca.v1.CertificateAuthority].
      *
      * Generated from protobuf field <code>repeated .google.cloud.security.privateca.v1.CertificateAuthority certificate_authorities = 1;</code>
-     * @param \Google\Cloud\Security\PrivateCA\V1\CertificateAuthority[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Security\PrivateCA\V1\CertificateAuthority>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCertificateAuthorities($var)
@@ -129,7 +133,7 @@ class ListCertificateAuthoritiesResponse extends \Google\Protobuf\Internal\Messa
      * A list of locations (e.g. "us-west1") that could not be reached.
      *
      * Generated from protobuf field <code>repeated string unreachable = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUnreachable($var)

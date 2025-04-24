@@ -17,6 +17,7 @@
 
 namespace Google\Cloud\Spanner;
 
+use Google\ApiCore\ValidationException;
 use Google\Cloud\Core\Exception\AbortedException;
 use Google\Cloud\Spanner\Session\Session;
 use Google\Cloud\Spanner\Session\SessionPoolInterface;
@@ -25,21 +26,21 @@ use Google\Cloud\Spanner\Session\SessionPoolInterface;
  * Manages interaction with Cloud Spanner inside a Transaction.
  *
  * Transactions can be started via
- * {@see Google\Cloud\Spanner\Database::runTransaction()} (recommended) or via
- * {@see Google\Cloud\Spanner\Database::transaction()}. Transactions should
- * always call {@see Google\Cloud\Spanner\Transaction::commit()} or
- * {@see Google\Cloud\Spanner\Transaction::rollback()} to ensure that locks are
+ * {@see \Google\Cloud\Spanner\Database::runTransaction()} (recommended) or via
+ * {@see \Google\Cloud\Spanner\Database::transaction()}. Transactions should
+ * always call {@see \Google\Cloud\Spanner\Transaction::commit()} or
+ * {@see \Google\Cloud\Spanner\Transaction::rollback()} to ensure that locks are
  * released in a timely manner.
  *
  * If you do not plan on performing any writes in your transaction, a
- * {@see Google\Cloud\Spanner\Snapshot} is a better solution which does not
+ * {@see \Google\Cloud\Spanner\Snapshot} is a better solution which does not
  * require a commit or rollback and does not lock any data.
  *
- * Transactions may raise {@see Google\Cloud\Core\Exception\AbortedException} errors
+ * Transactions may raise {@see \Google\Cloud\Core\Exception\AbortedException} errors
  * when the transaction cannot complete for any reason. In this case, the entire
  * operation (all reads and writes) should be reapplied atomically. Google Cloud
  * PHP handles this transparently when using
- * {@see Google\Cloud\Spanner\Database::runTransaction()}. In other cases, it is
+ * {@see \Google\Cloud\Spanner\Database::runTransaction()}. In other cases, it is
  * highly recommended that applications implement their own retry logic.
  *
  * Example:
@@ -64,6 +65,7 @@ use Google\Cloud\Spanner\Session\SessionPoolInterface;
  */
 class Transaction implements TransactionalReadInterface
 {
+    use MutationTrait;
     use TransactionalReadTrait;
 
     /**
@@ -81,6 +83,8 @@ class Transaction implements TransactionalReadInterface
      */
     private $isRetry = false;
 
+    private ValueMapper $mapper;
+
     /**
      * @param Operation $operation The Operation instance.
      * @param Session $session The session to use for spanner interactions.
@@ -89,6 +93,13 @@ class Transaction implements TransactionalReadInterface
      * @param bool $isRetry Whether the transaction will automatically retry or not.
      * @param string $tag A transaction tag. Requests made using this transaction will
      *        use this as the transaction tag.
+     * @param array $options [optional] {
+     *     Configuration Options.
+     *
+     *     @type array $begin The begin Transaction options.
+     *           [Refer](https://cloud.google.com/spanner/docs/reference/rpc/google.spanner.v1#transactionoptions)
+     * }
+     * @param ValueMapper $mapper Consumed internally for properly map mutation data.
      * @throws \InvalidArgumentException if a tag is specified on a single-use transaction.
      */
     public function __construct(
@@ -96,25 +107,31 @@ class Transaction implements TransactionalReadInterface
         Session $session,
         $transactionId = null,
         $isRetry = false,
-        $tag = null
+        $tag = null,
+        $options = [],
+        $mapper = null
     ) {
         $this->operation = $operation;
         $this->session = $session;
         $this->transactionId = $transactionId;
         $this->isRetry = $isRetry;
 
-        $this->type = $transactionId
+        $this->type = ($transactionId || isset($options['begin']))
             ? self::TYPE_PRE_ALLOCATED
             : self::TYPE_SINGLE_USE;
 
         if ($this->type == self::TYPE_SINGLE_USE && isset($tag)) {
             throw new \InvalidArgumentException(
-                "Cannot set a transaction tag on a single-use transaction."
+                'Cannot set a transaction tag on a single-use transaction.'
             );
         }
         $this->tag = $tag;
 
         $this->context = SessionPoolInterface::CONTEXT_READWRITE;
+        $this->options = $options;
+        if (!is_null($mapper)) {
+            $this->mapper = $mapper;
+        }
     }
 
     /**
@@ -136,213 +153,6 @@ class Transaction implements TransactionalReadInterface
     }
 
     /**
-     * Enqueue an insert mutation.
-     *
-     * Example:
-     * ```
-     * $transaction->insert('Posts', [
-     *     'ID' => 10,
-     *     'title' => 'My New Post',
-     *     'content' => 'Hello World'
-     * ]);
-     * ```
-     *
-     * @param string $table The table to insert into.
-     * @param array $data The data to insert.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function insert($table, array $data)
-    {
-        return $this->insertBatch($table, [$data]);
-    }
-
-    /**
-     * Enqueue one or more insert mutations.
-     *
-     * Example:
-     * ```
-     * $transaction->insertBatch('Posts', [
-     *     [
-     *         'ID' => 10,
-     *         'title' => 'My New Post',
-     *         'content' => 'Hello World'
-     *     ]
-     * ]);
-     * ```
-     *
-     * @param string $table The table to insert into.
-     * @param array $dataSet The data to insert.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function insertBatch($table, array $dataSet)
-    {
-        $this->enqueue(Operation::OP_INSERT, $table, $dataSet);
-
-        return $this;
-    }
-
-    /**
-     * Enqueue an update mutation.
-     *
-     * Example:
-     * ```
-     * $transaction->update('Posts', [
-     *     'ID' => 10,
-     *     'title' => 'My New Post [Updated!]',
-     *     'content' => 'Modified Content'
-     * ]);
-     * ```
-     *
-     * @param string $table The table to update.
-     * @param array $data The data to update.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function update($table, array $data)
-    {
-        return $this->updateBatch($table, [$data]);
-    }
-
-    /**
-     * Enqueue one or more update mutations.
-     *
-     * Example:
-     * ```
-     * $transaction->updateBatch('Posts', [
-     *     [
-     *         'ID' => 10,
-     *         'title' => 'My New Post [Updated!]',
-     *         'content' => 'Modified Content'
-     *     ]
-     * ]);
-     * ```
-     *
-     * @param string $table The table to update.
-     * @param array $dataSet The data to update.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function updateBatch($table, array $dataSet)
-    {
-        $this->enqueue(Operation::OP_UPDATE, $table, $dataSet);
-
-        return $this;
-    }
-
-    /**
-     * Enqueue an insert or update mutation.
-     *
-     * Example:
-     * ```
-     * $transaction->insertOrUpdate('Posts', [
-     *     'ID' => 10,
-     *     'title' => 'My New Post',
-     *     'content' => 'Hello World'
-     * ]);
-     * ```
-     *
-     * @param string $table The table to insert into or update.
-     * @param array $data The data to insert or update.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function insertOrUpdate($table, array $data)
-    {
-        return $this->insertOrUpdateBatch($table, [$data]);
-    }
-
-    /**
-     * Enqueue one or more insert or update mutations.
-     *
-     * Example:
-     * ```
-     * $transaction->insertOrUpdateBatch('Posts', [
-     *     [
-     *         'ID' => 10,
-     *         'title' => 'My New Post',
-     *         'content' => 'Hello World'
-     *     ]
-     * ]);
-     * ```
-     *
-     * @param string $table The table to insert into or update.
-     * @param array $dataSet The data to insert or update.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function insertOrUpdateBatch($table, array $dataSet)
-    {
-        $this->enqueue(Operation::OP_INSERT_OR_UPDATE, $table, $dataSet);
-
-        return $this;
-    }
-
-    /**
-     * Enqueue an replace mutation.
-     *
-     * Example:
-     * ```
-     * $transaction->replace('Posts', [
-     *     'ID' => 10,
-     *     'title' => 'My New Post [Replaced]',
-     *     'content' => 'Hello Moon'
-     * ]);
-     * ```
-     *
-     * @param string $table The table to replace into.
-     * @param array $data The data to replace.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function replace($table, array $data)
-    {
-        return $this->replaceBatch($table, [$data]);
-    }
-
-    /**
-     * Enqueue one or more replace mutations.
-     *
-     * Example:
-     * ```
-     * $transaction->replaceBatch('Posts', [
-     *     [
-     *         'ID' => 10,
-     *         'title' => 'My New Post [Replaced]',
-     *         'content' => 'Hello Moon'
-     *     ]
-     * ]);
-     * ```
-     *
-     * @param string $table The table to replace into.
-     * @param array $dataSet The data to replace.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function replaceBatch($table, array $dataSet)
-    {
-        $this->enqueue(Operation::OP_REPLACE, $table, $dataSet);
-
-        return $this;
-    }
-
-    /**
-     * Enqueue an delete mutation.
-     *
-     * Example:
-     * ```
-     * $keySet = new KeySet([
-     *     'keys' => [10]
-     * ]);
-     *
-     * $transaction->delete('Posts', $keySet);
-     * ```
-     *
-     * @param string $table The table to mutate.
-     * @param KeySet $keySet The KeySet to identify rows to delete.
-     * @return Transaction The transaction, to enable method chaining.
-     */
-    public function delete($table, KeySet $keySet)
-    {
-        $this->enqueue(Operation::OP_DELETE, $table, [$keySet]);
-
-        return $this;
-    }
-
-    /**
      * Execute a Cloud Spanner DML statement.
      *
      * Data Manipulation Language (DML) allows you to execute statements which
@@ -352,7 +162,7 @@ class Transaction implements TransactionalReadInterface
      * [DML syntax guide](https://cloud.google.com/spanner/docs/dml-syntax).
      *
      * To execute a SQL query (such as a SELECT), use
-     * {@see Google\Cloud\Spanner\Transaction::execute()}.
+     * {@see \Google\Cloud\Spanner\Transaction::execute()}.
      *
      * Mutations performed via DML will be visible to subsequent operations
      * within the same transaction. In other words, unlike with other mutation
@@ -410,19 +220,19 @@ class Transaction implements TransactionalReadInterface
      *           declarations are required in the case of struct parameters,
      *           or when a null value exists as a parameter.
      *           Accepted values for primitive types are defined as constants on
-     *           {@see Google\Cloud\Spanner\Database}, and are as follows:
+     *           {@see \Google\Cloud\Spanner\Database}, and are as follows:
      *           `Database::TYPE_BOOL`, `Database::TYPE_INT64`,
      *           `Database::TYPE_FLOAT64`, `Database::TYPE_TIMESTAMP`,
      *           `Database::TYPE_DATE`, `Database::TYPE_STRING`,
      *           `Database::TYPE_BYTES`. If the value is an array, use
-     *           {@see Google\Cloud\Spanner\ArrayType} to declare the array
+     *           {@see \Google\Cloud\Spanner\ArrayType} to declare the array
      *           parameter types. Likewise, for structs, use
-     *           {@see Google\Cloud\Spanner\StructType}.
+     *           {@see \Google\Cloud\Spanner\StructType}.
      *     @type array $requestOptions Request options.
      *         For more information on available options, please see
      *         [the upstream documentation](https://cloud.google.com/spanner/docs/reference/rest/v1/RequestOptions).
      *         Please note, if using the `priority` setting you may utilize the constants available
-     *         on {@see Google\Cloud\Spanner\V1\RequestOptions\Priority} to set a value.
+     *         on {@see \Google\Cloud\Spanner\V1\RequestOptions\Priority} to set a value.
      *         Please note, the `transactionTag` setting will be ignored as the transaction tag should have already
      *         been set when creating the transaction.
      * }
@@ -430,16 +240,13 @@ class Transaction implements TransactionalReadInterface
      */
     public function executeUpdate($sql, array $options = [])
     {
-        unset($options['requestOptions']['transactionTag']);
-        if (isset($this->tag)) {
-            $options += [
-                'requestOptions' => []
-            ];
-            $options['requestOptions']['transactionTag'] = $this->tag;
+        if (isset($options['transaction']['begin']['excludeTxnFromChangeStreams'])) {
+            throw new ValidationException(
+                'The excludeTxnFromChangeStreams option cannot be set for individual DML requests.'
+                . ' This option should be set at the transaction level.'
+            );
         }
-        $options['seqno'] = $this->seqno;
-        $this->seqno++;
-
+        $options = $this->buildUpdateOptions($options);
         return $this->operation
             ->executeUpdate($this->session, $this, $sql, $options);
     }
@@ -449,7 +256,7 @@ class Transaction implements TransactionalReadInterface
      *
      * This method allows many statements to be run with lower latency than
      * submitting them sequentially with
-     * {@see Google\Cloud\Spanner\Transaction::executeUpdate()}.
+     * {@see \Google\Cloud\Spanner\Transaction::executeUpdate()}.
      *
      * Statements are executed in order, sequentially. Execution will stop at
      * the first failed statement; the remaining statements will not be run.
@@ -505,14 +312,14 @@ class Transaction implements TransactionalReadInterface
      *        infer types. Explicit type declarations are required in the case
      *        of struct parameters, or when a null value exists as a parameter.
      *        Accepted values for primitive types are defined as constants on
-     *        {@see Google\Cloud\Spanner\Database}, and are as follows:
+     *        {@see \Google\Cloud\Spanner\Database}, and are as follows:
      *        `Database::TYPE_BOOL`, `Database::TYPE_INT64`,
      *        `Database::TYPE_FLOAT64`, `Database::TYPE_TIMESTAMP`,
      *        `Database::TYPE_DATE`, `Database::TYPE_STRING`,
      *        `Database::TYPE_BYTES`. If the value is an array, use
-     *        {@see Google\Cloud\Spanner\ArrayType} to declare the array
+     *        {@see \Google\Cloud\Spanner\ArrayType} to declare the array
      *        parameter types. Likewise, for structs, use
-     *        {@see Google\Cloud\Spanner\StructType}.
+     *        {@see \Google\Cloud\Spanner\StructType}.
      * @param array $options [optional] {
      *     Configuration Options.
      *
@@ -520,7 +327,7 @@ class Transaction implements TransactionalReadInterface
      *         For more information on available options, please see
      *         [the upstream documentation](https://cloud.google.com/spanner/docs/reference/rest/v1/RequestOptions).
      *         Please note, if using the `priority` setting you may utilize the constants available
-     *         on {@see Google\Cloud\Spanner\V1\RequestOptions\Priority} to set a value.
+     *         on {@see \Google\Cloud\Spanner\V1\RequestOptions\Priority} to set a value.
      *         Please note, the `transactionTag` setting will be ignored as the transaction tag should have already
      *         been set when creating the transaction.
      * }
@@ -529,18 +336,14 @@ class Transaction implements TransactionalReadInterface
      */
     public function executeUpdateBatch(array $statements, array $options = [])
     {
-        unset($options['requestOptions']['transactionTag']);
-        if (isset($this->tag)) {
-            $options += [
-                'requestOptions' => []
-            ];
-            $options['requestOptions']['transactionTag'] = $this->tag;
-        }
-        $options['seqno'] = $this->seqno;
-        $this->seqno++;
-
+        $options = $this->buildUpdateOptions($options);
         return $this->operation
-            ->executeUpdateBatch($this->session, $this, $statements, $options);
+            ->executeUpdateBatch(
+                $this->session,
+                $this,
+                $statements,
+                $options
+            );
     }
 
     /**
@@ -581,7 +384,7 @@ class Transaction implements TransactionalReadInterface
      * Commit and end the transaction.
      *
      * It is advised that transactions be run inside
-     * {@see Google\Cloud\Spanner\Database::runTransaction()} in order to take
+     * {@see \Google\Cloud\Spanner\Database::runTransaction()} in order to take
      * advantage of automated transaction retry in case of a transaction aborted
      * error.
      *
@@ -596,13 +399,16 @@ class Transaction implements TransactionalReadInterface
      *     @type array $mutations An array of mutations to commit. May be used
      *           instead of or in addition to enqueing mutations separately.
      *     @type bool $returnCommitStats If true, commit statistics will be
-     *           returned and accessible via {@see Google\Cloud\Spanner\Transaction::getCommitStats()}.
+     *           returned and accessible via {@see \Google\Cloud\Spanner\Transaction::getCommitStats()}.
      *           **Defaults to** `false`.
+     *     @type Duration $maxCommitDelay The amount of latency this request
+     *           is willing to incur in order to improve throughput.
+     *           **Defaults to** null.
      *     @type array $requestOptions Request options.
      *         For more information on available options, please see
      *         [the upstream documentation](https://cloud.google.com/spanner/docs/reference/rest/v1/RequestOptions).
      *         Please note, if using the `priority` setting you may utilize the constants available
-     *         on {@see Google\Cloud\Spanner\V1\RequestOptions\Priority} to set a value.
+     *         on {@see \Google\Cloud\Spanner\V1\RequestOptions\Priority} to set a value.
      *         Please note, the `requestTag` setting will be ignored as it is not supported for commit requests.
      * }
      * @return Timestamp The commit timestamp.
@@ -615,6 +421,21 @@ class Transaction implements TransactionalReadInterface
             throw new \BadMethodCallException('The transaction cannot be committed because it is not active');
         }
 
+        // For commit, A transaction ID is mandatory for non-single-use transactions,
+        // and the `begin` option is not supported.
+        if (empty($this->transactionId) && isset($this->options['begin'])) {
+            // Since the begin option is not supported in commit, unset it.
+            unset($this->options['begin']);
+
+            // A transaction ID is mandatory for non-single-use transactions.
+            if ($this->type !== self::TYPE_SINGLE_USE) {
+                // Execute the beginTransaction RPC.
+                $transaction = $this->operation->transaction($this->session, $this->options);
+                // Set the transaction ID of the current transaction.
+                $this->transactionId = $transaction->id();
+            }
+        }
+
         if (!$this->singleUseState()) {
             $this->state = self::STATE_COMMITTED;
         }
@@ -624,7 +445,7 @@ class Transaction implements TransactionalReadInterface
             'requestOptions' => []
         ];
 
-        $options['mutations'] += $this->mutations;
+        $options['mutations'] += $this->getMutations();
 
         $options['transactionId'] = $this->transactionId;
 
@@ -666,7 +487,7 @@ class Transaction implements TransactionalReadInterface
     /**
      * Check whether the current transaction is a retry transaction.
      *
-     * When using {@see Google\Cloud\Spanner\Database::runTransaction()},
+     * When using {@see \Google\Cloud\Spanner\Database::runTransaction()},
      * transactions are automatically retried when a conflict causes it to abort.
      * In such cases, subsequent invocations of the transaction callable will
      * provide a transaction where `$transaction->isRetry()` is true. This can
@@ -687,21 +508,29 @@ class Transaction implements TransactionalReadInterface
     }
 
     /**
-     * Format, validate and enqueue mutations in the transaction.
+     * Build the update options.
      *
-     * @param string $op The operation type.
-     * @param string $table The table name
-     * @param array $dataSet the mutations to enqueue
-     * @return void
+     * @param array $options The update options
+     * @return array
      */
-    private function enqueue($op, $table, array $dataSet)
+    private function buildUpdateOptions(array $options): array
     {
-        foreach ($dataSet as $data) {
-            if ($op === Operation::OP_DELETE) {
-                $this->mutations[] = $this->operation->deleteMutation($table, $data);
-            } else {
-                $this->mutations[] = $this->operation->mutation($op, $table, $data);
-            }
+        unset($options['requestOptions']['transactionTag']);
+        if (isset($this->tag)) {
+            $options['requestOptions']['transactionTag'] = $this->tag;
         }
+        $options['seqno'] = $this->seqno;
+        $this->seqno++;
+
+        $options['transactionType'] = $this->context;
+        if (empty($this->transactionId) && isset($this->options['begin'])) {
+            $options['begin'] = $this->options['begin'];
+        } else {
+            $options['transactionId'] = $this->transactionId;
+        }
+        $selector = $this->transactionSelector($options);
+        $options['transaction'] = $selector[0];
+
+        return $this->addLarHeader($options);
     }
 }

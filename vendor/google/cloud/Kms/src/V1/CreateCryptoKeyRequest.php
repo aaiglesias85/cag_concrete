@@ -22,21 +22,21 @@ class CreateCryptoKeyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. It must be unique within a KeyRing and match the regular
      * expression `[a-zA-Z0-9_-]{1,63}`
      *
      * Generated from protobuf field <code>string crypto_key_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $crypto_key_id = '';
+    protected $crypto_key_id = '';
     /**
      * Required. A [CryptoKey][google.cloud.kms.v1.CryptoKey] with initial field
      * values.
      *
      * Generated from protobuf field <code>.google.cloud.kms.v1.CryptoKey crypto_key = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $crypto_key = null;
+    protected $crypto_key = null;
     /**
      * If set to true, the request will create a
      * [CryptoKey][google.cloud.kms.v1.CryptoKey] without any
@@ -49,7 +49,28 @@ class CreateCryptoKeyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool skip_initial_version_creation = 5;</code>
      */
-    private $skip_initial_version_creation = false;
+    protected $skip_initial_version_creation = false;
+
+    /**
+     * @param string                         $parent      Required. The [name][google.cloud.kms.v1.KeyRing.name] of the KeyRing
+     *                                                    associated with the [CryptoKeys][google.cloud.kms.v1.CryptoKey]. Please see
+     *                                                    {@see KeyManagementServiceClient::keyRingName()} for help formatting this field.
+     * @param string                         $cryptoKeyId Required. It must be unique within a KeyRing and match the regular
+     *                                                    expression `[a-zA-Z0-9_-]{1,63}`
+     * @param \Google\Cloud\Kms\V1\CryptoKey $cryptoKey   Required. A [CryptoKey][google.cloud.kms.v1.CryptoKey] with initial field
+     *                                                    values.
+     *
+     * @return \Google\Cloud\Kms\V1\CreateCryptoKeyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $cryptoKeyId, \Google\Cloud\Kms\V1\CryptoKey $cryptoKey): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setCryptoKeyId($cryptoKeyId)
+            ->setCryptoKey($cryptoKey);
+    }
 
     /**
      * Constructor.

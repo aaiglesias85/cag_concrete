@@ -68,11 +68,23 @@ class Code
      */
     const INJECTED_KERNELS_DEPRECATED = 417377419;
     /**
+     * A WEIGHTED_MAGLEV backend service is associated with a health check that is not of type HTTP/HTTPS/HTTP2.
+     *
+     * Generated from protobuf enum <code>INVALID_HEALTH_CHECK_FOR_DYNAMIC_WIEGHTED_LB = 401542606;</code>
+     */
+    const INVALID_HEALTH_CHECK_FOR_DYNAMIC_WIEGHTED_LB = 401542606;
+    /**
      * When deploying a deployment with a exceedingly large number of resources
      *
      * Generated from protobuf enum <code>LARGE_DEPLOYMENT_WARNING = 481440678;</code>
      */
     const LARGE_DEPLOYMENT_WARNING = 481440678;
+    /**
+     * Resource can't be retrieved due to list overhead quota exceed which captures the amount of resources filtered out by user-defined list filter.
+     *
+     * Generated from protobuf enum <code>LIST_OVERHEAD_QUOTA_EXCEED = 47618117;</code>
+     */
+    const LIST_OVERHEAD_QUOTA_EXCEED = 47618117;
     /**
      * A resource depends on a missing type
      *
@@ -134,6 +146,12 @@ class Code
      */
     const PARTIAL_SUCCESS = 39966469;
     /**
+     * Quota information is not available to client requests (e.g: regions.list).
+     *
+     * Generated from protobuf enum <code>QUOTA_INFO_UNAVAILABLE = 304294182;</code>
+     */
+    const QUOTA_INFO_UNAVAILABLE = 304294182;
+    /**
      * The user attempted to use a resource that requires a TOS they have not accepted.
      *
      * Generated from protobuf enum <code>REQUIRED_TOS_AGREEMENT = 3745539;</code>
@@ -186,7 +204,9 @@ class Code
         self::EXTERNAL_API_WARNING => 'EXTERNAL_API_WARNING',
         self::FIELD_VALUE_OVERRIDEN => 'FIELD_VALUE_OVERRIDEN',
         self::INJECTED_KERNELS_DEPRECATED => 'INJECTED_KERNELS_DEPRECATED',
+        self::INVALID_HEALTH_CHECK_FOR_DYNAMIC_WIEGHTED_LB => 'INVALID_HEALTH_CHECK_FOR_DYNAMIC_WIEGHTED_LB',
         self::LARGE_DEPLOYMENT_WARNING => 'LARGE_DEPLOYMENT_WARNING',
+        self::LIST_OVERHEAD_QUOTA_EXCEED => 'LIST_OVERHEAD_QUOTA_EXCEED',
         self::MISSING_TYPE_DEPENDENCY => 'MISSING_TYPE_DEPENDENCY',
         self::NEXT_HOP_ADDRESS_NOT_ASSIGNED => 'NEXT_HOP_ADDRESS_NOT_ASSIGNED',
         self::NEXT_HOP_CANNOT_IP_FORWARD => 'NEXT_HOP_CANNOT_IP_FORWARD',
@@ -197,6 +217,7 @@ class Code
         self::NOT_CRITICAL_ERROR => 'NOT_CRITICAL_ERROR',
         self::NO_RESULTS_ON_PAGE => 'NO_RESULTS_ON_PAGE',
         self::PARTIAL_SUCCESS => 'PARTIAL_SUCCESS',
+        self::QUOTA_INFO_UNAVAILABLE => 'QUOTA_INFO_UNAVAILABLE',
         self::REQUIRED_TOS_AGREEMENT => 'REQUIRED_TOS_AGREEMENT',
         self::RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING => 'RESOURCE_IN_USE_BY_OTHER_RESOURCE_WARNING',
         self::RESOURCE_NOT_DELETED => 'RESOURCE_NOT_DELETED',

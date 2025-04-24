@@ -25,7 +25,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.type.LatLng arrival_location = 1;</code>
      */
-    private $arrival_location = null;
+    protected $arrival_location = null;
     /**
      * The waypoint where the vehicle arrives when performing this
      * `VisitRequest`. If the shipment model has duration distance matrices,
@@ -33,7 +33,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Waypoint arrival_waypoint = 2;</code>
      */
-    private $arrival_waypoint = null;
+    protected $arrival_waypoint = null;
     /**
      * The geo-location where the vehicle departs after completing this
      * `VisitRequest`. Can be omitted if it is the same as `arrival_location`.
@@ -42,7 +42,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.type.LatLng departure_location = 3;</code>
      */
-    private $departure_location = null;
+    protected $departure_location = null;
     /**
      * The waypoint where the vehicle departs after completing this
      * `VisitRequest`. Can be omitted if it is the same as `arrival_waypoint`.
@@ -51,7 +51,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Waypoint departure_waypoint = 4;</code>
      */
-    private $departure_waypoint = null;
+    protected $departure_waypoint = null;
     /**
      * Specifies tags attached to the visit request.
      * Empty or duplicate strings are not allowed.
@@ -82,7 +82,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 7;</code>
      */
-    private $duration = null;
+    protected $duration = null;
     /**
      * Cost to service this visit request on a vehicle route. This can be used
      * to pay different costs for each alternative pickup or delivery of a
@@ -91,11 +91,13 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double cost = 8;</code>
      */
-    private $cost = 0.0;
+    protected $cost = 0.0;
     /**
      * Load demands of this visit request. This is just like
-     * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands] field, except that it only applies to this
-     * [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest] instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
+     * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands]
+     * field, except that it only applies to this
+     * [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest]
+     * instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
      * The demands listed here are added to the demands listed in
      * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands].
      *
@@ -113,13 +115,16 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
     private $visit_types;
     /**
      * Specifies a label for this `VisitRequest`. This label is reported in the
-     * response as `visit_label` in the corresponding [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
+     * response as `visit_label` in the corresponding
+     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
      *
      * Generated from protobuf field <code>string label = 11;</code>
      */
-    private $label = '';
+    protected $label = '';
     /**
-     * Deprecated: Use [VisitRequest.load_demands][] instead.
+     * Deprecated: Use
+     * [VisitRequest.load_demands][google.cloud.optimization.v1.Shipment.VisitRequest.load_demands]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity demands = 9 [deprecated = true];</code>
      * @deprecated
@@ -150,10 +155,10 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *           `VisitRequest`. Can be omitted if it is the same as `arrival_waypoint`.
      *           If the shipment model has duration distance matrices,
      *           `departure_waypoint` must not be specified.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $tags
      *           Specifies tags attached to the visit request.
      *           Empty or duplicate strings are not allowed.
-     *     @type \Google\Cloud\Optimization\V1\TimeWindow[]|\Google\Protobuf\Internal\RepeatedField $time_windows
+     *     @type array<\Google\Cloud\Optimization\V1\TimeWindow>|\Google\Protobuf\Internal\RepeatedField $time_windows
      *           Time windows which constrain the arrival time at a visit.
      *           Note that a vehicle may depart outside of the arrival time window, i.e.
      *           arrival time + duration do not need to be inside a time window. This can
@@ -176,20 +181,25 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      *           and must not be negative.
      *     @type array|\Google\Protobuf\Internal\MapField $load_demands
      *           Load demands of this visit request. This is just like
-     *           [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands] field, except that it only applies to this
-     *           [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest] instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
+     *           [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands]
+     *           field, except that it only applies to this
+     *           [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest]
+     *           instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
      *           The demands listed here are added to the demands listed in
      *           [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands].
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $visit_types
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $visit_types
      *           Specifies the types of the visit. This may be used to allocate additional
      *           time required for a vehicle to complete this visit (see
      *           [Vehicle.extra_visit_duration_for_visit_type][google.cloud.optimization.v1.Vehicle.extra_visit_duration_for_visit_type]).
      *           A type can only appear once.
      *     @type string $label
      *           Specifies a label for this `VisitRequest`. This label is reported in the
-     *           response as `visit_label` in the corresponding [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
-     *     @type \Google\Cloud\Optimization\V1\CapacityQuantity[]|\Google\Protobuf\Internal\RepeatedField $demands
-     *           Deprecated: Use [VisitRequest.load_demands][] instead.
+     *           response as `visit_label` in the corresponding
+     *           [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
+     *     @type array<\Google\Cloud\Optimization\V1\CapacityQuantity>|\Google\Protobuf\Internal\RepeatedField $demands
+     *           Deprecated: Use
+     *           [VisitRequest.load_demands][google.cloud.optimization.v1.Shipment.VisitRequest.load_demands]
+     *           instead.
      * }
      */
     public function __construct($data = NULL) {
@@ -378,7 +388,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      * Empty or duplicate strings are not allowed.
      *
      * Generated from protobuf field <code>repeated string tags = 5;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTags($var)
@@ -424,7 +434,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      * be set if there is a single time window.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.TimeWindow time_windows = 6;</code>
-     * @param \Google\Cloud\Optimization\V1\TimeWindow[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\TimeWindow>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTimeWindows($var)
@@ -509,8 +519,10 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Load demands of this visit request. This is just like
-     * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands] field, except that it only applies to this
-     * [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest] instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
+     * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands]
+     * field, except that it only applies to this
+     * [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest]
+     * instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
      * The demands listed here are added to the demands listed in
      * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands].
      *
@@ -524,8 +536,10 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Load demands of this visit request. This is just like
-     * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands] field, except that it only applies to this
-     * [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest] instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
+     * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands]
+     * field, except that it only applies to this
+     * [VisitRequest][google.cloud.optimization.v1.Shipment.VisitRequest]
+     * instead of the whole [Shipment][google.cloud.optimization.v1.Shipment].
      * The demands listed here are added to the demands listed in
      * [Shipment.load_demands][google.cloud.optimization.v1.Shipment.load_demands].
      *
@@ -562,7 +576,7 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
      * A type can only appear once.
      *
      * Generated from protobuf field <code>repeated string visit_types = 10;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVisitTypes($var)
@@ -575,7 +589,8 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Specifies a label for this `VisitRequest`. This label is reported in the
-     * response as `visit_label` in the corresponding [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
+     * response as `visit_label` in the corresponding
+     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
      *
      * Generated from protobuf field <code>string label = 11;</code>
      * @return string
@@ -587,7 +602,8 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Specifies a label for this `VisitRequest`. This label is reported in the
-     * response as `visit_label` in the corresponding [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
+     * response as `visit_label` in the corresponding
+     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit].
      *
      * Generated from protobuf field <code>string label = 11;</code>
      * @param string $var
@@ -602,7 +618,9 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [VisitRequest.load_demands][] instead.
+     * Deprecated: Use
+     * [VisitRequest.load_demands][google.cloud.optimization.v1.Shipment.VisitRequest.load_demands]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity demands = 9 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -615,10 +633,12 @@ class VisitRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [VisitRequest.load_demands][] instead.
+     * Deprecated: Use
+     * [VisitRequest.load_demands][google.cloud.optimization.v1.Shipment.VisitRequest.load_demands]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity demands = 9 [deprecated = true];</code>
-     * @param \Google\Cloud\Optimization\V1\CapacityQuantity[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\CapacityQuantity>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */

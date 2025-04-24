@@ -21,13 +21,30 @@ class BatchCreateOccurrencesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The occurrences to create. Max allowed length is 1000.
      *
      * Generated from protobuf field <code>repeated .grafeas.v1.Occurrence occurrences = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $occurrences;
+
+    /**
+     * @param string                   $parent      The name of the project in the form of `projects/[PROJECT_ID]`, under which
+     *                                              the occurrences are to be created. Please see
+     *                                              {@see GrafeasClient::projectName()} for help formatting this field.
+     * @param \Grafeas\V1\Occurrence[] $occurrences The occurrences to create. Max allowed length is 1000.
+     *
+     * @return \Grafeas\V1\BatchCreateOccurrencesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, array $occurrences): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setOccurrences($occurrences);
+    }
 
     /**
      * Constructor.
@@ -38,7 +55,7 @@ class BatchCreateOccurrencesRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           The name of the project in the form of `projects/[PROJECT_ID]`, under which
      *           the occurrences are to be created.
-     *     @type \Grafeas\V1\Occurrence[]|\Google\Protobuf\Internal\RepeatedField $occurrences
+     *     @type array<\Grafeas\V1\Occurrence>|\Google\Protobuf\Internal\RepeatedField $occurrences
      *           The occurrences to create. Max allowed length is 1000.
      * }
      */
@@ -90,7 +107,7 @@ class BatchCreateOccurrencesRequest extends \Google\Protobuf\Internal\Message
      * The occurrences to create. Max allowed length is 1000.
      *
      * Generated from protobuf field <code>repeated .grafeas.v1.Occurrence occurrences = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Grafeas\V1\Occurrence[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Grafeas\V1\Occurrence>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOccurrences($var)

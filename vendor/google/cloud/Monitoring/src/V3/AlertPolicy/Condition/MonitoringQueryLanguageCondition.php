@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A condition type that allows alert policies to be defined using
+ * A condition type that allows alerting policies to be defined using
  * [Monitoring Query Language](https://cloud.google.com/monitoring/mql).
  *
  * Generated from protobuf message <code>google.monitoring.v3.AlertPolicy.Condition.MonitoringQueryLanguageCondition</code>
@@ -22,7 +22,7 @@ class MonitoringQueryLanguageCondition extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string query = 1;</code>
      */
-    private $query = '';
+    protected $query = '';
     /**
      * The amount of time that a time series must violate the
      * threshold to be considered failing. Currently, only values
@@ -37,7 +37,7 @@ class MonitoringQueryLanguageCondition extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 2;</code>
      */
-    private $duration = null;
+    protected $duration = null;
     /**
      * The number/percent of time series for which the comparison must hold
      * in order for the condition to trigger. If unspecified, then the
@@ -48,7 +48,14 @@ class MonitoringQueryLanguageCondition extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.Trigger trigger = 3;</code>
      */
-    private $trigger = null;
+    protected $trigger = null;
+    /**
+     * A condition control that determines how metric-threshold conditions
+     * are evaluated when data stops arriving.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.EvaluationMissingData evaluation_missing_data = 4;</code>
+     */
+    protected $evaluation_missing_data = 0;
 
     /**
      * Constructor.
@@ -77,6 +84,9 @@ class MonitoringQueryLanguageCondition extends \Google\Protobuf\Internal\Message
      *           time series that have been identified by `filter` and `aggregations`,
      *           or by the ratio, if `denominator_filter` and `denominator_aggregations`
      *           are specified.
+     *     @type int $evaluation_missing_data
+     *           A condition control that determines how metric-threshold conditions
+     *           are evaluated when data stops arriving.
      * }
      */
     public function __construct($data = NULL) {
@@ -212,8 +222,34 @@ class MonitoringQueryLanguageCondition extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * A condition control that determines how metric-threshold conditions
+     * are evaluated when data stops arriving.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.EvaluationMissingData evaluation_missing_data = 4;</code>
+     * @return int
+     */
+    public function getEvaluationMissingData()
+    {
+        return $this->evaluation_missing_data;
+    }
+
+    /**
+     * A condition control that determines how metric-threshold conditions
+     * are evaluated when data stops arriving.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.EvaluationMissingData evaluation_missing_data = 4;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setEvaluationMissingData($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\EvaluationMissingData::class);
+        $this->evaluation_missing_data = $var;
+
+        return $this;
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(MonitoringQueryLanguageCondition::class, \Google\Cloud\Monitoring\V3\AlertPolicy_Condition_MonitoringQueryLanguageCondition::class);
 

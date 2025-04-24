@@ -55,6 +55,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * INJECTED_SOLUTION_MISSING_LABEL = 2000;
      *     * INJECTED_SOLUTION_DUPLICATE_LABEL = 2001;
      *     * INJECTED_SOLUTION_AMBIGUOUS_INDEX = 2002;
+     *     * INJECTED_SOLUTION_INFEASIBLE_AFTER_GETTING_TRAVEL_TIMES = 2003;
+     *     * INJECTED_SOLUTION_TRANSITION_INCONSISTENT_WITH_ACTUAL_TRAVEL = 2004;
+     *     * INJECTED_SOLUTION_CONCURRENT_SOLUTION_TYPES = 2005;
+     *     * INJECTED_SOLUTION_MORE_THAN_ONE_PER_TYPE = 2006;
+     *     * INJECTED_SOLUTION_REFRESH_WITHOUT_POPULATE = 2008;
+     *     * INJECTED_SOLUTION_CONSTRAINED_ROUTE_PORTION_INFEASIBLE = 2010;
      * * SHIPMENT_MODEL_ERROR = 22;
      *     * SHIPMENT_MODEL_TOO_LARGE = 2200;
      *     * SHIPMENT_MODEL_TOO_MANY_CAPACITY_TYPES = 2201;
@@ -62,6 +68,8 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * SHIPMENT_MODEL_GLOBAL_END_TIME_TOO_LARGE_OR_NAN = 2203;
      *     * SHIPMENT_MODEL_GLOBAL_START_TIME_AFTER_GLOBAL_END_TIME = 2204;
      *     * SHIPMENT_MODEL_GLOBAL_DURATION_TOO_LONG = 2205;
+     *     * SHIPMENT_MODEL_MAX_ACTIVE_VEHICLES_NOT_POSITIVE = 2206;
+     *     * SHIPMENT_MODEL_DURATION_MATRIX_TOO_LARGE = 2207;
      * * INDEX_ERROR = 24;
      * * TAG_ERROR = 26;
      * * TIME_WINDOW_ERROR = 28;
@@ -143,9 +151,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * DURATION_LIMIT_QUADRATIC_SOFT_MAX_DURATION_EXCEEDS_GLOBAL_DURATION
      *       = 3815;
      * * SHIPMENT_ERROR = 40;
+     *     * SHIPMENT_PD_LIMIT_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      *     * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_NEGATIVE_OR_NAN = 4000;
      *     * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION
      *       = 4001;
+     *     * SHIPMENT_PD_RELATIVE_DETOUR_LIMIT_INVALID = 4015;
+     *     * SHIPMENT_PD_DETOUR_LIMIT_AND_EXTRA_VISIT_DURATION = 4016;
      *     * SHIPMENT_PD_TIME_LIMIT_DURATION_NEGATIVE_OR_NAN = 4002;
      *     * SHIPMENT_PD_TIME_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION = 4003;
      *     * SHIPMENT_EMPTY_SHIPMENT_TYPE = 4004;
@@ -158,7 +169,6 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * SHIPMENT_INVALID_COST_FOR_VEHICLE = 4011;
      *     * SHIPMENT_COST_FOR_VEHICLE_INDEX_OUT_OF_BOUNDS = 4012;
      *     * SHIPMENT_DUPLICATE_COST_FOR_VEHICLE_INDEX = 4013;
-     *     * SHIPMENT_DETOUR_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      * * VEHICLE_ERROR = 42;
      *     * VEHICLE_EMPTY_REQUIRED_OPERATOR_TYPE = 4200;
      *     * VEHICLE_DUPLICATE_REQUIRED_OPERATOR_TYPE = 4201;
@@ -182,6 +192,9 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * VEHICLE_INVALID_COST_PER_TRAVELED_HOUR = 4219;
      *     * VEHICLE_INVALID_FIXED_COST = 4220;
      *     * VEHICLE_INVALID_TRAVEL_DURATION_MULTIPLE = 4221;
+     *     * VEHICLE_TRAVEL_DURATION_MULTIPLE_WITH_SHIPMENT_PD_DETOUR_LIMITS
+     *       = 4223;
+     *     * VEHICLE_MATRIX_INDEX_WITH_SHIPMENT_PD_DETOUR_LIMITS = 4224;
      *     * VEHICLE_MINIMUM_DURATION_LONGER_THAN_DURATION_LIMIT = 4222;
      * * VISIT_REQUEST_ERROR = 44;
      *     * VISIT_REQUEST_EMPTY_TAG = 4400;
@@ -189,6 +202,13 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * VISIT_REQUEST_DURATION_NEGATIVE_OR_NAN = 4404;
      *     * VISIT_REQUEST_DURATION_EXCEEDS_GLOBAL_DURATION = 4405;
      * * PRECEDENCE_ERROR = 46;
+     *     * PRECEDENCE_RULE_MISSING_FIRST_INDEX = 4600;
+     *     * PRECEDENCE_RULE_MISSING_SECOND_INDEX = 4601;
+     *     * PRECEDENCE_RULE_FIRST_INDEX_OUT_OF_BOUNDS = 4602;
+     *     * PRECEDENCE_RULE_SECOND_INDEX_OUT_OF_BOUNDS = 4603;
+     *     * PRECEDENCE_RULE_DUPLICATE_INDEX = 4604;
+     *     * PRECEDENCE_RULE_INEXISTENT_FIRST_VISIT_REQUEST = 4605;
+     *     * PRECEDENCE_RULE_INEXISTENT_SECOND_VISIT_REQUEST = 4606;
      * * BREAK_ERROR = 48;
      *     * BREAK_RULE_EMPTY = 4800;
      *     * BREAK_REQUEST_UNSPECIFIED_DURATION = 4801;
@@ -234,19 +254,16 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      * * DURATION_SECONDS_MATRIX_ERROR = 56;
      *     * DURATION_SECONDS_MATRIX_DURATION_NEGATIVE_OR_NAN = 5600;
      *     * DURATION_SECONDS_MATRIX_DURATION_EXCEEDS_GLOBAL_DURATION = 5601;
-     * * GRAPH_ARC_ERROR = 58;
-     *     * GRAPH_ARC_DURATION_NEGATIVE_OR_NAN = 5800;
-     *     * GRAPH_ARC_DURATION_EXCEEDS_GLOBAL_DURATION = 5801;
      *
      * Generated from protobuf field <code>int32 code = 1;</code>
      */
-    private $code = 0;
+    protected $code = 0;
     /**
      * The error display name.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * An error context may involve 0, 1 (most of the time) or more fields. For
      * example, referring to vehicle #4 and shipment #2's first pickup can be
@@ -270,7 +287,7 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string error_message = 4;</code>
      */
-    private $error_message = '';
+    protected $error_message = '';
     /**
      * May contain the value(s) of the field(s). This is not always available. You
      * should absolutely not rely on it and use it only for manual model
@@ -278,7 +295,7 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string offending_values = 5;</code>
      */
-    private $offending_values = '';
+    protected $offending_values = '';
 
     /**
      * Constructor.
@@ -326,6 +343,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *               * INJECTED_SOLUTION_MISSING_LABEL = 2000;
      *               * INJECTED_SOLUTION_DUPLICATE_LABEL = 2001;
      *               * INJECTED_SOLUTION_AMBIGUOUS_INDEX = 2002;
+     *               * INJECTED_SOLUTION_INFEASIBLE_AFTER_GETTING_TRAVEL_TIMES = 2003;
+     *               * INJECTED_SOLUTION_TRANSITION_INCONSISTENT_WITH_ACTUAL_TRAVEL = 2004;
+     *               * INJECTED_SOLUTION_CONCURRENT_SOLUTION_TYPES = 2005;
+     *               * INJECTED_SOLUTION_MORE_THAN_ONE_PER_TYPE = 2006;
+     *               * INJECTED_SOLUTION_REFRESH_WITHOUT_POPULATE = 2008;
+     *               * INJECTED_SOLUTION_CONSTRAINED_ROUTE_PORTION_INFEASIBLE = 2010;
      *           * SHIPMENT_MODEL_ERROR = 22;
      *               * SHIPMENT_MODEL_TOO_LARGE = 2200;
      *               * SHIPMENT_MODEL_TOO_MANY_CAPACITY_TYPES = 2201;
@@ -333,6 +356,8 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *               * SHIPMENT_MODEL_GLOBAL_END_TIME_TOO_LARGE_OR_NAN = 2203;
      *               * SHIPMENT_MODEL_GLOBAL_START_TIME_AFTER_GLOBAL_END_TIME = 2204;
      *               * SHIPMENT_MODEL_GLOBAL_DURATION_TOO_LONG = 2205;
+     *               * SHIPMENT_MODEL_MAX_ACTIVE_VEHICLES_NOT_POSITIVE = 2206;
+     *               * SHIPMENT_MODEL_DURATION_MATRIX_TOO_LARGE = 2207;
      *           * INDEX_ERROR = 24;
      *           * TAG_ERROR = 26;
      *           * TIME_WINDOW_ERROR = 28;
@@ -414,9 +439,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *               * DURATION_LIMIT_QUADRATIC_SOFT_MAX_DURATION_EXCEEDS_GLOBAL_DURATION
      *                 = 3815;
      *           * SHIPMENT_ERROR = 40;
+     *               * SHIPMENT_PD_LIMIT_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      *               * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_NEGATIVE_OR_NAN = 4000;
      *               * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION
      *                 = 4001;
+     *               * SHIPMENT_PD_RELATIVE_DETOUR_LIMIT_INVALID = 4015;
+     *               * SHIPMENT_PD_DETOUR_LIMIT_AND_EXTRA_VISIT_DURATION = 4016;
      *               * SHIPMENT_PD_TIME_LIMIT_DURATION_NEGATIVE_OR_NAN = 4002;
      *               * SHIPMENT_PD_TIME_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION = 4003;
      *               * SHIPMENT_EMPTY_SHIPMENT_TYPE = 4004;
@@ -429,7 +457,6 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *               * SHIPMENT_INVALID_COST_FOR_VEHICLE = 4011;
      *               * SHIPMENT_COST_FOR_VEHICLE_INDEX_OUT_OF_BOUNDS = 4012;
      *               * SHIPMENT_DUPLICATE_COST_FOR_VEHICLE_INDEX = 4013;
-     *               * SHIPMENT_DETOUR_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      *           * VEHICLE_ERROR = 42;
      *               * VEHICLE_EMPTY_REQUIRED_OPERATOR_TYPE = 4200;
      *               * VEHICLE_DUPLICATE_REQUIRED_OPERATOR_TYPE = 4201;
@@ -453,6 +480,9 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *               * VEHICLE_INVALID_COST_PER_TRAVELED_HOUR = 4219;
      *               * VEHICLE_INVALID_FIXED_COST = 4220;
      *               * VEHICLE_INVALID_TRAVEL_DURATION_MULTIPLE = 4221;
+     *               * VEHICLE_TRAVEL_DURATION_MULTIPLE_WITH_SHIPMENT_PD_DETOUR_LIMITS
+     *                 = 4223;
+     *               * VEHICLE_MATRIX_INDEX_WITH_SHIPMENT_PD_DETOUR_LIMITS = 4224;
      *               * VEHICLE_MINIMUM_DURATION_LONGER_THAN_DURATION_LIMIT = 4222;
      *           * VISIT_REQUEST_ERROR = 44;
      *               * VISIT_REQUEST_EMPTY_TAG = 4400;
@@ -460,6 +490,13 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *               * VISIT_REQUEST_DURATION_NEGATIVE_OR_NAN = 4404;
      *               * VISIT_REQUEST_DURATION_EXCEEDS_GLOBAL_DURATION = 4405;
      *           * PRECEDENCE_ERROR = 46;
+     *               * PRECEDENCE_RULE_MISSING_FIRST_INDEX = 4600;
+     *               * PRECEDENCE_RULE_MISSING_SECOND_INDEX = 4601;
+     *               * PRECEDENCE_RULE_FIRST_INDEX_OUT_OF_BOUNDS = 4602;
+     *               * PRECEDENCE_RULE_SECOND_INDEX_OUT_OF_BOUNDS = 4603;
+     *               * PRECEDENCE_RULE_DUPLICATE_INDEX = 4604;
+     *               * PRECEDENCE_RULE_INEXISTENT_FIRST_VISIT_REQUEST = 4605;
+     *               * PRECEDENCE_RULE_INEXISTENT_SECOND_VISIT_REQUEST = 4606;
      *           * BREAK_ERROR = 48;
      *               * BREAK_RULE_EMPTY = 4800;
      *               * BREAK_REQUEST_UNSPECIFIED_DURATION = 4801;
@@ -505,12 +542,9 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *           * DURATION_SECONDS_MATRIX_ERROR = 56;
      *               * DURATION_SECONDS_MATRIX_DURATION_NEGATIVE_OR_NAN = 5600;
      *               * DURATION_SECONDS_MATRIX_DURATION_EXCEEDS_GLOBAL_DURATION = 5601;
-     *           * GRAPH_ARC_ERROR = 58;
-     *               * GRAPH_ARC_DURATION_NEGATIVE_OR_NAN = 5800;
-     *               * GRAPH_ARC_DURATION_EXCEEDS_GLOBAL_DURATION = 5801;
      *     @type string $display_name
      *           The error display name.
-     *     @type \Google\Cloud\Optimization\V1\OptimizeToursValidationError\FieldReference[]|\Google\Protobuf\Internal\RepeatedField $fields
+     *     @type array<\Google\Cloud\Optimization\V1\OptimizeToursValidationError\FieldReference>|\Google\Protobuf\Internal\RepeatedField $fields
      *           An error context may involve 0, 1 (most of the time) or more fields. For
      *           example, referring to vehicle #4 and shipment #2's first pickup can be
      *           done as follows:
@@ -577,6 +611,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * INJECTED_SOLUTION_MISSING_LABEL = 2000;
      *     * INJECTED_SOLUTION_DUPLICATE_LABEL = 2001;
      *     * INJECTED_SOLUTION_AMBIGUOUS_INDEX = 2002;
+     *     * INJECTED_SOLUTION_INFEASIBLE_AFTER_GETTING_TRAVEL_TIMES = 2003;
+     *     * INJECTED_SOLUTION_TRANSITION_INCONSISTENT_WITH_ACTUAL_TRAVEL = 2004;
+     *     * INJECTED_SOLUTION_CONCURRENT_SOLUTION_TYPES = 2005;
+     *     * INJECTED_SOLUTION_MORE_THAN_ONE_PER_TYPE = 2006;
+     *     * INJECTED_SOLUTION_REFRESH_WITHOUT_POPULATE = 2008;
+     *     * INJECTED_SOLUTION_CONSTRAINED_ROUTE_PORTION_INFEASIBLE = 2010;
      * * SHIPMENT_MODEL_ERROR = 22;
      *     * SHIPMENT_MODEL_TOO_LARGE = 2200;
      *     * SHIPMENT_MODEL_TOO_MANY_CAPACITY_TYPES = 2201;
@@ -584,6 +624,8 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * SHIPMENT_MODEL_GLOBAL_END_TIME_TOO_LARGE_OR_NAN = 2203;
      *     * SHIPMENT_MODEL_GLOBAL_START_TIME_AFTER_GLOBAL_END_TIME = 2204;
      *     * SHIPMENT_MODEL_GLOBAL_DURATION_TOO_LONG = 2205;
+     *     * SHIPMENT_MODEL_MAX_ACTIVE_VEHICLES_NOT_POSITIVE = 2206;
+     *     * SHIPMENT_MODEL_DURATION_MATRIX_TOO_LARGE = 2207;
      * * INDEX_ERROR = 24;
      * * TAG_ERROR = 26;
      * * TIME_WINDOW_ERROR = 28;
@@ -665,9 +707,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * DURATION_LIMIT_QUADRATIC_SOFT_MAX_DURATION_EXCEEDS_GLOBAL_DURATION
      *       = 3815;
      * * SHIPMENT_ERROR = 40;
+     *     * SHIPMENT_PD_LIMIT_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      *     * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_NEGATIVE_OR_NAN = 4000;
      *     * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION
      *       = 4001;
+     *     * SHIPMENT_PD_RELATIVE_DETOUR_LIMIT_INVALID = 4015;
+     *     * SHIPMENT_PD_DETOUR_LIMIT_AND_EXTRA_VISIT_DURATION = 4016;
      *     * SHIPMENT_PD_TIME_LIMIT_DURATION_NEGATIVE_OR_NAN = 4002;
      *     * SHIPMENT_PD_TIME_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION = 4003;
      *     * SHIPMENT_EMPTY_SHIPMENT_TYPE = 4004;
@@ -680,7 +725,6 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * SHIPMENT_INVALID_COST_FOR_VEHICLE = 4011;
      *     * SHIPMENT_COST_FOR_VEHICLE_INDEX_OUT_OF_BOUNDS = 4012;
      *     * SHIPMENT_DUPLICATE_COST_FOR_VEHICLE_INDEX = 4013;
-     *     * SHIPMENT_DETOUR_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      * * VEHICLE_ERROR = 42;
      *     * VEHICLE_EMPTY_REQUIRED_OPERATOR_TYPE = 4200;
      *     * VEHICLE_DUPLICATE_REQUIRED_OPERATOR_TYPE = 4201;
@@ -704,6 +748,9 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * VEHICLE_INVALID_COST_PER_TRAVELED_HOUR = 4219;
      *     * VEHICLE_INVALID_FIXED_COST = 4220;
      *     * VEHICLE_INVALID_TRAVEL_DURATION_MULTIPLE = 4221;
+     *     * VEHICLE_TRAVEL_DURATION_MULTIPLE_WITH_SHIPMENT_PD_DETOUR_LIMITS
+     *       = 4223;
+     *     * VEHICLE_MATRIX_INDEX_WITH_SHIPMENT_PD_DETOUR_LIMITS = 4224;
      *     * VEHICLE_MINIMUM_DURATION_LONGER_THAN_DURATION_LIMIT = 4222;
      * * VISIT_REQUEST_ERROR = 44;
      *     * VISIT_REQUEST_EMPTY_TAG = 4400;
@@ -711,6 +758,13 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * VISIT_REQUEST_DURATION_NEGATIVE_OR_NAN = 4404;
      *     * VISIT_REQUEST_DURATION_EXCEEDS_GLOBAL_DURATION = 4405;
      * * PRECEDENCE_ERROR = 46;
+     *     * PRECEDENCE_RULE_MISSING_FIRST_INDEX = 4600;
+     *     * PRECEDENCE_RULE_MISSING_SECOND_INDEX = 4601;
+     *     * PRECEDENCE_RULE_FIRST_INDEX_OUT_OF_BOUNDS = 4602;
+     *     * PRECEDENCE_RULE_SECOND_INDEX_OUT_OF_BOUNDS = 4603;
+     *     * PRECEDENCE_RULE_DUPLICATE_INDEX = 4604;
+     *     * PRECEDENCE_RULE_INEXISTENT_FIRST_VISIT_REQUEST = 4605;
+     *     * PRECEDENCE_RULE_INEXISTENT_SECOND_VISIT_REQUEST = 4606;
      * * BREAK_ERROR = 48;
      *     * BREAK_RULE_EMPTY = 4800;
      *     * BREAK_REQUEST_UNSPECIFIED_DURATION = 4801;
@@ -756,9 +810,6 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      * * DURATION_SECONDS_MATRIX_ERROR = 56;
      *     * DURATION_SECONDS_MATRIX_DURATION_NEGATIVE_OR_NAN = 5600;
      *     * DURATION_SECONDS_MATRIX_DURATION_EXCEEDS_GLOBAL_DURATION = 5601;
-     * * GRAPH_ARC_ERROR = 58;
-     *     * GRAPH_ARC_DURATION_NEGATIVE_OR_NAN = 5800;
-     *     * GRAPH_ARC_DURATION_EXCEEDS_GLOBAL_DURATION = 5801;
      *
      * Generated from protobuf field <code>int32 code = 1;</code>
      * @return int
@@ -808,6 +859,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * INJECTED_SOLUTION_MISSING_LABEL = 2000;
      *     * INJECTED_SOLUTION_DUPLICATE_LABEL = 2001;
      *     * INJECTED_SOLUTION_AMBIGUOUS_INDEX = 2002;
+     *     * INJECTED_SOLUTION_INFEASIBLE_AFTER_GETTING_TRAVEL_TIMES = 2003;
+     *     * INJECTED_SOLUTION_TRANSITION_INCONSISTENT_WITH_ACTUAL_TRAVEL = 2004;
+     *     * INJECTED_SOLUTION_CONCURRENT_SOLUTION_TYPES = 2005;
+     *     * INJECTED_SOLUTION_MORE_THAN_ONE_PER_TYPE = 2006;
+     *     * INJECTED_SOLUTION_REFRESH_WITHOUT_POPULATE = 2008;
+     *     * INJECTED_SOLUTION_CONSTRAINED_ROUTE_PORTION_INFEASIBLE = 2010;
      * * SHIPMENT_MODEL_ERROR = 22;
      *     * SHIPMENT_MODEL_TOO_LARGE = 2200;
      *     * SHIPMENT_MODEL_TOO_MANY_CAPACITY_TYPES = 2201;
@@ -815,6 +872,8 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * SHIPMENT_MODEL_GLOBAL_END_TIME_TOO_LARGE_OR_NAN = 2203;
      *     * SHIPMENT_MODEL_GLOBAL_START_TIME_AFTER_GLOBAL_END_TIME = 2204;
      *     * SHIPMENT_MODEL_GLOBAL_DURATION_TOO_LONG = 2205;
+     *     * SHIPMENT_MODEL_MAX_ACTIVE_VEHICLES_NOT_POSITIVE = 2206;
+     *     * SHIPMENT_MODEL_DURATION_MATRIX_TOO_LARGE = 2207;
      * * INDEX_ERROR = 24;
      * * TAG_ERROR = 26;
      * * TIME_WINDOW_ERROR = 28;
@@ -896,9 +955,12 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * DURATION_LIMIT_QUADRATIC_SOFT_MAX_DURATION_EXCEEDS_GLOBAL_DURATION
      *       = 3815;
      * * SHIPMENT_ERROR = 40;
+     *     * SHIPMENT_PD_LIMIT_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      *     * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_NEGATIVE_OR_NAN = 4000;
      *     * SHIPMENT_PD_ABSOLUTE_DETOUR_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION
      *       = 4001;
+     *     * SHIPMENT_PD_RELATIVE_DETOUR_LIMIT_INVALID = 4015;
+     *     * SHIPMENT_PD_DETOUR_LIMIT_AND_EXTRA_VISIT_DURATION = 4016;
      *     * SHIPMENT_PD_TIME_LIMIT_DURATION_NEGATIVE_OR_NAN = 4002;
      *     * SHIPMENT_PD_TIME_LIMIT_DURATION_EXCEEDS_GLOBAL_DURATION = 4003;
      *     * SHIPMENT_EMPTY_SHIPMENT_TYPE = 4004;
@@ -911,7 +973,6 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * SHIPMENT_INVALID_COST_FOR_VEHICLE = 4011;
      *     * SHIPMENT_COST_FOR_VEHICLE_INDEX_OUT_OF_BOUNDS = 4012;
      *     * SHIPMENT_DUPLICATE_COST_FOR_VEHICLE_INDEX = 4013;
-     *     * SHIPMENT_DETOUR_WITHOUT_PICKUP_AND_DELIVERY = 4014;
      * * VEHICLE_ERROR = 42;
      *     * VEHICLE_EMPTY_REQUIRED_OPERATOR_TYPE = 4200;
      *     * VEHICLE_DUPLICATE_REQUIRED_OPERATOR_TYPE = 4201;
@@ -935,6 +996,9 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * VEHICLE_INVALID_COST_PER_TRAVELED_HOUR = 4219;
      *     * VEHICLE_INVALID_FIXED_COST = 4220;
      *     * VEHICLE_INVALID_TRAVEL_DURATION_MULTIPLE = 4221;
+     *     * VEHICLE_TRAVEL_DURATION_MULTIPLE_WITH_SHIPMENT_PD_DETOUR_LIMITS
+     *       = 4223;
+     *     * VEHICLE_MATRIX_INDEX_WITH_SHIPMENT_PD_DETOUR_LIMITS = 4224;
      *     * VEHICLE_MINIMUM_DURATION_LONGER_THAN_DURATION_LIMIT = 4222;
      * * VISIT_REQUEST_ERROR = 44;
      *     * VISIT_REQUEST_EMPTY_TAG = 4400;
@@ -942,6 +1006,13 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      *     * VISIT_REQUEST_DURATION_NEGATIVE_OR_NAN = 4404;
      *     * VISIT_REQUEST_DURATION_EXCEEDS_GLOBAL_DURATION = 4405;
      * * PRECEDENCE_ERROR = 46;
+     *     * PRECEDENCE_RULE_MISSING_FIRST_INDEX = 4600;
+     *     * PRECEDENCE_RULE_MISSING_SECOND_INDEX = 4601;
+     *     * PRECEDENCE_RULE_FIRST_INDEX_OUT_OF_BOUNDS = 4602;
+     *     * PRECEDENCE_RULE_SECOND_INDEX_OUT_OF_BOUNDS = 4603;
+     *     * PRECEDENCE_RULE_DUPLICATE_INDEX = 4604;
+     *     * PRECEDENCE_RULE_INEXISTENT_FIRST_VISIT_REQUEST = 4605;
+     *     * PRECEDENCE_RULE_INEXISTENT_SECOND_VISIT_REQUEST = 4606;
      * * BREAK_ERROR = 48;
      *     * BREAK_RULE_EMPTY = 4800;
      *     * BREAK_REQUEST_UNSPECIFIED_DURATION = 4801;
@@ -987,9 +1058,6 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      * * DURATION_SECONDS_MATRIX_ERROR = 56;
      *     * DURATION_SECONDS_MATRIX_DURATION_NEGATIVE_OR_NAN = 5600;
      *     * DURATION_SECONDS_MATRIX_DURATION_EXCEEDS_GLOBAL_DURATION = 5601;
-     * * GRAPH_ARC_ERROR = 58;
-     *     * GRAPH_ARC_DURATION_NEGATIVE_OR_NAN = 5800;
-     *     * GRAPH_ARC_DURATION_EXCEEDS_GLOBAL_DURATION = 5801;
      *
      * Generated from protobuf field <code>int32 code = 1;</code>
      * @param int $var
@@ -1060,7 +1128,7 @@ class OptimizeToursValidationError extends \Google\Protobuf\Internal\Message
      * given error code.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.OptimizeToursValidationError.FieldReference fields = 3;</code>
-     * @param \Google\Cloud\Optimization\V1\OptimizeToursValidationError\FieldReference[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\OptimizeToursValidationError\FieldReference>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFields($var)

@@ -23,7 +23,7 @@ class CreateEntryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The ID of the entry to create.
      * The ID must contain only letters (a-z, A-Z), numbers (0-9),
@@ -32,13 +32,38 @@ class CreateEntryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string entry_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $entry_id = '';
+    protected $entry_id = '';
     /**
      * Required. The entry to create.
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.Entry entry = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $entry = null;
+    protected $entry = null;
+
+    /**
+     * @param string                             $parent  Required. The name of the entry group this entry belongs to.
+     *
+     *                                                    Note: The entry itself and its child resources might not be stored in
+     *                                                    the location specified in its name. Please see
+     *                                                    {@see DataCatalogClient::entryGroupName()} for help formatting this field.
+     * @param string                             $entryId Required. The ID of the entry to create.
+     *
+     *                                                    The ID must contain only letters (a-z, A-Z), numbers (0-9),
+     *                                                    and underscores (_).
+     *                                                    The maximum size is 64 bytes when encoded in UTF-8.
+     * @param \Google\Cloud\DataCatalog\V1\Entry $entry   Required. The entry to create.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\CreateEntryRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $entryId, \Google\Cloud\DataCatalog\V1\Entry $entry): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setEntryId($entryId)
+            ->setEntry($entry);
+    }
 
     /**
      * Constructor.

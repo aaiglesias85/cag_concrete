@@ -21,28 +21,28 @@ class StoredInfoTypeVersion extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.StoredInfoTypeConfig config = 1;</code>
      */
-    private $config = null;
+    protected $config = null;
     /**
      * Create timestamp of the version. Read-only, determined by the system
      * when the version is created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Stored info type version state. Read-only, updated by the system
      * during dictionary creation.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.StoredInfoTypeState state = 3;</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Errors that occurred when creating this storedInfoType version, or
      * anomalies detected in the storedInfoType data that render it unusable. Only
      * the five most recent errors will be displayed, with the most recent error
      * appearing first.
      * For example, some of the data for stored custom dictionaries is put in
-     * the user's Google Cloud Storage bucket, and if this data is modified or
+     * the user's Cloud Storage bucket, and if this data is modified or
      * deleted by the user or another system, the dictionary becomes invalid.
      * If any errors occur, fix the problem indicated by the error message and
      * use the UpdateStoredInfoType API method to create another version of the
@@ -57,7 +57,7 @@ class StoredInfoTypeVersion extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.StoredInfoTypeStats stats = 5;</code>
      */
-    private $stats = null;
+    protected $stats = null;
 
     /**
      * Constructor.
@@ -73,13 +73,13 @@ class StoredInfoTypeVersion extends \Google\Protobuf\Internal\Message
      *     @type int $state
      *           Stored info type version state. Read-only, updated by the system
      *           during dictionary creation.
-     *     @type \Google\Cloud\Dlp\V2\Error[]|\Google\Protobuf\Internal\RepeatedField $errors
+     *     @type array<\Google\Cloud\Dlp\V2\Error>|\Google\Protobuf\Internal\RepeatedField $errors
      *           Errors that occurred when creating this storedInfoType version, or
      *           anomalies detected in the storedInfoType data that render it unusable. Only
      *           the five most recent errors will be displayed, with the most recent error
      *           appearing first.
      *           For example, some of the data for stored custom dictionaries is put in
-     *           the user's Google Cloud Storage bucket, and if this data is modified or
+     *           the user's Cloud Storage bucket, and if this data is modified or
      *           deleted by the user or another system, the dictionary becomes invalid.
      *           If any errors occur, fix the problem indicated by the error message and
      *           use the UpdateStoredInfoType API method to create another version of the
@@ -202,7 +202,7 @@ class StoredInfoTypeVersion extends \Google\Protobuf\Internal\Message
      * the five most recent errors will be displayed, with the most recent error
      * appearing first.
      * For example, some of the data for stored custom dictionaries is put in
-     * the user's Google Cloud Storage bucket, and if this data is modified or
+     * the user's Cloud Storage bucket, and if this data is modified or
      * deleted by the user or another system, the dictionary becomes invalid.
      * If any errors occur, fix the problem indicated by the error message and
      * use the UpdateStoredInfoType API method to create another version of the
@@ -223,7 +223,7 @@ class StoredInfoTypeVersion extends \Google\Protobuf\Internal\Message
      * the five most recent errors will be displayed, with the most recent error
      * appearing first.
      * For example, some of the data for stored custom dictionaries is put in
-     * the user's Google Cloud Storage bucket, and if this data is modified or
+     * the user's Cloud Storage bucket, and if this data is modified or
      * deleted by the user or another system, the dictionary becomes invalid.
      * If any errors occur, fix the problem indicated by the error message and
      * use the UpdateStoredInfoType API method to create another version of the
@@ -231,7 +231,7 @@ class StoredInfoTypeVersion extends \Google\Protobuf\Internal\Message
      * not the source of the error.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.Error errors = 4;</code>
-     * @param \Google\Cloud\Dlp\V2\Error[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\Error>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrors($var)

@@ -30,41 +30,75 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Optional. The maximum number of results to return from this request.  Non-positive
-     * values are ignored. If not specified, the server will determine the number
-     * of results to return.
+     * Optional. The maximum number of results to return from this request.
+     * Non-positive values are ignored. If not specified, the server will
+     * determine the number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
-     * Optional. If present, retrieves the next batch of results from the preceding call to
-     * this method. `page_token` must be the value of `next_page_token` from the
-     * previous response. The values of other method parameters must be identical
-     * to those in the previous call.
+     * Optional. If present, retrieves the next batch of results from the
+     * preceding call to this method. `page_token` must be the value of
+     * `next_page_token` from the previous response. The values of other method
+     * parameters must be identical to those in the previous call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Optional. Filter expression to restrict the insights returned. Supported
      * filter fields:
      * * `stateInfo.state`
      * * `insightSubtype`
      * * `severity`
+     * * `targetResources`
      * Examples:
      * * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      * * `insightSubtype = PERMISSIONS_USAGE`
      * * `severity = CRITICAL OR severity = HIGH`
+     * * `targetResources :
+     * //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      * * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)`
+     * The max allowed filter length is 500 characters.
      * (These expressions are based on the filter language described at
      * https://google.aip.dev/160)
      *
      * Generated from protobuf field <code>string filter = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $parent Required. The container resource on which to execute the request.
+     *                       Acceptable formats:
+     *
+     *                       * `projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]`
+     *
+     *                       * `projects/[PROJECT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]`
+     *
+     *                       * `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]`
+     *
+     *                       * `folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]`
+     *
+     *                       * `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]`
+     *
+     *                       LOCATION here refers to GCP Locations:
+     *                       https://cloud.google.com/about/locations/
+     *                       INSIGHT_TYPE_ID refers to supported insight types:
+     *                       https://cloud.google.com/recommender/docs/insights/insight-types. Please see
+     *                       {@see RecommenderClient::insightTypeName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Recommender\V1\ListInsightsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -85,25 +119,29 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
      *           INSIGHT_TYPE_ID refers to supported insight types:
      *           https://cloud.google.com/recommender/docs/insights/insight-types.
      *     @type int $page_size
-     *           Optional. The maximum number of results to return from this request.  Non-positive
-     *           values are ignored. If not specified, the server will determine the number
-     *           of results to return.
+     *           Optional. The maximum number of results to return from this request.
+     *           Non-positive values are ignored. If not specified, the server will
+     *           determine the number of results to return.
      *     @type string $page_token
-     *           Optional. If present, retrieves the next batch of results from the preceding call to
-     *           this method. `page_token` must be the value of `next_page_token` from the
-     *           previous response. The values of other method parameters must be identical
-     *           to those in the previous call.
+     *           Optional. If present, retrieves the next batch of results from the
+     *           preceding call to this method. `page_token` must be the value of
+     *           `next_page_token` from the previous response. The values of other method
+     *           parameters must be identical to those in the previous call.
      *     @type string $filter
      *           Optional. Filter expression to restrict the insights returned. Supported
      *           filter fields:
      *           * `stateInfo.state`
      *           * `insightSubtype`
      *           * `severity`
+     *           * `targetResources`
      *           Examples:
      *           * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      *           * `insightSubtype = PERMISSIONS_USAGE`
      *           * `severity = CRITICAL OR severity = HIGH`
+     *           * `targetResources :
+     *           //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      *           * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)`
+     *           The max allowed filter length is 500 characters.
      *           (These expressions are based on the filter language described at
      *           https://google.aip.dev/160)
      * }
@@ -160,9 +198,9 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The maximum number of results to return from this request.  Non-positive
-     * values are ignored. If not specified, the server will determine the number
-     * of results to return.
+     * Optional. The maximum number of results to return from this request.
+     * Non-positive values are ignored. If not specified, the server will
+     * determine the number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -173,9 +211,9 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The maximum number of results to return from this request.  Non-positive
-     * values are ignored. If not specified, the server will determine the number
-     * of results to return.
+     * Optional. The maximum number of results to return from this request.
+     * Non-positive values are ignored. If not specified, the server will
+     * determine the number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -190,10 +228,10 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If present, retrieves the next batch of results from the preceding call to
-     * this method. `page_token` must be the value of `next_page_token` from the
-     * previous response. The values of other method parameters must be identical
-     * to those in the previous call.
+     * Optional. If present, retrieves the next batch of results from the
+     * preceding call to this method. `page_token` must be the value of
+     * `next_page_token` from the previous response. The values of other method
+     * parameters must be identical to those in the previous call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -204,10 +242,10 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If present, retrieves the next batch of results from the preceding call to
-     * this method. `page_token` must be the value of `next_page_token` from the
-     * previous response. The values of other method parameters must be identical
-     * to those in the previous call.
+     * Optional. If present, retrieves the next batch of results from the
+     * preceding call to this method. `page_token` must be the value of
+     * `next_page_token` from the previous response. The values of other method
+     * parameters must be identical to those in the previous call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -227,11 +265,15 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
      * * `stateInfo.state`
      * * `insightSubtype`
      * * `severity`
+     * * `targetResources`
      * Examples:
      * * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      * * `insightSubtype = PERMISSIONS_USAGE`
      * * `severity = CRITICAL OR severity = HIGH`
+     * * `targetResources :
+     * //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      * * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)`
+     * The max allowed filter length is 500 characters.
      * (These expressions are based on the filter language described at
      * https://google.aip.dev/160)
      *
@@ -249,11 +291,15 @@ class ListInsightsRequest extends \Google\Protobuf\Internal\Message
      * * `stateInfo.state`
      * * `insightSubtype`
      * * `severity`
+     * * `targetResources`
      * Examples:
      * * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      * * `insightSubtype = PERMISSIONS_USAGE`
      * * `severity = CRITICAL OR severity = HIGH`
+     * * `targetResources :
+     * //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      * * `stateInfo.state = ACTIVE AND (severity = CRITICAL OR severity = HIGH)`
+     * The max allowed filter length is 500 characters.
      * (These expressions are based on the filter language described at
      * https://google.aip.dev/160)
      *

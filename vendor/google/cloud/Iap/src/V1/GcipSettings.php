@@ -33,7 +33,7 @@ class GcipSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.StringValue login_page_uri = 2;</code>
      */
-    private $login_page_uri = null;
+    protected $login_page_uri = null;
 
     /**
      * Constructor.
@@ -41,7 +41,7 @@ class GcipSettings extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $tenant_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $tenant_ids
      *           GCIP tenant ids that are linked to the IAP resource.
      *           tenant_ids could be a string beginning with a number character to indicate
      *           authenticating with GCIP tenant flow, or in the format of _<ProjectNumber>
@@ -84,7 +84,7 @@ class GcipSettings extends \Google\Protobuf\Internal\Message
      * while for tenant flow, tenant_ids can contain multiple elements.
      *
      * Generated from protobuf field <code>repeated string tenant_ids = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTenantIds($var)
@@ -128,7 +128,7 @@ class GcipSettings extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.StringValue login_page_uri = 2;</code>
      * @return string|null
      */
-    public function getLoginPageUriValue()
+    public function getLoginPageUriUnwrapped()
     {
         return $this->readWrapperValue("login_page_uri");
     }
@@ -161,7 +161,7 @@ class GcipSettings extends \Google\Protobuf\Internal\Message
      * @param string|null $var
      * @return $this
      */
-    public function setLoginPageUriValue($var)
+    public function setLoginPageUriUnwrapped($var)
     {
         $this->writeWrapperValue("login_page_uri", $var);
         return $this;}

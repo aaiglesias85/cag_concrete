@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [KeyManagementService.ListEkmConnections][].
+ * Response message for
+ * [EkmService.ListEkmConnections][google.cloud.kms.v1.EkmService.ListEkmConnections].
  *
  * Generated from protobuf message <code>google.cloud.kms.v1.ListEkmConnectionsResponse</code>
  */
@@ -28,14 +29,14 @@ class ListEkmConnectionsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * The total number of [EkmConnections][google.cloud.kms.v1.EkmConnection]
      * that matched the query.
      *
      * Generated from protobuf field <code>int32 total_size = 3;</code>
      */
-    private $total_size = 0;
+    protected $total_size = 0;
 
     /**
      * Constructor.
@@ -43,7 +44,7 @@ class ListEkmConnectionsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Kms\V1\EkmConnection[]|\Google\Protobuf\Internal\RepeatedField $ekm_connections
+     *     @type array<\Google\Cloud\Kms\V1\EkmConnection>|\Google\Protobuf\Internal\RepeatedField $ekm_connections
      *           The list of [EkmConnections][google.cloud.kms.v1.EkmConnection].
      *     @type string $next_page_token
      *           A token to retrieve next page of results. Pass this value in
@@ -74,7 +75,7 @@ class ListEkmConnectionsResponse extends \Google\Protobuf\Internal\Message
      * The list of [EkmConnections][google.cloud.kms.v1.EkmConnection].
      *
      * Generated from protobuf field <code>repeated .google.cloud.kms.v1.EkmConnection ekm_connections = 1;</code>
-     * @param \Google\Cloud\Kms\V1\EkmConnection[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Kms\V1\EkmConnection>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEkmConnections($var)

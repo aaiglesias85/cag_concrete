@@ -3,129 +3,167 @@
 
 ## CI Status
 
-PHP Version  | Status
------------- | ------
-PHP 7.2 | [![Kokoro CI](https://storage.googleapis.com/cloud-devrel-public/php/badges/google-cloud-php/php72.svg)](https://storage.googleapis.com/cloud-devrel-public/php/badges/google-cloud-php/php72.html)
+View the [list of supported APIs and Services](https://cloud.google.com/php/docs/reference).
 
-[![Latest Stable Version](https://poser.pugx.org/google/cloud/v/stable)](https://packagist.org/packages/google/cloud) [![Packagist](https://img.shields.io/packagist/dm/google/cloud.svg)](https://packagist.org/packages/google/cloud)
+If you need support for other Google APIs, please check out the
+[Google APIs Client Library for PHP](https://github.com/google/google-api-php-client).
 
-* [Homepage](http://googleapis.github.io/google-cloud-php)
-* [API Documentation](https://googleapis.github.io/google-cloud-php/#/docs/google-cloud/latest/servicebuilder)
-
-This client supports the following Google Cloud Platform services at a [General Availability](#versioning) quality level:
-* [Cloud AutoML](AutoMl)
-* [Cloud Firestore](Firestore)
-* [Cloud Spanner](Spanner)
-* [Google BigQuery](BigQuery)
-* [Google Bigtable](Bigtable)
-* [Google Cloud Asset](Asset)
-* [Google Cloud BigQuery Data Transfer](BigQueryDataTransfer)
-* [Google Cloud BigQuery Storage](BigQueryStorage)
-* [Google Cloud Billing](Billing)
-* [Google Cloud Compute](Compute)
-* [Google Cloud Container](Container)
-* [Google Cloud Dataproc](Dataproc)
-* [Google Cloud Datastore](Datastore)
-* [Google Cloud Data Catalog](DataCatalog)
-* [Google Cloud IoT](Iot)
-* [Google Cloud KMS](Kms)
-* [Google Cloud OsLogin](OsLogin)
-* [Google Cloud Pub/Sub](PubSub)
-* [Google Cloud Recaptcha Enterprise](RecaptchaEnterprise)
-* [Google Cloud Redis](Redis)
-* [Google Cloud Scheduler](Scheduler)
-* [Google Cloud Security Command Center](SecurityCenter)
-* [Google Cloud Speech](Speech)
-* [Google Cloud Storage](Storage)
-* [Google Cloud Tasks](Tasks)
-* [Google Cloud Text-to-Speech](TextToSpeech)
-* [Google Cloud Translation](Translate)
-* [Google Cloud Video Intelligence](VideoIntelligence)
-* [Google Cloud Vision](Vision)
-* [Google Cloud Web Risk](WebRisk)
-* [Google DLP](Dlp)
-* [Google Stackdriver Debugger](Debugger)
-* [Google Stackdriver Logging](Logging)
-* [Google Stackdriver Monitoring](Monitoring)
-* [Google Stackdriver Trace](Trace)
-* [Recommender](Recommender)
-* [Secret Manager](SecretManager)
-
-This client supports the following Google Cloud Platform services at a [Beta](#versioning) quality level:
-
-* [Dialogflow API](Dialogflow)
-* [Google Analytics Admin](AnalyticsAdmin)
-* [Google Analytics Data](AnalyticsData)
-* [Google Certificate Authority Service](SecurityPrivateCa)
-* [Google Cloud Assured Workloads](AssuredWorkloads)
-* [Google Cloud BigQuery Connection](BigQueryConnection)
-* [Google Cloud BigQuery Reservation](BigQueryReservation)
-* [Google Cloud Channel](Channel)
-* [Google Cloud Datastore Admin](DatastoreAdmin)
-* [Google Cloud Natural Language](Language)
-* [Google Cloud Retail](Retail)
-* [Google Cloud Talent Solution](Talent)
-* [Google Cloud Web Security Scanner](WebSecurityScanner)
-* [Google Cloud Workflows](Workflows)
-* [Google Service Directory](ServiceDirectory)
-* [Google Stackdriver Error Reporting](ErrorReporting)
-* [Memorystore for Memcached](Memcache)
-* [Recommendations AI](RecommendationEngine)
-
-If you need support for other Google APIs, please check out the [Google APIs Client Library for PHP](https://github.com/google/google-api-php-client).
-
-## Quick Start
-
-We recommend installing individual component packages when possible. A list of available packages can be found on [Packagist](https://packagist.org/search/?q=google%2Fcloud-).
+We recommend installing individual component packages. A list of available packages can be found on
+[Packagist](https://packagist.org/search/?q=google%2Fcloud-).
 
 For example:
-
 ```sh
+$ composer require google/cloud-storage
 $ composer require google/cloud-bigquery
 $ composer require google/cloud-datastore
 ```
 
-We also provide the `google/cloud` package, which includes all Google Cloud clients.
+## Quickstart
 
+In this guide we'll focus on how to configure your client for local development using the Google
+Cloud CLI (`gcloud`).
+
+### For local development:
+* Install the Google Cloud CLI.
+* Authenticate with `gcloud` to generate the credentials file.
+* Instantiate a client.
+
+### Installing the Google Cloud CLI
+In order to generate our needed credentials file we need to authenticate to gcloud first.
+Installation is handled differently depending on your platform. Here is a link to help you setup
+the Google Cloud CLI:
+
+https://cloud.google.com/sdk/docs/install
+
+### Authenticate via the `gcloud` command
+Once the Google Cloud CLI tools are installed it is required that we authenticate via the `gcloud`:
+```shell
+$ gcloud init
+$ gcloud auth application-default login
+```
+
+This will create a local file in your system that the authentication library for our client will
+read in order to make requests to the apis with those credentials. This file is located in different
+place depending on your system.
+
+Windows:
+```
+%APPDATA%\gcloud\application_default_credentials.json
+```
+
+Linux and MacOS:
+```
+$HOME/.config/gcloud/application_default_credentials.json
+```
+
+To read more about Authentication, see [AUTHENTICATION.md](AUTHENTICATION.md)
+
+### Installing a client
+Install the Google Translate client library with composer
 ```sh
-$ composer require google/cloud
+composer install google/cloud-translate
+```
+**Note**: For this example, we are using the Google Translate client library. Check the
+[the complete list of packages](https://cloud.google.com/php/docs/reference/) to find your required
+library.
+
+### Instantiating the client
+Now that we've authenticated and installed the client library, we can instantiate a client which will
+detect the JSON file created by the gcloud CLI and use it to authenticate your requests:
+
+```php
+require_once 'vendor/autoload.php';
+
+use Google\Cloud\Translate\V3\Client\TranslationServiceClient;
+use Google\Cloud\Translate\V3\TranslateTextRequest;
+
+// Instantiating the client gathers the credentials from the `application_default_credentials.json`
+$client = new TranslationServiceClient([]);
+
+$request = new TranslateTextRequest();
+$request->setParent('projects/<YOUR_PROJECT_ID>');
+$request->setTargetLanguageCode('en-US');
+$request->setContents(['こんにちは']);
+
+// The request will contain the authentication token based on the default credentials file
+$response = $client->translateText($request);
+
+var_dump($response->getTranslations()[0]);
+// {
+//     ["translatedText"]=>
+//     string(5) "Hello"
+//     ["detectedLanguageCode"]=>
+//     string(2) "ja"
+// }
+
 ```
 
 ### Authentication
 
-Authentication is handled by the client library automatically. You just need to provide the authentication details when creating a client. Generally, authentication is accomplished using a Service Account. For more information on obtaining Service Account credentials, see our [Authentication Guide](https://cloud.google.com/docs/authentication/production#manually).
+#### Note
+This quickstart is built with local development in mind. The steps for deploying your project are
+different depending on the environment you use. Here we provide some basic instruction in how to get
+started with deployment of your project:
 
-Once you've obtained your credentials file, it may be used to create an authenticated client.
+ * For applications running elsewhere, authentication is usually accomplished using a Service
+   Account.
+
+For more information on obtaining Service Account credentials see our
+[Authentication Guide](https://cloud.google.com/docs/authentication/production#manually). Set the
+`GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to your credentials file.
+
+#### Note:
+Some clients accept the `keyFilePath` and `keyFile` configuration options pointing to the credentials file:
 
 ```php
 require 'vendor/autoload.php';
 
-use Google\Cloud\Core\ServiceBuilder;
+use Google\Cloud\Storage\StorageClient;
 
 // Authenticate using a keyfile path
-$cloud = new ServiceBuilder([
+$cloud = new StorageClient([
     'keyFilePath' => 'path/to/keyfile.json'
 ]);
 
 // Authenticate using keyfile data
-$cloud = new ServiceBuilder([
+$cloud = new StorageClient([
     'keyFile' => json_decode(file_get_contents('/path/to/keyfile.json'), true)
 ]);
 ```
+A list of clients that accept these parameters are:
+- [Bigtable](https://github.com/googleapis/google-cloud-php-bigtable)
+- [Spanner](https://github.com/googleapis/google-cloud-php-spanner)
+- [Firestore](https://github.com/googleapis/google-cloud-php-firestore)
+- [Datastore](https://github.com/googleapis/google-cloud-php-datastore)
+- [Pubsub](https://github.com/googleapis/google-cloud-php-pubsub)
+- [Debugger](https://github.com/googleapis/google-cloud-php-debugger)
+- [Logging](https://github.com/googleapis/google-cloud-php-logging)
+- [Translate](https://github.com/googleapis/google-cloud-php-translate)
+- [Bigquery](https://github.com/googleapis/google-cloud-php-bigquery)
+- [Storage](https://github.com/googleapis/google-cloud-php-storage)
+
+We recommend to visit the Check the [client documentation][php-ref-docs] for the client library you're using for more in depth information.
+
+[php-ref-docs]: https://cloud.google.com/php/docs/reference
 
 If you do not wish to embed your authentication information in your application code, you may also make use of [Application Default Credentials](https://developers.google.com/identity/protocols/application-default-credentials).
 
 ```php
 require 'vendor/autoload.php';
 
-use Google\Cloud\Core\ServiceBuilder;
+use Google\Cloud\Storage\StorageClient;
 
 putenv('GOOGLE_APPLICATION_CREDENTIALS=/path/to/keyfile.json');
 
-$cloud = new ServiceBuilder();
+$cloud = new StorageClient();
 ```
 
 The `GOOGLE_APPLICATION_CREDENTIALS` environment variable may be set in your server configuration.
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### gRPC and Protobuf
 
@@ -176,8 +214,7 @@ $spanner = new SpannerClient([
 
 ## PHP Versions Supported
 
-All client libraries support PHP 5.5 and above, with the exception of
-[Google Cloud Compute](Compute), which supports PHP 7.0 and above.
+All client libraries support PHP 8.0 and above.
 
 ## Versioning
 
@@ -203,6 +240,10 @@ and requests with a higher priority.
 Contributions to this library are always welcome and highly encouraged.
 
 See [CONTRIBUTING](CONTRIBUTING.md) for more information on how to get started.
+
+This repository is not an official support channel. If you have support questions,
+file a support request through the normal Google support channels,
+or post questions on a forum such as [StackOverflow](http://stackoverflow.com/questions/tagged/google-cloud-platform+php).
 
 ## License
 

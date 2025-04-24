@@ -22,29 +22,47 @@ class ListCompaniesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The starting indicator from which to return results.
      *
      * Generated from protobuf field <code>string page_token = 2;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * The maximum number of companies to be returned, at most 100.
      * Default is 100 if a non-positive number is provided.
      *
      * Generated from protobuf field <code>int32 page_size = 3;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Set to true if the companies requested must have open jobs.
      * Defaults to false.
-     * If true, at most [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of companies are fetched, among which
-     * only those with open jobs are returned.
+     * If true, at most
+     * [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of
+     * companies are fetched, among which only those with open jobs are returned.
      *
      * Generated from protobuf field <code>bool require_open_jobs = 4;</code>
      */
-    private $require_open_jobs = false;
+    protected $require_open_jobs = false;
+
+    /**
+     * @param string $parent Required. Resource name of the tenant under which the company is created.
+     *
+     *                       The format is "projects/{project_id}/tenants/{tenant_id}", for example,
+     *                       "projects/foo/tenants/bar". Please see
+     *                       {@see CompanyServiceClient::tenantName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Talent\V4\ListCompaniesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -64,8 +82,9 @@ class ListCompaniesRequest extends \Google\Protobuf\Internal\Message
      *     @type bool $require_open_jobs
      *           Set to true if the companies requested must have open jobs.
      *           Defaults to false.
-     *           If true, at most [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of companies are fetched, among which
-     *           only those with open jobs are returned.
+     *           If true, at most
+     *           [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of
+     *           companies are fetched, among which only those with open jobs are returned.
      * }
      */
     public function __construct($data = NULL) {
@@ -160,8 +179,9 @@ class ListCompaniesRequest extends \Google\Protobuf\Internal\Message
     /**
      * Set to true if the companies requested must have open jobs.
      * Defaults to false.
-     * If true, at most [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of companies are fetched, among which
-     * only those with open jobs are returned.
+     * If true, at most
+     * [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of
+     * companies are fetched, among which only those with open jobs are returned.
      *
      * Generated from protobuf field <code>bool require_open_jobs = 4;</code>
      * @return bool
@@ -174,8 +194,9 @@ class ListCompaniesRequest extends \Google\Protobuf\Internal\Message
     /**
      * Set to true if the companies requested must have open jobs.
      * Defaults to false.
-     * If true, at most [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of companies are fetched, among which
-     * only those with open jobs are returned.
+     * If true, at most
+     * [page_size][google.cloud.talent.v4.ListCompaniesRequest.page_size] of
+     * companies are fetched, among which only those with open jobs are returned.
      *
      * Generated from protobuf field <code>bool require_open_jobs = 4;</code>
      * @param bool $var

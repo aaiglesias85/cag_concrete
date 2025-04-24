@@ -20,7 +20,7 @@ class NfsMount extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string server = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $server = '';
+    protected $server = '';
     /**
      * Required. Source path exported from NFS server.
      * Has to start with '/', and combined with the ip address, it indicates
@@ -28,14 +28,14 @@ class NfsMount extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string path = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $path = '';
+    protected $path = '';
     /**
-     * Required. Destination mount path. The NFS will be mounted for the user under
-     * /mnt/nfs/<mount_point>
+     * Required. Destination mount path. The NFS will be mounted for the user
+     * under /mnt/nfs/<mount_point>
      *
      * Generated from protobuf field <code>string mount_point = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $mount_point = '';
+    protected $mount_point = '';
 
     /**
      * Constructor.
@@ -50,8 +50,8 @@ class NfsMount extends \Google\Protobuf\Internal\Message
      *           Has to start with '/', and combined with the ip address, it indicates
      *           the source mount path in the form of `server:path`
      *     @type string $mount_point
-     *           Required. Destination mount path. The NFS will be mounted for the user under
-     *           /mnt/nfs/<mount_point>
+     *           Required. Destination mount path. The NFS will be mounted for the user
+     *           under /mnt/nfs/<mount_point>
      * }
      */
     public function __construct($data = NULL) {
@@ -116,8 +116,8 @@ class NfsMount extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Destination mount path. The NFS will be mounted for the user under
-     * /mnt/nfs/<mount_point>
+     * Required. Destination mount path. The NFS will be mounted for the user
+     * under /mnt/nfs/<mount_point>
      *
      * Generated from protobuf field <code>string mount_point = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -128,8 +128,8 @@ class NfsMount extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Destination mount path. The NFS will be mounted for the user under
-     * /mnt/nfs/<mount_point>
+     * Required. Destination mount path. The NFS will be mounted for the user
+     * under /mnt/nfs/<mount_point>
      *
      * Generated from protobuf field <code>string mount_point = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

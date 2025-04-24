@@ -16,16 +16,17 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListSnapshotsResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The resulting snapshots.
+     * Optional. The resulting snapshots.
      *
-     * Generated from protobuf field <code>repeated .google.pubsub.v1.Snapshot snapshots = 1;</code>
+     * Generated from protobuf field <code>repeated .google.pubsub.v1.Snapshot snapshots = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $snapshots;
     /**
-     * If not empty, indicates that there may be more snapshot that match the
-     * request; this value should be passed in a new `ListSnapshotsRequest`.
+     * Optional. If not empty, indicates that there may be more snapshot that
+     * match the request; this value should be passed in a new
+     * `ListSnapshotsRequest`.
      *
-     * Generated from protobuf field <code>string next_page_token = 2;</code>
+     * Generated from protobuf field <code>string next_page_token = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $next_page_token = '';
 
@@ -35,11 +36,12 @@ class ListSnapshotsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\PubSub\V1\Snapshot[]|\Google\Protobuf\Internal\RepeatedField $snapshots
-     *           The resulting snapshots.
+     *     @type array<\Google\Cloud\PubSub\V1\Snapshot>|\Google\Protobuf\Internal\RepeatedField $snapshots
+     *           Optional. The resulting snapshots.
      *     @type string $next_page_token
-     *           If not empty, indicates that there may be more snapshot that match the
-     *           request; this value should be passed in a new `ListSnapshotsRequest`.
+     *           Optional. If not empty, indicates that there may be more snapshot that
+     *           match the request; this value should be passed in a new
+     *           `ListSnapshotsRequest`.
      * }
      */
     public function __construct($data = NULL) {
@@ -48,9 +50,9 @@ class ListSnapshotsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The resulting snapshots.
+     * Optional. The resulting snapshots.
      *
-     * Generated from protobuf field <code>repeated .google.pubsub.v1.Snapshot snapshots = 1;</code>
+     * Generated from protobuf field <code>repeated .google.pubsub.v1.Snapshot snapshots = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getSnapshots()
@@ -59,10 +61,10 @@ class ListSnapshotsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The resulting snapshots.
+     * Optional. The resulting snapshots.
      *
-     * Generated from protobuf field <code>repeated .google.pubsub.v1.Snapshot snapshots = 1;</code>
-     * @param \Google\Cloud\PubSub\V1\Snapshot[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated .google.pubsub.v1.Snapshot snapshots = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<\Google\Cloud\PubSub\V1\Snapshot>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSnapshots($var)
@@ -74,10 +76,11 @@ class ListSnapshotsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * If not empty, indicates that there may be more snapshot that match the
-     * request; this value should be passed in a new `ListSnapshotsRequest`.
+     * Optional. If not empty, indicates that there may be more snapshot that
+     * match the request; this value should be passed in a new
+     * `ListSnapshotsRequest`.
      *
-     * Generated from protobuf field <code>string next_page_token = 2;</code>
+     * Generated from protobuf field <code>string next_page_token = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getNextPageToken()
@@ -86,10 +89,11 @@ class ListSnapshotsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * If not empty, indicates that there may be more snapshot that match the
-     * request; this value should be passed in a new `ListSnapshotsRequest`.
+     * Optional. If not empty, indicates that there may be more snapshot that
+     * match the request; this value should be passed in a new
+     * `ListSnapshotsRequest`.
      *
-     * Generated from protobuf field <code>string next_page_token = 2;</code>
+     * Generated from protobuf field <code>string next_page_token = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */

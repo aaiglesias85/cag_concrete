@@ -22,25 +22,25 @@ class CertificateMap extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * One or more paragraphs of text description of a certificate map.
      *
      * Generated from protobuf field <code>string description = 5;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. The creation timestamp of a Certificate Map.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The update timestamp of a Certificate Map.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Set of labels associated with a Certificate Map.
      *
@@ -48,7 +48,9 @@ class CertificateMap extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * Output only. A list of GCLB targets which use this Certificate Map.
+     * Output only. A list of GCLB targets that use this Certificate Map.
+     * A Target Proxy is only present on this list if it's attached to a
+     * Forwarding Rule.
      *
      * Generated from protobuf field <code>repeated .google.cloud.certificatemanager.v1.CertificateMap.GclbTarget gclb_targets = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
@@ -72,8 +74,10 @@ class CertificateMap extends \Google\Protobuf\Internal\Message
      *           Output only. The update timestamp of a Certificate Map.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Set of labels associated with a Certificate Map.
-     *     @type \Google\Cloud\CertificateManager\V1\CertificateMap\GclbTarget[]|\Google\Protobuf\Internal\RepeatedField $gclb_targets
-     *           Output only. A list of GCLB targets which use this Certificate Map.
+     *     @type array<\Google\Cloud\CertificateManager\V1\CertificateMap\GclbTarget>|\Google\Protobuf\Internal\RepeatedField $gclb_targets
+     *           Output only. A list of GCLB targets that use this Certificate Map.
+     *           A Target Proxy is only present on this list if it's attached to a
+     *           Forwarding Rule.
      * }
      */
     public function __construct($data = NULL) {
@@ -236,7 +240,9 @@ class CertificateMap extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A list of GCLB targets which use this Certificate Map.
+     * Output only. A list of GCLB targets that use this Certificate Map.
+     * A Target Proxy is only present on this list if it's attached to a
+     * Forwarding Rule.
      *
      * Generated from protobuf field <code>repeated .google.cloud.certificatemanager.v1.CertificateMap.GclbTarget gclb_targets = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -247,10 +253,12 @@ class CertificateMap extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A list of GCLB targets which use this Certificate Map.
+     * Output only. A list of GCLB targets that use this Certificate Map.
+     * A Target Proxy is only present on this list if it's attached to a
+     * Forwarding Rule.
      *
      * Generated from protobuf field <code>repeated .google.cloud.certificatemanager.v1.CertificateMap.GclbTarget gclb_targets = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\CertificateManager\V1\CertificateMap\GclbTarget[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\CertificateManager\V1\CertificateMap\GclbTarget>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setGclbTargets($var)

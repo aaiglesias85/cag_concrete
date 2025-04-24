@@ -16,6 +16,22 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class ReadWrite extends \Google\Protobuf\Internal\Message
 {
+    /**
+     * Read lock mode for the transaction.
+     *
+     * Generated from protobuf field <code>.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode read_lock_mode = 1;</code>
+     */
+    private $read_lock_mode = 0;
+    /**
+     * Optional. Clients should pass the transaction ID of the previous
+     * transaction attempt that was aborted if this transaction is being
+     * executed on a multiplexed session.
+     * This feature is not yet supported and will result in an UNIMPLEMENTED
+     * error.
+     *
+     * Generated from protobuf field <code>bytes multiplexed_session_previous_transaction_id = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $multiplexed_session_previous_transaction_id = '';
 
     /**
      * Constructor.
@@ -23,11 +39,79 @@ class ReadWrite extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type int $read_lock_mode
+     *           Read lock mode for the transaction.
+     *     @type string $multiplexed_session_previous_transaction_id
+     *           Optional. Clients should pass the transaction ID of the previous
+     *           transaction attempt that was aborted if this transaction is being
+     *           executed on a multiplexed session.
+     *           This feature is not yet supported and will result in an UNIMPLEMENTED
+     *           error.
      * }
      */
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Spanner\V1\Transaction::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * Read lock mode for the transaction.
+     *
+     * Generated from protobuf field <code>.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode read_lock_mode = 1;</code>
+     * @return int
+     */
+    public function getReadLockMode()
+    {
+        return $this->read_lock_mode;
+    }
+
+    /**
+     * Read lock mode for the transaction.
+     *
+     * Generated from protobuf field <code>.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode read_lock_mode = 1;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setReadLockMode($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Spanner\V1\TransactionOptions\ReadWrite\ReadLockMode::class);
+        $this->read_lock_mode = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Clients should pass the transaction ID of the previous
+     * transaction attempt that was aborted if this transaction is being
+     * executed on a multiplexed session.
+     * This feature is not yet supported and will result in an UNIMPLEMENTED
+     * error.
+     *
+     * Generated from protobuf field <code>bytes multiplexed_session_previous_transaction_id = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getMultiplexedSessionPreviousTransactionId()
+    {
+        return $this->multiplexed_session_previous_transaction_id;
+    }
+
+    /**
+     * Optional. Clients should pass the transaction ID of the previous
+     * transaction attempt that was aborted if this transaction is being
+     * executed on a multiplexed session.
+     * This feature is not yet supported and will result in an UNIMPLEMENTED
+     * error.
+     *
+     * Generated from protobuf field <code>bytes multiplexed_session_previous_transaction_id = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setMultiplexedSessionPreviousTransactionId($var)
+    {
+        GPBUtil::checkString($var, False);
+        $this->multiplexed_session_previous_transaction_id = $var;
+
+        return $this;
     }
 
 }

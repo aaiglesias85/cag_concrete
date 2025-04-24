@@ -22,16 +22,16 @@ class DefaultPool extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
-     * Optional. Cloud Storage location where execution outputs should be stored. This can
-     * either be a bucket ("gs://my-bucket") or a path within a bucket
+     * Optional. Cloud Storage location where execution outputs should be stored.
+     * This can either be a bucket ("gs://my-bucket") or a path within a bucket
      * ("gs://my-bucket/my-dir").
      * If unspecified, a default bucket located in the same region will be used.
      *
      * Generated from protobuf field <code>string artifact_storage = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $artifact_storage = '';
+    protected $artifact_storage = '';
 
     /**
      * Constructor.
@@ -44,8 +44,8 @@ class DefaultPool extends \Google\Protobuf\Internal\Message
      *           the project execution service account
      *           (<PROJECT_NUMBER>-compute&#64;developer.gserviceaccount.com) will be used.
      *     @type string $artifact_storage
-     *           Optional. Cloud Storage location where execution outputs should be stored. This can
-     *           either be a bucket ("gs://my-bucket") or a path within a bucket
+     *           Optional. Cloud Storage location where execution outputs should be stored.
+     *           This can either be a bucket ("gs://my-bucket") or a path within a bucket
      *           ("gs://my-bucket/my-dir").
      *           If unspecified, a default bucket located in the same region will be used.
      * }
@@ -86,8 +86,8 @@ class DefaultPool extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage location where execution outputs should be stored. This can
-     * either be a bucket ("gs://my-bucket") or a path within a bucket
+     * Optional. Cloud Storage location where execution outputs should be stored.
+     * This can either be a bucket ("gs://my-bucket") or a path within a bucket
      * ("gs://my-bucket/my-dir").
      * If unspecified, a default bucket located in the same region will be used.
      *
@@ -100,8 +100,8 @@ class DefaultPool extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage location where execution outputs should be stored. This can
-     * either be a bucket ("gs://my-bucket") or a path within a bucket
+     * Optional. Cloud Storage location where execution outputs should be stored.
+     * This can either be a bucket ("gs://my-bucket") or a path within a bucket
      * ("gs://my-bucket/my-dir").
      * If unspecified, a default bucket located in the same region will be used.
      *

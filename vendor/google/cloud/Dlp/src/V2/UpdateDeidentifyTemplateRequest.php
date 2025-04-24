@@ -16,25 +16,47 @@ use Google\Protobuf\Internal\GPBUtil;
 class UpdateDeidentifyTemplateRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Resource name of organization and deidentify template to be updated, for
-     * example `organizations/433245324/deidentifyTemplates/432452342` or
+     * Required. Resource name of organization and deidentify template to be
+     * updated, for example
+     * `organizations/433245324/deidentifyTemplates/432452342` or
      * projects/project-id/deidentifyTemplates/432452342.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * New DeidentifyTemplate value.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DeidentifyTemplate deidentify_template = 2;</code>
      */
-    private $deidentify_template = null;
+    protected $deidentify_template = null;
     /**
      * Mask to control which fields get updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 3;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param string                                  $name               Required. Resource name of organization and deidentify template to be
+     *                                                                    updated, for example
+     *                                                                    `organizations/433245324/deidentifyTemplates/432452342` or
+     *                                                                    projects/project-id/deidentifyTemplates/432452342. Please see
+     *                                                                    {@see DlpServiceClient::deidentifyTemplateName()} for help formatting this field.
+     * @param \Google\Cloud\Dlp\V2\DeidentifyTemplate $deidentifyTemplate New DeidentifyTemplate value.
+     * @param \Google\Protobuf\FieldMask              $updateMask         Mask to control which fields get updated.
+     *
+     * @return \Google\Cloud\Dlp\V2\UpdateDeidentifyTemplateRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\Dlp\V2\DeidentifyTemplate $deidentifyTemplate, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setDeidentifyTemplate($deidentifyTemplate)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -43,8 +65,9 @@ class UpdateDeidentifyTemplateRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Required. Resource name of organization and deidentify template to be updated, for
-     *           example `organizations/433245324/deidentifyTemplates/432452342` or
+     *           Required. Resource name of organization and deidentify template to be
+     *           updated, for example
+     *           `organizations/433245324/deidentifyTemplates/432452342` or
      *           projects/project-id/deidentifyTemplates/432452342.
      *     @type \Google\Cloud\Dlp\V2\DeidentifyTemplate $deidentify_template
      *           New DeidentifyTemplate value.
@@ -58,8 +81,9 @@ class UpdateDeidentifyTemplateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of organization and deidentify template to be updated, for
-     * example `organizations/433245324/deidentifyTemplates/432452342` or
+     * Required. Resource name of organization and deidentify template to be
+     * updated, for example
+     * `organizations/433245324/deidentifyTemplates/432452342` or
      * projects/project-id/deidentifyTemplates/432452342.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -71,8 +95,9 @@ class UpdateDeidentifyTemplateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of organization and deidentify template to be updated, for
-     * example `organizations/433245324/deidentifyTemplates/432452342` or
+     * Required. Resource name of organization and deidentify template to be
+     * updated, for example
+     * `organizations/433245324/deidentifyTemplates/432452342` or
      * projects/project-id/deidentifyTemplates/432452342.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>

@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request for [HubService.CreateHub][google.cloud.networkconnectivity.v1.HubService.CreateHub] method.
+ * Request for
+ * [HubService.CreateHub][google.cloud.networkconnectivity.v1.HubService.CreateHub]
+ * method.
  *
  * Generated from protobuf message <code>google.cloud.networkconnectivity.v1.CreateHubRequest</code>
  */
@@ -20,25 +22,25 @@ class CreateHubRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. A unique identifier for the hub.
      *
      * Generated from protobuf field <code>string hub_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $hub_id = '';
+    protected $hub_id = '';
     /**
      * Required. The initial values for a new hub.
      *
      * Generated from protobuf field <code>.google.cloud.networkconnectivity.v1.Hub hub = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $hub = null;
+    protected $hub = null;
     /**
-     * Optional. A unique request ID (optional). If you specify this ID, you can use it
-     * in cases when you need to retry your request. When you need to retry, this
-     * ID lets the server know that it can ignore the request if it has already
-     * been completed. The server guarantees that for at least 60 minutes after
-     * the first request.
+     * Optional. A request ID to identify requests. Specify a unique request ID so
+     * that if you must retry your request, the server knows to ignore the request
+     * if it has already been completed. The server guarantees that a request
+     * doesn't result in creation of duplicate commitments for at least 60
+     * minutes.
      * For example, consider a situation where you make an initial request and
      * the request times out. If you make the request again with the same request
      * ID, the server can check to see whether the original operation
@@ -49,7 +51,25 @@ class CreateHubRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                                   $parent Required. The parent resource. Please see
+     *                                                         {@see HubServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\NetworkConnectivity\V1\Hub $hub    Required. The initial values for a new hub.
+     * @param string                                   $hubId  Required. A unique identifier for the hub.
+     *
+     * @return \Google\Cloud\NetworkConnectivity\V1\CreateHubRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\NetworkConnectivity\V1\Hub $hub, string $hubId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setHub($hub)
+            ->setHubId($hubId);
+    }
 
     /**
      * Constructor.
@@ -64,11 +84,11 @@ class CreateHubRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\NetworkConnectivity\V1\Hub $hub
      *           Required. The initial values for a new hub.
      *     @type string $request_id
-     *           Optional. A unique request ID (optional). If you specify this ID, you can use it
-     *           in cases when you need to retry your request. When you need to retry, this
-     *           ID lets the server know that it can ignore the request if it has already
-     *           been completed. The server guarantees that for at least 60 minutes after
-     *           the first request.
+     *           Optional. A request ID to identify requests. Specify a unique request ID so
+     *           that if you must retry your request, the server knows to ignore the request
+     *           if it has already been completed. The server guarantees that a request
+     *           doesn't result in creation of duplicate commitments for at least 60
+     *           minutes.
      *           For example, consider a situation where you make an initial request and
      *           the request times out. If you make the request again with the same request
      *           ID, the server can check to see whether the original operation
@@ -172,11 +192,11 @@ class CreateHubRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A unique request ID (optional). If you specify this ID, you can use it
-     * in cases when you need to retry your request. When you need to retry, this
-     * ID lets the server know that it can ignore the request if it has already
-     * been completed. The server guarantees that for at least 60 minutes after
-     * the first request.
+     * Optional. A request ID to identify requests. Specify a unique request ID so
+     * that if you must retry your request, the server knows to ignore the request
+     * if it has already been completed. The server guarantees that a request
+     * doesn't result in creation of duplicate commitments for at least 60
+     * minutes.
      * For example, consider a situation where you make an initial request and
      * the request times out. If you make the request again with the same request
      * ID, the server can check to see whether the original operation
@@ -194,11 +214,11 @@ class CreateHubRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A unique request ID (optional). If you specify this ID, you can use it
-     * in cases when you need to retry your request. When you need to retry, this
-     * ID lets the server know that it can ignore the request if it has already
-     * been completed. The server guarantees that for at least 60 minutes after
-     * the first request.
+     * Optional. A request ID to identify requests. Specify a unique request ID so
+     * that if you must retry your request, the server knows to ignore the request
+     * if it has already been completed. The server guarantees that a request
+     * doesn't result in creation of duplicate commitments for at least 60
+     * minutes.
      * For example, consider a situation where you make an initial request and
      * the request times out. If you make the request again with the same request
      * ID, the server can check to see whether the original operation

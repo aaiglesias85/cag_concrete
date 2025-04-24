@@ -16,25 +16,25 @@ use Google\Protobuf\Internal\GPBUtil;
 class ReauthSettings extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Reauth method required by the policy.
+     * Reauth method requested.
      *
      * Generated from protobuf field <code>.google.cloud.iap.v1.ReauthSettings.Method method = 1;</code>
      */
-    private $method = 0;
+    protected $method = 0;
     /**
      * Reauth session lifetime, how long before a user has to reauthenticate
      * again.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration max_age = 2;</code>
      */
-    private $max_age = null;
+    protected $max_age = null;
     /**
      * How IAP determines the effective policy in cases of hierarchial policies.
      * Policies are merged from higher in the hierarchy to lower in the hierarchy.
      *
      * Generated from protobuf field <code>.google.cloud.iap.v1.ReauthSettings.PolicyType policy_type = 3;</code>
      */
-    private $policy_type = 0;
+    protected $policy_type = 0;
 
     /**
      * Constructor.
@@ -43,7 +43,7 @@ class ReauthSettings extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $method
-     *           Reauth method required by the policy.
+     *           Reauth method requested.
      *     @type \Google\Protobuf\Duration $max_age
      *           Reauth session lifetime, how long before a user has to reauthenticate
      *           again.
@@ -58,7 +58,7 @@ class ReauthSettings extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reauth method required by the policy.
+     * Reauth method requested.
      *
      * Generated from protobuf field <code>.google.cloud.iap.v1.ReauthSettings.Method method = 1;</code>
      * @return int
@@ -69,7 +69,7 @@ class ReauthSettings extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reauth method required by the policy.
+     * Reauth method requested.
      *
      * Generated from protobuf field <code>.google.cloud.iap.v1.ReauthSettings.Method method = 1;</code>
      * @param int $var

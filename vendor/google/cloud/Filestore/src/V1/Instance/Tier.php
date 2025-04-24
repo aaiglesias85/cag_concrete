@@ -20,13 +20,13 @@ class Tier
      */
     const TIER_UNSPECIFIED = 0;
     /**
-     * STANDARD tier.
+     * STANDARD tier. BASIC_HDD is the preferred term for this tier.
      *
      * Generated from protobuf enum <code>STANDARD = 1;</code>
      */
     const STANDARD = 1;
     /**
-     * PREMIUM tier.
+     * PREMIUM tier. BASIC_SSD is the preferred term for this tier.
      *
      * Generated from protobuf enum <code>PREMIUM = 2;</code>
      */
@@ -54,6 +54,27 @@ class Tier
      * Generated from protobuf enum <code>HIGH_SCALE_SSD = 5;</code>
      */
     const HIGH_SCALE_SSD = 5;
+    /**
+     * ENTERPRISE instances offer the features and availability needed for
+     * mission-critical workloads.
+     *
+     * Generated from protobuf enum <code>ENTERPRISE = 6;</code>
+     */
+    const ENTERPRISE = 6;
+    /**
+     * ZONAL instances offer expanded capacity and performance scaling
+     * capabilities.
+     *
+     * Generated from protobuf enum <code>ZONAL = 7;</code>
+     */
+    const ZONAL = 7;
+    /**
+     * REGIONAL instances offer the features and availability needed for
+     * mission-critical workloads.
+     *
+     * Generated from protobuf enum <code>REGIONAL = 8;</code>
+     */
+    const REGIONAL = 8;
 
     private static $valueToName = [
         self::TIER_UNSPECIFIED => 'TIER_UNSPECIFIED',
@@ -62,6 +83,9 @@ class Tier
         self::BASIC_HDD => 'BASIC_HDD',
         self::BASIC_SSD => 'BASIC_SSD',
         self::HIGH_SCALE_SSD => 'HIGH_SCALE_SSD',
+        self::ENTERPRISE => 'ENTERPRISE',
+        self::ZONAL => 'ZONAL',
+        self::REGIONAL => 'REGIONAL',
     ];
 
     public static function name($value)
@@ -85,6 +109,4 @@ class Tier
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Tier::class, \Google\Cloud\Filestore\V1\Instance_Tier::class);
 

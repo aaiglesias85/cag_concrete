@@ -6,7 +6,7 @@
 admin:
   resource: '../src/Routes/Admin/'
   type:     directory
-  prefix:   /
+  prefix:   /admin
 
 auntenticarUsuario:
   path:  /usuario/autenticar

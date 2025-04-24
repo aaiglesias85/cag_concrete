@@ -23,7 +23,7 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string resource_name = 1;</code>
      */
-    private $resource_name = '';
+    protected $resource_name = '';
     /**
      * The type of the Google Cloud resource. Examples include: APPLICATION,
      * PROJECT, and ORGANIZATION. This is a case insensitive field defined by
@@ -32,21 +32,21 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string resource_type = 2;</code>
      */
-    private $resource_type = '';
+    protected $resource_type = '';
     /**
      * The full resource name of the immediate parent of the resource. See:
      * https://cloud.google.com/apis/design/resource_names#full_resource_name
      *
      * Generated from protobuf field <code>string resource_parent = 3;</code>
      */
-    private $resource_parent = '';
+    protected $resource_parent = '';
     /**
      * The full resource name of the project the resource belongs to. See:
      * https://cloud.google.com/apis/design/resource_names#full_resource_name
      *
      * Generated from protobuf field <code>string resource_project = 4;</code>
      */
-    private $resource_project = '';
+    protected $resource_project = '';
     /**
      * Owners of the Google Cloud resource.
      *
@@ -58,19 +58,19 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string resource_display_name = 6;</code>
      */
-    private $resource_display_name = '';
+    protected $resource_display_name = '';
     /**
      * The user defined display name for the parent of this resource.
      *
      * Generated from protobuf field <code>string resource_parent_display_name = 7;</code>
      */
-    private $resource_parent_display_name = '';
+    protected $resource_parent_display_name = '';
     /**
      * The user defined display name for the project of this resource.
      *
      * Generated from protobuf field <code>string resource_project_display_name = 8;</code>
      */
-    private $resource_project_display_name = '';
+    protected $resource_project_display_name = '';
     /**
      * Contains a Folder message for each folder in the assets ancestry.
      * The first folder is the deepest nested folder, and the last folder is the
@@ -101,7 +101,7 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      *     @type string $resource_project
      *           The full resource name of the project the resource belongs to. See:
      *           https://cloud.google.com/apis/design/resource_names#full_resource_name
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $resource_owners
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $resource_owners
      *           Owners of the Google Cloud resource.
      *     @type string $resource_display_name
      *           The user defined display name for this resource.
@@ -109,7 +109,7 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      *           The user defined display name for the parent of this resource.
      *     @type string $resource_project_display_name
      *           The user defined display name for the project of this resource.
-     *     @type \Google\Cloud\SecurityCenter\V1\Folder[]|\Google\Protobuf\Internal\RepeatedField $folders
+     *     @type array<\Google\Cloud\SecurityCenter\V1\Folder>|\Google\Protobuf\Internal\RepeatedField $folders
      *           Contains a Folder message for each folder in the assets ancestry.
      *           The first folder is the deepest nested folder, and the last folder is the
      *           folder directly under the Organization.
@@ -253,7 +253,7 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      * Owners of the Google Cloud resource.
      *
      * Generated from protobuf field <code>repeated string resource_owners = 5;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResourceOwners($var)
@@ -361,7 +361,7 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
      * folder directly under the Organization.
      *
      * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.Folder folders = 10;</code>
-     * @param \Google\Cloud\SecurityCenter\V1\Folder[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\SecurityCenter\V1\Folder>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFolders($var)
@@ -374,6 +374,4 @@ class SecurityCenterProperties extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(SecurityCenterProperties::class, \Google\Cloud\SecurityCenter\V1\Asset_SecurityCenterProperties::class);
 

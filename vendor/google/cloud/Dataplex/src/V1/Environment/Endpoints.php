@@ -9,6 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * URI Endpoints to access sessions associated with the Environment.
+ *
  * Generated from protobuf message <code>google.cloud.dataplex.v1.Environment.Endpoints</code>
  */
 class Endpoints extends \Google\Protobuf\Internal\Message
@@ -18,13 +20,13 @@ class Endpoints extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string notebooks = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $notebooks = '';
+    protected $notebooks = '';
     /**
      * Output only. URI to serve SQL APIs
      *
      * Generated from protobuf field <code>string sql = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $sql = '';
+    protected $sql = '';
 
     /**
      * Constructor.

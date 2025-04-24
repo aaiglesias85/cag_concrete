@@ -17,19 +17,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class UpdateSpecialistPoolOperationMetadata extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The name of the SpecialistPool to which the specialists are being added.
-     * Format:
+     * Output only. The name of the SpecialistPool to which the specialists are
+     * being added. Format:
      * `projects/{project_id}/locations/{location_id}/specialistPools/{specialist_pool}`
      *
      * Generated from protobuf field <code>string specialist_pool = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
-    private $specialist_pool = '';
+    protected $specialist_pool = '';
     /**
      * The operation generic information.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GenericOperationMetadata generic_metadata = 2;</code>
      */
-    private $generic_metadata = null;
+    protected $generic_metadata = null;
 
     /**
      * Constructor.
@@ -38,8 +38,8 @@ class UpdateSpecialistPoolOperationMetadata extends \Google\Protobuf\Internal\Me
      *     Optional. Data for populating the Message object.
      *
      *     @type string $specialist_pool
-     *           Output only. The name of the SpecialistPool to which the specialists are being added.
-     *           Format:
+     *           Output only. The name of the SpecialistPool to which the specialists are
+     *           being added. Format:
      *           `projects/{project_id}/locations/{location_id}/specialistPools/{specialist_pool}`
      *     @type \Google\Cloud\AIPlatform\V1\GenericOperationMetadata $generic_metadata
      *           The operation generic information.
@@ -51,8 +51,8 @@ class UpdateSpecialistPoolOperationMetadata extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Output only. The name of the SpecialistPool to which the specialists are being added.
-     * Format:
+     * Output only. The name of the SpecialistPool to which the specialists are
+     * being added. Format:
      * `projects/{project_id}/locations/{location_id}/specialistPools/{specialist_pool}`
      *
      * Generated from protobuf field <code>string specialist_pool = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
@@ -64,8 +64,8 @@ class UpdateSpecialistPoolOperationMetadata extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Output only. The name of the SpecialistPool to which the specialists are being added.
-     * Format:
+     * Output only. The name of the SpecialistPool to which the specialists are
+     * being added. Format:
      * `projects/{project_id}/locations/{location_id}/specialistPools/{specialist_pool}`
      *
      * Generated from protobuf field <code>string specialist_pool = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>

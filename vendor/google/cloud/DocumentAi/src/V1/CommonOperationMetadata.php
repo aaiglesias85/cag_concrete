@@ -20,25 +20,31 @@ class CommonOperationMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.CommonOperationMetadata.State state = 1;</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * A message providing more details about the current state of processing.
      *
      * Generated from protobuf field <code>string state_message = 2;</code>
      */
-    private $state_message = '';
+    protected $state_message = '';
+    /**
+     * A related resource to this operation.
+     *
+     * Generated from protobuf field <code>string resource = 5;</code>
+     */
+    protected $resource = '';
     /**
      * The creation time of the operation.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * The last update time of the operation.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4;</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
 
     /**
      * Constructor.
@@ -50,6 +56,8 @@ class CommonOperationMetadata extends \Google\Protobuf\Internal\Message
      *           The state of the operation.
      *     @type string $state_message
      *           A message providing more details about the current state of processing.
+     *     @type string $resource
+     *           A related resource to this operation.
      *     @type \Google\Protobuf\Timestamp $create_time
      *           The creation time of the operation.
      *     @type \Google\Protobuf\Timestamp $update_time
@@ -109,6 +117,32 @@ class CommonOperationMetadata extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->state_message = $var;
+
+        return $this;
+    }
+
+    /**
+     * A related resource to this operation.
+     *
+     * Generated from protobuf field <code>string resource = 5;</code>
+     * @return string
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+    /**
+     * A related resource to this operation.
+     *
+     * Generated from protobuf field <code>string resource = 5;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setResource($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->resource = $var;
 
         return $this;
     }

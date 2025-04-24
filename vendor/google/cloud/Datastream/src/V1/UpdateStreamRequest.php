@@ -24,13 +24,13 @@ class UpdateStreamRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Required. The stream resource to update.
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.Stream stream = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $stream = null;
+    protected $stream = null;
     /**
      * Optional. A request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -46,20 +46,39 @@ class UpdateStreamRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
     /**
-     * Optional. Only validate the stream with the changes, without actually updating it.
-     * The default is false.
+     * Optional. Only validate the stream with the changes, without actually
+     * updating it. The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
     /**
      * Optional. Update the stream without validating it.
      *
      * Generated from protobuf field <code>bool force = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $force = false;
+    protected $force = false;
+
+    /**
+     * @param \Google\Cloud\Datastream\V1\Stream $stream     Required. The stream resource to update.
+     * @param \Google\Protobuf\FieldMask         $updateMask Optional. Field mask is used to specify the fields to be overwritten in the
+     *                                                       stream resource by the update.
+     *                                                       The fields specified in the update_mask are relative to the resource, not
+     *                                                       the full request. A field will be overwritten if it is in the mask. If the
+     *                                                       user does not provide a mask then all fields will be overwritten.
+     *
+     * @return \Google\Cloud\Datastream\V1\UpdateStreamRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Datastream\V1\Stream $stream, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setStream($stream)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -88,8 +107,8 @@ class UpdateStreamRequest extends \Google\Protobuf\Internal\Message
      *           The request ID must be a valid UUID with the exception that zero UUID is
      *           not supported (00000000-0000-0000-0000-000000000000).
      *     @type bool $validate_only
-     *           Optional. Only validate the stream with the changes, without actually updating it.
-     *           The default is false.
+     *           Optional. Only validate the stream with the changes, without actually
+     *           updating it. The default is false.
      *     @type bool $force
      *           Optional. Update the stream without validating it.
      * }
@@ -226,8 +245,8 @@ class UpdateStreamRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Only validate the stream with the changes, without actually updating it.
-     * The default is false.
+     * Optional. Only validate the stream with the changes, without actually
+     * updating it. The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
@@ -238,8 +257,8 @@ class UpdateStreamRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Only validate the stream with the changes, without actually updating it.
-     * The default is false.
+     * Optional. Only validate the stream with the changes, without actually
+     * updating it. The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var

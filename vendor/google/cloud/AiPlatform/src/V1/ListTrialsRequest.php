@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [VizierService.ListTrials][google.cloud.aiplatform.v1.VizierService.ListTrials].
+ * Request message for
+ * [VizierService.ListTrials][google.cloud.aiplatform.v1.VizierService.ListTrials].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListTrialsRequest</code>
  */
@@ -21,21 +22,36 @@ class ListTrialsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. A page token to request the next page of results.
      * If unspecified, there are no subsequent pages.
      *
      * Generated from protobuf field <code>string page_token = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Optional. The number of Trials to retrieve per "page" of results.
      * If unspecified, the service will pick an appropriate default.
      *
      * Generated from protobuf field <code>int32 page_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
+
+    /**
+     * @param string $parent Required. The resource name of the Study to list the Trial from.
+     *                       Format: `projects/{project}/locations/{location}/studies/{study}`
+     *                       Please see {@see VizierServiceClient::studyName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListTrialsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

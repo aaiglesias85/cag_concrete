@@ -20,19 +20,19 @@ class ReachabilityDetails extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.ReachabilityDetails.Result result = 1;</code>
      */
-    private $result = 0;
+    protected $result = 0;
     /**
      * The time of the configuration analysis.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp verify_time = 2;</code>
      */
-    private $verify_time = null;
+    protected $verify_time = null;
     /**
      * The details of a failure or a cancellation of reachability analysis.
      *
      * Generated from protobuf field <code>.google.rpc.Status error = 3;</code>
      */
-    private $error = null;
+    protected $error = null;
     /**
      * Result may contain a list of traces if a test has multiple possible
      * paths in the network, such as when destination endpoint is a load balancer
@@ -54,7 +54,7 @@ class ReachabilityDetails extends \Google\Protobuf\Internal\Message
      *           The time of the configuration analysis.
      *     @type \Google\Rpc\Status $error
      *           The details of a failure or a cancellation of reachability analysis.
-     *     @type \Google\Cloud\NetworkManagement\V1\Trace[]|\Google\Protobuf\Internal\RepeatedField $traces
+     *     @type array<\Google\Cloud\NetworkManagement\V1\Trace>|\Google\Protobuf\Internal\RepeatedField $traces
      *           Result may contain a list of traces if a test has multiple possible
      *           paths in the network, such as when destination endpoint is a load balancer
      *           with multiple backends.
@@ -182,7 +182,7 @@ class ReachabilityDetails extends \Google\Protobuf\Internal\Message
      * with multiple backends.
      *
      * Generated from protobuf field <code>repeated .google.cloud.networkmanagement.v1.Trace traces = 5;</code>
-     * @param \Google\Cloud\NetworkManagement\V1\Trace[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\NetworkManagement\V1\Trace>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTraces($var)

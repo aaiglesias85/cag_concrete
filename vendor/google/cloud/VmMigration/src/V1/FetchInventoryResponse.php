@@ -17,12 +17,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class FetchInventoryResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The timestamp when the source was last queried (if the result is from the
-     * cache).
+     * Output only. The timestamp when the source was last queried (if the result
+     * is from the cache).
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     protected $SourceVms;
 
     /**
@@ -32,10 +32,12 @@ class FetchInventoryResponse extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Cloud\VMMigration\V1\VmwareVmsDetails $vmware_vms
-     *           Output only. The description of the VMs in a Source of type Vmware.
+     *           The description of the VMs in a Source of type Vmware.
+     *     @type \Google\Cloud\VMMigration\V1\AwsVmsDetails $aws_vms
+     *           The description of the VMs in a Source of type AWS.
      *     @type \Google\Protobuf\Timestamp $update_time
-     *           Output only. The timestamp when the source was last queried (if the result is from the
-     *           cache).
+     *           Output only. The timestamp when the source was last queried (if the result
+     *           is from the cache).
      * }
      */
     public function __construct($data = NULL) {
@@ -44,9 +46,9 @@ class FetchInventoryResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The description of the VMs in a Source of type Vmware.
+     * The description of the VMs in a Source of type Vmware.
      *
-     * Generated from protobuf field <code>.google.cloud.vmmigration.v1.VmwareVmsDetails vmware_vms = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>.google.cloud.vmmigration.v1.VmwareVmsDetails vmware_vms = 1;</code>
      * @return \Google\Cloud\VMMigration\V1\VmwareVmsDetails|null
      */
     public function getVmwareVms()
@@ -60,9 +62,9 @@ class FetchInventoryResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The description of the VMs in a Source of type Vmware.
+     * The description of the VMs in a Source of type Vmware.
      *
-     * Generated from protobuf field <code>.google.cloud.vmmigration.v1.VmwareVmsDetails vmware_vms = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>.google.cloud.vmmigration.v1.VmwareVmsDetails vmware_vms = 1;</code>
      * @param \Google\Cloud\VMMigration\V1\VmwareVmsDetails $var
      * @return $this
      */
@@ -75,8 +77,39 @@ class FetchInventoryResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The timestamp when the source was last queried (if the result is from the
-     * cache).
+     * The description of the VMs in a Source of type AWS.
+     *
+     * Generated from protobuf field <code>.google.cloud.vmmigration.v1.AwsVmsDetails aws_vms = 3;</code>
+     * @return \Google\Cloud\VMMigration\V1\AwsVmsDetails|null
+     */
+    public function getAwsVms()
+    {
+        return $this->readOneof(3);
+    }
+
+    public function hasAwsVms()
+    {
+        return $this->hasOneof(3);
+    }
+
+    /**
+     * The description of the VMs in a Source of type AWS.
+     *
+     * Generated from protobuf field <code>.google.cloud.vmmigration.v1.AwsVmsDetails aws_vms = 3;</code>
+     * @param \Google\Cloud\VMMigration\V1\AwsVmsDetails $var
+     * @return $this
+     */
+    public function setAwsVms($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\VMMigration\V1\AwsVmsDetails::class);
+        $this->writeOneof(3, $var);
+
+        return $this;
+    }
+
+    /**
+     * Output only. The timestamp when the source was last queried (if the result
+     * is from the cache).
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -97,8 +130,8 @@ class FetchInventoryResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The timestamp when the source was last queried (if the result is from the
-     * cache).
+     * Output only. The timestamp when the source was last queried (if the result
+     * is from the cache).
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var

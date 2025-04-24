@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Agents.ImportAgent][google.cloud.dialogflow.v2.Agents.ImportAgent].
+ * The request message for
+ * [Agents.ImportAgent][google.cloud.dialogflow.v2.Agents.ImportAgent].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ImportAgentRequest</code>
  */
@@ -21,7 +22,7 @@ class ImportAgentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     protected $agent;
 
     /**

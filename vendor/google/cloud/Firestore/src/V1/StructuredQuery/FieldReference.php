@@ -9,13 +9,19 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A reference to a field, such as `max(messages.time) as max_time`.
+ * A reference to a field in a document, ex: `stats.operations`.
  *
  * Generated from protobuf message <code>google.firestore.v1.StructuredQuery.FieldReference</code>
  */
 class FieldReference extends \Google\Protobuf\Internal\Message
 {
     /**
+     * A reference to a field in a document.
+     * Requires:
+     * * MUST be a dot-delimited (`.`) string of segments, where each segment
+     * conforms to [document field name][google.firestore.v1.Document.fields]
+     * limitations.
+     *
      * Generated from protobuf field <code>string field_path = 2;</code>
      */
     private $field_path = '';
@@ -27,6 +33,11 @@ class FieldReference extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $field_path
+     *           A reference to a field in a document.
+     *           Requires:
+     *           * MUST be a dot-delimited (`.`) string of segments, where each segment
+     *           conforms to [document field name][google.firestore.v1.Document.fields]
+     *           limitations.
      * }
      */
     public function __construct($data = NULL) {
@@ -35,6 +46,12 @@ class FieldReference extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * A reference to a field in a document.
+     * Requires:
+     * * MUST be a dot-delimited (`.`) string of segments, where each segment
+     * conforms to [document field name][google.firestore.v1.Document.fields]
+     * limitations.
+     *
      * Generated from protobuf field <code>string field_path = 2;</code>
      * @return string
      */
@@ -44,6 +61,12 @@ class FieldReference extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * A reference to a field in a document.
+     * Requires:
+     * * MUST be a dot-delimited (`.`) string of segments, where each segment
+     * conforms to [document field name][google.firestore.v1.Document.fields]
+     * limitations.
+     *
      * Generated from protobuf field <code>string field_path = 2;</code>
      * @param string $var
      * @return $this

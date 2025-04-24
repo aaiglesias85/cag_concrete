@@ -21,12 +21,12 @@ class Condition extends \Google\Protobuf\Internal\Message
      * Required if the condition exists. The unique resource name for this
      * condition. Its format is:
      *     projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[POLICY_ID]/conditions/[CONDITION_ID]
-     * `[CONDITION_ID]` is assigned by Stackdriver Monitoring when the
+     * `[CONDITION_ID]` is assigned by Cloud Monitoring when the
      * condition is created as part of a new or updated alerting policy.
      * When calling the
      * [alertPolicies.create][google.monitoring.v3.AlertPolicyService.CreateAlertPolicy]
      * method, do not include the `name` field in the conditions of the
-     * requested alerting policy. Stackdriver Monitoring creates the
+     * requested alerting policy. Cloud Monitoring creates the
      * condition identifiers and includes them in the new policy.
      * When calling the
      * [alertPolicies.update][google.monitoring.v3.AlertPolicyService.UpdateAlertPolicy]
@@ -41,7 +41,7 @@ class Condition extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 12;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * A short name or phrase used to identify the condition in dashboards,
      * notifications, and incidents. To avoid confusion, don't use the same
@@ -49,7 +49,7 @@ class Condition extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 6;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     protected $condition;
 
     /**
@@ -62,12 +62,12 @@ class Condition extends \Google\Protobuf\Internal\Message
      *           Required if the condition exists. The unique resource name for this
      *           condition. Its format is:
      *               projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[POLICY_ID]/conditions/[CONDITION_ID]
-     *           `[CONDITION_ID]` is assigned by Stackdriver Monitoring when the
+     *           `[CONDITION_ID]` is assigned by Cloud Monitoring when the
      *           condition is created as part of a new or updated alerting policy.
      *           When calling the
      *           [alertPolicies.create][google.monitoring.v3.AlertPolicyService.CreateAlertPolicy]
      *           method, do not include the `name` field in the conditions of the
-     *           requested alerting policy. Stackdriver Monitoring creates the
+     *           requested alerting policy. Cloud Monitoring creates the
      *           condition identifiers and includes them in the new policy.
      *           When calling the
      *           [alertPolicies.update][google.monitoring.v3.AlertPolicyService.UpdateAlertPolicy]
@@ -94,6 +94,10 @@ class Condition extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\MonitoringQueryLanguageCondition $condition_monitoring_query_language
      *           A condition that uses the Monitoring Query Language to define
      *           alerts.
+     *     @type \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\PrometheusQueryLanguageCondition $condition_prometheus_query_language
+     *           A condition that uses the Prometheus query language to define alerts.
+     *     @type \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\SqlCondition $condition_sql
+     *           A condition that periodically evaluates a SQL query result.
      * }
      */
     public function __construct($data = NULL) {
@@ -105,12 +109,12 @@ class Condition extends \Google\Protobuf\Internal\Message
      * Required if the condition exists. The unique resource name for this
      * condition. Its format is:
      *     projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[POLICY_ID]/conditions/[CONDITION_ID]
-     * `[CONDITION_ID]` is assigned by Stackdriver Monitoring when the
+     * `[CONDITION_ID]` is assigned by Cloud Monitoring when the
      * condition is created as part of a new or updated alerting policy.
      * When calling the
      * [alertPolicies.create][google.monitoring.v3.AlertPolicyService.CreateAlertPolicy]
      * method, do not include the `name` field in the conditions of the
-     * requested alerting policy. Stackdriver Monitoring creates the
+     * requested alerting policy. Cloud Monitoring creates the
      * condition identifiers and includes them in the new policy.
      * When calling the
      * [alertPolicies.update][google.monitoring.v3.AlertPolicyService.UpdateAlertPolicy]
@@ -135,12 +139,12 @@ class Condition extends \Google\Protobuf\Internal\Message
      * Required if the condition exists. The unique resource name for this
      * condition. Its format is:
      *     projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[POLICY_ID]/conditions/[CONDITION_ID]
-     * `[CONDITION_ID]` is assigned by Stackdriver Monitoring when the
+     * `[CONDITION_ID]` is assigned by Cloud Monitoring when the
      * condition is created as part of a new or updated alerting policy.
      * When calling the
      * [alertPolicies.create][google.monitoring.v3.AlertPolicyService.CreateAlertPolicy]
      * method, do not include the `name` field in the conditions of the
-     * requested alerting policy. Stackdriver Monitoring creates the
+     * requested alerting policy. Cloud Monitoring creates the
      * condition identifiers and includes them in the new policy.
      * When calling the
      * [alertPolicies.update][google.monitoring.v3.AlertPolicyService.UpdateAlertPolicy]
@@ -326,6 +330,68 @@ class Condition extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * A condition that uses the Prometheus query language to define alerts.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.PrometheusQueryLanguageCondition condition_prometheus_query_language = 21;</code>
+     * @return \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\PrometheusQueryLanguageCondition|null
+     */
+    public function getConditionPrometheusQueryLanguage()
+    {
+        return $this->readOneof(21);
+    }
+
+    public function hasConditionPrometheusQueryLanguage()
+    {
+        return $this->hasOneof(21);
+    }
+
+    /**
+     * A condition that uses the Prometheus query language to define alerts.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.PrometheusQueryLanguageCondition condition_prometheus_query_language = 21;</code>
+     * @param \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\PrometheusQueryLanguageCondition $var
+     * @return $this
+     */
+    public function setConditionPrometheusQueryLanguage($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\PrometheusQueryLanguageCondition::class);
+        $this->writeOneof(21, $var);
+
+        return $this;
+    }
+
+    /**
+     * A condition that periodically evaluates a SQL query result.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.SqlCondition condition_sql = 22;</code>
+     * @return \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\SqlCondition|null
+     */
+    public function getConditionSql()
+    {
+        return $this->readOneof(22);
+    }
+
+    public function hasConditionSql()
+    {
+        return $this->hasOneof(22);
+    }
+
+    /**
+     * A condition that periodically evaluates a SQL query result.
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.SqlCondition condition_sql = 22;</code>
+     * @param \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\SqlCondition $var
+     * @return $this
+     */
+    public function setConditionSql($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Monitoring\V3\AlertPolicy\Condition\SqlCondition::class);
+        $this->writeOneof(22, $var);
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getCondition()
@@ -335,6 +401,4 @@ class Condition extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Condition::class, \Google\Cloud\Monitoring\V3\AlertPolicy_Condition::class);
 

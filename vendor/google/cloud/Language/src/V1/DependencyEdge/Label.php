@@ -583,7 +583,7 @@ class Label
         self::DTMOD => 'DTMOD',
         self::FOREIGN => 'FOREIGN',
         self::KW => 'KW',
-        self::PBLIST => 'PBLIST',
+        self::PBLIST => 'LIST',
         self::NOMC => 'NOMC',
         self::NOMCSUBJ => 'NOMCSUBJ',
         self::NOMCSUBJPASS => 'NOMCSUBJPASS',
@@ -612,13 +612,15 @@ class Label
     {
         $const = __CLASS__ . '::' . strtoupper($name);
         if (!defined($const)) {
-            throw new UnexpectedValueException(sprintf(
-                    'Enum %s has no value defined for name %s', __CLASS__, $name));
+            $pbconst =  __CLASS__. '::PB' . strtoupper($name);
+            if (!defined($pbconst)) {
+                throw new UnexpectedValueException(sprintf(
+                        'Enum %s has no value defined for name %s', __CLASS__, $name));
+            }
+            return constant($pbconst);
         }
         return constant($const);
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Label::class, \Google\Cloud\Language\V1\DependencyEdge_Label::class);
 

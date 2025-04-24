@@ -21,7 +21,7 @@ class CreateEndpointRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The Resource ID must be 1-63 characters long, and comply with
      * <a href="https://www.ietf.org/rfc/rfc1035.txt" target="_blank">RFC1035</a>.
@@ -33,13 +33,37 @@ class CreateEndpointRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string endpoint_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $endpoint_id = '';
+    protected $endpoint_id = '';
     /**
      * Required. A endpoint with initial fields set.
      *
      * Generated from protobuf field <code>.google.cloud.servicedirectory.v1.Endpoint endpoint = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $endpoint = null;
+    protected $endpoint = null;
+
+    /**
+     * @param string                                     $parent     Required. The resource name of the service that this endpoint provides. Please see
+     *                                                               {@see RegistrationServiceClient::serviceName()} for help formatting this field.
+     * @param \Google\Cloud\ServiceDirectory\V1\Endpoint $endpoint   Required. A endpoint with initial fields set.
+     * @param string                                     $endpointId Required. The Resource ID must be 1-63 characters long, and comply with
+     *                                                               <a href="https://www.ietf.org/rfc/rfc1035.txt" target="_blank">RFC1035</a>.
+     *                                                               Specifically, the name must be 1-63 characters long and match the regular
+     *                                                               expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?` which means the first
+     *                                                               character must be a lowercase letter, and all following characters must
+     *                                                               be a dash, lowercase letter, or digit, except the last character, which
+     *                                                               cannot be a dash.
+     *
+     * @return \Google\Cloud\ServiceDirectory\V1\CreateEndpointRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\ServiceDirectory\V1\Endpoint $endpoint, string $endpointId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setEndpoint($endpoint)
+            ->setEndpointId($endpointId);
+    }
 
     /**
      * Constructor.

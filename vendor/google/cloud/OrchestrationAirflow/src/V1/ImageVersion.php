@@ -17,18 +17,18 @@ class ImageVersion extends \Google\Protobuf\Internal\Message
 {
     /**
      * The string identifier of the ImageVersion, in the form:
-     * "composer-x.y.z-airflow-a.b(.c)"
+     * "composer-x.y.z-airflow-a.b.c"
      *
      * Generated from protobuf field <code>string image_version_id = 1;</code>
      */
-    private $image_version_id = '';
+    protected $image_version_id = '';
     /**
      * Whether this is the default ImageVersion used by Composer during
      * environment creation if no input ImageVersion is specified.
      *
      * Generated from protobuf field <code>bool is_default = 2;</code>
      */
-    private $is_default = false;
+    protected $is_default = false;
     /**
      * supported python versions
      *
@@ -40,20 +40,20 @@ class ImageVersion extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.type.Date release_date = 4;</code>
      */
-    private $release_date = null;
+    protected $release_date = null;
     /**
      * Whether it is impossible to create an environment with the image version.
      *
      * Generated from protobuf field <code>bool creation_disabled = 5;</code>
      */
-    private $creation_disabled = false;
+    protected $creation_disabled = false;
     /**
      * Whether it is impossible to upgrade an environment running with the image
      * version.
      *
      * Generated from protobuf field <code>bool upgrade_disabled = 6;</code>
      */
-    private $upgrade_disabled = false;
+    protected $upgrade_disabled = false;
 
     /**
      * Constructor.
@@ -63,11 +63,11 @@ class ImageVersion extends \Google\Protobuf\Internal\Message
      *
      *     @type string $image_version_id
      *           The string identifier of the ImageVersion, in the form:
-     *           "composer-x.y.z-airflow-a.b(.c)"
+     *           "composer-x.y.z-airflow-a.b.c"
      *     @type bool $is_default
      *           Whether this is the default ImageVersion used by Composer during
      *           environment creation if no input ImageVersion is specified.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $supported_python_versions
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $supported_python_versions
      *           supported python versions
      *     @type \Google\Type\Date $release_date
      *           The date of the version release.
@@ -85,7 +85,7 @@ class ImageVersion extends \Google\Protobuf\Internal\Message
 
     /**
      * The string identifier of the ImageVersion, in the form:
-     * "composer-x.y.z-airflow-a.b(.c)"
+     * "composer-x.y.z-airflow-a.b.c"
      *
      * Generated from protobuf field <code>string image_version_id = 1;</code>
      * @return string
@@ -97,7 +97,7 @@ class ImageVersion extends \Google\Protobuf\Internal\Message
 
     /**
      * The string identifier of the ImageVersion, in the form:
-     * "composer-x.y.z-airflow-a.b(.c)"
+     * "composer-x.y.z-airflow-a.b.c"
      *
      * Generated from protobuf field <code>string image_version_id = 1;</code>
      * @param string $var
@@ -154,7 +154,7 @@ class ImageVersion extends \Google\Protobuf\Internal\Message
      * supported python versions
      *
      * Generated from protobuf field <code>repeated string supported_python_versions = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSupportedPythonVersions($var)

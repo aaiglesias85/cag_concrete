@@ -21,31 +21,31 @@ class Layout extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.TextAnchor text_anchor = 1;</code>
      */
-    private $text_anchor = null;
+    protected $text_anchor = null;
     /**
      * Confidence of the current
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout] within
      * context of the object this layout is for. e.g. confidence can be for a
      * single token, a table, a visual element, etc. depending on context.
-     * Range [0, 1].
+     * Range `[0, 1]`.
      *
      * Generated from protobuf field <code>float confidence = 2;</code>
      */
-    private $confidence = 0.0;
+    protected $confidence = 0.0;
     /**
      * The bounding polygon for the
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout].
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.BoundingPoly bounding_poly = 3;</code>
      */
-    private $bounding_poly = null;
+    protected $bounding_poly = null;
     /**
      * Detected orientation for the
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout].
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Layout.Orientation orientation = 4;</code>
      */
-    private $orientation = 0;
+    protected $orientation = 0;
 
     /**
      * Constructor.
@@ -61,7 +61,7 @@ class Layout extends \Google\Protobuf\Internal\Message
      *           [Layout][google.cloud.documentai.v1.Document.Page.Layout] within
      *           context of the object this layout is for. e.g. confidence can be for a
      *           single token, a table, a visual element, etc. depending on context.
-     *           Range [0, 1].
+     *           Range `[0, 1]`.
      *     @type \Google\Cloud\DocumentAI\V1\BoundingPoly $bounding_poly
      *           The bounding polygon for the
      *           [Layout][google.cloud.documentai.v1.Document.Page.Layout].
@@ -118,7 +118,7 @@ class Layout extends \Google\Protobuf\Internal\Message
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout] within
      * context of the object this layout is for. e.g. confidence can be for a
      * single token, a table, a visual element, etc. depending on context.
-     * Range [0, 1].
+     * Range `[0, 1]`.
      *
      * Generated from protobuf field <code>float confidence = 2;</code>
      * @return float
@@ -133,7 +133,7 @@ class Layout extends \Google\Protobuf\Internal\Message
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout] within
      * context of the object this layout is for. e.g. confidence can be for a
      * single token, a table, a visual element, etc. depending on context.
-     * Range [0, 1].
+     * Range `[0, 1]`.
      *
      * Generated from protobuf field <code>float confidence = 2;</code>
      * @param float $var

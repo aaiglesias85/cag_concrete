@@ -21,7 +21,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. Resource labels that can contain user-provided metadata.
      *
@@ -30,7 +30,7 @@ class Domain extends \Google\Protobuf\Internal\Message
     private $labels;
     /**
      * Optional. The full names of the Google Compute Engine
-     * [networks](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) the domain
+     * [networks](/compute/docs/networks-and-firewalls#networks) the domain
      * instance is connected to. Networks can be added using UpdateDomain.
      * The domain is only available on networks listed in `authorized_networks`.
      * If CIDR subnets overlap between networks, domain creation will fail.
@@ -46,7 +46,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string reserved_ip_range = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $reserved_ip_range = '';
+    protected $reserved_ip_range = '';
     /**
      * Required. Locations where domain needs to be provisioned.
      * [regions][compute/docs/regions-zones/]
@@ -63,7 +63,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string admin = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $admin = '';
+    protected $admin = '';
     /**
      * Output only. The fully-qualified domain name of the exposed domain used by
      * clients to connect to the service. Similar to what would be chosen for an
@@ -71,32 +71,32 @@ class Domain extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string fqdn = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $fqdn = '';
+    protected $fqdn = '';
     /**
      * Output only. The time the instance was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The last update time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Output only. The current state of this domain.
      *
      * Generated from protobuf field <code>.google.cloud.managedidentities.v1.Domain.State state = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. Additional information about the current status of this
      * domain, if available.
      *
      * Generated from protobuf field <code>string status_message = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $status_message = '';
+    protected $status_message = '';
     /**
      * Output only. The current trusts associated with the domain.
      *
@@ -115,9 +115,9 @@ class Domain extends \Google\Protobuf\Internal\Message
      *           `projects/{project_id}/locations/global/domains/{domain_name}`.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Optional. Resource labels that can contain user-provided metadata.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $authorized_networks
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $authorized_networks
      *           Optional. The full names of the Google Compute Engine
-     *           [networks](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) the domain
+     *           [networks](/compute/docs/networks-and-firewalls#networks) the domain
      *           instance is connected to. Networks can be added using UpdateDomain.
      *           The domain is only available on networks listed in `authorized_networks`.
      *           If CIDR subnets overlap between networks, domain creation will fail.
@@ -126,7 +126,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      *           domain. Reserved networks must be /24 or larger. Ranges must be
      *           unique and non-overlapping with existing subnets in
      *           [Domain].[authorized_networks].
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $locations
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $locations
      *           Required. Locations where domain needs to be provisioned.
      *           [regions][compute/docs/regions-zones/]
      *           e.g. us-west1 or us-east4
@@ -148,7 +148,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      *     @type string $status_message
      *           Output only. Additional information about the current status of this
      *           domain, if available.
-     *     @type \Google\Cloud\ManagedIdentities\V1\Trust[]|\Google\Protobuf\Internal\RepeatedField $trusts
+     *     @type array<\Google\Cloud\ManagedIdentities\V1\Trust>|\Google\Protobuf\Internal\RepeatedField $trusts
      *           Output only. The current trusts associated with the domain.
      * }
      */
@@ -213,7 +213,7 @@ class Domain extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. The full names of the Google Compute Engine
-     * [networks](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) the domain
+     * [networks](/compute/docs/networks-and-firewalls#networks) the domain
      * instance is connected to. Networks can be added using UpdateDomain.
      * The domain is only available on networks listed in `authorized_networks`.
      * If CIDR subnets overlap between networks, domain creation will fail.
@@ -228,13 +228,13 @@ class Domain extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. The full names of the Google Compute Engine
-     * [networks](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) the domain
+     * [networks](/compute/docs/networks-and-firewalls#networks) the domain
      * instance is connected to. Networks can be added using UpdateDomain.
      * The domain is only available on networks listed in `authorized_networks`.
      * If CIDR subnets overlap between networks, domain creation will fail.
      *
      * Generated from protobuf field <code>repeated string authorized_networks = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAuthorizedNetworks($var)
@@ -300,7 +300,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      * block.
      *
      * Generated from protobuf field <code>repeated string locations = 5 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLocations($var)
@@ -510,7 +510,7 @@ class Domain extends \Google\Protobuf\Internal\Message
      * Output only. The current trusts associated with the domain.
      *
      * Generated from protobuf field <code>repeated .google.cloud.managedidentities.v1.Trust trusts = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\ManagedIdentities\V1\Trust[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ManagedIdentities\V1\Trust>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTrusts($var)

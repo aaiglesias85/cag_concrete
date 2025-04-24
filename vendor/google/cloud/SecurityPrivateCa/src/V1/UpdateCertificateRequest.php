@@ -9,31 +9,33 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [CertificateAuthorityService.UpdateCertificate][google.cloud.security.privateca.v1.CertificateAuthorityService.UpdateCertificate].
+ * Request message for
+ * [CertificateAuthorityService.UpdateCertificate][google.cloud.security.privateca.v1.CertificateAuthorityService.UpdateCertificate].
  *
  * Generated from protobuf message <code>google.cloud.security.privateca.v1.UpdateCertificateRequest</code>
  */
 class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. [Certificate][google.cloud.security.privateca.v1.Certificate] with updated values.
+     * Required. [Certificate][google.cloud.security.privateca.v1.Certificate]
+     * with updated values.
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.Certificate certificate = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $certificate = null;
+    protected $certificate = null;
     /**
      * Required. A list of fields to be updated in this request.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
-     * Optional. An ID to identify requests. Specify a unique request ID so that if you must
-     * retry your request, the server will know to ignore the request if it has
-     * already been completed. The server will guarantee that for at least 60
-     * minutes since the first request.
-     * For example, consider a situation where you make an initial request and t
-     * he request times out. If you make the request again with the same request
+     * Optional. An ID to identify requests. Specify a unique request ID so that
+     * if you must retry your request, the server will know to ignore the request
+     * if it has already been completed. The server will guarantee that for at
+     * least 60 minutes since the first request.
+     * For example, consider a situation where you make an initial request and
+     * the request times out. If you make the request again with the same request
      * ID, the server can check if original operation with the same request ID
      * was received, and if so, will ignore the second request. This prevents
      * clients from accidentally creating duplicate commitments.
@@ -42,7 +44,23 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param \Google\Cloud\Security\PrivateCA\V1\Certificate $certificate Required. [Certificate][google.cloud.security.privateca.v1.Certificate]
+     *                                                                     with updated values.
+     * @param \Google\Protobuf\FieldMask                      $updateMask  Required. A list of fields to be updated in this request.
+     *
+     * @return \Google\Cloud\Security\PrivateCA\V1\UpdateCertificateRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Security\PrivateCA\V1\Certificate $certificate, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setCertificate($certificate)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -51,16 +69,17 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Cloud\Security\PrivateCA\V1\Certificate $certificate
-     *           Required. [Certificate][google.cloud.security.privateca.v1.Certificate] with updated values.
+     *           Required. [Certificate][google.cloud.security.privateca.v1.Certificate]
+     *           with updated values.
      *     @type \Google\Protobuf\FieldMask $update_mask
      *           Required. A list of fields to be updated in this request.
      *     @type string $request_id
-     *           Optional. An ID to identify requests. Specify a unique request ID so that if you must
-     *           retry your request, the server will know to ignore the request if it has
-     *           already been completed. The server will guarantee that for at least 60
-     *           minutes since the first request.
-     *           For example, consider a situation where you make an initial request and t
-     *           he request times out. If you make the request again with the same request
+     *           Optional. An ID to identify requests. Specify a unique request ID so that
+     *           if you must retry your request, the server will know to ignore the request
+     *           if it has already been completed. The server will guarantee that for at
+     *           least 60 minutes since the first request.
+     *           For example, consider a situation where you make an initial request and
+     *           the request times out. If you make the request again with the same request
      *           ID, the server can check if original operation with the same request ID
      *           was received, and if so, will ignore the second request. This prevents
      *           clients from accidentally creating duplicate commitments.
@@ -74,7 +93,8 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. [Certificate][google.cloud.security.privateca.v1.Certificate] with updated values.
+     * Required. [Certificate][google.cloud.security.privateca.v1.Certificate]
+     * with updated values.
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.Certificate certificate = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\Security\PrivateCA\V1\Certificate|null
@@ -95,7 +115,8 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. [Certificate][google.cloud.security.privateca.v1.Certificate] with updated values.
+     * Required. [Certificate][google.cloud.security.privateca.v1.Certificate]
+     * with updated values.
      *
      * Generated from protobuf field <code>.google.cloud.security.privateca.v1.Certificate certificate = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\Security\PrivateCA\V1\Certificate $var
@@ -146,12 +167,12 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. An ID to identify requests. Specify a unique request ID so that if you must
-     * retry your request, the server will know to ignore the request if it has
-     * already been completed. The server will guarantee that for at least 60
-     * minutes since the first request.
-     * For example, consider a situation where you make an initial request and t
-     * he request times out. If you make the request again with the same request
+     * Optional. An ID to identify requests. Specify a unique request ID so that
+     * if you must retry your request, the server will know to ignore the request
+     * if it has already been completed. The server will guarantee that for at
+     * least 60 minutes since the first request.
+     * For example, consider a situation where you make an initial request and
+     * the request times out. If you make the request again with the same request
      * ID, the server can check if original operation with the same request ID
      * was received, and if so, will ignore the second request. This prevents
      * clients from accidentally creating duplicate commitments.
@@ -167,12 +188,12 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. An ID to identify requests. Specify a unique request ID so that if you must
-     * retry your request, the server will know to ignore the request if it has
-     * already been completed. The server will guarantee that for at least 60
-     * minutes since the first request.
-     * For example, consider a situation where you make an initial request and t
-     * he request times out. If you make the request again with the same request
+     * Optional. An ID to identify requests. Specify a unique request ID so that
+     * if you must retry your request, the server will know to ignore the request
+     * if it has already been completed. The server will guarantee that for at
+     * least 60 minutes since the first request.
+     * For example, consider a situation where you make an initial request and
+     * the request times out. If you make the request again with the same request
      * ID, the server can check if original operation with the same request ID
      * was received, and if so, will ignore the second request. This prevents
      * clients from accidentally creating duplicate commitments.

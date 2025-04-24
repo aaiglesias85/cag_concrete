@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-datastore/v/stable)](https://packagist.org/packages/google/cloud-datastore) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-datastore.svg)](https://packagist.org/packages/google/cloud-datastore)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-datastore/latest)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-datastore/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -19,16 +19,10 @@ them in the way it describes relationships between data objects.
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-datastore
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 ### Authentication
@@ -59,6 +53,11 @@ $datastore->update($bob);
 $key = $datastore->key('Person', '12345328897844');
 $entity = $datastore->lookup($key);
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

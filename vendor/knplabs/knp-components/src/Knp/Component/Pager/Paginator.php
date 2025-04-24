@@ -2,28 +2,26 @@
 
 namespace Knp\Component\Pager;
 
+use Doctrine\DBAL\Connection;
+use Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface;
 use Knp\Component\Pager\Exception\PageLimitInvalidException;
 use Knp\Component\Pager\Exception\PageNumberInvalidException;
 use Knp\Component\Pager\Exception\PageNumberOutOfRangeException;
 use Knp\Component\Pager\Pagination\PaginationInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Paginator uses event dispatcher to trigger pagination
  * lifecycle events. Subscribers are expected to paginate
- * wanted target and finally it generates pagination view
+ * wanted target, and finally it generates pagination view
  * which is only the result of paginator
  */
 final class Paginator implements PaginatorInterface
 {
-    private EventDispatcherInterface $eventDispatcher;
-
     /**
      * Default options of paginator
      *
-     * @var array<string, scalar>
+     * @var array<string, string|int|bool>
      */
     private array $defaultOptions = [
         self::PAGE_PARAMETER_NAME => 'page',
@@ -36,30 +34,35 @@ final class Paginator implements PaginatorInterface
         self::DEFAULT_LIMIT => self::DEFAULT_LIMIT_VALUE,
     ];
 
-    private ?RequestStack $requestStack;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, RequestStack $requestStack = null)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private ArgumentAccessInterface $argumentAccess,
+        private readonly ?Connection $connection = null
+    ) {
     }
 
     /**
-     * Override the default paginator options
-     * to be reused for paginations
+     * Override the default paginator options to be reused for paginations
+     *
+     * @param array<string, string|int|bool> $options
      */ 
     public function setDefaultPaginatorOptions(array $options): void
     {
         $this->defaultOptions = \array_merge($this->defaultOptions, $options);
     }
 
-    public function paginate($target, int $page = 1, int $limit = null, array $options = []): PaginationInterface
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return PaginationInterface<int, mixed>
+     */
+    public function paginate($target, int $page = 1, ?int $limit = null, array $options = []): PaginationInterface
     {
         if ($page <= 0) {
             throw PageNumberInvalidException::create($page);
         }
 
-        $limit = $limit ?? $this->defaultOptions[self::DEFAULT_LIMIT];
+        $limit ??= (int) $this->defaultOptions[self::DEFAULT_LIMIT];
         if ($limit <= 0) {
             throw PageLimitInvalidException::create($limit);
         }
@@ -72,22 +75,23 @@ final class Paginator implements PaginatorInterface
             $options[PaginatorInterface::DEFAULT_SORT_FIELD_NAME] = implode('+', $options[PaginatorInterface::DEFAULT_SORT_FIELD_NAME]);
         }
 
-        $request = null === $this->requestStack ? Request::createFromGlobals() : $this->requestStack->getCurrentRequest();
-
+        $argumentAccess = $this->argumentAccess;
+        
         // default sort field and direction are set based on options (if available)
-        if (isset($options[self::DEFAULT_SORT_FIELD_NAME]) && !$request->query->has($options[self::SORT_FIELD_PARAMETER_NAME])) {
-           $request->query->set($options[self::SORT_FIELD_PARAMETER_NAME], $options[self::DEFAULT_SORT_FIELD_NAME]);
+        if (isset($options[self::DEFAULT_SORT_FIELD_NAME]) && !$argumentAccess->has($options[self::SORT_FIELD_PARAMETER_NAME])) {
+           $argumentAccess->set($options[self::SORT_FIELD_PARAMETER_NAME], $options[self::DEFAULT_SORT_FIELD_NAME]);
 
-            if (!$request->query->has($options[PaginatorInterface::SORT_DIRECTION_PARAMETER_NAME])) {
-                $request->query->set($options[PaginatorInterface::SORT_DIRECTION_PARAMETER_NAME], $options[PaginatorInterface::DEFAULT_SORT_DIRECTION] ?? 'asc');
+            if (!$argumentAccess->has($options[PaginatorInterface::SORT_DIRECTION_PARAMETER_NAME])) {
+                $argumentAccess->set($options[PaginatorInterface::SORT_DIRECTION_PARAMETER_NAME], $options[PaginatorInterface::DEFAULT_SORT_DIRECTION] ?? 'asc');
             }
         }
 
         // before pagination start
-        $beforeEvent = new Event\BeforeEvent($this->eventDispatcher, $request);
+        $beforeEvent = new Event\BeforeEvent($this->eventDispatcher, $this->argumentAccess, $this->connection);
+        $beforeEvent->options = &$options;
         $this->eventDispatcher->dispatch($beforeEvent, 'knp_pager.before');
         // items
-        $itemsEvent = new Event\ItemsEvent($offset, $limit);
+        $itemsEvent = new Event\ItemsEvent($offset, $limit, $this->argumentAccess);
         $itemsEvent->options = &$options;
         $itemsEvent->target = &$target;
         $this->eventDispatcher->dispatch($itemsEvent, 'knp_pager.items');

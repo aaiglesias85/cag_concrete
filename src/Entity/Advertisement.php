@@ -2,118 +2,90 @@
 
 namespace App\Entity;
 
+use App\Repository\AdvertisementRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Advertisement
- *
- * @ORM\Table(name="advertisement")
- * @ORM\Entity(repositoryClass="App\Repository\AdvertisementRepository")
- */
+#[ORM\Entity(repositoryClass: AdvertisementRepository::class)]
+#[ORM\Table(name: 'advertisement')]
 class Advertisement
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="advertisement_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $advertisementId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: 'advertisement_id', type: 'integer', nullable: true)]
+    private ?int $advertisementId = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="title", type="string", length=255, nullable=false)
-     */
-    private $title;
+    #[ORM\Column(name: 'title', type: 'string', length: 255, nullable: true)]
+    private ?string $title = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=false)
-     */
-    private $description;
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="status", type="boolean", nullable=false)
-     */
-    private $status;
+    #[ORM\Column(name: 'status', type: 'boolean', nullable: true)]
+    private ?bool $status = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="start_date", type="datetime", nullable=true)
-     */
-    private $startDate;
+    #[ORM\Column(name: 'start_date', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $startDate = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="end_date", type="datetime", nullable=true)
-     */
-    private $endDate;
+    #[ORM\Column(name: 'end_date', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $endDate = null;
 
-    /**
-     * Get advertisementId
-     *
-     * @return integer
-     */
-    public function getAdvertisementId()
+    public function getAdvertisementId(): ?int
     {
         return $this->advertisementId;
     }
 
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle( $title)
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+        return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription( $description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+        return $this;
     }
 
-    public function getStatus()
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus( $status)
+    public function setStatus(?bool $status): self
     {
         $this->status = $status;
+        return $this;
     }
 
-    public function getStartDate()
+    public function getStartDate(): ?\DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function setStartDate( $startDate)
+    public function setStartDate(?\DateTimeInterface $startDate): self
     {
         $this->startDate = $startDate;
+        return $this;
     }
 
-    public function getEndDate()
+    public function getEndDate(): ?\DateTimeInterface
     {
         return $this->endDate;
     }
 
-    public function setEndDate( $endDate)
+    public function setEndDate(?\DateTimeInterface $endDate): self
     {
         $this->endDate = $endDate;
+        return $this;
     }
-
 }

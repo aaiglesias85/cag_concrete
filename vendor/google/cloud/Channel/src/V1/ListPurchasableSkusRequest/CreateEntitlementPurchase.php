@@ -23,7 +23,7 @@ class CreateEntitlementPurchase extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string product = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $product = '';
+    protected $product = '';
 
     /**
      * Constructor.
@@ -74,6 +74,4 @@ class CreateEntitlementPurchase extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(CreateEntitlementPurchase::class, \Google\Cloud\Channel\V1\ListPurchasableSkusRequest_CreateEntitlementPurchase::class);
 

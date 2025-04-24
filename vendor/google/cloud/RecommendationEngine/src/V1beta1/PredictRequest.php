@@ -42,7 +42,7 @@ class PredictRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Context about the user, what they are looking at and what action
      * they took to trigger the predict request. Note that this user event detail
@@ -51,7 +51,7 @@ class PredictRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.recommendationengine.v1beta1.UserEvent user_event = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $user_event = null;
+    protected $user_event = null;
     /**
      * Optional. Maximum number of results to return per page. Set this property
      * to the number of prediction results required. If zero, the service will
@@ -59,13 +59,13 @@ class PredictRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The previous PredictResponse.next_page_token.
      *
      * Generated from protobuf field <code>string page_token = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Optional. Filter for restricting prediction results. Accepts values for
      * tags and the `filterOutOfStockItems` flag.
@@ -84,7 +84,7 @@ class PredictRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Optional. Use dryRun mode for this prediction query. If set to true, a
      * dummy model will be used that returns arbitrary catalog items.
@@ -93,7 +93,7 @@ class PredictRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool dry_run = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $dry_run = false;
+    protected $dry_run = false;
     /**
      * Optional. Additional domain specific parameters for the predictions.
      * Allowed values:
@@ -122,6 +122,53 @@ class PredictRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>map<string, string> labels = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $labels;
+
+    /**
+     * @param string                                               $name      Required. Full resource name of the format:
+     *                                                                        `{name=projects/&#42;/locations/global/catalogs/default_catalog/eventStores/default_event_store/placements/*}`
+     *                                                                        The id of the recommendation engine placement. This id is used to identify
+     *                                                                        the set of models that will be used to make the prediction.
+     *
+     *                                                                        We currently support three placements with the following IDs by default:
+     *
+     *                                                                        * `shopping_cart`: Predicts items frequently bought together with one or
+     *                                                                        more catalog items in the same shopping session. Commonly displayed after
+     *                                                                        `add-to-cart` events, on product detail pages, or on the shopping cart
+     *                                                                        page.
+     *
+     *                                                                        * `home_page`: Predicts the next product that a user will most likely
+     *                                                                        engage with or purchase based on the shopping or viewing history of the
+     *                                                                        specified `userId` or `visitorId`. For example - Recommendations for you.
+     *
+     *                                                                        * `product_detail`: Predicts the next product that a user will most likely
+     *                                                                        engage with or purchase. The prediction is based on the shopping or
+     *                                                                        viewing history of the specified `userId` or `visitorId` and its
+     *                                                                        relevance to a specified `CatalogItem`. Typically used on product detail
+     *                                                                        pages. For example - More items like this.
+     *
+     *                                                                        * `recently_viewed_default`: Returns up to 75 items recently viewed by the
+     *                                                                        specified `userId` or `visitorId`, most recent ones first. Returns
+     *                                                                        nothing if neither of them has viewed any items yet. For example -
+     *                                                                        Recently viewed.
+     *
+     *                                                                        The full list of available placements can be seen at
+     *                                                                        https://console.cloud.google.com/recommendation/datafeeds/default_catalog/dashboard
+     *                                                                        Please see {@see PredictionServiceClient::placementName()} for help formatting this field.
+     * @param \Google\Cloud\RecommendationEngine\V1beta1\UserEvent $userEvent Required. Context about the user, what they are looking at and what action
+     *                                                                        they took to trigger the predict request. Note that this user event detail
+     *                                                                        won't be ingested to userEvent logs. Thus, a separate userEvent write
+     *                                                                        request is required for event logging.
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\PredictRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\RecommendationEngine\V1beta1\UserEvent $userEvent): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setUserEvent($userEvent);
+    }
 
     /**
      * Constructor.

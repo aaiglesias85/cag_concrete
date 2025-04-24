@@ -23,14 +23,14 @@ class MacSignRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The data to sign. The MAC tag is computed over this data field
      * based on the specific algorithm.
      *
      * Generated from protobuf field <code>bytes data = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $data = '';
+    protected $data = '';
     /**
      * Optional. An optional CRC32C checksum of the
      * [MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data]. If
@@ -52,7 +52,26 @@ class MacSignRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Int64Value data_crc32c = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $data_crc32c = null;
+    protected $data_crc32c = null;
+
+    /**
+     * @param string $name Required. The resource name of the
+     *                     [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+     *                     signing. Please see
+     *                     {@see KeyManagementServiceClient::cryptoKeyVersionName()} for help formatting this field.
+     * @param string $data Required. The data to sign. The MAC tag is computed over this data field
+     *                     based on the specific algorithm.
+     *
+     * @return \Google\Cloud\Kms\V1\MacSignRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, string $data): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setData($data);
+    }
 
     /**
      * Constructor.
@@ -211,7 +230,7 @@ class MacSignRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.Int64Value data_crc32c = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int|string|null
      */
-    public function getDataCrc32CValue()
+    public function getDataCrc32CUnwrapped()
     {
         return $this->readWrapperValue("data_crc32c");
     }
@@ -272,7 +291,7 @@ class MacSignRequest extends \Google\Protobuf\Internal\Message
      * @param int|string|null $var
      * @return $this
      */
-    public function setDataCrc32CValue($var)
+    public function setDataCrc32CUnwrapped($var)
     {
         $this->writeWrapperValue("data_crc32c", $var);
         return $this;}

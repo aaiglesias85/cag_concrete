@@ -16,14 +16,14 @@ use Google\Protobuf\Internal\GPBUtil;
 class UpdateTagKeyRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The new definition of the TagKey. Only the `description` and `etag` fields
-     * can be updated by this request. If the `etag` field is not empty, it
-     * must match the `etag` field of the existing tag key. Otherwise,
-     * `FAILED_PRECONDITION` will be returned.
+     * Required. The new definition of the TagKey. Only the `description` and
+     * `etag` fields can be updated by this request. If the `etag` field is not
+     * empty, it must match the `etag` field of the existing tag key. Otherwise,
+     * `ABORTED` will be returned.
      *
      * Generated from protobuf field <code>.google.cloud.resourcemanager.v3.TagKey tag_key = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $tag_key = null;
+    protected $tag_key = null;
     /**
      * Fields to be updated. The mask may only contain `description` or
      * `etag`. If omitted entirely, both `description` and `etag` are assumed to
@@ -31,14 +31,34 @@ class UpdateTagKeyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Set as true to perform validations necessary for updating the resource, but
      * not actually perform the action.
      *
      * Generated from protobuf field <code>bool validate_only = 3;</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+
+    /**
+     * @param \Google\Cloud\ResourceManager\V3\TagKey $tagKey     Required. The new definition of the TagKey. Only the `description` and
+     *                                                            `etag` fields can be updated by this request. If the `etag` field is not
+     *                                                            empty, it must match the `etag` field of the existing tag key. Otherwise,
+     *                                                            `ABORTED` will be returned.
+     * @param \Google\Protobuf\FieldMask              $updateMask Fields to be updated. The mask may only contain `description` or
+     *                                                            `etag`. If omitted entirely, both `description` and `etag` are assumed to
+     *                                                            be significant.
+     *
+     * @return \Google\Cloud\ResourceManager\V3\UpdateTagKeyRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\ResourceManager\V3\TagKey $tagKey, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setTagKey($tagKey)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -47,10 +67,10 @@ class UpdateTagKeyRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Cloud\ResourceManager\V3\TagKey $tag_key
-     *           Required. The new definition of the TagKey. Only the `description` and `etag` fields
-     *           can be updated by this request. If the `etag` field is not empty, it
-     *           must match the `etag` field of the existing tag key. Otherwise,
-     *           `FAILED_PRECONDITION` will be returned.
+     *           Required. The new definition of the TagKey. Only the `description` and
+     *           `etag` fields can be updated by this request. If the `etag` field is not
+     *           empty, it must match the `etag` field of the existing tag key. Otherwise,
+     *           `ABORTED` will be returned.
      *     @type \Google\Protobuf\FieldMask $update_mask
      *           Fields to be updated. The mask may only contain `description` or
      *           `etag`. If omitted entirely, both `description` and `etag` are assumed to
@@ -66,10 +86,10 @@ class UpdateTagKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The new definition of the TagKey. Only the `description` and `etag` fields
-     * can be updated by this request. If the `etag` field is not empty, it
-     * must match the `etag` field of the existing tag key. Otherwise,
-     * `FAILED_PRECONDITION` will be returned.
+     * Required. The new definition of the TagKey. Only the `description` and
+     * `etag` fields can be updated by this request. If the `etag` field is not
+     * empty, it must match the `etag` field of the existing tag key. Otherwise,
+     * `ABORTED` will be returned.
      *
      * Generated from protobuf field <code>.google.cloud.resourcemanager.v3.TagKey tag_key = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\ResourceManager\V3\TagKey|null
@@ -90,10 +110,10 @@ class UpdateTagKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The new definition of the TagKey. Only the `description` and `etag` fields
-     * can be updated by this request. If the `etag` field is not empty, it
-     * must match the `etag` field of the existing tag key. Otherwise,
-     * `FAILED_PRECONDITION` will be returned.
+     * Required. The new definition of the TagKey. Only the `description` and
+     * `etag` fields can be updated by this request. If the `etag` field is not
+     * empty, it must match the `etag` field of the existing tag key. Otherwise,
+     * `ABORTED` will be returned.
      *
      * Generated from protobuf field <code>.google.cloud.resourcemanager.v3.TagKey tag_key = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\ResourceManager\V3\TagKey $var

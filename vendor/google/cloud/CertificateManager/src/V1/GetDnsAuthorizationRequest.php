@@ -16,12 +16,27 @@ use Google\Protobuf\Internal\GPBUtil;
 class GetDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. A name of the dns authorization to describe. Must be in the format
-     * `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
+     * Required. A name of the dns authorization to describe. Must be in the
+     * format `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. A name of the dns authorization to describe. Must be in the
+     *                     format `projects/&#42;/locations/&#42;/dnsAuthorizations/*`. Please see
+     *                     {@see CertificateManagerClient::dnsAuthorizationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\CertificateManager\V1\GetDnsAuthorizationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -30,8 +45,8 @@ class GetDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Required. A name of the dns authorization to describe. Must be in the format
-     *           `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
+     *           Required. A name of the dns authorization to describe. Must be in the
+     *           format `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
      * }
      */
     public function __construct($data = NULL) {
@@ -40,8 +55,8 @@ class GetDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. A name of the dns authorization to describe. Must be in the format
-     * `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
+     * Required. A name of the dns authorization to describe. Must be in the
+     * format `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -52,8 +67,8 @@ class GetDnsAuthorizationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. A name of the dns authorization to describe. Must be in the format
-     * `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
+     * Required. A name of the dns authorization to describe. Must be in the
+     * format `projects/&#42;&#47;locations/&#42;&#47;dnsAuthorizations/&#42;`.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

@@ -21,14 +21,14 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Free-form human readable summary in English. The maximum length is 500
      * characters.
      *
      * Generated from protobuf field <code>string description = 2;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Contains an identifier for a subtype of recommendations produced for the
      * same recommender. Subtype is a function of content and impact, meaning a
@@ -41,21 +41,21 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string recommender_subtype = 12;</code>
      */
-    private $recommender_subtype = '';
+    protected $recommender_subtype = '';
     /**
      * Last time this recommendation was refreshed by the system that created it
      * in the first place.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_refresh_time = 4;</code>
      */
-    private $last_refresh_time = null;
+    protected $last_refresh_time = null;
     /**
      * The primary impact that this recommendation can have while trying to
      * optimize for one category.
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.Impact primary_impact = 5;</code>
      */
-    private $primary_impact = null;
+    protected $primary_impact = null;
     /**
      * Optional set of additional impact that this recommendation may have when
      * trying to optimize for the primary category. These may be positive
@@ -69,26 +69,26 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.Recommendation.Priority priority = 17;</code>
      */
-    private $priority = 0;
+    protected $priority = 0;
     /**
      * Content of the recommendation describing recommended changes to resources.
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.RecommendationContent content = 7;</code>
      */
-    private $content = null;
+    protected $content = null;
     /**
      * Information for state. Contains state and metadata.
      *
      * Generated from protobuf field <code>.google.cloud.recommender.v1.RecommendationStateInfo state_info = 10;</code>
      */
-    private $state_info = null;
+    protected $state_info = null;
     /**
      * Fingerprint of the Recommendation. Provides optimistic locking when
      * updating states.
      *
      * Generated from protobuf field <code>string etag = 11;</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
      * Insights that led to this recommendation.
      *
@@ -103,7 +103,7 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string xor_group_id = 18;</code>
      */
-    private $xor_group_id = '';
+    protected $xor_group_id = '';
 
     /**
      * Constructor.
@@ -131,7 +131,7 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Recommender\V1\Impact $primary_impact
      *           The primary impact that this recommendation can have while trying to
      *           optimize for one category.
-     *     @type \Google\Cloud\Recommender\V1\Impact[]|\Google\Protobuf\Internal\RepeatedField $additional_impact
+     *     @type array<\Google\Cloud\Recommender\V1\Impact>|\Google\Protobuf\Internal\RepeatedField $additional_impact
      *           Optional set of additional impact that this recommendation may have when
      *           trying to optimize for the primary category. These may be positive
      *           or negative.
@@ -144,7 +144,7 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      *     @type string $etag
      *           Fingerprint of the Recommendation. Provides optimistic locking when
      *           updating states.
-     *     @type \Google\Cloud\Recommender\V1\Recommendation\InsightReference[]|\Google\Protobuf\Internal\RepeatedField $associated_insights
+     *     @type array<\Google\Cloud\Recommender\V1\Recommendation\InsightReference>|\Google\Protobuf\Internal\RepeatedField $associated_insights
      *           Insights that led to this recommendation.
      *     @type string $xor_group_id
      *           Corresponds to a mutually exclusive group ID within a recommender.
@@ -347,7 +347,7 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      * or negative.
      *
      * Generated from protobuf field <code>repeated .google.cloud.recommender.v1.Impact additional_impact = 6;</code>
-     * @param \Google\Cloud\Recommender\V1\Impact[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Recommender\V1\Impact>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAdditionalImpact($var)
@@ -499,7 +499,7 @@ class Recommendation extends \Google\Protobuf\Internal\Message
      * Insights that led to this recommendation.
      *
      * Generated from protobuf field <code>repeated .google.cloud.recommender.v1.Recommendation.InsightReference associated_insights = 14;</code>
-     * @param \Google\Cloud\Recommender\V1\Recommendation\InsightReference[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Recommender\V1\Recommendation\InsightReference>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAssociatedInsights($var)

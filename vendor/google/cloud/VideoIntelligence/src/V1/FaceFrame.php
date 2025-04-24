@@ -11,6 +11,7 @@ use Google\Protobuf\Internal\GPBUtil;
 /**
  * Deprecated. No effect.
  *
+ * @deprecated
  * Generated from protobuf message <code>google.cloud.videointelligence.v1.FaceFrame</code>
  */
 class FaceFrame extends \Google\Protobuf\Internal\Message
@@ -29,7 +30,7 @@ class FaceFrame extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration time_offset = 2;</code>
      */
-    private $time_offset = null;
+    protected $time_offset = null;
 
     /**
      * Constructor.
@@ -37,7 +38,7 @@ class FaceFrame extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\VideoIntelligence\V1\NormalizedBoundingBox[]|\Google\Protobuf\Internal\RepeatedField $normalized_bounding_boxes
+     *     @type array<\Google\Cloud\VideoIntelligence\V1\NormalizedBoundingBox>|\Google\Protobuf\Internal\RepeatedField $normalized_bounding_boxes
      *           Normalized Bounding boxes in a frame.
      *           There can be more than one boxes if the same face is detected in multiple
      *           locations within the current frame.
@@ -70,7 +71,7 @@ class FaceFrame extends \Google\Protobuf\Internal\Message
      * locations within the current frame.
      *
      * Generated from protobuf field <code>repeated .google.cloud.videointelligence.v1.NormalizedBoundingBox normalized_bounding_boxes = 1;</code>
-     * @param \Google\Cloud\VideoIntelligence\V1\NormalizedBoundingBox[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\VideoIntelligence\V1\NormalizedBoundingBox>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNormalizedBoundingBoxes($var)

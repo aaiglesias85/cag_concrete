@@ -21,7 +21,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The display name of the IndexEndpoint.
      * The name can be up to 128 characters long and can consist of any UTF-8
@@ -29,13 +29,13 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * The description of the IndexEndpoint.
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. The indexes deployed in this endpoint.
      *
@@ -48,7 +48,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 5;</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
      * The labels with user-defined metadata to organize your IndexEndpoints.
      * Label keys and values can be no longer than 64 characters
@@ -64,7 +64,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this IndexEndpoint was last updated.
      * This timestamp is not updated when the endpoint's DeployedIndexes are
@@ -73,7 +73,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Optional. The full name of the Google Compute Engine
      * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks)
@@ -84,16 +84,18 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      * [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
      * are mutually exclusive.
      * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert):
-     * projects/{project}/global/networks/{network}.
+     * `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in '12345', and {network} is
      * network name.
      *
      * Generated from protobuf field <code>string network = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
-     * Optional. Deprecated: If true, expose the IndexEndpoint via private service connect.
-     * Only one of the fields, [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
+     * Optional. Deprecated: If true, expose the IndexEndpoint via private service
+     * connect.
+     * Only one of the fields,
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
      * [enable_private_service_connect][google.cloud.aiplatform.v1.IndexEndpoint.enable_private_service_connect],
      * can be set.
      *
@@ -101,6 +103,51 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      * @deprecated
      */
     protected $enable_private_service_connect = false;
+    /**
+     * Optional. Configuration for private service connect.
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] and
+     * [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
+     * are mutually exclusive.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PrivateServiceConnectConfig private_service_connect_config = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $private_service_connect_config = null;
+    /**
+     * Optional. If true, the deployed index will be accessible through public
+     * endpoint.
+     *
+     * Generated from protobuf field <code>bool public_endpoint_enabled = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $public_endpoint_enabled = false;
+    /**
+     * Output only. If
+     * [public_endpoint_enabled][google.cloud.aiplatform.v1.IndexEndpoint.public_endpoint_enabled]
+     * is true, this field will be populated with the domain name to use for this
+     * index endpoint.
+     *
+     * Generated from protobuf field <code>string public_endpoint_domain_name = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $public_endpoint_domain_name = '';
+    /**
+     * Immutable. Customer-managed encryption key spec for an IndexEndpoint. If
+     * set, this IndexEndpoint and all sub-resources of this IndexEndpoint will be
+     * secured by this key.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 15 [(.google.api.field_behavior) = IMMUTABLE];</code>
+     */
+    protected $encryption_spec = null;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 17 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 18 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzi = false;
 
     /**
      * Constructor.
@@ -116,7 +163,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *           characters.
      *     @type string $description
      *           The description of the IndexEndpoint.
-     *     @type \Google\Cloud\AIPlatform\V1\DeployedIndex[]|\Google\Protobuf\Internal\RepeatedField $deployed_indexes
+     *     @type array<\Google\Cloud\AIPlatform\V1\DeployedIndex>|\Google\Protobuf\Internal\RepeatedField $deployed_indexes
      *           Output only. The indexes deployed in this endpoint.
      *     @type string $etag
      *           Used to perform consistent read-modify-write updates. If not set, a blind
@@ -144,14 +191,37 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      *           [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
      *           are mutually exclusive.
      *           [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert):
-     *           projects/{project}/global/networks/{network}.
+     *           `projects/{project}/global/networks/{network}`.
      *           Where {project} is a project number, as in '12345', and {network} is
      *           network name.
      *     @type bool $enable_private_service_connect
-     *           Optional. Deprecated: If true, expose the IndexEndpoint via private service connect.
-     *           Only one of the fields, [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
+     *           Optional. Deprecated: If true, expose the IndexEndpoint via private service
+     *           connect.
+     *           Only one of the fields,
+     *           [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
      *           [enable_private_service_connect][google.cloud.aiplatform.v1.IndexEndpoint.enable_private_service_connect],
      *           can be set.
+     *     @type \Google\Cloud\AIPlatform\V1\PrivateServiceConnectConfig $private_service_connect_config
+     *           Optional. Configuration for private service connect.
+     *           [network][google.cloud.aiplatform.v1.IndexEndpoint.network] and
+     *           [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
+     *           are mutually exclusive.
+     *     @type bool $public_endpoint_enabled
+     *           Optional. If true, the deployed index will be accessible through public
+     *           endpoint.
+     *     @type string $public_endpoint_domain_name
+     *           Output only. If
+     *           [public_endpoint_enabled][google.cloud.aiplatform.v1.IndexEndpoint.public_endpoint_enabled]
+     *           is true, this field will be populated with the domain name to use for this
+     *           index endpoint.
+     *     @type \Google\Cloud\AIPlatform\V1\EncryptionSpec $encryption_spec
+     *           Immutable. Customer-managed encryption key spec for an IndexEndpoint. If
+     *           set, this IndexEndpoint and all sub-resources of this IndexEndpoint will be
+     *           secured by this key.
+     *     @type bool $satisfies_pzs
+     *           Output only. Reserved for future use.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -256,7 +326,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      * Output only. The indexes deployed in this endpoint.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.DeployedIndex deployed_indexes = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\AIPlatform\V1\DeployedIndex[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\DeployedIndex>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDeployedIndexes($var)
@@ -417,7 +487,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      * [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
      * are mutually exclusive.
      * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert):
-     * projects/{project}/global/networks/{network}.
+     * `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in '12345', and {network} is
      * network name.
      *
@@ -439,7 +509,7 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
      * [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
      * are mutually exclusive.
      * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert):
-     * projects/{project}/global/networks/{network}.
+     * `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in '12345', and {network} is
      * network name.
      *
@@ -456,8 +526,10 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Deprecated: If true, expose the IndexEndpoint via private service connect.
-     * Only one of the fields, [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
+     * Optional. Deprecated: If true, expose the IndexEndpoint via private service
+     * connect.
+     * Only one of the fields,
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
      * [enable_private_service_connect][google.cloud.aiplatform.v1.IndexEndpoint.enable_private_service_connect],
      * can be set.
      *
@@ -472,8 +544,10 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Deprecated: If true, expose the IndexEndpoint via private service connect.
-     * Only one of the fields, [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
+     * Optional. Deprecated: If true, expose the IndexEndpoint via private service
+     * connect.
+     * Only one of the fields,
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] or
      * [enable_private_service_connect][google.cloud.aiplatform.v1.IndexEndpoint.enable_private_service_connect],
      * can be set.
      *
@@ -487,6 +561,200 @@ class IndexEndpoint extends \Google\Protobuf\Internal\Message
         @trigger_error('enable_private_service_connect is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkBool($var);
         $this->enable_private_service_connect = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Configuration for private service connect.
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] and
+     * [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
+     * are mutually exclusive.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PrivateServiceConnectConfig private_service_connect_config = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\AIPlatform\V1\PrivateServiceConnectConfig|null
+     */
+    public function getPrivateServiceConnectConfig()
+    {
+        return $this->private_service_connect_config;
+    }
+
+    public function hasPrivateServiceConnectConfig()
+    {
+        return isset($this->private_service_connect_config);
+    }
+
+    public function clearPrivateServiceConnectConfig()
+    {
+        unset($this->private_service_connect_config);
+    }
+
+    /**
+     * Optional. Configuration for private service connect.
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] and
+     * [private_service_connect_config][google.cloud.aiplatform.v1.IndexEndpoint.private_service_connect_config]
+     * are mutually exclusive.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.PrivateServiceConnectConfig private_service_connect_config = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\AIPlatform\V1\PrivateServiceConnectConfig $var
+     * @return $this
+     */
+    public function setPrivateServiceConnectConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\PrivateServiceConnectConfig::class);
+        $this->private_service_connect_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. If true, the deployed index will be accessible through public
+     * endpoint.
+     *
+     * Generated from protobuf field <code>bool public_endpoint_enabled = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getPublicEndpointEnabled()
+    {
+        return $this->public_endpoint_enabled;
+    }
+
+    /**
+     * Optional. If true, the deployed index will be accessible through public
+     * endpoint.
+     *
+     * Generated from protobuf field <code>bool public_endpoint_enabled = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setPublicEndpointEnabled($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->public_endpoint_enabled = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. If
+     * [public_endpoint_enabled][google.cloud.aiplatform.v1.IndexEndpoint.public_endpoint_enabled]
+     * is true, this field will be populated with the domain name to use for this
+     * index endpoint.
+     *
+     * Generated from protobuf field <code>string public_endpoint_domain_name = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getPublicEndpointDomainName()
+    {
+        return $this->public_endpoint_domain_name;
+    }
+
+    /**
+     * Output only. If
+     * [public_endpoint_enabled][google.cloud.aiplatform.v1.IndexEndpoint.public_endpoint_enabled]
+     * is true, this field will be populated with the domain name to use for this
+     * index endpoint.
+     *
+     * Generated from protobuf field <code>string public_endpoint_domain_name = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPublicEndpointDomainName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->public_endpoint_domain_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Immutable. Customer-managed encryption key spec for an IndexEndpoint. If
+     * set, this IndexEndpoint and all sub-resources of this IndexEndpoint will be
+     * secured by this key.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 15 [(.google.api.field_behavior) = IMMUTABLE];</code>
+     * @return \Google\Cloud\AIPlatform\V1\EncryptionSpec|null
+     */
+    public function getEncryptionSpec()
+    {
+        return $this->encryption_spec;
+    }
+
+    public function hasEncryptionSpec()
+    {
+        return isset($this->encryption_spec);
+    }
+
+    public function clearEncryptionSpec()
+    {
+        unset($this->encryption_spec);
+    }
+
+    /**
+     * Immutable. Customer-managed encryption key spec for an IndexEndpoint. If
+     * set, this IndexEndpoint and all sub-resources of this IndexEndpoint will be
+     * secured by this key.
+     *
+     * Generated from protobuf field <code>.google.cloud.aiplatform.v1.EncryptionSpec encryption_spec = 15 [(.google.api.field_behavior) = IMMUTABLE];</code>
+     * @param \Google\Cloud\AIPlatform\V1\EncryptionSpec $var
+     * @return $this
+     */
+    public function setEncryptionSpec($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\EncryptionSpec::class);
+        $this->encryption_spec = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 17 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 17 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 18 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return $this->satisfies_pzi;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 18 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
 
         return $this;
     }

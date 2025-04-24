@@ -28,13 +28,20 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
      */
     private $cdn_policy = null;
     /**
+     * Compress text responses using Brotli or gzip compression, based on the client's Accept-Encoding header.
+     * Check the CompressionMode enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string compression_mode = 95520988;</code>
+     */
+    private $compression_mode = null;
+    /**
      * [Output Only] Creation timestamp in RFC3339 text format.
      *
      * Generated from protobuf field <code>optional string creation_timestamp = 30525366;</code>
      */
     private $creation_timestamp = null;
     /**
-     * Headers that the HTTP/S load balancer should add to proxied responses.
+     * Headers that the Application Load Balancer should add to proxied responses.
      *
      * Generated from protobuf field <code>repeated string custom_response_headers = 387539094;</code>
      */
@@ -81,6 +88,12 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string self_link = 456214797;</code>
      */
     private $self_link = null;
+    /**
+     * [Output Only] List of resources referencing that backend bucket.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.compute.v1.BackendBucketUsedBy used_by = 389320729;</code>
+     */
+    private $used_by;
 
     /**
      * Constructor.
@@ -92,10 +105,13 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
      *           Cloud Storage bucket name.
      *     @type \Google\Cloud\Compute\V1\BackendBucketCdnPolicy $cdn_policy
      *           Cloud CDN configuration for this BackendBucket.
+     *     @type string $compression_mode
+     *           Compress text responses using Brotli or gzip compression, based on the client's Accept-Encoding header.
+     *           Check the CompressionMode enum for the list of possible values.
      *     @type string $creation_timestamp
      *           [Output Only] Creation timestamp in RFC3339 text format.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $custom_response_headers
-     *           Headers that the HTTP/S load balancer should add to proxied responses.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $custom_response_headers
+     *           Headers that the Application Load Balancer should add to proxied responses.
      *     @type string $description
      *           An optional textual description of the resource; provided by the client when the resource is created.
      *     @type string $edge_security_policy
@@ -110,6 +126,8 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
      *           Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
+     *     @type array<\Google\Cloud\Compute\V1\BackendBucketUsedBy>|\Google\Protobuf\Internal\RepeatedField $used_by
+     *           [Output Only] List of resources referencing that backend bucket.
      * }
      */
     public function __construct($data = NULL) {
@@ -190,6 +208,44 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Compress text responses using Brotli or gzip compression, based on the client's Accept-Encoding header.
+     * Check the CompressionMode enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string compression_mode = 95520988;</code>
+     * @return string
+     */
+    public function getCompressionMode()
+    {
+        return isset($this->compression_mode) ? $this->compression_mode : '';
+    }
+
+    public function hasCompressionMode()
+    {
+        return isset($this->compression_mode);
+    }
+
+    public function clearCompressionMode()
+    {
+        unset($this->compression_mode);
+    }
+
+    /**
+     * Compress text responses using Brotli or gzip compression, based on the client's Accept-Encoding header.
+     * Check the CompressionMode enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string compression_mode = 95520988;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCompressionMode($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->compression_mode = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] Creation timestamp in RFC3339 text format.
      *
      * Generated from protobuf field <code>optional string creation_timestamp = 30525366;</code>
@@ -226,7 +282,7 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Headers that the HTTP/S load balancer should add to proxied responses.
+     * Headers that the Application Load Balancer should add to proxied responses.
      *
      * Generated from protobuf field <code>repeated string custom_response_headers = 387539094;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -237,10 +293,10 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Headers that the HTTP/S load balancer should add to proxied responses.
+     * Headers that the Application Load Balancer should add to proxied responses.
      *
      * Generated from protobuf field <code>repeated string custom_response_headers = 387539094;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCustomResponseHeaders($var)
@@ -499,6 +555,32 @@ class BackendBucket extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->self_link = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] List of resources referencing that backend bucket.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.compute.v1.BackendBucketUsedBy used_by = 389320729;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getUsedBy()
+    {
+        return $this->used_by;
+    }
+
+    /**
+     * [Output Only] List of resources referencing that backend bucket.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.compute.v1.BackendBucketUsedBy used_by = 389320729;</code>
+     * @param array<\Google\Cloud\Compute\V1\BackendBucketUsedBy>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setUsedBy($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Compute\V1\BackendBucketUsedBy::class);
+        $this->used_by = $arr;
 
         return $this;
     }

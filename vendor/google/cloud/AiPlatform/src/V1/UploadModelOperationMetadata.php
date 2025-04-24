@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Details of [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel] operation.
+ * Details of
+ * [ModelService.UploadModel][google.cloud.aiplatform.v1.ModelService.UploadModel]
+ * operation.
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.UploadModelOperationMetadata</code>
  */
@@ -20,7 +22,7 @@ class UploadModelOperationMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GenericOperationMetadata generic_metadata = 1;</code>
      */
-    private $generic_metadata = null;
+    protected $generic_metadata = null;
 
     /**
      * Constructor.

@@ -19,11 +19,11 @@ class CreateBackupRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The relative resource name of the service in which to create a
      * backup of the following form:
-     * `projects/{project_number}/locations/{location_id}/services/{service_id}`
+     * `projects/{project_number}/locations/{location_id}/services/{service_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The ID of the backup, which is used as the final component of the
      * backup's name.
@@ -33,14 +33,14 @@ class CreateBackupRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string backup_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $backup_id = '';
+    protected $backup_id = '';
     /**
      * Required. The backup to create. The `name` field is ignored. The ID of the
      * created backup must be provided in the request's `backup_id` field.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1beta.Backup backup = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $backup = null;
+    protected $backup = null;
     /**
      * Optional. A request ID. Specify a unique request ID to allow the server to
      * ignore the request if it has completed. The server will ignore subsequent
@@ -55,7 +55,34 @@ class CreateBackupRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                                $parent   Required. The relative resource name of the service in which to create a
+     *                                                        backup of the following form:
+     *
+     *                                                        `projects/{project_number}/locations/{location_id}/services/{service_id}`. Please see
+     *                                                        {@see DataprocMetastoreClient::serviceName()} for help formatting this field.
+     * @param \Google\Cloud\Metastore\V1beta\Backup $backup   Required. The backup to create. The `name` field is ignored. The ID of the
+     *                                                        created backup must be provided in the request's `backup_id` field.
+     * @param string                                $backupId Required. The ID of the backup, which is used as the final component of the
+     *                                                        backup's name.
+     *
+     *                                                        This value must be between 1 and 64 characters long, begin with a letter,
+     *                                                        end with a letter or number, and consist of alpha-numeric ASCII characters
+     *                                                        or hyphens.
+     *
+     * @return \Google\Cloud\Metastore\V1beta\CreateBackupRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Metastore\V1beta\Backup $backup, string $backupId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setBackup($backup)
+            ->setBackupId($backupId);
+    }
 
     /**
      * Constructor.
@@ -66,7 +93,7 @@ class CreateBackupRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Required. The relative resource name of the service in which to create a
      *           backup of the following form:
-     *           `projects/{project_number}/locations/{location_id}/services/{service_id}`
+     *           `projects/{project_number}/locations/{location_id}/services/{service_id}`.
      *     @type string $backup_id
      *           Required. The ID of the backup, which is used as the final component of the
      *           backup's name.
@@ -97,7 +124,7 @@ class CreateBackupRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The relative resource name of the service in which to create a
      * backup of the following form:
-     * `projects/{project_number}/locations/{location_id}/services/{service_id}`
+     * `projects/{project_number}/locations/{location_id}/services/{service_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -110,7 +137,7 @@ class CreateBackupRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The relative resource name of the service in which to create a
      * backup of the following form:
-     * `projects/{project_number}/locations/{location_id}/services/{service_id}`
+     * `projects/{project_number}/locations/{location_id}/services/{service_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

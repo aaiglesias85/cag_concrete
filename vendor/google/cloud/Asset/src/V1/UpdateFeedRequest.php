@@ -16,15 +16,15 @@ use Google\Protobuf\Internal\GPBUtil;
 class UpdateFeedRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The new values of feed details. It must match an existing feed and the
-     * field `name` must be in the format of:
+     * Required. The new values of feed details. It must match an existing feed
+     * and the field `name` must be in the format of:
      * projects/project_number/feeds/feed_id or
      * folders/folder_number/feeds/feed_id or
      * organizations/organization_number/feeds/feed_id.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.Feed feed = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $feed = null;
+    protected $feed = null;
     /**
      * Required. Only updates the `feed` fields indicated by this mask.
      * The field mask must not be empty, and it must not contain fields that
@@ -32,7 +32,24 @@ class UpdateFeedRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Asset\V1\Feed $feed Required. The new values of feed details. It must match an existing feed
+     *                                          and the field `name` must be in the format of:
+     *                                          projects/project_number/feeds/feed_id or
+     *                                          folders/folder_number/feeds/feed_id or
+     *                                          organizations/organization_number/feeds/feed_id.
+     *
+     * @return \Google\Cloud\Asset\V1\UpdateFeedRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Asset\V1\Feed $feed): self
+    {
+        return (new self())
+            ->setFeed($feed);
+    }
 
     /**
      * Constructor.
@@ -41,8 +58,8 @@ class UpdateFeedRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Cloud\Asset\V1\Feed $feed
-     *           Required. The new values of feed details. It must match an existing feed and the
-     *           field `name` must be in the format of:
+     *           Required. The new values of feed details. It must match an existing feed
+     *           and the field `name` must be in the format of:
      *           projects/project_number/feeds/feed_id or
      *           folders/folder_number/feeds/feed_id or
      *           organizations/organization_number/feeds/feed_id.
@@ -58,8 +75,8 @@ class UpdateFeedRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The new values of feed details. It must match an existing feed and the
-     * field `name` must be in the format of:
+     * Required. The new values of feed details. It must match an existing feed
+     * and the field `name` must be in the format of:
      * projects/project_number/feeds/feed_id or
      * folders/folder_number/feeds/feed_id or
      * organizations/organization_number/feeds/feed_id.
@@ -83,8 +100,8 @@ class UpdateFeedRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The new values of feed details. It must match an existing feed and the
-     * field `name` must be in the format of:
+     * Required. The new values of feed details. It must match an existing feed
+     * and the field `name` must be in the format of:
      * projects/project_number/feeds/feed_id or
      * folders/folder_number/feeds/feed_id or
      * organizations/organization_number/feeds/feed_id.

@@ -23,11 +23,11 @@ class ListStoredInfoTypesResponse extends \Google\Protobuf\Internal\Message
     private $stored_info_types;
     /**
      * If the next page is available then the next page token to be used
-     * in following ListStoredInfoTypes request.
+     * in the following ListStoredInfoTypes request.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,11 +35,11 @@ class ListStoredInfoTypesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dlp\V2\StoredInfoType[]|\Google\Protobuf\Internal\RepeatedField $stored_info_types
+     *     @type array<\Google\Cloud\Dlp\V2\StoredInfoType>|\Google\Protobuf\Internal\RepeatedField $stored_info_types
      *           List of storedInfoTypes, up to page_size in ListStoredInfoTypesRequest.
      *     @type string $next_page_token
      *           If the next page is available then the next page token to be used
-     *           in following ListStoredInfoTypes request.
+     *           in the following ListStoredInfoTypes request.
      * }
      */
     public function __construct($data = NULL) {
@@ -62,7 +62,7 @@ class ListStoredInfoTypesResponse extends \Google\Protobuf\Internal\Message
      * List of storedInfoTypes, up to page_size in ListStoredInfoTypesRequest.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.StoredInfoType stored_info_types = 1;</code>
-     * @param \Google\Cloud\Dlp\V2\StoredInfoType[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\StoredInfoType>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setStoredInfoTypes($var)
@@ -75,7 +75,7 @@ class ListStoredInfoTypesResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * If the next page is available then the next page token to be used
-     * in following ListStoredInfoTypes request.
+     * in the following ListStoredInfoTypes request.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @return string
@@ -87,7 +87,7 @@ class ListStoredInfoTypesResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * If the next page is available then the next page token to be used
-     * in following ListStoredInfoTypes request.
+     * in the following ListStoredInfoTypes request.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @param string $var

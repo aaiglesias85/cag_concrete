@@ -7,7 +7,7 @@ namespace Google\Cloud\Compute\V1\Commitment;
 use UnexpectedValueException;
 
 /**
- * [Output Only] Status of the commitment with regards to eventual expiration (each commitment has an end date defined). One of the following values: NOT_YET_ACTIVE, ACTIVE, EXPIRED.
+ * [Output Only] Status of the commitment with regards to eventual expiration (each commitment has an end date defined). Status can be one of the following values: NOT_YET_ACTIVE, ACTIVE, or EXPIRED.
  *
  * Protobuf type <code>google.cloud.compute.v1.Commitment.Status</code>
  */
@@ -24,6 +24,12 @@ class Status
      */
     const ACTIVE = 314733318;
     /**
+     * Deprecate CANCELED status. Will use separate status to differentiate cancel by mergeCud or manual cancellation.
+     *
+     * Generated from protobuf enum <code>CANCELLED = 41957681;</code>
+     */
+    const CANCELLED = 41957681;
+    /**
      * Generated from protobuf enum <code>CREATING = 455564985;</code>
      */
     const CREATING = 455564985;
@@ -39,6 +45,7 @@ class Status
     private static $valueToName = [
         self::UNDEFINED_STATUS => 'UNDEFINED_STATUS',
         self::ACTIVE => 'ACTIVE',
+        self::CANCELLED => 'CANCELLED',
         self::CREATING => 'CREATING',
         self::EXPIRED => 'EXPIRED',
         self::NOT_YET_ACTIVE => 'NOT_YET_ACTIVE',

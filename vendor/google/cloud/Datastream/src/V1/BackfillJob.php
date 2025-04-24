@@ -16,29 +16,29 @@ use Google\Protobuf\Internal\GPBUtil;
 class BackfillJob extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Backfill job state.
+     * Output only. Backfill job state.
      *
-     * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.State state = 1;</code>
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.State state = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Backfill job's triggering reason.
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.Trigger trigger = 2;</code>
      */
-    private $trigger = 0;
+    protected $trigger = 0;
     /**
      * Output only. Backfill job's start time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_start_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $last_start_time = null;
+    protected $last_start_time = null;
     /**
      * Output only. Backfill job's end time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_end_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $last_end_time = null;
+    protected $last_end_time = null;
     /**
      * Output only. Errors which caused the backfill job to fail.
      *
@@ -53,14 +53,14 @@ class BackfillJob extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $state
-     *           Backfill job state.
+     *           Output only. Backfill job state.
      *     @type int $trigger
      *           Backfill job's triggering reason.
      *     @type \Google\Protobuf\Timestamp $last_start_time
      *           Output only. Backfill job's start time.
      *     @type \Google\Protobuf\Timestamp $last_end_time
      *           Output only. Backfill job's end time.
-     *     @type \Google\Cloud\Datastream\V1\Error[]|\Google\Protobuf\Internal\RepeatedField $errors
+     *     @type array<\Google\Cloud\Datastream\V1\Error>|\Google\Protobuf\Internal\RepeatedField $errors
      *           Output only. Errors which caused the backfill job to fail.
      * }
      */
@@ -70,9 +70,9 @@ class BackfillJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Backfill job state.
+     * Output only. Backfill job state.
      *
-     * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.State state = 1;</code>
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.State state = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return int
      */
     public function getState()
@@ -81,9 +81,9 @@ class BackfillJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Backfill job state.
+     * Output only. Backfill job state.
      *
-     * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.State state = 1;</code>
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob.State state = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param int $var
      * @return $this
      */
@@ -208,7 +208,7 @@ class BackfillJob extends \Google\Protobuf\Internal\Message
      * Output only. Errors which caused the backfill job to fail.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datastream.v1.Error errors = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\Datastream\V1\Error[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastream\V1\Error>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrors($var)

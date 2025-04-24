@@ -23,12 +23,12 @@ class ListDeidentifyTemplatesResponse extends \Google\Protobuf\Internal\Message
      */
     private $deidentify_templates;
     /**
-     * If the next page is available then the next page token to be used
-     * in following ListDeidentifyTemplates request.
+     * If the next page is available then the next page token to be used in the
+     * following ListDeidentifyTemplates request.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -36,12 +36,12 @@ class ListDeidentifyTemplatesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dlp\V2\DeidentifyTemplate[]|\Google\Protobuf\Internal\RepeatedField $deidentify_templates
+     *     @type array<\Google\Cloud\Dlp\V2\DeidentifyTemplate>|\Google\Protobuf\Internal\RepeatedField $deidentify_templates
      *           List of deidentify templates, up to page_size in
      *           ListDeidentifyTemplatesRequest.
      *     @type string $next_page_token
-     *           If the next page is available then the next page token to be used
-     *           in following ListDeidentifyTemplates request.
+     *           If the next page is available then the next page token to be used in the
+     *           following ListDeidentifyTemplates request.
      * }
      */
     public function __construct($data = NULL) {
@@ -66,7 +66,7 @@ class ListDeidentifyTemplatesResponse extends \Google\Protobuf\Internal\Message
      * ListDeidentifyTemplatesRequest.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.DeidentifyTemplate deidentify_templates = 1;</code>
-     * @param \Google\Cloud\Dlp\V2\DeidentifyTemplate[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\DeidentifyTemplate>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDeidentifyTemplates($var)
@@ -78,8 +78,8 @@ class ListDeidentifyTemplatesResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * If the next page is available then the next page token to be used
-     * in following ListDeidentifyTemplates request.
+     * If the next page is available then the next page token to be used in the
+     * following ListDeidentifyTemplates request.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @return string
@@ -90,8 +90,8 @@ class ListDeidentifyTemplatesResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * If the next page is available then the next page token to be used
-     * in following ListDeidentifyTemplates request.
+     * If the next page is available then the next page token to be used in the
+     * following ListDeidentifyTemplates request.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @param string $var

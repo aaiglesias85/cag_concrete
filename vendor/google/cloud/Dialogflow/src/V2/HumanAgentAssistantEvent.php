@@ -22,7 +22,7 @@ class HumanAgentAssistantEvent extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string conversation = 1;</code>
      */
-    private $conversation = '';
+    protected $conversation = '';
     /**
      * The participant that the suggestion is compiled for.
      * Format: `projects/<Project ID>/conversations/<Conversation
@@ -30,7 +30,7 @@ class HumanAgentAssistantEvent extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string participant = 3;</code>
      */
-    private $participant = '';
+    protected $participant = '';
     /**
      * The suggestion results payload that this notification refers to.
      *
@@ -51,7 +51,7 @@ class HumanAgentAssistantEvent extends \Google\Protobuf\Internal\Message
      *           The participant that the suggestion is compiled for.
      *           Format: `projects/<Project ID>/conversations/<Conversation
      *           ID>/participants/<Participant ID>`. It will not be set in legacy workflow.
-     *     @type \Google\Cloud\Dialogflow\V2\SuggestionResult[]|\Google\Protobuf\Internal\RepeatedField $suggestion_results
+     *     @type array<\Google\Cloud\Dialogflow\V2\SuggestionResult>|\Google\Protobuf\Internal\RepeatedField $suggestion_results
      *           The suggestion results payload that this notification refers to.
      * }
      */
@@ -133,7 +133,7 @@ class HumanAgentAssistantEvent extends \Google\Protobuf\Internal\Message
      * The suggestion results payload that this notification refers to.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.SuggestionResult suggestion_results = 5;</code>
-     * @param \Google\Cloud\Dialogflow\V2\SuggestionResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\SuggestionResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSuggestionResults($var)

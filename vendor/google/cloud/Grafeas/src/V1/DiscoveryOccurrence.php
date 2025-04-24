@@ -20,13 +20,24 @@ class DiscoveryOccurrence extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.ContinuousAnalysis continuous_analysis = 1;</code>
      */
-    private $continuous_analysis = 0;
+    protected $continuous_analysis = 0;
     /**
      * The status of discovery for the resource.
      *
      * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.AnalysisStatus analysis_status = 2;</code>
      */
-    private $analysis_status = 0;
+    protected $analysis_status = 0;
+    /**
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.AnalysisCompleted analysis_completed = 7;</code>
+     */
+    protected $analysis_completed = null;
+    /**
+     * Indicates any errors encountered during analysis of a resource. There
+     * could be 0 or more of these errors.
+     *
+     * Generated from protobuf field <code>repeated .google.rpc.Status analysis_error = 8;</code>
+     */
+    private $analysis_error;
     /**
      * When an error is encountered this will contain a LocalizedMessage under
      * details to show to the user. The LocalizedMessage is output only and
@@ -34,25 +45,37 @@ class DiscoveryOccurrence extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.rpc.Status analysis_status_error = 3;</code>
      */
-    private $analysis_status_error = null;
+    protected $analysis_status_error = null;
     /**
      * The CPE of the resource being scanned.
      *
      * Generated from protobuf field <code>string cpe = 4;</code>
      */
-    private $cpe = '';
+    protected $cpe = '';
     /**
      * The last time this resource was scanned.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_scan_time = 5;</code>
      */
-    private $last_scan_time = null;
+    protected $last_scan_time = null;
     /**
      * The time occurrences related to this discovery occurrence were archived.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp archive_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $archive_time = null;
+    protected $archive_time = null;
+    /**
+     * The status of an SBOM generation.
+     *
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.SBOMStatus sbom_status = 9;</code>
+     */
+    protected $sbom_status = null;
+    /**
+     * The status of an vulnerability attestation generation.
+     *
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.VulnerabilityAttestation vulnerability_attestation = 10;</code>
+     */
+    protected $vulnerability_attestation = null;
 
     /**
      * Constructor.
@@ -64,6 +87,10 @@ class DiscoveryOccurrence extends \Google\Protobuf\Internal\Message
      *           Whether the resource is continuously analyzed.
      *     @type int $analysis_status
      *           The status of discovery for the resource.
+     *     @type \Grafeas\V1\DiscoveryOccurrence\AnalysisCompleted $analysis_completed
+     *     @type array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $analysis_error
+     *           Indicates any errors encountered during analysis of a resource. There
+     *           could be 0 or more of these errors.
      *     @type \Google\Rpc\Status $analysis_status_error
      *           When an error is encountered this will contain a LocalizedMessage under
      *           details to show to the user. The LocalizedMessage is output only and
@@ -74,6 +101,10 @@ class DiscoveryOccurrence extends \Google\Protobuf\Internal\Message
      *           The last time this resource was scanned.
      *     @type \Google\Protobuf\Timestamp $archive_time
      *           The time occurrences related to this discovery occurrence were archived.
+     *     @type \Grafeas\V1\DiscoveryOccurrence\SBOMStatus $sbom_status
+     *           The status of an SBOM generation.
+     *     @type \Grafeas\V1\DiscoveryOccurrence\VulnerabilityAttestation $vulnerability_attestation
+     *           The status of an vulnerability attestation generation.
      * }
      */
     public function __construct($data = NULL) {
@@ -129,6 +160,66 @@ class DiscoveryOccurrence extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Grafeas\V1\DiscoveryOccurrence\AnalysisStatus::class);
         $this->analysis_status = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.AnalysisCompleted analysis_completed = 7;</code>
+     * @return \Grafeas\V1\DiscoveryOccurrence\AnalysisCompleted|null
+     */
+    public function getAnalysisCompleted()
+    {
+        return $this->analysis_completed;
+    }
+
+    public function hasAnalysisCompleted()
+    {
+        return isset($this->analysis_completed);
+    }
+
+    public function clearAnalysisCompleted()
+    {
+        unset($this->analysis_completed);
+    }
+
+    /**
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.AnalysisCompleted analysis_completed = 7;</code>
+     * @param \Grafeas\V1\DiscoveryOccurrence\AnalysisCompleted $var
+     * @return $this
+     */
+    public function setAnalysisCompleted($var)
+    {
+        GPBUtil::checkMessage($var, \Grafeas\V1\DiscoveryOccurrence\AnalysisCompleted::class);
+        $this->analysis_completed = $var;
+
+        return $this;
+    }
+
+    /**
+     * Indicates any errors encountered during analysis of a resource. There
+     * could be 0 or more of these errors.
+     *
+     * Generated from protobuf field <code>repeated .google.rpc.Status analysis_error = 8;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAnalysisError()
+    {
+        return $this->analysis_error;
+    }
+
+    /**
+     * Indicates any errors encountered during analysis of a resource. There
+     * could be 0 or more of these errors.
+     *
+     * Generated from protobuf field <code>repeated .google.rpc.Status analysis_error = 8;</code>
+     * @param array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAnalysisError($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Rpc\Status::class);
+        $this->analysis_error = $arr;
 
         return $this;
     }
@@ -267,6 +358,78 @@ class DiscoveryOccurrence extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->archive_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * The status of an SBOM generation.
+     *
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.SBOMStatus sbom_status = 9;</code>
+     * @return \Grafeas\V1\DiscoveryOccurrence\SBOMStatus|null
+     */
+    public function getSbomStatus()
+    {
+        return $this->sbom_status;
+    }
+
+    public function hasSbomStatus()
+    {
+        return isset($this->sbom_status);
+    }
+
+    public function clearSbomStatus()
+    {
+        unset($this->sbom_status);
+    }
+
+    /**
+     * The status of an SBOM generation.
+     *
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.SBOMStatus sbom_status = 9;</code>
+     * @param \Grafeas\V1\DiscoveryOccurrence\SBOMStatus $var
+     * @return $this
+     */
+    public function setSbomStatus($var)
+    {
+        GPBUtil::checkMessage($var, \Grafeas\V1\DiscoveryOccurrence\SBOMStatus::class);
+        $this->sbom_status = $var;
+
+        return $this;
+    }
+
+    /**
+     * The status of an vulnerability attestation generation.
+     *
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.VulnerabilityAttestation vulnerability_attestation = 10;</code>
+     * @return \Grafeas\V1\DiscoveryOccurrence\VulnerabilityAttestation|null
+     */
+    public function getVulnerabilityAttestation()
+    {
+        return $this->vulnerability_attestation;
+    }
+
+    public function hasVulnerabilityAttestation()
+    {
+        return isset($this->vulnerability_attestation);
+    }
+
+    public function clearVulnerabilityAttestation()
+    {
+        unset($this->vulnerability_attestation);
+    }
+
+    /**
+     * The status of an vulnerability attestation generation.
+     *
+     * Generated from protobuf field <code>.grafeas.v1.DiscoveryOccurrence.VulnerabilityAttestation vulnerability_attestation = 10;</code>
+     * @param \Grafeas\V1\DiscoveryOccurrence\VulnerabilityAttestation $var
+     * @return $this
+     */
+    public function setVulnerabilityAttestation($var)
+    {
+        GPBUtil::checkMessage($var, \Grafeas\V1\DiscoveryOccurrence\VulnerabilityAttestation::class);
+        $this->vulnerability_attestation = $var;
 
         return $this;
     }

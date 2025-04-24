@@ -21,7 +21,7 @@ class CustomMetric extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Immutable. Tagging name for this custom metric.
      * If this is an event-scoped metric, then this is the event parameter
@@ -31,7 +31,7 @@ class CustomMetric extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parameter_name = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $parameter_name = '';
+    protected $parameter_name = '';
     /**
      * Required. Display name for this custom metric as shown in the Analytics UI.
      * Max length of 82 characters, alphanumeric plus space and underscore
@@ -41,30 +41,30 @@ class CustomMetric extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Optional. Description for this custom dimension.
      * Max length of 150 characters.
      *
      * Generated from protobuf field <code>string description = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Required. The type for the custom metric's value.
      *
      * Generated from protobuf field <code>.google.analytics.admin.v1alpha.CustomMetric.MeasurementUnit measurement_unit = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $measurement_unit = 0;
+    protected $measurement_unit = 0;
     /**
      * Required. Immutable. The scope of this custom metric.
      *
      * Generated from protobuf field <code>.google.analytics.admin.v1alpha.CustomMetric.MetricScope scope = 6 [(.google.api.field_behavior) = REQUIRED, (.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $scope = 0;
+    protected $scope = 0;
     /**
-     * Optional. Types of restricted data that this metric may contain. Required for metrics
-     * with CURRENCY measurement unit. Must be empty for metrics with a
-     * non-CURRENCY measurement unit.
+     * Optional. Types of restricted data that this metric may contain. Required
+     * for metrics with CURRENCY measurement unit. Must be empty for metrics with
+     * a non-CURRENCY measurement unit.
      *
      * Generated from protobuf field <code>repeated .google.analytics.admin.v1alpha.CustomMetric.RestrictedMetricType restricted_metric_type = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
@@ -98,10 +98,10 @@ class CustomMetric extends \Google\Protobuf\Internal\Message
      *           Required. The type for the custom metric's value.
      *     @type int $scope
      *           Required. Immutable. The scope of this custom metric.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $restricted_metric_type
-     *           Optional. Types of restricted data that this metric may contain. Required for metrics
-     *           with CURRENCY measurement unit. Must be empty for metrics with a
-     *           non-CURRENCY measurement unit.
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $restricted_metric_type
+     *           Optional. Types of restricted data that this metric may contain. Required
+     *           for metrics with CURRENCY measurement unit. Must be empty for metrics with
+     *           a non-CURRENCY measurement unit.
      * }
      */
     public function __construct($data = NULL) {
@@ -286,9 +286,9 @@ class CustomMetric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Types of restricted data that this metric may contain. Required for metrics
-     * with CURRENCY measurement unit. Must be empty for metrics with a
-     * non-CURRENCY measurement unit.
+     * Optional. Types of restricted data that this metric may contain. Required
+     * for metrics with CURRENCY measurement unit. Must be empty for metrics with
+     * a non-CURRENCY measurement unit.
      *
      * Generated from protobuf field <code>repeated .google.analytics.admin.v1alpha.CustomMetric.RestrictedMetricType restricted_metric_type = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -299,12 +299,12 @@ class CustomMetric extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Types of restricted data that this metric may contain. Required for metrics
-     * with CURRENCY measurement unit. Must be empty for metrics with a
-     * non-CURRENCY measurement unit.
+     * Optional. Types of restricted data that this metric may contain. Required
+     * for metrics with CURRENCY measurement unit. Must be empty for metrics with
+     * a non-CURRENCY measurement unit.
      *
      * Generated from protobuf field <code>repeated .google.analytics.admin.v1alpha.CustomMetric.RestrictedMetricType restricted_metric_type = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRestrictedMetricType($var)

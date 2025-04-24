@@ -20,13 +20,29 @@ class MysqlSourceConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.MysqlRdbms include_objects = 1;</code>
      */
-    private $include_objects = null;
+    protected $include_objects = null;
     /**
      * MySQL objects to exclude from the stream.
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.MysqlRdbms exclude_objects = 2;</code>
      */
-    private $exclude_objects = null;
+    protected $exclude_objects = null;
+    /**
+     * Maximum number of concurrent CDC tasks. The number should be non negative.
+     * If not set (or set to 0), the system's default value will be used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_cdc_tasks = 3;</code>
+     */
+    protected $max_concurrent_cdc_tasks = 0;
+    /**
+     * Maximum number of concurrent backfill tasks. The number should be non
+     * negative. If not set (or set to 0), the system's default value will be
+     * used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_backfill_tasks = 4;</code>
+     */
+    protected $max_concurrent_backfill_tasks = 0;
+    protected $cdc_method;
 
     /**
      * Constructor.
@@ -38,6 +54,17 @@ class MysqlSourceConfig extends \Google\Protobuf\Internal\Message
      *           MySQL objects to retrieve from the source.
      *     @type \Google\Cloud\Datastream\V1\MysqlRdbms $exclude_objects
      *           MySQL objects to exclude from the stream.
+     *     @type int $max_concurrent_cdc_tasks
+     *           Maximum number of concurrent CDC tasks. The number should be non negative.
+     *           If not set (or set to 0), the system's default value will be used.
+     *     @type int $max_concurrent_backfill_tasks
+     *           Maximum number of concurrent backfill tasks. The number should be non
+     *           negative. If not set (or set to 0), the system's default value will be
+     *           used.
+     *     @type \Google\Cloud\Datastream\V1\MysqlSourceConfig\BinaryLogPosition $binary_log_position
+     *           Use Binary log position based replication.
+     *     @type \Google\Cloud\Datastream\V1\MysqlSourceConfig\Gtid $gtid
+     *           Use GTID based replication.
      * }
      */
     public function __construct($data = NULL) {
@@ -115,6 +142,134 @@ class MysqlSourceConfig extends \Google\Protobuf\Internal\Message
         $this->exclude_objects = $var;
 
         return $this;
+    }
+
+    /**
+     * Maximum number of concurrent CDC tasks. The number should be non negative.
+     * If not set (or set to 0), the system's default value will be used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_cdc_tasks = 3;</code>
+     * @return int
+     */
+    public function getMaxConcurrentCdcTasks()
+    {
+        return $this->max_concurrent_cdc_tasks;
+    }
+
+    /**
+     * Maximum number of concurrent CDC tasks. The number should be non negative.
+     * If not set (or set to 0), the system's default value will be used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_cdc_tasks = 3;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setMaxConcurrentCdcTasks($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->max_concurrent_cdc_tasks = $var;
+
+        return $this;
+    }
+
+    /**
+     * Maximum number of concurrent backfill tasks. The number should be non
+     * negative. If not set (or set to 0), the system's default value will be
+     * used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_backfill_tasks = 4;</code>
+     * @return int
+     */
+    public function getMaxConcurrentBackfillTasks()
+    {
+        return $this->max_concurrent_backfill_tasks;
+    }
+
+    /**
+     * Maximum number of concurrent backfill tasks. The number should be non
+     * negative. If not set (or set to 0), the system's default value will be
+     * used.
+     *
+     * Generated from protobuf field <code>int32 max_concurrent_backfill_tasks = 4;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setMaxConcurrentBackfillTasks($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->max_concurrent_backfill_tasks = $var;
+
+        return $this;
+    }
+
+    /**
+     * Use Binary log position based replication.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.MysqlSourceConfig.BinaryLogPosition binary_log_position = 101;</code>
+     * @return \Google\Cloud\Datastream\V1\MysqlSourceConfig\BinaryLogPosition|null
+     */
+    public function getBinaryLogPosition()
+    {
+        return $this->readOneof(101);
+    }
+
+    public function hasBinaryLogPosition()
+    {
+        return $this->hasOneof(101);
+    }
+
+    /**
+     * Use Binary log position based replication.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.MysqlSourceConfig.BinaryLogPosition binary_log_position = 101;</code>
+     * @param \Google\Cloud\Datastream\V1\MysqlSourceConfig\BinaryLogPosition $var
+     * @return $this
+     */
+    public function setBinaryLogPosition($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\MysqlSourceConfig\BinaryLogPosition::class);
+        $this->writeOneof(101, $var);
+
+        return $this;
+    }
+
+    /**
+     * Use GTID based replication.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.MysqlSourceConfig.Gtid gtid = 102;</code>
+     * @return \Google\Cloud\Datastream\V1\MysqlSourceConfig\Gtid|null
+     */
+    public function getGtid()
+    {
+        return $this->readOneof(102);
+    }
+
+    public function hasGtid()
+    {
+        return $this->hasOneof(102);
+    }
+
+    /**
+     * Use GTID based replication.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.MysqlSourceConfig.Gtid gtid = 102;</code>
+     * @param \Google\Cloud\Datastream\V1\MysqlSourceConfig\Gtid $var
+     * @return $this
+     */
+    public function setGtid($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\MysqlSourceConfig\Gtid::class);
+        $this->writeOneof(102, $var);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCdcMethod()
+    {
+        return $this->whichOneof("cdc_method");
     }
 
 }

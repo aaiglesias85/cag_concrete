@@ -20,14 +20,16 @@ class TextSpan extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string content = 1;</code>
      */
-    private $content = '';
+    protected $content = '';
     /**
      * The API calculates the beginning offset of the content in the original
-     * document according to the [EncodingType][google.cloud.language.v1.EncodingType] specified in the API request.
+     * document according to the
+     * [EncodingType][google.cloud.language.v1.EncodingType] specified in the API
+     * request.
      *
      * Generated from protobuf field <code>int32 begin_offset = 2;</code>
      */
-    private $begin_offset = 0;
+    protected $begin_offset = 0;
 
     /**
      * Constructor.
@@ -39,7 +41,9 @@ class TextSpan extends \Google\Protobuf\Internal\Message
      *           The content of the output text.
      *     @type int $begin_offset
      *           The API calculates the beginning offset of the content in the original
-     *           document according to the [EncodingType][google.cloud.language.v1.EncodingType] specified in the API request.
+     *           document according to the
+     *           [EncodingType][google.cloud.language.v1.EncodingType] specified in the API
+     *           request.
      * }
      */
     public function __construct($data = NULL) {
@@ -75,7 +79,9 @@ class TextSpan extends \Google\Protobuf\Internal\Message
 
     /**
      * The API calculates the beginning offset of the content in the original
-     * document according to the [EncodingType][google.cloud.language.v1.EncodingType] specified in the API request.
+     * document according to the
+     * [EncodingType][google.cloud.language.v1.EncodingType] specified in the API
+     * request.
      *
      * Generated from protobuf field <code>int32 begin_offset = 2;</code>
      * @return int
@@ -87,7 +93,9 @@ class TextSpan extends \Google\Protobuf\Internal\Message
 
     /**
      * The API calculates the beginning offset of the content in the original
-     * document according to the [EncodingType][google.cloud.language.v1.EncodingType] specified in the API request.
+     * document according to the
+     * [EncodingType][google.cloud.language.v1.EncodingType] specified in the API
+     * request.
      *
      * Generated from protobuf field <code>int32 begin_offset = 2;</code>
      * @param int $var

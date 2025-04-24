@@ -23,14 +23,14 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool use_ip_aliases = 1;</code>
      */
-    private $use_ip_aliases = false;
+    protected $use_ip_aliases = false;
     /**
      * Whether a new subnetwork will be created automatically for the cluster.
      * This field is only applicable when `use_ip_aliases` is true.
      *
      * Generated from protobuf field <code>bool create_subnetwork = 2;</code>
      */
-    private $create_subnetwork = false;
+    protected $create_subnetwork = false;
     /**
      * A custom subnetwork name to be used if `create_subnetwork` is true.  If
      * this field is empty, then an automatic name will be chosen for the new
@@ -38,7 +38,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string subnetwork_name = 3;</code>
      */
-    private $subnetwork_name = '';
+    protected $subnetwork_name = '';
     /**
      * This field is deprecated, use cluster_ipv4_cidr_block.
      *
@@ -70,7 +70,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string cluster_secondary_range_name = 7;</code>
      */
-    private $cluster_secondary_range_name = '';
+    protected $cluster_secondary_range_name = '';
     /**
      * The name of the secondary range to be used as for the services
      * CIDR block.  The secondary range will be used for service
@@ -81,7 +81,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string services_secondary_range_name = 8;</code>
      */
-    private $services_secondary_range_name = '';
+    protected $services_secondary_range_name = '';
     /**
      * The IP address range for the cluster pod IPs. If this field is set, then
      * `cluster.cluster_ipv4_cidr` must be left blank.
@@ -97,7 +97,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string cluster_ipv4_cidr_block = 9;</code>
      */
-    private $cluster_ipv4_cidr_block = '';
+    protected $cluster_ipv4_cidr_block = '';
     /**
      * The IP address range of the instance IPs in this cluster.
      * This is applicable only if `create_subnetwork` is true.
@@ -112,7 +112,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string node_ipv4_cidr_block = 10;</code>
      */
-    private $node_ipv4_cidr_block = '';
+    protected $node_ipv4_cidr_block = '';
     /**
      * The IP address range of the services IPs in this cluster. If blank, a range
      * will be automatically chosen with the default size.
@@ -128,7 +128,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string services_ipv4_cidr_block = 11;</code>
      */
-    private $services_ipv4_cidr_block = '';
+    protected $services_ipv4_cidr_block = '';
     /**
      * The IP address range of the Cloud TPUs in this cluster. If unspecified, a
      * range will be automatically chosen with the default size.
@@ -144,7 +144,7 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string tpu_ipv4_cidr_block = 13;</code>
      */
-    private $tpu_ipv4_cidr_block = '';
+    protected $tpu_ipv4_cidr_block = '';
     /**
      * Whether routes will be used for pod IPs in the cluster.
      * This is used in conjunction with use_ip_aliases. It cannot be true if
@@ -153,7 +153,63 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool use_routes = 15;</code>
      */
-    private $use_routes = false;
+    protected $use_routes = false;
+    /**
+     * The IP stack type of the cluster
+     *
+     * Generated from protobuf field <code>.google.container.v1.StackType stack_type = 16;</code>
+     */
+    protected $stack_type = 0;
+    /**
+     * The ipv6 access type (internal or external) when create_subnetwork is true
+     *
+     * Generated from protobuf field <code>.google.container.v1.IPv6AccessType ipv6_access_type = 17;</code>
+     */
+    protected $ipv6_access_type = 0;
+    /**
+     * [PRIVATE FIELD]
+     * Pod CIDR size overprovisioning config for the cluster.
+     * Pod CIDR size per node depends on max_pods_per_node. By default, the value
+     * of max_pods_per_node is doubled and then rounded off to next power of 2 to
+     * get the size of pod CIDR block per node.
+     * Example: max_pods_per_node of 30 would result in 64 IPs (/26).
+     * This config can disable the doubling of IPs (we still round off to next
+     * power of 2)
+     * Example: max_pods_per_node of 30 will result in 32 IPs (/27) when
+     * overprovisioning is disabled.
+     *
+     * Generated from protobuf field <code>.google.container.v1.PodCIDROverprovisionConfig pod_cidr_overprovision_config = 21;</code>
+     */
+    protected $pod_cidr_overprovision_config = null;
+    /**
+     * Output only. The subnet's IPv6 CIDR block used by nodes and pods.
+     *
+     * Generated from protobuf field <code>string subnet_ipv6_cidr_block = 22 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $subnet_ipv6_cidr_block = '';
+    /**
+     * Output only. The services IPv6 CIDR block for the cluster.
+     *
+     * Generated from protobuf field <code>string services_ipv6_cidr_block = 23 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $services_ipv6_cidr_block = '';
+    /**
+     * Output only. The additional pod ranges that are added to the cluster.
+     * These pod ranges can be used by new node pools to allocate pod IPs
+     * automatically. Once the range is removed it will not show up in
+     * IPAllocationPolicy.
+     *
+     * Generated from protobuf field <code>.google.container.v1.AdditionalPodRangesConfig additional_pod_ranges_config = 24 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $additional_pod_ranges_config = null;
+    /**
+     * Output only. The utilization of the cluster default IPv4 range for the
+     * pod. The ratio is Usage/[Total number of IPs in the secondary range],
+     * Usage=numNodes*numZones*podIPsPerNode.
+     *
+     * Generated from protobuf field <code>double default_pod_ipv4_range_utilization = 25 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $default_pod_ipv4_range_utilization = 0.0;
 
     /**
      * Constructor.
@@ -245,6 +301,34 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
      *           This is used in conjunction with use_ip_aliases. It cannot be true if
      *           use_ip_aliases is true. If both use_ip_aliases and use_routes are false,
      *           then the server picks the default IP allocation mode
+     *     @type int $stack_type
+     *           The IP stack type of the cluster
+     *     @type int $ipv6_access_type
+     *           The ipv6 access type (internal or external) when create_subnetwork is true
+     *     @type \Google\Cloud\Container\V1\PodCIDROverprovisionConfig $pod_cidr_overprovision_config
+     *           [PRIVATE FIELD]
+     *           Pod CIDR size overprovisioning config for the cluster.
+     *           Pod CIDR size per node depends on max_pods_per_node. By default, the value
+     *           of max_pods_per_node is doubled and then rounded off to next power of 2 to
+     *           get the size of pod CIDR block per node.
+     *           Example: max_pods_per_node of 30 would result in 64 IPs (/26).
+     *           This config can disable the doubling of IPs (we still round off to next
+     *           power of 2)
+     *           Example: max_pods_per_node of 30 will result in 32 IPs (/27) when
+     *           overprovisioning is disabled.
+     *     @type string $subnet_ipv6_cidr_block
+     *           Output only. The subnet's IPv6 CIDR block used by nodes and pods.
+     *     @type string $services_ipv6_cidr_block
+     *           Output only. The services IPv6 CIDR block for the cluster.
+     *     @type \Google\Cloud\Container\V1\AdditionalPodRangesConfig $additional_pod_ranges_config
+     *           Output only. The additional pod ranges that are added to the cluster.
+     *           These pod ranges can be used by new node pools to allocate pod IPs
+     *           automatically. Once the range is removed it will not show up in
+     *           IPAllocationPolicy.
+     *     @type float $default_pod_ipv4_range_utilization
+     *           Output only. The utilization of the cluster default IPv4 range for the
+     *           pod. The ratio is Usage/[Total number of IPs in the secondary range],
+     *           Usage=numNodes*numZones*podIPsPerNode.
      * }
      */
     public function __construct($data = NULL) {
@@ -714,6 +798,236 @@ class IPAllocationPolicy extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->use_routes = $var;
+
+        return $this;
+    }
+
+    /**
+     * The IP stack type of the cluster
+     *
+     * Generated from protobuf field <code>.google.container.v1.StackType stack_type = 16;</code>
+     * @return int
+     */
+    public function getStackType()
+    {
+        return $this->stack_type;
+    }
+
+    /**
+     * The IP stack type of the cluster
+     *
+     * Generated from protobuf field <code>.google.container.v1.StackType stack_type = 16;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setStackType($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Container\V1\StackType::class);
+        $this->stack_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * The ipv6 access type (internal or external) when create_subnetwork is true
+     *
+     * Generated from protobuf field <code>.google.container.v1.IPv6AccessType ipv6_access_type = 17;</code>
+     * @return int
+     */
+    public function getIpv6AccessType()
+    {
+        return $this->ipv6_access_type;
+    }
+
+    /**
+     * The ipv6 access type (internal or external) when create_subnetwork is true
+     *
+     * Generated from protobuf field <code>.google.container.v1.IPv6AccessType ipv6_access_type = 17;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setIpv6AccessType($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Container\V1\IPv6AccessType::class);
+        $this->ipv6_access_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * [PRIVATE FIELD]
+     * Pod CIDR size overprovisioning config for the cluster.
+     * Pod CIDR size per node depends on max_pods_per_node. By default, the value
+     * of max_pods_per_node is doubled and then rounded off to next power of 2 to
+     * get the size of pod CIDR block per node.
+     * Example: max_pods_per_node of 30 would result in 64 IPs (/26).
+     * This config can disable the doubling of IPs (we still round off to next
+     * power of 2)
+     * Example: max_pods_per_node of 30 will result in 32 IPs (/27) when
+     * overprovisioning is disabled.
+     *
+     * Generated from protobuf field <code>.google.container.v1.PodCIDROverprovisionConfig pod_cidr_overprovision_config = 21;</code>
+     * @return \Google\Cloud\Container\V1\PodCIDROverprovisionConfig|null
+     */
+    public function getPodCidrOverprovisionConfig()
+    {
+        return $this->pod_cidr_overprovision_config;
+    }
+
+    public function hasPodCidrOverprovisionConfig()
+    {
+        return isset($this->pod_cidr_overprovision_config);
+    }
+
+    public function clearPodCidrOverprovisionConfig()
+    {
+        unset($this->pod_cidr_overprovision_config);
+    }
+
+    /**
+     * [PRIVATE FIELD]
+     * Pod CIDR size overprovisioning config for the cluster.
+     * Pod CIDR size per node depends on max_pods_per_node. By default, the value
+     * of max_pods_per_node is doubled and then rounded off to next power of 2 to
+     * get the size of pod CIDR block per node.
+     * Example: max_pods_per_node of 30 would result in 64 IPs (/26).
+     * This config can disable the doubling of IPs (we still round off to next
+     * power of 2)
+     * Example: max_pods_per_node of 30 will result in 32 IPs (/27) when
+     * overprovisioning is disabled.
+     *
+     * Generated from protobuf field <code>.google.container.v1.PodCIDROverprovisionConfig pod_cidr_overprovision_config = 21;</code>
+     * @param \Google\Cloud\Container\V1\PodCIDROverprovisionConfig $var
+     * @return $this
+     */
+    public function setPodCidrOverprovisionConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\PodCIDROverprovisionConfig::class);
+        $this->pod_cidr_overprovision_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The subnet's IPv6 CIDR block used by nodes and pods.
+     *
+     * Generated from protobuf field <code>string subnet_ipv6_cidr_block = 22 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getSubnetIpv6CidrBlock()
+    {
+        return $this->subnet_ipv6_cidr_block;
+    }
+
+    /**
+     * Output only. The subnet's IPv6 CIDR block used by nodes and pods.
+     *
+     * Generated from protobuf field <code>string subnet_ipv6_cidr_block = 22 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSubnetIpv6CidrBlock($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->subnet_ipv6_cidr_block = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The services IPv6 CIDR block for the cluster.
+     *
+     * Generated from protobuf field <code>string services_ipv6_cidr_block = 23 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getServicesIpv6CidrBlock()
+    {
+        return $this->services_ipv6_cidr_block;
+    }
+
+    /**
+     * Output only. The services IPv6 CIDR block for the cluster.
+     *
+     * Generated from protobuf field <code>string services_ipv6_cidr_block = 23 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setServicesIpv6CidrBlock($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->services_ipv6_cidr_block = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The additional pod ranges that are added to the cluster.
+     * These pod ranges can be used by new node pools to allocate pod IPs
+     * automatically. Once the range is removed it will not show up in
+     * IPAllocationPolicy.
+     *
+     * Generated from protobuf field <code>.google.container.v1.AdditionalPodRangesConfig additional_pod_ranges_config = 24 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\Container\V1\AdditionalPodRangesConfig|null
+     */
+    public function getAdditionalPodRangesConfig()
+    {
+        return $this->additional_pod_ranges_config;
+    }
+
+    public function hasAdditionalPodRangesConfig()
+    {
+        return isset($this->additional_pod_ranges_config);
+    }
+
+    public function clearAdditionalPodRangesConfig()
+    {
+        unset($this->additional_pod_ranges_config);
+    }
+
+    /**
+     * Output only. The additional pod ranges that are added to the cluster.
+     * These pod ranges can be used by new node pools to allocate pod IPs
+     * automatically. Once the range is removed it will not show up in
+     * IPAllocationPolicy.
+     *
+     * Generated from protobuf field <code>.google.container.v1.AdditionalPodRangesConfig additional_pod_ranges_config = 24 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\Container\V1\AdditionalPodRangesConfig $var
+     * @return $this
+     */
+    public function setAdditionalPodRangesConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\AdditionalPodRangesConfig::class);
+        $this->additional_pod_ranges_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The utilization of the cluster default IPv4 range for the
+     * pod. The ratio is Usage/[Total number of IPs in the secondary range],
+     * Usage=numNodes*numZones*podIPsPerNode.
+     *
+     * Generated from protobuf field <code>double default_pod_ipv4_range_utilization = 25 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return float
+     */
+    public function getDefaultPodIpv4RangeUtilization()
+    {
+        return $this->default_pod_ipv4_range_utilization;
+    }
+
+    /**
+     * Output only. The utilization of the cluster default IPv4 range for the
+     * pod. The ratio is Usage/[Total number of IPs in the secondary range],
+     * Usage=numNodes*numZones*podIPsPerNode.
+     *
+     * Generated from protobuf field <code>double default_pod_ipv4_range_utilization = 25 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setDefaultPodIpv4RangeUtilization($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->default_pod_ipv4_range_utilization = $var;
 
         return $this;
     }

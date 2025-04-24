@@ -20,7 +20,7 @@ class UpdateTriggerRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.eventarc.v1.Trigger trigger = 1;</code>
      */
-    private $trigger = null;
+    protected $trigger = null;
     /**
      * The fields to be updated; only fields explicitly provided are updated.
      * If no field mask is provided, all provided fields in the request are
@@ -28,21 +28,41 @@ class UpdateTriggerRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * If set to true, and the trigger is not found, a new trigger will be
      * created. In this situation, `update_mask` is ignored.
      *
      * Generated from protobuf field <code>bool allow_missing = 3;</code>
      */
-    private $allow_missing = false;
+    protected $allow_missing = false;
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+
+    /**
+     * @param \Google\Cloud\Eventarc\V1\Trigger $trigger      The trigger to be updated.
+     * @param \Google\Protobuf\FieldMask        $updateMask   The fields to be updated; only fields explicitly provided are updated.
+     *                                                        If no field mask is provided, all provided fields in the request are
+     *                                                        updated. To update all fields, provide a field mask of "*".
+     * @param bool                              $allowMissing If set to true, and the trigger is not found, a new trigger will be
+     *                                                        created. In this situation, `update_mask` is ignored.
+     *
+     * @return \Google\Cloud\Eventarc\V1\UpdateTriggerRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Eventarc\V1\Trigger $trigger, \Google\Protobuf\FieldMask $updateMask, bool $allowMissing): self
+    {
+        return (new self())
+            ->setTrigger($trigger)
+            ->setUpdateMask($updateMask)
+            ->setAllowMissing($allowMissing);
+    }
 
     /**
      * Constructor.
@@ -60,7 +80,7 @@ class UpdateTriggerRequest extends \Google\Protobuf\Internal\Message
      *           If set to true, and the trigger is not found, a new trigger will be
      *           created. In this situation, `update_mask` is ignored.
      *     @type bool $validate_only
-     *           Required. If set, validate the request and preview the review, but do not
+     *           Optional. If set, validate the request and preview the review, but do not
      *           post it.
      * }
      */
@@ -174,10 +194,10 @@ class UpdateTriggerRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
      */
     public function getValidateOnly()
@@ -186,10 +206,10 @@ class UpdateTriggerRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var
      * @return $this
      */

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [AnswerRecords.ListAnswerRecords][google.cloud.dialogflow.v2.AnswerRecords.ListAnswerRecords].
+ * Request message for
+ * [AnswerRecords.ListAnswerRecords][google.cloud.dialogflow.v2.AnswerRecords.ListAnswerRecords].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListAnswerRecordsRequest</code>
  */
@@ -22,17 +23,23 @@ class ListAnswerRecordsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Required. Filters to restrict results to specific answer records.
-     * Filter on answer record type. Currently predicates on `type` is supported,
-     * valid values are `ARTICLE_ANSWER`, `FAQ_ANSWER`.
+     * Optional. Filters to restrict results to specific answer records. The
+     * expression has the following syntax:
+     *     <field> <operator> <value> [AND <field> <operator> <value>] ...
+     * The following fields and operators are supported:
+     * * conversation_id with equals(=) operator
+     * Examples:
+     * * `conversation_id=bar` matches answer records in the
+     *   `projects/foo/locations/global/conversations/bar` conversation
+     *   (assuming the parent is `projects/foo/locations/global`).
      * For more information about filtering, see
      * [API Filtering](https://aip.dev/160).
      *
-     * Generated from protobuf field <code>string filter = 2 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string filter = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Optional. The maximum number of records to return in a single page.
      * The server may return fewer records than this. If unspecified, we use 10.
@@ -40,7 +47,7 @@ class ListAnswerRecordsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The
      * [ListAnswerRecordsResponse.next_page_token][google.cloud.dialogflow.v2.ListAnswerRecordsResponse.next_page_token]
@@ -49,7 +56,23 @@ class ListAnswerRecordsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The project to list all answer records for in reverse
+     *                       chronological order. Format: `projects/<Project ID>/locations/<Location
+     *                       ID>`. Please see
+     *                       {@see AnswerRecordsClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\ListAnswerRecordsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -62,9 +85,15 @@ class ListAnswerRecordsRequest extends \Google\Protobuf\Internal\Message
      *           chronological order. Format: `projects/<Project ID>/locations/<Location
      *           ID>`.
      *     @type string $filter
-     *           Required. Filters to restrict results to specific answer records.
-     *           Filter on answer record type. Currently predicates on `type` is supported,
-     *           valid values are `ARTICLE_ANSWER`, `FAQ_ANSWER`.
+     *           Optional. Filters to restrict results to specific answer records. The
+     *           expression has the following syntax:
+     *               <field> <operator> <value> [AND <field> <operator> <value>] ...
+     *           The following fields and operators are supported:
+     *           * conversation_id with equals(=) operator
+     *           Examples:
+     *           * `conversation_id=bar` matches answer records in the
+     *             `projects/foo/locations/global/conversations/bar` conversation
+     *             (assuming the parent is `projects/foo/locations/global`).
      *           For more information about filtering, see
      *           [API Filtering](https://aip.dev/160).
      *     @type int $page_size
@@ -114,13 +143,19 @@ class ListAnswerRecordsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Filters to restrict results to specific answer records.
-     * Filter on answer record type. Currently predicates on `type` is supported,
-     * valid values are `ARTICLE_ANSWER`, `FAQ_ANSWER`.
+     * Optional. Filters to restrict results to specific answer records. The
+     * expression has the following syntax:
+     *     <field> <operator> <value> [AND <field> <operator> <value>] ...
+     * The following fields and operators are supported:
+     * * conversation_id with equals(=) operator
+     * Examples:
+     * * `conversation_id=bar` matches answer records in the
+     *   `projects/foo/locations/global/conversations/bar` conversation
+     *   (assuming the parent is `projects/foo/locations/global`).
      * For more information about filtering, see
      * [API Filtering](https://aip.dev/160).
      *
-     * Generated from protobuf field <code>string filter = 2 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string filter = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getFilter()
@@ -129,13 +164,19 @@ class ListAnswerRecordsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Filters to restrict results to specific answer records.
-     * Filter on answer record type. Currently predicates on `type` is supported,
-     * valid values are `ARTICLE_ANSWER`, `FAQ_ANSWER`.
+     * Optional. Filters to restrict results to specific answer records. The
+     * expression has the following syntax:
+     *     <field> <operator> <value> [AND <field> <operator> <value>] ...
+     * The following fields and operators are supported:
+     * * conversation_id with equals(=) operator
+     * Examples:
+     * * `conversation_id=bar` matches answer records in the
+     *   `projects/foo/locations/global/conversations/bar` conversation
+     *   (assuming the parent is `projects/foo/locations/global`).
      * For more information about filtering, see
      * [API Filtering](https://aip.dev/160).
      *
-     * Generated from protobuf field <code>string filter = 2 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string filter = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */

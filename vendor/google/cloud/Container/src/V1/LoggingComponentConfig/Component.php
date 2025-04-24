@@ -31,11 +31,46 @@ class Component
      * Generated from protobuf enum <code>WORKLOADS = 2;</code>
      */
     const WORKLOADS = 2;
+    /**
+     * kube-apiserver
+     *
+     * Generated from protobuf enum <code>APISERVER = 3;</code>
+     */
+    const APISERVER = 3;
+    /**
+     * kube-scheduler
+     *
+     * Generated from protobuf enum <code>SCHEDULER = 4;</code>
+     */
+    const SCHEDULER = 4;
+    /**
+     * kube-controller-manager
+     *
+     * Generated from protobuf enum <code>CONTROLLER_MANAGER = 5;</code>
+     */
+    const CONTROLLER_MANAGER = 5;
+    /**
+     * kcp-sshd
+     *
+     * Generated from protobuf enum <code>KCP_SSHD = 7;</code>
+     */
+    const KCP_SSHD = 7;
+    /**
+     * kcp connection logs
+     *
+     * Generated from protobuf enum <code>KCP_CONNECTION = 8;</code>
+     */
+    const KCP_CONNECTION = 8;
 
     private static $valueToName = [
         self::COMPONENT_UNSPECIFIED => 'COMPONENT_UNSPECIFIED',
         self::SYSTEM_COMPONENTS => 'SYSTEM_COMPONENTS',
         self::WORKLOADS => 'WORKLOADS',
+        self::APISERVER => 'APISERVER',
+        self::SCHEDULER => 'SCHEDULER',
+        self::CONTROLLER_MANAGER => 'CONTROLLER_MANAGER',
+        self::KCP_SSHD => 'KCP_SSHD',
+        self::KCP_CONNECTION => 'KCP_CONNECTION',
     ];
 
     public static function name($value)
@@ -59,6 +94,4 @@ class Component
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Component::class, \Google\Cloud\Container\V1\LoggingComponentConfig_Component::class);
 

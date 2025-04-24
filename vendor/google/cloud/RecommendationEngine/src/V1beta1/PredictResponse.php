@@ -29,7 +29,7 @@ class PredictResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string recommendation_token = 2;</code>
      */
-    private $recommendation_token = '';
+    protected $recommendation_token = '';
     /**
      * IDs of items in the request that were missing from the catalog.
      *
@@ -41,7 +41,7 @@ class PredictResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool dry_run = 4;</code>
      */
-    private $dry_run = false;
+    protected $dry_run = false;
     /**
      * Additional domain specific prediction response metadata.
      *
@@ -54,7 +54,7 @@ class PredictResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 6;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -62,14 +62,14 @@ class PredictResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\RecommendationEngine\V1beta1\PredictResponse\PredictionResult[]|\Google\Protobuf\Internal\RepeatedField $results
+     *     @type array<\Google\Cloud\RecommendationEngine\V1beta1\PredictResponse\PredictionResult>|\Google\Protobuf\Internal\RepeatedField $results
      *           A list of recommended items. The order represents the ranking (from the
      *           most relevant item to the least).
      *     @type string $recommendation_token
      *           A unique recommendation token. This should be included in the user event
      *           logs resulting from this recommendation, which enables accurate attribution
      *           of recommendation model performance.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $items_missing_in_catalog
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $items_missing_in_catalog
      *           IDs of items in the request that were missing from the catalog.
      *     @type bool $dry_run
      *           True if the dryRun property was set in the request.
@@ -102,7 +102,7 @@ class PredictResponse extends \Google\Protobuf\Internal\Message
      * most relevant item to the least).
      *
      * Generated from protobuf field <code>repeated .google.cloud.recommendationengine.v1beta1.PredictResponse.PredictionResult results = 1;</code>
-     * @param \Google\Cloud\RecommendationEngine\V1beta1\PredictResponse\PredictionResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\RecommendationEngine\V1beta1\PredictResponse\PredictionResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResults($var)
@@ -158,7 +158,7 @@ class PredictResponse extends \Google\Protobuf\Internal\Message
      * IDs of items in the request that were missing from the catalog.
      *
      * Generated from protobuf field <code>repeated string items_missing_in_catalog = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setItemsMissingInCatalog($var)

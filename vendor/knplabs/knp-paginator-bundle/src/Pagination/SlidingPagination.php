@@ -4,35 +4,35 @@ namespace Knp\Bundle\PaginatorBundle\Pagination;
 
 use Knp\Component\Pager\Pagination\AbstractPagination;
 
+/**
+ * @template TKey
+ * @template TValue
+ *
+ * @template-extends AbstractPagination<TKey, TValue>
+ *
+ * @template-implements SlidingPaginationInterface<TKey, TValue>
+ */
 final class SlidingPagination extends AbstractPagination implements SlidingPaginationInterface
 {
-    /** @var string|null */
-    private $route;
+    private ?string $route = null;
 
-    /** @var array<string, mixed> */
-    private $params;
+    private int $pageRange = 5;
 
-    /** @var int */
-    private $pageRange = 5;
+    private ?int $pageLimit = null;
 
-    /** @var int|null */
-    private $pageLimit = null;
+    private ?string $template = null;
 
-    /** @var string|null */
-    private $template;
+    private ?string $relLinksTemplate = null;
 
-    /** @var string|null */
-    private $sortableTemplate;
+    private ?string $sortableTemplate = null;
 
-    /** @var string|null */
-    private $filtrationTemplate;
+    private ?string $filtrationTemplate = null;
 
     /**
      * @param array<string, mixed> $params
      */
-    public function __construct(array $params)
+    public function __construct(private array $params)
     {
-        $this->params = $params;
     }
 
     public function setUsedRoute(?string $route): void
@@ -65,10 +65,7 @@ final class SlidingPagination extends AbstractPagination implements SlidingPagin
         return $this->filtrationTemplate;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setParam(string $name, $value): void
+    public function setParam(string $name, mixed $value): void
     {
         $this->params[$name] = $value;
     }
@@ -86,6 +83,16 @@ final class SlidingPagination extends AbstractPagination implements SlidingPagin
     public function getTemplate(): ?string
     {
         return $this->template;
+    }
+
+    public function setRelLinksTemplate(string $relLinksTemplate): void
+    {
+        $this->relLinksTemplate = $relLinksTemplate;
+    }
+
+    public function getRelLinksTemplate(): ?string
+    {
+        return $this->relLinksTemplate;
     }
 
     public function setPageRange(int $range): void

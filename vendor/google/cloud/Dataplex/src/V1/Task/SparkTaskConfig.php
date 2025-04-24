@@ -16,16 +16,16 @@ use Google\Protobuf\Internal\GPBUtil;
 class SparkTaskConfig extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Optional. Cloud Storage URIs of files to be placed in the working directory of each
-     * executor.
+     * Optional. Cloud Storage URIs of files to be placed in the working
+     * directory of each executor.
      *
      * Generated from protobuf field <code>repeated string file_uris = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $file_uris;
     /**
-     * Optional. Cloud Storage URIs of archives to be extracted into the working directory
-     * of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and
-     * .zip.
+     * Optional. Cloud Storage URIs of archives to be extracted into the working
+     * directory of each executor. Supported file types: .jar, .tar, .tar.gz,
+     * .tgz, and .zip.
      *
      * Generated from protobuf field <code>repeated string archive_uris = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
@@ -35,7 +35,7 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.InfrastructureSpec infrastructure_spec = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $infrastructure_spec = null;
+    protected $infrastructure_spec = null;
     protected $driver;
 
     /**
@@ -59,21 +59,20 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
      *           Must be a .py file. The execution args are passed in as a sequence of
      *           named process arguments (`--key=value`).
      *     @type string $sql_script_file
-     *           A reference to a query file. This can be the Cloud Storage URI of the
-     *           query file or it can the path to a SqlScript Content. The execution
-     *           args are used to declare a set of script variables
-     *           (`set key="value";`).
+     *           A reference to a query file. This should be the Cloud Storage URI of
+     *           the query file. The execution args are used to declare a set of script
+     *           variables (`set key="value";`).
      *     @type string $sql_script
      *           The query text.
      *           The execution args are used to declare a set of script variables
      *           (`set key="value";`).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $file_uris
-     *           Optional. Cloud Storage URIs of files to be placed in the working directory of each
-     *           executor.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $archive_uris
-     *           Optional. Cloud Storage URIs of archives to be extracted into the working directory
-     *           of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and
-     *           .zip.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $file_uris
+     *           Optional. Cloud Storage URIs of files to be placed in the working
+     *           directory of each executor.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $archive_uris
+     *           Optional. Cloud Storage URIs of archives to be extracted into the working
+     *           directory of each executor. Supported file types: .jar, .tar, .tar.gz,
+     *           .tgz, and .zip.
      *     @type \Google\Cloud\Dataplex\V1\Task\InfrastructureSpec $infrastructure_spec
      *           Optional. Infrastructure specification for the execution.
      * }
@@ -193,10 +192,9 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A reference to a query file. This can be the Cloud Storage URI of the
-     * query file or it can the path to a SqlScript Content. The execution
-     * args are used to declare a set of script variables
-     * (`set key="value";`).
+     * A reference to a query file. This should be the Cloud Storage URI of
+     * the query file. The execution args are used to declare a set of script
+     * variables (`set key="value";`).
      *
      * Generated from protobuf field <code>string sql_script_file = 104;</code>
      * @return string
@@ -212,10 +210,9 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A reference to a query file. This can be the Cloud Storage URI of the
-     * query file or it can the path to a SqlScript Content. The execution
-     * args are used to declare a set of script variables
-     * (`set key="value";`).
+     * A reference to a query file. This should be the Cloud Storage URI of
+     * the query file. The execution args are used to declare a set of script
+     * variables (`set key="value";`).
      *
      * Generated from protobuf field <code>string sql_script_file = 104;</code>
      * @param string $var
@@ -265,8 +262,8 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage URIs of files to be placed in the working directory of each
-     * executor.
+     * Optional. Cloud Storage URIs of files to be placed in the working
+     * directory of each executor.
      *
      * Generated from protobuf field <code>repeated string file_uris = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -277,11 +274,11 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage URIs of files to be placed in the working directory of each
-     * executor.
+     * Optional. Cloud Storage URIs of files to be placed in the working
+     * directory of each executor.
      *
      * Generated from protobuf field <code>repeated string file_uris = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFileUris($var)
@@ -293,9 +290,9 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage URIs of archives to be extracted into the working directory
-     * of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and
-     * .zip.
+     * Optional. Cloud Storage URIs of archives to be extracted into the working
+     * directory of each executor. Supported file types: .jar, .tar, .tar.gz,
+     * .tgz, and .zip.
      *
      * Generated from protobuf field <code>repeated string archive_uris = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -306,12 +303,12 @@ class SparkTaskConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cloud Storage URIs of archives to be extracted into the working directory
-     * of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and
-     * .zip.
+     * Optional. Cloud Storage URIs of archives to be extracted into the working
+     * directory of each executor. Supported file types: .jar, .tar, .tar.gz,
+     * .tgz, and .zip.
      *
      * Generated from protobuf field <code>repeated string archive_uris = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArchiveUris($var)

@@ -17,17 +17,21 @@ use Google\Protobuf\Internal\GPBUtil;
 class Proximity extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Number of characters before the finding to consider.
+     * Number of characters before the finding to consider. For tabular data,
+     * if you want to modify the likelihood of an entire column of findngs,
+     * set this to 1. For more information, see
+     * [Hotword example: Set the match likelihood of a table column]
+     * (https://cloud.google.com/sensitive-data-protection/docs/creating-custom-infotypes-likelihood#match-column-values).
      *
      * Generated from protobuf field <code>int32 window_before = 1;</code>
      */
-    private $window_before = 0;
+    protected $window_before = 0;
     /**
      * Number of characters after the finding to consider.
      *
      * Generated from protobuf field <code>int32 window_after = 2;</code>
      */
-    private $window_after = 0;
+    protected $window_after = 0;
 
     /**
      * Constructor.
@@ -36,7 +40,11 @@ class Proximity extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $window_before
-     *           Number of characters before the finding to consider.
+     *           Number of characters before the finding to consider. For tabular data,
+     *           if you want to modify the likelihood of an entire column of findngs,
+     *           set this to 1. For more information, see
+     *           [Hotword example: Set the match likelihood of a table column]
+     *           (https://cloud.google.com/sensitive-data-protection/docs/creating-custom-infotypes-likelihood#match-column-values).
      *     @type int $window_after
      *           Number of characters after the finding to consider.
      * }
@@ -47,7 +55,11 @@ class Proximity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Number of characters before the finding to consider.
+     * Number of characters before the finding to consider. For tabular data,
+     * if you want to modify the likelihood of an entire column of findngs,
+     * set this to 1. For more information, see
+     * [Hotword example: Set the match likelihood of a table column]
+     * (https://cloud.google.com/sensitive-data-protection/docs/creating-custom-infotypes-likelihood#match-column-values).
      *
      * Generated from protobuf field <code>int32 window_before = 1;</code>
      * @return int
@@ -58,7 +70,11 @@ class Proximity extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Number of characters before the finding to consider.
+     * Number of characters before the finding to consider. For tabular data,
+     * if you want to modify the likelihood of an entire column of findngs,
+     * set this to 1. For more information, see
+     * [Hotword example: Set the match likelihood of a table column]
+     * (https://cloud.google.com/sensitive-data-protection/docs/creating-custom-infotypes-likelihood#match-column-values).
      *
      * Generated from protobuf field <code>int32 window_before = 1;</code>
      * @param int $var
@@ -100,6 +116,4 @@ class Proximity extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Proximity::class, \Google\Cloud\Dlp\V2\CustomInfoType_DetectionRule_Proximity::class);
 

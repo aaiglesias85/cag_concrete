@@ -25,7 +25,7 @@ class VersionedResource extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string version = 1;</code>
      */
-    private $version = '';
+    protected $version = '';
     /**
      * JSON representation of the resource as defined by the corresponding
      * service providing this resource.
@@ -36,11 +36,11 @@ class VersionedResource extends \Google\Protobuf\Internal\Message
      * `https://cloud.google.com/compute/docs/reference/rest/v1/instances`.
      * You can find the resource definition for each supported resource type in
      * this table:
-     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      *
      * Generated from protobuf field <code>.google.protobuf.Struct resource = 2;</code>
      */
-    private $resource = null;
+    protected $resource = null;
 
     /**
      * Constructor.
@@ -64,7 +64,7 @@ class VersionedResource extends \Google\Protobuf\Internal\Message
      *           `https://cloud.google.com/compute/docs/reference/rest/v1/instances`.
      *           You can find the resource definition for each supported resource type in
      *           this table:
-     *           `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     *           `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      * }
      */
     public function __construct($data = NULL) {
@@ -116,7 +116,7 @@ class VersionedResource extends \Google\Protobuf\Internal\Message
      * `https://cloud.google.com/compute/docs/reference/rest/v1/instances`.
      * You can find the resource definition for each supported resource type in
      * this table:
-     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      *
      * Generated from protobuf field <code>.google.protobuf.Struct resource = 2;</code>
      * @return \Google\Protobuf\Struct|null
@@ -146,7 +146,7 @@ class VersionedResource extends \Google\Protobuf\Internal\Message
      * `https://cloud.google.com/compute/docs/reference/rest/v1/instances`.
      * You can find the resource definition for each supported resource type in
      * this table:
-     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types#searchable_asset_types`
+     * `https://cloud.google.com/asset-inventory/docs/supported-asset-types`
      *
      * Generated from protobuf field <code>.google.protobuf.Struct resource = 2;</code>
      * @param \Google\Protobuf\Struct $var

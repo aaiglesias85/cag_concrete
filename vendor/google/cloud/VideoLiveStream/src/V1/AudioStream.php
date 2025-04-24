@@ -22,7 +22,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool transmux = 8;</code>
      */
-    private $transmux = false;
+    protected $transmux = false;
     /**
      * The codec for this audio stream. The default is `aac`.
      * Supported audio codecs:
@@ -30,19 +30,20 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string codec = 1;</code>
      */
-    private $codec = '';
+    protected $codec = '';
     /**
-     * Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     * Required. Audio bitrate in bits per second. Must be between 1 and
+     * 10,000,000.
      *
      * Generated from protobuf field <code>int32 bitrate_bps = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $bitrate_bps = 0;
+    protected $bitrate_bps = 0;
     /**
      * Number of audio channels. Must be between 1 and 6. The default is 2.
      *
      * Generated from protobuf field <code>int32 channel_count = 3;</code>
      */
-    private $channel_count = 0;
+    protected $channel_count = 0;
     /**
      * A list of channel names specifying layout of the audio channels.
      * This only affects the metadata embedded in the container headers, if
@@ -69,7 +70,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 sample_rate_hertz = 6;</code>
      */
-    private $sample_rate_hertz = 0;
+    protected $sample_rate_hertz = 0;
 
     /**
      * Constructor.
@@ -86,10 +87,11 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *           Supported audio codecs:
      *           - `aac`
      *     @type int $bitrate_bps
-     *           Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     *           Required. Audio bitrate in bits per second. Must be between 1 and
+     *           10,000,000.
      *     @type int $channel_count
      *           Number of audio channels. Must be between 1 and 6. The default is 2.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $channel_layout
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $channel_layout
      *           A list of channel names specifying layout of the audio channels.
      *           This only affects the metadata embedded in the container headers, if
      *           supported by the specified format. The default is `[fl, fr]`.
@@ -100,7 +102,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *           - `sr` - Side right channel
      *           - `fc` - Front center channel
      *           - `lfe` - Low frequency
-     *     @type \Google\Cloud\Video\LiveStream\V1\AudioStream\AudioMapping[]|\Google\Protobuf\Internal\RepeatedField $mapping
+     *     @type array<\Google\Cloud\Video\LiveStream\V1\AudioStream\AudioMapping>|\Google\Protobuf\Internal\RepeatedField $mapping
      *           The mapping for the input streams and audio channels.
      *     @type int $sample_rate_hertz
      *           The audio sample rate in Hertz. The default is 48000 Hertz.
@@ -172,7 +174,8 @@ class AudioStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     * Required. Audio bitrate in bits per second. Must be between 1 and
+     * 10,000,000.
      *
      * Generated from protobuf field <code>int32 bitrate_bps = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return int
@@ -183,7 +186,8 @@ class AudioStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     * Required. Audio bitrate in bits per second. Must be between 1 and
+     * 10,000,000.
      *
      * Generated from protobuf field <code>int32 bitrate_bps = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param int $var
@@ -256,7 +260,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      * - `lfe` - Low frequency
      *
      * Generated from protobuf field <code>repeated string channel_layout = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setChannelLayout($var)
@@ -282,7 +286,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      * The mapping for the input streams and audio channels.
      *
      * Generated from protobuf field <code>repeated .google.cloud.video.livestream.v1.AudioStream.AudioMapping mapping = 5;</code>
-     * @param \Google\Cloud\Video\LiveStream\V1\AudioStream\AudioMapping[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Video\LiveStream\V1\AudioStream\AudioMapping>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMapping($var)

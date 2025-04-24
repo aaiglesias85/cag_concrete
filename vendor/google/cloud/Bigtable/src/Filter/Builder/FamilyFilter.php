@@ -18,7 +18,6 @@
 namespace Google\Cloud\Bigtable\Filter\Builder;
 
 use Google\Cloud\Bigtable\Filter\SimpleFilter;
-use Google\Cloud\Bigtable\V2\RowFilter;
 
 /**
  * A builder used to configure column family filters.
@@ -68,7 +67,7 @@ class FamilyFilter
      * $familyFilter = $builder->exactMatch('cf1');
      * ```
      *
-     * @param string $value An exact value to match.
+     * @param array|string $value An exact value to match.
      * @return SimpleFilter
      * @throws \InvalidArgumentException When the provided value is not an array
      *         or string.

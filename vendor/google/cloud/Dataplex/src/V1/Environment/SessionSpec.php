@@ -9,6 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * Configuration for sessions created for this environment.
+ *
  * Generated from protobuf message <code>google.cloud.dataplex.v1.Environment.SessionSpec</code>
  */
 class SessionSpec extends \Google\Protobuf\Internal\Message
@@ -19,17 +21,17 @@ class SessionSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration max_idle_duration = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $max_idle_duration = null;
+    protected $max_idle_duration = null;
     /**
-     * Optional. If True, this causes sessions to be pre-created and available for faster
-     * startup to enable interactive exploration use-cases. This defaults to
-     * False to avoid additional billed charges.
-     * These can only be set to True for the environment with name set to
-     * "default", and with default configuration.
+     * Optional. If True, this causes sessions to be pre-created and available
+     * for faster startup to enable interactive exploration use-cases. This
+     * defaults to False to avoid additional billed charges. These can only be
+     * set to True for the environment with name set to "default", and with
+     * default configuration.
      *
      * Generated from protobuf field <code>bool enable_fast_startup = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $enable_fast_startup = false;
+    protected $enable_fast_startup = false;
 
     /**
      * Constructor.
@@ -41,11 +43,11 @@ class SessionSpec extends \Google\Protobuf\Internal\Message
      *           Optional. The idle time configuration of the session. The session will be
      *           auto-terminated at the end of this period.
      *     @type bool $enable_fast_startup
-     *           Optional. If True, this causes sessions to be pre-created and available for faster
-     *           startup to enable interactive exploration use-cases. This defaults to
-     *           False to avoid additional billed charges.
-     *           These can only be set to True for the environment with name set to
-     *           "default", and with default configuration.
+     *           Optional. If True, this causes sessions to be pre-created and available
+     *           for faster startup to enable interactive exploration use-cases. This
+     *           defaults to False to avoid additional billed charges. These can only be
+     *           set to True for the environment with name set to "default", and with
+     *           default configuration.
      * }
      */
     public function __construct($data = NULL) {
@@ -92,11 +94,11 @@ class SessionSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If True, this causes sessions to be pre-created and available for faster
-     * startup to enable interactive exploration use-cases. This defaults to
-     * False to avoid additional billed charges.
-     * These can only be set to True for the environment with name set to
-     * "default", and with default configuration.
+     * Optional. If True, this causes sessions to be pre-created and available
+     * for faster startup to enable interactive exploration use-cases. This
+     * defaults to False to avoid additional billed charges. These can only be
+     * set to True for the environment with name set to "default", and with
+     * default configuration.
      *
      * Generated from protobuf field <code>bool enable_fast_startup = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
@@ -107,11 +109,11 @@ class SessionSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If True, this causes sessions to be pre-created and available for faster
-     * startup to enable interactive exploration use-cases. This defaults to
-     * False to avoid additional billed charges.
-     * These can only be set to True for the environment with name set to
-     * "default", and with default configuration.
+     * Optional. If True, this causes sessions to be pre-created and available
+     * for faster startup to enable interactive exploration use-cases. This
+     * defaults to False to avoid additional billed charges. These can only be
+     * set to True for the environment with name set to "default", and with
+     * default configuration.
      *
      * Generated from protobuf field <code>bool enable_fast_startup = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var

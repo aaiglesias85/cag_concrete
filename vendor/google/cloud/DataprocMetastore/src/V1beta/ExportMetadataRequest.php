@@ -19,11 +19,11 @@ class ExportMetadataRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The relative resource name of the metastore service to run
      * export, in the following form:
-     * `projects/{project_id}/locations/{location_id}/services/{service_id}`
+     * `projects/{project_id}/locations/{location_id}/services/{service_id}`.
      *
      * Generated from protobuf field <code>string service = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $service = '';
+    protected $service = '';
     /**
      * Optional. A request ID. Specify a unique request ID to allow the server to
      * ignore the request if it has completed. The server will ignore subsequent
@@ -38,14 +38,14 @@ class ExportMetadataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
     /**
      * Optional. The type of the database dump. If unspecified, defaults to
      * `MYSQL`.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1beta.DatabaseDumpSpec.Type database_dump_type = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $database_dump_type = 0;
+    protected $database_dump_type = 0;
     protected $destination;
 
     /**
@@ -61,7 +61,7 @@ class ExportMetadataRequest extends \Google\Protobuf\Internal\Message
      *     @type string $service
      *           Required. The relative resource name of the metastore service to run
      *           export, in the following form:
-     *           `projects/{project_id}/locations/{location_id}/services/{service_id}`
+     *           `projects/{project_id}/locations/{location_id}/services/{service_id}`.
      *     @type string $request_id
      *           Optional. A request ID. Specify a unique request ID to allow the server to
      *           ignore the request if it has completed. The server will ignore subsequent
@@ -121,7 +121,7 @@ class ExportMetadataRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The relative resource name of the metastore service to run
      * export, in the following form:
-     * `projects/{project_id}/locations/{location_id}/services/{service_id}`
+     * `projects/{project_id}/locations/{location_id}/services/{service_id}`.
      *
      * Generated from protobuf field <code>string service = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -134,7 +134,7 @@ class ExportMetadataRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The relative resource name of the metastore service to run
      * export, in the following form:
-     * `projects/{project_id}/locations/{location_id}/services/{service_id}`
+     * `projects/{project_id}/locations/{location_id}/services/{service_id}`.
      *
      * Generated from protobuf field <code>string service = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

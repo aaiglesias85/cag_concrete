@@ -20,38 +20,38 @@ class Connector extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Name of a VPC network.
      *
      * Generated from protobuf field <code>string network = 2;</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
      * The range of internal addresses that follows RFC 4632 notation.
      * Example: `10.132.0.0/28`.
      *
      * Generated from protobuf field <code>string ip_cidr_range = 3;</code>
      */
-    private $ip_cidr_range = '';
+    protected $ip_cidr_range = '';
     /**
      * Output only. State of the VPC access connector.
      *
      * Generated from protobuf field <code>.google.cloud.vpcaccess.v1.Connector.State state = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Minimum throughput of the connector in Mbps. Default and min is 200.
      *
      * Generated from protobuf field <code>int32 min_throughput = 5;</code>
      */
-    private $min_throughput = 0;
+    protected $min_throughput = 0;
     /**
-     * Maximum throughput of the connector in Mbps. Default is 200, max is 1000.
+     * Maximum throughput of the connector in Mbps. Default is 300, max is 1000.
      *
      * Generated from protobuf field <code>int32 max_throughput = 6;</code>
      */
-    private $max_throughput = 0;
+    protected $max_throughput = 0;
     /**
      * Output only. List of projects using the connector.
      *
@@ -63,7 +63,25 @@ class Connector extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.vpcaccess.v1.Connector.Subnet subnet = 8;</code>
      */
-    private $subnet = null;
+    protected $subnet = null;
+    /**
+     * Machine type of VM Instance underlying connector. Default is e2-micro
+     *
+     * Generated from protobuf field <code>string machine_type = 10;</code>
+     */
+    protected $machine_type = '';
+    /**
+     * Minimum value of instances in autoscaling group underlying the connector.
+     *
+     * Generated from protobuf field <code>int32 min_instances = 11;</code>
+     */
+    protected $min_instances = 0;
+    /**
+     * Maximum value of instances in autoscaling group underlying the connector.
+     *
+     * Generated from protobuf field <code>int32 max_instances = 12;</code>
+     */
+    protected $max_instances = 0;
 
     /**
      * Constructor.
@@ -83,11 +101,17 @@ class Connector extends \Google\Protobuf\Internal\Message
      *     @type int $min_throughput
      *           Minimum throughput of the connector in Mbps. Default and min is 200.
      *     @type int $max_throughput
-     *           Maximum throughput of the connector in Mbps. Default is 200, max is 1000.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $connected_projects
+     *           Maximum throughput of the connector in Mbps. Default is 300, max is 1000.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $connected_projects
      *           Output only. List of projects using the connector.
      *     @type \Google\Cloud\VpcAccess\V1\Connector\Subnet $subnet
      *           The subnet in which to house the VPC Access Connector.
+     *     @type string $machine_type
+     *           Machine type of VM Instance underlying connector. Default is e2-micro
+     *     @type int $min_instances
+     *           Minimum value of instances in autoscaling group underlying the connector.
+     *     @type int $max_instances
+     *           Maximum value of instances in autoscaling group underlying the connector.
      * }
      */
     public function __construct($data = NULL) {
@@ -228,7 +252,7 @@ class Connector extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum throughput of the connector in Mbps. Default is 200, max is 1000.
+     * Maximum throughput of the connector in Mbps. Default is 300, max is 1000.
      *
      * Generated from protobuf field <code>int32 max_throughput = 6;</code>
      * @return int
@@ -239,7 +263,7 @@ class Connector extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum throughput of the connector in Mbps. Default is 200, max is 1000.
+     * Maximum throughput of the connector in Mbps. Default is 300, max is 1000.
      *
      * Generated from protobuf field <code>int32 max_throughput = 6;</code>
      * @param int $var
@@ -268,7 +292,7 @@ class Connector extends \Google\Protobuf\Internal\Message
      * Output only. List of projects using the connector.
      *
      * Generated from protobuf field <code>repeated string connected_projects = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConnectedProjects($var)
@@ -311,6 +335,84 @@ class Connector extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\VpcAccess\V1\Connector\Subnet::class);
         $this->subnet = $var;
+
+        return $this;
+    }
+
+    /**
+     * Machine type of VM Instance underlying connector. Default is e2-micro
+     *
+     * Generated from protobuf field <code>string machine_type = 10;</code>
+     * @return string
+     */
+    public function getMachineType()
+    {
+        return $this->machine_type;
+    }
+
+    /**
+     * Machine type of VM Instance underlying connector. Default is e2-micro
+     *
+     * Generated from protobuf field <code>string machine_type = 10;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setMachineType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->machine_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Minimum value of instances in autoscaling group underlying the connector.
+     *
+     * Generated from protobuf field <code>int32 min_instances = 11;</code>
+     * @return int
+     */
+    public function getMinInstances()
+    {
+        return $this->min_instances;
+    }
+
+    /**
+     * Minimum value of instances in autoscaling group underlying the connector.
+     *
+     * Generated from protobuf field <code>int32 min_instances = 11;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setMinInstances($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->min_instances = $var;
+
+        return $this;
+    }
+
+    /**
+     * Maximum value of instances in autoscaling group underlying the connector.
+     *
+     * Generated from protobuf field <code>int32 max_instances = 12;</code>
+     * @return int
+     */
+    public function getMaxInstances()
+    {
+        return $this->max_instances;
+    }
+
+    /**
+     * Maximum value of instances in autoscaling group underlying the connector.
+     *
+     * Generated from protobuf field <code>int32 max_instances = 12;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setMaxInstances($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->max_instances = $var;
 
         return $this;
     }

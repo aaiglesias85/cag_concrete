@@ -20,13 +20,29 @@ class CreateModelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The model to create.
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.Model model = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $model = null;
+    protected $model = null;
+
+    /**
+     * @param string                        $parent Required. Resource name of the parent project where the model is being created. Please see
+     *                                              {@see AutoMlClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\AutoMl\V1\Model $model  Required. The model to create.
+     *
+     * @return \Google\Cloud\AutoMl\V1\CreateModelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AutoMl\V1\Model $model): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setModel($model);
+    }
 
     /**
      * Constructor.

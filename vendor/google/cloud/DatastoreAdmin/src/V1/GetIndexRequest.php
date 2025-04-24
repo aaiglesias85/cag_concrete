@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [google.datastore.admin.v1.DatastoreAdmin.GetIndex][google.datastore.admin.v1.DatastoreAdmin.GetIndex].
+ * The request for
+ * [google.datastore.admin.v1.DatastoreAdmin.GetIndex][google.datastore.admin.v1.DatastoreAdmin.GetIndex].
  *
  * Generated from protobuf message <code>google.datastore.admin.v1.GetIndexRequest</code>
  */
@@ -20,13 +21,13 @@ class GetIndexRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string project_id = 1;</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
     /**
      * The resource ID of the index to get.
      *
      * Generated from protobuf field <code>string index_id = 3;</code>
      */
-    private $index_id = '';
+    protected $index_id = '';
 
     /**
      * Constructor.

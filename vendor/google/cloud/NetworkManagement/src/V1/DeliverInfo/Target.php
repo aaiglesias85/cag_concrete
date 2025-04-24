@@ -49,6 +49,81 @@ class Target
      * Generated from protobuf enum <code>CLOUD_SQL_INSTANCE = 5;</code>
      */
     const CLOUD_SQL_INSTANCE = 5;
+    /**
+     * Target is a published service that uses [Private Service
+     * Connect](https://cloud.google.com/vpc/docs/configure-private-service-connect-services).
+     *
+     * Generated from protobuf enum <code>PSC_PUBLISHED_SERVICE = 6;</code>
+     */
+    const PSC_PUBLISHED_SERVICE = 6;
+    /**
+     * Target is Google APIs that use [Private Service
+     * Connect](https://cloud.google.com/vpc/docs/configure-private-service-connect-apis).
+     *
+     * Generated from protobuf enum <code>PSC_GOOGLE_API = 7;</code>
+     */
+    const PSC_GOOGLE_API = 7;
+    /**
+     * Target is a VPC-SC that uses [Private Service
+     * Connect](https://cloud.google.com/vpc/docs/configure-private-service-connect-apis).
+     *
+     * Generated from protobuf enum <code>PSC_VPC_SC = 8;</code>
+     */
+    const PSC_VPC_SC = 8;
+    /**
+     * Target is a serverless network endpoint group.
+     *
+     * Generated from protobuf enum <code>SERVERLESS_NEG = 9;</code>
+     */
+    const SERVERLESS_NEG = 9;
+    /**
+     * Target is a Cloud Storage bucket.
+     *
+     * Generated from protobuf enum <code>STORAGE_BUCKET = 10;</code>
+     */
+    const STORAGE_BUCKET = 10;
+    /**
+     * Target is a private network. Used only for return traces.
+     *
+     * Generated from protobuf enum <code>PRIVATE_NETWORK = 11;</code>
+     */
+    const PRIVATE_NETWORK = 11;
+    /**
+     * Target is a Cloud Function. Used only for return traces.
+     *
+     * Generated from protobuf enum <code>CLOUD_FUNCTION = 12;</code>
+     */
+    const CLOUD_FUNCTION = 12;
+    /**
+     * Target is a App Engine service version. Used only for return traces.
+     *
+     * Generated from protobuf enum <code>APP_ENGINE_VERSION = 13;</code>
+     */
+    const APP_ENGINE_VERSION = 13;
+    /**
+     * Target is a Cloud Run revision. Used only for return traces.
+     *
+     * Generated from protobuf enum <code>CLOUD_RUN_REVISION = 14;</code>
+     */
+    const CLOUD_RUN_REVISION = 14;
+    /**
+     * Target is a Google-managed service. Used only for return traces.
+     *
+     * Generated from protobuf enum <code>GOOGLE_MANAGED_SERVICE = 15;</code>
+     */
+    const GOOGLE_MANAGED_SERVICE = 15;
+    /**
+     * Target is a Redis Instance.
+     *
+     * Generated from protobuf enum <code>REDIS_INSTANCE = 16;</code>
+     */
+    const REDIS_INSTANCE = 16;
+    /**
+     * Target is a Redis Cluster.
+     *
+     * Generated from protobuf enum <code>REDIS_CLUSTER = 17;</code>
+     */
+    const REDIS_CLUSTER = 17;
 
     private static $valueToName = [
         self::TARGET_UNSPECIFIED => 'TARGET_UNSPECIFIED',
@@ -57,6 +132,18 @@ class Target
         self::GOOGLE_API => 'GOOGLE_API',
         self::GKE_MASTER => 'GKE_MASTER',
         self::CLOUD_SQL_INSTANCE => 'CLOUD_SQL_INSTANCE',
+        self::PSC_PUBLISHED_SERVICE => 'PSC_PUBLISHED_SERVICE',
+        self::PSC_GOOGLE_API => 'PSC_GOOGLE_API',
+        self::PSC_VPC_SC => 'PSC_VPC_SC',
+        self::SERVERLESS_NEG => 'SERVERLESS_NEG',
+        self::STORAGE_BUCKET => 'STORAGE_BUCKET',
+        self::PRIVATE_NETWORK => 'PRIVATE_NETWORK',
+        self::CLOUD_FUNCTION => 'CLOUD_FUNCTION',
+        self::APP_ENGINE_VERSION => 'APP_ENGINE_VERSION',
+        self::CLOUD_RUN_REVISION => 'CLOUD_RUN_REVISION',
+        self::GOOGLE_MANAGED_SERVICE => 'GOOGLE_MANAGED_SERVICE',
+        self::REDIS_INSTANCE => 'REDIS_INSTANCE',
+        self::REDIS_CLUSTER => 'REDIS_CLUSTER',
     ];
 
     public static function name($value)
@@ -80,6 +167,4 @@ class Target
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Target::class, \Google\Cloud\NetworkManagement\V1\DeliverInfo_Target::class);
 

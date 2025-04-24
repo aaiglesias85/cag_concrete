@@ -17,14 +17,44 @@ class DeleteEventsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Required. The resource name of the Google Cloud Platform project. Written
-     * as `projects/{projectID}`, where `{projectID}` is the
-     * [Google Cloud Platform project
-     * ID](https://support.google.com/cloud/answer/6158840).
-     * Example: `projects/my-project-123`.
+     * as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     * where `{projectID}` is the [Google Cloud Platform project
+     * ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     * a Cloud region.
+     * Examples: `projects/my-project-123`,
+     * `projects/my-project-123/locations/global`.
+     * For a list of supported locations, see [Supported
+     * Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     * the default when unspecified.
      *
      * Generated from protobuf field <code>string project_name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
     private $project_name = '';
+
+    /**
+     * @param string $projectName Required. The resource name of the Google Cloud Platform project. Written
+     *                            as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     *                            where `{projectID}` is the [Google Cloud Platform project
+     *                            ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     *                            a Cloud region.
+     *
+     *                            Examples: `projects/my-project-123`,
+     *                            `projects/my-project-123/locations/global`.
+     *
+     *                            For a list of supported locations, see [Supported
+     *                            Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     *                            the default when unspecified. Please see
+     *                            {@see ErrorStatsServiceClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\ErrorReporting\V1beta1\DeleteEventsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectName): self
+    {
+        return (new self())
+            ->setProjectName($projectName);
+    }
 
     /**
      * Constructor.
@@ -34,10 +64,15 @@ class DeleteEventsRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_name
      *           Required. The resource name of the Google Cloud Platform project. Written
-     *           as `projects/{projectID}`, where `{projectID}` is the
-     *           [Google Cloud Platform project
-     *           ID](https://support.google.com/cloud/answer/6158840).
-     *           Example: `projects/my-project-123`.
+     *           as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     *           where `{projectID}` is the [Google Cloud Platform project
+     *           ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     *           a Cloud region.
+     *           Examples: `projects/my-project-123`,
+     *           `projects/my-project-123/locations/global`.
+     *           For a list of supported locations, see [Supported
+     *           Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     *           the default when unspecified.
      * }
      */
     public function __construct($data = NULL) {
@@ -47,10 +82,15 @@ class DeleteEventsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The resource name of the Google Cloud Platform project. Written
-     * as `projects/{projectID}`, where `{projectID}` is the
-     * [Google Cloud Platform project
-     * ID](https://support.google.com/cloud/answer/6158840).
-     * Example: `projects/my-project-123`.
+     * as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     * where `{projectID}` is the [Google Cloud Platform project
+     * ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     * a Cloud region.
+     * Examples: `projects/my-project-123`,
+     * `projects/my-project-123/locations/global`.
+     * For a list of supported locations, see [Supported
+     * Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     * the default when unspecified.
      *
      * Generated from protobuf field <code>string project_name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -62,10 +102,15 @@ class DeleteEventsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The resource name of the Google Cloud Platform project. Written
-     * as `projects/{projectID}`, where `{projectID}` is the
-     * [Google Cloud Platform project
-     * ID](https://support.google.com/cloud/answer/6158840).
-     * Example: `projects/my-project-123`.
+     * as `projects/{projectID}` or `projects/{projectID}/locations/{location}`,
+     * where `{projectID}` is the [Google Cloud Platform project
+     * ID](https://support.google.com/cloud/answer/6158840) and `{location}` is
+     * a Cloud region.
+     * Examples: `projects/my-project-123`,
+     * `projects/my-project-123/locations/global`.
+     * For a list of supported locations, see [Supported
+     * Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     * the default when unspecified.
      *
      * Generated from protobuf field <code>string project_name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

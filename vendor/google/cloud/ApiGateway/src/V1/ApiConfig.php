@@ -22,19 +22,19 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Created time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Updated time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Optional. Resource labels to represent user-provided metadata.
      * Refer to cloud documentation on labels for more details.
@@ -48,7 +48,7 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Immutable. The Google Cloud IAM Service Account that Gateways serving this config
      * should use to authenticate to other services. This may either be the
@@ -60,20 +60,20 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string gateway_service_account = 14 [(.google.api.field_behavior) = IMMUTABLE, (.google.api.resource_reference) = {</code>
      */
-    private $gateway_service_account = '';
+    protected $gateway_service_account = '';
     /**
      * Output only. The ID of the associated Service Config (
      * https://cloud.google.com/service-infrastructure/docs/glossary#config).
      *
      * Generated from protobuf field <code>string service_config_id = 12 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
-    private $service_config_id = '';
+    protected $service_config_id = '';
     /**
      * Output only. State of the API Config.
      *
      * Generated from protobuf field <code>.google.cloud.apigateway.v1.ApiConfig.State state = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Optional. OpenAPI specification documents. If specified, grpc_services and
      * managed_service_configs must not be included.
@@ -137,13 +137,13 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      *           https://cloud.google.com/service-infrastructure/docs/glossary#config).
      *     @type int $state
      *           Output only. State of the API Config.
-     *     @type \Google\Cloud\ApiGateway\V1\ApiConfig\OpenApiDocument[]|\Google\Protobuf\Internal\RepeatedField $openapi_documents
+     *     @type array<\Google\Cloud\ApiGateway\V1\ApiConfig\OpenApiDocument>|\Google\Protobuf\Internal\RepeatedField $openapi_documents
      *           Optional. OpenAPI specification documents. If specified, grpc_services and
      *           managed_service_configs must not be included.
-     *     @type \Google\Cloud\ApiGateway\V1\ApiConfig\GrpcServiceDefinition[]|\Google\Protobuf\Internal\RepeatedField $grpc_services
+     *     @type array<\Google\Cloud\ApiGateway\V1\ApiConfig\GrpcServiceDefinition>|\Google\Protobuf\Internal\RepeatedField $grpc_services
      *           Optional. gRPC service definition files. If specified, openapi_documents must
      *           not be included.
-     *     @type \Google\Cloud\ApiGateway\V1\ApiConfig\File[]|\Google\Protobuf\Internal\RepeatedField $managed_service_configs
+     *     @type array<\Google\Cloud\ApiGateway\V1\ApiConfig\File>|\Google\Protobuf\Internal\RepeatedField $managed_service_configs
      *           Optional. Service Configuration files. At least one must be included when using gRPC
      *           service definitions. See
      *           https://cloud.google.com/endpoints/docs/grpc/grpc-service-config#service_configuration_overview
@@ -427,7 +427,7 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      * managed_service_configs must not be included.
      *
      * Generated from protobuf field <code>repeated .google.cloud.apigateway.v1.ApiConfig.OpenApiDocument openapi_documents = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\ApiGateway\V1\ApiConfig\OpenApiDocument[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ApiGateway\V1\ApiConfig\OpenApiDocument>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOpenapiDocuments($var)
@@ -455,7 +455,7 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      * not be included.
      *
      * Generated from protobuf field <code>repeated .google.cloud.apigateway.v1.ApiConfig.GrpcServiceDefinition grpc_services = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\ApiGateway\V1\ApiConfig\GrpcServiceDefinition[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ApiGateway\V1\ApiConfig\GrpcServiceDefinition>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setGrpcServices($var)
@@ -501,7 +501,7 @@ class ApiConfig extends \Google\Protobuf\Internal\Message
      * fields.
      *
      * Generated from protobuf field <code>repeated .google.cloud.apigateway.v1.ApiConfig.File managed_service_configs = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\ApiGateway\V1\ApiConfig\File[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ApiGateway\V1\ApiConfig\File>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setManagedServiceConfigs($var)

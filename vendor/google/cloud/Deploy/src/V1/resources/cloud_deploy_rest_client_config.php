@@ -1,8 +1,52 @@
 <?php
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * GENERATED CODE WARNING
+ * This file was automatically generated - do not edit!
+ */
 
 return [
     'interfaces' => [
         'google.cloud.deploy.v1.CloudDeploy' => [
+            'AbandonRelease' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/releases/*}:abandon',
+                'body' => '*',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'AdvanceRollout' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*}:advance',
+                'body' => '*',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
             'ApproveRollout' => [
                 'method' => 'post',
                 'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*}:approve',
@@ -13,6 +57,60 @@ return [
                             'getName',
                         ],
                     ],
+                ],
+            ],
+            'CancelAutomationRun' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/automationRuns/*}:cancel',
+                'body' => '*',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'CancelRollout' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*}:cancel',
+                'body' => '*',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'CreateAutomation' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*/deliveryPipelines/*}/automations',
+                'body' => 'automation',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'automation_id',
+                ],
+            ],
+            'CreateCustomTargetType' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*}/customTargetTypes',
+                'body' => 'custom_target_type',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'custom_target_type_id',
                 ],
             ],
             'CreateDeliveryPipeline' => [
@@ -28,6 +126,21 @@ return [
                 ],
                 'queryParams' => [
                     'delivery_pipeline_id',
+                ],
+            ],
+            'CreateDeployPolicy' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*}/deployPolicies',
+                'body' => 'deploy_policy',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'deploy_policy_id',
                 ],
             ],
             'CreateRelease' => [
@@ -75,9 +188,42 @@ return [
                     'target_id',
                 ],
             ],
+            'DeleteAutomation' => [
+                'method' => 'delete',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/automations/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'DeleteCustomTargetType' => [
+                'method' => 'delete',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/customTargetTypes/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
             'DeleteDeliveryPipeline' => [
                 'method' => 'delete',
                 'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'DeleteDeployPolicy' => [
+                'method' => 'delete',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deployPolicies/*}',
                 'placeholders' => [
                     'name' => [
                         'getters' => [
@@ -97,6 +243,28 @@ return [
                     ],
                 ],
             ],
+            'GetAutomation' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/automations/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'GetAutomationRun' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/automationRuns/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
             'GetConfig' => [
                 'method' => 'get',
                 'uriTemplate' => '/v1/{name=projects/*/locations/*/config}',
@@ -108,9 +276,42 @@ return [
                     ],
                 ],
             ],
+            'GetCustomTargetType' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/customTargetTypes/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
             'GetDeliveryPipeline' => [
                 'method' => 'get',
                 'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'GetDeployPolicy' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deployPolicies/*}',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'GetJobRun' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*/jobRuns/*}',
                 'placeholders' => [
                     'name' => [
                         'getters' => [
@@ -152,9 +353,76 @@ return [
                     ],
                 ],
             ],
+            'IgnoreJob' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{rollout=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*}:ignoreJob',
+                'body' => '*',
+                'placeholders' => [
+                    'rollout' => [
+                        'getters' => [
+                            'getRollout',
+                        ],
+                    ],
+                ],
+            ],
+            'ListAutomationRuns' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*/deliveryPipelines/*}/automationRuns',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
+            'ListAutomations' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*/deliveryPipelines/*}/automations',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
+            'ListCustomTargetTypes' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*}/customTargetTypes',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
             'ListDeliveryPipelines' => [
                 'method' => 'get',
                 'uriTemplate' => '/v1/{parent=projects/*/locations/*}/deliveryPipelines',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
+            'ListDeployPolicies' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*}/deployPolicies',
+                'placeholders' => [
+                    'parent' => [
+                        'getters' => [
+                            'getParent',
+                        ],
+                    ],
+                ],
+            ],
+            'ListJobRuns' => [
+                'method' => 'get',
+                'uriTemplate' => '/v1/{parent=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*}/jobRuns',
                 'placeholders' => [
                     'parent' => [
                         'getters' => [
@@ -196,6 +464,74 @@ return [
                     ],
                 ],
             ],
+            'RetryJob' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{rollout=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*}:retryJob',
+                'body' => '*',
+                'placeholders' => [
+                    'rollout' => [
+                        'getters' => [
+                            'getRollout',
+                        ],
+                    ],
+                ],
+            ],
+            'RollbackTarget' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*}:rollbackTarget',
+                'body' => '*',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'TerminateJobRun' => [
+                'method' => 'post',
+                'uriTemplate' => '/v1/{name=projects/*/locations/*/deliveryPipelines/*/releases/*/rollouts/*/jobRuns/*}:terminate',
+                'body' => '*',
+                'placeholders' => [
+                    'name' => [
+                        'getters' => [
+                            'getName',
+                        ],
+                    ],
+                ],
+            ],
+            'UpdateAutomation' => [
+                'method' => 'patch',
+                'uriTemplate' => '/v1/{automation.name=projects/*/locations/*/deliveryPipelines/*/automations/*}',
+                'body' => 'automation',
+                'placeholders' => [
+                    'automation.name' => [
+                        'getters' => [
+                            'getAutomation',
+                            'getName',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'update_mask',
+                ],
+            ],
+            'UpdateCustomTargetType' => [
+                'method' => 'patch',
+                'uriTemplate' => '/v1/{custom_target_type.name=projects/*/locations/*/customTargetTypes/*}',
+                'body' => 'custom_target_type',
+                'placeholders' => [
+                    'custom_target_type.name' => [
+                        'getters' => [
+                            'getCustomTargetType',
+                            'getName',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'update_mask',
+                ],
+            ],
             'UpdateDeliveryPipeline' => [
                 'method' => 'patch',
                 'uriTemplate' => '/v1/{delivery_pipeline.name=projects/*/locations/*/deliveryPipelines/*}',
@@ -204,6 +540,22 @@ return [
                     'delivery_pipeline.name' => [
                         'getters' => [
                             'getDeliveryPipeline',
+                            'getName',
+                        ],
+                    ],
+                ],
+                'queryParams' => [
+                    'update_mask',
+                ],
+            ],
+            'UpdateDeployPolicy' => [
+                'method' => 'patch',
+                'uriTemplate' => '/v1/{deploy_policy.name=projects/*/locations/*/deployPolicies/*}',
+                'body' => 'deploy_policy',
+                'placeholders' => [
+                    'deploy_policy.name' => [
+                        'getters' => [
+                            'getDeployPolicy',
                             'getName',
                         ],
                     ],
@@ -262,6 +614,14 @@ return [
                         'method' => 'get',
                         'uriTemplate' => '/v1/{resource=projects/*/locations/*/targets/*}:getIamPolicy',
                     ],
+                    [
+                        'method' => 'get',
+                        'uriTemplate' => '/v1/{resource=projects/*/locations/*/customTargetTypes/*}:getIamPolicy',
+                    ],
+                    [
+                        'method' => 'get',
+                        'uriTemplate' => '/v1/{resource=projects/*/locations/*/deployPolicies/*}:getIamPolicy',
+                    ],
                 ],
                 'placeholders' => [
                     'resource' => [
@@ -279,6 +639,16 @@ return [
                     [
                         'method' => 'post',
                         'uriTemplate' => '/v1/{resource=projects/*/locations/*/targets/*}:setIamPolicy',
+                        'body' => '*',
+                    ],
+                    [
+                        'method' => 'post',
+                        'uriTemplate' => '/v1/{resource=projects/*/locations/*/customTargetTypes/*}:setIamPolicy',
+                        'body' => '*',
+                    ],
+                    [
+                        'method' => 'post',
+                        'uriTemplate' => '/v1/{resource=projects/*/locations/*/deployPolicies/*}:setIamPolicy',
                         'body' => '*',
                     ],
                 ],
@@ -358,4 +728,5 @@ return [
             ],
         ],
     ],
+    'numericEnums' => true,
 ];

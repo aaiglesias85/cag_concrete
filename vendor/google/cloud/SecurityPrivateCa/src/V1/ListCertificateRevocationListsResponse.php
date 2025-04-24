@@ -17,7 +17,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListCertificateRevocationListsResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The list of [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
+     * The list of
+     * [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
      *
      * Generated from protobuf field <code>repeated .google.cloud.security.privateca.v1.CertificateRevocationList certificate_revocation_lists = 1;</code>
      */
@@ -29,7 +30,7 @@ class ListCertificateRevocationListsResponse extends \Google\Protobuf\Internal\M
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * A list of locations (e.g. "us-west1") that could not be reached.
      *
@@ -43,13 +44,14 @@ class ListCertificateRevocationListsResponse extends \Google\Protobuf\Internal\M
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Security\PrivateCA\V1\CertificateRevocationList[]|\Google\Protobuf\Internal\RepeatedField $certificate_revocation_lists
-     *           The list of [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
+     *     @type array<\Google\Cloud\Security\PrivateCA\V1\CertificateRevocationList>|\Google\Protobuf\Internal\RepeatedField $certificate_revocation_lists
+     *           The list of
+     *           [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
      *     @type string $next_page_token
      *           A token to retrieve next page of results. Pass this value in
      *           [ListCertificateRevocationListsRequest.next_page_token][] to retrieve the
      *           next page of results.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $unreachable
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unreachable
      *           A list of locations (e.g. "us-west1") that could not be reached.
      * }
      */
@@ -59,7 +61,8 @@ class ListCertificateRevocationListsResponse extends \Google\Protobuf\Internal\M
     }
 
     /**
-     * The list of [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
+     * The list of
+     * [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
      *
      * Generated from protobuf field <code>repeated .google.cloud.security.privateca.v1.CertificateRevocationList certificate_revocation_lists = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -70,10 +73,11 @@ class ListCertificateRevocationListsResponse extends \Google\Protobuf\Internal\M
     }
 
     /**
-     * The list of [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
+     * The list of
+     * [CertificateRevocationLists][google.cloud.security.privateca.v1.CertificateRevocationList].
      *
      * Generated from protobuf field <code>repeated .google.cloud.security.privateca.v1.CertificateRevocationList certificate_revocation_lists = 1;</code>
-     * @param \Google\Cloud\Security\PrivateCA\V1\CertificateRevocationList[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Security\PrivateCA\V1\CertificateRevocationList>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCertificateRevocationLists($var)
@@ -129,7 +133,7 @@ class ListCertificateRevocationListsResponse extends \Google\Protobuf\Internal\M
      * A list of locations (e.g. "us-west1") that could not be reached.
      *
      * Generated from protobuf field <code>repeated string unreachable = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUnreachable($var)

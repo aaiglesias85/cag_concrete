@@ -17,33 +17,36 @@ class Visualization extends \Google\Protobuf\Internal\Message
 {
     /**
      * Type of the image visualization. Only applicable to
-     * [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
+     * [Integrated Gradients
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
      * OUTLINES shows regions of attribution, while PIXELS shows per-pixel
      * attribution. Defaults to OUTLINES.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata.Visualization.Type type = 1;</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
      * Whether to only highlight pixels with positive contributions, negative
      * or both. Defaults to POSITIVE.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata.Visualization.Polarity polarity = 2;</code>
      */
-    private $polarity = 0;
+    protected $polarity = 0;
     /**
      * The color scheme used for the highlighted areas.
      * Defaults to PINK_GREEN for
-     * [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
+     * [Integrated Gradients
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
      * which shows positive attributions in green and negative in pink.
      * Defaults to VIRIDIS for
-     * [XRAI attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution], which
-     * highlights the most influential regions in yellow and the least
+     * [XRAI
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution],
+     * which highlights the most influential regions in yellow and the least
      * influential in blue.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata.Visualization.ColorMap color_map = 3;</code>
      */
-    private $color_map = 0;
+    protected $color_map = 0;
     /**
      * Excludes attributions above the specified percentile from the
      * highlighted areas. Using the clip_percent_upperbound and
@@ -53,14 +56,14 @@ class Visualization extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float clip_percent_upperbound = 4;</code>
      */
-    private $clip_percent_upperbound = 0.0;
+    protected $clip_percent_upperbound = 0.0;
     /**
      * Excludes attributions below the specified percentile, from the
      * highlighted areas. Defaults to 62.
      *
      * Generated from protobuf field <code>float clip_percent_lowerbound = 5;</code>
      */
-    private $clip_percent_lowerbound = 0.0;
+    protected $clip_percent_lowerbound = 0.0;
     /**
      * How the original image is displayed in the visualization.
      * Adjusting the overlay can help increase visual clarity if the original
@@ -68,7 +71,7 @@ class Visualization extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata.Visualization.OverlayType overlay_type = 6;</code>
      */
-    private $overlay_type = 0;
+    protected $overlay_type = 0;
 
     /**
      * Constructor.
@@ -78,7 +81,8 @@ class Visualization extends \Google\Protobuf\Internal\Message
      *
      *     @type int $type
      *           Type of the image visualization. Only applicable to
-     *           [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
+     *           [Integrated Gradients
+     *           attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
      *           OUTLINES shows regions of attribution, while PIXELS shows per-pixel
      *           attribution. Defaults to OUTLINES.
      *     @type int $polarity
@@ -87,11 +91,13 @@ class Visualization extends \Google\Protobuf\Internal\Message
      *     @type int $color_map
      *           The color scheme used for the highlighted areas.
      *           Defaults to PINK_GREEN for
-     *           [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
+     *           [Integrated Gradients
+     *           attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
      *           which shows positive attributions in green and negative in pink.
      *           Defaults to VIRIDIS for
-     *           [XRAI attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution], which
-     *           highlights the most influential regions in yellow and the least
+     *           [XRAI
+     *           attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution],
+     *           which highlights the most influential regions in yellow and the least
      *           influential in blue.
      *     @type float $clip_percent_upperbound
      *           Excludes attributions above the specified percentile from the
@@ -115,7 +121,8 @@ class Visualization extends \Google\Protobuf\Internal\Message
 
     /**
      * Type of the image visualization. Only applicable to
-     * [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
+     * [Integrated Gradients
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
      * OUTLINES shows regions of attribution, while PIXELS shows per-pixel
      * attribution. Defaults to OUTLINES.
      *
@@ -129,7 +136,8 @@ class Visualization extends \Google\Protobuf\Internal\Message
 
     /**
      * Type of the image visualization. Only applicable to
-     * [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
+     * [Integrated Gradients
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution].
      * OUTLINES shows regions of attribution, while PIXELS shows per-pixel
      * attribution. Defaults to OUTLINES.
      *
@@ -176,11 +184,13 @@ class Visualization extends \Google\Protobuf\Internal\Message
     /**
      * The color scheme used for the highlighted areas.
      * Defaults to PINK_GREEN for
-     * [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
+     * [Integrated Gradients
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
      * which shows positive attributions in green and negative in pink.
      * Defaults to VIRIDIS for
-     * [XRAI attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution], which
-     * highlights the most influential regions in yellow and the least
+     * [XRAI
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution],
+     * which highlights the most influential regions in yellow and the least
      * influential in blue.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata.Visualization.ColorMap color_map = 3;</code>
@@ -194,11 +204,13 @@ class Visualization extends \Google\Protobuf\Internal\Message
     /**
      * The color scheme used for the highlighted areas.
      * Defaults to PINK_GREEN for
-     * [Integrated Gradients attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
+     * [Integrated Gradients
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.integrated_gradients_attribution],
      * which shows positive attributions in green and negative in pink.
      * Defaults to VIRIDIS for
-     * [XRAI attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution], which
-     * highlights the most influential regions in yellow and the least
+     * [XRAI
+     * attribution][google.cloud.aiplatform.v1.ExplanationParameters.xrai_attribution],
+     * which highlights the most influential regions in yellow and the least
      * influential in blue.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata.Visualization.ColorMap color_map = 3;</code>

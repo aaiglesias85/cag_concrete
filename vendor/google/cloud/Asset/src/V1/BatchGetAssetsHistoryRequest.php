@@ -22,7 +22,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * A list of the full names of the assets.
      * See: https://cloud.google.com/asset-inventory/docs/resource-name-format
@@ -39,7 +39,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.ContentType content_type = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $content_type = 0;
+    protected $content_type = 0;
     /**
      * Optional. The time window for the asset history. Both start_time and
      * end_time are optional and if set, it must be after the current time minus
@@ -50,7 +50,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.TimeWindow read_time_window = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $read_time_window = null;
+    protected $read_time_window = null;
     /**
      * Optional. A list of relationship types to output, for example:
      * `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
@@ -83,7 +83,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      *           Required. The relative name of the root asset. It can only be an
      *           organization number (such as "organizations/123"), a project ID (such as
      *           "projects/my-project-id")", or a project number (such as "projects/12345").
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $asset_names
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $asset_names
      *           A list of the full names of the assets.
      *           See: https://cloud.google.com/asset-inventory/docs/resource-name-format
      *           Example:
@@ -99,7 +99,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      *           If start_time is not set, the snapshot of the assets at end_time will be
      *           returned. The returned results contain all temporal assets whose time
      *           window overlap with read_time_window.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $relationship_types
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $relationship_types
      *           Optional. A list of relationship types to output, for example:
      *           `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
      *           content_type=RELATIONSHIP.
@@ -178,7 +178,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      * size of the asset name list is 100 in one request.
      *
      * Generated from protobuf field <code>repeated string asset_names = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAssetNames($var)
@@ -306,7 +306,7 @@ class BatchGetAssetsHistoryRequest extends \Google\Protobuf\Internal\Message
      * supported asset types and relationship types.
      *
      * Generated from protobuf field <code>repeated string relationship_types = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRelationshipTypes($var)

@@ -9,10 +9,10 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Configuration for RCTokens generated for CSM workloads protected by IAP.
- * RCTokens are IAP generated JWTs that can be verified at the application. The
- * RCToken is primarily used for ISTIO deployments, and can be scoped to a
- * single mesh by configuring the audience field accordingly
+ * Configuration for RCToken generated for service mesh workloads protected by
+ * IAP. RCToken are IAP generated JWTs that can be verified at the application.
+ * The RCToken is primarily used for service mesh deployments, and can be scoped
+ * to a single mesh by configuring the audience field accordingly.
  *
  * Generated from protobuf message <code>google.cloud.iap.v1.CsmSettings</code>
  */
@@ -24,7 +24,7 @@ class CsmSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.StringValue rctoken_aud = 1;</code>
      */
-    private $rctoken_aud = null;
+    protected $rctoken_aud = null;
 
     /**
      * Constructor.
@@ -73,7 +73,7 @@ class CsmSettings extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.StringValue rctoken_aud = 1;</code>
      * @return string|null
      */
-    public function getRctokenAudValue()
+    public function getRctokenAudUnwrapped()
     {
         return $this->readWrapperValue("rctoken_aud");
     }
@@ -104,7 +104,7 @@ class CsmSettings extends \Google\Protobuf\Internal\Message
      * @param string|null $var
      * @return $this
      */
-    public function setRctokenAudValue($var)
+    public function setRctokenAudUnwrapped($var)
     {
         $this->writeWrapperValue("rctoken_aud", $var);
         return $this;}

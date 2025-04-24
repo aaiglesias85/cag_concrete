@@ -17,43 +17,43 @@ use Google\Protobuf\Internal\GPBUtil;
 class Distribution extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
+     * The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
      * denoting the package manager version distributing a package.
      *
-     * Generated from protobuf field <code>string cpe_uri = 1;</code>
+     * Generated from protobuf field <code>string cpe_uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $cpe_uri = '';
+    protected $cpe_uri = '';
     /**
      * The CPU architecture for which packages in this distribution channel were
      * built.
      *
      * Generated from protobuf field <code>.grafeas.v1.Architecture architecture = 2;</code>
      */
-    private $architecture = 0;
+    protected $architecture = 0;
     /**
      * The latest available version of this package in this distribution channel.
      *
      * Generated from protobuf field <code>.grafeas.v1.Version latest_version = 3;</code>
      */
-    private $latest_version = null;
+    protected $latest_version = null;
     /**
      * A freeform string denoting the maintainer of this package.
      *
      * Generated from protobuf field <code>string maintainer = 4;</code>
      */
-    private $maintainer = '';
+    protected $maintainer = '';
     /**
      * The distribution channel-specific homepage for this package.
      *
      * Generated from protobuf field <code>string url = 5;</code>
      */
-    private $url = '';
+    protected $url = '';
     /**
      * The distribution channel-specific description of this package.
      *
      * Generated from protobuf field <code>string description = 6;</code>
      */
-    private $description = '';
+    protected $description = '';
 
     /**
      * Constructor.
@@ -62,7 +62,7 @@ class Distribution extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $cpe_uri
-     *           Required. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
+     *           The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
      *           denoting the package manager version distributing a package.
      *     @type int $architecture
      *           The CPU architecture for which packages in this distribution channel were
@@ -83,10 +83,10 @@ class Distribution extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
+     * The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
      * denoting the package manager version distributing a package.
      *
-     * Generated from protobuf field <code>string cpe_uri = 1;</code>
+     * Generated from protobuf field <code>string cpe_uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
      */
     public function getCpeUri()
@@ -95,10 +95,10 @@ class Distribution extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
+     * The cpe_uri in [CPE format](https://cpe.mitre.org/specification/)
      * denoting the package manager version distributing a package.
      *
-     * Generated from protobuf field <code>string cpe_uri = 1;</code>
+     * Generated from protobuf field <code>string cpe_uri = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
      * @return $this
      */

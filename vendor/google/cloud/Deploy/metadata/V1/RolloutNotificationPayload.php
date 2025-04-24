@@ -17,16 +17,18 @@ class RolloutNotificationPayload
         \GPBMetadata\Google\Cloud\Deploy\V1\LogEnums::initOnce();
         $pool->internalAddGeneratedFile(
             '
-ƒ
-9google/cloud/deploy/v1/rollout_notification_payload.protogoogle.cloud.deploy.v1"¦
+Ÿ
+9google/cloud/deploy/v1/rollout_notification_payload.protogoogle.cloud.deploy.v1"Ì
 RolloutNotificationEvent
 message (	
 pipeline_uid (	
 release_uid (	
-rollout (	*
-type (2.google.cloud.deploy.v1.Type
-	target_id (	B}
-com.google.cloud.deploy.v1BRolloutNotificationPayloadProtoPZ<google.golang.org/genproto/googleapis/cloud/deploy/v1;deploybproto3'
+release (	
+rollout_uid (	
+rollout (	
+	target_id (	*
+type (2.google.cloud.deploy.v1.TypeBs
+com.google.cloud.deploy.v1BRolloutNotificationPayloadProtoPZ2cloud.google.com/go/deploy/apiv1/deploypb;deploypbbproto3'
         , true);
 
         static::$is_initialized = true;

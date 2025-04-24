@@ -75,7 +75,7 @@ class FirestoreClient
     use SnapshotTrait;
     use ValidateTrait;
 
-    const VERSION = '1.23.0';
+    const VERSION = '1.49.0';
 
     const DEFAULT_DATABASE = '(default)';
 
@@ -85,6 +85,7 @@ class FirestoreClient
 
     /**
      * @var Connection\ConnectionInterface
+     * @internal
      */
     private $connection;
 
@@ -109,6 +110,8 @@ class FirestoreClient
      *           place of the service's default endpoint.
      *     @type string $projectId The project ID from the Google Developer's
      *           Console.
+     *     @type string $database The database name to use, if different from
+                 the default.
      *     @type CacheItemPoolInterface $authCache A cache for storing access
      *           tokens. **Defaults to** a simple in memory implementation.
      *     @type array $authCacheOptions Cache configuration options.
@@ -128,7 +131,7 @@ class FirestoreClient
      *     @type string $quotaProject Specifies a user project to bill for
      *           access charges associated with the request.
      *     @type bool $returnInt64AsObject If true, 64 bit integers will be
-     *           returned as a {@see Google\Cloud\Core\Int64} object for 32 bit
+     *           returned as a {@see \Google\Cloud\Core\Int64} object for 32 bit
      *           platform compatibility. **Defaults to** false.
      * }
      * @throws \InvalidArgumentException
@@ -144,13 +147,13 @@ class FirestoreClient
             'scopes' => [self::FULL_CONTROL_SCOPE],
             'database' => self::DEFAULT_DATABASE,
             'hasEmulator' => (bool) $emulatorHost,
-            'emulatorHost' => $emulatorHost
+            'emulatorHost' => $emulatorHost,
         ];
 
         $this->database = $config['database'];
 
         $this->connection = new Grpc($this->configureAuthentication($config) + [
-            'projectId' => $this->projectId
+            'projectId' => $this->projectId,
         ]);
 
         $this->valueMapper = new ValueMapper(
@@ -162,7 +165,7 @@ class FirestoreClient
     /**
      * Get a Batch Writer
      *
-     * The {@see Google\Cloud\Firestore\WriteBatch} allows more performant
+     * The {@see \Google\Cloud\Firestore\WriteBatch} allows more performant
      * multi-document, atomic updates.
      *
      * Example:
@@ -171,16 +174,73 @@ class FirestoreClient
      * ```
      *
      * @return WriteBatch
+     * @deprecated Please use {@see \Google\Cloud\Firestore\BulkWriter} instead.
      */
     public function batch()
     {
-        return new WriteBatch(
+        if (!class_exists(WriteBatch::class, false)) {
+            class_alias(BulkWriter::class, WriteBatch::class);
+        }
+        return new BulkWriter(
             $this->connection,
             $this->valueMapper,
             $this->databaseName(
                 $this->projectId,
                 $this->database
             )
+        );
+    }
+
+    /**
+     * Get a Bulk Writer
+     *
+     * {@see \Google\Cloud\Firestore\BulkWriter} allows scheduling multiple
+     * writes with auto-retries in batches. Please note:
+     *     - This method is blocking and may execute many sequential batch write requests.
+     *     - Gradually ramps up writes as specified by the 500/50/5 rule.
+     *     - Does not guarantee the order of writes.
+     *     - Accepts unique document references only.
+     * Read more: [Ramping up traffic](https://cloud.google.com/firestore/docs/best-practices#ramping_up_traffic)
+     *
+     * Example:
+     * ```
+     * $batch = $firestore->bulkWriter();
+     * ```
+     *
+     * @param array $options [optional] {
+     *     Configuration options.
+     *
+     *     Please note that the default values are experiementally derived after
+     *     performance evaluations. The underlying constants may change in backwards-
+     *     incompatible ways. Please use with caution, and test thoroughly when
+     *     upgrading.
+     *
+     *     @type int $maxBatchSize Maximum number of requests per batch.
+     *           **Defaults to** `20`.
+     *     @type bool $greedilySend Flag to indicate whether BulkWriter greedily
+     *           sends batches. **Defaults to** `true`.
+     *     @type bool $isThrottlingEnabled Flag to indicate whether rate of
+     *           sending writes can be throttled. **Defaults to** `true`.
+     *     @type int $initialOpsPerSecond Initial number of operations per second.
+     *           **Defaults to** `20`.
+     *     @type int $maxOpsPerSecond Maximum number of operations per second.
+     *           **Defaults to** `500`.
+     *     @type callable $isRetryable Default retry handler for individial writes
+     *           status code to be retried. Should accept error code and return
+     *           true if retryable.
+     * }
+     * @return BulkWriter
+     */
+    public function bulkWriter(array $options = [])
+    {
+        return new BulkWriter(
+            $this->connection,
+            $this->valueMapper,
+            $this->databaseName(
+                $this->projectId,
+                $this->database
+            ),
+            $options
         );
     }
 
@@ -233,9 +293,13 @@ class FirestoreClient
      *           resume the loading of results from a specific point.
      * }
      * @return ItemIterator<CollectionReference>
+     * @throws \InvalidArgumentException if an invalid `$options.readTime` is
+     *     specified.
      */
     public function collections(array $options = [])
     {
+        $options = $this->formatReadTimeOption($options);
+
         $resultLimit = $this->pluck('resultLimit', $options, false);
         return new ItemIterator(
             new PageIterator(
@@ -248,7 +312,7 @@ class FirestoreClient
                 ] + $options,
                 [
                     'itemsKey' => 'collectionIds',
-                    'resultLimit' => $resultLimit
+                    'resultLimit' => $resultLimit,
                 ]
             )
         );
@@ -284,7 +348,7 @@ class FirestoreClient
      * requested, except in case of error.
      *
      * Note that this method will **always** return instances of
-     * {@see Google\Cloud\Firestore\DocumentSnapshot}, even if the documents
+     * {@see \Google\Cloud\Firestore\DocumentSnapshot}, even if the documents
      * requested do not exist. It is highly recommended that you check for
      * existence before accessing document data.
      *
@@ -341,14 +405,14 @@ class FirestoreClient
      * $query = $firestore->collectionGroup('users');
      * $querySnapshot = $query->documents();
      *
-     * echo sprintf('Found %d documents!', $querySnapshot->size());
+     * echo $querySnapshot->size() . ' documents found!';
      * ```
      *
      * @param string $id Identifies the collection to query over. Every
      *        collection or subcollection with this ID as the last segment of
      *        its path will be included. May not contain a slash.
      * @return Query
-     * @throws InvalidArgumentException If the collection ID is not well-formed.
+     * @throws \InvalidArgumentException If the collection ID is not well-formed.
      */
     public function collectionGroup($id)
     {
@@ -366,9 +430,9 @@ class FirestoreClient
                 'from' => [
                     [
                         'collectionId' => $id,
-                        'allDescendants' => true
-                    ]
-                ]
+                        'allDescendants' => true,
+                    ],
+                ],
             ]
         );
     }
@@ -445,17 +509,17 @@ class FirestoreClient
             'maxRetries' => self::MAX_RETRIES,
             'begin' => [],
             'commit' => [],
-            'rollback' => []
+            'rollback' => [],
         ];
 
         $retryableErrors = [
-            AbortedException::class
+            AbortedException::class,
         ];
 
         $delayFn = function () {
             return [
                 'seconds' => 0,
-                'nanos' => 0
+                'nanos' => 0,
             ];
         };
 
@@ -480,7 +544,7 @@ class FirestoreClient
 
             $beginTransaction = $this->connection->beginTransaction(array_filter([
                 'database' => $database,
-                'retryTransaction' => $transactionId
+                'retryTransaction' => $transactionId,
             ]) + $options['begin']);
 
             $transactionId = $beginTransaction['transaction'];
@@ -497,7 +561,7 @@ class FirestoreClient
 
                 if (!$transaction->writer()->isEmpty()) {
                     $transaction->writer()->commit([
-                        'transaction' => $transactionId
+                        'transaction' => $transactionId,
                     ] + $options['commit']);
                 } else {
                     // trigger rollback if no writes exist.
@@ -512,7 +576,7 @@ class FirestoreClient
             }
         }, [
             $callable,
-            $options
+            $options,
         ]);
     }
 

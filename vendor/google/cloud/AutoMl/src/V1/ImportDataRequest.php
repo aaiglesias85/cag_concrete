@@ -21,14 +21,32 @@ class ImportDataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The desired input location and its domain specific semantics,
      * if any.
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.InputConfig input_config = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $input_config = null;
+    protected $input_config = null;
+
+    /**
+     * @param string                              $name        Required. Dataset name. Dataset must already exist. All imported
+     *                                                         annotations and examples will be added. Please see
+     *                                                         {@see AutoMlClient::datasetName()} for help formatting this field.
+     * @param \Google\Cloud\AutoMl\V1\InputConfig $inputConfig Required. The desired input location and its domain specific semantics,
+     *                                                         if any.
+     *
+     * @return \Google\Cloud\AutoMl\V1\ImportDataRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\AutoMl\V1\InputConfig $inputConfig): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setInputConfig($inputConfig);
+    }
 
     /**
      * Constructor.

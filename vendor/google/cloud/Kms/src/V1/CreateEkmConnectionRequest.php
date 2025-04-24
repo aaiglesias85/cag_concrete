@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [KeyManagementService.CreateEkmConnection][].
+ * Request message for
+ * [EkmService.CreateEkmConnection][google.cloud.kms.v1.EkmService.CreateEkmConnection].
  *
  * Generated from protobuf message <code>google.cloud.kms.v1.CreateEkmConnectionRequest</code>
  */
@@ -22,21 +23,43 @@ class CreateEkmConnectionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. It must be unique within a location and match the regular
      * expression `[a-zA-Z0-9_-]{1,63}`.
      *
      * Generated from protobuf field <code>string ekm_connection_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $ekm_connection_id = '';
+    protected $ekm_connection_id = '';
     /**
      * Required. An [EkmConnection][google.cloud.kms.v1.EkmConnection] with
      * initial field values.
      *
      * Generated from protobuf field <code>.google.cloud.kms.v1.EkmConnection ekm_connection = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $ekm_connection = null;
+    protected $ekm_connection = null;
+
+    /**
+     * @param string                             $parent          Required. The resource name of the location associated with the
+     *                                                            [EkmConnection][google.cloud.kms.v1.EkmConnection], in the format
+     *                                                            `projects/&#42;/locations/*`. Please see
+     *                                                            {@see EkmServiceClient::locationName()} for help formatting this field.
+     * @param string                             $ekmConnectionId Required. It must be unique within a location and match the regular
+     *                                                            expression `[a-zA-Z0-9_-]{1,63}`.
+     * @param \Google\Cloud\Kms\V1\EkmConnection $ekmConnection   Required. An [EkmConnection][google.cloud.kms.v1.EkmConnection] with
+     *                                                            initial field values.
+     *
+     * @return \Google\Cloud\Kms\V1\CreateEkmConnectionRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $ekmConnectionId, \Google\Cloud\Kms\V1\EkmConnection $ekmConnection): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setEkmConnectionId($ekmConnectionId)
+            ->setEkmConnection($ekmConnection);
+    }
 
     /**
      * Constructor.

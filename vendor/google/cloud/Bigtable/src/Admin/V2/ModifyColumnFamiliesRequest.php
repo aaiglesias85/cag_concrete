@@ -23,16 +23,43 @@ class ModifyColumnFamiliesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Required. Modifications to be atomically applied to the specified table's families.
-     * Entries are applied in order, meaning that earlier modifications can be
-     * masked by later ones (in the case of repeated updates to the same family,
-     * for example).
+     * Required. Modifications to be atomically applied to the specified table's
+     * families. Entries are applied in order, meaning that earlier modifications
+     * can be masked by later ones (in the case of repeated updates to the same
+     * family, for example).
      *
      * Generated from protobuf field <code>repeated .google.bigtable.admin.v2.ModifyColumnFamiliesRequest.Modification modifications = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $modifications;
+    /**
+     * Optional. If true, ignore safety checks when modifying the column families.
+     *
+     * Generated from protobuf field <code>bool ignore_warnings = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $ignore_warnings = false;
+
+    /**
+     * @param string                                                                     $name          Required. The unique name of the table whose families should be modified.
+     *                                                                                                  Values are of the form
+     *                                                                                                  `projects/{project}/instances/{instance}/tables/{table}`. Please see
+     *                                                                                                  {@see BigtableTableAdminClient::tableName()} for help formatting this field.
+     * @param \Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest\Modification[] $modifications Required. Modifications to be atomically applied to the specified table's
+     *                                                                                                  families. Entries are applied in order, meaning that earlier modifications
+     *                                                                                                  can be masked by later ones (in the case of repeated updates to the same
+     *                                                                                                  family, for example).
+     *
+     * @return \Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, array $modifications): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setModifications($modifications);
+    }
 
     /**
      * Constructor.
@@ -44,11 +71,13 @@ class ModifyColumnFamiliesRequest extends \Google\Protobuf\Internal\Message
      *           Required. The unique name of the table whose families should be modified.
      *           Values are of the form
      *           `projects/{project}/instances/{instance}/tables/{table}`.
-     *     @type \Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest\Modification[]|\Google\Protobuf\Internal\RepeatedField $modifications
-     *           Required. Modifications to be atomically applied to the specified table's families.
-     *           Entries are applied in order, meaning that earlier modifications can be
-     *           masked by later ones (in the case of repeated updates to the same family,
-     *           for example).
+     *     @type array<\Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest\Modification>|\Google\Protobuf\Internal\RepeatedField $modifications
+     *           Required. Modifications to be atomically applied to the specified table's
+     *           families. Entries are applied in order, meaning that earlier modifications
+     *           can be masked by later ones (in the case of repeated updates to the same
+     *           family, for example).
+     *     @type bool $ignore_warnings
+     *           Optional. If true, ignore safety checks when modifying the column families.
      * }
      */
     public function __construct($data = NULL) {
@@ -87,10 +116,10 @@ class ModifyColumnFamiliesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Modifications to be atomically applied to the specified table's families.
-     * Entries are applied in order, meaning that earlier modifications can be
-     * masked by later ones (in the case of repeated updates to the same family,
-     * for example).
+     * Required. Modifications to be atomically applied to the specified table's
+     * families. Entries are applied in order, meaning that earlier modifications
+     * can be masked by later ones (in the case of repeated updates to the same
+     * family, for example).
      *
      * Generated from protobuf field <code>repeated .google.bigtable.admin.v2.ModifyColumnFamiliesRequest.Modification modifications = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -101,19 +130,45 @@ class ModifyColumnFamiliesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Modifications to be atomically applied to the specified table's families.
-     * Entries are applied in order, meaning that earlier modifications can be
-     * masked by later ones (in the case of repeated updates to the same family,
-     * for example).
+     * Required. Modifications to be atomically applied to the specified table's
+     * families. Entries are applied in order, meaning that earlier modifications
+     * can be masked by later ones (in the case of repeated updates to the same
+     * family, for example).
      *
      * Generated from protobuf field <code>repeated .google.bigtable.admin.v2.ModifyColumnFamiliesRequest.Modification modifications = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest\Modification[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest\Modification>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setModifications($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Bigtable\Admin\V2\ModifyColumnFamiliesRequest\Modification::class);
         $this->modifications = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Optional. If true, ignore safety checks when modifying the column families.
+     *
+     * Generated from protobuf field <code>bool ignore_warnings = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getIgnoreWarnings()
+    {
+        return $this->ignore_warnings;
+    }
+
+    /**
+     * Optional. If true, ignore safety checks when modifying the column families.
+     *
+     * Generated from protobuf field <code>bool ignore_warnings = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setIgnoreWarnings($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->ignore_warnings = $var;
 
         return $this;
     }

@@ -20,20 +20,20 @@ class ValidationError extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.ValidationError.Severity severity = 1;</code>
      */
-    private $severity = 0;
+    protected $severity = 0;
     /**
      * The names of the entries that the error is associated with.
      * Format:
-     * - "projects/<Project ID>/agent", if the error is associated with the entire
+     * - `projects/<Project ID>/agent`, if the error is associated with the entire
      * agent.
-     * - "projects/<Project ID>/agent/intents/<Intent ID>", if the error is
+     * - `projects/<Project ID>/agent/intents/<Intent ID>`, if the error is
      * associated with certain intents.
-     * - "projects/<Project
-     * ID>/agent/intents/<Intent Id>/trainingPhrases/<Training Phrase ID>", if the
-     * error is associated with certain intent training phrases.
-     * - "projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
-     * ID>", if the error is associated with certain intent parameters.
-     * - "projects/<Project ID>/agent/entities/<Entity ID>", if the error is
+     * - `projects/<Project ID>/agent/intents/<Intent
+     * Id>/trainingPhrases/<Training Phrase ID>`, if the error is associated with
+     * certain intent training phrases.
+     * - `projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
+     * ID>`, if the error is associated with certain intent parameters.
+     * - `projects/<Project ID>/agent/entities/<Entity ID>`, if the error is
      * associated with certain entities.
      *
      * Generated from protobuf field <code>repeated string entries = 3;</code>
@@ -44,7 +44,7 @@ class ValidationError extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string error_message = 4;</code>
      */
-    private $error_message = '';
+    protected $error_message = '';
 
     /**
      * Constructor.
@@ -54,19 +54,19 @@ class ValidationError extends \Google\Protobuf\Internal\Message
      *
      *     @type int $severity
      *           The severity of the error.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $entries
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $entries
      *           The names of the entries that the error is associated with.
      *           Format:
-     *           - "projects/<Project ID>/agent", if the error is associated with the entire
+     *           - `projects/<Project ID>/agent`, if the error is associated with the entire
      *           agent.
-     *           - "projects/<Project ID>/agent/intents/<Intent ID>", if the error is
+     *           - `projects/<Project ID>/agent/intents/<Intent ID>`, if the error is
      *           associated with certain intents.
-     *           - "projects/<Project
-     *           ID>/agent/intents/<Intent Id>/trainingPhrases/<Training Phrase ID>", if the
-     *           error is associated with certain intent training phrases.
-     *           - "projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
-     *           ID>", if the error is associated with certain intent parameters.
-     *           - "projects/<Project ID>/agent/entities/<Entity ID>", if the error is
+     *           - `projects/<Project ID>/agent/intents/<Intent
+     *           Id>/trainingPhrases/<Training Phrase ID>`, if the error is associated with
+     *           certain intent training phrases.
+     *           - `projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
+     *           ID>`, if the error is associated with certain intent parameters.
+     *           - `projects/<Project ID>/agent/entities/<Entity ID>`, if the error is
      *           associated with certain entities.
      *     @type string $error_message
      *           The detailed error message.
@@ -106,16 +106,16 @@ class ValidationError extends \Google\Protobuf\Internal\Message
     /**
      * The names of the entries that the error is associated with.
      * Format:
-     * - "projects/<Project ID>/agent", if the error is associated with the entire
+     * - `projects/<Project ID>/agent`, if the error is associated with the entire
      * agent.
-     * - "projects/<Project ID>/agent/intents/<Intent ID>", if the error is
+     * - `projects/<Project ID>/agent/intents/<Intent ID>`, if the error is
      * associated with certain intents.
-     * - "projects/<Project
-     * ID>/agent/intents/<Intent Id>/trainingPhrases/<Training Phrase ID>", if the
-     * error is associated with certain intent training phrases.
-     * - "projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
-     * ID>", if the error is associated with certain intent parameters.
-     * - "projects/<Project ID>/agent/entities/<Entity ID>", if the error is
+     * - `projects/<Project ID>/agent/intents/<Intent
+     * Id>/trainingPhrases/<Training Phrase ID>`, if the error is associated with
+     * certain intent training phrases.
+     * - `projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
+     * ID>`, if the error is associated with certain intent parameters.
+     * - `projects/<Project ID>/agent/entities/<Entity ID>`, if the error is
      * associated with certain entities.
      *
      * Generated from protobuf field <code>repeated string entries = 3;</code>
@@ -129,20 +129,20 @@ class ValidationError extends \Google\Protobuf\Internal\Message
     /**
      * The names of the entries that the error is associated with.
      * Format:
-     * - "projects/<Project ID>/agent", if the error is associated with the entire
+     * - `projects/<Project ID>/agent`, if the error is associated with the entire
      * agent.
-     * - "projects/<Project ID>/agent/intents/<Intent ID>", if the error is
+     * - `projects/<Project ID>/agent/intents/<Intent ID>`, if the error is
      * associated with certain intents.
-     * - "projects/<Project
-     * ID>/agent/intents/<Intent Id>/trainingPhrases/<Training Phrase ID>", if the
-     * error is associated with certain intent training phrases.
-     * - "projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
-     * ID>", if the error is associated with certain intent parameters.
-     * - "projects/<Project ID>/agent/entities/<Entity ID>", if the error is
+     * - `projects/<Project ID>/agent/intents/<Intent
+     * Id>/trainingPhrases/<Training Phrase ID>`, if the error is associated with
+     * certain intent training phrases.
+     * - `projects/<Project ID>/agent/intents/<Intent Id>/parameters/<Parameter
+     * ID>`, if the error is associated with certain intent parameters.
+     * - `projects/<Project ID>/agent/entities/<Entity ID>`, if the error is
      * associated with certain entities.
      *
      * Generated from protobuf field <code>repeated string entries = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEntries($var)

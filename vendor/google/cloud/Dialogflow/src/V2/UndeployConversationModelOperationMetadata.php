@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Metadata for a [ConversationModels.UndeployConversationModel][google.cloud.dialogflow.v2.ConversationModels.UndeployConversationModel] operation.
+ * Metadata for a
+ * [ConversationModels.UndeployConversationModel][google.cloud.dialogflow.v2.ConversationModels.UndeployConversationModel]
+ * operation.
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.UndeployConversationModelOperationMetadata</code>
  */
@@ -21,14 +23,14 @@ class UndeployConversationModelOperationMetadata extends \Google\Protobuf\Intern
      *
      * Generated from protobuf field <code>string conversation_model = 1;</code>
      */
-    private $conversation_model = '';
+    protected $conversation_model = '';
     /**
      * Timestamp when the request to undeploy conversation model was submitted.
      * The time is measured on server side.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
 
     /**
      * Constructor.

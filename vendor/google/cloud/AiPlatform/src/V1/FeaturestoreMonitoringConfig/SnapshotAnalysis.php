@@ -33,20 +33,14 @@ class SnapshotAnalysis extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool disabled = 1;</code>
      */
-    private $disabled = false;
+    protected $disabled = false;
     /**
      * Configuration of the snapshot analysis based monitoring pipeline
      * running interval. The value indicates number of days.
-     * If both
-     * [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     * and [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval][]
-     * are set when creating/updating EntityTypes/Features,
-     * [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     * will be used.
      *
      * Generated from protobuf field <code>int32 monitoring_interval_days = 3;</code>
      */
-    private $monitoring_interval_days = 0;
+    protected $monitoring_interval_days = 0;
     /**
      * Customized export features time window for snapshot analysis. Unit is one
      * day. Default value is 3 weeks. Minimum value is 1 day. Maximum value is
@@ -54,7 +48,7 @@ class SnapshotAnalysis extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 staleness_days = 4;</code>
      */
-    private $staleness_days = 0;
+    protected $staleness_days = 0;
 
     /**
      * Constructor.
@@ -77,12 +71,6 @@ class SnapshotAnalysis extends \Google\Protobuf\Internal\Message
      *     @type int $monitoring_interval_days
      *           Configuration of the snapshot analysis based monitoring pipeline
      *           running interval. The value indicates number of days.
-     *           If both
-     *           [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     *           and [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval][]
-     *           are set when creating/updating EntityTypes/Features,
-     *           [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     *           will be used.
      *     @type int $staleness_days
      *           Customized export features time window for snapshot analysis. Unit is one
      *           day. Default value is 3 weeks. Minimum value is 1 day. Maximum value is
@@ -143,12 +131,6 @@ class SnapshotAnalysis extends \Google\Protobuf\Internal\Message
     /**
      * Configuration of the snapshot analysis based monitoring pipeline
      * running interval. The value indicates number of days.
-     * If both
-     * [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     * and [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval][]
-     * are set when creating/updating EntityTypes/Features,
-     * [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     * will be used.
      *
      * Generated from protobuf field <code>int32 monitoring_interval_days = 3;</code>
      * @return int
@@ -161,12 +143,6 @@ class SnapshotAnalysis extends \Google\Protobuf\Internal\Message
     /**
      * Configuration of the snapshot analysis based monitoring pipeline
      * running interval. The value indicates number of days.
-     * If both
-     * [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     * and [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval][]
-     * are set when creating/updating EntityTypes/Features,
-     * [FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis.monitoring_interval_days]
-     * will be used.
      *
      * Generated from protobuf field <code>int32 monitoring_interval_days = 3;</code>
      * @param int $var

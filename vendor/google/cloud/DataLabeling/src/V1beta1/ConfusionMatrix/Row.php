@@ -21,7 +21,7 @@ class Row extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.datalabeling.v1beta1.AnnotationSpec annotation_spec = 1;</code>
      */
-    private $annotation_spec = null;
+    protected $annotation_spec = null;
     /**
      * A list of the confusion matrix entries. One entry for each possible
      * predicted label.
@@ -38,7 +38,7 @@ class Row extends \Google\Protobuf\Internal\Message
      *
      *     @type \Google\Cloud\DataLabeling\V1beta1\AnnotationSpec $annotation_spec
      *           The annotation spec of the ground truth label for this row.
-     *     @type \Google\Cloud\DataLabeling\V1beta1\ConfusionMatrix\ConfusionMatrixEntry[]|\Google\Protobuf\Internal\RepeatedField $entries
+     *     @type array<\Google\Cloud\DataLabeling\V1beta1\ConfusionMatrix\ConfusionMatrixEntry>|\Google\Protobuf\Internal\RepeatedField $entries
      *           A list of the confusion matrix entries. One entry for each possible
      *           predicted label.
      * }
@@ -101,7 +101,7 @@ class Row extends \Google\Protobuf\Internal\Message
      * predicted label.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datalabeling.v1beta1.ConfusionMatrix.ConfusionMatrixEntry entries = 2;</code>
-     * @param \Google\Cloud\DataLabeling\V1beta1\ConfusionMatrix\ConfusionMatrixEntry[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DataLabeling\V1beta1\ConfusionMatrix\ConfusionMatrixEntry>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEntries($var)
@@ -114,6 +114,4 @@ class Row extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Row::class, \Google\Cloud\DataLabeling\V1beta1\ConfusionMatrix_Row::class);
 

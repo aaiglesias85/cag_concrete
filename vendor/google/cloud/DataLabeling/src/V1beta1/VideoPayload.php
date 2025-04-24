@@ -20,13 +20,13 @@ class VideoPayload extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string mime_type = 1;</code>
      */
-    private $mime_type = '';
+    protected $mime_type = '';
     /**
      * Video uri from the user bucket.
      *
      * Generated from protobuf field <code>string video_uri = 2;</code>
      */
-    private $video_uri = '';
+    protected $video_uri = '';
     /**
      * The list of video thumbnails.
      *
@@ -38,13 +38,13 @@ class VideoPayload extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float frame_rate = 4;</code>
      */
-    private $frame_rate = 0.0;
+    protected $frame_rate = 0.0;
     /**
      * Signed uri of the video file in the service bucket.
      *
      * Generated from protobuf field <code>string signed_uri = 5;</code>
      */
-    private $signed_uri = '';
+    protected $signed_uri = '';
 
     /**
      * Constructor.
@@ -56,7 +56,7 @@ class VideoPayload extends \Google\Protobuf\Internal\Message
      *           Video format.
      *     @type string $video_uri
      *           Video uri from the user bucket.
-     *     @type \Google\Cloud\DataLabeling\V1beta1\VideoThumbnail[]|\Google\Protobuf\Internal\RepeatedField $video_thumbnails
+     *     @type array<\Google\Cloud\DataLabeling\V1beta1\VideoThumbnail>|\Google\Protobuf\Internal\RepeatedField $video_thumbnails
      *           The list of video thumbnails.
      *     @type float $frame_rate
      *           FPS of the video.
@@ -136,7 +136,7 @@ class VideoPayload extends \Google\Protobuf\Internal\Message
      * The list of video thumbnails.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datalabeling.v1beta1.VideoThumbnail video_thumbnails = 3;</code>
-     * @param \Google\Cloud\DataLabeling\V1beta1\VideoThumbnail[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DataLabeling\V1beta1\VideoThumbnail>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVideoThumbnails($var)

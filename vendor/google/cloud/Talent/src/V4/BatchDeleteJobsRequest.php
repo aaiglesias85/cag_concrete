@@ -23,7 +23,7 @@ class BatchDeleteJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The names of the jobs to delete.
      * The format is "projects/{project_id}/tenants/{tenant_id}/jobs/{job_id}".
@@ -33,6 +33,32 @@ class BatchDeleteJobsRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated string names = 2 [(.google.api.resource_reference) = {</code>
      */
     private $names;
+
+    /**
+     * @param string   $parent Required. The resource name of the tenant under which the job is created.
+     *
+     *                         The format is "projects/{project_id}/tenants/{tenant_id}". For example,
+     *                         "projects/foo/tenants/bar".
+     *
+     *                         The parent of all of the jobs specified in `names` must match this field. Please see
+     *                         {@see JobServiceClient::tenantName()} for help formatting this field.
+     * @param string[] $names  The names of the jobs to delete.
+     *
+     *                         The format is "projects/{project_id}/tenants/{tenant_id}/jobs/{job_id}".
+     *                         For example, "projects/foo/tenants/bar/jobs/baz".
+     *
+     *                         A maximum of 200 jobs can be deleted in a batch.
+     *
+     * @return \Google\Cloud\Talent\V4\BatchDeleteJobsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, array $names): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setNames($names);
+    }
 
     /**
      * Constructor.
@@ -45,7 +71,7 @@ class BatchDeleteJobsRequest extends \Google\Protobuf\Internal\Message
      *           The format is "projects/{project_id}/tenants/{tenant_id}". For example,
      *           "projects/foo/tenants/bar".
      *           The parent of all of the jobs specified in `names` must match this field.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $names
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $names
      *           The names of the jobs to delete.
      *           The format is "projects/{project_id}/tenants/{tenant_id}/jobs/{job_id}".
      *           For example, "projects/foo/tenants/bar/jobs/baz".
@@ -110,7 +136,7 @@ class BatchDeleteJobsRequest extends \Google\Protobuf\Internal\Message
      * A maximum of 200 jobs can be deleted in a batch.
      *
      * Generated from protobuf field <code>repeated string names = 2 [(.google.api.resource_reference) = {</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNames($var)

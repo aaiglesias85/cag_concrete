@@ -21,7 +21,23 @@ class GetAlertPolicyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 3 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The alerting policy to retrieve. The format is:
+     *
+     *                     projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
+     *                     Please see {@see AlertPolicyServiceClient::alertPolicyName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Monitoring\V3\GetAlertPolicyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

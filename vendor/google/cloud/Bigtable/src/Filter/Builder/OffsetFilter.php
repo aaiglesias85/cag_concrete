@@ -35,7 +35,7 @@ class OffsetFilter
     /**
      * Skips the first N cells of each row, matching all subsequent cells. If
      * duplicate cells are present, as is possible when using an
-     * {@see Google\Cloud\Bigtable\Filter\InterleaveFilter}, each copy of the
+     * {@see \Google\Cloud\Bigtable\Filter\InterleaveFilter}, each copy of the
      * cell is counted separately.
      *
      * Example:
@@ -49,7 +49,7 @@ class OffsetFilter
     public function cellsPerRow($count)
     {
         return new SimpleFilter(
-            (new RowFilter)->setCellsPerRowOffsetFilter($count)
+            (new RowFilter())->setCellsPerRowOffsetFilter($count)
         );
     }
 }

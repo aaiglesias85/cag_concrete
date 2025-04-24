@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent].
+ * The request message for
+ * [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.AnalyzeContentRequest</code>
  */
@@ -22,7 +23,7 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string participant = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $participant = '';
+    protected $participant = '';
     /**
      * Speech synthesis configuration.
      * The speech synthesis settings for a virtual agent that may be configured
@@ -32,19 +33,19 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.OutputAudioConfig reply_audio_config = 5;</code>
      */
-    private $reply_audio_config = null;
+    protected $reply_audio_config = null;
     /**
      * Parameters for a Dialogflow virtual-agent query.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.QueryParameters query_params = 9;</code>
      */
-    private $query_params = null;
+    protected $query_params = null;
     /**
      * Parameters for a human assist query.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AssistQueryParameters assist_query_params = 14;</code>
      */
-    private $assist_query_params = null;
+    protected $assist_query_params = null;
     /**
      * Additional parameters to be put into Dialogflow CX session parameters. To
      * remove a parameter from the session, clients should explicitly set the
@@ -54,7 +55,7 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Struct cx_parameters = 18;</code>
      */
-    private $cx_parameters = null;
+    protected $cx_parameters = null;
     /**
      * A unique identifier for this request. Restricted to 36 ASCII characters.
      * A random UUID is recommended.
@@ -62,8 +63,62 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 11;</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
     protected $input;
+
+    /**
+     * @param string                                $participant Required. The name of the participant this text comes from.
+     *                                                           Format: `projects/<Project ID>/locations/<Location
+     *                                                           ID>/conversations/<Conversation ID>/participants/<Participant ID>`. Please see
+     *                                                           {@see ParticipantsClient::participantName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\TextInput $textInput   The natural language text to be processed.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\AnalyzeContentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $participant, \Google\Cloud\Dialogflow\V2\TextInput $textInput): self
+    {
+        return (new self())
+            ->setParticipant($participant)
+            ->setTextInput($textInput);
+    }
+
+    /**
+     * @param string                                 $participant Required. The name of the participant this text comes from.
+     *                                                            Format: `projects/<Project ID>/locations/<Location
+     *                                                            ID>/conversations/<Conversation ID>/participants/<Participant ID>`. Please see
+     *                                                            {@see ParticipantsClient::participantName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\EventInput $eventInput  An input event to send to Dialogflow.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\AnalyzeContentRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParticipantEventInput(string $participant, \Google\Cloud\Dialogflow\V2\EventInput $eventInput): self
+    {
+        return (new self())
+            ->setParticipant($participant)
+            ->setEventInput($eventInput);
+    }
+
+    /**
+     * @param string                                 $participant Required. The name of the participant this text comes from.
+     *                                                            Format: `projects/<Project ID>/locations/<Location
+     *                                                            ID>/conversations/<Conversation ID>/participants/<Participant ID>`. Please see
+     *                                                            {@see ParticipantsClient::participantName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\AudioInput $audioInput  The natural language speech audio to be processed.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\AnalyzeContentRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParticipantAudioInput(string $participant, \Google\Cloud\Dialogflow\V2\AudioInput $audioInput): self
+    {
+        return (new self())
+            ->setParticipant($participant)
+            ->setAudioInput($audioInput);
+    }
 
     /**
      * Constructor.
@@ -77,8 +132,12 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
      *           ID>/conversations/<Conversation ID>/participants/<Participant ID>`.
      *     @type \Google\Cloud\Dialogflow\V2\TextInput $text_input
      *           The natural language text to be processed.
+     *     @type \Google\Cloud\Dialogflow\V2\AudioInput $audio_input
+     *           The natural language speech audio to be processed.
      *     @type \Google\Cloud\Dialogflow\V2\EventInput $event_input
      *           An input event to send to Dialogflow.
+     *     @type \Google\Cloud\Dialogflow\V2\SuggestionInput $suggestion_input
+     *           An input representing the selection of a suggestion.
      *     @type \Google\Cloud\Dialogflow\V2\OutputAudioConfig $reply_audio_config
      *           Speech synthesis configuration.
      *           The speech synthesis settings for a virtual agent that may be configured
@@ -168,6 +227,37 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The natural language speech audio to be processed.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AudioInput audio_input = 7;</code>
+     * @return \Google\Cloud\Dialogflow\V2\AudioInput|null
+     */
+    public function getAudioInput()
+    {
+        return $this->readOneof(7);
+    }
+
+    public function hasAudioInput()
+    {
+        return $this->hasOneof(7);
+    }
+
+    /**
+     * The natural language speech audio to be processed.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AudioInput audio_input = 7;</code>
+     * @param \Google\Cloud\Dialogflow\V2\AudioInput $var
+     * @return $this
+     */
+    public function setAudioInput($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dialogflow\V2\AudioInput::class);
+        $this->writeOneof(7, $var);
+
+        return $this;
+    }
+
+    /**
      * An input event to send to Dialogflow.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.EventInput event_input = 8;</code>
@@ -194,6 +284,37 @@ class AnalyzeContentRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Dialogflow\V2\EventInput::class);
         $this->writeOneof(8, $var);
+
+        return $this;
+    }
+
+    /**
+     * An input representing the selection of a suggestion.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.SuggestionInput suggestion_input = 12;</code>
+     * @return \Google\Cloud\Dialogflow\V2\SuggestionInput|null
+     */
+    public function getSuggestionInput()
+    {
+        return $this->readOneof(12);
+    }
+
+    public function hasSuggestionInput()
+    {
+        return $this->hasOneof(12);
+    }
+
+    /**
+     * An input representing the selection of a suggestion.
+     *
+     * Generated from protobuf field <code>.google.cloud.dialogflow.v2.SuggestionInput suggestion_input = 12;</code>
+     * @param \Google\Cloud\Dialogflow\V2\SuggestionInput $var
+     * @return $this
+     */
+    public function setSuggestionInput($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dialogflow\V2\SuggestionInput::class);
+        $this->writeOneof(12, $var);
 
         return $this;
     }

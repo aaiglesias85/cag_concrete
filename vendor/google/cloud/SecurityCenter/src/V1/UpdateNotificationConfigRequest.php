@@ -20,14 +20,44 @@ class UpdateNotificationConfigRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.NotificationConfig notification_config = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $notification_config = null;
+    protected $notification_config = null;
     /**
      * The FieldMask to use when updating the notification config.
      * If empty all mutable fields will be updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\SecurityCenter\V1\NotificationConfig $notificationConfig Required. The notification config to update.
+     *
+     * @return \Google\Cloud\SecurityCenter\V1\UpdateNotificationConfigRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\SecurityCenter\V1\NotificationConfig $notificationConfig): self
+    {
+        return (new self())
+            ->setNotificationConfig($notificationConfig);
+    }
+
+    /**
+     * @param \Google\Cloud\SecurityCenter\V1\NotificationConfig $notificationConfig Required. The notification config to update.
+     * @param \Google\Protobuf\FieldMask                         $updateMask         The FieldMask to use when updating the notification config.
+     *
+     *                                                                               If empty all mutable fields will be updated.
+     *
+     * @return \Google\Cloud\SecurityCenter\V1\UpdateNotificationConfigRequest
+     *
+     * @experimental
+     */
+    public static function buildFromNotificationConfigUpdateMask(\Google\Cloud\SecurityCenter\V1\NotificationConfig $notificationConfig, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setNotificationConfig($notificationConfig)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

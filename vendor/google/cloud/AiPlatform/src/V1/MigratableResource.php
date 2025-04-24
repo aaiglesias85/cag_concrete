@@ -17,19 +17,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class MigratableResource extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. Timestamp when the last migration attempt on this MigratableResource
-     * started. Will not be set if there's no migration attempt on this
-     * MigratableResource.
+     * Output only. Timestamp when the last migration attempt on this
+     * MigratableResource started. Will not be set if there's no migration attempt
+     * on this MigratableResource.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_migrate_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $last_migrate_time = null;
+    protected $last_migrate_time = null;
     /**
      * Output only. Timestamp when this MigratableResource was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_update_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $last_update_time = null;
+    protected $last_update_time = null;
     protected $resource;
 
     /**
@@ -47,9 +47,9 @@ class MigratableResource extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\AIPlatform\V1\MigratableResource\DataLabelingDataset $data_labeling_dataset
      *           Output only. Represents one Dataset in datalabeling.googleapis.com.
      *     @type \Google\Protobuf\Timestamp $last_migrate_time
-     *           Output only. Timestamp when the last migration attempt on this MigratableResource
-     *           started. Will not be set if there's no migration attempt on this
-     *           MigratableResource.
+     *           Output only. Timestamp when the last migration attempt on this
+     *           MigratableResource started. Will not be set if there's no migration attempt
+     *           on this MigratableResource.
      *     @type \Google\Protobuf\Timestamp $last_update_time
      *           Output only. Timestamp when this MigratableResource was last updated.
      * }
@@ -184,9 +184,9 @@ class MigratableResource extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Timestamp when the last migration attempt on this MigratableResource
-     * started. Will not be set if there's no migration attempt on this
-     * MigratableResource.
+     * Output only. Timestamp when the last migration attempt on this
+     * MigratableResource started. Will not be set if there's no migration attempt
+     * on this MigratableResource.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_migrate_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -207,9 +207,9 @@ class MigratableResource extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Timestamp when the last migration attempt on this MigratableResource
-     * started. Will not be set if there's no migration attempt on this
-     * MigratableResource.
+     * Output only. Timestamp when the last migration attempt on this
+     * MigratableResource started. Will not be set if there's no migration attempt
+     * on this MigratableResource.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp last_migrate_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var

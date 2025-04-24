@@ -19,13 +19,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class BigQueryDateShardedSpec extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The Data Catalog resource name of the dataset entry the current table
-     * belongs to. For example:
+     * Output only. The Data Catalog resource name of the dataset entry the
+     * current table belongs to. For example:
      * `projects/{PROJECT_ID}/locations/{LOCATION}/entrygroups/{ENTRY_GROUP_ID}/entries/{ENTRY_ID}`.
      *
      * Generated from protobuf field <code>string dataset = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
-    private $dataset = '';
+    protected $dataset = '';
     /**
      * Output only. The table name prefix of the shards.
      * The name of any given shard is `[table_prefix]YYYYMMDD`.
@@ -34,19 +34,19 @@ class BigQueryDateShardedSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string table_prefix = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $table_prefix = '';
+    protected $table_prefix = '';
     /**
      * Output only. Total number of shards.
      *
      * Generated from protobuf field <code>int64 shard_count = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $shard_count = 0;
+    protected $shard_count = 0;
     /**
      * Output only. BigQuery resource name of the latest shard.
      *
      * Generated from protobuf field <code>string latest_shard_resource = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $latest_shard_resource = '';
+    protected $latest_shard_resource = '';
 
     /**
      * Constructor.
@@ -55,8 +55,8 @@ class BigQueryDateShardedSpec extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $dataset
-     *           Output only. The Data Catalog resource name of the dataset entry the current table
-     *           belongs to. For example:
+     *           Output only. The Data Catalog resource name of the dataset entry the
+     *           current table belongs to. For example:
      *           `projects/{PROJECT_ID}/locations/{LOCATION}/entrygroups/{ENTRY_GROUP_ID}/entries/{ENTRY_ID}`.
      *     @type string $table_prefix
      *           Output only. The table name prefix of the shards.
@@ -75,8 +75,8 @@ class BigQueryDateShardedSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The Data Catalog resource name of the dataset entry the current table
-     * belongs to. For example:
+     * Output only. The Data Catalog resource name of the dataset entry the
+     * current table belongs to. For example:
      * `projects/{PROJECT_ID}/locations/{LOCATION}/entrygroups/{ENTRY_GROUP_ID}/entries/{ENTRY_ID}`.
      *
      * Generated from protobuf field <code>string dataset = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
@@ -88,8 +88,8 @@ class BigQueryDateShardedSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The Data Catalog resource name of the dataset entry the current table
-     * belongs to. For example:
+     * Output only. The Data Catalog resource name of the dataset entry the
+     * current table belongs to. For example:
      * `projects/{PROJECT_ID}/locations/{LOCATION}/entrygroups/{ENTRY_GROUP_ID}/entries/{ENTRY_ID}`.
      *
      * Generated from protobuf field <code>string dataset = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>

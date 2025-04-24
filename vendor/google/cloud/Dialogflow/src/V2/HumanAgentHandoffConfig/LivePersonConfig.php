@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Configuration specific to LivePerson (https://www.liveperson.com).
+ * Configuration specific to [LivePerson](https://www.liveperson.com).
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.HumanAgentHandoffConfig.LivePersonConfig</code>
  */
@@ -21,7 +21,7 @@ class LivePersonConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string account_number = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $account_number = '';
+    protected $account_number = '';
 
     /**
      * Constructor.
@@ -69,6 +69,4 @@ class LivePersonConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(LivePersonConfig::class, \Google\Cloud\Dialogflow\V2\HumanAgentHandoffConfig_LivePersonConfig::class);
 

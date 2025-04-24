@@ -22,7 +22,7 @@ class SmartReplyMetrics extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float allowlist_coverage = 1;</code>
      */
-    private $allowlist_coverage = 0.0;
+    protected $allowlist_coverage = 0.0;
     /**
      * Metrics of top n smart replies, sorted by [TopNMetric.n][].
      *
@@ -34,7 +34,7 @@ class SmartReplyMetrics extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 conversation_count = 3;</code>
      */
-    private $conversation_count = 0;
+    protected $conversation_count = 0;
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ class SmartReplyMetrics extends \Google\Protobuf\Internal\Message
      *           Percentage of target participant messages in the evaluation dataset for
      *           which similar messages have appeared at least once in the allowlist. Should
      *           be [0, 1].
-     *     @type \Google\Cloud\Dialogflow\V2\SmartReplyMetrics\TopNMetrics[]|\Google\Protobuf\Internal\RepeatedField $top_n_metrics
+     *     @type array<\Google\Cloud\Dialogflow\V2\SmartReplyMetrics\TopNMetrics>|\Google\Protobuf\Internal\RepeatedField $top_n_metrics
      *           Metrics of top n smart replies, sorted by [TopNMetric.n][].
      *     @type int|string $conversation_count
      *           Total number of conversations used to generate this metric.
@@ -102,7 +102,7 @@ class SmartReplyMetrics extends \Google\Protobuf\Internal\Message
      * Metrics of top n smart replies, sorted by [TopNMetric.n][].
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.SmartReplyMetrics.TopNMetrics top_n_metrics = 2;</code>
-     * @param \Google\Cloud\Dialogflow\V2\SmartReplyMetrics\TopNMetrics[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\SmartReplyMetrics\TopNMetrics>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTopNMetrics($var)

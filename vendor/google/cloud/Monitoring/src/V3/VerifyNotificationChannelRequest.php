@@ -20,7 +20,7 @@ class VerifyNotificationChannelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The verification code that was delivered to the channel as
      * a result of invoking the `SendNotificationChannelVerificationCode` API
@@ -32,7 +32,29 @@ class VerifyNotificationChannelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string code = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $code = '';
+    protected $code = '';
+
+    /**
+     * @param string $name Required. The notification channel to verify. Please see
+     *                     {@see NotificationChannelServiceClient::notificationChannelName()} for help formatting this field.
+     * @param string $code Required. The verification code that was delivered to the channel as
+     *                     a result of invoking the `SendNotificationChannelVerificationCode` API
+     *                     method or that was retrieved from a verified channel via
+     *                     `GetNotificationChannelVerificationCode`. For example, one might have
+     *                     "G-123456" or "TKNZGhhd2EyN3I1MnRnMjRv" (in general, one is only
+     *                     guaranteed that the code is valid UTF-8; one should not
+     *                     make any assumptions regarding the structure or format of the code).
+     *
+     * @return \Google\Cloud\Monitoring\V3\VerifyNotificationChannelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, string $code): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setCode($code);
+    }
 
     /**
      * Constructor.

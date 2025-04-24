@@ -17,25 +17,40 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListConversationDatasetsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The project and location name to list all conversation datasets for.
-     * Format: `projects/<Project ID>/locations/<Location ID>`
+     * Required. The project and location name to list all conversation datasets
+     * for. Format: `projects/<Project ID>/locations/<Location ID>`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. Maximum number of conversation datasets to return in a single
      * page. By default 100 and at most 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The next_page_token value returned from a previous list request.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The project and location name to list all conversation datasets
+     *                       for. Format: `projects/<Project ID>/locations/<Location ID>`
+     *                       Please see {@see ConversationDatasetsClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\ListConversationDatasetsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -44,8 +59,8 @@ class ListConversationDatasetsRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The project and location name to list all conversation datasets for.
-     *           Format: `projects/<Project ID>/locations/<Location ID>`
+     *           Required. The project and location name to list all conversation datasets
+     *           for. Format: `projects/<Project ID>/locations/<Location ID>`
      *     @type int $page_size
      *           Optional. Maximum number of conversation datasets to return in a single
      *           page. By default 100 and at most 1000.
@@ -59,8 +74,8 @@ class ListConversationDatasetsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The project and location name to list all conversation datasets for.
-     * Format: `projects/<Project ID>/locations/<Location ID>`
+     * Required. The project and location name to list all conversation datasets
+     * for. Format: `projects/<Project ID>/locations/<Location ID>`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -71,8 +86,8 @@ class ListConversationDatasetsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The project and location name to list all conversation datasets for.
-     * Format: `projects/<Project ID>/locations/<Location ID>`
+     * Required. The project and location name to list all conversation datasets
+     * for. Format: `projects/<Project ID>/locations/<Location ID>`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

@@ -9,7 +9,6 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Messages
  * A request message for InstanceGroupManagers.AbandonInstances. See the method description for details.
  *
  * Generated from protobuf message <code>google.cloud.compute.v1.AbandonInstancesInstanceGroupManagerRequest</code>
@@ -46,6 +45,25 @@ class AbandonInstancesInstanceGroupManagerRequest extends \Google\Protobuf\Inter
      * Generated from protobuf field <code>string zone = 3744684 [(.google.api.field_behavior) = REQUIRED, (.google.cloud.operation_request_field) = "zone"];</code>
      */
     private $zone = '';
+
+    /**
+     * @param string                                                                $project                                              Project ID for this request.
+     * @param string                                                                $zone                                                 The name of the zone where the managed instance group is located.
+     * @param string                                                                $instanceGroupManager                                 The name of the managed instance group.
+     * @param \Google\Cloud\Compute\V1\InstanceGroupManagersAbandonInstancesRequest $instanceGroupManagersAbandonInstancesRequestResource The body resource for this request
+     *
+     * @return \Google\Cloud\Compute\V1\AbandonInstancesInstanceGroupManagerRequest
+     *
+     * @experimental
+     */
+    public static function build(string $project, string $zone, string $instanceGroupManager, \Google\Cloud\Compute\V1\InstanceGroupManagersAbandonInstancesRequest $instanceGroupManagersAbandonInstancesRequestResource): self
+    {
+        return (new self())
+            ->setProject($project)
+            ->setZone($zone)
+            ->setInstanceGroupManager($instanceGroupManager)
+            ->setInstanceGroupManagersAbandonInstancesRequestResource($instanceGroupManagersAbandonInstancesRequestResource);
+    }
 
     /**
      * Constructor.

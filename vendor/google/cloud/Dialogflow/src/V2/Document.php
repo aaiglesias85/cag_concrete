@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A knowledge document to be used by a [KnowledgeBase][google.cloud.dialogflow.v2.KnowledgeBase].
+ * A knowledge document to be used by a
+ * [KnowledgeBase][google.cloud.dialogflow.v2.KnowledgeBase].
  * For more information, see the [knowledge base
  * guide](https://cloud.google.com/dialogflow/docs/how/knowledge-bases).
  * Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;
@@ -27,20 +28,20 @@ class Document extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The display name of the document. The name must be 1024 bytes or
      * less; otherwise, the creation request fails.
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Required. The MIME type of this document.
      *
      * Generated from protobuf field <code>string mime_type = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $mime_type = '';
+    protected $mime_type = '';
     /**
      * Required. The knowledge type of document content.
      *
@@ -57,14 +58,14 @@ class Document extends \Google\Protobuf\Internal\Message
      * fails, we will keep the document unchanged.
      * If a reload fails with internal errors, the system will try to reload the
      * document on the next day.
-     * If a reload fails with non-retriable errors (e.g. PERMISION_DENIED), the
+     * If a reload fails with non-retriable errors (e.g. PERMISSION_DENIED), the
      * system will not try to reload the document anymore. You need to manually
      * reload the document successfully by calling `ReloadDocument` and clear the
      * errors.
      *
      * Generated from protobuf field <code>bool enable_auto_reload = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $enable_auto_reload = false;
+    protected $enable_auto_reload = false;
     /**
      * Output only. The time and status of the latest reload.
      * This reload may have been triggered automatically or manually
@@ -72,7 +73,7 @@ class Document extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Document.ReloadStatus latest_reload_status = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $latest_reload_status = null;
+    protected $latest_reload_status = null;
     /**
      * Optional. Metadata for the document. The metadata supports arbitrary
      * key-value pairs. Suggested use cases include storing a document's title,
@@ -87,7 +88,7 @@ class Document extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Document.State state = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     protected $source;
 
     /**
@@ -106,7 +107,7 @@ class Document extends \Google\Protobuf\Internal\Message
      *           less; otherwise, the creation request fails.
      *     @type string $mime_type
      *           Required. The MIME type of this document.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $knowledge_types
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $knowledge_types
      *           Required. The knowledge type of document content.
      *     @type string $content_uri
      *           The URI where the file content is located.
@@ -129,7 +130,7 @@ class Document extends \Google\Protobuf\Internal\Message
      *           fails, we will keep the document unchanged.
      *           If a reload fails with internal errors, the system will try to reload the
      *           document on the next day.
-     *           If a reload fails with non-retriable errors (e.g. PERMISION_DENIED), the
+     *           If a reload fails with non-retriable errors (e.g. PERMISSION_DENIED), the
      *           system will not try to reload the document anymore. You need to manually
      *           reload the document successfully by calling `ReloadDocument` and clear the
      *           errors.
@@ -252,7 +253,7 @@ class Document extends \Google\Protobuf\Internal\Message
      * Required. The knowledge type of document content.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.Document.KnowledgeType knowledge_types = 4 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setKnowledgeTypes($var)
@@ -349,7 +350,7 @@ class Document extends \Google\Protobuf\Internal\Message
      * fails, we will keep the document unchanged.
      * If a reload fails with internal errors, the system will try to reload the
      * document on the next day.
-     * If a reload fails with non-retriable errors (e.g. PERMISION_DENIED), the
+     * If a reload fails with non-retriable errors (e.g. PERMISSION_DENIED), the
      * system will not try to reload the document anymore. You need to manually
      * reload the document successfully by calling `ReloadDocument` and clear the
      * errors.
@@ -372,7 +373,7 @@ class Document extends \Google\Protobuf\Internal\Message
      * fails, we will keep the document unchanged.
      * If a reload fails with internal errors, the system will try to reload the
      * document on the next day.
-     * If a reload fails with non-retriable errors (e.g. PERMISION_DENIED), the
+     * If a reload fails with non-retriable errors (e.g. PERMISSION_DENIED), the
      * system will not try to reload the document anymore. You need to manually
      * reload the document successfully by calling `ReloadDocument` and clear the
      * errors.

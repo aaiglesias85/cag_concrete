@@ -20,14 +20,14 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 accelerator_count = 1;</code>
      */
-    private $accelerator_count = 0;
+    protected $accelerator_count = 0;
     /**
      * The accelerator type resource name. List of supported accelerators
      * [here](https://cloud.google.com/compute/docs/gpus)
      *
      * Generated from protobuf field <code>string accelerator_type = 2;</code>
      */
-    private $accelerator_type = '';
+    protected $accelerator_type = '';
     /**
      * Size of partitions to create on the GPU. Valid values are described in the
      * NVIDIA [mig user
@@ -35,7 +35,19 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string gpu_partition_size = 3;</code>
      */
-    private $gpu_partition_size = '';
+    protected $gpu_partition_size = '';
+    /**
+     * The configuration for GPU sharing options.
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.GPUSharingConfig gpu_sharing_config = 5;</code>
+     */
+    protected $gpu_sharing_config = null;
+    /**
+     * The configuration for auto installation of GPU driver.
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.GPUDriverInstallationConfig gpu_driver_installation_config = 6;</code>
+     */
+    protected $gpu_driver_installation_config = null;
 
     /**
      * Constructor.
@@ -52,6 +64,10 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      *           Size of partitions to create on the GPU. Valid values are described in the
      *           NVIDIA [mig user
      *           guide](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/#partitioning).
+     *     @type \Google\Cloud\Container\V1\GPUSharingConfig $gpu_sharing_config
+     *           The configuration for GPU sharing options.
+     *     @type \Google\Cloud\Container\V1\GPUDriverInstallationConfig $gpu_driver_installation_config
+     *           The configuration for auto installation of GPU driver.
      * }
      */
     public function __construct($data = NULL) {
@@ -139,6 +155,78 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->gpu_partition_size = $var;
+
+        return $this;
+    }
+
+    /**
+     * The configuration for GPU sharing options.
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.GPUSharingConfig gpu_sharing_config = 5;</code>
+     * @return \Google\Cloud\Container\V1\GPUSharingConfig|null
+     */
+    public function getGpuSharingConfig()
+    {
+        return $this->gpu_sharing_config;
+    }
+
+    public function hasGpuSharingConfig()
+    {
+        return isset($this->gpu_sharing_config);
+    }
+
+    public function clearGpuSharingConfig()
+    {
+        unset($this->gpu_sharing_config);
+    }
+
+    /**
+     * The configuration for GPU sharing options.
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.GPUSharingConfig gpu_sharing_config = 5;</code>
+     * @param \Google\Cloud\Container\V1\GPUSharingConfig $var
+     * @return $this
+     */
+    public function setGpuSharingConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\GPUSharingConfig::class);
+        $this->gpu_sharing_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * The configuration for auto installation of GPU driver.
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.GPUDriverInstallationConfig gpu_driver_installation_config = 6;</code>
+     * @return \Google\Cloud\Container\V1\GPUDriverInstallationConfig|null
+     */
+    public function getGpuDriverInstallationConfig()
+    {
+        return $this->gpu_driver_installation_config;
+    }
+
+    public function hasGpuDriverInstallationConfig()
+    {
+        return isset($this->gpu_driver_installation_config);
+    }
+
+    public function clearGpuDriverInstallationConfig()
+    {
+        unset($this->gpu_driver_installation_config);
+    }
+
+    /**
+     * The configuration for auto installation of GPU driver.
+     *
+     * Generated from protobuf field <code>optional .google.container.v1.GPUDriverInstallationConfig gpu_driver_installation_config = 6;</code>
+     * @param \Google\Cloud\Container\V1\GPUDriverInstallationConfig $var
+     * @return $this
+     */
+    public function setGpuDriverInstallationConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\GPUDriverInstallationConfig::class);
+        $this->gpu_driver_installation_config = $var;
 
         return $this;
     }

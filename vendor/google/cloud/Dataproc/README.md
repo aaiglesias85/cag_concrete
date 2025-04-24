@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-dataproc/v/stable)](https://packagist.org/packages/google/cloud-dataproc) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-dataproc.svg)](https://packagist.org/packages/google/cloud-dataproc)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-dataproc/latest)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-dataproc/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -19,16 +19,10 @@ administration, you can focus on your jobs and your data.
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-dataproc
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take advantage of the benefits offered by gRPC (such as streaming methods)
@@ -66,6 +60,11 @@ $job->setHadoopJob($hadoopJob);
 $jobControllerClient = new JobControllerClient();
 $submittedJob = $jobControllerClient->submitJob($projectId, $region, $job);
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

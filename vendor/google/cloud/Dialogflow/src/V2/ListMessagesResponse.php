@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The response message for [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages].
+ * The response message for
+ * [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListMessagesResponse</code>
  */
@@ -29,7 +30,7 @@ class ListMessagesResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -37,7 +38,7 @@ class ListMessagesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dialogflow\V2\Message[]|\Google\Protobuf\Internal\RepeatedField $messages
+     *     @type array<\Google\Cloud\Dialogflow\V2\Message>|\Google\Protobuf\Internal\RepeatedField $messages
      *           The list of messages. There will be a maximum number of items
      *           returned based on the page_size field in the request.
      *           `messages` is sorted by `create_time` in descending order.
@@ -70,7 +71,7 @@ class ListMessagesResponse extends \Google\Protobuf\Internal\Message
      * `messages` is sorted by `create_time` in descending order.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.Message messages = 1;</code>
-     * @param \Google\Cloud\Dialogflow\V2\Message[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\Message>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMessages($var)

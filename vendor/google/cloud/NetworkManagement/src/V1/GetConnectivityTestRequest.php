@@ -19,9 +19,24 @@ class GetConnectivityTestRequest extends \Google\Protobuf\Internal\Message
      * Required. `ConnectivityTest` resource name using the form:
      *     `projects/{project_id}/locations/global/connectivityTests/{test_id}`
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. `ConnectivityTest` resource name using the form:
+     *                     `projects/{project_id}/locations/global/connectivityTests/{test_id}`
+     *                     Please see {@see ReachabilityServiceClient::connectivityTestName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\NetworkManagement\V1\GetConnectivityTestRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -43,7 +58,7 @@ class GetConnectivityTestRequest extends \Google\Protobuf\Internal\Message
      * Required. `ConnectivityTest` resource name using the form:
      *     `projects/{project_id}/locations/global/connectivityTests/{test_id}`
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
      */
     public function getName()
@@ -55,7 +70,7 @@ class GetConnectivityTestRequest extends \Google\Protobuf\Internal\Message
      * Required. `ConnectivityTest` resource name using the form:
      *     `projects/{project_id}/locations/global/connectivityTests/{test_id}`
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
      * @return $this
      */

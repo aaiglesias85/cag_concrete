@@ -40,6 +40,17 @@ class LookupResponse extends \Google\Protobuf\Internal\Message
      */
     private $deferred;
     /**
+     * The identifier of the transaction that was started as part of this Lookup
+     * request.
+     * Set only when
+     * [ReadOptions.new_transaction][google.datastore.v1.ReadOptions.new_transaction]
+     * was set in
+     * [LookupRequest.read_options][google.datastore.v1.LookupRequest.read_options].
+     *
+     * Generated from protobuf field <code>bytes transaction = 5;</code>
+     */
+    private $transaction = '';
+    /**
      * The time at which these entities were read or found missing.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp read_time = 7;</code>
@@ -52,18 +63,25 @@ class LookupResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Datastore\V1\EntityResult[]|\Google\Protobuf\Internal\RepeatedField $found
+     *     @type array<\Google\Cloud\Datastore\V1\EntityResult>|\Google\Protobuf\Internal\RepeatedField $found
      *           Entities found as `ResultType.FULL` entities. The order of results in this
      *           field is undefined and has no relation to the order of the keys in the
      *           input.
-     *     @type \Google\Cloud\Datastore\V1\EntityResult[]|\Google\Protobuf\Internal\RepeatedField $missing
+     *     @type array<\Google\Cloud\Datastore\V1\EntityResult>|\Google\Protobuf\Internal\RepeatedField $missing
      *           Entities not found as `ResultType.KEY_ONLY` entities. The order of results
      *           in this field is undefined and has no relation to the order of the keys
      *           in the input.
-     *     @type \Google\Cloud\Datastore\V1\Key[]|\Google\Protobuf\Internal\RepeatedField $deferred
+     *     @type array<\Google\Cloud\Datastore\V1\Key>|\Google\Protobuf\Internal\RepeatedField $deferred
      *           A list of keys that were not looked up due to resource constraints. The
      *           order of results in this field is undefined and has no relation to the
      *           order of the keys in the input.
+     *     @type string $transaction
+     *           The identifier of the transaction that was started as part of this Lookup
+     *           request.
+     *           Set only when
+     *           [ReadOptions.new_transaction][google.datastore.v1.ReadOptions.new_transaction]
+     *           was set in
+     *           [LookupRequest.read_options][google.datastore.v1.LookupRequest.read_options].
      *     @type \Google\Protobuf\Timestamp $read_time
      *           The time at which these entities were read or found missing.
      * }
@@ -92,7 +110,7 @@ class LookupResponse extends \Google\Protobuf\Internal\Message
      * input.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.EntityResult found = 1;</code>
-     * @param \Google\Cloud\Datastore\V1\EntityResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\EntityResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFound($var)
@@ -122,7 +140,7 @@ class LookupResponse extends \Google\Protobuf\Internal\Message
      * in the input.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.EntityResult missing = 2;</code>
-     * @param \Google\Cloud\Datastore\V1\EntityResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\EntityResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMissing($var)
@@ -152,13 +170,49 @@ class LookupResponse extends \Google\Protobuf\Internal\Message
      * order of the keys in the input.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.Key deferred = 3;</code>
-     * @param \Google\Cloud\Datastore\V1\Key[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\Key>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDeferred($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Datastore\V1\Key::class);
         $this->deferred = $arr;
+
+        return $this;
+    }
+
+    /**
+     * The identifier of the transaction that was started as part of this Lookup
+     * request.
+     * Set only when
+     * [ReadOptions.new_transaction][google.datastore.v1.ReadOptions.new_transaction]
+     * was set in
+     * [LookupRequest.read_options][google.datastore.v1.LookupRequest.read_options].
+     *
+     * Generated from protobuf field <code>bytes transaction = 5;</code>
+     * @return string
+     */
+    public function getTransaction()
+    {
+        return $this->transaction;
+    }
+
+    /**
+     * The identifier of the transaction that was started as part of this Lookup
+     * request.
+     * Set only when
+     * [ReadOptions.new_transaction][google.datastore.v1.ReadOptions.new_transaction]
+     * was set in
+     * [LookupRequest.read_options][google.datastore.v1.LookupRequest.read_options].
+     *
+     * Generated from protobuf field <code>bytes transaction = 5;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setTransaction($var)
+    {
+        GPBUtil::checkString($var, False);
+        $this->transaction = $var;
 
         return $this;
     }

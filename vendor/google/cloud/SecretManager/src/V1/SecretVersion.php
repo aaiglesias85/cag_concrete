@@ -16,54 +16,84 @@ use Google\Protobuf\Internal\GPBUtil;
 class SecretVersion extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The resource name of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the
-     * format `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
-     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and
-     * are incremented for each subsequent version of the secret.
+     * Output only. The resource name of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+     * `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a
+     * [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and are
+     * incremented for each subsequent version of the secret.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Output only. The time at which the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
+     * Output only. The time at which the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
-     * Output only. The time this [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
-     * Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state] is
+     * Output only. The time this
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
+     * Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state]
+     * is
      * [DESTROYED][google.cloud.secretmanager.v1.SecretVersion.State.DESTROYED].
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp destroy_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $destroy_time = null;
+    protected $destroy_time = null;
     /**
-     * Output only. The current state of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * Output only. The current state of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.SecretVersion.State state = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
-     * The replication status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * The replication status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.ReplicationStatus replication_status = 5;</code>
      */
-    private $replication_status = null;
+    protected $replication_status = null;
     /**
-     * Output only. Etag of the currently stored [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * Output only. Etag of the currently stored
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>string etag = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
-     * Output only. True if payload checksum specified in [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has been
-     * received by [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService] on
+     * Output only. True if payload checksum specified in
+     * [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has
+     * been received by
+     * [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+     * on
      * [SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion].
      *
      * Generated from protobuf field <code>bool client_specified_payload_checksum = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $client_specified_payload_checksum = false;
+    protected $client_specified_payload_checksum = false;
+    /**
+     * Optional. Output only. Scheduled destroy time for secret version.
+     * This is a part of the Delayed secret version destroy feature. For a
+     * Secret with a valid version destroy TTL, when a secert version is
+     * destroyed, version is moved to disabled state and it is scheduled for
+     * destruction Version is destroyed only after the scheduled_destroy_time.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp scheduled_destroy_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $scheduled_destroy_time = null;
+    /**
+     * Output only. The customer-managed encryption status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     * populated if customer-managed encryption is used and
+     * [Secret][google.cloud.secretmanager.v1.Secret] is a regionalized secret.
+     *
+     * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus customer_managed_encryption = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $customer_managed_encryption = null;
 
     /**
      * Constructor.
@@ -72,26 +102,48 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Output only. The resource name of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the
-     *           format `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
-     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and
-     *           are incremented for each subsequent version of the secret.
+     *           Output only. The resource name of the
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+     *           `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a
+     *           [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and are
+     *           incremented for each subsequent version of the secret.
      *     @type \Google\Protobuf\Timestamp $create_time
-     *           Output only. The time at which the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
+     *           Output only. The time at which the
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
      *     @type \Google\Protobuf\Timestamp $destroy_time
-     *           Output only. The time this [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
-     *           Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state] is
+     *           Output only. The time this
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
+     *           Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state]
+     *           is
      *           [DESTROYED][google.cloud.secretmanager.v1.SecretVersion.State.DESTROYED].
      *     @type int $state
-     *           Output only. The current state of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     *           Output only. The current state of the
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *     @type \Google\Cloud\SecretManager\V1\ReplicationStatus $replication_status
-     *           The replication status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     *           The replication status of the
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *     @type string $etag
-     *           Output only. Etag of the currently stored [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     *           Output only. Etag of the currently stored
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *     @type bool $client_specified_payload_checksum
-     *           Output only. True if payload checksum specified in [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has been
-     *           received by [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService] on
+     *           Output only. True if payload checksum specified in
+     *           [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has
+     *           been received by
+     *           [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+     *           on
      *           [SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion].
+     *     @type \Google\Protobuf\Timestamp $scheduled_destroy_time
+     *           Optional. Output only. Scheduled destroy time for secret version.
+     *           This is a part of the Delayed secret version destroy feature. For a
+     *           Secret with a valid version destroy TTL, when a secert version is
+     *           destroyed, version is moved to disabled state and it is scheduled for
+     *           destruction Version is destroyed only after the scheduled_destroy_time.
+     *     @type \Google\Cloud\SecretManager\V1\CustomerManagedEncryptionStatus $customer_managed_encryption
+     *           Output only. The customer-managed encryption status of the
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     *           populated if customer-managed encryption is used and
+     *           [Secret][google.cloud.secretmanager.v1.Secret] is a regionalized secret.
      * }
      */
     public function __construct($data = NULL) {
@@ -100,10 +152,12 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The resource name of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the
-     * format `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
-     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and
-     * are incremented for each subsequent version of the secret.
+     * Output only. The resource name of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+     * `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a
+     * [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and are
+     * incremented for each subsequent version of the secret.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -114,10 +168,12 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The resource name of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the
-     * format `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
-     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and
-     * are incremented for each subsequent version of the secret.
+     * Output only. The resource name of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+     * `projects/&#42;&#47;secrets/&#42;&#47;versions/&#42;`.
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a
+     * [Secret][google.cloud.secretmanager.v1.Secret] start at 1 and are
+     * incremented for each subsequent version of the secret.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -132,7 +188,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The time at which the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
+     * Output only. The time at which the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -153,7 +210,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The time at which the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
+     * Output only. The time at which the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var
@@ -168,8 +226,10 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The time this [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
-     * Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state] is
+     * Output only. The time this
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
+     * Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state]
+     * is
      * [DESTROYED][google.cloud.secretmanager.v1.SecretVersion.State.DESTROYED].
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp destroy_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -191,8 +251,10 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The time this [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
-     * Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state] is
+     * Output only. The time this
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
+     * Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state]
+     * is
      * [DESTROYED][google.cloud.secretmanager.v1.SecretVersion.State.DESTROYED].
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp destroy_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -208,7 +270,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The current state of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * Output only. The current state of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.SecretVersion.State state = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return int
@@ -219,7 +282,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The current state of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * Output only. The current state of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.SecretVersion.State state = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param int $var
@@ -234,7 +298,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The replication status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * The replication status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.ReplicationStatus replication_status = 5;</code>
      * @return \Google\Cloud\SecretManager\V1\ReplicationStatus|null
@@ -255,7 +320,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The replication status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * The replication status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.ReplicationStatus replication_status = 5;</code>
      * @param \Google\Cloud\SecretManager\V1\ReplicationStatus $var
@@ -270,7 +336,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Etag of the currently stored [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * Output only. Etag of the currently stored
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>string etag = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -281,7 +348,8 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Etag of the currently stored [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+     * Output only. Etag of the currently stored
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>string etag = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -296,8 +364,11 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. True if payload checksum specified in [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has been
-     * received by [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService] on
+     * Output only. True if payload checksum specified in
+     * [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has
+     * been received by
+     * [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+     * on
      * [SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion].
      *
      * Generated from protobuf field <code>bool client_specified_payload_checksum = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -309,8 +380,11 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. True if payload checksum specified in [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has been
-     * received by [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService] on
+     * Output only. True if payload checksum specified in
+     * [SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has
+     * been received by
+     * [SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+     * on
      * [SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion].
      *
      * Generated from protobuf field <code>bool client_specified_payload_checksum = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -321,6 +395,92 @@ class SecretVersion extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->client_specified_payload_checksum = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Output only. Scheduled destroy time for secret version.
+     * This is a part of the Delayed secret version destroy feature. For a
+     * Secret with a valid version destroy TTL, when a secert version is
+     * destroyed, version is moved to disabled state and it is scheduled for
+     * destruction Version is destroyed only after the scheduled_destroy_time.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp scheduled_destroy_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Timestamp|null
+     */
+    public function getScheduledDestroyTime()
+    {
+        return $this->scheduled_destroy_time;
+    }
+
+    public function hasScheduledDestroyTime()
+    {
+        return isset($this->scheduled_destroy_time);
+    }
+
+    public function clearScheduledDestroyTime()
+    {
+        unset($this->scheduled_destroy_time);
+    }
+
+    /**
+     * Optional. Output only. Scheduled destroy time for secret version.
+     * This is a part of the Delayed secret version destroy feature. For a
+     * Secret with a valid version destroy TTL, when a secert version is
+     * destroyed, version is moved to disabled state and it is scheduled for
+     * destruction Version is destroyed only after the scheduled_destroy_time.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp scheduled_destroy_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Protobuf\Timestamp $var
+     * @return $this
+     */
+    public function setScheduledDestroyTime($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        $this->scheduled_destroy_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The customer-managed encryption status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     * populated if customer-managed encryption is used and
+     * [Secret][google.cloud.secretmanager.v1.Secret] is a regionalized secret.
+     *
+     * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus customer_managed_encryption = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\SecretManager\V1\CustomerManagedEncryptionStatus|null
+     */
+    public function getCustomerManagedEncryption()
+    {
+        return $this->customer_managed_encryption;
+    }
+
+    public function hasCustomerManagedEncryption()
+    {
+        return isset($this->customer_managed_encryption);
+    }
+
+    public function clearCustomerManagedEncryption()
+    {
+        unset($this->customer_managed_encryption);
+    }
+
+    /**
+     * Output only. The customer-managed encryption status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     * populated if customer-managed encryption is used and
+     * [Secret][google.cloud.secretmanager.v1.Secret] is a regionalized secret.
+     *
+     * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus customer_managed_encryption = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\SecretManager\V1\CustomerManagedEncryptionStatus $var
+     * @return $this
+     */
+    public function setCustomerManagedEncryption($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\SecretManager\V1\CustomerManagedEncryptionStatus::class);
+        $this->customer_managed_encryption = $var;
 
         return $this;
     }

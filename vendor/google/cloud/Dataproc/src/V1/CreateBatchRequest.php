@@ -20,21 +20,21 @@ class CreateBatchRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The batch to create.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.Batch batch = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $batch = null;
+    protected $batch = null;
     /**
-     * Optional. The ID to use for the batch, which will become the final component of
-     * the batch's resource name.
+     * Optional. The ID to use for the batch, which will become the final
+     * component of the batch's resource name.
      * This value must be 4-63 characters. Valid characters are `/[a-z][0-9]-/`.
      *
      * Generated from protobuf field <code>string batch_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $batch_id = '';
+    protected $batch_id = '';
     /**
      * Optional. A unique ID used to identify the request. If the service
      * receives two
@@ -49,7 +49,28 @@ class CreateBatchRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                          $parent  Required. The parent resource where this batch will be created. Please see
+     *                                                 {@see BatchControllerClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Dataproc\V1\Batch $batch   Required. The batch to create.
+     * @param string                          $batchId Optional. The ID to use for the batch, which will become the final
+     *                                                 component of the batch's resource name.
+     *
+     *                                                 This value must be 4-63 characters. Valid characters are `/[a-z][0-9]-/`.
+     *
+     * @return \Google\Cloud\Dataproc\V1\CreateBatchRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dataproc\V1\Batch $batch, string $batchId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setBatch($batch)
+            ->setBatchId($batchId);
+    }
 
     /**
      * Constructor.
@@ -62,8 +83,8 @@ class CreateBatchRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Dataproc\V1\Batch $batch
      *           Required. The batch to create.
      *     @type string $batch_id
-     *           Optional. The ID to use for the batch, which will become the final component of
-     *           the batch's resource name.
+     *           Optional. The ID to use for the batch, which will become the final
+     *           component of the batch's resource name.
      *           This value must be 4-63 characters. Valid characters are `/[a-z][0-9]-/`.
      *     @type string $request_id
      *           Optional. A unique ID used to identify the request. If the service
@@ -146,8 +167,8 @@ class CreateBatchRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The ID to use for the batch, which will become the final component of
-     * the batch's resource name.
+     * Optional. The ID to use for the batch, which will become the final
+     * component of the batch's resource name.
      * This value must be 4-63 characters. Valid characters are `/[a-z][0-9]-/`.
      *
      * Generated from protobuf field <code>string batch_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -159,8 +180,8 @@ class CreateBatchRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The ID to use for the batch, which will become the final component of
-     * the batch's resource name.
+     * Optional. The ID to use for the batch, which will become the final
+     * component of the batch's resource name.
      * This value must be 4-63 characters. Valid characters are `/[a-z][0-9]-/`.
      *
      * Generated from protobuf field <code>string batch_id = 3 [(.google.api.field_behavior) = OPTIONAL];</code>

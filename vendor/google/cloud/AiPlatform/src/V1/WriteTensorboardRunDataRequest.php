@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [TensorboardService.WriteTensorboardRunData][google.cloud.aiplatform.v1.TensorboardService.WriteTensorboardRunData].
+ * Request message for
+ * [TensorboardService.WriteTensorboardRunData][google.cloud.aiplatform.v1.TensorboardService.WriteTensorboardRunData].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.WriteTensorboardRunDataRequest</code>
  */
@@ -22,7 +23,7 @@ class WriteTensorboardRunDataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string tensorboard_run = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $tensorboard_run = '';
+    protected $tensorboard_run = '';
     /**
      * Required. The TensorboardTimeSeries data to write.
      * Values with in a time series are indexed by their step value.
@@ -35,6 +36,28 @@ class WriteTensorboardRunDataRequest extends \Google\Protobuf\Internal\Message
     private $time_series_data;
 
     /**
+     * @param string                                       $tensorboardRun Required. The resource name of the TensorboardRun to write data to.
+     *                                                                     Format:
+     *                                                                     `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}`
+     *                                                                     Please see {@see TensorboardServiceClient::tensorboardRunName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\TimeSeriesData[] $timeSeriesData Required. The TensorboardTimeSeries data to write.
+     *                                                                     Values with in a time series are indexed by their step value.
+     *                                                                     Repeated writes to the same step will overwrite the existing value for that
+     *                                                                     step.
+     *                                                                     The upper limit of data points per write request is 5000.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\WriteTensorboardRunDataRequest
+     *
+     * @experimental
+     */
+    public static function build(string $tensorboardRun, array $timeSeriesData): self
+    {
+        return (new self())
+            ->setTensorboardRun($tensorboardRun)
+            ->setTimeSeriesData($timeSeriesData);
+    }
+
+    /**
      * Constructor.
      *
      * @param array $data {
@@ -44,7 +67,7 @@ class WriteTensorboardRunDataRequest extends \Google\Protobuf\Internal\Message
      *           Required. The resource name of the TensorboardRun to write data to.
      *           Format:
      *           `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}`
-     *     @type \Google\Cloud\AIPlatform\V1\TimeSeriesData[]|\Google\Protobuf\Internal\RepeatedField $time_series_data
+     *     @type array<\Google\Cloud\AIPlatform\V1\TimeSeriesData>|\Google\Protobuf\Internal\RepeatedField $time_series_data
      *           Required. The TensorboardTimeSeries data to write.
      *           Values with in a time series are indexed by their step value.
      *           Repeated writes to the same step will overwrite the existing value for that
@@ -110,7 +133,7 @@ class WriteTensorboardRunDataRequest extends \Google\Protobuf\Internal\Message
      * The upper limit of data points per write request is 5000.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.TimeSeriesData time_series_data = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\AIPlatform\V1\TimeSeriesData[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\TimeSeriesData>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTimeSeriesData($var)

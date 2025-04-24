@@ -23,7 +23,7 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Deprecated. This field has no effect.
      *
@@ -36,20 +36,21 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.ProductInputConfig input_config = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $input_config = null;
+    protected $input_config = null;
     /**
      * The desired location of errors incurred during the Import.
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.ImportErrorsConfig errors_config = 3;</code>
      */
-    private $errors_config = null;
+    protected $errors_config = null;
     /**
-     * Indicates which fields in the provided imported 'products' to update. If
-     * not set, will by default update all fields.
+     * Indicates which fields in the provided imported `products` to update. If
+     * not set, all fields are updated. If provided, only the existing product
+     * fields are updated. Missing products will not be created.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 4;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * The mode of reconciliation between existing products and the products to be
      * imported. Defaults to
@@ -57,11 +58,11 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.ImportProductsRequest.ReconciliationMode reconciliation_mode = 5;</code>
      */
-    private $reconciliation_mode = 0;
+    protected $reconciliation_mode = 0;
     /**
      * Full Pub/Sub topic name for receiving notification. If this field is set,
-     * when the import is finished, a notification will be sent to
-     * specified Pub/Sub topic. The message data will be JSON string of a
+     * when the import is finished, a notification is sent to
+     * specified Pub/Sub topic. The message data is JSON string of a
      * [Operation][google.longrunning.Operation].
      * Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`. It has
      * to be within the same project as
@@ -76,7 +77,7 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string notification_pubsub_topic = 7;</code>
      */
-    private $notification_pubsub_topic = '';
+    protected $notification_pubsub_topic = '';
 
     /**
      * Constructor.
@@ -96,16 +97,17 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Retail\V2\ImportErrorsConfig $errors_config
      *           The desired location of errors incurred during the Import.
      *     @type \Google\Protobuf\FieldMask $update_mask
-     *           Indicates which fields in the provided imported 'products' to update. If
-     *           not set, will by default update all fields.
+     *           Indicates which fields in the provided imported `products` to update. If
+     *           not set, all fields are updated. If provided, only the existing product
+     *           fields are updated. Missing products will not be created.
      *     @type int $reconciliation_mode
      *           The mode of reconciliation between existing products and the products to be
      *           imported. Defaults to
      *           [ReconciliationMode.INCREMENTAL][google.cloud.retail.v2.ImportProductsRequest.ReconciliationMode.INCREMENTAL].
      *     @type string $notification_pubsub_topic
      *           Full Pub/Sub topic name for receiving notification. If this field is set,
-     *           when the import is finished, a notification will be sent to
-     *           specified Pub/Sub topic. The message data will be JSON string of a
+     *           when the import is finished, a notification is sent to
+     *           specified Pub/Sub topic. The message data is JSON string of a
      *           [Operation][google.longrunning.Operation].
      *           Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`. It has
      *           to be within the same project as
@@ -259,8 +261,9 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Indicates which fields in the provided imported 'products' to update. If
-     * not set, will by default update all fields.
+     * Indicates which fields in the provided imported `products` to update. If
+     * not set, all fields are updated. If provided, only the existing product
+     * fields are updated. Missing products will not be created.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 4;</code>
      * @return \Google\Protobuf\FieldMask|null
@@ -281,8 +284,9 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Indicates which fields in the provided imported 'products' to update. If
-     * not set, will by default update all fields.
+     * Indicates which fields in the provided imported `products` to update. If
+     * not set, all fields are updated. If provided, only the existing product
+     * fields are updated. Missing products will not be created.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 4;</code>
      * @param \Google\Protobuf\FieldMask $var
@@ -328,8 +332,8 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Full Pub/Sub topic name for receiving notification. If this field is set,
-     * when the import is finished, a notification will be sent to
-     * specified Pub/Sub topic. The message data will be JSON string of a
+     * when the import is finished, a notification is sent to
+     * specified Pub/Sub topic. The message data is JSON string of a
      * [Operation][google.longrunning.Operation].
      * Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`. It has
      * to be within the same project as
@@ -352,8 +356,8 @@ class ImportProductsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Full Pub/Sub topic name for receiving notification. If this field is set,
-     * when the import is finished, a notification will be sent to
-     * specified Pub/Sub topic. The message data will be JSON string of a
+     * when the import is finished, a notification is sent to
+     * specified Pub/Sub topic. The message data is JSON string of a
      * [Operation][google.longrunning.Operation].
      * Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`. It has
      * to be within the same project as

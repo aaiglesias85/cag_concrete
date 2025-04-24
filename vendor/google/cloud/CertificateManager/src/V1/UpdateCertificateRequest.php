@@ -20,15 +20,32 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.certificatemanager.v1.Certificate certificate = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $certificate = null;
+    protected $certificate = null;
     /**
-     * Required. The update mask applies to the resource. For the `FieldMask` definition,
-     * see
+     * Required. The update mask applies to the resource. For the `FieldMask`
+     * definition, see
      * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\CertificateManager\V1\Certificate $certificate Required. A definition of the certificate to update.
+     * @param \Google\Protobuf\FieldMask                      $updateMask  Required. The update mask applies to the resource. For the `FieldMask`
+     *                                                                     definition, see
+     *                                                                     https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
+     *
+     * @return \Google\Cloud\CertificateManager\V1\UpdateCertificateRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\CertificateManager\V1\Certificate $certificate, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setCertificate($certificate)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -39,8 +56,8 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\CertificateManager\V1\Certificate $certificate
      *           Required. A definition of the certificate to update.
      *     @type \Google\Protobuf\FieldMask $update_mask
-     *           Required. The update mask applies to the resource. For the `FieldMask` definition,
-     *           see
+     *           Required. The update mask applies to the resource. For the `FieldMask`
+     *           definition, see
      *           https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
      * }
      */
@@ -86,8 +103,8 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The update mask applies to the resource. For the `FieldMask` definition,
-     * see
+     * Required. The update mask applies to the resource. For the `FieldMask`
+     * definition, see
      * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -109,8 +126,8 @@ class UpdateCertificateRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The update mask applies to the resource. For the `FieldMask` definition,
-     * see
+     * Required. The update mask applies to the resource. For the `FieldMask`
+     * definition, see
      * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>

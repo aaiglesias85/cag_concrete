@@ -33,7 +33,7 @@ class HealthStatus extends \Google\Protobuf\Internal\Message
      */
     private $forwarding_rule_ip = null;
     /**
-     * Health state of the instance.
+     * Health state of the IPv4 address of the instance.
      * Check the HealthState enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string health_state = 324007150;</code>
@@ -51,6 +51,17 @@ class HealthStatus extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string ip_address = 406272220;</code>
      */
     private $ip_address = null;
+    /**
+     * Generated from protobuf field <code>optional string ipv6_address = 341563804;</code>
+     */
+    private $ipv6_address = null;
+    /**
+     * Health state of the IPv6 address of the instance.
+     * Check the Ipv6HealthState enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string ipv6_health_state = 190316614;</code>
+     */
+    private $ipv6_health_state = null;
     /**
      * The named port of the instance group, not necessarily the port that is health-checked.
      *
@@ -82,12 +93,16 @@ class HealthStatus extends \Google\Protobuf\Internal\Message
      *     @type string $forwarding_rule_ip
      *           A forwarding rule IP address assigned to this instance.
      *     @type string $health_state
-     *           Health state of the instance.
+     *           Health state of the IPv4 address of the instance.
      *           Check the HealthState enum for the list of possible values.
      *     @type string $instance
      *           URL of the instance resource.
      *     @type string $ip_address
      *           For target pool based Network Load Balancing, it indicates the forwarding rule's IP address assigned to this instance. For other types of load balancing, the field indicates VM internal ip.
+     *     @type string $ipv6_address
+     *     @type string $ipv6_health_state
+     *           Health state of the IPv6 address of the instance.
+     *           Check the Ipv6HealthState enum for the list of possible values.
      *     @type int $port
      *           The named port of the instance group, not necessarily the port that is health-checked.
      *     @type string $weight
@@ -200,7 +215,7 @@ class HealthStatus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Health state of the instance.
+     * Health state of the IPv4 address of the instance.
      * Check the HealthState enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string health_state = 324007150;</code>
@@ -222,7 +237,7 @@ class HealthStatus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Health state of the instance.
+     * Health state of the IPv4 address of the instance.
      * Check the HealthState enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string health_state = 324007150;</code>
@@ -305,6 +320,76 @@ class HealthStatus extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->ip_address = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>optional string ipv6_address = 341563804;</code>
+     * @return string
+     */
+    public function getIpv6Address()
+    {
+        return isset($this->ipv6_address) ? $this->ipv6_address : '';
+    }
+
+    public function hasIpv6Address()
+    {
+        return isset($this->ipv6_address);
+    }
+
+    public function clearIpv6Address()
+    {
+        unset($this->ipv6_address);
+    }
+
+    /**
+     * Generated from protobuf field <code>optional string ipv6_address = 341563804;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setIpv6Address($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ipv6_address = $var;
+
+        return $this;
+    }
+
+    /**
+     * Health state of the IPv6 address of the instance.
+     * Check the Ipv6HealthState enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string ipv6_health_state = 190316614;</code>
+     * @return string
+     */
+    public function getIpv6HealthState()
+    {
+        return isset($this->ipv6_health_state) ? $this->ipv6_health_state : '';
+    }
+
+    public function hasIpv6HealthState()
+    {
+        return isset($this->ipv6_health_state);
+    }
+
+    public function clearIpv6HealthState()
+    {
+        unset($this->ipv6_health_state);
+    }
+
+    /**
+     * Health state of the IPv6 address of the instance.
+     * Check the Ipv6HealthState enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string ipv6_health_state = 190316614;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setIpv6HealthState($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ipv6_health_state = $var;
 
         return $this;
     }

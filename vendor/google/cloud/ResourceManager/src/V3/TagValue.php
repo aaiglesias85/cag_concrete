@@ -21,31 +21,33 @@ class TagValue extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Immutable. The resource name of the new TagValue's parent TagKey.
      * Must be of the form `tagKeys/{tag_key_id}`.
      *
      * Generated from protobuf field <code>string parent = 2 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Required. Immutable. User-assigned short name for TagValue. The short name should be
-     * unique for TagValues within the same parent TagKey.
+     * Required. Immutable. User-assigned short name for TagValue. The short name
+     * should be unique for TagValues within the same parent TagKey.
      * The short name must be 63 characters or less, beginning and ending with
      * an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_),
      * dots (.), and alphanumerics between.
      *
      * Generated from protobuf field <code>string short_name = 3 [(.google.api.field_behavior) = REQUIRED, (.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $short_name = '';
+    protected $short_name = '';
     /**
-     * Output only. Namespaced name of the TagValue. Must be in the format
-     * `{organization_id}/{tag_key_short_name}/{short_name}`.
+     * Output only. The namespaced name of the TagValue. Can be in the form
+     * `{organization_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     * `{project_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     * `{project_number}/{tag_key_short_name}/{tag_value_short_name}`.
      *
      * Generated from protobuf field <code>string namespaced_name = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $namespaced_name = '';
+    protected $namespaced_name = '';
     /**
      * Optional. User-assigned description of the TagValue.
      * Must not exceed 256 characters.
@@ -53,26 +55,27 @@ class TagValue extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. Creation time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Update time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * Optional. Entity tag which users can pass to prevent race conditions. This field is
-     * always set in server responses. See UpdateTagValueRequest for details.
+     * Optional. Entity tag which users can pass to prevent race conditions. This
+     * field is always set in server responses. See UpdateTagValueRequest for
+     * details.
      *
      * Generated from protobuf field <code>string etag = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $etag = '';
+    protected $etag = '';
 
     /**
      * Constructor.
@@ -86,14 +89,16 @@ class TagValue extends \Google\Protobuf\Internal\Message
      *           Immutable. The resource name of the new TagValue's parent TagKey.
      *           Must be of the form `tagKeys/{tag_key_id}`.
      *     @type string $short_name
-     *           Required. Immutable. User-assigned short name for TagValue. The short name should be
-     *           unique for TagValues within the same parent TagKey.
+     *           Required. Immutable. User-assigned short name for TagValue. The short name
+     *           should be unique for TagValues within the same parent TagKey.
      *           The short name must be 63 characters or less, beginning and ending with
      *           an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_),
      *           dots (.), and alphanumerics between.
      *     @type string $namespaced_name
-     *           Output only. Namespaced name of the TagValue. Must be in the format
-     *           `{organization_id}/{tag_key_short_name}/{short_name}`.
+     *           Output only. The namespaced name of the TagValue. Can be in the form
+     *           `{organization_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     *           `{project_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     *           `{project_number}/{tag_key_short_name}/{tag_value_short_name}`.
      *     @type string $description
      *           Optional. User-assigned description of the TagValue.
      *           Must not exceed 256 characters.
@@ -103,8 +108,9 @@ class TagValue extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Update time.
      *     @type string $etag
-     *           Optional. Entity tag which users can pass to prevent race conditions. This field is
-     *           always set in server responses. See UpdateTagValueRequest for details.
+     *           Optional. Entity tag which users can pass to prevent race conditions. This
+     *           field is always set in server responses. See UpdateTagValueRequest for
+     *           details.
      * }
      */
     public function __construct($data = NULL) {
@@ -167,8 +173,8 @@ class TagValue extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Immutable. User-assigned short name for TagValue. The short name should be
-     * unique for TagValues within the same parent TagKey.
+     * Required. Immutable. User-assigned short name for TagValue. The short name
+     * should be unique for TagValues within the same parent TagKey.
      * The short name must be 63 characters or less, beginning and ending with
      * an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_),
      * dots (.), and alphanumerics between.
@@ -182,8 +188,8 @@ class TagValue extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Immutable. User-assigned short name for TagValue. The short name should be
-     * unique for TagValues within the same parent TagKey.
+     * Required. Immutable. User-assigned short name for TagValue. The short name
+     * should be unique for TagValues within the same parent TagKey.
      * The short name must be 63 characters or less, beginning and ending with
      * an alphanumeric character ([a-z0-9A-Z]) with dashes (-), underscores (_),
      * dots (.), and alphanumerics between.
@@ -201,8 +207,10 @@ class TagValue extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Namespaced name of the TagValue. Must be in the format
-     * `{organization_id}/{tag_key_short_name}/{short_name}`.
+     * Output only. The namespaced name of the TagValue. Can be in the form
+     * `{organization_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     * `{project_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     * `{project_number}/{tag_key_short_name}/{tag_value_short_name}`.
      *
      * Generated from protobuf field <code>string namespaced_name = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -213,8 +221,10 @@ class TagValue extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Namespaced name of the TagValue. Must be in the format
-     * `{organization_id}/{tag_key_short_name}/{short_name}`.
+     * Output only. The namespaced name of the TagValue. Can be in the form
+     * `{organization_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     * `{project_id}/{tag_key_short_name}/{tag_value_short_name}` or
+     * `{project_number}/{tag_key_short_name}/{tag_value_short_name}`.
      *
      * Generated from protobuf field <code>string namespaced_name = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -331,8 +341,9 @@ class TagValue extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Entity tag which users can pass to prevent race conditions. This field is
-     * always set in server responses. See UpdateTagValueRequest for details.
+     * Optional. Entity tag which users can pass to prevent race conditions. This
+     * field is always set in server responses. See UpdateTagValueRequest for
+     * details.
      *
      * Generated from protobuf field <code>string etag = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -343,8 +354,9 @@ class TagValue extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Entity tag which users can pass to prevent race conditions. This field is
-     * always set in server responses. See UpdateTagValueRequest for details.
+     * Optional. Entity tag which users can pass to prevent race conditions. This
+     * field is always set in server responses. See UpdateTagValueRequest for
+     * details.
      *
      * Generated from protobuf field <code>string etag = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var

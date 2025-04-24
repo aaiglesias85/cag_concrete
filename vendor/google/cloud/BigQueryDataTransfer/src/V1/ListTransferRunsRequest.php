@@ -16,14 +16,14 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListTransferRunsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Name of transfer configuration for which transfer runs should be retrieved.
-     * Format of transfer configuration resource name is:
+     * Required. Name of transfer configuration for which transfer runs should be
+     * retrieved. Format of transfer configuration resource name is:
      * `projects/{project_id}/transferConfigs/{config_id}` or
      * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * When specified, only transfer runs with requested states are returned.
      *
@@ -39,19 +39,36 @@ class ListTransferRunsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Page size. The default page size is the maximum value of 1000 results.
      *
      * Generated from protobuf field <code>int32 page_size = 4;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Indicates how run attempts are to be pulled.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.datatransfer.v1.ListTransferRunsRequest.RunAttempt run_attempt = 5;</code>
      */
-    private $run_attempt = 0;
+    protected $run_attempt = 0;
+
+    /**
+     * @param string $parent Required. Name of transfer configuration for which transfer runs should be
+     *                       retrieved. Format of transfer configuration resource name is:
+     *                       `projects/{project_id}/transferConfigs/{config_id}` or
+     *                       `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`. Please see
+     *                       {@see DataTransferServiceClient::transferConfigName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\BigQuery\DataTransfer\V1\ListTransferRunsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -60,11 +77,11 @@ class ListTransferRunsRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. Name of transfer configuration for which transfer runs should be retrieved.
-     *           Format of transfer configuration resource name is:
+     *           Required. Name of transfer configuration for which transfer runs should be
+     *           retrieved. Format of transfer configuration resource name is:
      *           `projects/{project_id}/transferConfigs/{config_id}` or
      *           `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $states
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $states
      *           When specified, only transfer runs with requested states are returned.
      *     @type string $page_token
      *           Pagination token, which can be used to request a specific page
@@ -84,8 +101,8 @@ class ListTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Name of transfer configuration for which transfer runs should be retrieved.
-     * Format of transfer configuration resource name is:
+     * Required. Name of transfer configuration for which transfer runs should be
+     * retrieved. Format of transfer configuration resource name is:
      * `projects/{project_id}/transferConfigs/{config_id}` or
      * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *
@@ -98,8 +115,8 @@ class ListTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Name of transfer configuration for which transfer runs should be retrieved.
-     * Format of transfer configuration resource name is:
+     * Required. Name of transfer configuration for which transfer runs should be
+     * retrieved. Format of transfer configuration resource name is:
      * `projects/{project_id}/transferConfigs/{config_id}` or
      * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *
@@ -130,7 +147,7 @@ class ListTransferRunsRequest extends \Google\Protobuf\Internal\Message
      * When specified, only transfer runs with requested states are returned.
      *
      * Generated from protobuf field <code>repeated .google.cloud.bigquery.datatransfer.v1.TransferState states = 2;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setStates($var)

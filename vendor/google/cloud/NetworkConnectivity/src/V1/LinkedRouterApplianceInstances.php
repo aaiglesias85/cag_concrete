@@ -31,7 +31,22 @@ class LinkedRouterApplianceInstances extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool site_to_site_data_transfer = 2;</code>
      */
-    private $site_to_site_data_transfer = false;
+    protected $site_to_site_data_transfer = false;
+    /**
+     * Output only. The VPC network where these router appliance instances are
+     * located.
+     *
+     * Generated from protobuf field <code>string vpc_network = 3 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
+     */
+    protected $vpc_network = '';
+    /**
+     * Optional. IP ranges allowed to be included during import from hub (does not
+     * control transit connectivity). The only allowed value for now is
+     * "ALL_IPV4_RANGES".
+     *
+     * Generated from protobuf field <code>repeated string include_import_ranges = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $include_import_ranges;
 
     /**
      * Constructor.
@@ -39,12 +54,19 @@ class LinkedRouterApplianceInstances extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\NetworkConnectivity\V1\RouterApplianceInstance[]|\Google\Protobuf\Internal\RepeatedField $instances
+     *     @type array<\Google\Cloud\NetworkConnectivity\V1\RouterApplianceInstance>|\Google\Protobuf\Internal\RepeatedField $instances
      *           The list of router appliance instances.
      *     @type bool $site_to_site_data_transfer
      *           A value that controls whether site-to-site data transfer is enabled for
      *           these resources. Data transfer is available only in [supported
      *           locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations).
+     *     @type string $vpc_network
+     *           Output only. The VPC network where these router appliance instances are
+     *           located.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $include_import_ranges
+     *           Optional. IP ranges allowed to be included during import from hub (does not
+     *           control transit connectivity). The only allowed value for now is
+     *           "ALL_IPV4_RANGES".
      * }
      */
     public function __construct($data = NULL) {
@@ -67,7 +89,7 @@ class LinkedRouterApplianceInstances extends \Google\Protobuf\Internal\Message
      * The list of router appliance instances.
      *
      * Generated from protobuf field <code>repeated .google.cloud.networkconnectivity.v1.RouterApplianceInstance instances = 1;</code>
-     * @param \Google\Cloud\NetworkConnectivity\V1\RouterApplianceInstance[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\NetworkConnectivity\V1\RouterApplianceInstance>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInstances($var)
@@ -104,6 +126,64 @@ class LinkedRouterApplianceInstances extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->site_to_site_data_transfer = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The VPC network where these router appliance instances are
+     * located.
+     *
+     * Generated from protobuf field <code>string vpc_network = 3 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getVpcNetwork()
+    {
+        return $this->vpc_network;
+    }
+
+    /**
+     * Output only. The VPC network where these router appliance instances are
+     * located.
+     *
+     * Generated from protobuf field <code>string vpc_network = 3 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setVpcNetwork($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->vpc_network = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. IP ranges allowed to be included during import from hub (does not
+     * control transit connectivity). The only allowed value for now is
+     * "ALL_IPV4_RANGES".
+     *
+     * Generated from protobuf field <code>repeated string include_import_ranges = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getIncludeImportRanges()
+    {
+        return $this->include_import_ranges;
+    }
+
+    /**
+     * Optional. IP ranges allowed to be included during import from hub (does not
+     * control transit connectivity). The only allowed value for now is
+     * "ALL_IPV4_RANGES".
+     *
+     * Generated from protobuf field <code>repeated string include_import_ranges = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setIncludeImportRanges($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->include_import_ranges = $arr;
 
         return $this;
     }

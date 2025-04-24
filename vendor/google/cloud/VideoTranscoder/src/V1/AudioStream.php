@@ -27,19 +27,20 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string codec = 1;</code>
      */
-    private $codec = '';
+    protected $codec = '';
     /**
-     * Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     * Required. Audio bitrate in bits per second. Must be between 1 and
+     * 10,000,000.
      *
      * Generated from protobuf field <code>int32 bitrate_bps = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $bitrate_bps = 0;
+    protected $bitrate_bps = 0;
     /**
      * Number of audio channels. Must be between 1 and 6. The default is 2.
      *
      * Generated from protobuf field <code>int32 channel_count = 3;</code>
      */
-    private $channel_count = 0;
+    protected $channel_count = 0;
     /**
      * A list of channel names specifying layout of the audio channels.
      * This only affects the metadata embedded in the container headers, if
@@ -66,7 +67,23 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 sample_rate_hertz = 6;</code>
      */
-    private $sample_rate_hertz = 0;
+    protected $sample_rate_hertz = 0;
+    /**
+     * The BCP-47 language code, such as `en-US` or `sr-Latn`. For more
+     * information, see
+     * https://www.unicode.org/reports/tr35/#Unicode_locale_identifier. Not
+     * supported in MP4 files.
+     *
+     * Generated from protobuf field <code>string language_code = 7;</code>
+     */
+    protected $language_code = '';
+    /**
+     * The name for this particular audio stream that
+     * will be added to the HLS/DASH manifest. Not supported in MP4 files.
+     *
+     * Generated from protobuf field <code>string display_name = 8;</code>
+     */
+    protected $display_name = '';
 
     /**
      * Constructor.
@@ -84,10 +101,11 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *           - `ac3`
      *           - `eac3`
      *     @type int $bitrate_bps
-     *           Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     *           Required. Audio bitrate in bits per second. Must be between 1 and
+     *           10,000,000.
      *     @type int $channel_count
      *           Number of audio channels. Must be between 1 and 6. The default is 2.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $channel_layout
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $channel_layout
      *           A list of channel names specifying layout of the audio channels.
      *           This only affects the metadata embedded in the container headers, if
      *           supported by the specified format. The default is `["fl", "fr"]`.
@@ -98,10 +116,18 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      *           - `sr` - Side right channel
      *           - `fc` - Front center channel
      *           - `lfe` - Low frequency
-     *     @type \Google\Cloud\Video\Transcoder\V1\AudioStream\AudioMapping[]|\Google\Protobuf\Internal\RepeatedField $mapping
+     *     @type array<\Google\Cloud\Video\Transcoder\V1\AudioStream\AudioMapping>|\Google\Protobuf\Internal\RepeatedField $mapping
      *           The mapping for the `Job.edit_list` atoms with audio `EditAtom.inputs`.
      *     @type int $sample_rate_hertz
      *           The audio sample rate in Hertz. The default is 48000 Hertz.
+     *     @type string $language_code
+     *           The BCP-47 language code, such as `en-US` or `sr-Latn`. For more
+     *           information, see
+     *           https://www.unicode.org/reports/tr35/#Unicode_locale_identifier. Not
+     *           supported in MP4 files.
+     *     @type string $display_name
+     *           The name for this particular audio stream that
+     *           will be added to the HLS/DASH manifest. Not supported in MP4 files.
      * }
      */
     public function __construct($data = NULL) {
@@ -150,7 +176,8 @@ class AudioStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     * Required. Audio bitrate in bits per second. Must be between 1 and
+     * 10,000,000.
      *
      * Generated from protobuf field <code>int32 bitrate_bps = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return int
@@ -161,7 +188,8 @@ class AudioStream extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Audio bitrate in bits per second. Must be between 1 and 10,000,000.
+     * Required. Audio bitrate in bits per second. Must be between 1 and
+     * 10,000,000.
      *
      * Generated from protobuf field <code>int32 bitrate_bps = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param int $var
@@ -234,7 +262,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      * - `lfe` - Low frequency
      *
      * Generated from protobuf field <code>repeated string channel_layout = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setChannelLayout($var)
@@ -260,7 +288,7 @@ class AudioStream extends \Google\Protobuf\Internal\Message
      * The mapping for the `Job.edit_list` atoms with audio `EditAtom.inputs`.
      *
      * Generated from protobuf field <code>repeated .google.cloud.video.transcoder.v1.AudioStream.AudioMapping mapping = 5;</code>
-     * @param \Google\Cloud\Video\Transcoder\V1\AudioStream\AudioMapping[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Video\Transcoder\V1\AudioStream\AudioMapping>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMapping($var)
@@ -293,6 +321,66 @@ class AudioStream extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkInt32($var);
         $this->sample_rate_hertz = $var;
+
+        return $this;
+    }
+
+    /**
+     * The BCP-47 language code, such as `en-US` or `sr-Latn`. For more
+     * information, see
+     * https://www.unicode.org/reports/tr35/#Unicode_locale_identifier. Not
+     * supported in MP4 files.
+     *
+     * Generated from protobuf field <code>string language_code = 7;</code>
+     * @return string
+     */
+    public function getLanguageCode()
+    {
+        return $this->language_code;
+    }
+
+    /**
+     * The BCP-47 language code, such as `en-US` or `sr-Latn`. For more
+     * information, see
+     * https://www.unicode.org/reports/tr35/#Unicode_locale_identifier. Not
+     * supported in MP4 files.
+     *
+     * Generated from protobuf field <code>string language_code = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setLanguageCode($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->language_code = $var;
+
+        return $this;
+    }
+
+    /**
+     * The name for this particular audio stream that
+     * will be added to the HLS/DASH manifest. Not supported in MP4 files.
+     *
+     * Generated from protobuf field <code>string display_name = 8;</code>
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->display_name;
+    }
+
+    /**
+     * The name for this particular audio stream that
+     * will be added to the HLS/DASH manifest. Not supported in MP4 files.
+     *
+     * Generated from protobuf field <code>string display_name = 8;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDisplayName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->display_name = $var;
 
         return $this;
     }

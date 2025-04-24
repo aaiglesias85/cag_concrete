@@ -16,17 +16,23 @@ use Google\Protobuf\Internal\GPBUtil;
 class PreprocessingConfig extends \Google\Protobuf\Internal\Message
 {
     /**
+     * Audio preprocessing configuration.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.livestream.v1.PreprocessingConfig.Audio audio = 1;</code>
+     */
+    protected $audio = null;
+    /**
      * Specify the video cropping configuration.
      *
      * Generated from protobuf field <code>.google.cloud.video.livestream.v1.PreprocessingConfig.Crop crop = 2;</code>
      */
-    private $crop = null;
+    protected $crop = null;
     /**
      * Specify the video pad filter configuration.
      *
      * Generated from protobuf field <code>.google.cloud.video.livestream.v1.PreprocessingConfig.Pad pad = 3;</code>
      */
-    private $pad = null;
+    protected $pad = null;
 
     /**
      * Constructor.
@@ -34,6 +40,8 @@ class PreprocessingConfig extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type \Google\Cloud\Video\LiveStream\V1\PreprocessingConfig\Audio $audio
+     *           Audio preprocessing configuration.
      *     @type \Google\Cloud\Video\LiveStream\V1\PreprocessingConfig\Crop $crop
      *           Specify the video cropping configuration.
      *     @type \Google\Cloud\Video\LiveStream\V1\PreprocessingConfig\Pad $pad
@@ -43,6 +51,42 @@ class PreprocessingConfig extends \Google\Protobuf\Internal\Message
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Cloud\Video\Livestream\V1\Outputs::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * Audio preprocessing configuration.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.livestream.v1.PreprocessingConfig.Audio audio = 1;</code>
+     * @return \Google\Cloud\Video\LiveStream\V1\PreprocessingConfig\Audio|null
+     */
+    public function getAudio()
+    {
+        return $this->audio;
+    }
+
+    public function hasAudio()
+    {
+        return isset($this->audio);
+    }
+
+    public function clearAudio()
+    {
+        unset($this->audio);
+    }
+
+    /**
+     * Audio preprocessing configuration.
+     *
+     * Generated from protobuf field <code>.google.cloud.video.livestream.v1.PreprocessingConfig.Audio audio = 1;</code>
+     * @param \Google\Cloud\Video\LiveStream\V1\PreprocessingConfig\Audio $var
+     * @return $this
+     */
+    public function setAudio($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Video\LiveStream\V1\PreprocessingConfig\Audio::class);
+        $this->audio = $var;
+
+        return $this;
     }
 
     /**

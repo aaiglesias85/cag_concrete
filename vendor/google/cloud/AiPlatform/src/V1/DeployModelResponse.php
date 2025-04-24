@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [EndpointService.DeployModel][google.cloud.aiplatform.v1.EndpointService.DeployModel].
+ * Response message for
+ * [EndpointService.DeployModel][google.cloud.aiplatform.v1.EndpointService.DeployModel].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.DeployModelResponse</code>
  */
@@ -20,7 +21,7 @@ class DeployModelResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DeployedModel deployed_model = 1;</code>
      */
-    private $deployed_model = null;
+    protected $deployed_model = null;
 
     /**
      * Constructor.

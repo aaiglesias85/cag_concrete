@@ -98,26 +98,26 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 vehicle_index = 1;</code>
      */
-    private $vehicle_index = 0;
+    protected $vehicle_index = 0;
     /**
      * Label of the vehicle performing this route, equal to
      * `ShipmentModel.vehicles(vehicle_index).label`, if specified.
      *
      * Generated from protobuf field <code>string vehicle_label = 2;</code>
      */
-    private $vehicle_label = '';
+    protected $vehicle_label = '';
     /**
      * Time at which the vehicle starts its route.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp vehicle_start_time = 5;</code>
      */
-    private $vehicle_start_time = null;
+    protected $vehicle_start_time = null;
     /**
      * Time at which the vehicle finishes its route.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp vehicle_end_time = 6;</code>
      */
-    private $vehicle_end_time = null;
+    protected $vehicle_end_time = null;
     /**
      * Ordered sequence of visits representing a route.
      * visits[i] is the i-th visit in the route.
@@ -140,8 +140,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      * insufficient time to complete traffic-adjusted travel, delays, and breaks
      * between visits, before the first visit, or after the last visit, while
      * still satisfying the visit and vehicle time windows. For example,
-     *   ```start_time(previous_visit) + duration(previous_visit) +
-     *   travel_duration(previous_visit, next_visit) > start_time(next_visit)```
+     * ```
+     *   start_time(previous_visit) + duration(previous_visit) +
+     *   travel_duration(previous_visit, next_visit) > start_time(next_visit)
+     * ```
      * Arrival at next_visit will likely happen later than its current
      * time window due the increased estimate of travel time
      * `travel_duration(previous_visit, next_visit)` due to traffic. Also, a break
@@ -150,7 +152,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool has_traffic_infeasibilities = 9;</code>
      */
-    private $has_traffic_infeasibilities = false;
+    protected $has_traffic_infeasibilities = false;
     /**
      * The encoded polyline representation of the route.
      * This field is only populated if
@@ -159,7 +161,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.ShipmentRoute.EncodedPolyline route_polyline = 10;</code>
      */
-    private $route_polyline = null;
+    protected $route_polyline = null;
     /**
      * Breaks scheduled for the vehicle performing this route.
      * The `breaks` sequence represents time intervals, each starting at the
@@ -170,12 +172,16 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     private $breaks;
     /**
      * Duration, distance and load metrics for this route. The fields of
-     * [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are summed over all [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] or
-     * [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits], depending on the context.
+     * [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are
+     * summed over all
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * or
+     * [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits],
+     * depending on the context.
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.AggregatedMetrics metrics = 12;</code>
      */
-    private $metrics = null;
+    protected $metrics = null;
     /**
      * Cost of the route, broken down by cost-related request fields.
      * The keys are proto paths, relative to the input OptimizeToursRequest, e.g.
@@ -194,11 +200,13 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double route_total_cost = 18;</code>
      */
-    private $route_total_cost = 0.0;
+    protected $route_total_cost = 0.0;
     /**
-     * Deprecated: Use [ShipmentRoute.Transition.loads][] instead.
-     * Vehicle loads upon arrival at its end location, for each
-     * type specified in [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
+     * Deprecated: Use
+     * [Transition.vehicle_loads][google.cloud.optimization.v1.ShipmentRoute.Transition.vehicle_loads]
+     * instead. Vehicle loads upon arrival at its end location, for each type
+     * specified in
+     * [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
      * `start_load_intervals`, `end_load_intervals` or demands. Exception: we omit
      * loads for quantity types unconstrained by intervals and that don't have any
      * non-zero demand on the route.
@@ -208,8 +216,9 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      */
     private $end_loads;
     /**
-     * Deprecated: Use [ShipmentRoute.Transition][] instead.
-     * Ordered list of travel steps for the route.
+     * Deprecated: Use
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * instead. Ordered list of travel steps for the route.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute.TravelStep travel_steps = 14 [deprecated = true];</code>
      * @deprecated
@@ -218,8 +227,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     /**
      * Deprecated: No longer used.
      * This field will only be populated at the
-     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit] level.
-     * Extra detour time due to the shipments visited on the route.
+     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit]
+     * level.
+     * This field is the extra detour time due to the shipments visited on the
+     * route.
      * It is equal to `vehicle_end_time` - `vehicle_start_time` - travel duration
      * from the vehicle's start_location to its `end_location`.
      *
@@ -228,8 +239,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      */
     protected $vehicle_detour = null;
     /**
-     * Deprecated: Use [ShipmentRoute.Transition.delay_duration][] instead.
-     * Delay occurring before the vehicle end. See
+     * Deprecated: Delay occurring before the vehicle end. See
      * [TransitionAttributes.delay][google.cloud.optimization.v1.TransitionAttributes.delay].
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.ShipmentRoute.Delay delay_before_vehicle_end = 16 [deprecated = true];</code>
@@ -253,11 +263,11 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *           Time at which the vehicle starts its route.
      *     @type \Google\Protobuf\Timestamp $vehicle_end_time
      *           Time at which the vehicle finishes its route.
-     *     @type \Google\Cloud\Optimization\V1\ShipmentRoute\Visit[]|\Google\Protobuf\Internal\RepeatedField $visits
+     *     @type array<\Google\Cloud\Optimization\V1\ShipmentRoute\Visit>|\Google\Protobuf\Internal\RepeatedField $visits
      *           Ordered sequence of visits representing a route.
      *           visits[i] is the i-th visit in the route.
      *           If this field is empty, the vehicle is considered as unused.
-     *     @type \Google\Cloud\Optimization\V1\ShipmentRoute\Transition[]|\Google\Protobuf\Internal\RepeatedField $transitions
+     *     @type array<\Google\Cloud\Optimization\V1\ShipmentRoute\Transition>|\Google\Protobuf\Internal\RepeatedField $transitions
      *           Ordered list of transitions for the route.
      *     @type bool $has_traffic_infeasibilities
      *           When
@@ -267,8 +277,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *           insufficient time to complete traffic-adjusted travel, delays, and breaks
      *           between visits, before the first visit, or after the last visit, while
      *           still satisfying the visit and vehicle time windows. For example,
-     *             ```start_time(previous_visit) + duration(previous_visit) +
-     *             travel_duration(previous_visit, next_visit) > start_time(next_visit)```
+     *           ```
+     *             start_time(previous_visit) + duration(previous_visit) +
+     *             travel_duration(previous_visit, next_visit) > start_time(next_visit)
+     *           ```
      *           Arrival at next_visit will likely happen later than its current
      *           time window due the increased estimate of travel time
      *           `travel_duration(previous_visit, next_visit)` due to traffic. Also, a break
@@ -279,14 +291,18 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *           This field is only populated if
      *           [OptimizeToursRequest.populate_polylines][google.cloud.optimization.v1.OptimizeToursRequest.populate_polylines]
      *           is set to true.
-     *     @type \Google\Cloud\Optimization\V1\ShipmentRoute\PBBreak[]|\Google\Protobuf\Internal\RepeatedField $breaks
+     *     @type array<\Google\Cloud\Optimization\V1\ShipmentRoute\PBBreak>|\Google\Protobuf\Internal\RepeatedField $breaks
      *           Breaks scheduled for the vehicle performing this route.
      *           The `breaks` sequence represents time intervals, each starting at the
      *           corresponding `start_time` and lasting `duration` seconds.
      *     @type \Google\Cloud\Optimization\V1\AggregatedMetrics $metrics
      *           Duration, distance and load metrics for this route. The fields of
-     *           [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are summed over all [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] or
-     *           [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits], depending on the context.
+     *           [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are
+     *           summed over all
+     *           [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     *           or
+     *           [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits],
+     *           depending on the context.
      *     @type array|\Google\Protobuf\Internal\MapField $route_costs
      *           Cost of the route, broken down by cost-related request fields.
      *           The keys are proto paths, relative to the input OptimizeToursRequest, e.g.
@@ -298,26 +314,30 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      *           that are only reported in an aggregated way as of 2022/01.
      *     @type float $route_total_cost
      *           Total cost of the route. The sum of all costs in the cost map.
-     *     @type \Google\Cloud\Optimization\V1\CapacityQuantity[]|\Google\Protobuf\Internal\RepeatedField $end_loads
-     *           Deprecated: Use [ShipmentRoute.Transition.loads][] instead.
-     *           Vehicle loads upon arrival at its end location, for each
-     *           type specified in [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
+     *     @type array<\Google\Cloud\Optimization\V1\CapacityQuantity>|\Google\Protobuf\Internal\RepeatedField $end_loads
+     *           Deprecated: Use
+     *           [Transition.vehicle_loads][google.cloud.optimization.v1.ShipmentRoute.Transition.vehicle_loads]
+     *           instead. Vehicle loads upon arrival at its end location, for each type
+     *           specified in
+     *           [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
      *           `start_load_intervals`, `end_load_intervals` or demands. Exception: we omit
      *           loads for quantity types unconstrained by intervals and that don't have any
      *           non-zero demand on the route.
-     *     @type \Google\Cloud\Optimization\V1\ShipmentRoute\TravelStep[]|\Google\Protobuf\Internal\RepeatedField $travel_steps
-     *           Deprecated: Use [ShipmentRoute.Transition][] instead.
-     *           Ordered list of travel steps for the route.
+     *     @type array<\Google\Cloud\Optimization\V1\ShipmentRoute\TravelStep>|\Google\Protobuf\Internal\RepeatedField $travel_steps
+     *           Deprecated: Use
+     *           [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     *           instead. Ordered list of travel steps for the route.
      *     @type \Google\Protobuf\Duration $vehicle_detour
      *           Deprecated: No longer used.
      *           This field will only be populated at the
-     *           [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit] level.
-     *           Extra detour time due to the shipments visited on the route.
+     *           [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit]
+     *           level.
+     *           This field is the extra detour time due to the shipments visited on the
+     *           route.
      *           It is equal to `vehicle_end_time` - `vehicle_start_time` - travel duration
      *           from the vehicle's start_location to its `end_location`.
      *     @type \Google\Cloud\Optimization\V1\ShipmentRoute\Delay $delay_before_vehicle_end
-     *           Deprecated: Use [ShipmentRoute.Transition.delay_duration][] instead.
-     *           Delay occurring before the vehicle end. See
+     *           Deprecated: Delay occurring before the vehicle end. See
      *           [TransitionAttributes.delay][google.cloud.optimization.v1.TransitionAttributes.delay].
      * }
      */
@@ -473,7 +493,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      * If this field is empty, the vehicle is considered as unused.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute.Visit visits = 7;</code>
-     * @param \Google\Cloud\Optimization\V1\ShipmentRoute\Visit[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\ShipmentRoute\Visit>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVisits($var)
@@ -499,7 +519,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      * Ordered list of transitions for the route.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute.Transition transitions = 8;</code>
-     * @param \Google\Cloud\Optimization\V1\ShipmentRoute\Transition[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\ShipmentRoute\Transition>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTransitions($var)
@@ -518,8 +538,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      * insufficient time to complete traffic-adjusted travel, delays, and breaks
      * between visits, before the first visit, or after the last visit, while
      * still satisfying the visit and vehicle time windows. For example,
-     *   ```start_time(previous_visit) + duration(previous_visit) +
-     *   travel_duration(previous_visit, next_visit) > start_time(next_visit)```
+     * ```
+     *   start_time(previous_visit) + duration(previous_visit) +
+     *   travel_duration(previous_visit, next_visit) > start_time(next_visit)
+     * ```
      * Arrival at next_visit will likely happen later than its current
      * time window due the increased estimate of travel time
      * `travel_duration(previous_visit, next_visit)` due to traffic. Also, a break
@@ -542,8 +564,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      * insufficient time to complete traffic-adjusted travel, delays, and breaks
      * between visits, before the first visit, or after the last visit, while
      * still satisfying the visit and vehicle time windows. For example,
-     *   ```start_time(previous_visit) + duration(previous_visit) +
-     *   travel_duration(previous_visit, next_visit) > start_time(next_visit)```
+     * ```
+     *   start_time(previous_visit) + duration(previous_visit) +
+     *   travel_duration(previous_visit, next_visit) > start_time(next_visit)
+     * ```
      * Arrival at next_visit will likely happen later than its current
      * time window due the increased estimate of travel time
      * `travel_duration(previous_visit, next_visit)` due to traffic. Also, a break
@@ -623,7 +647,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
      * corresponding `start_time` and lasting `duration` seconds.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute.Break breaks = 11;</code>
-     * @param \Google\Cloud\Optimization\V1\ShipmentRoute\PBBreak[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\ShipmentRoute\PBBreak>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBreaks($var)
@@ -636,8 +660,12 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
 
     /**
      * Duration, distance and load metrics for this route. The fields of
-     * [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are summed over all [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] or
-     * [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits], depending on the context.
+     * [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are
+     * summed over all
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * or
+     * [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits],
+     * depending on the context.
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.AggregatedMetrics metrics = 12;</code>
      * @return \Google\Cloud\Optimization\V1\AggregatedMetrics|null
@@ -659,8 +687,12 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
 
     /**
      * Duration, distance and load metrics for this route. The fields of
-     * [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are summed over all [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] or
-     * [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits], depending on the context.
+     * [AggregatedMetrics][google.cloud.optimization.v1.AggregatedMetrics] are
+     * summed over all
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * or
+     * [ShipmentRoute.visits][google.cloud.optimization.v1.ShipmentRoute.visits],
+     * depending on the context.
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.AggregatedMetrics metrics = 12;</code>
      * @param \Google\Cloud\Optimization\V1\AggregatedMetrics $var
@@ -741,9 +773,11 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [ShipmentRoute.Transition.loads][] instead.
-     * Vehicle loads upon arrival at its end location, for each
-     * type specified in [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
+     * Deprecated: Use
+     * [Transition.vehicle_loads][google.cloud.optimization.v1.ShipmentRoute.Transition.vehicle_loads]
+     * instead. Vehicle loads upon arrival at its end location, for each type
+     * specified in
+     * [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
      * `start_load_intervals`, `end_load_intervals` or demands. Exception: we omit
      * loads for quantity types unconstrained by intervals and that don't have any
      * non-zero demand on the route.
@@ -759,15 +793,17 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [ShipmentRoute.Transition.loads][] instead.
-     * Vehicle loads upon arrival at its end location, for each
-     * type specified in [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
+     * Deprecated: Use
+     * [Transition.vehicle_loads][google.cloud.optimization.v1.ShipmentRoute.Transition.vehicle_loads]
+     * instead. Vehicle loads upon arrival at its end location, for each type
+     * specified in
+     * [Vehicle.capacities][google.cloud.optimization.v1.Vehicle.capacities],
      * `start_load_intervals`, `end_load_intervals` or demands. Exception: we omit
      * loads for quantity types unconstrained by intervals and that don't have any
      * non-zero demand on the route.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity end_loads = 13 [deprecated = true];</code>
-     * @param \Google\Cloud\Optimization\V1\CapacityQuantity[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\CapacityQuantity>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */
@@ -781,8 +817,9 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [ShipmentRoute.Transition][] instead.
-     * Ordered list of travel steps for the route.
+     * Deprecated: Use
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * instead. Ordered list of travel steps for the route.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute.TravelStep travel_steps = 14 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -795,11 +832,12 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [ShipmentRoute.Transition][] instead.
-     * Ordered list of travel steps for the route.
+     * Deprecated: Use
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * instead. Ordered list of travel steps for the route.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute.TravelStep travel_steps = 14 [deprecated = true];</code>
-     * @param \Google\Cloud\Optimization\V1\ShipmentRoute\TravelStep[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\ShipmentRoute\TravelStep>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */
@@ -815,8 +853,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     /**
      * Deprecated: No longer used.
      * This field will only be populated at the
-     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit] level.
-     * Extra detour time due to the shipments visited on the route.
+     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit]
+     * level.
+     * This field is the extra detour time due to the shipments visited on the
+     * route.
      * It is equal to `vehicle_end_time` - `vehicle_start_time` - travel duration
      * from the vehicle's start_location to its `end_location`.
      *
@@ -845,8 +885,10 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     /**
      * Deprecated: No longer used.
      * This field will only be populated at the
-     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit] level.
-     * Extra detour time due to the shipments visited on the route.
+     * [ShipmentRoute.Visit][google.cloud.optimization.v1.ShipmentRoute.Visit]
+     * level.
+     * This field is the extra detour time due to the shipments visited on the
+     * route.
      * It is equal to `vehicle_end_time` - `vehicle_start_time` - travel duration
      * from the vehicle's start_location to its `end_location`.
      *
@@ -865,8 +907,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [ShipmentRoute.Transition.delay_duration][] instead.
-     * Delay occurring before the vehicle end. See
+     * Deprecated: Delay occurring before the vehicle end. See
      * [TransitionAttributes.delay][google.cloud.optimization.v1.TransitionAttributes.delay].
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.ShipmentRoute.Delay delay_before_vehicle_end = 16 [deprecated = true];</code>
@@ -892,8 +933,7 @@ class ShipmentRoute extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [ShipmentRoute.Transition.delay_duration][] instead.
-     * Delay occurring before the vehicle end. See
+     * Deprecated: Delay occurring before the vehicle end. See
      * [TransitionAttributes.delay][google.cloud.optimization.v1.TransitionAttributes.delay].
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.ShipmentRoute.Delay delay_before_vehicle_end = 16 [deprecated = true];</code>

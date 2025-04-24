@@ -21,19 +21,21 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
 {
     /**
      * The type of the notification channel. This field matches the
-     * value of the [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type] field.
+     * value of the
+     * [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type]
+     * field.
      *
      * Generated from protobuf field <code>string type = 1;</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
-     * The full REST resource name for this channel. The format is:
+     * Identifier. The full REST resource name for this channel. The format is:
      *     projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
      * The `[CHANNEL_ID]` is automatically assigned by the server on creation.
      *
-     * Generated from protobuf field <code>string name = 6;</code>
+     * Generated from protobuf field <code>string name = 6 [(.google.api.field_behavior) = IDENTIFIER];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * An optional human-readable name for this notification channel. It is
      * recommended that you specify a non-empty and unique name in order to
@@ -42,7 +44,7 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 3;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * An optional human-readable description of this notification channel. This
      * description may provide additional details, beyond the display
@@ -50,12 +52,12 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 4;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Configuration fields that define the channel and its behavior. The
      * permissible and required labels are specified in the
-     * [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels] of the
-     * `NotificationChannelDescriptor` corresponding to the `type` field.
+     * [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels]
+     * of the `NotificationChannelDescriptor` corresponding to the `type` field.
      *
      * Generated from protobuf field <code>map<string, string> labels = 5;</code>
      */
@@ -93,7 +95,7 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.NotificationChannel.VerificationStatus verification_status = 9;</code>
      */
-    private $verification_status = 0;
+    protected $verification_status = 0;
     /**
      * Whether notifications are forwarded to the described channel. This makes
      * it possible to disable delivery of notifications to a particular channel
@@ -104,13 +106,13 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue enabled = 11;</code>
      */
-    private $enabled = null;
+    protected $enabled = null;
     /**
      * Record of the creation of this channel.
      *
      * Generated from protobuf field <code>.google.monitoring.v3.MutationRecord creation_record = 12;</code>
      */
-    private $creation_record = null;
+    protected $creation_record = null;
     /**
      * Records of the modification of this channel.
      *
@@ -126,9 +128,11 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *
      *     @type string $type
      *           The type of the notification channel. This field matches the
-     *           value of the [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type] field.
+     *           value of the
+     *           [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type]
+     *           field.
      *     @type string $name
-     *           The full REST resource name for this channel. The format is:
+     *           Identifier. The full REST resource name for this channel. The format is:
      *               projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
      *           The `[CHANNEL_ID]` is automatically assigned by the server on creation.
      *     @type string $display_name
@@ -143,8 +147,8 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Configuration fields that define the channel and its behavior. The
      *           permissible and required labels are specified in the
-     *           [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels] of the
-     *           `NotificationChannelDescriptor` corresponding to the `type` field.
+     *           [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels]
+     *           of the `NotificationChannelDescriptor` corresponding to the `type` field.
      *     @type array|\Google\Protobuf\Internal\MapField $user_labels
      *           User-supplied key/value data that does not need to conform to
      *           the corresponding `NotificationChannelDescriptor`'s schema, unlike
@@ -180,7 +184,7 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      *           of alerting policies on the channel at some point in the future.
      *     @type \Google\Cloud\Monitoring\V3\MutationRecord $creation_record
      *           Record of the creation of this channel.
-     *     @type \Google\Cloud\Monitoring\V3\MutationRecord[]|\Google\Protobuf\Internal\RepeatedField $mutation_records
+     *     @type array<\Google\Cloud\Monitoring\V3\MutationRecord>|\Google\Protobuf\Internal\RepeatedField $mutation_records
      *           Records of the modification of this channel.
      * }
      */
@@ -191,7 +195,9 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
 
     /**
      * The type of the notification channel. This field matches the
-     * value of the [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type] field.
+     * value of the
+     * [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type]
+     * field.
      *
      * Generated from protobuf field <code>string type = 1;</code>
      * @return string
@@ -203,7 +209,9 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
 
     /**
      * The type of the notification channel. This field matches the
-     * value of the [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type] field.
+     * value of the
+     * [NotificationChannelDescriptor.type][google.monitoring.v3.NotificationChannelDescriptor.type]
+     * field.
      *
      * Generated from protobuf field <code>string type = 1;</code>
      * @param string $var
@@ -218,11 +226,11 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The full REST resource name for this channel. The format is:
+     * Identifier. The full REST resource name for this channel. The format is:
      *     projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
      * The `[CHANNEL_ID]` is automatically assigned by the server on creation.
      *
-     * Generated from protobuf field <code>string name = 6;</code>
+     * Generated from protobuf field <code>string name = 6 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @return string
      */
     public function getName()
@@ -231,11 +239,11 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The full REST resource name for this channel. The format is:
+     * Identifier. The full REST resource name for this channel. The format is:
      *     projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
      * The `[CHANNEL_ID]` is automatically assigned by the server on creation.
      *
-     * Generated from protobuf field <code>string name = 6;</code>
+     * Generated from protobuf field <code>string name = 6 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @param string $var
      * @return $this
      */
@@ -312,8 +320,8 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
     /**
      * Configuration fields that define the channel and its behavior. The
      * permissible and required labels are specified in the
-     * [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels] of the
-     * `NotificationChannelDescriptor` corresponding to the `type` field.
+     * [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels]
+     * of the `NotificationChannelDescriptor` corresponding to the `type` field.
      *
      * Generated from protobuf field <code>map<string, string> labels = 5;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -326,8 +334,8 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
     /**
      * Configuration fields that define the channel and its behavior. The
      * permissible and required labels are specified in the
-     * [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels] of the
-     * `NotificationChannelDescriptor` corresponding to the `type` field.
+     * [NotificationChannelDescriptor.labels][google.monitoring.v3.NotificationChannelDescriptor.labels]
+     * of the `NotificationChannelDescriptor` corresponding to the `type` field.
      *
      * Generated from protobuf field <code>map<string, string> labels = 5;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -476,7 +484,7 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.BoolValue enabled = 11;</code>
      * @return bool|null
      */
-    public function getEnabledValue()
+    public function getEnabledUnwrapped()
     {
         return $this->readWrapperValue("enabled");
     }
@@ -515,7 +523,7 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      * @param bool|null $var
      * @return $this
      */
-    public function setEnabledValue($var)
+    public function setEnabledUnwrapped($var)
     {
         $this->writeWrapperValue("enabled", $var);
         return $this;}
@@ -571,7 +579,7 @@ class NotificationChannel extends \Google\Protobuf\Internal\Message
      * Records of the modification of this channel.
      *
      * Generated from protobuf field <code>repeated .google.monitoring.v3.MutationRecord mutation_records = 13;</code>
-     * @param \Google\Cloud\Monitoring\V3\MutationRecord[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Monitoring\V3\MutationRecord>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMutationRecords($var)

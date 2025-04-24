@@ -16,19 +16,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class FeatureSpec extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. ID of the Feature to import values of. This Feature must exist in the
-     * target EntityType, or the request will fail.
+     * Required. ID of the Feature to import values of. This Feature must exist
+     * in the target EntityType, or the request will fail.
      *
      * Generated from protobuf field <code>string id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Source column to get the Feature values from. If not set, uses the column
      * with the same name as the Feature ID.
      *
      * Generated from protobuf field <code>string source_field = 2;</code>
      */
-    private $source_field = '';
+    protected $source_field = '';
 
     /**
      * Constructor.
@@ -37,8 +37,8 @@ class FeatureSpec extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $id
-     *           Required. ID of the Feature to import values of. This Feature must exist in the
-     *           target EntityType, or the request will fail.
+     *           Required. ID of the Feature to import values of. This Feature must exist
+     *           in the target EntityType, or the request will fail.
      *     @type string $source_field
      *           Source column to get the Feature values from. If not set, uses the column
      *           with the same name as the Feature ID.
@@ -50,8 +50,8 @@ class FeatureSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. ID of the Feature to import values of. This Feature must exist in the
-     * target EntityType, or the request will fail.
+     * Required. ID of the Feature to import values of. This Feature must exist
+     * in the target EntityType, or the request will fail.
      *
      * Generated from protobuf field <code>string id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -62,8 +62,8 @@ class FeatureSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. ID of the Feature to import values of. This Feature must exist in the
-     * target EntityType, or the request will fail.
+     * Required. ID of the Feature to import values of. This Feature must exist
+     * in the target EntityType, or the request will fail.
      *
      * Generated from protobuf field <code>string id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

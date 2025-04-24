@@ -9,8 +9,10 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Output from [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob] for Model Monitoring baseline dataset,
- * which can be used to generate baseline attribution scores.
+ * Output from
+ * [BatchPredictionJob][google.cloud.aiplatform.v1.BatchPredictionJob] for
+ * Model Monitoring baseline dataset, which can be used to generate baseline
+ * attribution scores.
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig.ExplanationConfig.ExplanationBaseline</code>
  */
@@ -21,7 +23,7 @@ class ExplanationBaseline extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelMonitoringObjectiveConfig.ExplanationConfig.ExplanationBaseline.PredictionFormat prediction_format = 1;</code>
      */
-    private $prediction_format = 0;
+    protected $prediction_format = 0;
     protected $destination;
 
     /**

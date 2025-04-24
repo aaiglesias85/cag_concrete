@@ -18,18 +18,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class SerializedTaxonomy extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Display name of the taxonomy. At most 200 bytes when encoded in UTF-8.
+     * Required. Display name of the taxonomy. At most 200 bytes when encoded in
+     * UTF-8.
      *
      * Generated from protobuf field <code>string display_name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Description of the serialized taxonomy. At most 2000 bytes when
      * encoded in UTF-8. If not set, defaults to an empty description.
      *
      * Generated from protobuf field <code>string description = 2;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Top level policy tags associated with the taxonomy, if any.
      *
@@ -50,13 +51,14 @@ class SerializedTaxonomy extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $display_name
-     *           Required. Display name of the taxonomy. At most 200 bytes when encoded in UTF-8.
+     *           Required. Display name of the taxonomy. At most 200 bytes when encoded in
+     *           UTF-8.
      *     @type string $description
      *           Description of the serialized taxonomy. At most 2000 bytes when
      *           encoded in UTF-8. If not set, defaults to an empty description.
-     *     @type \Google\Cloud\DataCatalog\V1\SerializedPolicyTag[]|\Google\Protobuf\Internal\RepeatedField $policy_tags
+     *     @type array<\Google\Cloud\DataCatalog\V1\SerializedPolicyTag>|\Google\Protobuf\Internal\RepeatedField $policy_tags
      *           Top level policy tags associated with the taxonomy, if any.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $activated_policy_types
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $activated_policy_types
      *           A list of policy types that are activated per taxonomy.
      * }
      */
@@ -66,7 +68,8 @@ class SerializedTaxonomy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Display name of the taxonomy. At most 200 bytes when encoded in UTF-8.
+     * Required. Display name of the taxonomy. At most 200 bytes when encoded in
+     * UTF-8.
      *
      * Generated from protobuf field <code>string display_name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -77,7 +80,8 @@ class SerializedTaxonomy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Display name of the taxonomy. At most 200 bytes when encoded in UTF-8.
+     * Required. Display name of the taxonomy. At most 200 bytes when encoded in
+     * UTF-8.
      *
      * Generated from protobuf field <code>string display_name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -134,7 +138,7 @@ class SerializedTaxonomy extends \Google\Protobuf\Internal\Message
      * Top level policy tags associated with the taxonomy, if any.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datacatalog.v1.SerializedPolicyTag policy_tags = 3;</code>
-     * @param \Google\Cloud\DataCatalog\V1\SerializedPolicyTag[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DataCatalog\V1\SerializedPolicyTag>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPolicyTags($var)
@@ -160,7 +164,7 @@ class SerializedTaxonomy extends \Google\Protobuf\Internal\Message
      * A list of policy types that are activated per taxonomy.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datacatalog.v1.Taxonomy.PolicyType activated_policy_types = 4;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setActivatedPolicyTypes($var)

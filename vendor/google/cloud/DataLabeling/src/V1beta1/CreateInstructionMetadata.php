@@ -21,7 +21,7 @@ class CreateInstructionMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string instruction = 1;</code>
      */
-    private $instruction = '';
+    protected $instruction = '';
     /**
      * Partial failures encountered.
      * E.g. single files that couldn't be read.
@@ -35,7 +35,7 @@ class CreateInstructionMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ class CreateInstructionMetadata extends \Google\Protobuf\Internal\Message
      *     @type string $instruction
      *           The name of the created Instruction.
      *           projects/{project_id}/instructions/{instruction_id}
-     *     @type \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $partial_failures
+     *     @type array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $partial_failures
      *           Partial failures encountered.
      *           E.g. single files that couldn't be read.
      *           Status details field will contain standard GCP error details.
@@ -106,7 +106,7 @@ class CreateInstructionMetadata extends \Google\Protobuf\Internal\Message
      * Status details field will contain standard GCP error details.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Status partial_failures = 2;</code>
-     * @param \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPartialFailures($var)

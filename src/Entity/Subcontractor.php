@@ -4,201 +4,147 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Subcontractor
- *
- * @ORM\Table(name="subcontractor")
- * @ORM\Entity(repositoryClass="App\Repository\SubcontractorRepository")
- */
+#[ORM\Table(name: "subcontractor")]
+#[ORM\Entity(repositoryClass: "App\Repository\SubcontractorRepository")]
 class Subcontractor
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="subcontractor_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $subcontractorId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "subcontractor_id", type: "integer", nullable: false)]
+    private ?int $subcontractorId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    private ?string $name;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="phone", type="string", length=50, nullable=false)
-     */
-    private $phone;
+    #[ORM\Column(name: "phone", type: "string", length: 50, nullable: true)]
+    private ?string $phone;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="address", type="text", nullable=false)
-     */
-    private $address;
+    #[ORM\Column(name: "address", type: "text", nullable: true)]
+    private ?string $address;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="contact_name", type="string", length=255, nullable=false)
-     */
-    private $contactName;
+    #[ORM\Column(name: "contact_name", type: "string", length: 255, nullable: true)]
+    private ?string $contactName;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="contact_email", type="string", length=255, nullable=false)
-     */
-    private $contactEmail;
+    #[ORM\Column(name: "contact_email", type: "string", length: 255, nullable: true)]
+    private ?string $contactEmail;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="company_name", type="string", length=255, nullable=false)
-     */
-    private $companyName;
+    #[ORM\Column(name: "company_name", type: "string", length: 255, nullable: true)]
+    private ?string $companyName;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="company_phone", type="string", length=50, nullable=false)
-     */
-    private $companyPhone;
+    #[ORM\Column(name: "company_phone", type: "string", length: 50, nullable: true)]
+    private ?string $companyPhone;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="company_address", type="text", nullable=false)
-     */
-    private $companyAddress;
+    #[ORM\Column(name: "company_address", type: "text", nullable: true)]
+    private ?string $companyAddress;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     */
-    private $createdAt;
+    #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
+    private ?\DateTime $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
+    #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
+    private ?\DateTime $updatedAt;
 
-    /**
-     * Get subcontractorId
-     *
-     * @return integer
-     */
-    public function getSubcontractorId()
+    public function getSubcontractorId(): ?int
     {
         return $this->subcontractorId;
     }
 
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name): void
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    public function getPhone()
+    public function getName(): ?string
     {
-        return $this->phone;
+        return $this->name;
     }
 
-    public function setPhone($phone): void
+    public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
     }
 
-    public function getContactName()
+    public function getPhone(): ?string
     {
-        return $this->contactName;
+        return $this->phone;
     }
 
-    public function setContactName($contactName): void
-    {
-        $this->contactName = $contactName;
-    }
-
-    public function getContactEmail()
-    {
-        return $this->contactEmail;
-    }
-
-    public function setContactEmail($contactEmail): void
-    {
-        $this->contactEmail = $contactEmail;
-    }
-
-    public function getCreatedAt(): \DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): \DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getAddress()
-    {
-        return $this->address;
-    }
-
-    public function setAddress($address)
+    public function setAddress(?string $address): void
     {
         $this->address = $address;
     }
 
-    public function getCompanyName()
+    public function getAddress(): ?string
     {
-        return $this->companyName;
+        return $this->address;
     }
 
-    public function setCompanyName( $companyName)
+    public function setContactName(?string $contactName): void
+    {
+        $this->contactName = $contactName;
+    }
+
+    public function getContactName(): ?string
+    {
+        return $this->contactName;
+    }
+
+    public function setContactEmail(?string $contactEmail): void
+    {
+        $this->contactEmail = $contactEmail;
+    }
+
+    public function getContactEmail(): ?string
+    {
+        return $this->contactEmail;
+    }
+
+    public function setCompanyName(?string $companyName): void
     {
         $this->companyName = $companyName;
     }
 
-    public function getCompanyPhone()
+    public function getCompanyName(): ?string
     {
-        return $this->companyPhone;
+        return $this->companyName;
     }
 
-    public function setCompanyPhone( $companyPhone)
+    public function setCompanyPhone(?string $companyPhone): void
     {
         $this->companyPhone = $companyPhone;
     }
 
-    public function getCompanyAddress()
+    public function getCompanyPhone(): ?string
     {
-        return $this->companyAddress;
+        return $this->companyPhone;
     }
 
-    public function setCompanyAddress( $companyAddress)
+    public function setCompanyAddress(?string $companyAddress): void
     {
         $this->companyAddress = $companyAddress;
     }
 
+    public function getCompanyAddress(): ?string
+    {
+        return $this->companyAddress;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
 }

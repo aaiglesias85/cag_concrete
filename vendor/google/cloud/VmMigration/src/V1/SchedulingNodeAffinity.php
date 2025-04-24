@@ -22,14 +22,14 @@ class SchedulingNodeAffinity extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string key = 1;</code>
      */
-    private $key = '';
+    protected $key = '';
     /**
      * The operator to use for the node resources specified in the `values`
      * parameter.
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.SchedulingNodeAffinity.Operator operator = 2;</code>
      */
-    private $operator = 0;
+    protected $operator = 0;
     /**
      * Corresponds to the label values of Node resource.
      *
@@ -48,7 +48,7 @@ class SchedulingNodeAffinity extends \Google\Protobuf\Internal\Message
      *     @type int $operator
      *           The operator to use for the node resources specified in the `values`
      *           parameter.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $values
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $values
      *           Corresponds to the label values of Node resource.
      * }
      */
@@ -126,7 +126,7 @@ class SchedulingNodeAffinity extends \Google\Protobuf\Internal\Message
      * Corresponds to the label values of Node resource.
      *
      * Generated from protobuf field <code>repeated string values = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setValues($var)

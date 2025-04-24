@@ -15,6 +15,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class SecurityPolicyAdvancedOptionsConfig extends \Google\Protobuf\Internal\Message
 {
     /**
+     * Custom configuration to apply the JSON parsing. Only applicable when json_parsing is set to STANDARD.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.SecurityPolicyAdvancedOptionsConfigJsonCustomConfig json_custom_config = 111570105;</code>
+     */
+    private $json_custom_config = null;
+    /**
      * 
      * Check the JsonParsing enum for the list of possible values.
      *
@@ -28,6 +34,12 @@ class SecurityPolicyAdvancedOptionsConfig extends \Google\Protobuf\Internal\Mess
      * Generated from protobuf field <code>optional string log_level = 140582601;</code>
      */
     private $log_level = null;
+    /**
+     * An optional list of case-insensitive request header names to use for resolving the callers client IP address.
+     *
+     * Generated from protobuf field <code>repeated string user_ip_request_headers = 421050290;</code>
+     */
+    private $user_ip_request_headers;
 
     /**
      * Constructor.
@@ -35,17 +47,57 @@ class SecurityPolicyAdvancedOptionsConfig extends \Google\Protobuf\Internal\Mess
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type \Google\Cloud\Compute\V1\SecurityPolicyAdvancedOptionsConfigJsonCustomConfig $json_custom_config
+     *           Custom configuration to apply the JSON parsing. Only applicable when json_parsing is set to STANDARD.
      *     @type string $json_parsing
      *           
      *           Check the JsonParsing enum for the list of possible values.
      *     @type string $log_level
      *           
      *           Check the LogLevel enum for the list of possible values.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $user_ip_request_headers
+     *           An optional list of case-insensitive request header names to use for resolving the callers client IP address.
      * }
      */
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Cloud\Compute\V1\Compute::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * Custom configuration to apply the JSON parsing. Only applicable when json_parsing is set to STANDARD.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.SecurityPolicyAdvancedOptionsConfigJsonCustomConfig json_custom_config = 111570105;</code>
+     * @return \Google\Cloud\Compute\V1\SecurityPolicyAdvancedOptionsConfigJsonCustomConfig|null
+     */
+    public function getJsonCustomConfig()
+    {
+        return $this->json_custom_config;
+    }
+
+    public function hasJsonCustomConfig()
+    {
+        return isset($this->json_custom_config);
+    }
+
+    public function clearJsonCustomConfig()
+    {
+        unset($this->json_custom_config);
+    }
+
+    /**
+     * Custom configuration to apply the JSON parsing. Only applicable when json_parsing is set to STANDARD.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.SecurityPolicyAdvancedOptionsConfigJsonCustomConfig json_custom_config = 111570105;</code>
+     * @param \Google\Cloud\Compute\V1\SecurityPolicyAdvancedOptionsConfigJsonCustomConfig $var
+     * @return $this
+     */
+    public function setJsonCustomConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\SecurityPolicyAdvancedOptionsConfigJsonCustomConfig::class);
+        $this->json_custom_config = $var;
+
+        return $this;
     }
 
     /**
@@ -120,6 +172,32 @@ class SecurityPolicyAdvancedOptionsConfig extends \Google\Protobuf\Internal\Mess
     {
         GPBUtil::checkString($var, True);
         $this->log_level = $var;
+
+        return $this;
+    }
+
+    /**
+     * An optional list of case-insensitive request header names to use for resolving the callers client IP address.
+     *
+     * Generated from protobuf field <code>repeated string user_ip_request_headers = 421050290;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getUserIpRequestHeaders()
+    {
+        return $this->user_ip_request_headers;
+    }
+
+    /**
+     * An optional list of case-insensitive request header names to use for resolving the callers client IP address.
+     *
+     * Generated from protobuf field <code>repeated string user_ip_request_headers = 421050290;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setUserIpRequestHeaders($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->user_ip_request_headers = $arr;
 
         return $this;
     }

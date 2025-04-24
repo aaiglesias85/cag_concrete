@@ -20,8 +20,9 @@ class DeploymentResourcesType
      */
     const DEPLOYMENT_RESOURCES_TYPE_UNSPECIFIED = 0;
     /**
-     * Resources that are dedicated to the [DeployedModel][google.cloud.aiplatform.v1.DeployedModel], and that need a
-     * higher degree of manual configuration.
+     * Resources that are dedicated to the
+     * [DeployedModel][google.cloud.aiplatform.v1.DeployedModel], and that need
+     * a higher degree of manual configuration.
      *
      * Generated from protobuf enum <code>DEDICATED_RESOURCES = 1;</code>
      */
@@ -33,11 +34,22 @@ class DeploymentResourcesType
      * Generated from protobuf enum <code>AUTOMATIC_RESOURCES = 2;</code>
      */
     const AUTOMATIC_RESOURCES = 2;
+    /**
+     * Resources that can be shared by multiple
+     * [DeployedModels][google.cloud.aiplatform.v1.DeployedModel]. A
+     * pre-configured
+     * [DeploymentResourcePool][google.cloud.aiplatform.v1.DeploymentResourcePool]
+     * is required.
+     *
+     * Generated from protobuf enum <code>SHARED_RESOURCES = 3;</code>
+     */
+    const SHARED_RESOURCES = 3;
 
     private static $valueToName = [
         self::DEPLOYMENT_RESOURCES_TYPE_UNSPECIFIED => 'DEPLOYMENT_RESOURCES_TYPE_UNSPECIFIED',
         self::DEDICATED_RESOURCES => 'DEDICATED_RESOURCES',
         self::AUTOMATIC_RESOURCES => 'AUTOMATIC_RESOURCES',
+        self::SHARED_RESOURCES => 'SHARED_RESOURCES',
     ];
 
     public static function name($value)

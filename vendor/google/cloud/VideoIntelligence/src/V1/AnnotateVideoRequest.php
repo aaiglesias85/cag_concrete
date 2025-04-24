@@ -30,7 +30,7 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string input_uri = 1;</code>
      */
-    private $input_uri = '';
+    protected $input_uri = '';
     /**
      * The video data bytes.
      * If unset, the input video(s) should be specified via the `input_uri`.
@@ -38,7 +38,7 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes input_content = 6;</code>
      */
-    private $input_content = '';
+    protected $input_content = '';
     /**
      * Required. Requested video annotation features.
      *
@@ -50,7 +50,7 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.videointelligence.v1.VideoContext video_context = 3;</code>
      */
-    private $video_context = null;
+    protected $video_context = null;
     /**
      * Optional. Location where the output (in JSON format) should be stored.
      * Currently, only [Cloud Storage](https://cloud.google.com/storage/)
@@ -62,7 +62,7 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string output_uri = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $output_uri = '';
+    protected $output_uri = '';
     /**
      * Optional. Cloud region where annotation should take place. Supported cloud
      * regions are: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no
@@ -71,7 +71,33 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string location_id = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $location_id = '';
+    protected $location_id = '';
+
+    /**
+     * @param string $inputUri Input video location. Currently, only
+     *                         [Cloud Storage](https://cloud.google.com/storage/) URIs are
+     *                         supported. URIs must be specified in the following format:
+     *                         `gs://bucket-id/object-id` (other URI formats return
+     *                         [google.rpc.Code.INVALID_ARGUMENT][google.rpc.Code.INVALID_ARGUMENT]). For
+     *                         more information, see [Request
+     *                         URIs](https://cloud.google.com/storage/docs/request-endpoints). To identify
+     *                         multiple videos, a video URI may include wildcards in the `object-id`.
+     *                         Supported wildcards: '*' to match 0 or more characters;
+     *                         '?' to match 1 character. If unset, the input video should be embedded
+     *                         in the request as `input_content`. If set, `input_content` must be unset.
+     * @param int[]  $features Required. Requested video annotation features.
+     *                         For allowed values, use constants defined on {@see \Google\Cloud\VideoIntelligence\V1\Feature}
+     *
+     * @return \Google\Cloud\VideoIntelligence\V1\AnnotateVideoRequest
+     *
+     * @experimental
+     */
+    public static function build(string $inputUri, array $features): self
+    {
+        return (new self())
+            ->setInputUri($inputUri)
+            ->setFeatures($features);
+    }
 
     /**
      * Constructor.
@@ -95,7 +121,7 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      *           The video data bytes.
      *           If unset, the input video(s) should be specified via the `input_uri`.
      *           If set, `input_uri` must be unset.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $features
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $features
      *           Required. Requested video annotation features.
      *     @type \Google\Cloud\VideoIntelligence\V1\VideoContext $video_context
      *           Additional video context and/or feature-specific parameters.
@@ -210,7 +236,7 @@ class AnnotateVideoRequest extends \Google\Protobuf\Internal\Message
      * Required. Requested video annotation features.
      *
      * Generated from protobuf field <code>repeated .google.cloud.videointelligence.v1.Feature features = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFeatures($var)

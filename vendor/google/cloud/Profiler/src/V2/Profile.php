@@ -18,9 +18,9 @@ class Profile extends \Google\Protobuf\Internal\Message
     /**
      * Output only. Opaque, server-assigned, unique ID for this profile.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Type of profile.
      * For offline mode, this must be specified when creating the profile. For
@@ -28,13 +28,13 @@ class Profile extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.devtools.cloudprofiler.v2.ProfileType profile_type = 2;</code>
      */
-    private $profile_type = 0;
+    protected $profile_type = 0;
     /**
      * Deployment this profile corresponds to.
      *
      * Generated from protobuf field <code>.google.devtools.cloudprofiler.v2.Deployment deployment = 3;</code>
      */
-    private $deployment = null;
+    protected $deployment = null;
     /**
      * Duration of the profiling session.
      * Input (for the offline mode) or output (for the online mode).
@@ -45,22 +45,29 @@ class Profile extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 4;</code>
      */
-    private $duration = null;
+    protected $duration = null;
     /**
      * Input only. Profile bytes, as a gzip compressed serialized proto, the
      * format is https://github.com/google/pprof/blob/master/proto/profile.proto.
      *
-     * Generated from protobuf field <code>bytes profile_bytes = 5;</code>
+     * Generated from protobuf field <code>bytes profile_bytes = 5 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      */
-    private $profile_bytes = '';
+    protected $profile_bytes = '';
     /**
      * Input only. Labels associated to this specific profile. These labels will
-     * get merged with the deployment labels for the final data set.  See
+     * get merged with the deployment labels for the final data set. See
      * documentation on deployment labels for validation rules and limits.
      *
-     * Generated from protobuf field <code>map<string, string> labels = 6;</code>
+     * Generated from protobuf field <code>map<string, string> labels = 6 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      */
     private $labels;
+    /**
+     * Output only. Start time for the profile.
+     * This output is only present in response from the ListProfiles method.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $start_time = null;
 
     /**
      * Constructor.
@@ -88,8 +95,11 @@ class Profile extends \Google\Protobuf\Internal\Message
      *           format is https://github.com/google/pprof/blob/master/proto/profile.proto.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Input only. Labels associated to this specific profile. These labels will
-     *           get merged with the deployment labels for the final data set.  See
+     *           get merged with the deployment labels for the final data set. See
      *           documentation on deployment labels for validation rules and limits.
+     *     @type \Google\Protobuf\Timestamp $start_time
+     *           Output only. Start time for the profile.
+     *           This output is only present in response from the ListProfiles method.
      * }
      */
     public function __construct($data = NULL) {
@@ -100,7 +110,7 @@ class Profile extends \Google\Protobuf\Internal\Message
     /**
      * Output only. Opaque, server-assigned, unique ID for this profile.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getName()
@@ -111,7 +121,7 @@ class Profile extends \Google\Protobuf\Internal\Message
     /**
      * Output only. Opaque, server-assigned, unique ID for this profile.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -239,7 +249,7 @@ class Profile extends \Google\Protobuf\Internal\Message
      * Input only. Profile bytes, as a gzip compressed serialized proto, the
      * format is https://github.com/google/pprof/blob/master/proto/profile.proto.
      *
-     * Generated from protobuf field <code>bytes profile_bytes = 5;</code>
+     * Generated from protobuf field <code>bytes profile_bytes = 5 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @return string
      */
     public function getProfileBytes()
@@ -251,7 +261,7 @@ class Profile extends \Google\Protobuf\Internal\Message
      * Input only. Profile bytes, as a gzip compressed serialized proto, the
      * format is https://github.com/google/pprof/blob/master/proto/profile.proto.
      *
-     * Generated from protobuf field <code>bytes profile_bytes = 5;</code>
+     * Generated from protobuf field <code>bytes profile_bytes = 5 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -265,10 +275,10 @@ class Profile extends \Google\Protobuf\Internal\Message
 
     /**
      * Input only. Labels associated to this specific profile. These labels will
-     * get merged with the deployment labels for the final data set.  See
+     * get merged with the deployment labels for the final data set. See
      * documentation on deployment labels for validation rules and limits.
      *
-     * Generated from protobuf field <code>map<string, string> labels = 6;</code>
+     * Generated from protobuf field <code>map<string, string> labels = 6 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\MapField
      */
     public function getLabels()
@@ -278,10 +288,10 @@ class Profile extends \Google\Protobuf\Internal\Message
 
     /**
      * Input only. Labels associated to this specific profile. These labels will
-     * get merged with the deployment labels for the final data set.  See
+     * get merged with the deployment labels for the final data set. See
      * documentation on deployment labels for validation rules and limits.
      *
-     * Generated from protobuf field <code>map<string, string> labels = 6;</code>
+     * Generated from protobuf field <code>map<string, string> labels = 6 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
      * @return $this
      */
@@ -289,6 +299,44 @@ class Profile extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->labels = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Start time for the profile.
+     * This output is only present in response from the ListProfiles method.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Timestamp|null
+     */
+    public function getStartTime()
+    {
+        return $this->start_time;
+    }
+
+    public function hasStartTime()
+    {
+        return isset($this->start_time);
+    }
+
+    public function clearStartTime()
+    {
+        unset($this->start_time);
+    }
+
+    /**
+     * Output only. Start time for the profile.
+     * This output is only present in response from the ListProfiles method.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Protobuf\Timestamp $var
+     * @return $this
+     */
+    public function setStartTime($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        $this->start_time = $var;
 
         return $this;
     }

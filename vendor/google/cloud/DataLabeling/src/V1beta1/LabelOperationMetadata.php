@@ -21,7 +21,7 @@ class LabelOperationMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 progress_percent = 1;</code>
      */
-    private $progress_percent = 0;
+    protected $progress_percent = 0;
     /**
      * Output only. Partial failures encountered.
      * E.g. single files that couldn't be read.
@@ -35,7 +35,7 @@ class LabelOperationMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 16;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     protected $details;
 
     /**
@@ -70,7 +70,7 @@ class LabelOperationMetadata extends \Google\Protobuf\Internal\Message
      *           Details of label text entity extraction operation.
      *     @type int $progress_percent
      *           Output only. Progress of label operation. Range: [0, 100].
-     *     @type \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $partial_failures
+     *     @type array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $partial_failures
      *           Output only. Partial failures encountered.
      *           E.g. single files that couldn't be read.
      *           Status details field will contain standard GCP error details.
@@ -500,7 +500,7 @@ class LabelOperationMetadata extends \Google\Protobuf\Internal\Message
      * Status details field will contain standard GCP error details.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Status partial_failures = 2;</code>
-     * @param \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPartialFailures($var)

@@ -27,7 +27,7 @@ class UpdateCatalogRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.Catalog catalog = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $catalog = null;
+    protected $catalog = null;
     /**
      * Indicates which fields in the provided
      * [Catalog][google.cloud.retail.v2.Catalog] to update.
@@ -36,7 +36,33 @@ class UpdateCatalogRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Retail\V2\Catalog $catalog    Required. The [Catalog][google.cloud.retail.v2.Catalog] to update.
+     *
+     *                                                    If the caller does not have permission to update the
+     *                                                    [Catalog][google.cloud.retail.v2.Catalog], regardless of whether or not it
+     *                                                    exists, a PERMISSION_DENIED error is returned.
+     *
+     *                                                    If the [Catalog][google.cloud.retail.v2.Catalog] to update does not exist,
+     *                                                    a NOT_FOUND error is returned.
+     * @param \Google\Protobuf\FieldMask      $updateMask Indicates which fields in the provided
+     *                                                    [Catalog][google.cloud.retail.v2.Catalog] to update.
+     *
+     *                                                    If an unsupported or unknown field is provided, an INVALID_ARGUMENT error
+     *                                                    is returned.
+     *
+     * @return \Google\Cloud\Retail\V2\UpdateCatalogRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Retail\V2\Catalog $catalog, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setCatalog($catalog)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

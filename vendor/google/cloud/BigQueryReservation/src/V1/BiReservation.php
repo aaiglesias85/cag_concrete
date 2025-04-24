@@ -22,19 +22,19 @@ class BiReservation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. The last update timestamp of a reservation.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Size of a reservation, in bytes.
      *
      * Generated from protobuf field <code>int64 size = 4;</code>
      */
-    private $size = 0;
+    protected $size = 0;
     /**
      * Preferred tables to use BI capacity for.
      *
@@ -56,7 +56,7 @@ class BiReservation extends \Google\Protobuf\Internal\Message
      *           Output only. The last update timestamp of a reservation.
      *     @type int|string $size
      *           Size of a reservation, in bytes.
-     *     @type \Google\Cloud\BigQuery\Reservation\V1\TableReference[]|\Google\Protobuf\Internal\RepeatedField $preferred_tables
+     *     @type array<\Google\Cloud\BigQuery\Reservation\V1\TableReference>|\Google\Protobuf\Internal\RepeatedField $preferred_tables
      *           Preferred tables to use BI capacity for.
      * }
      */
@@ -172,7 +172,7 @@ class BiReservation extends \Google\Protobuf\Internal\Message
      * Preferred tables to use BI capacity for.
      *
      * Generated from protobuf field <code>repeated .google.cloud.bigquery.reservation.v1.TableReference preferred_tables = 5;</code>
-     * @param \Google\Cloud\BigQuery\Reservation\V1\TableReference[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\BigQuery\Reservation\V1\TableReference>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPreferredTables($var)

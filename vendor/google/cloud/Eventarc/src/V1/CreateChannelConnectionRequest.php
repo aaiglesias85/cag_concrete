@@ -20,19 +20,37 @@ class CreateChannelConnectionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. Channel connection to create.
      *
      * Generated from protobuf field <code>.google.cloud.eventarc.v1.ChannelConnection channel_connection = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $channel_connection = null;
+    protected $channel_connection = null;
     /**
      * Required. The user-provided ID to be assigned to the channel connection.
      *
      * Generated from protobuf field <code>string channel_connection_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $channel_connection_id = '';
+    protected $channel_connection_id = '';
+
+    /**
+     * @param string                                      $parent              Required. The parent collection in which to add this channel connection. Please see
+     *                                                                         {@see EventarcClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Eventarc\V1\ChannelConnection $channelConnection   Required. Channel connection to create.
+     * @param string                                      $channelConnectionId Required. The user-provided ID to be assigned to the channel connection.
+     *
+     * @return \Google\Cloud\Eventarc\V1\CreateChannelConnectionRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Eventarc\V1\ChannelConnection $channelConnection, string $channelConnectionId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setChannelConnection($channelConnection)
+            ->setChannelConnectionId($channelConnectionId);
+    }
 
     /**
      * Constructor.

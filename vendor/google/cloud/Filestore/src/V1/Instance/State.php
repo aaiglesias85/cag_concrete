@@ -59,6 +59,37 @@ class State
      * Generated from protobuf enum <code>RESTORING = 7;</code>
      */
     const RESTORING = 7;
+    /**
+     * The instance is suspended. You can get further details from
+     * the `suspension_reasons` field of the `Instance` resource.
+     *
+     * Generated from protobuf enum <code>SUSPENDED = 8;</code>
+     */
+    const SUSPENDED = 8;
+    /**
+     * The instance is in the process of becoming suspended.
+     *
+     * Generated from protobuf enum <code>SUSPENDING = 9;</code>
+     */
+    const SUSPENDING = 9;
+    /**
+     * The instance is in the process of becoming active.
+     *
+     * Generated from protobuf enum <code>RESUMING = 10;</code>
+     */
+    const RESUMING = 10;
+    /**
+     * The instance is reverting to a snapshot.
+     *
+     * Generated from protobuf enum <code>REVERTING = 12;</code>
+     */
+    const REVERTING = 12;
+    /**
+     * The replica instance is being promoted.
+     *
+     * Generated from protobuf enum <code>PROMOTING = 13;</code>
+     */
+    const PROMOTING = 13;
 
     private static $valueToName = [
         self::STATE_UNSPECIFIED => 'STATE_UNSPECIFIED',
@@ -68,6 +99,11 @@ class State
         self::DELETING => 'DELETING',
         self::ERROR => 'ERROR',
         self::RESTORING => 'RESTORING',
+        self::SUSPENDED => 'SUSPENDED',
+        self::SUSPENDING => 'SUSPENDING',
+        self::RESUMING => 'RESUMING',
+        self::REVERTING => 'REVERTING',
+        self::PROMOTING => 'PROMOTING',
     ];
 
     public static function name($value)
@@ -91,6 +127,4 @@ class State
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(State::class, \Google\Cloud\Filestore\V1\Instance_State::class);
 

@@ -73,7 +73,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
      */
     private $node_type = null;
     /**
-     * The flexible properties of the desired node type. Node groups that use this node template will create nodes of a type that matches these properties. This field is mutually exclusive with the node_type property; you can only define one or the other, but not both.
+     * Do not use. Instead, use the node_type property.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.NodeTemplateNodeTypeFlexibility node_type_flexibility = 315257905;</code>
      */
@@ -116,7 +116,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Compute\V1\AcceleratorConfig[]|\Google\Protobuf\Internal\RepeatedField $accelerators
+     *     @type array<\Google\Cloud\Compute\V1\AcceleratorConfig>|\Google\Protobuf\Internal\RepeatedField $accelerators
      *     @type string $cpu_overcommit_type
      *           CPU overcommit.
      *           Check the CpuOvercommitType enum for the list of possible values.
@@ -124,7 +124,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
      *           [Output Only] Creation timestamp in RFC3339 text format.
      *     @type string $description
      *           An optional description of this resource. Provide this property when you create the resource.
-     *     @type \Google\Cloud\Compute\V1\LocalDisk[]|\Google\Protobuf\Internal\RepeatedField $disks
+     *     @type array<\Google\Cloud\Compute\V1\LocalDisk>|\Google\Protobuf\Internal\RepeatedField $disks
      *     @type int|string $id
      *           [Output Only] The unique identifier for the resource. This identifier is defined by the server.
      *     @type string $kind
@@ -136,7 +136,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
      *     @type string $node_type
      *           The node type to use for nodes group that are created from this template.
      *     @type \Google\Cloud\Compute\V1\NodeTemplateNodeTypeFlexibility $node_type_flexibility
-     *           The flexible properties of the desired node type. Node groups that use this node template will create nodes of a type that matches these properties. This field is mutually exclusive with the node_type property; you can only define one or the other, but not both.
+     *           Do not use. Instead, use the node_type property.
      *     @type string $region
      *           [Output Only] The name of the region where the node template resides, such as us-central1.
      *     @type string $self_link
@@ -166,7 +166,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.AcceleratorConfig accelerators = 269577064;</code>
-     * @param \Google\Cloud\Compute\V1\AcceleratorConfig[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\AcceleratorConfig>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAccelerators($var)
@@ -298,7 +298,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.LocalDisk disks = 95594102;</code>
-     * @param \Google\Cloud\Compute\V1\LocalDisk[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\LocalDisk>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDisks($var)
@@ -480,7 +480,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The flexible properties of the desired node type. Node groups that use this node template will create nodes of a type that matches these properties. This field is mutually exclusive with the node_type property; you can only define one or the other, but not both.
+     * Do not use. Instead, use the node_type property.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.NodeTemplateNodeTypeFlexibility node_type_flexibility = 315257905;</code>
      * @return \Google\Cloud\Compute\V1\NodeTemplateNodeTypeFlexibility|null
@@ -501,7 +501,7 @@ class NodeTemplate extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The flexible properties of the desired node type. Node groups that use this node template will create nodes of a type that matches these properties. This field is mutually exclusive with the node_type property; you can only define one or the other, but not both.
+     * Do not use. Instead, use the node_type property.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.NodeTemplateNodeTypeFlexibility node_type_flexibility = 315257905;</code>
      * @param \Google\Cloud\Compute\V1\NodeTemplateNodeTypeFlexibility $var

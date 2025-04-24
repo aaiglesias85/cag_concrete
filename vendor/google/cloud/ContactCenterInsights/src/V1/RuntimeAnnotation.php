@@ -22,31 +22,37 @@ class RuntimeAnnotation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string annotation_id = 1;</code>
      */
-    private $annotation_id = '';
+    protected $annotation_id = '';
     /**
      * The time at which this annotation was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * The boundary in the conversation where the annotation starts, inclusive.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.AnnotationBoundary start_boundary = 3;</code>
      */
-    private $start_boundary = null;
+    protected $start_boundary = null;
     /**
      * The boundary in the conversation where the annotation ends, inclusive.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.AnnotationBoundary end_boundary = 4;</code>
      */
-    private $end_boundary = null;
+    protected $end_boundary = null;
     /**
      * The feedback that the customer has about the answer in `data`.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.AnswerFeedback answer_feedback = 5;</code>
      */
-    private $answer_feedback = null;
+    protected $answer_feedback = null;
+    /**
+     * Explicit input used for generating the answer
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.RuntimeAnnotation.UserInput user_input = 16;</code>
+     */
+    protected $user_input = null;
     protected $data;
 
     /**
@@ -65,6 +71,8 @@ class RuntimeAnnotation extends \Google\Protobuf\Internal\Message
      *           Agent Assist Smart Compose suggestion data.
      *     @type \Google\Cloud\ContactCenterInsights\V1\DialogflowInteractionData $dialogflow_interaction
      *           Dialogflow interaction data.
+     *     @type \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData $conversation_summarization_suggestion
+     *           Conversation summarization suggestion data.
      *     @type string $annotation_id
      *           The unique identifier of the annotation.
      *           Format:
@@ -77,6 +85,8 @@ class RuntimeAnnotation extends \Google\Protobuf\Internal\Message
      *           The boundary in the conversation where the annotation ends, inclusive.
      *     @type \Google\Cloud\ContactCenterInsights\V1\AnswerFeedback $answer_feedback
      *           The feedback that the customer has about the answer in `data`.
+     *     @type \Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation\UserInput $user_input
+     *           Explicit input used for generating the answer
      * }
      */
     public function __construct($data = NULL) {
@@ -235,6 +245,37 @@ class RuntimeAnnotation extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\DialogflowInteractionData::class);
         $this->writeOneof(10, $var);
+
+        return $this;
+    }
+
+    /**
+     * Conversation summarization suggestion data.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationSummarizationSuggestionData conversation_summarization_suggestion = 12;</code>
+     * @return \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData|null
+     */
+    public function getConversationSummarizationSuggestion()
+    {
+        return $this->readOneof(12);
+    }
+
+    public function hasConversationSummarizationSuggestion()
+    {
+        return $this->hasOneof(12);
+    }
+
+    /**
+     * Conversation summarization suggestion data.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationSummarizationSuggestionData conversation_summarization_suggestion = 12;</code>
+     * @param \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData $var
+     * @return $this
+     */
+    public function setConversationSummarizationSuggestion($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData::class);
+        $this->writeOneof(12, $var);
 
         return $this;
     }
@@ -409,6 +450,42 @@ class RuntimeAnnotation extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\AnswerFeedback::class);
         $this->answer_feedback = $var;
+
+        return $this;
+    }
+
+    /**
+     * Explicit input used for generating the answer
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.RuntimeAnnotation.UserInput user_input = 16;</code>
+     * @return \Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation\UserInput|null
+     */
+    public function getUserInput()
+    {
+        return $this->user_input;
+    }
+
+    public function hasUserInput()
+    {
+        return isset($this->user_input);
+    }
+
+    public function clearUserInput()
+    {
+        unset($this->user_input);
+    }
+
+    /**
+     * Explicit input used for generating the answer
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.RuntimeAnnotation.UserInput user_input = 16;</code>
+     * @param \Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation\UserInput $var
+     * @return $this
+     */
+    public function setUserInput($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation\UserInput::class);
+        $this->user_input = $var;
 
         return $this;
     }

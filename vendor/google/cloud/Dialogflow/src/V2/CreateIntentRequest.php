@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Intents.CreateIntent][google.cloud.dialogflow.v2.Intents.CreateIntent].
+ * The request message for
+ * [Intents.CreateIntent][google.cloud.dialogflow.v2.Intents.CreateIntent].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.CreateIntentRequest</code>
  */
@@ -21,13 +22,13 @@ class CreateIntentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The intent to create.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Intent intent = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $intent = null;
+    protected $intent = null;
     /**
      * Optional. The language used to access language-specific data.
      * If not specified, the agent's default language is used.
@@ -37,13 +38,53 @@ class CreateIntentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * Optional. The resource view to apply to the returned intent.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.IntentView intent_view = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $intent_view = 0;
+    protected $intent_view = 0;
+
+    /**
+     * @param string                             $parent Required. The agent to create a intent for.
+     *                                                   Format: `projects/<Project ID>/agent`. Please see
+     *                                                   {@see IntentsClient::agentName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\Intent $intent Required. The intent to create.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\CreateIntentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dialogflow\V2\Intent $intent): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setIntent($intent);
+    }
+
+    /**
+     * @param string                             $parent       Required. The agent to create a intent for.
+     *                                                         Format: `projects/<Project ID>/agent`. Please see
+     *                                                         {@see IntentsClient::agentName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\Intent $intent       Required. The intent to create.
+     * @param string                             $languageCode Optional. The language used to access language-specific data.
+     *                                                         If not specified, the agent's default language is used.
+     *                                                         For more information, see
+     *                                                         [Multilingual intent and entity
+     *                                                         data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+     *
+     * @return \Google\Cloud\Dialogflow\V2\CreateIntentRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParentIntentLanguageCode(string $parent, \Google\Cloud\Dialogflow\V2\Intent $intent, string $languageCode): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setIntent($intent)
+            ->setLanguageCode($languageCode);
+    }
 
     /**
      * Constructor.

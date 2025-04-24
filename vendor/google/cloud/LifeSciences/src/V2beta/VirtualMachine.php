@@ -16,23 +16,23 @@ use Google\Protobuf\Internal\GPBUtil;
 class VirtualMachine extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The machine type of the virtual machine to create. Must be the short name
-     * of a standard machine type (such as "n1-standard-1") or a custom machine
-     * type (such as "custom-1-4096", where "1" indicates the number of vCPUs and
-     * "4096" indicates the memory in MB). See
-     * [Creating an instance with a custom machine
+     * Required. The machine type of the virtual machine to create. Must be the
+     * short name of a standard machine type (such as "n1-standard-1") or a custom
+     * machine type (such as "custom-1-4096", where "1" indicates the number of
+     * vCPUs and "4096" indicates the memory in MB). See [Creating an instance
+     * with a custom machine
      * type](https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#create)
      * for more specifications on creating a custom machine type.
      *
      * Generated from protobuf field <code>string machine_type = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $machine_type = '';
+    protected $machine_type = '';
     /**
      * If true, allocate a preemptible VM.
      *
      * Generated from protobuf field <code>bool preemptible = 2;</code>
      */
-    private $preemptible = false;
+    protected $preemptible = false;
     /**
      * Optional set of labels to apply to the VM and any attached disk resources.
      * These labels must adhere to the [name and value
@@ -57,7 +57,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.Network network = 5;</code>
      */
-    private $network = null;
+    protected $network = null;
     /**
      * The list of accelerators to attach to the VM.
      *
@@ -70,7 +70,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.ServiceAccount service_account = 7;</code>
      */
-    private $service_account = null;
+    protected $service_account = null;
     /**
      * The size of the boot disk, in GB. The boot disk must be large
      * enough to accommodate all of the Docker images from each action in the
@@ -79,7 +79,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 boot_disk_size_gb = 8;</code>
      */
-    private $boot_disk_size_gb = 0;
+    protected $boot_disk_size_gb = 0;
     /**
      * The CPU platform to request. An instance based on a newer platform can be
      * allocated, but never one with fewer capabilities. The value of this
@@ -91,7 +91,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string cpu_platform = 9;</code>
      */
-    private $cpu_platform = '';
+    protected $cpu_platform = '';
     /**
      * The host operating system image to use.
      * Currently, only Container-Optimized OS images can be used.
@@ -105,7 +105,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string boot_image = 10;</code>
      */
-    private $boot_image = '';
+    protected $boot_image = '';
     /**
      * The NVIDIA driver version to use when attaching an NVIDIA GPU accelerator.
      * The version specified here must be compatible with the GPU libraries
@@ -121,7 +121,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enable_stackdriver_monitoring = 12;</code>
      */
-    private $enable_stackdriver_monitoring = false;
+    protected $enable_stackdriver_monitoring = false;
     /**
      * The Compute Engine Disk Images to use as a Docker cache. The disks will be
      * mounted into the Docker folder in a way that the images present in the
@@ -143,6 +143,13 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.cloud.lifesciences.v2beta.Volume volumes = 14;</code>
      */
     private $volumes;
+    /**
+     * If specified, the VM will only be allocated inside the matching
+     * reservation. It will fail if the VM parameters don't match the reservation.
+     *
+     * Generated from protobuf field <code>string reservation = 15;</code>
+     */
+    protected $reservation = '';
 
     /**
      * Constructor.
@@ -151,11 +158,11 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $machine_type
-     *           Required. The machine type of the virtual machine to create. Must be the short name
-     *           of a standard machine type (such as "n1-standard-1") or a custom machine
-     *           type (such as "custom-1-4096", where "1" indicates the number of vCPUs and
-     *           "4096" indicates the memory in MB). See
-     *           [Creating an instance with a custom machine
+     *           Required. The machine type of the virtual machine to create. Must be the
+     *           short name of a standard machine type (such as "n1-standard-1") or a custom
+     *           machine type (such as "custom-1-4096", where "1" indicates the number of
+     *           vCPUs and "4096" indicates the memory in MB). See [Creating an instance
+     *           with a custom machine
      *           type](https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#create)
      *           for more specifications on creating a custom machine type.
      *     @type bool $preemptible
@@ -168,12 +175,12 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *           Labels keys with the prefix 'google-' are reserved for use by Google.
      *           Labels applied at creation time to the VM. Applied on a best-effort basis
      *           to attached disk resources shortly after VM creation.
-     *     @type \Google\Cloud\LifeSciences\V2beta\Disk[]|\Google\Protobuf\Internal\RepeatedField $disks
+     *     @type array<\Google\Cloud\LifeSciences\V2beta\Disk>|\Google\Protobuf\Internal\RepeatedField $disks
      *           The list of disks to create and attach to the VM.
      *           Specify either the `volumes[]` field or the `disks[]` field, but not both.
      *     @type \Google\Cloud\LifeSciences\V2beta\Network $network
      *           The VM network configuration.
-     *     @type \Google\Cloud\LifeSciences\V2beta\Accelerator[]|\Google\Protobuf\Internal\RepeatedField $accelerators
+     *     @type array<\Google\Cloud\LifeSciences\V2beta\Accelerator>|\Google\Protobuf\Internal\RepeatedField $accelerators
      *           The list of accelerators to attach to the VM.
      *     @type \Google\Cloud\LifeSciences\V2beta\ServiceAccount $service_account
      *           The service account to install on the VM. This account does not need
@@ -208,7 +215,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *           hosted in the `nvidia-drivers-us-public` bucket on Google Cloud Storage.
      *     @type bool $enable_stackdriver_monitoring
      *           Whether Stackdriver monitoring should be enabled on the VM.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $docker_cache_images
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $docker_cache_images
      *           The Compute Engine Disk Images to use as a Docker cache. The disks will be
      *           mounted into the Docker folder in a way that the images present in the
      *           cache will not need to be pulled. The digests of the cached images must
@@ -218,9 +225,12 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      *           Docker images have already been pulled. Any images pulled that are not
      *           cached will be stored on the first cache disk instead of the boot disk.
      *           Only a single image is supported.
-     *     @type \Google\Cloud\LifeSciences\V2beta\Volume[]|\Google\Protobuf\Internal\RepeatedField $volumes
+     *     @type array<\Google\Cloud\LifeSciences\V2beta\Volume>|\Google\Protobuf\Internal\RepeatedField $volumes
      *           The list of disks and other storage to create or attach to the VM.
      *           Specify either the `volumes[]` field or the `disks[]` field, but not both.
+     *     @type string $reservation
+     *           If specified, the VM will only be allocated inside the matching
+     *           reservation. It will fail if the VM parameters don't match the reservation.
      * }
      */
     public function __construct($data = NULL) {
@@ -229,11 +239,11 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The machine type of the virtual machine to create. Must be the short name
-     * of a standard machine type (such as "n1-standard-1") or a custom machine
-     * type (such as "custom-1-4096", where "1" indicates the number of vCPUs and
-     * "4096" indicates the memory in MB). See
-     * [Creating an instance with a custom machine
+     * Required. The machine type of the virtual machine to create. Must be the
+     * short name of a standard machine type (such as "n1-standard-1") or a custom
+     * machine type (such as "custom-1-4096", where "1" indicates the number of
+     * vCPUs and "4096" indicates the memory in MB). See [Creating an instance
+     * with a custom machine
      * type](https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#create)
      * for more specifications on creating a custom machine type.
      *
@@ -246,11 +256,11 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The machine type of the virtual machine to create. Must be the short name
-     * of a standard machine type (such as "n1-standard-1") or a custom machine
-     * type (such as "custom-1-4096", where "1" indicates the number of vCPUs and
-     * "4096" indicates the memory in MB). See
-     * [Creating an instance with a custom machine
+     * Required. The machine type of the virtual machine to create. Must be the
+     * short name of a standard machine type (such as "n1-standard-1") or a custom
+     * machine type (such as "custom-1-4096", where "1" indicates the number of
+     * vCPUs and "4096" indicates the memory in MB). See [Creating an instance
+     * with a custom machine
      * type](https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#create)
      * for more specifications on creating a custom machine type.
      *
@@ -347,7 +357,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      * Specify either the `volumes[]` field or the `disks[]` field, but not both.
      *
      * Generated from protobuf field <code>repeated .google.cloud.lifesciences.v2beta.Disk disks = 4;</code>
-     * @param \Google\Cloud\LifeSciences\V2beta\Disk[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\LifeSciences\V2beta\Disk>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDisks($var)
@@ -409,7 +419,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      * The list of accelerators to attach to the VM.
      *
      * Generated from protobuf field <code>repeated .google.cloud.lifesciences.v2beta.Accelerator accelerators = 6;</code>
-     * @param \Google\Cloud\LifeSciences\V2beta\Accelerator[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\LifeSciences\V2beta\Accelerator>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAccelerators($var)
@@ -663,7 +673,7 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      * Only a single image is supported.
      *
      * Generated from protobuf field <code>repeated string docker_cache_images = 13;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDockerCacheImages($var)
@@ -691,13 +701,41 @@ class VirtualMachine extends \Google\Protobuf\Internal\Message
      * Specify either the `volumes[]` field or the `disks[]` field, but not both.
      *
      * Generated from protobuf field <code>repeated .google.cloud.lifesciences.v2beta.Volume volumes = 14;</code>
-     * @param \Google\Cloud\LifeSciences\V2beta\Volume[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\LifeSciences\V2beta\Volume>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVolumes($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\LifeSciences\V2beta\Volume::class);
         $this->volumes = $arr;
+
+        return $this;
+    }
+
+    /**
+     * If specified, the VM will only be allocated inside the matching
+     * reservation. It will fail if the VM parameters don't match the reservation.
+     *
+     * Generated from protobuf field <code>string reservation = 15;</code>
+     * @return string
+     */
+    public function getReservation()
+    {
+        return $this->reservation;
+    }
+
+    /**
+     * If specified, the VM will only be allocated inside the matching
+     * reservation. It will fail if the VM parameters don't match the reservation.
+     *
+     * Generated from protobuf field <code>string reservation = 15;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setReservation($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->reservation = $var;
 
         return $this;
     }

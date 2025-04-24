@@ -21,6 +21,7 @@ use Google\Cloud\Core\ArrayTrait;
 use Google\Cloud\Core\DebugInfoTrait;
 use Google\Cloud\Core\Iterator\ItemIterator;
 use Google\Cloud\Core\Iterator\PageIterator;
+use Google\Cloud\Core\TimestampTrait;
 use Google\Cloud\Firestore\Connection\ConnectionInterface;
 
 /**
@@ -43,9 +44,11 @@ class CollectionReference extends Query
     use ArrayTrait;
     use DebugInfoTrait;
     use PathTrait;
+    use TimestampTrait;
 
     /**
      * @var ConnectionInterface
+     * @internal
      */
     private $connection;
 
@@ -66,6 +69,8 @@ class CollectionReference extends Query
 
     /**
      * @param ConnectionInterface $connection A Connection to Cloud Firestore.
+     *        This object is created by FirestoreClient,
+     *        and should not be instantiated outside of this client.
      * @param ValueMapper $valueMapper A Firestore Value Mapper.
      * @param string $name The absolute name of the collection.
      */
@@ -99,8 +104,8 @@ class CollectionReference extends Query
      * `projects/<project-id>/databases/<database-id>/documents/<relative-path>`.
      *
      * Other methods are available to retrieve different parts of a collection name:
-     * * {@see Google\Cloud\Firestore\CollectionReference::id()} Returns the last element.
-     * * {@see Google\Cloud\Firestore\CollectionReference::path()} Returns the path, relative to the database.
+     * * {@see \Google\Cloud\Firestore\CollectionReference::id()} Returns the last element.
+     * * {@see \Google\Cloud\Firestore\CollectionReference::path()} Returns the path, relative to the database.
      *
      * Example:
      * ```
@@ -120,7 +125,7 @@ class CollectionReference extends Query
      * Paths identify the location of a collection, relative to the database name.
      *
      * To retrieve the collection ID (the last element of the path), use
-     * {@see Google\Cloud\Firestore\CollectionReference::id()}.
+     * {@see \Google\Cloud\Firestore\CollectionReference::id()}.
      *
      * Example:
      * ```
@@ -139,7 +144,7 @@ class CollectionReference extends Query
      *
      * IDs are the path element which identifies a resource. To retrieve the
      * full path to a resource (the resource name), use
-     * {@see Google\Cloud\Firestore\CollectionReference::name()}.
+     * {@see \Google\Cloud\Firestore\CollectionReference::name()}.
      *
      * Example:
      * ```
@@ -173,10 +178,10 @@ class CollectionReference extends Query
      * Get a document reference with a randomly generated document ID.
      *
      * If you wish to create a document reference with a specified name, use
-     * {@see Google\Cloud\Firestore\CollectionReference::document()}.
+     * {@see \Google\Cloud\Firestore\CollectionReference::document()}.
      *
      * This method does NOT insert the document until you call
-     * {@see Google\Cloud\Firestore\DocumentReference::create()}.
+     * {@see \Google\Cloud\Firestore\DocumentReference::create()}.
      *
      * Example:
      * ```
@@ -195,14 +200,14 @@ class CollectionReference extends Query
      *
      * This method will generate a random document name. If you wish to create a
      * document with a specified name, create a reference with
-     * {@see Google\Cloud\Firestore\CollectionReference::document()}, then call
-     * {@see Google\Cloud\Firestore\DocumentReference::create()} to insert the
+     * {@see \Google\Cloud\Firestore\CollectionReference::document()}, then call
+     * {@see \Google\Cloud\Firestore\DocumentReference::create()} to insert the
      * document.
      *
      * This method immediately inserts the document. If you wish for lazy
      * creation of a Document instance, refer to
-     * {@see Google\Cloud\Firestore\CollectionReference::document()} or
-     * {@see Google\Cloud\Firestore\CollectionReference::newDocument()}.
+     * {@see \Google\Cloud\Firestore\CollectionReference::document()} or
+     * {@see \Google\Cloud\Firestore\CollectionReference::newDocument()}.
      *
      * Example:
      * ```
@@ -255,6 +260,8 @@ class CollectionReference extends Query
      *           resume the loading of results from a specific point.
      * }
      * @return ItemIterator<DocumentReference>
+     * @throws \InvalidArgumentException if an invalid `$options.readTime` is
+     *     specified.
      */
     public function listDocuments(array $options = [])
     {
@@ -265,6 +272,8 @@ class CollectionReference extends Query
             'collectionId' => $this->pathId($this->name),
             'mask' => []
         ];
+
+        $options = $this->formatReadTimeOption($options);
 
         return new ItemIterator(
             new PageIterator(

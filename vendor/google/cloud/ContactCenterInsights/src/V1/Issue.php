@@ -22,25 +22,38 @@ class Issue extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The representative name for the issue.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. The time at which this issue was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The most recent time that this issue was updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
+    /**
+     * Output only. Resource names of the sample representative utterances that
+     * match to this issue.
+     *
+     * Generated from protobuf field <code>repeated string sample_utterances = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $sample_utterances;
+    /**
+     * Representative description of the issue.
+     *
+     * Generated from protobuf field <code>string display_description = 14;</code>
+     */
+    protected $display_description = '';
 
     /**
      * Constructor.
@@ -58,6 +71,11 @@ class Issue extends \Google\Protobuf\Internal\Message
      *           Output only. The time at which this issue was created.
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. The most recent time that this issue was updated.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $sample_utterances
+     *           Output only. Resource names of the sample representative utterances that
+     *           match to this issue.
+     *     @type string $display_description
+     *           Representative description of the issue.
      * }
      */
     public function __construct($data = NULL) {
@@ -189,6 +207,60 @@ class Issue extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->update_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Resource names of the sample representative utterances that
+     * match to this issue.
+     *
+     * Generated from protobuf field <code>repeated string sample_utterances = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getSampleUtterances()
+    {
+        return $this->sample_utterances;
+    }
+
+    /**
+     * Output only. Resource names of the sample representative utterances that
+     * match to this issue.
+     *
+     * Generated from protobuf field <code>repeated string sample_utterances = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setSampleUtterances($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->sample_utterances = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Representative description of the issue.
+     *
+     * Generated from protobuf field <code>string display_description = 14;</code>
+     * @return string
+     */
+    public function getDisplayDescription()
+    {
+        return $this->display_description;
+    }
+
+    /**
+     * Representative description of the issue.
+     *
+     * Generated from protobuf field <code>string display_description = 14;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDisplayDescription($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->display_description = $var;
 
         return $this;
     }

@@ -20,14 +20,24 @@ class RawDocument extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes content = 1;</code>
      */
-    private $content = '';
+    protected $content = '';
     /**
      * An IANA MIME type (RFC6838) indicating the nature and format of the
-     * [content].
+     * [content][google.cloud.documentai.v1.RawDocument.content].
      *
      * Generated from protobuf field <code>string mime_type = 2;</code>
      */
-    private $mime_type = '';
+    protected $mime_type = '';
+    /**
+     * The display name of the document, it supports all Unicode characters except
+     * the following:
+     * `*`, `?`, `[`, `]`, `%`, `{`, `}`,`'`, `\"`, `,`
+     * `~`, `=` and `:` are reserved.
+     * If not specified, a default ID is generated.
+     *
+     * Generated from protobuf field <code>string display_name = 3;</code>
+     */
+    protected $display_name = '';
 
     /**
      * Constructor.
@@ -39,7 +49,13 @@ class RawDocument extends \Google\Protobuf\Internal\Message
      *           Inline document content.
      *     @type string $mime_type
      *           An IANA MIME type (RFC6838) indicating the nature and format of the
-     *           [content].
+     *           [content][google.cloud.documentai.v1.RawDocument.content].
+     *     @type string $display_name
+     *           The display name of the document, it supports all Unicode characters except
+     *           the following:
+     *           `*`, `?`, `[`, `]`, `%`, `{`, `}`,`'`, `\"`, `,`
+     *           `~`, `=` and `:` are reserved.
+     *           If not specified, a default ID is generated.
      * }
      */
     public function __construct($data = NULL) {
@@ -75,7 +91,7 @@ class RawDocument extends \Google\Protobuf\Internal\Message
 
     /**
      * An IANA MIME type (RFC6838) indicating the nature and format of the
-     * [content].
+     * [content][google.cloud.documentai.v1.RawDocument.content].
      *
      * Generated from protobuf field <code>string mime_type = 2;</code>
      * @return string
@@ -87,7 +103,7 @@ class RawDocument extends \Google\Protobuf\Internal\Message
 
     /**
      * An IANA MIME type (RFC6838) indicating the nature and format of the
-     * [content].
+     * [content][google.cloud.documentai.v1.RawDocument.content].
      *
      * Generated from protobuf field <code>string mime_type = 2;</code>
      * @param string $var
@@ -97,6 +113,40 @@ class RawDocument extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->mime_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * The display name of the document, it supports all Unicode characters except
+     * the following:
+     * `*`, `?`, `[`, `]`, `%`, `{`, `}`,`'`, `\"`, `,`
+     * `~`, `=` and `:` are reserved.
+     * If not specified, a default ID is generated.
+     *
+     * Generated from protobuf field <code>string display_name = 3;</code>
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->display_name;
+    }
+
+    /**
+     * The display name of the document, it supports all Unicode characters except
+     * the following:
+     * `*`, `?`, `[`, `]`, `%`, `{`, `}`,`'`, `\"`, `,`
+     * `~`, `=` and `:` are reserved.
+     * If not specified, a default ID is generated.
+     *
+     * Generated from protobuf field <code>string display_name = 3;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDisplayName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->display_name = $var;
 
         return $this;
     }

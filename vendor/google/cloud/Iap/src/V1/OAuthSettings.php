@@ -25,7 +25,13 @@ class OAuthSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.StringValue login_hint = 2;</code>
      */
-    private $login_hint = null;
+    protected $login_hint = null;
+    /**
+     * List of OAuth client IDs allowed to programmatically authenticate with IAP.
+     *
+     * Generated from protobuf field <code>repeated string programmatic_clients = 5;</code>
+     */
+    private $programmatic_clients;
 
     /**
      * Constructor.
@@ -39,6 +45,8 @@ class OAuthSettings extends \Google\Protobuf\Internal\Message
      *           https://developers.google.com/identity/protocols/OpenIDConnect#hd-param
      *           Note: IAP does not verify that the id token's hd claim matches this value
      *           since access behavior is managed by IAM policies.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $programmatic_clients
+     *           List of OAuth client IDs allowed to programmatically authenticate with IAP.
      * }
      */
     public function __construct($data = NULL) {
@@ -83,7 +91,7 @@ class OAuthSettings extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.StringValue login_hint = 2;</code>
      * @return string|null
      */
-    public function getLoginHintValue()
+    public function getLoginHintUnwrapped()
     {
         return $this->readWrapperValue("login_hint");
     }
@@ -120,10 +128,36 @@ class OAuthSettings extends \Google\Protobuf\Internal\Message
      * @param string|null $var
      * @return $this
      */
-    public function setLoginHintValue($var)
+    public function setLoginHintUnwrapped($var)
     {
         $this->writeWrapperValue("login_hint", $var);
         return $this;}
+
+    /**
+     * List of OAuth client IDs allowed to programmatically authenticate with IAP.
+     *
+     * Generated from protobuf field <code>repeated string programmatic_clients = 5;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getProgrammaticClients()
+    {
+        return $this->programmatic_clients;
+    }
+
+    /**
+     * List of OAuth client IDs allowed to programmatically authenticate with IAP.
+     *
+     * Generated from protobuf field <code>repeated string programmatic_clients = 5;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setProgrammaticClients($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->programmatic_clients = $arr;
+
+        return $this;
+    }
 
 }
 

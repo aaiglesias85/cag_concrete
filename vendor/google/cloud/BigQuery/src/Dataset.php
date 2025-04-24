@@ -35,6 +35,7 @@ class Dataset
 
     /**
      * @var ConnectionInterface Represents a connection to BigQuery.
+     * @internal
      */
     private $connection;
 
@@ -60,7 +61,8 @@ class Dataset
 
     /**
      * @param ConnectionInterface $connection Represents a connection to
-     *        BigQuery.
+     *        BigQuery. This object is created by BigQueryClient,
+     *        and should not be instantiated outside of this client.
      * @param string $id The dataset's ID.
      * @param string $projectId The project's ID.
      * @param array $info [optional] The dataset's metadata.
@@ -177,9 +179,10 @@ class Dataset
     }
 
     /**
-     * Lazily instantiates a table. There are no network requests made at this
-     * point. To see the operations that can be performed on a dataset please
-     * see {@see Google\Cloud\BigQuery\Table}.
+     * Lazily instantiates a table.
+     *
+     * There are no network requests made at this point. To see the operations
+     * that can be performed on a dataset please see {@see Table}.
      *
      * Example:
      * ```
@@ -305,9 +308,10 @@ class Dataset
     }
 
     /**
-     * Lazily instantiates a machine learning model in the dataset. There are no
-     * network requests made at this point. To see the operations that can be performed on a
-     * model, please see {@see Google\Cloud\BigQuery\Model}.
+     * Lazily instantiates a machine learning model in the dataset.
+     *
+     * There are no network requests made at this point. To see the operations
+     * that can be performed on a model, please see {@see Model}.
      *
      * Example:
      * ```
@@ -340,7 +344,7 @@ class Dataset
      * subset of the resource representation. Fields returned include
      * `modelReference`, `modelType`, `creationTime`, `lastModifiedTime` and
      * `labels`. To obtain a full representation, call
-     * {@see Google\Cloud\BigQuery\Model::reload()}.
+     * {@see Model::reload()}.
      *
      * Example:
      * ```
@@ -390,7 +394,7 @@ class Dataset
      *
      * There are no network requests made at this point. To see the operations
      * that can be performed on a routine, please see
-     * {@see Google\Cloud\BigQuery\Routine}.
+     * {@see Routine}.
      *
      * Example:
      * ```
@@ -420,7 +424,7 @@ class Dataset
      * subset of the resource representation. Fields returned include `etag`,
      * `projectId`, `datasetId`, `routineId`, `routineType`, `creationTime`,
      * `lastModifiedTime` and `language`. To obtain a full representation, call
-     * {@see Google\Cloud\BigQuery\Routine::reload()}.
+     * {@see Routine::reload()}.
      *
      * Example:
      * ```

@@ -18,48 +18,62 @@ use Google\Protobuf\Internal\GPBUtil;
 class CutoverJob extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The time the cutover job was created (as an API call, not when it was
-     * actually created in the target).
+     * Output only. The time the cutover job was created (as an API call, not when
+     * it was actually created in the target).
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
+    /**
+     * Output only. The time the cutover job had finished.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 16 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $end_time = null;
     /**
      * Output only. The name of the cutover job.
      *
      * Generated from protobuf field <code>string name = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. State of the cutover job.
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.CutoverJob.State state = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. The time the state was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp state_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state_time = null;
+    protected $state_time = null;
     /**
      * Output only. The current progress in percentage of the cutover job.
      *
      * Generated from protobuf field <code>int32 progress_percent = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $progress_percent = 0;
+    protected $progress_percent = 0;
     /**
-     * Output only. Provides details for the errors that led to the Cutover Job's state.
+     * Output only. Provides details for the errors that led to the Cutover Job's
+     * state.
      *
      * Generated from protobuf field <code>.google.rpc.Status error = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $error = null;
+    protected $error = null;
     /**
-     * Output only. A message providing possible extra details about the current state.
+     * Output only. A message providing possible extra details about the current
+     * state.
      *
      * Generated from protobuf field <code>string state_message = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state_message = '';
+    protected $state_message = '';
+    /**
+     * Output only. The cutover steps list representing its progress.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.vmmigration.v1.CutoverStep steps = 17 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $steps;
     protected $target_vm_details;
 
     /**
@@ -71,8 +85,10 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\VMMigration\V1\ComputeEngineTargetDetails $compute_engine_target_details
      *           Output only. Details of the target VM in Compute Engine.
      *     @type \Google\Protobuf\Timestamp $create_time
-     *           Output only. The time the cutover job was created (as an API call, not when it was
-     *           actually created in the target).
+     *           Output only. The time the cutover job was created (as an API call, not when
+     *           it was actually created in the target).
+     *     @type \Google\Protobuf\Timestamp $end_time
+     *           Output only. The time the cutover job had finished.
      *     @type string $name
      *           Output only. The name of the cutover job.
      *     @type int $state
@@ -82,9 +98,13 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
      *     @type int $progress_percent
      *           Output only. The current progress in percentage of the cutover job.
      *     @type \Google\Rpc\Status $error
-     *           Output only. Provides details for the errors that led to the Cutover Job's state.
+     *           Output only. Provides details for the errors that led to the Cutover Job's
+     *           state.
      *     @type string $state_message
-     *           Output only. A message providing possible extra details about the current state.
+     *           Output only. A message providing possible extra details about the current
+     *           state.
+     *     @type array<\Google\Cloud\VMMigration\V1\CutoverStep>|\Google\Protobuf\Internal\RepeatedField $steps
+     *           Output only. The cutover steps list representing its progress.
      * }
      */
     public function __construct($data = NULL) {
@@ -124,8 +144,8 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The time the cutover job was created (as an API call, not when it was
-     * actually created in the target).
+     * Output only. The time the cutover job was created (as an API call, not when
+     * it was actually created in the target).
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -146,8 +166,8 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The time the cutover job was created (as an API call, not when it was
-     * actually created in the target).
+     * Output only. The time the cutover job was created (as an API call, not when
+     * it was actually created in the target).
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var
@@ -157,6 +177,42 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->create_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The time the cutover job had finished.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 16 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Timestamp|null
+     */
+    public function getEndTime()
+    {
+        return $this->end_time;
+    }
+
+    public function hasEndTime()
+    {
+        return isset($this->end_time);
+    }
+
+    public function clearEndTime()
+    {
+        unset($this->end_time);
+    }
+
+    /**
+     * Output only. The time the cutover job had finished.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 16 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Protobuf\Timestamp $var
+     * @return $this
+     */
+    public function setEndTime($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        $this->end_time = $var;
 
         return $this;
     }
@@ -276,7 +332,8 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Provides details for the errors that led to the Cutover Job's state.
+     * Output only. Provides details for the errors that led to the Cutover Job's
+     * state.
      *
      * Generated from protobuf field <code>.google.rpc.Status error = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Rpc\Status|null
@@ -297,7 +354,8 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Provides details for the errors that led to the Cutover Job's state.
+     * Output only. Provides details for the errors that led to the Cutover Job's
+     * state.
      *
      * Generated from protobuf field <code>.google.rpc.Status error = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Rpc\Status $var
@@ -312,7 +370,8 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A message providing possible extra details about the current state.
+     * Output only. A message providing possible extra details about the current
+     * state.
      *
      * Generated from protobuf field <code>string state_message = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -323,7 +382,8 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A message providing possible extra details about the current state.
+     * Output only. A message providing possible extra details about the current
+     * state.
      *
      * Generated from protobuf field <code>string state_message = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -333,6 +393,32 @@ class CutoverJob extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->state_message = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The cutover steps list representing its progress.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.vmmigration.v1.CutoverStep steps = 17 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getSteps()
+    {
+        return $this->steps;
+    }
+
+    /**
+     * Output only. The cutover steps list representing its progress.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.vmmigration.v1.CutoverStep steps = 17 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<\Google\Cloud\VMMigration\V1\CutoverStep>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setSteps($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\VMMigration\V1\CutoverStep::class);
+        $this->steps = $arr;
 
         return $this;
     }

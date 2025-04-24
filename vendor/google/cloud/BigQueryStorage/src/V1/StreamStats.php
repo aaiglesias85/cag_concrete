@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Estimated stream statistics for a given Stream.
+ * Estimated stream statistics for a given read Stream.
  *
  * Generated from protobuf message <code>google.cloud.bigquery.storage.v1.StreamStats</code>
  */
@@ -20,7 +20,7 @@ class StreamStats extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.storage.v1.StreamStats.Progress progress = 2;</code>
      */
-    private $progress = null;
+    protected $progress = null;
 
     /**
      * Constructor.
@@ -45,7 +45,7 @@ class StreamStats extends \Google\Protobuf\Internal\Message
      */
     public function getProgress()
     {
-        return isset($this->progress) ? $this->progress : null;
+        return $this->progress;
     }
 
     public function hasProgress()

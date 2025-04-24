@@ -21,20 +21,20 @@ class ListUserEventsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. Maximum number of results to return per page. If zero, the
      * service will choose a reasonable default.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The previous ListUserEventsResponse.next_page_token.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Optional. Filtering expression to specify restrictions over
      * returned events. This is a sequence of terms, where each term applies some
@@ -65,7 +65,55 @@ class ListUserEventsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $parent Required. The parent eventStore resource name, such as
+     *                       `projects/&#42;/locations/&#42;/catalogs/default_catalog/eventStores/default_event_store`. Please see
+     *                       {@see UserEventServiceClient::eventStoreName()} for help formatting this field.
+     * @param string $filter Optional. Filtering expression to specify restrictions over
+     *                       returned events. This is a sequence of terms, where each term applies some
+     *                       kind of a restriction to the returned user events. Use this expression to
+     *                       restrict results to a specific time range, or filter events by eventType.
+     *                       eg: eventTime > "2012-04-23T18:25:43.511Z" eventsMissingCatalogItems
+     *                       eventTime<"2012-04-23T18:25:43.511Z" eventType=search
+     *
+     *                       We expect only 3 types of fields:
+     *
+     *                       * eventTime: this can be specified a maximum of 2 times, once with a
+     *                       less than operator and once with a greater than operator. The
+     *                       eventTime restrict should result in one contiguous valid eventTime
+     *                       range.
+     *
+     *                       * eventType: only 1 eventType restriction can be specified.
+     *
+     *                       * eventsMissingCatalogItems: specififying this will restrict results
+     *                       to events for which catalog items were not found in the catalog. The
+     *                       default behavior is to return only those events for which catalog
+     *                       items were found.
+     *
+     *                       Some examples of valid filters expressions:
+     *
+     *                       * Example 1: eventTime > "2012-04-23T18:25:43.511Z"
+     *                       eventTime < "2012-04-23T18:30:43.511Z"
+     *                       * Example 2: eventTime > "2012-04-23T18:25:43.511Z"
+     *                       eventType = detail-page-view
+     *                       * Example 3: eventsMissingCatalogItems
+     *                       eventType = search eventTime < "2018-04-23T18:30:43.511Z"
+     *                       * Example 4: eventTime > "2012-04-23T18:25:43.511Z"
+     *                       * Example 5: eventType = search
+     *                       * Example 6: eventsMissingCatalogItems
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\ListUserEventsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $filter): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setFilter($filter);
+    }
 
     /**
      * Constructor.

@@ -30,41 +30,134 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Optional. The maximum number of results to return from this request.  Non-positive
-     * values are ignored. If not specified, the server will determine the number
-     * of results to return.
+     * Optional. The maximum number of results to return from this request.
+     * Non-positive values are ignored. If not specified, the server will
+     * determine the number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
-     * Optional. If present, retrieves the next batch of results from the preceding call to
-     * this method. `page_token` must be the value of `next_page_token` from the
-     * previous response. The values of other method parameters must be identical
-     * to those in the previous call.
+     * Optional. If present, retrieves the next batch of results from the
+     * preceding call to this method. `page_token` must be the value of
+     * `next_page_token` from the previous response. The values of other method
+     * parameters must be identical to those in the previous call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Filter expression to restrict the recommendations returned. Supported
      * filter fields:
      * * `state_info.state`
      * * `recommenderSubtype`
      * * `priority`
+     * * `targetResources`
      * Examples:
      * * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      * * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE`
      * * `priority = P1 OR priority = P2`
+     * * `targetResources :
+     * //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      * * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)`
+     * The max allowed filter length is 500 characters.
      * (These expressions are based on the filter language described at
      * https://google.aip.dev/160)
      *
      * Generated from protobuf field <code>string filter = 5;</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $parent Required. The container resource on which to execute the request.
+     *                       Acceptable formats:
+     *
+     *                       * `projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `projects/[PROJECT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       LOCATION here refers to GCP Locations:
+     *                       https://cloud.google.com/about/locations/
+     *                       RECOMMENDER_ID refers to supported recommenders:
+     *                       https://cloud.google.com/recommender/docs/recommenders. Please see
+     *                       {@see RecommenderClient::recommenderName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Recommender\V1\ListRecommendationsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
+
+    /**
+     * @param string $parent Required. The container resource on which to execute the request.
+     *                       Acceptable formats:
+     *
+     *                       * `projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `projects/[PROJECT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       * `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]`
+     *
+     *                       LOCATION here refers to GCP Locations:
+     *                       https://cloud.google.com/about/locations/
+     *                       RECOMMENDER_ID refers to supported recommenders:
+     *                       https://cloud.google.com/recommender/docs/recommenders. Please see
+     *                       {@see RecommenderClient::recommenderName()} for help formatting this field.
+     * @param string $filter Filter expression to restrict the recommendations returned. Supported
+     *                       filter fields:
+     *
+     *                       * `state_info.state`
+     *
+     *                       * `recommenderSubtype`
+     *
+     *                       * `priority`
+     *
+     *                       * `targetResources`
+     *
+     *                       Examples:
+     *
+     *                       * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
+     *
+     *                       * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE`
+     *
+     *                       * `priority = P1 OR priority = P2`
+     *
+     *                       * `targetResources :
+     *                       //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
+     *
+     *                       * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)`
+     *
+     *                       The max allowed filter length is 500 characters.
+     *
+     *                       (These expressions are based on the filter language described at
+     *                       https://google.aip.dev/160)
+     *
+     * @return \Google\Cloud\Recommender\V1\ListRecommendationsRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParentFilter(string $parent, string $filter): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setFilter($filter);
+    }
 
     /**
      * Constructor.
@@ -85,25 +178,29 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
      *           RECOMMENDER_ID refers to supported recommenders:
      *           https://cloud.google.com/recommender/docs/recommenders.
      *     @type int $page_size
-     *           Optional. The maximum number of results to return from this request.  Non-positive
-     *           values are ignored. If not specified, the server will determine the number
-     *           of results to return.
+     *           Optional. The maximum number of results to return from this request.
+     *           Non-positive values are ignored. If not specified, the server will
+     *           determine the number of results to return.
      *     @type string $page_token
-     *           Optional. If present, retrieves the next batch of results from the preceding call to
-     *           this method. `page_token` must be the value of `next_page_token` from the
-     *           previous response. The values of other method parameters must be identical
-     *           to those in the previous call.
+     *           Optional. If present, retrieves the next batch of results from the
+     *           preceding call to this method. `page_token` must be the value of
+     *           `next_page_token` from the previous response. The values of other method
+     *           parameters must be identical to those in the previous call.
      *     @type string $filter
      *           Filter expression to restrict the recommendations returned. Supported
      *           filter fields:
      *           * `state_info.state`
      *           * `recommenderSubtype`
      *           * `priority`
+     *           * `targetResources`
      *           Examples:
      *           * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      *           * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE`
      *           * `priority = P1 OR priority = P2`
+     *           * `targetResources :
+     *           //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      *           * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)`
+     *           The max allowed filter length is 500 characters.
      *           (These expressions are based on the filter language described at
      *           https://google.aip.dev/160)
      * }
@@ -160,9 +257,9 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The maximum number of results to return from this request.  Non-positive
-     * values are ignored. If not specified, the server will determine the number
-     * of results to return.
+     * Optional. The maximum number of results to return from this request.
+     * Non-positive values are ignored. If not specified, the server will
+     * determine the number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -173,9 +270,9 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The maximum number of results to return from this request.  Non-positive
-     * values are ignored. If not specified, the server will determine the number
-     * of results to return.
+     * Optional. The maximum number of results to return from this request.
+     * Non-positive values are ignored. If not specified, the server will
+     * determine the number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -190,10 +287,10 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If present, retrieves the next batch of results from the preceding call to
-     * this method. `page_token` must be the value of `next_page_token` from the
-     * previous response. The values of other method parameters must be identical
-     * to those in the previous call.
+     * Optional. If present, retrieves the next batch of results from the
+     * preceding call to this method. `page_token` must be the value of
+     * `next_page_token` from the previous response. The values of other method
+     * parameters must be identical to those in the previous call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -204,10 +301,10 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If present, retrieves the next batch of results from the preceding call to
-     * this method. `page_token` must be the value of `next_page_token` from the
-     * previous response. The values of other method parameters must be identical
-     * to those in the previous call.
+     * Optional. If present, retrieves the next batch of results from the
+     * preceding call to this method. `page_token` must be the value of
+     * `next_page_token` from the previous response. The values of other method
+     * parameters must be identical to those in the previous call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -227,11 +324,15 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
      * * `state_info.state`
      * * `recommenderSubtype`
      * * `priority`
+     * * `targetResources`
      * Examples:
      * * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      * * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE`
      * * `priority = P1 OR priority = P2`
+     * * `targetResources :
+     * //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      * * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)`
+     * The max allowed filter length is 500 characters.
      * (These expressions are based on the filter language described at
      * https://google.aip.dev/160)
      *
@@ -249,11 +350,15 @@ class ListRecommendationsRequest extends \Google\Protobuf\Internal\Message
      * * `state_info.state`
      * * `recommenderSubtype`
      * * `priority`
+     * * `targetResources`
      * Examples:
      * * `stateInfo.state = ACTIVE OR stateInfo.state = DISMISSED`
      * * `recommenderSubtype = REMOVE_ROLE OR recommenderSubtype = REPLACE_ROLE`
      * * `priority = P1 OR priority = P2`
+     * * `targetResources :
+     * //compute.googleapis.com/projects/1234/zones/us-central1-a/instances/instance-1`
      * * `stateInfo.state = ACTIVE AND (priority = P1 OR priority = P2)`
+     * The max allowed filter length is 500 characters.
      * (These expressions are based on the filter language described at
      * https://google.aip.dev/160)
      *

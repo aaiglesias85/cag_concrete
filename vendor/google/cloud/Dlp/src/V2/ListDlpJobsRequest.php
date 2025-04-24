@@ -19,11 +19,11 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      * Required. Parent resource name.
      * The format of this value varies depending on whether you have [specified a
      * processing
-     * location](https://cloud.google.com/dlp/docs/specifying-location):
-     * + Projects scope, location specified:<br/>
-     *   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
-     * + Projects scope, no location specified (defaults to global):<br/>
-     *   `projects/`<var>PROJECT_ID</var>
+     * location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
+     * + Projects scope, location specified:
+     *   `projects/{project_id}/locations/{location_id}`
+     * + Projects scope, no location specified (defaults to global):
+     *   `projects/{project_id}`
      * The following example `parent` string specifies a parent project with the
      * identifier `example-project`, and specifies the `europe-west3` location
      * for processing data:
@@ -31,7 +31,7 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 4 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Allows filtering.
      * Supported syntax:
@@ -42,13 +42,13 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      * * Supported fields/values for inspect jobs:
      *     - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
      *     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
-     *     - `trigger_name` - The resource name of the trigger that created job.
-     *     - 'end_time` - Corresponds to time the job finished.
-     *     - 'start_time` - Corresponds to time the job finished.
+     *     - `trigger_name` - The name of the trigger that created the job.
+     *     - 'end_time` - Corresponds to the time the job finished.
+     *     - 'start_time` - Corresponds to the time the job finished.
      * * Supported fields for risk analysis jobs:
      *     - `state` - RUNNING|CANCELED|FINISHED|FAILED
-     *     - 'end_time` - Corresponds to time the job finished.
-     *     - 'start_time` - Corresponds to time the job finished.
+     *     - 'end_time` - Corresponds to the time the job finished.
+     *     - 'start_time` - Corresponds to the time the job finished.
      * * The operator must be `=` or `!=`.
      * Examples:
      * * inspected_storage = cloud_storage AND state = done
@@ -59,46 +59,75 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 1;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * The standard list page size.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The standard list page token.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * The type of job. Defaults to `DlpJobType.INSPECT`
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DlpJobType type = 5;</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
-     * Comma separated list of fields to order by,
-     * followed by `asc` or `desc` postfix. This list is case-insensitive,
-     * default sorting order is ascending, redundant space characters are
+     * Comma-separated list of fields to order by,
+     * followed by `asc` or `desc` postfix. This list is case insensitive. The
+     * default sorting order is ascending. Redundant space characters are
      * insignificant.
      * Example: `name asc, end_time asc, create_time desc`
      * Supported fields are:
-     * - `create_time`: corresponds to time the job was created.
-     * - `end_time`: corresponds to time the job ended.
-     * - `name`: corresponds to job's name.
+     * - `create_time`: corresponds to the time the job was created.
+     * - `end_time`: corresponds to the time the job ended.
+     * - `name`: corresponds to the job's name.
      * - `state`: corresponds to `state`
      *
      * Generated from protobuf field <code>string order_by = 6;</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
     /**
      * Deprecated. This field has no effect.
      *
      * Generated from protobuf field <code>string location_id = 7;</code>
      */
-    private $location_id = '';
+    protected $location_id = '';
+
+    /**
+     * @param string $parent Required. Parent resource name.
+     *
+     *                       The format of this value varies depending on whether you have [specified a
+     *                       processing
+     *                       location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
+     *
+     *                       + Projects scope, location specified:
+     *                       `projects/{project_id}/locations/{location_id}`
+     *                       + Projects scope, no location specified (defaults to global):
+     *                       `projects/{project_id}`
+     *
+     *                       The following example `parent` string specifies a parent project with the
+     *                       identifier `example-project`, and specifies the `europe-west3` location
+     *                       for processing data:
+     *
+     *                       parent=projects/example-project/locations/europe-west3
+     *                       Please see {@see DlpServiceClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dlp\V2\ListDlpJobsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -110,11 +139,11 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      *           Required. Parent resource name.
      *           The format of this value varies depending on whether you have [specified a
      *           processing
-     *           location](https://cloud.google.com/dlp/docs/specifying-location):
-     *           + Projects scope, location specified:<br/>
-     *             `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
-     *           + Projects scope, no location specified (defaults to global):<br/>
-     *             `projects/`<var>PROJECT_ID</var>
+     *           location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
+     *           + Projects scope, location specified:
+     *             `projects/{project_id}/locations/{location_id}`
+     *           + Projects scope, no location specified (defaults to global):
+     *             `projects/{project_id}`
      *           The following example `parent` string specifies a parent project with the
      *           identifier `example-project`, and specifies the `europe-west3` location
      *           for processing data:
@@ -129,13 +158,13 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      *           * Supported fields/values for inspect jobs:
      *               - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
      *               - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
-     *               - `trigger_name` - The resource name of the trigger that created job.
-     *               - 'end_time` - Corresponds to time the job finished.
-     *               - 'start_time` - Corresponds to time the job finished.
+     *               - `trigger_name` - The name of the trigger that created the job.
+     *               - 'end_time` - Corresponds to the time the job finished.
+     *               - 'start_time` - Corresponds to the time the job finished.
      *           * Supported fields for risk analysis jobs:
      *               - `state` - RUNNING|CANCELED|FINISHED|FAILED
-     *               - 'end_time` - Corresponds to time the job finished.
-     *               - 'start_time` - Corresponds to time the job finished.
+     *               - 'end_time` - Corresponds to the time the job finished.
+     *               - 'start_time` - Corresponds to the time the job finished.
      *           * The operator must be `=` or `!=`.
      *           Examples:
      *           * inspected_storage = cloud_storage AND state = done
@@ -150,15 +179,15 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      *     @type int $type
      *           The type of job. Defaults to `DlpJobType.INSPECT`
      *     @type string $order_by
-     *           Comma separated list of fields to order by,
-     *           followed by `asc` or `desc` postfix. This list is case-insensitive,
-     *           default sorting order is ascending, redundant space characters are
+     *           Comma-separated list of fields to order by,
+     *           followed by `asc` or `desc` postfix. This list is case insensitive. The
+     *           default sorting order is ascending. Redundant space characters are
      *           insignificant.
      *           Example: `name asc, end_time asc, create_time desc`
      *           Supported fields are:
-     *           - `create_time`: corresponds to time the job was created.
-     *           - `end_time`: corresponds to time the job ended.
-     *           - `name`: corresponds to job's name.
+     *           - `create_time`: corresponds to the time the job was created.
+     *           - `end_time`: corresponds to the time the job ended.
+     *           - `name`: corresponds to the job's name.
      *           - `state`: corresponds to `state`
      *     @type string $location_id
      *           Deprecated. This field has no effect.
@@ -173,11 +202,11 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      * Required. Parent resource name.
      * The format of this value varies depending on whether you have [specified a
      * processing
-     * location](https://cloud.google.com/dlp/docs/specifying-location):
-     * + Projects scope, location specified:<br/>
-     *   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
-     * + Projects scope, no location specified (defaults to global):<br/>
-     *   `projects/`<var>PROJECT_ID</var>
+     * location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
+     * + Projects scope, location specified:
+     *   `projects/{project_id}/locations/{location_id}`
+     * + Projects scope, no location specified (defaults to global):
+     *   `projects/{project_id}`
      * The following example `parent` string specifies a parent project with the
      * identifier `example-project`, and specifies the `europe-west3` location
      * for processing data:
@@ -195,11 +224,11 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      * Required. Parent resource name.
      * The format of this value varies depending on whether you have [specified a
      * processing
-     * location](https://cloud.google.com/dlp/docs/specifying-location):
-     * + Projects scope, location specified:<br/>
-     *   `projects/`<var>PROJECT_ID</var>`/locations/`<var>LOCATION_ID</var>
-     * + Projects scope, no location specified (defaults to global):<br/>
-     *   `projects/`<var>PROJECT_ID</var>
+     * location](https://cloud.google.com/sensitive-data-protection/docs/specifying-location):
+     * + Projects scope, location specified:
+     *   `projects/{project_id}/locations/{location_id}`
+     * + Projects scope, no location specified (defaults to global):
+     *   `projects/{project_id}`
      * The following example `parent` string specifies a parent project with the
      * identifier `example-project`, and specifies the `europe-west3` location
      * for processing data:
@@ -227,13 +256,13 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      * * Supported fields/values for inspect jobs:
      *     - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
      *     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
-     *     - `trigger_name` - The resource name of the trigger that created job.
-     *     - 'end_time` - Corresponds to time the job finished.
-     *     - 'start_time` - Corresponds to time the job finished.
+     *     - `trigger_name` - The name of the trigger that created the job.
+     *     - 'end_time` - Corresponds to the time the job finished.
+     *     - 'start_time` - Corresponds to the time the job finished.
      * * Supported fields for risk analysis jobs:
      *     - `state` - RUNNING|CANCELED|FINISHED|FAILED
-     *     - 'end_time` - Corresponds to time the job finished.
-     *     - 'start_time` - Corresponds to time the job finished.
+     *     - 'end_time` - Corresponds to the time the job finished.
+     *     - 'start_time` - Corresponds to the time the job finished.
      * * The operator must be `=` or `!=`.
      * Examples:
      * * inspected_storage = cloud_storage AND state = done
@@ -260,13 +289,13 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
      * * Supported fields/values for inspect jobs:
      *     - `state` - PENDING|RUNNING|CANCELED|FINISHED|FAILED
      *     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
-     *     - `trigger_name` - The resource name of the trigger that created job.
-     *     - 'end_time` - Corresponds to time the job finished.
-     *     - 'start_time` - Corresponds to time the job finished.
+     *     - `trigger_name` - The name of the trigger that created the job.
+     *     - 'end_time` - Corresponds to the time the job finished.
+     *     - 'start_time` - Corresponds to the time the job finished.
      * * Supported fields for risk analysis jobs:
      *     - `state` - RUNNING|CANCELED|FINISHED|FAILED
-     *     - 'end_time` - Corresponds to time the job finished.
-     *     - 'start_time` - Corresponds to time the job finished.
+     *     - 'end_time` - Corresponds to the time the job finished.
+     *     - 'start_time` - Corresponds to the time the job finished.
      * * The operator must be `=` or `!=`.
      * Examples:
      * * inspected_storage = cloud_storage AND state = done
@@ -366,15 +395,15 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Comma separated list of fields to order by,
-     * followed by `asc` or `desc` postfix. This list is case-insensitive,
-     * default sorting order is ascending, redundant space characters are
+     * Comma-separated list of fields to order by,
+     * followed by `asc` or `desc` postfix. This list is case insensitive. The
+     * default sorting order is ascending. Redundant space characters are
      * insignificant.
      * Example: `name asc, end_time asc, create_time desc`
      * Supported fields are:
-     * - `create_time`: corresponds to time the job was created.
-     * - `end_time`: corresponds to time the job ended.
-     * - `name`: corresponds to job's name.
+     * - `create_time`: corresponds to the time the job was created.
+     * - `end_time`: corresponds to the time the job ended.
+     * - `name`: corresponds to the job's name.
      * - `state`: corresponds to `state`
      *
      * Generated from protobuf field <code>string order_by = 6;</code>
@@ -386,15 +415,15 @@ class ListDlpJobsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Comma separated list of fields to order by,
-     * followed by `asc` or `desc` postfix. This list is case-insensitive,
-     * default sorting order is ascending, redundant space characters are
+     * Comma-separated list of fields to order by,
+     * followed by `asc` or `desc` postfix. This list is case insensitive. The
+     * default sorting order is ascending. Redundant space characters are
      * insignificant.
      * Example: `name asc, end_time asc, create_time desc`
      * Supported fields are:
-     * - `create_time`: corresponds to time the job was created.
-     * - `end_time`: corresponds to time the job ended.
-     * - `name`: corresponds to job's name.
+     * - `create_time`: corresponds to the time the job was created.
+     * - `end_time`: corresponds to the time the job ended.
+     * - `name`: corresponds to the job's name.
      * - `state`: corresponds to `state`
      *
      * Generated from protobuf field <code>string order_by = 6;</code>

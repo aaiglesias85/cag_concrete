@@ -20,49 +20,55 @@ class TransferOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The ID of the Google Cloud project that owns the operation.
      *
      * Generated from protobuf field <code>string project_id = 2;</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
     /**
      * Transfer specification.
      *
      * Generated from protobuf field <code>.google.storagetransfer.v1.TransferSpec transfer_spec = 3;</code>
      */
-    private $transfer_spec = null;
+    protected $transfer_spec = null;
     /**
      * Notification configuration.
      *
      * Generated from protobuf field <code>.google.storagetransfer.v1.NotificationConfig notification_config = 10;</code>
      */
-    private $notification_config = null;
+    protected $notification_config = null;
+    /**
+     * Cloud Logging configuration.
+     *
+     * Generated from protobuf field <code>.google.storagetransfer.v1.LoggingConfig logging_config = 12;</code>
+     */
+    protected $logging_config = null;
     /**
      * Start time of this transfer execution.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * End time of this transfer execution.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 5;</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * Status of the transfer operation.
      *
      * Generated from protobuf field <code>.google.storagetransfer.v1.TransferOperation.Status status = 6;</code>
      */
-    private $status = 0;
+    protected $status = 0;
     /**
      * Information about the progress of the transfer operation.
      *
      * Generated from protobuf field <code>.google.storagetransfer.v1.TransferCounters counters = 7;</code>
      */
-    private $counters = null;
+    protected $counters = null;
     /**
      * Summarizes errors encountered with sample error log entries.
      *
@@ -74,7 +80,7 @@ class TransferOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string transfer_job_name = 9;</code>
      */
-    private $transfer_job_name = '';
+    protected $transfer_job_name = '';
 
     /**
      * Constructor.
@@ -90,6 +96,8 @@ class TransferOperation extends \Google\Protobuf\Internal\Message
      *           Transfer specification.
      *     @type \Google\Cloud\StorageTransfer\V1\NotificationConfig $notification_config
      *           Notification configuration.
+     *     @type \Google\Cloud\StorageTransfer\V1\LoggingConfig $logging_config
+     *           Cloud Logging configuration.
      *     @type \Google\Protobuf\Timestamp $start_time
      *           Start time of this transfer execution.
      *     @type \Google\Protobuf\Timestamp $end_time
@@ -98,7 +106,7 @@ class TransferOperation extends \Google\Protobuf\Internal\Message
      *           Status of the transfer operation.
      *     @type \Google\Cloud\StorageTransfer\V1\TransferCounters $counters
      *           Information about the progress of the transfer operation.
-     *     @type \Google\Cloud\StorageTransfer\V1\ErrorSummary[]|\Google\Protobuf\Internal\RepeatedField $error_breakdowns
+     *     @type array<\Google\Cloud\StorageTransfer\V1\ErrorSummary>|\Google\Protobuf\Internal\RepeatedField $error_breakdowns
      *           Summarizes errors encountered with sample error log entries.
      *     @type string $transfer_job_name
      *           The name of the transfer job that triggers this transfer operation.
@@ -229,6 +237,42 @@ class TransferOperation extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\StorageTransfer\V1\NotificationConfig::class);
         $this->notification_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Cloud Logging configuration.
+     *
+     * Generated from protobuf field <code>.google.storagetransfer.v1.LoggingConfig logging_config = 12;</code>
+     * @return \Google\Cloud\StorageTransfer\V1\LoggingConfig|null
+     */
+    public function getLoggingConfig()
+    {
+        return $this->logging_config;
+    }
+
+    public function hasLoggingConfig()
+    {
+        return isset($this->logging_config);
+    }
+
+    public function clearLoggingConfig()
+    {
+        unset($this->logging_config);
+    }
+
+    /**
+     * Cloud Logging configuration.
+     *
+     * Generated from protobuf field <code>.google.storagetransfer.v1.LoggingConfig logging_config = 12;</code>
+     * @param \Google\Cloud\StorageTransfer\V1\LoggingConfig $var
+     * @return $this
+     */
+    public function setLoggingConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\StorageTransfer\V1\LoggingConfig::class);
+        $this->logging_config = $var;
 
         return $this;
     }
@@ -382,7 +426,7 @@ class TransferOperation extends \Google\Protobuf\Internal\Message
      * Summarizes errors encountered with sample error log entries.
      *
      * Generated from protobuf field <code>repeated .google.storagetransfer.v1.ErrorSummary error_breakdowns = 8;</code>
-     * @param \Google\Cloud\StorageTransfer\V1\ErrorSummary[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\StorageTransfer\V1\ErrorSummary>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrorBreakdowns($var)

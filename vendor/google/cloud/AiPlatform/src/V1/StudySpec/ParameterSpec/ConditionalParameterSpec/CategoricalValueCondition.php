@@ -16,8 +16,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class CategoricalValueCondition extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Matches values of the parent parameter of 'CATEGORICAL' type.
-     * All values must exist in `categorical_value_spec` of parent
+     * Required. Matches values of the parent parameter of 'CATEGORICAL'
+     * type. All values must exist in `categorical_value_spec` of parent
      * parameter.
      *
      * Generated from protobuf field <code>repeated string values = 1 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -30,9 +30,9 @@ class CategoricalValueCondition extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $values
-     *           Required. Matches values of the parent parameter of 'CATEGORICAL' type.
-     *           All values must exist in `categorical_value_spec` of parent
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $values
+     *           Required. Matches values of the parent parameter of 'CATEGORICAL'
+     *           type. All values must exist in `categorical_value_spec` of parent
      *           parameter.
      * }
      */
@@ -42,8 +42,8 @@ class CategoricalValueCondition extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Matches values of the parent parameter of 'CATEGORICAL' type.
-     * All values must exist in `categorical_value_spec` of parent
+     * Required. Matches values of the parent parameter of 'CATEGORICAL'
+     * type. All values must exist in `categorical_value_spec` of parent
      * parameter.
      *
      * Generated from protobuf field <code>repeated string values = 1 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -55,12 +55,12 @@ class CategoricalValueCondition extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Matches values of the parent parameter of 'CATEGORICAL' type.
-     * All values must exist in `categorical_value_spec` of parent
+     * Required. Matches values of the parent parameter of 'CATEGORICAL'
+     * type. All values must exist in `categorical_value_spec` of parent
      * parameter.
      *
      * Generated from protobuf field <code>repeated string values = 1 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setValues($var)

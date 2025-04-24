@@ -27,20 +27,43 @@ class ListWorkflowTemplatesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. The maximum number of results to return in each response.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The page token, returned by a previous call, to request the
      * next page of results.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The resource name of the region or location, as described
+     *                       in https://cloud.google.com/apis/design/resource_names.
+     *
+     *                       * For `projects.regions.workflowTemplates,list`, the resource
+     *                       name of the region has the following format:
+     *                       `projects/{project_id}/regions/{region}`
+     *
+     *                       * For `projects.locations.workflowTemplates.list`, the
+     *                       resource name of the location has the following format:
+     *                       `projects/{project_id}/locations/{location}`
+     *                       Please see {@see WorkflowTemplateServiceClient::regionName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dataproc\V1\ListWorkflowTemplatesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

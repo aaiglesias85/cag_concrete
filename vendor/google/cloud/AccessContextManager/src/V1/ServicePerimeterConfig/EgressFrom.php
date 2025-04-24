@@ -40,7 +40,7 @@ class EgressFrom extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.identity.accesscontextmanager.v1.ServicePerimeterConfig.IdentityType identity_type = 2;</code>
      */
-    private $identity_type = 0;
+    protected $identity_type = 0;
 
     /**
      * Constructor.
@@ -48,7 +48,7 @@ class EgressFrom extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $identities
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $identities
      *           A list of identities that are allowed access through this [EgressPolicy].
      *           Should be in the format of email address. The email address should
      *           represent individual user or service account only.
@@ -82,7 +82,7 @@ class EgressFrom extends \Google\Protobuf\Internal\Message
      * represent individual user or service account only.
      *
      * Generated from protobuf field <code>repeated string identities = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setIdentities($var)
@@ -125,6 +125,4 @@ class EgressFrom extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(EgressFrom::class, \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig_EgressFrom::class);
 

@@ -47,14 +47,33 @@ class StorageClient
     use ArrayTrait;
     use ClientTrait;
 
-    const VERSION = '1.27.1';
+    const VERSION = '1.47.0';
 
     const FULL_CONTROL_SCOPE = 'https://www.googleapis.com/auth/devstorage.full_control';
     const READ_ONLY_SCOPE = 'https://www.googleapis.com/auth/devstorage.read_only';
     const READ_WRITE_SCOPE = 'https://www.googleapis.com/auth/devstorage.read_write';
 
     /**
+     * Retry strategy to signify that we never want to retry an operation
+     * even if the error is retryable.
+     *
+     * We can set $options['retryStrategy'] to one of "always", "never" and
+     * "idempotent".
+     */
+    const RETRY_NEVER = 'never';
+    /**
+     * Retry strategy to signify that we always want to retry an operation.
+     */
+    const RETRY_ALWAYS = 'always';
+    /**
+     * This is the default. This signifies that we want to retry an operation
+     * only if it is retryable and the error is retryable.
+     */
+    const RETRY_IDEMPOTENT = 'idempotent';
+
+    /**
      * @var ConnectionInterface Represents a connection to Storage.
+     * @internal
      */
     protected $connection;
 
@@ -108,9 +127,10 @@ class StorageClient
     }
 
     /**
-     * Lazily instantiates a bucket. There are no network requests made at this
-     * point. To see the operations that can be performed on a bucket please
-     * see {@see Google\Cloud\Storage\Bucket}.
+     * Lazily instantiates a bucket.
+     *
+     * There are no network requests made at this point. To see the operations
+     * that can be performed on a bucket please see {@see Bucket}.
      *
      * If `$userProject` is set to true, the current project ID (used to
      * instantiate the client) will be billed for all requests. If
@@ -128,9 +148,19 @@ class StorageClient
      *        will be used. If a string, that string will be used as the
      *        userProject argument, and that project will be billed for the
      *        request. **Defaults to** `false`.
+     * @param array $options [optional] {
+     *     Configuration Options.
+     *
+     *     @type bool $softDeleted  If set to true, only soft-deleted bucket versions
+     *           are listed as distinct results in order of bucket name and generation
+     *           number. The default value is false.
+     *     @type string $generation If present, selects a specific soft-deleted version
+     *           of this bucket instead of the live version. This parameter is required if
+     *           softDeleted is set to true.
+     * }
      * @return Bucket
      */
-    public function bucket($name, $userProject = false)
+    public function bucket($name, $userProject = false, array $options = [])
     {
         if (!$userProject) {
             $userProject = null;
@@ -138,7 +168,7 @@ class StorageClient
             $userProject = $this->projectId;
         }
 
-        return new Bucket($this->connection, $name, [
+        return new Bucket($this->connection, $name, $options + [
             'requesterProjectId' => $userProject
         ]);
     }
@@ -180,6 +210,9 @@ class StorageClient
      *           return the specified fields.
      *     @type string $userProject If set, this is the ID of the project which
      *           will be billed for the request.
+     *     @type bool $softDeleted  If set to true, only soft-deleted bucket versions
+     *           are listed as distinct results in order of bucket name and generation
+     *           number. The default value is false.
      *     @type bool $bucketUserProject If true, each returned instance will
      *           have `$userProject` set to the value of `$options.userProject`.
      *           If false, `$options.userProject` will be used ONLY for the
@@ -219,6 +252,38 @@ class StorageClient
     }
 
     /**
+     * Restores a soft-deleted bucket.
+     *
+     * Example:
+     * ```
+     * $bucket = $storage->bucket->restore('my-bucket');
+     * ```
+     *
+     * @param string $name The name of the bucket to restore.
+     * @param string $generation The specific version of the bucket to be restored.
+     * @param array $options [optional] {
+     *     Configuration Options.
+     *
+     *     @type string $projection Determines which properties to return. May
+     *           be either `"full"` or `"noAcl"`. **Defaults to** `"noAcl"`,
+     *           unless the bucket resource specifies acl or defaultObjectAcl
+     *           properties, when it defaults to `"full"`.
+     * }
+     * @return Bucket
+     */
+    public function restore(string $name, string $generation, array $options = [])
+    {
+        $res = $this->connection->restoreBucket([
+            'bucket' => $name,
+            'generation' => $generation,
+        ] + $options);
+        return new Bucket(
+            $this->connection,
+            $name
+        );
+    }
+
+    /**
      * Create a bucket. Bucket names must be unique as Cloud Storage uses a flat
      * namespace. For more information please see
      * [bucket name requirements](https://cloud.google.com/storage/docs/naming#requirements)
@@ -251,6 +316,10 @@ class StorageClient
      *           `"projectPrivate"`, and `"publicRead"`.
      *     @type string $predefinedDefaultObjectAcl Apply a predefined set of
      *           default object access controls to this bucket.
+     *     @type bool $enableObjectRetention Whether object retention should
+     *          be enabled on this bucket. For more information, refer to the
+     *          [Object Retention Lock](https://cloud.google.com/storage/docs/object-lock)
+     *          documentation.
      *     @type string $projection Determines which properties to return. May
      *           be either `"full"` or `"noAcl"`. **Defaults to** `"noAcl"`,
      *           unless the bucket resource specifies acl or defaultObjectAcl
@@ -263,11 +332,16 @@ class StorageClient
      *     @type array $defaultObjectAcl Default access controls to apply to new
      *           objects when no ACL is provided.
      *     @type array|Lifecycle $lifecycle The bucket's lifecycle configuration.
-     *     @type string $location The location of the bucket. A dual-region can
-     *           be specified as a string (e.g. "US-CENTRAL1+US-WEST1"). For
-     *           more information, see
+     *     @type string $location The location of the bucket. If specifying
+     *           a dual-region, the `customPlacementConfig` property should be
+     *           set in conjunction. For more information, see
      *           [Bucket Locations](https://cloud.google.com/storage/docs/locations).
      *           **Defaults to** `"US"`.
+     *     @type array $hierarchicalNamespace The hierarchical namespace configuration
+     *           on this bucket.
+     *     @type array $customPlacementConfig The bucket's dual regions. For more
+     *           information, see
+     *           [Bucket Locations](https://cloud.google.com/storage/docs/locations).
      *     @type array $logging The bucket's logging configuration, which
      *           defines the destination bucket and optional name prefix for the
      *           current bucket's logs.
@@ -281,6 +355,12 @@ class StorageClient
      *           more information, refer to the
      *           [Storage Classes](https://cloud.google.com/storage/docs/storage-classes)
      *           documentation. **Defaults to** `"STANDARD"`.
+     *     @type array $autoclass The bucket's autoclass configuration.
+     *           Buckets can have either StorageClass OLM rules or Autoclass,
+     *           but not both. When Autoclass is enabled on a bucket, adding
+     *           StorageClass OLM rules will result in failure.
+     *           For more information, refer to
+     *           [Storage Autoclass](https://cloud.google.com/storage/docs/autoclass)
      *     @type array $versioning The bucket's versioning configuration.
      *     @type array $website The bucket's website configuration.
      *     @type array $billing The bucket's billing configuration.
@@ -310,7 +390,7 @@ class StorageClient
      *           occurs, signified by the hold's release.
      *     @type array $retentionPolicy Defines the retention policy for a
      *           bucket. In order to lock a retention policy, please see
-     *           {@see Google\Cloud\Storage\Bucket::lockRetentionPolicy()}.
+     *           {@see Bucket::lockRetentionPolicy()}.
      *     @type int $retentionPolicy.retentionPeriod Specifies the retention
      *           period for objects in seconds. During the retention period an
      *           object cannot be overwritten or deleted. Retention period must
@@ -390,7 +470,7 @@ class StorageClient
      * @param string $uri The URI to accept an upload request.
      * @param string|resource|StreamInterface $data The data to be uploaded
      * @param array $options [optional] Configuration Options. Refer to
-     *        {@see Google\Cloud\Core\Upload\AbstractUploader::__construct()}.
+     *        {@see \Google\Cloud\Core\Upload\AbstractUploader::__construct()}.
      * @return SignedUrlUploader
      */
     public function signedUrlUploader($uri, $data, array $options = [])
