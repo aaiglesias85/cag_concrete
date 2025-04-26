@@ -9,7 +9,12 @@ parameters:
   google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
   recaptcha_publick_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
   recaptcha_private_key: '%env(GOOGLE_RECAPTCHA_SECRET)%'
+  google_maps_api_key: '%env(GOOGLE_MAPS_API_KEY)%'
   direccion_url: '%env(direccion_url)%'
+
+twig:
+  globals:
+    google_maps_api_key: '%google_maps_api_key%'
 
 services:
   kernel.listener.exception_listener:
