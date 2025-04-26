@@ -81,11 +81,11 @@ class DataTrackingLaborRepository extends EntityRepository
      *
      * @return float
      */
-    public function TotalHours($data_tracking_id = '', $employee_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function TotalHours($data_tracking_id = '', $employee_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $em = $this->getEntityManager();
         $consulta = 'SELECT SUM(d_t_l.hours) FROM App\Entity\DataTrackingLabor d_t_l ';
-        $join = ' LEFT JOIN d_t_l.dataTracking d_t LEFT JOIN d_t_l.employee e ';
+        $join = ' LEFT JOIN d_t_l.dataTracking d_t LEFT JOIN d_t_l.employee e LEFT JOIN d_t.project p ';
         $where = '';
 
         if ($data_tracking_id != '') {
@@ -102,6 +102,14 @@ class DataTrackingLaborRepository extends EntityRepository
                 $where .= 'WHERE (e.employeeId = :employee_id) ';
             else
                 $where .= 'AND (e.employeeId = :employee_id) ';
+        }
+
+        if ($project_id != '') {
+            $esta_query = explode("WHERE", $where);
+            if (count($esta_query) == 1)
+                $where .= 'WHERE (p.projectId = :project_id) ';
+            else
+                $where .= 'AND (p.projectId = :project_id) ';
         }
 
         if ($fecha_inicial != "") {
@@ -141,6 +149,11 @@ class DataTrackingLaborRepository extends EntityRepository
         $esta_query_employee_id = substr_count($consulta, ':employee_id');
         if ($esta_query_employee_id == 1) {
             $query->setParameter('employee_id', $employee_id);
+        }
+
+        $esta_query_project_id = substr_count($consulta, ':project_id');
+        if ($esta_query_project_id == 1) {
+            $query->setParameter('project_id', $project_id);
         }
 
         $esta_query_start = substr_count($consulta, ':start');
@@ -464,7 +477,8 @@ class DataTrackingLaborRepository extends EntityRepository
         $consulta = $this->createQueryBuilder('d_t_l')
             ->leftJoin('d_t_l.employee', 'e')
             ->leftJoin('d_t_l.dataTracking', 'd_t')
-            ->leftJoin('d_t.project', 'p');
+            ->leftJoin('d_t.project', 'p')
+            ->where('d_t_l.employee is not null');
 
         if ($sSearch != "") {
             $consulta->andWhere('e.name LIKE :employee OR d_t_l.role LIKE :role OR p.projectNumber LIKE :number OR p.name LIKE :name OR p.description LIKE :description')
@@ -518,7 +532,7 @@ class DataTrackingLaborRepository extends EntityRepository
         $em = $this->getEntityManager();
         $consulta = 'SELECT SUM(d_t_l.hours * d_t_l.hourlyRate) FROM App\Entity\DataTrackingLabor d_t_l ';
         $join = ' LEFT JOIN d_t_l.employee e LEFT JOIN d_t_l.dataTracking d_t LEFT JOIN d_t.project p ';
-        $where = '';
+        $where = ' WHERE (d_t_l.employee is not null) ';
 
         if ($sSearch != "") {
             $esta_query = explode("WHERE", $where);
@@ -648,16 +662,39 @@ class DataTrackingLaborRepository extends EntityRepository
      *
      * @return DataTrackingLabor[]
      */
-    public function ListarEmployeesDeProject($project_id)
+    public function ListarEmployeesDeProject($project_id = '', $fecha_inicial = '', $fecha_fin = '', $employee_id = '')
     {
         $consulta = $this->createQueryBuilder('d_t_l')
             ->leftJoin('d_t_l.dataTracking', 'd_t')
             ->leftJoin('d_t.project', 'p')
-            ->leftJoin('d_t_l.employee', 'e');
+            ->leftJoin('d_t_l.employee', 'e')
+            ->where('d_t_l.employee is not null');
 
         if ($project_id != '') {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
+        }
+
+        if ($employee_id != '') {
+            $consulta->andWhere('e.employeeId = :employee_id')
+                ->setParameter('employee_id', $employee_id);
+        }
+
+        if ($fecha_inicial != "") {
+
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+
+            $consulta->andWhere('d_t.date >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+        if ($fecha_fin != "") {
+
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
+
+            $consulta->andWhere('d_t.date <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
         }
 
         $consulta->groupBy('e.employeeId');
