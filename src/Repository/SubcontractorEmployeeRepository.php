@@ -3,119 +3,90 @@
 namespace App\Repository;
 
 use App\Entity\SubcontractorEmployee;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class SubcontractorEmployeeRepository extends EntityRepository
+class SubcontractorEmployeeRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, SubcontractorEmployee::class);
+    }
 
     /**
-     * ListarEmployeesDeSubcontractor: Lista los employees
+     * Listar los empleados de un subcontratista
      *
      * @return SubcontractorEmployee[]
      */
-    public function ListarEmployeesDeSubcontractor($subcontractor_id)
+    public function ListarEmployeesDeSubcontractor(int $subcontractorId): array
     {
-        $consulta = $this->createQueryBuilder('s_e')
+        return $this->createQueryBuilder('s_e')
+            ->leftJoin('s_e.subcontractor', 's')
+            ->andWhere('s.subcontractorId = :subcontractorId')
+            ->setParameter('subcontractorId', $subcontractorId)
+            ->orderBy('s_e.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Listar los empleados con paginación, filtrado y ordenación
+     *
+     * @return SubcontractorEmployee[]
+     */
+    public function ListarEmployees(
+        int $start,
+        int $limit,
+        ?string $sSearch = null,
+        string $sortColumn = 'name',
+        string $sortDirection = 'ASC',
+        ?int $subcontractorId = null
+    ): array {
+        $qb = $this->createQueryBuilder('s_e')
             ->leftJoin('s_e.subcontractor', 's');
 
-        if ($subcontractor_id != '') {
-            $consulta->andWhere('s.subcontractorId = :subcontractor_id')
-                ->setParameter('subcontractor_id', $subcontractor_id);
+        // Filtrar por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('s_e.name LIKE :search OR s_e.position LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
+        // Filtrar por subcontratista
+        if ($subcontractorId) {
+            $qb->andWhere('s.subcontractorId = :subcontractorId')
+                ->setParameter('subcontractorId', $subcontractorId);
+        }
 
-        $consulta->orderBy('s_e.name', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+        return $qb->orderBy('s_e.' . $sortColumn, $sortDirection)
+            ->setFirstResult($start)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarEmployees: Lista los notes
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * Obtener el total de empleados según filtros
      *
-     * @return SubcontractorEmployee[]
+     * @return int
      */
-    public function ListarEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id = '')
+    public function TotalEmployees(?string $sSearch = null, ?int $subcontractorId = null): int
     {
-        $consulta = $this->createQueryBuilder('s_e')
-            ->leftJoin('s_e.subcontractor', 's')
-        ;
+        $qb = $this->createQueryBuilder('s_e')
+            ->select('COUNT(s_e.employeeId)')
+            ->leftJoin('s_e.subcontractor', 's');
 
-        if ($sSearch != "") {
-            $consulta->andWhere('s_e.name LIKE :name OR s_e.position LIKE :position')
-                ->setParameter('name', "%{$sSearch}%")
-                ->setParameter('position', "%{$sSearch}%");
+        // Filtrar por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('s_e.name LIKE :search OR s_e.position LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
-        if ($subcontractor_id != '') {
-            $consulta->andWhere('s.subcontractorId = :subcontractor_id')
-                ->setParameter('subcontractor_id', $subcontractor_id);
+        // Filtrar por subcontratista
+        if ($subcontractorId) {
+            $qb->andWhere('s.subcontractorId = :subcontractorId')
+                ->setParameter('subcontractorId', $subcontractorId);
         }
 
-        $consulta->orderBy("s_e.$iSortCol_0", $sSortDir_0);
-
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
-        }
-
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
-
-    /**
-     * TotalEmployees: Total de notes de la BD
-     * @param string $sSearch Para buscar
-     *
-     * @author Marcel
-     */
-    public function TotalEmployees($sSearch, $subcontractor_id = '')
-    {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(s_e.employeeId) FROM App\Entity\SubcontractorEmployee s_e ';
-        $join = ' LEFT JOIN s_e.subcontractor s ';
-        $where = '';
-
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (s_e.name LIKE :name OR s_e.position LIKE :position) ';
-            else
-                $where .= 'AND (s_e.name LIKE :name OR s_e.position LIKE :position) ';
-        }
-
-        if ($subcontractor_id != '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (s.subcontractorId = :subcontractor_id) ';
-            else
-                $where .= 'AND (s.subcontractorId = :subcontractor_id) ';
-        }
-
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros
-        //$sSearch
-        $esta_query_name = substr_count($consulta, ':name');
-        if ($esta_query_name == 1)
-            $query->setParameter(':name', "%{$sSearch}%");
-
-        $esta_query_position = substr_count($consulta, ':position');
-        if ($esta_query_position == 1)
-            $query->setParameter(':position', "%{$sSearch}%");
-
-        $esta_query_subcontractor_id = substr_count($consulta, ':subcontractor_id');
-        if ($esta_query_subcontractor_id == 1) {
-            $query->setParameter('subcontractor_id', $subcontractor_id);
-        }
-
-        $total = $query->getSingleScalarResult();
-        return $total;
-    }
-
 }

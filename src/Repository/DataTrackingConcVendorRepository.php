@@ -5,10 +5,8 @@ namespace App\Repository;
 use App\Entity\DataTrackingConcVendor;
 use Doctrine\ORM\EntityRepository;
 
-
 class DataTrackingConcVendorRepository extends EntityRepository
 {
-
     /**
      * ListarConcVendor: Lista la conc vendor del data tracking
      *
@@ -16,181 +14,106 @@ class DataTrackingConcVendorRepository extends EntityRepository
      */
     public function ListarConcVendor($data_tracking_id)
     {
-        $consulta = $this->createQueryBuilder('d_t_c_v')
-            ->leftJoin('d_t_c_v.dataTracking', 'd_t');
+        $qb = $this->createQueryBuilder('d_t_c_v')
+            ->leftJoin('d_t_c_v.dataTracking', 'd_t')
+            ->orderBy('d_t_c_v.id', 'ASC');
 
-        if ($data_tracking_id != '') {
-            $consulta->andWhere('d_t.id = :data_tracking_id')
+        if (!empty($data_tracking_id)) {
+            $qb->andWhere('d_t.id = :data_tracking_id')
                 ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-
-        $consulta->orderBy('d_t_c_v.id', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+        return $qb->getQuery()->getResult();
     }
-
 
     /**
      * TotalConcUsed: Total de conc used de la BD
+     *
      * @param string $data_tracking_id
+     * @param string $fecha_inicial
+     * @param string $fecha_fin
      *
      * @return float
      */
     public function TotalConcUsed($data_tracking_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT SUM(d_t_c_v.totalConcUsed) FROM App\Entity\DataTrackingConcVendor d_t_c_v ';
-        $join = ' LEFT JOIN d_t_c_v.dataTracking d_t ';
-        $where = '';
+        $qb = $this->createQueryBuilder('d_t_c_v')
+            ->select('SUM(d_t_c_v.totalConcUsed)')
+            ->leftJoin('d_t_c_v.dataTracking', 'd_t');
 
-        if ($data_tracking_id != '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.id = :data_tracking_id) ';
-            else
-                $where .= 'AND (d_t.id = :data_tracking_id) ';
+        if (!empty($data_tracking_id)) {
+            $qb->andWhere('d_t.id = :data_tracking_id')
+                ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date >= :start) ';
-            else
-                $where .= 'AND (d_t.date >= :start) ';
+        if (!empty($fecha_inicial)) {
+            $fecha_inicial_dt = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            if ($fecha_inicial_dt) {
+                $qb->andWhere('d_t.date >= :start')
+                    ->setParameter('start', $fecha_inicial_dt->format('Y-m-d'));
+            }
         }
 
-        if ($fecha_fin != "") {
-
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date <= :end) ';
-            else
-                $where .= 'AND (d_t.date <= :end) ';
+        if (!empty($fecha_fin)) {
+            $fecha_fin_dt = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            if ($fecha_fin_dt) {
+                $qb->andWhere('d_t.date <= :end')
+                    ->setParameter('end', $fecha_fin_dt->format('Y-m-d'));
+            }
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros
-        //$sSearch
-        $esta_query_data_tracking_id = substr_count($consulta, ':data_tracking_id');
-        if ($esta_query_data_tracking_id == 1) {
-            $query->setParameter('data_tracking_id', $data_tracking_id);
-        }
-
-        $esta_query_start = substr_count($consulta, ':start');
-        if ($esta_query_start == 1) {
-            $query->setParameter('start', $fecha_inicial);
-        }
-
-        $esta_query_end = substr_count($consulta, ':end');
-        if ($esta_query_end == 1) {
-            $query->setParameter('end', $fecha_fin);
-        }
-
-        return $query->getSingleScalarResult();
+        return (float) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
      * TotalConcPrice: Total de hours * rate de la BD
+     *
      * @param string $data_tracking_id
+     * @param string $project_id
+     * @param string $fecha_inicial
+     * @param string $fecha_fin
+     * @param string $status
      *
      * @return float
      */
     public function TotalConcPrice($data_tracking_id = '', $project_id = '', $fecha_inicial = '', $fecha_fin = '', $status = '')
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT SUM(d_t_c_v.totalConcUsed * d_t_c_v.concPrice) FROM App\Entity\DataTrackingConcVendor d_t_c_v ';
-        $join = ' LEFT JOIN d_t_c_v.dataTracking d_t LEFT JOIN d_t.project p ';
-        $where = '';
+        $qb = $this->createQueryBuilder('d_t_c_v')
+            ->select('SUM(d_t_c_v.totalConcUsed * d_t_c_v.concPrice)')
+            ->leftJoin('d_t_c_v.dataTracking', 'd_t')
+            ->leftJoin('d_t.project', 'p');
 
-        if ($data_tracking_id != '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.id = :data_tracking_id) ';
-            else
-                $where .= 'AND (d_t.id = :data_tracking_id) ';
+        if (!empty($data_tracking_id)) {
+            $qb->andWhere('d_t.id = :data_tracking_id')
+                ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        if ($project_id != '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (p.projectId = :project_id) ';
-            else
-                $where .= 'AND (p.projectId = :project_id) ';
+        if (!empty($project_id)) {
+            $qb->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date >= :start) ';
-            else
-                $where .= 'AND (d_t.date >= :start) ';
+        if (!empty($fecha_inicial)) {
+            $fecha_inicial_dt = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            if ($fecha_inicial_dt) {
+                $qb->andWhere('d_t.date >= :start')
+                    ->setParameter('start', $fecha_inicial_dt->format('Y-m-d'));
+            }
         }
-        if ($fecha_fin != "") {
 
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (d_t.date <= :end) ';
-            else
-                $where .= 'AND (d_t.date <= :end) ';
+        if (!empty($fecha_fin)) {
+            $fecha_fin_dt = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            if ($fecha_fin_dt) {
+                $qb->andWhere('d_t.date <= :end')
+                    ->setParameter('end', $fecha_fin_dt->format('Y-m-d'));
+            }
         }
 
         if ($status !== '') {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (p.status = :status) ';
-            else
-                $where .= 'AND (p.status = :status) ';
+            $qb->andWhere('p.status = :status')
+                ->setParameter('status', $status);
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros
-        //$sSearch
-        $esta_query_data_tracking_id = substr_count($consulta, ':data_tracking_id');
-        if ($esta_query_data_tracking_id == 1) {
-            $query->setParameter('data_tracking_id', $data_tracking_id);
-        }
-
-        $esta_query_project_id = substr_count($consulta, ':project_id');
-        if ($esta_query_project_id == 1) {
-            $query->setParameter('project_id', $project_id);
-        }
-
-        $esta_query_start = substr_count($consulta, ':start');
-        if ($esta_query_start == 1) {
-            $query->setParameter('start', $fecha_inicial);
-        }
-
-        $esta_query_end = substr_count($consulta, ':end');
-        if ($esta_query_end == 1) {
-            $query->setParameter('end', $fecha_fin);
-        }
-
-        $esta_query_status = substr_count($consulta, ':status');
-        if ($esta_query_status == 1) {
-            $query->setParameter('status', $status);
-        }
-
-        return $query->getSingleScalarResult();
+        return (float) $qb->getQuery()->getSingleScalarResult();
     }
-
 }

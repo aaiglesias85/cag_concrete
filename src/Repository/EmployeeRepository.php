@@ -5,89 +5,72 @@ namespace App\Repository;
 use App\Entity\Employee;
 use Doctrine\ORM\EntityRepository;
 
-
 class EmployeeRepository extends EntityRepository
 {
-
     /**
-     * ListarOrdenados: Lista los employees
+     * ListarOrdenados: Lista los employees ordenados por nombre.
      *
      * @return Employee[]
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('e')
-            ->orderBy('e.name', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarEmployees: Lista los employees
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * ListarEmployees: Lista los employees con filtros y ordenación.
+     *
+     * @param int $start El inicio de la paginación
+     * @param int $limit El límite de resultados
+     * @param string|null $sSearch El término de búsqueda (opcional)
+     * @param string $iSortCol_0 Columna para ordenar
+     * @param string $sSortDir_0 Dirección del orden (ASC/DESC)
      *
      * @return Employee[]
      */
-    public function ListarEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarEmployees(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array
     {
-        $consulta = $this->createQueryBuilder('e');
+        $qb = $this->createQueryBuilder('e');
 
-        if ($sSearch != ""){
-            $consulta->andWhere('e.name LIKE :name OR e.position LIKE :position')
-                ->setParameter('name', "%{$sSearch}%")
-                ->setParameter('position', "%{$sSearch}%");
+        // Agregar filtro de búsqueda si es necesario
+        if (!empty($sSearch)) {
+            $qb->andWhere('e.name LIKE :search OR e.position LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
+        // Ordenar por la columna seleccionada
+        $qb->orderBy("e.$iSortCol_0", $sSortDir_0);
 
-        $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
-
+        // Limitar los resultados con paginación
         if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+            $qb->setMaxResults($limit)
+                ->setFirstResult($start);
         }
 
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return $qb->getQuery()->getResult();
     }
 
     /**
-     * TotalEmployees: Total de employees de la BD
-     * @param string $sSearch Para buscar
+     * TotalEmployees: Obtiene el total de employees en la BD, con filtro de búsqueda.
      *
-     * @author Marcel
+     * @param string|null $sSearch El término de búsqueda (opcional)
+     *
+     * @return int El número total de employees
      */
-    public function TotalEmployees($sSearch)
+    public function TotalEmployees(?string $sSearch): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(e.employeeId) FROM App\Entity\Employee e ';
-        $join = '';
-        $where = '';
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(e.employeeId)');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (e.name LIKE :name OR e.position LIKE :position) ';
-            else
-                $where .= 'AND (e.name LIKE :name OR e.position LIKE :position) ';
+        // Agregar filtro de búsqueda si es necesario
+        if (!empty($sSearch)) {
+            $qb->andWhere('e.name LIKE :search OR e.position LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_name = substr_count($consulta, ':name');
-        if ($esta_query_name == 1)
-            $query->setParameter(':name', "%{$sSearch}%");
-
-        $esta_query_position = substr_count($consulta, ':position');
-        if ($esta_query_position == 1)
-            $query->setParameter(':position', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

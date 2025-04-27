@@ -3,170 +3,116 @@
 namespace App\Repository;
 
 use App\Entity\Advertisement;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class AdvertisementRepository extends EntityRepository
+class AdvertisementRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Advertisement::class);
+    }
 
     /**
-     * ListarOrdenados: Lista los advertisements
+     * Lista los advertisements ordenados
      *
      * @return Advertisement[]
      */
-    public function ListarOrdenados($fecha_inicial = '', $fecha_fin = '', $sort = 'DESC')
+    public function ListarOrdenados(?string $fechaInicial = null, ?string $fechaFinal = null, string $sort = 'DESC'): array
     {
-        $consulta = $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->andWhere('a.status = 1');
 
-        // Agrupamos las condiciones usando orX directamente en la consulta
-        $consulta->andWhere(
-            $consulta->expr()->orX(
+        $qb->andWhere(
+            $qb->expr()->orX(
                 'a.startDate IS NULL AND a.endDate IS NULL',
-                'a.startDate <= :fecha_inicial AND a.endDate >= :fecha_final'
+                'a.startDate <= :fechaInicial AND a.endDate >= :fechaFinal'
             )
         );
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $consulta->setParameter('fecha_inicial', $fecha_inicial);
+        if (!empty($fechaInicial)) {
+            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
+            $qb->setParameter('fechaInicial', $fechaInicialDate);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $consulta->setParameter('fecha_final', $fecha_fin);
+        if (!empty($fechaFinal)) {
+            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
+            $qb->setParameter('fechaFinal', $fechaFinalDate);
         }
 
-        // Ordenar por la fecha de inicio
-        $consulta->orderBy('a.startDate', $sort);
-
-        return $consulta->getQuery()->getResult();
+        return $qb->orderBy('a.startDate', $sort)
+            ->getQuery()
+            ->getResult();
     }
 
-
     /**
-     * ListarAdvertisements: Lista los advertisements
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * Lista los advertisements paginados y filtrados
      *
      * @return Advertisement[]
      */
-    public function ListarAdvertisements($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin)
-    {
-        $consulta = $this->createQueryBuilder('a');
+    public function ListarAdvertisements(
+        int $start,
+        int $limit,
+        ?string $sSearch = null,
+        string $sortColumn = 'startDate',
+        string $sortDirection = 'ASC',
+        ?string $fechaInicial = null,
+        ?string $fechaFinal = null
+    ): array {
+        $qb = $this->createQueryBuilder('a');
 
-        if ($sSearch != "") {
-            $consulta->andWhere('a.title LIKE :title OR a.description LIKE :description')
-                ->setParameter('title', "%{$sSearch}%")
-                ->setParameter('description', "%{$sSearch}%");
+        if (!empty($sSearch)) {
+            $qb->andWhere('a.title LIKE :search OR a.description LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $consulta->andWhere('a.startDate <= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
-        if ($fecha_fin != "") {
-
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $consulta->andWhere('a.endDate >= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
+        if (!empty($fechaInicial)) {
+            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
+            $qb->andWhere('a.startDate <= :fechaInicial')
+                ->setParameter('fechaInicial', $fechaInicialDate);
         }
 
-
-        $consulta->orderBy("a.$iSortCol_0", $sSortDir_0);
-
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+        if (!empty($fechaFinal)) {
+            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
+            $qb->andWhere('a.endDate >= :fechaFinal')
+                ->setParameter('fechaFinal', $fechaFinalDate);
         }
 
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return $qb->orderBy('a.' . $sortColumn, $sortDirection)
+            ->setFirstResult($start)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * TotalAdvertisements: Total de advertisements de la BD
-     * @param string $sSearch Para buscar
-     *
-     * @author Marcel
+     * Total de advertisements según filtros
      */
-    public function TotalAdvertisements($sSearch, $fecha_inicial, $fecha_fin)
-    {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(a.advertisementId) FROM App\Entity\Advertisement a ';
-        $join = '';
-        $where = '';
+    public function TotalAdvertisements(
+        ?string $sSearch = null,
+        ?string $fechaInicial = null,
+        ?string $fechaFinal = null
+    ): int {
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(a.advertisementId)');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (a.title LIKE :title OR a.description LIKE :description) ';
-            else
-                $where .= 'AND (a.title LIKE :title OR a.description LIKE :description) ';
+        if (!empty($sSearch)) {
+            $qb->andWhere('a.title LIKE :search OR a.description LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
-        if ($fecha_inicial != "") {
-
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1) {
-                $where .= 'WHERE a.startDate <= :inicio ';
-            } else {
-                $where .= ' AND a.startDate <= :inicio ';
-            }
+        if (!empty($fechaInicial)) {
+            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
+            $qb->andWhere('a.startDate <= :fechaInicial')
+                ->setParameter('fechaInicial', $fechaInicialDate);
         }
 
-        if ($fecha_fin != "") {
-
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1) {
-                $where .= 'WHERE a.endDate >= :fin ';
-            } else {
-                $where .= ' AND a.endDate >= :fin ';
-            }
+        if (!empty($fechaFinal)) {
+            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
+            $qb->andWhere('a.endDate >= :fechaFinal')
+                ->setParameter('fechaFinal', $fechaFinalDate);
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_title = substr_count($consulta, ':title');
-        if ($esta_query_title == 1)
-            $query->setParameter(':title', "%{$sSearch}%");
-
-        $esta_query_description = substr_count($consulta, ':description');
-        if ($esta_query_description == 1)
-            $query->setParameter(':description', "%{$sSearch}%");
-
-
-        $esta_query_inicio = substr_count($consulta, ':inicio');
-        if ($esta_query_inicio == 1) {
-            $query->setParameter('inicio', $fecha_inicial);
-        }
-
-        $esta_query_fin = substr_count($consulta, ':fin');
-        if ($esta_query_fin == 1) {
-            $query->setParameter('fin', $fecha_fin);
-        }
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

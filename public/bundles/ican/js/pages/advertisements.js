@@ -145,7 +145,7 @@ var Advertisements = function () {
     var btnClickFiltrar = function () {
         var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-log .m_form_search').val();
+        var generalSearch = $('#lista-advertisement .m_form_search').val();
         query.generalSearch = generalSearch;
 
         var fechaInicial = $('#fechaInicial').val();

@@ -3,117 +3,75 @@
 namespace App\Repository;
 
 use App\Entity\Subcontractor;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class SubcontractorRepository extends EntityRepository
+class SubcontractorRepository extends ServiceEntityRepository
 {
-
-    /**
-     * ListarOrdenados: Lista los subcontractors
-     *
-     * @return Subcontractor[]
-     */
-    public function ListarOrdenados()
+    public function __construct(ManagerRegistry $registry)
     {
-        $consulta = $this->createQueryBuilder('s')
-            ->orderBy('s.name', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+        parent::__construct($registry, Subcontractor::class);
     }
 
     /**
-     * ListarSubcontractors: Lista los subcontractors
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * Listar los subcontractors ordenados por nombre
      *
      * @return Subcontractor[]
      */
-    public function ListarSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('s');
-
-        if ($sSearch != ""){
-            $consulta->andWhere('s.companyPhone LIKE :companyPhone OR s.companyAddress LIKE :companyAddress OR s.companyName LIKE :companyName OR
-             s.contactEmail LIKE :contactEmail OR s.contactName LIKE :contactName OR s.phone LIKE :phone OR s.name LIKE :name')
-                ->setParameter('name', "%{$sSearch}%")
-                ->setParameter('phone', "%{$sSearch}%")
-                ->setParameter('contactName', "%{$sSearch}%")
-                ->setParameter('companyName', "%{$sSearch}%")
-                ->setParameter('companyAddress', "%{$sSearch}%")
-                ->setParameter('companyPhone', "%{$sSearch}%")
-                ->setParameter('contactEmail', "%{$sSearch}%");
-        }
-
-
-        $consulta->orderBy("s.$iSortCol_0", $sSortDir_0);
-
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
-        }
-
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * TotalSubcontractors: Total de subcontractors de la BD
-     * @param string $sSearch Para buscar
+     * Listar los subcontractors con filtros de búsqueda, paginación y ordenación
      *
-     * @author Marcel
+     * @return Subcontractor[]
      */
-    public function TotalSubcontractors($sSearch)
+    public function ListarSubcontractors(
+        int     $start,
+        int     $limit,
+        ?string $sSearch = null,
+        string  $sortColumn = 'name',
+        string  $sortDirection = 'ASC'
+    ): array
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(s.subcontractorId) FROM App\Entity\Subcontractor s ';
-        $join = '';
-        $where = '';
+        $qb = $this->createQueryBuilder('s');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (s.companyPhone LIKE :qaz OR s.companyAddress LIKE :wsx OR s.companyName LIKE :edc OR s.contactEmail LIKE :email OR s.contactName LIKE :contact OR s.phone LIKE :phone OR s.name LIKE :name) ';
-            else
-                $where .= 'AND (s.companyPhone LIKE :qaz OR s.companyAddress LIKE :wsx OR s.companyName LIKE :edc OR s.contactEmail LIKE :email OR s.contactName LIKE :contact OR s.phone LIKE :phone OR s.name LIKE :name) ';
+        // Filtro por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('s.companyPhone LIKE :search OR s.companyAddress LIKE :search OR s.companyName LIKE :search OR
+                s.contactEmail LIKE :search OR s.contactName LIKE :search OR s.phone LIKE :search OR s.name LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_company_phone = substr_count($consulta, ':qaz');
-        if ($esta_query_company_phone == 1)
-            $query->setParameter(':qaz', "%{$sSearch}%");
+        return $qb->orderBy("s.$sortColumn", $sortDirection)
+            ->setFirstResult($start)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
-        $esta_query_company_address = substr_count($consulta, ':wsx');
-        if ($esta_query_company_address == 1)
-            $query->setParameter(':wsx', "%{$sSearch}%");
+    /**
+     * Obtener el total de subcontractors según los filtros de búsqueda
+     *
+     * @return int
+     */
+    public function TotalSubcontractors(?string $sSearch = null): int
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->select('COUNT(s.subcontractorId)');
 
-        $esta_query_company_name = substr_count($consulta, ':edc');
-        if ($esta_query_company_name == 1)
-            $query->setParameter(':edc', "%{$sSearch}%");
+        // Filtro por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('s.companyPhone LIKE :search OR s.companyAddress LIKE :search OR s.companyName LIKE :search OR
+                s.contactEmail LIKE :search OR s.contactName LIKE :search OR s.phone LIKE :search OR s.name LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
 
-        $esta_query_name = substr_count($consulta, ':name');
-        if ($esta_query_name == 1)
-            $query->setParameter(':name', "%{$sSearch}%");
-
-        $esta_query_email = substr_count($consulta, ':email');
-        if ($esta_query_email == 1)
-            $query->setParameter(':email', "%{$sSearch}%");
-
-        $esta_query_phone = substr_count($consulta, ':phone');
-        if ($esta_query_phone == 1)
-            $query->setParameter(':phone', "%{$sSearch}%");
-
-        $esta_query_contact = substr_count($consulta, ':contact');
-        if ($esta_query_contact == 1)
-            $query->setParameter(':contact', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 }

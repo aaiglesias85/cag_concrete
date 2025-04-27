@@ -3,85 +3,67 @@
 namespace App\Repository;
 
 use App\Entity\Unit;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class UnitRepository extends EntityRepository
+class UnitRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Unit::class);
+    }
 
     /**
-     * ListarOrdenados: Lista las units
+     * Listar las unidades ordenadas por descripción
      *
      * @return Unit[]
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('u')
+        return $this->createQueryBuilder('u')
             ->where('u.status = 1')
-            ->orderBy('u.description', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+            ->orderBy('u.description', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarUnits: Lista los units
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * Listar unidades con filtros de búsqueda, paginación y ordenación
      *
      * @return Unit[]
      */
-    public function ListarUnits($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
-    {
-        $consulta = $this->createQueryBuilder('u');
+    public function ListarUnits(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array {
+        $qb = $this->createQueryBuilder('u');
 
-        if ($sSearch != "")
-            $consulta->andWhere('u.description LIKE :description')
-                ->setParameter('description', "%{$sSearch}%");
-
-        $consulta->orderBy("u.$iSortCol_0", $sSortDir_0);
-
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+        // Filtro por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('u.description LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return $qb->orderBy("u.$sortColumn", $sortDirection)
+            ->setFirstResult($start)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * TotalUnits: Total de units de la BD
-     * @param string $sSearch Para buscar
+     * Obtener el total de unidades según los filtros de búsqueda
      *
-     * @author Marcel
+     * @return int
      */
-    public function TotalUnits($sSearch)
+    public function TotalUnits(?string $sSearch = null): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(u.unitId) FROM App\Entity\Unit u ';
-        $join = '';
-        $where = '';
+        $qb = $this->createQueryBuilder('u')
+            ->select('COUNT(u.unitId)');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE u.description LIKE :description ';
-            else
-                $where .= 'AND u.description LIKE :description ';
+        // Filtro por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('u.description LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_description = substr_count($consulta, ':description');
-        if ($esta_query_description == 1)
-            $query->setParameter(':description', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }
