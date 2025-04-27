@@ -21,7 +21,8 @@ var Companies = function () {
                 selector: {class: 'm-checkbox--solid m-checkbox--brand'}
             });
         }
-        aoColumns.push({
+        aoColumns.push(
+            {
                 field: "name",
                 title: "Name"
             },
@@ -958,6 +959,11 @@ var Companies = function () {
         var table = $('#lista-projects-table-editable');
 
         var aoColumns = [
+            {
+                field: "projectNumber",
+                title: "C & G Project #",
+                width: 120,
+            },
             {
                 field: "county",
                 title: "County"
