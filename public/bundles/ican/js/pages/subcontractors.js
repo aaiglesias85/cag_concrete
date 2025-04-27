@@ -1466,6 +1466,11 @@ var Subcontractors = function () {
 
         var aoColumns = [
             {
+                field: "projectNumber",
+                title: "C & G Project #",
+                width: 120,
+            },
+            {
                 field: "county",
                 title: "County"
             },
