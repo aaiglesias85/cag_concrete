@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="PROD AZURE GenerarOTDigitalIndividualC2C" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" resourceRoot="" id="b6791611-b7c2-44e7-be58-cf91fc50a26f" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="IntegracionAsistidaSOAP" type="wsdl" bindingName="{http://www.chilexpress.cl/IntegracionAsistida/}IntegracionAsistidaSOAP" soapVersion="1_1" anonymous="optional" definition="http://qaws.ssichilexpress.cl/OSB/GenerarOTDigitalIndividualC2C?wsdl" id="cfc7c465-d4ff-411f-857a-724abd41cc73" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://qaws.ssichilexpress.cl/OSB/GenerarOTDigitalIndividualC2C?wsdl"><con:part><con:url>http://qaws.ssichilexpress.cl/OSB/GenerarOTDigitalIndividualC2C?wsdl</con:url><con:content><![CDATA[<WL5G3N0:definitions name="IntegracionAsistida" targetNamespace="http://www.chilexpress.cl/IntegracionAsistida/" xmlns:WL5G3N0="http://schemas.xmlsoap.org/wsdl/" xmlns:WL5G3N1="http://www.chilexpress.cl/IntegracionAsistida/" xmlns:WL5G3N2="http://schemas.xmlsoap.org/wsdl/soap/">
+  <WL5G3N0:types>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/IntegracionAsistida/" xmlns:giarp="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaResp" xmlns:giarq="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaReq" xmlns:hdrp="http://ws.chilexpress.cl/OSB/EBO/HeaderResponse" xmlns:hdrq="http://ws.chilexpress.cl/OSB/EBO/HeaderRequest" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.chilexpress.cl/IntegracionAsistida/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://ws.chilexpress.cl/OSB/EBO/HeaderRequest" schemaLocation="http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FUT000001_EsquemasComunes%2FResources%2FSchemas%2FEBO%2FHeaderRequest"/>
+      <xs:import namespace="http://ws.chilexpress.cl/OSB/EBO/HeaderResponse" schemaLocation="http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FUT000001_EsquemasComunes%2FResources%2FSchemas%2FEBO%2FHeaderResponse"/>
+      <xs:import namespace="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaReq" schemaLocation="http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FPX200156_GenerarIntegracionAsistidaCOMP%2FResources%2FSchemas%2FGenerarIntegracionAsistidaReq"/>
+      <xs:import namespace="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaResp" schemaLocation="http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FPX200156_GenerarIntegracionAsistidaCOMP%2FResources%2FSchemas%2FGenerarIntegracionAsistidaResp"/>
+      <xs:element name="headerRequest" type="hdrq:datosHeaderRequest"/>
+      <xs:element name="headerResponse" type="hdrp:datosHeaderResponse"/>
+      <xs:element name="IntegracionAsistidaRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="giarq:reqGenerarIntegracionAsistida"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IntegracionAsistidaResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="giarp:respGenerarIntegracionAsistida"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </WL5G3N0:types>
+  <WL5G3N0:message name="IntegracionAsistidaReq">
+    <WL5G3N0:part element="WL5G3N1:IntegracionAsistidaRequest" name="IntegracionAsistidaReqParam"/>
+  </WL5G3N0:message>
+  <WL5G3N0:message name="IntegracionAsistidaResp">
+    <WL5G3N0:part element="WL5G3N1:IntegracionAsistidaResponse" name="IntegracionAsistidaRespParam"/>
+  </WL5G3N0:message>
+  <WL5G3N0:message name="headerRequestMessage">
+    <WL5G3N0:part element="WL5G3N1:headerRequest" name="headerRequest"/>
+  </WL5G3N0:message>
+  <WL5G3N0:message name="headerResponseMessage">
+    <WL5G3N0:part element="WL5G3N1:headerResponse" name="headerResponse"/>
+  </WL5G3N0:message>
+  <WL5G3N0:portType name="IntegracionAsistidaPT">
+    <WL5G3N0:operation name="IntegracionAsistidaOp">
+      <WL5G3N0:input message="WL5G3N1:IntegracionAsistidaReq"/>
+      <WL5G3N0:output message="WL5G3N1:IntegracionAsistidaResp"/>
+    </WL5G3N0:operation>
+  </WL5G3N0:portType>
+  <WL5G3N0:binding name="IntegracionAsistidaSOAP" type="WL5G3N1:IntegracionAsistidaPT">
+    <WL5G3N2:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <WL5G3N0:operation name="IntegracionAsistidaOp">
+      <WL5G3N2:operation style="document"/>
+      <WL5G3N0:input>
+        <WL5G3N2:header message="WL5G3N1:headerRequestMessage" part="headerRequest" use="literal"/>
+        <WL5G3N2:body use="literal"/>
+      </WL5G3N0:input>
+      <WL5G3N0:output>
+        <WL5G3N2:header message="WL5G3N1:headerResponseMessage" part="headerResponse" use="literal"/>
+        <WL5G3N2:body use="literal"/>
+      </WL5G3N0:output>
+    </WL5G3N0:operation>
+  </WL5G3N0:binding>
+  <WL5G3N0:service name="IntegracionAsistida">
+    <WL5G3N0:port binding="WL5G3N1:IntegracionAsistidaSOAP" name="IntegracionAsistidaSOAP">
+      <WL5G3N2:address location="http://QA_Purapel.cxp.cl:7011/OSB/GenerarOTDigitalIndividualC2C"/>
+    </WL5G3N0:port>
+  </WL5G3N0:service>
+</WL5G3N0:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FUT000001_EsquemasComunes%2FResources%2FSchemas%2FEBO%2FHeaderRequest</con:url><con:content><![CDATA[<schema targetNamespace="http://ws.chilexpress.cl/OSB/EBO/HeaderRequest" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.chilexpress.cl/OSB/EBO/HeaderRequest">
+  <complexType name="datosConsumidor">
+    <sequence/>
+  </complexType>
+  <complexType name="datosTransaccion">
+    <sequence>
+      <element name="fechaHora">
+        <simpleType>
+          <restriction base="xsd:string">
+            <minLength value="1"/>
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="idTransaccionNegocio">
+        <simpleType>
+          <restriction base="xsd:string">
+            <minLength value="1"/>
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="idTransaccionOSB" minOccurs="0">
+        <simpleType>
+          <restriction base="string">
+            <minLength value="1"/>
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="sistema">
+        <simpleType>
+          <restriction base="string">
+            <minLength value="1"/>
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="usuario" minOccurs="0">
+        <simpleType>
+          <restriction base="xsd:string">
+            <minLength value="1"/>
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="oficinaCaja" minOccurs="0">
+        <simpleType>
+          <restriction base="xsd:string">
+            <minLength value="1"/>
+          </restriction>
+        </simpleType>
+      </element>
+      <element name="nodoHeader" minOccurs="0">
+        <complexType>
+          <complexContent>
+            <extension base="tns:anyNode"/>
+          </complexContent>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="anyNode" mixed="true">
+    <complexContent mixed="true">
+      <restriction base="xsd:anyType">
+        <sequence>
+          <any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </restriction>
+    </complexContent>
+  </complexType>
+  <complexType name="datosHeaderRequest">
+    <sequence>
+      <element name="transaccion" type="tns:datosTransaccion"/>
+    </sequence>
+    <anyAttribute namespace="##other" processContents="lax"/>
+  </complexType>
+</schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FUT000001_EsquemasComunes%2FResources%2FSchemas%2FEBO%2FHeaderResponse</con:url><con:content><![CDATA[<schema targetNamespace="http://ws.chilexpress.cl/OSB/EBO/HeaderResponse" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.chilexpress.cl/OSB/EBO/HeaderResponse">
+  <complexType name="datosTransaccion">
+    <sequence>
+      <element name="internalCode" type="xsd:string"/>
+      <element name="idTransaccionNegocio" type="xsd:string"/>
+      <element name="fechaHoraInicioTrx" nillable="true" type="xsd:dateTime"/>
+      <element name="fechaHoraFinTrx" nillable="true" type="xsd:dateTime"/>
+      <element name="estado" nillable="true" type="xsd:string"/>
+    </sequence>
+  </complexType>
+  <complexType name="datosHeaderResponse">
+    <sequence>
+      <element name="transaccion" type="tns:datosTransaccion"/>
+    </sequence>
+  </complexType>
+</schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FPX200156_GenerarIntegracionAsistidaCOMP%2FResources%2FSchemas%2FGenerarIntegracionAsistidaReq</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaReq" xmlns="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaReq" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="reqGenerarIntegracionAsistida" type="GenerarIntegracionAsistidaRequestType"/>
+  <xs:complexType name="GenerarIntegracionAsistidaRequestType">
+    <xs:sequence>
+      <xs:element name="codigoProducto" type="xs:int"/>
+      <xs:element name="codigoServicio" type="xs:int"/>
+      <xs:element name="comunaOrigen" type="xs:string"/>
+      <xs:element name="numeroTCC" type="xs:int"/>
+      <xs:element name="referenciaEnvio" type="xs:string"/>
+      <xs:element name="referenciaEnvio2" type="xs:string"/>
+      <xs:element name="montoCobrar" type="xs:decimal" default="0" minOccurs="0"/>
+      <xs:element name="eoc" type="xs:boolean"/>
+      <xs:element name="Remitente" type="RemitenteType"/>
+      <xs:element name="Destinatario" type="DestinatarioType"/>
+      <xs:element name="Direccion" type="DireccionType"/>
+      <xs:element name="DireccionDevolucion" type="DireccionType"/>
+      <xs:element name="Pieza" type="PiezaType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RemitenteType">
+    <xs:sequence>
+      <xs:element name="nombre" type="xs:string"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="celular" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DestinatarioType">
+    <xs:sequence>
+      <xs:element name="nombre" type="xs:string"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="celular" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DireccionType">
+    <xs:sequence>
+      <xs:element name="comuna" type="xs:string"/>
+      <xs:element name="calle" type="xs:string"/>
+      <xs:element name="numero" type="xs:string"/>
+      <xs:element name="complemento" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PiezaType">
+    <xs:sequence>
+      <xs:element name="peso" type="xs:decimal"/>
+      <xs:element name="alto" type="xs:int"/>
+      <xs:element name="ancho" type="xs:int"/>
+      <xs:element name="largo" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FPX200156_GenerarIntegracionAsistidaCOMP%2FResources%2FSchemas%2FGenerarIntegracionAsistidaResp</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaResp" xmlns="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaResp" xmlns:eo="http://ws.chilexpress.cl/OSB/EBO/EstadoOperacion" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://ws.chilexpress.cl/OSB/EBO/EstadoOperacion" schemaLocation="http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FUT000001_EsquemasComunes%2FResources%2FSchemas%2FEBO%2FEstadoOperacion"/>
+  <xs:element name="respGenerarIntegracionAsistida" type="GenerarIntegracionAsistidaResponseType"/>
+  <xs:complexType name="GenerarIntegracionAsistidaResponseType">
+    <xs:sequence>
+      <xs:element name="EstadoOperacion" type="eo:EstadoOperacionType"/>
+      <xs:element name="DatosOT" type="DatosOTType"/>
+      <xs:element name="DatosEtiqueta" type="DatosEtiquetaType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DatosOTType">
+    <xs:sequence>
+      <xs:element name="numeroOt" type="xs:decimal"/>
+      <xs:element name="numeroOtPadre" type="xs:decimal"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DatosEtiquetaType">
+    <xs:sequence>
+      <xs:element name="numeroOT" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="numeroOTPadre" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="glosaProductoOT" type="xs:string" minOccurs="0"/>
+      <xs:element name="glosaServicio" type="xs:string" minOccurs="0"/>
+      <xs:element name="nombreDestinatario" type="xs:string" minOccurs="0"/>
+      <xs:element name="numeroGuia" type="xs:string" minOccurs="0"/>
+      <xs:element name="glosaCobertura" type="xs:string" minOccurs="0"/>
+      <xs:element name="direccion" type="xs:string" minOccurs="0"/>
+      <xs:element name="codigoRegion" type="xs:string" minOccurs="0"/>
+      <xs:element name="adicionales" type="xs:string" minOccurs="0"/>
+      <xs:element name="peso" type="xs:string" minOccurs="0"/>
+      <xs:element name="alto" type="xs:string" minOccurs="0"/>
+      <xs:element name="ancho" type="xs:string" minOccurs="0"/>
+      <xs:element name="largo" type="xs:string" minOccurs="0"/>
+      <xs:element name="xmlSalidaEpl" type="xs:string" minOccurs="0"/>
+      <xs:element name="barcode" type="xs:string" minOccurs="0"/>
+      <xs:element name="referencia2" type="xs:string" minOccurs="0"/>
+      <xs:element name="informacionProducto" type="xs:string" minOccurs="0"/>
+      <xs:element name="GlosaCortaProductoOT" type="xs:string" minOccurs="0"/>
+      <xs:element name="fechaImpresion" type="xs:string" minOccurs="0"/>
+      <xs:element name="numeroBulto" type="xs:string" minOccurs="0"/>
+      <xs:element name="centroDistribucionDestino" type="xs:string" minOccurs="0"/>
+      <xs:element name="imagenEtiqueta" type="xs:base64Binary" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://qaws.ssichilexpress.cl:80/OSB/GenerarOTDigitalIndividualC2C?SCHEMA%2FUT000001_EsquemasComunes%2FResources%2FSchemas%2FEBO%2FEstadoOperacion</con:url><con:content><![CDATA[<xs:schema targetNamespace="http://ws.chilexpress.cl/OSB/EBO/EstadoOperacion" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns="http://ws.chilexpress.cl/OSB/EBO/EstadoOperacion" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="EstadoOperacionType">
+    <xs:sequence>
+      <xs:element name="codigoEstado" type="xs:integer" minOccurs="0"/>
+      <xs:element name="descripcionEstado" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://qaws.ssichilexpress.cl/OSB/GenerarOTDigitalIndividualC2C</con:endpoint><con:endpoint>http://ws.ssichilexpress.cl/OSB/GenerarOTDigitalIndividualC2C</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="IntegracionAsistidaOp" bindingOperationName="IntegracionAsistidaOp" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="ca533318-5421-4e29-9ed6-e5c44f73c0c6"><con:settings/><con:call name="Request 1" id="746ae77b-8d13-4aea-933b-de9830b0f0af"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://testservices.wschilexpress.com/OSB/GenerarOTDigitalIndividualC2C</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:gen="http://ws.chilexpress.cl/OSB/INTERNO/COM/GenerarIntegracionAsistidaReq"
+xmlns:head="http://ws.chilexpress.cl/OSB/EBO/HeaderRequest"
+xmlns:int="http://www.chilexpress.cl/IntegracionAsistida/"
+xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<int:IntegracionAsistidaRequest>
+			<gen:reqGenerarIntegracionAsistida>
+				<gen:codigoProducto>3</gen:codigoProducto>
+				<gen:codigoServicio>3</gen:codigoServicio>
+				<gen:comunaOrigen>PUDAHUEL</gen:comunaOrigen>
+				<gen:numeroTCC>18578680</gen:numeroTCC>
+				<gen:referenciaEnvio>TEST</gen:referenciaEnvio>
+				<gen:referenciaEnvio2>TEST2</gen:referenciaEnvio2>
+				<gen:eoc>0</gen:eoc>
+				<gen:Remitente>
+					<gen:nombre>TEST</gen:nombre>
+					<gen:email>test@chilexpress.cl</gen:email>
+					<gen:celular>223824861</gen:celular>
+				</gen:Remitente>
+				<gen:Destinatario>
+					<gen:nombre>Prueba6</gen:nombre>
+					<gen:email>test@chilexpress.cl</gen:email>
+					<gen:celular>227665433</gen:celular>
+				</gen:Destinatario>
+				<gen:Direccion>
+					<gen:comuna>Santiago Centro</gen:comuna>
+					<gen:calle>Merced</gen:calle>
+					<gen:numero>614</gen:numero>
+					<gen:complemento/>
+				</gen:Direccion>
+				<gen:DireccionDevolucion>
+					<gen:comuna>PUDAHUEL</gen:comuna>
+					<gen:calle>JOSE JOAQUIN PEREZ</gen:calle>
+					<gen:numero>1376</gen:numero>
+					<gen:complemento/>
+				</gen:DireccionDevolucion>
+				<gen:Pieza>
+					<gen:peso>1.0</gen:peso>
+					<gen:alto>25</gen:alto>
+					<gen:ancho>33</gen:ancho>
+					<gen:largo>14</gen:largo>
+				</gen:Pieza>
+			</gen:reqGenerarIntegracionAsistida>
+		</int:IntegracionAsistidaRequest>
+	</soapenv:Body>
+</soapenv:Envelope>
+]]></con:request><con:credentials><con:username>UsrTestServicios</con:username><con:password>U$$vr2$tS2T</con:password><con:domain/><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/IntegracionAsistida/IntegracionAsistidaPT/IntegracionAsistidaOpRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
