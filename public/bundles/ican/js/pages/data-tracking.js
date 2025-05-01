@@ -1567,7 +1567,7 @@ var DataTracking = function () {
             if (nEditingRowItem == null) {
                 quantity = quantity.trim().replace(/^[-+]/, "");
             } else {
-                var old_cant = items_data_tracking[nEditingRowItem].quantity > 0 ? items_data_tracking[nEditingRowItem].quantity : 0;
+                var old_cant = items_data_tracking[nEditingRowItem].quantity > 0 ? parseFloat(items_data_tracking[nEditingRowItem].quantity) : 0;
                 var raw_quantity = quantity.trim(); // por si tiene espacios
                 var sign = raw_quantity.charAt(0); // obtenemos el primer carácter
                 var number = parseFloat(raw_quantity.replace(/^[-+]/, "")); // quitamos signo y convertimos a número
