@@ -174,7 +174,7 @@ class ProjectController extends AbstractController
             if ($project_id == "") {
                 $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name, $description,
                     $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
-                $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
+                    $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             } else {
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
@@ -302,12 +302,12 @@ class ProjectController extends AbstractController
      */
     public function listarOrdenados(Request $request)
     {
-        $company_id = $request->get('company_id');
-        $inspector_id = $request->get('inspector_id');
-        $search = $request->get('search');
-        $from = $request->get('from');
-        $to = $request->get('to');
-        $status = $request->get('status');
+        $company_id = $request->get('company_id') ?? '';
+        $inspector_id = $request->get('inspector_id') ?? '';
+        $search = $request->get('search') ?? '';
+        $from = $request->get('from') ?? '';
+        $to = $request->get('to') ?? '';
+        $status = $request->get('status') ?? '';
 
         try {
             $projects = $this->projectService->ListarOrdenados($search, $company_id, $inspector_id, $from, $to, $status);
