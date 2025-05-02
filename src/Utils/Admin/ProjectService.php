@@ -919,47 +919,8 @@ class ProjectService extends Base
                 return $resultado;
             }
 
-            // contacts
-            $contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
-                ->ListarContacts($project_id);
-            foreach ($contacts as $contact) {
-                $em->remove($contact);
-            }
-
-            // items
-            $items = $this->getDoctrine()->getRepository(ProjectItem::class)
-                ->ListarItemsDeProject($project_id);
-            foreach ($items as $item) {
-                $em->remove($item);
-            }
-
-            // data tracking
-            $data_tracking = $this->getDoctrine()->getRepository(DataTracking::class)
-                ->ListarDataTracking($project_id);
-            foreach ($data_tracking as $data) {
-
-                $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                    ->ListarItems($data->getId());
-                foreach ($items as $item) {
-                    $em->remove($item);
-                }
-
-                $em->remove($data);
-            }
-
-            // notes
-            $notes = $this->getDoctrine()->getRepository(ProjectNotes::class)
-                ->ListarNotesDeProject($project_id);
-            foreach ($notes as $note) {
-                $em->remove($note);
-            }
-
-            // notificaciones
-            $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
-                ->ListarNotificacionesDeProject($project_id);
-            foreach ($notificaciones as $notificacion) {
-                $em->remove($notificacion);
-            }
+            // eliminar informacion de un project
+            $this->EliminarInformacionDeProject($project_id);
 
             $project_descripcion = $entity->getName();
 
@@ -980,6 +941,61 @@ class ProjectService extends Base
         }
 
         return $resultado;
+    }
+
+    private function EliminarInformacionDeProject($project_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // contacts
+        $contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
+            ->ListarContacts($project_id);
+        foreach ($contacts as $contact) {
+            $em->remove($contact);
+        }
+
+        // items
+        $items = $this->getDoctrine()->getRepository(ProjectItem::class)
+            ->ListarItemsDeProject($project_id);
+        foreach ($items as $item) {
+
+            // subcontractors
+            $data_tracking_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+                ->ListarSubcontractsDeItemProject($item->getId());
+            foreach ($data_tracking_subcontractors as $subcontractor) {
+                $em->remove($subcontractor);
+            }
+
+            $em->remove($item);
+        }
+
+        // data tracking
+        $data_tracking = $this->getDoctrine()->getRepository(DataTracking::class)
+            ->ListarDataTracking($project_id);
+        foreach ($data_tracking as $data) {
+
+            $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+                ->ListarItems($data->getId());
+            foreach ($items as $item) {
+                $em->remove($item);
+            }
+
+            $em->remove($data);
+        }
+
+        // notes
+        $notes = $this->getDoctrine()->getRepository(ProjectNotes::class)
+            ->ListarNotesDeProject($project_id);
+        foreach ($notes as $note) {
+            $em->remove($note);
+        }
+
+        // notificaciones
+        $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
+            ->ListarNotificacionesDeProject($project_id);
+        foreach ($notificaciones as $notificacion) {
+            $em->remove($notificacion);
+        }
     }
 
     /**
@@ -1008,47 +1024,8 @@ class ProjectService extends Base
                             ->ListarInvoicesDeProject($project_id);
                         if (count($invoices) == 0) {
 
-                            // contacts
-                            $contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
-                                ->ListarContacts($project_id);
-                            foreach ($contacts as $contact) {
-                                $em->remove($contact);
-                            }
-
-                            // items
-                            $items = $this->getDoctrine()->getRepository(ProjectItem::class)
-                                ->ListarItemsDeProject($project_id);
-                            foreach ($items as $item) {
-                                $em->remove($item);
-                            }
-
-                            // data tracking
-                            $data_tracking = $this->getDoctrine()->getRepository(DataTracking::class)
-                                ->ListarDataTracking($project_id);
-                            foreach ($data_tracking as $data) {
-
-                                $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                                    ->ListarItems($data->getId());
-                                foreach ($items as $item) {
-                                    $em->remove($item);
-                                }
-
-                                $em->remove($data);
-                            }
-
-                            // notes
-                            $notes = $this->getDoctrine()->getRepository(ProjectNotes::class)
-                                ->ListarNotesDeProject($project_id);
-                            foreach ($notes as $note) {
-                                $em->remove($note);
-                            }
-
-                            // notificaciones
-                            $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
-                                ->ListarNotificacionesDeProject($project_id);
-                            foreach ($notificaciones as $notificacion) {
-                                $em->remove($notificacion);
-                            }
+                            // eliminar informacion de un project
+                            $this->EliminarInformacionDeProject($project_id);
 
                             $project_descripcion = $entity->getName();
 
