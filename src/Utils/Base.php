@@ -2,6 +2,11 @@
 
 namespace App\Utils;
 
+use App\Entity\DataTrackingConcVendor;
+use App\Entity\DataTrackingItem;
+use App\Entity\DataTrackingLabor;
+use App\Entity\DataTrackingMaterial;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
@@ -824,6 +829,51 @@ class Base
         }
 
         return $yield_calculation_name;
+    }
+
+    /**
+     * EliminarInformacionRelacionadaDataTracking
+     * @param $data_tracking_id
+     * @return void
+     */
+    public function EliminarInformacionRelacionadaDataTracking($data_tracking_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // conc vendors
+        $conc_vendors = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->ListarConcVendor($data_tracking_id);
+        foreach ($conc_vendors as $conc_vendor) {
+            $em->remove($conc_vendor);
+        }
+
+        // items
+        $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+            ->ListarItems($data_tracking_id);
+        foreach ($items as $item) {
+            $em->remove($item);
+        }
+
+        // labor
+        $data_tracking_labors = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarLabor($data_tracking_id);
+        foreach ($data_tracking_labors as $data_tracking_labor) {
+            $em->remove($data_tracking_labor);
+        }
+
+        // materials
+        $data_tracking_materials = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
+            ->ListarMaterials($data_tracking_id);
+        foreach ($data_tracking_materials as $data_tracking_material) {
+            $em->remove($data_tracking_material);
+        }
+
+        // data tracking subcontract
+        $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontracts($data_tracking_id);
+        foreach ($subcontract_items as $subcontract_item) {
+            $em->remove($subcontract_item);
+        }
     }
 
 }

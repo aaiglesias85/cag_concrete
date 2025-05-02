@@ -974,11 +974,8 @@ class ProjectService extends Base
             ->ListarDataTracking($project_id);
         foreach ($data_tracking as $data) {
 
-            $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                ->ListarItems($data->getId());
-            foreach ($items as $item) {
-                $em->remove($item);
-            }
+            // eliminar informacion data tracking
+            $this->EliminarInformacionRelacionadaDataTracking($data->getId());
 
             $em->remove($data);
         }
