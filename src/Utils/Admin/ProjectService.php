@@ -772,7 +772,7 @@ class ProjectService extends Base
             $arreglo_resultado['items'] = $items;
 
             // contacts
-            $contacts = $this->ListarContacts($project_id);
+            $contacts = $this->ListarContactsDeProject($project_id);
             $arreglo_resultado['contacts'] = $contacts;
 
             // invoices
@@ -821,32 +821,6 @@ class ProjectService extends Base
         }
 
         return $invoices;
-    }
-
-    /**
-     * ListarContacts
-     * @param $project_id
-     * @return array
-     */
-    public function ListarContacts($project_id)
-    {
-        $contacts = [];
-
-        $project_contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
-            ->ListarContacts($project_id);
-        foreach ($project_contacts as $key => $contact) {
-            $contacts[] = [
-                'contact_id' => $contact->getContactId(),
-                'name' => $contact->getName(),
-                'email' => $contact->getEmail(),
-                'phone' => $contact->getPhone(),
-                'role' => $contact->getRole(),
-                'notes' => $contact->getNotes(),
-                'posicion' => $key
-            ];
-        }
-
-        return $contacts;
     }
 
     /**

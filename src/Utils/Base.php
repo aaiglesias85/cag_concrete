@@ -11,6 +11,7 @@ use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
+use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\Unit;
@@ -349,6 +350,7 @@ class Base
             $menuReporteSubcontractor = false;
             $menuReporteEmployee = false;
             $menuConcreteVendor = false;
+            $menuSchedule = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -414,6 +416,9 @@ class Base
                 if ($permiso['funcion_id'] == 21 && $permiso['ver']) {
                     $menuConcreteVendor = true;
                 }
+                if ($permiso['funcion_id'] == 22 && $permiso['ver']) {
+                    $menuSchedule = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -437,6 +442,7 @@ class Base
                 'menuReporteSubcontractor' => $menuReporteSubcontractor,
                 'menuReporteEmployee' => $menuReporteEmployee,
                 'menuConcreteVendor' => $menuConcreteVendor,
+                'menuSchedule' => $menuSchedule,
             );
         }
 
@@ -879,6 +885,32 @@ class Base
         foreach ($subcontract_items as $subcontract_item) {
             $em->remove($subcontract_item);
         }
+    }
+
+    /**
+     * ListarContactsDeProject
+     * @param $project_id
+     * @return array
+     */
+    public function ListarContactsDeProject($project_id)
+    {
+        $contacts = [];
+
+        $project_contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
+            ->ListarContacts($project_id);
+        foreach ($project_contacts as $key => $contact) {
+            $contacts[] = [
+                'contact_id' => $contact->getContactId(),
+                'name' => $contact->getName(),
+                'email' => $contact->getEmail(),
+                'phone' => $contact->getPhone(),
+                'role' => $contact->getRole(),
+                'notes' => $contact->getNotes(),
+                'posicion' => $key
+            ];
+        }
+
+        return $contacts;
     }
 
 }

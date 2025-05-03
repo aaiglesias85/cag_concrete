@@ -1,0 +1,23 @@
+schedule:
+  path: /schedule
+  defaults: { _controller: App\Controller\Admin\ScheduleController::index }
+
+listarScheduleAdmin:
+  path: /schedule/listar
+  defaults: { _controller: App\Controller\Admin\ScheduleController::listar, _format: json }
+
+salvarScheduleAdmin:
+  path: /schedule/salvar
+  defaults: { _controller: App\Controller\Admin\ScheduleController::salvar, _format: json }
+
+eliminarScheduleAdmin:
+  path: /schedule/eliminar
+  defaults: { _controller: App\Controller\Admin\ScheduleController::eliminar, _format: json }
+
+eliminarSchedulesAdmin:
+  path: /schedule/eliminarSchedules
+  defaults: { _controller: App\Controller\Admin\ScheduleController::eliminarSchedules, _format: json }
+
+cargarDatosScheduleAdmin:
+  path: /schedule/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ScheduleController::cargarDatos, _format: json }

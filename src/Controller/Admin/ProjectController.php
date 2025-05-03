@@ -711,4 +711,30 @@ class ProjectController extends AbstractController
             return $this->json($resultadoJson);
         }
     }
+
+    /**
+     * listarContacts Acción que lista los contacts de un project
+     *
+     */
+    public function listarContacts(Request $request)
+    {
+
+        $project_id = $request->get('project_id');
+
+        try {
+
+            $contacts = $this->projectService->ListarContactsDeProject($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['contacts'] = $contacts;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

@@ -66,6 +66,10 @@ agregarItemProjectAdmin:
   defaults: { _controller: App\Controller\Admin\ProjectController::agregarItem, _format: json }
 
 #contacts
+listarContactsDeProjectAdmin:
+  path: /project/listarContacts
+  defaults: { _controller: App\Controller\Admin\ProjectController::listarContacts, _format: json }
+
 eliminarContactProjectAdmin:
   path: /project/eliminarContact
   defaults: { _controller: App\Controller\Admin\ProjectController::eliminarContact, _format: json }
