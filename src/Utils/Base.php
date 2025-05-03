@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
@@ -899,6 +900,32 @@ class Base
         $project_contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
             ->ListarContacts($project_id);
         foreach ($project_contacts as $key => $contact) {
+            $contacts[] = [
+                'contact_id' => $contact->getContactId(),
+                'name' => $contact->getName(),
+                'email' => $contact->getEmail(),
+                'phone' => $contact->getPhone(),
+                'role' => $contact->getRole(),
+                'notes' => $contact->getNotes(),
+                'posicion' => $key
+            ];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * ListarContactsDeConcreteVendor
+     * @param $vendor_id
+     * @return array
+     */
+    public function ListarContactsDeConcreteVendor($vendor_id)
+    {
+        $contacts = [];
+
+        $vendor_contacts = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
+            ->ListarContacts($vendor_id);
+        foreach ($vendor_contacts as $key => $contact) {
             $contacts[] = [
                 'contact_id' => $contact->getContactId(),
                 'name' => $contact->getName(),

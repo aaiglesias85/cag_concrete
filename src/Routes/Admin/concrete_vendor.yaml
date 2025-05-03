@@ -21,3 +21,12 @@ salvarConcreteVendorAdmin:
 cargarDatosConcreteVendorAdmin:
   path:  /concrete-vendor/cargarDatos
   defaults: { _controller: App\Controller\Admin\ConcreteVendorController::cargarDatos, _format: json }
+  
+#contacts
+listarContactsDeConcreteVendorAdmin:
+  path: /concrete-vendor/listarContacts
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::listarContacts, _format: json }
+
+eliminarContactConcreteVendorAdmin:
+  path: /concrete-vendor/eliminarContact
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::eliminarContact, _format: json }

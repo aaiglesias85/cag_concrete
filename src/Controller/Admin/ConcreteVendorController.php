@@ -105,12 +105,16 @@ class ConcreteVendorController extends AbstractController
         $contactName = $request->get('contactName');
         $contactEmail = $request->get('contactEmail');
 
+        // contacts
+        $contacts = $request->get('contacts');
+        $contacts = json_decode($contacts);
+
         try {
 
             if ($vendor_id == "") {
-                $resultado = $this->concreteVendorService->SalvarVendor($name, $phone, $address, $contactName, $contactEmail);
+                $resultado = $this->concreteVendorService->SalvarVendor($name, $phone, $address, $contactName, $contactEmail, $contacts);
             } else {
-                $resultado = $this->concreteVendorService->ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail);
+                $resultado = $this->concreteVendorService->ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail, $contacts);
             }
 
             if ($resultado['success']) {
@@ -213,6 +217,61 @@ class ConcreteVendorController extends AbstractController
 
                 return $this->json($resultadoJson);
             }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
+    }
+
+    /**
+     * listarContacts Acción que lista los contacts de un concrete vendor
+     *
+     */
+    public function listarContacts(Request $request)
+    {
+
+        $vendor_id = $request->get('vendor_id');
+
+        try {
+
+            $contacts = $this->concreteVendorService->ListarContactsDeConcreteVendor($vendor_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['contacts'] = $contacts;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarContact Acción que elimina un contact en la BD
+     *
+     */
+    public function eliminarContact(Request $request)
+    {
+        $contact_id = $request->get('contact_id');
+
+        try {
+            $resultado = $this->concreteVendorService->EliminarContact($contact_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

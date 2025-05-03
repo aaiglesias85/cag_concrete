@@ -3,11 +3,46 @@
 namespace App\Utils\Admin;
 
 use App\Entity\ConcreteVendor;
+use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingConcVendor;
 use App\Utils\Base;
 
 class ConcreteVendorService extends Base
 {
+
+    /**
+     * EliminarContact: Elimina un contact en la BD
+     * @param int $contact_id Id
+     * @author Marcel
+     */
+    public function EliminarContact($contact_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
+            ->find($contact_id);
+        /**@var ConcreteVendorContact $entity */
+        if ($entity != null) {
+
+            $contact_name = $entity->getName();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Concrete Vendor Contact";
+            $log_descripcion = "The concrete vendor contact is deleted: $contact_name";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
 
     /**
      * ListarOrdenados
@@ -55,6 +90,10 @@ class ConcreteVendorService extends Base
             $arreglo_resultado['contactName'] = $entity->getContactName();
             $arreglo_resultado['contactEmail'] = $entity->getContactEmail();
 
+            // contacts
+            $contacts = $this->ListarContactsDeConcreteVendor($vendor_id);
+            $arreglo_resultado['contacts'] = $contacts;
+
             $resultado['success'] = true;
             $resultado['vendor'] = $arreglo_resultado;
         }
@@ -76,12 +115,8 @@ class ConcreteVendorService extends Base
         /**@var ConcreteVendor $entity */
         if ($entity != null) {
 
-            // eliminar datatracking vendor
-            $data_trackings = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-                ->ListarDataTrackingsDeConcVendor($vendor_id);
-            foreach ($data_trackings as $data_tracking) {
-                $em->remove($data_tracking);
-            }
+            // eliminar informacion relacionada
+            $this->EliminarInformacionRelacionada($vendor_id);
 
             $vendor_descripcion = $entity->getName();
 
@@ -101,6 +136,27 @@ class ConcreteVendorService extends Base
         }
 
         return $resultado;
+    }
+
+    public function EliminarInformacionRelacionada($vendor_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // contacts
+        $contacts = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
+            ->ListarContacts($vendor_id);
+        foreach ($contacts as $contact) {
+            $em->remove($contact);
+        }
+
+        // eliminar datatracking vendor
+        $data_trackings = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->ListarDataTrackingsDeConcVendor($vendor_id);
+        foreach ($data_trackings as $data_tracking) {
+            $em->remove($data_tracking);
+        }
+
+
     }
 
     /**
@@ -124,12 +180,8 @@ class ConcreteVendorService extends Base
                     /**@var ConcreteVendor $entity */
                     if ($entity != null) {
 
-                        // eliminar datatracking vendor
-                        $data_trackings = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-                            ->ListarDataTrackingsDeConcVendor($vendor_id);
-                        foreach ($data_trackings as $data_tracking) {
-                            $em->remove($data_tracking);
-                        }
+                        // eliminar informacion relacionada
+                        $this->EliminarInformacionRelacionada($vendor_id);
 
                         $vendor_descripcion = $entity->getName();
 
@@ -166,7 +218,7 @@ class ConcreteVendorService extends Base
      * @param int $vendor_id Id
      * @author Marcel
      */
-    public function ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail)
+    public function ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail, $contacts)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -189,6 +241,9 @@ class ConcreteVendorService extends Base
             $entity->setContactName($contactName);
             $entity->setContactEmail($contactEmail);
 
+            // save contacts
+            $this->SalvarContacts($entity, $contacts);
+
             $em->flush();
 
             //Salvar log
@@ -208,7 +263,7 @@ class ConcreteVendorService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarVendor($name, $phone, $address, $contactName, $contactEmail)
+    public function SalvarVendor($name, $phone, $address, $contactName, $contactEmail, $contacts)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -231,6 +286,9 @@ class ConcreteVendorService extends Base
 
         $em->persist($entity);
 
+        // save contacts
+        $this->SalvarContacts($entity, $contacts);
+
         $em->flush();
 
         //Salvar log
@@ -242,6 +300,46 @@ class ConcreteVendorService extends Base
         $resultado['success'] = true;
 
         return $resultado;
+    }
+
+    /**
+     * SalvarContacts
+     * @param $contacts
+     * @param ConcreteVendor $entity
+     * @return void
+     */
+    public function SalvarContacts($entity, $contacts)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //Senderos
+        foreach ($contacts as $value) {
+
+            $contact_entity = null;
+
+            if (is_numeric($value->contact_id)) {
+                $contact_entity = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
+                    ->find($value->contact_id);
+            }
+
+            $is_new_contact = false;
+            if ($contact_entity == null) {
+                $contact_entity = new ConcreteVendorContact();
+                $is_new_contact = true;
+            }
+
+            $contact_entity->setName($value->name);
+            $contact_entity->setEmail($value->email);
+            $contact_entity->setPhone($value->phone);
+            $contact_entity->setRole($value->role);
+            $contact_entity->setNotes($value->notes);
+
+            if ($is_new_contact) {
+                $contact_entity->setConcreteVendor($entity);
+
+                $em->persist($contact_entity);
+            }
+        }
     }
 
     /**
