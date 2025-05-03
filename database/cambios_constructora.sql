@@ -21,3 +21,6 @@ CREATE TABLE concrete_vendor
 ALTER TABLE `data_tracking_conc_vendor` ADD `vendor_id` INT(11) NULL AFTER `data_tracking_id`, ADD INDEX (`vendor_id`);
 ALTER TABLE `data_tracking_conc_vendor` ADD CONSTRAINT `Refdatatrackingconcvendor36` FOREIGN KEY (`vendor_id`)
     REFERENCES `concrete_vendor`(`vendor_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+-- tienes que ejecutar este script para definir en el datatracking la relacion con los concrete vendors
+-- http://localhost/constructora/public/definir-concrete-vendor-datatracking
