@@ -28,7 +28,7 @@
             {% endif %}
 
             <!-- menu projects -->
-            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor %}
+            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor %}
                 <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
                     m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
@@ -66,6 +66,15 @@
                                     <a href="{{ url('subcontractor') }}" class="m-menu__link ">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                         <span class="m-menu__link-text">Subcontractors</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% if menu.menuConcreteVendor %}
+                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                    <a href="{{ url('conc_vendor') }}" class="m-menu__link ">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Concrete Vendors</span>
                                     </a>
                                 </li>
                             {% endif %}
@@ -118,8 +127,7 @@
 
             <!-- menu libraries -->
             {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or
-                menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement or
-                menu.menuConcreteVendor %}
+                menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement  %}
                 <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true"
                     m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Libraries">
@@ -202,15 +210,6 @@
                                     <a href="{{ url('advertisement') }}" class="m-menu__link ">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                         <span class="m-menu__link-text">Advertisements</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuConcreteVendor %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('conc_vendor') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Concrete Vendors</span>
                                     </a>
                                 </li>
                             {% endif %}
