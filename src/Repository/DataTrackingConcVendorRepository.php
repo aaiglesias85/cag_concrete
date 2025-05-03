@@ -27,6 +27,25 @@ class DataTrackingConcVendorRepository extends EntityRepository
     }
 
     /**
+     * ListarDataTrackingsDeConcVendor: Lista la conc vendor del data tracking
+     *
+     * @return DataTrackingConcVendor[]
+     */
+    public function ListarDataTrackingsDeConcVendor($vendor_id)
+    {
+        $qb = $this->createQueryBuilder('d_t_c_v')
+            ->leftJoin('d_t_c_v.concreteVendor', 'c_v')
+            ->orderBy('d_t_c_v.id', 'ASC');
+
+        if (!empty($vendor_id)) {
+            $qb->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * TotalConcUsed: Total de conc used de la BD
      *
      * @param string $data_tracking_id

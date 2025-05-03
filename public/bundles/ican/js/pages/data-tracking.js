@@ -2787,7 +2787,7 @@ var DataTracking = function () {
 
         var aoColumns = [
             {
-                field: "conc_vendor",
+                field: "vendor",
                 title: "Conc Vendor",
             },
             {
@@ -2920,12 +2920,6 @@ var DataTracking = function () {
                 total_conc_used: {
                     required: true
                 },
-                conc_vendor: {
-                    required: true
-                },
-                /*conc_price: {
-                    required: true
-                },*/
             },
             showErrors: function (errorMap, errorList) {
                 // Clean up any tooltips for valid elements
@@ -2976,10 +2970,17 @@ var DataTracking = function () {
             e.preventDefault();
 
 
-            if ($('#data-tracking-conc-vendor-form').valid()) {
+            var vendor_id = $('#concrete-vendor').val();
 
+            if ($('#data-tracking-conc-vendor-form').valid() && vendor_id !== '') {
+
+                if (ExistConcreteVendor(vendor_id)) {
+                    toastr.error("The selected concrete vendor has already been added", "");
+                    return;
+                }
+
+                var vendor =  $("#concrete-vendor option:selected").text();
                 var total_conc_used = $('#total_conc_used').val();
-                var conc_vendor = $('#conc_vendor').val();
                 var conc_price = $('#conc_price').val();
 
                 var total = total_conc_used * conc_price;
@@ -2988,7 +2989,8 @@ var DataTracking = function () {
 
                     conc_vendors.push({
                         data_tracking_conc_vendor_id: '',
-                        conc_vendor: conc_vendor,
+                        vendor_id: vendor_id,
+                        vendor: vendor,
                         total_conc_used: total_conc_used,
                         conc_price: conc_price,
                         total: total,
@@ -2998,7 +3000,8 @@ var DataTracking = function () {
                 } else {
                     var posicion = nEditingRowConcVendor;
                     if (conc_vendors[posicion]) {
-                        conc_vendors[posicion].conc_vendor = conc_vendor;
+                        conc_vendors[posicion].vendor_id = vendor_id;
+                        conc_vendors[posicion].vendor = vendor;
                         conc_vendors[posicion].total_conc_used = total_conc_used;
                         conc_vendors[posicion].conc_price = conc_price;
                         conc_vendors[posicion].total = total;
@@ -3015,6 +3018,19 @@ var DataTracking = function () {
                 // reset
                 resetFormConcVendor();
 
+            }else{
+                if (vendor_id === '') {
+                    var $element = $('#select-concrete-vendor .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
             }
 
         });
@@ -3032,7 +3048,10 @@ var DataTracking = function () {
                 $('#total_conc_used').off('change', calcularTotalConcrete);
                 $('#conc_price').off('change', calcularTotalConcrete);
 
-                $('#conc_vendor').val(conc_vendors[posicion].conc_vendor);
+                $('#concrete-vendor').val(conc_vendors[posicion].vendor_id);
+                $('#concrete-vendor').trigger('change');
+
+
                 $('#total_conc_used').val(conc_vendors[posicion].total_conc_used);
                 $('#conc_price').val(conc_vendors[posicion].conc_price);
 
@@ -3118,6 +3137,29 @@ var DataTracking = function () {
             //actualizar lista
             actualizarTableListaConcVendors();
         }
+
+        function ExistConcreteVendor(vendor_id) {
+            var result = false;
+
+            if (nEditingRowConcVendor == null) {
+                for (var i = 0; i < conc_vendors.length; i++) {
+                    if (conc_vendors[i].vendor_id === vendor_id) {
+                        result = true;
+                        break;
+                    }
+                }
+            } else {
+                var posicion = nEditingRowConcVendor;
+                for (var i = 0; i < conc_vendors.length; i++) {
+                    if (conc_vendors[i].vendor_id === vendor_id && conc_vendors[i].data_tracking_conc_vendor_id !== conc_vendors[posicion].data_tracking_conc_vendor_id) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        };
     };
     var resetFormConcVendor = function () {
         $('#data-tracking-conc-vendor-form input').each(function (e) {
@@ -3127,6 +3169,12 @@ var DataTracking = function () {
             $element.data("title", "").removeClass("has-error").tooltip("dispose");
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
+
+        $('#concrete-vendor').val('');
+        $('#concrete-vendor').trigger('change');
+
+        var $element = $('.select2');
+        $element.removeClass('has-error').tooltip("dispose");
 
         nEditingRowConcVendor = null;
     };

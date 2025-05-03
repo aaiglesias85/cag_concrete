@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\ConcreteVendor;
 use App\Entity\Employee;
 use App\Entity\Equation;
 use App\Entity\Inspector;
@@ -65,6 +66,10 @@ class DataTrackingController extends AbstractController
                 $subcontractors = $this->dataTrackingService->getDoctrine()->getRepository(Subcontractor::class)
                     ->ListarOrdenados();
 
+                // concrete vendors
+                $concrete_vendors = $this->dataTrackingService->getDoctrine()->getRepository(ConcreteVendor::class)
+                    ->ListarOrdenados();
+
                 return $this->render('admin/data-tracking/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
@@ -74,6 +79,7 @@ class DataTrackingController extends AbstractController
                     'materials' => $materials,
                     'overheads' => $overheads,
                     'subcontractors' => $subcontractors,
+                    'concrete_vendors' => $concrete_vendors
                 ));
             }
         } else {

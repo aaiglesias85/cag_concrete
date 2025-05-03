@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 04-04-2025 a las 19:08:31
+-- Tiempo de generación: 03-05-2025 a las 17:07:40
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -87,6 +87,21 @@ INSERT INTO `company_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `concrete_vendor`
+--
+
+CREATE TABLE `concrete_vendor` (
+  `vendor_id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `address` text,
+  `phone` varchar(50) DEFAULT NULL,
+  `contact_name` varchar(255) DEFAULT NULL,
+  `contact_email` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `data_tracking`
 --
 
@@ -137,18 +152,19 @@ CREATE TABLE `data_tracking_conc_vendor` (
   `conc_vendor` varchar(255) DEFAULT NULL,
   `total_conc_used` decimal(18,2) DEFAULT NULL,
   `conc_price` decimal(18,2) DEFAULT NULL,
-  `data_tracking_id` int(11) DEFAULT NULL
+  `data_tracking_id` int(11) DEFAULT NULL,
+  `vendor_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `data_tracking_conc_vendor`
 --
 
-INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`, `conc_price`, `data_tracking_id`) VALUES
-(1, 'Disrupsoft', 5.00, 10.00, 4),
-(2, 'Disrupsoft', 100.00, 100.00, 3),
-(3, 'DGGG', 25.00, 100.00, 5),
-(4, 'DIO', 50.00, 100.00, 5);
+INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`, `conc_price`, `data_tracking_id`, `vendor_id`) VALUES
+(1, 'Disrupsoft', 5.00, 10.00, 4, NULL),
+(2, 'Disrupsoft', 100.00, 100.00, 3, NULL),
+(3, 'DGGG', 25.00, 100.00, 5, NULL),
+(4, 'DIO', 50.00, 100.00, 5, NULL);
 
 -- --------------------------------------------------------
 
@@ -347,7 +363,10 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (15, 'materials', 'Materials'),
 (16, 'overhead', 'Overhead Price'),
 (17, 'advertisement', 'Advertisements'),
-(18, 'subcontractor', 'Subcontractor');
+(18, 'subcontractor', 'Subcontractor'),
+(19, 'reporte_subcontractor', 'Subcontractors'),
+(20, 'reporte_employee', 'Employees'),
+(21, 'conc_vendor', 'Concrete Vendors');
 
 -- --------------------------------------------------------
 
@@ -1181,7 +1200,10 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (27, 1, 1, 1, 1, 1, 15),
 (28, 1, 1, 1, 1, 1, 16),
 (29, 1, 1, 1, 1, 1, 17),
-(30, 1, 1, 1, 1, 1, 18);
+(30, 1, 1, 1, 1, 1, 18),
+(31, 1, 1, 1, 1, 1, 19),
+(32, 1, 1, 1, 1, 1, 20),
+(33, 1, 1, 1, 1, 1, 21);
 
 -- --------------------------------------------------------
 
@@ -1195,7 +1217,10 @@ CREATE TABLE `subcontractor` (
   `address` text,
   `phone` varchar(50) DEFAULT NULL,
   `contact_name` varchar(255) DEFAULT NULL,
-  `contact_email` varchar(255) DEFAULT NULL
+  `contact_email` varchar(255) DEFAULT NULL,
+  `company_name` varchar(255) DEFAULT NULL,
+  `company_phone` varchar(50) DEFAULT NULL,
+  `company_address` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -1313,7 +1338,10 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (19, 1, 1, 1, 1, 1, 15),
 (20, 1, 1, 1, 1, 1, 16),
 (21, 1, 1, 1, 1, 1, 17),
-(22, 1, 1, 1, 1, 1, 18);
+(22, 1, 1, 1, 1, 1, 18),
+(23, 1, 1, 1, 1, 1, 19),
+(24, 1, 1, 1, 1, 1, 20),
+(25, 1, 1, 1, 1, 1, 21);
 
 --
 -- Índices para tablas volcadas
@@ -1339,6 +1367,12 @@ ALTER TABLE `company_contact`
   ADD KEY `Ref6474` (`company_id`);
 
 --
+-- Indices de la tabla `concrete_vendor`
+--
+ALTER TABLE `concrete_vendor`
+  ADD PRIMARY KEY (`vendor_id`);
+
+--
 -- Indices de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -1352,7 +1386,8 @@ ALTER TABLE `data_tracking`
 --
 ALTER TABLE `data_tracking_conc_vendor`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `Ref6345` (`data_tracking_id`);
+  ADD KEY `Ref6345` (`data_tracking_id`),
+  ADD KEY `vendor_id` (`vendor_id`);
 
 --
 -- Indices de la tabla `data_tracking_item`
@@ -1572,6 +1607,12 @@ ALTER TABLE `company_contact`
   MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de la tabla `concrete_vendor`
+--
+ALTER TABLE `concrete_vendor`
+  MODIFY `vendor_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -1623,7 +1664,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -1707,7 +1748,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -1743,7 +1784,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Restricciones para tablas volcadas
@@ -1767,7 +1808,8 @@ ALTER TABLE `data_tracking`
 -- Filtros para la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
-  ADD CONSTRAINT `Refdatatrackingconcvendor35` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `Refdatatrackingconcvendor35` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `Refdatatrackingconcvendor36` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`);
 
 --
 -- Filtros para la tabla `data_tracking_item`

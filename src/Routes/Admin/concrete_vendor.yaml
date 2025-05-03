@@ -1,0 +1,23 @@
+conc_vendor:
+  path:  /concrete-vendors
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::index }
+
+listarConcreteVendorAdmin:
+  path:  /concrete-vendor/listar
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::listar, _format: json }
+
+eliminarConcreteVendorAdmin:
+  path:  /concrete-vendor/eliminar
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::eliminar, _format: json }
+
+eliminarConcreteVendorsAdmin:
+  path:  /concrete-vendor/eliminarVendors
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::eliminarVendors, _format: json }
+
+salvarConcreteVendorAdmin:
+  path:  /concrete-vendor/salvar
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::salvar, _format: json }
+
+cargarDatosConcreteVendorAdmin:
+  path:  /concrete-vendor/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::cargarDatos, _format: json }

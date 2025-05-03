@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\ConcreteVendor;
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
@@ -42,7 +43,7 @@ class DataTrackingService extends Base
             $project_name = $entity->getDataTracking()->getProject()->getProjectNumber() . " - " . $entity->getDataTracking()->getProject()->getName();
             $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
 
-            $conc_vendor = $entity->getConcVendor();
+            $conc_vendor = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getName() : '';
 
             $em->remove($entity);
             $em->flush();
@@ -363,7 +364,8 @@ class DataTrackingService extends Base
 
             $items[] = [
                 'data_tracking_conc_vendor_id' => $value->getId(),
-                "conc_vendor" => $value->getConcVendor(),
+                "vendor_id" => $value->getConcreteVendor()->getVendorId(),
+                "vendor" => $value->getConcreteVendor()->getName(),
                 "total_conc_used" => $total_conc_used,
                 "conc_price" => $conc_price,
                 "total" => $total,
@@ -814,7 +816,10 @@ class DataTrackingService extends Base
                 $is_new_data_tracking_conc_vendor = true;
             }
 
-            $data_tracking_conc_vendor_entity->setConcVendor($value->conc_vendor);
+            $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                ->find($value->vendor_id);
+            $data_tracking_conc_vendor_entity->setConcreteVendor($concrete_vendor);
+
             $data_tracking_conc_vendor_entity->setTotalConcUsed($value->total_conc_used);
             $data_tracking_conc_vendor_entity->setConcPrice($value->conc_price);
 

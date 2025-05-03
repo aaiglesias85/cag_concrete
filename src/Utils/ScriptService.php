@@ -2,7 +2,9 @@
 
 namespace App\Utils;
 
+use App\Entity\ConcreteVendor;
 use App\Entity\DataTracking;
+use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Item;
@@ -13,6 +15,55 @@ use App\Entity\ProjectItem;
 
 class ScriptService extends Base
 {
+
+    /**
+     * DefinirConcreteVendorDataTracking
+     */
+    public function DefinirConcreteVendorDataTracking()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // listar datatracking
+        $data_trackings_conc_vendor = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)->findAll();
+        foreach ($data_trackings_conc_vendor as $data_tracking_conc_vendor) {
+
+            $conc_vendor = $data_tracking_conc_vendor->getConcVendor();
+            $concrete_vendor = $this->SalvarConcreteVendor($conc_vendor);
+            if($concrete_vendor){
+                $data_tracking_conc_vendor->setConcVendor(NULL);
+                $data_tracking_conc_vendor->setConcreteVendor($concrete_vendor);
+
+            }
+        }
+
+        $em->flush();
+
+
+    }
+
+    private function SalvarConcreteVendor($name)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //Verificar name
+        $entity = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+            ->findOneBy(['name' => $name]);
+        if($entity === null){
+
+            $entity = new ConcreteVendor();
+
+            $entity->setName($name);
+            $entity->setPhone("");
+            $entity->setAddress("");
+            $entity->setContactName("");
+            $entity->setContactEmail("");
+
+            $em->persist($entity);
+            $em->flush();
+
+        }
+        return $entity;
+    }
 
     /**
      * DefinirSubcontractorDatatrackingProjectItem

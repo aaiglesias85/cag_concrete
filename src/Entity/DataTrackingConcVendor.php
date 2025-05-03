@@ -26,6 +26,10 @@ class DataTrackingConcVendor
     #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
     private ?DataTracking $dataTracking;
 
+    #[ORM\ManyToOne(targetEntity: ConcreteVendor::class)]
+    #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id')]
+    private ?ConcreteVendor $concreteVendor;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,5 +73,15 @@ class DataTrackingConcVendor
     public function setDataTracking(?DataTracking $dataTracking): void
     {
         $this->dataTracking = $dataTracking;
+    }
+
+    public function getConcreteVendor(): ?ConcreteVendor
+    {
+        return $this->concreteVendor;
+    }
+
+    public function setConcreteVendor(?ConcreteVendor $concreteVendor): void
+    {
+        $this->concreteVendor = $concreteVendor;
     }
 }
