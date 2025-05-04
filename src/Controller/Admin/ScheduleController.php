@@ -56,13 +56,14 @@ class ScheduleController extends AbstractController
         $query = !empty($request->get('query')) ? $request->get('query') : array();
         $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
         $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
+        $vendor_id = isset($query['vendor_id']) && is_string($query['vendor_id']) ? $query['vendor_id'] : '';
         $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
         $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
 
         //Sort
         $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
         $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'desc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'dateStart';
+        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'day';
         //$start and $limit
         $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
         $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
@@ -71,7 +72,7 @@ class ScheduleController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->scheduleService->TotalSchedules($sSearch, $project_id, $fecha_inicial, $fecha_fin);
+            $total = $this->scheduleService->TotalSchedules($sSearch, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -92,7 +93,7 @@ class ScheduleController extends AbstractController
             );
 
             $data = $this->scheduleService->ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                $project_id, $fecha_inicial, $fecha_fin);
+                $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -110,12 +111,11 @@ class ScheduleController extends AbstractController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
+     * salvar Acción para agregar schedules en la BD
      *
      */
     public function salvar(Request $request)
     {
-        $schedule_id = $request->get('schedule_id');
 
         $project_id = $request->get('project_id');
         $project_contact_id = $request->get('project_contact_id');
@@ -130,15 +130,63 @@ class ScheduleController extends AbstractController
         $vendor_id = $request->get('vendor_id');
         $concrete_vendor_contacts_id = $request->get('concrete_vendor_contacts_id');
 
+        $hour = $request->get('hour');
+        $quantity = $request->get('quantity');
+        $notes = $request->get('notes');
+
         try {
 
-            if ($schedule_id == "") {
-                $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
-                    $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id);
+            $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
+                $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes);
+
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+                return $this->json($resultadoJson);
             } else {
-                $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $date_start,
-                    $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id);
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+
+                return $this->json($resultadoJson);
             }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * actualizar Acción para modificar un schedule un menu en la BD
+     *
+     */
+    public function actualizar(Request $request)
+    {
+        $schedule_id = $request->get('schedule_id');
+
+        $project_id = $request->get('project_id');
+        $project_contact_id = $request->get('project_contact_id');
+
+        $description = $request->get('description');
+        $location = $request->get('location');
+        $latitud = $request->get('latitud');
+        $longitud = $request->get('longitud');
+
+        $vendor_id = $request->get('vendor_id');
+        $concrete_vendor_contacts_id = $request->get('concrete_vendor_contacts_id');
+
+        $day = $request->get('day');
+        $hour = $request->get('hour');
+        $quantity = $request->get('quantity');
+        $notes = $request->get('notes');
+
+        try {
+
+            $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
+                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes);
 
             if ($resultado['success']) {
 

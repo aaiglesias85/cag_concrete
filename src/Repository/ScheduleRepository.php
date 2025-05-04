@@ -7,6 +7,37 @@ use Doctrine\ORM\EntityRepository;
 
 class ScheduleRepository extends EntityRepository
 {
+
+    /**
+     * ListarSchedulesRangoFecha: Lista el schedule de un rango de fecha
+     *
+     * @return Schedule[]
+     */
+    public function ListarSchedulesRangoFecha($fecha_inicial = '', $fecha_fin = '')
+    {
+        $consulta = $this->createQueryBuilder('s');
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+
+            $consulta->andWhere('s.day >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+
+            $consulta->andWhere('s.day <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        $consulta->orderBy('s.day', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
     /**
      * ListarSchedulesDeProject: Lista el schedule de project
      *
@@ -23,22 +54,22 @@ class ScheduleRepository extends EntityRepository
         }
 
         if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('s.dateStart >= :fecha_inicial')
+            $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('s.dateStop <= :fecha_final')
+            $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy('s.dateStart', "ASC");
+        $consulta->orderBy('s.day', "ASC");
 
         return $consulta->getQuery()->getResult();
     }
@@ -58,7 +89,7 @@ class ScheduleRepository extends EntityRepository
                 ->setParameter('contact_id', $contact_id);
         }
 
-        $consulta->orderBy('s.dateStart', "ASC");
+        $consulta->orderBy('s.day', "ASC");
 
         return $consulta->getQuery()->getResult();
     }
@@ -78,7 +109,7 @@ class ScheduleRepository extends EntityRepository
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-        $consulta->orderBy('s.dateStart', "ASC");
+        $consulta->orderBy('s.day', "ASC");
 
         return $consulta->getQuery()->getResult();
     }
@@ -91,7 +122,7 @@ class ScheduleRepository extends EntityRepository
      *
      * @return Schedule[]
      */
-    public function ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id = '', $vendor_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.project', 'p')
@@ -99,7 +130,7 @@ class ScheduleRepository extends EntityRepository
             ->leftJoin('s.concreteVendor', 'c_v');
 
         if ($sSearch != "") {
-            $consulta->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
+            $consulta->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -109,19 +140,24 @@ class ScheduleRepository extends EntityRepository
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ($vendor_id != '') {
+            $consulta->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
+        }
 
-            $consulta->andWhere('s.dateStart >= :fecha_inicial')
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial ." 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+
+            $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('s.dateStop <= :fecha_final')
+            $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
@@ -134,6 +170,9 @@ class ScheduleRepository extends EntityRepository
                 break;
             case "concreteVendor":
                 $consulta->orderBy("c_v.name", $sSortDir_0);
+                break;
+            case "hour":
+                $consulta->orderBy("s.day", $sSortDir_0);
                 break;
             default:
                 $consulta->orderBy("s.$iSortCol_0", $sSortDir_0);
@@ -155,17 +194,23 @@ class ScheduleRepository extends EntityRepository
      *
      * @return int
      */
-    public function TotalSchedules($sSearch, $project_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function TotalSchedules($sSearch, $project_id = '', $vendor_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('s')
             ->select('COUNT(s.scheduleId)')
             ->leftJoin('s.project', 'p')
-            ->leftJoin('s.contactProject', 'p_c');
+            ->leftJoin('s.contactProject', 'p_c')
+            ->leftJoin('s.concreteVendor', 'c_v');
 
         if ($sSearch != "") {
-            $consulta->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
+            $consulta->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($vendor_id != '') {
+            $consulta->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
         }
 
         if ($project_id != '') {
@@ -174,18 +219,18 @@ class ScheduleRepository extends EntityRepository
         }
 
         if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('s.dateStart >= :fecha_inicial')
+            $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('s.dateStop <= :fecha_final')
+            $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 

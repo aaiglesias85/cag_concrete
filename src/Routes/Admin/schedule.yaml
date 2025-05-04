@@ -10,6 +10,10 @@ salvarScheduleAdmin:
   path: /schedule/salvar
   defaults: { _controller: App\Controller\Admin\ScheduleController::salvar, _format: json }
 
+actualizarScheduleAdmin:
+  path: /schedule/actualizar
+  defaults: { _controller: App\Controller\Admin\ScheduleController::actualizar, _format: json }
+
 eliminarScheduleAdmin:
   path: /schedule/eliminar
   defaults: { _controller: App\Controller\Admin\ScheduleController::eliminar, _format: json }

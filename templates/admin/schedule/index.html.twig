@@ -93,12 +93,20 @@
             <div class="m-portlet__body">
                 <!--begin: Search Form -->
                 <div class="form-group m-form__group row align-items-center mb-2">
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <select class="form-control m-select2" id="filtro-project">
                             <option value="">Projects</option>
                             {% for item in projects %}
                                 <option value="{{ item.projectId }}">{{ item.projectNumber }}
                                     - {{ item.description }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control m-select2" id="filtro-concrete-vendor">
+                            <option value="">Concrete Vendor</option>
+                            {% for item in concrete_vendors %}
+                                <option value="{{ item.vendorId }}">{{ item.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -170,172 +178,198 @@
                 </div>
             </div>
 
-            <div class="m-portlet__body">
+            <form class="m-form" id="schedule-form" action="#"
+                  enctype="multipart/form-data" method="post">
 
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active wizard-tab" data-item="1"
-                           data-toggle="tab" href="#tab-content-general" id="tab-general">
-                            General
-                        </a>
-                    </li>
-                </ul>
+                <input type="hidden" id="schedule_id" name="schedule_id"/>
 
-                <div class="tab-content">
-                    <div class="tab-pane active" id="tab-content-general" role="tabpanel">
-                        <form class="m-form" id="schedule-form" action="#" enctype="multipart/form-data"
-                              method="post">
+                <div class="m-portlet__body">
 
-                            <input type="hidden" id="schedule_id" name="schedule_id"/>
+                    <div class="m-form__section m-form__section--first">
 
-                            <div class="m-form__section m-form__section--first">
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
-                                        <div class="col-md-4" id="select-project">
-                                            <label>
-                                                <span class="ic-step-number">1</span>
-                                                Project
-                                                <span class="ic-small italic">(required)</span>
-                                            </label>
-                                            <select class="form-control m-select2 event-change" id="project"
-                                                    name="project">
-                                                <option value="">Select</option>
-                                                {% for item in projects %}
-                                                    <option value="{{ item.projectId }}">{{ item.projectNumber }}
-                                                        - {{ item.description }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4" id="select-contact-project">
-                                            <label>
-                                                Contact Project
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <select class="form-control m-select2 event-change" id="contact-project"
-                                                    name="contactproject">
-                                                <option value="">Select</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <label>
-                                                Start Date
-                                                <span class="ic-small italic">(required)</span>
-                                            </label>
-                                            <div class='input-group date'>
-                                                <input type='text' class="form-control m-input date-picker event-change"
-                                                       placeholder="Date Start" autocomplete="off"
-                                                       id="date-start" name="datestart"/>
-                                                <div class="input-group-append">
+                        <div class="form-group m-form__group ic-form-group">
+                            <div class="row">
+                                <div class="col-md-4" id="select-project">
+                                    <label>
+                                        <span class="ic-step-number">1</span>
+                                        Project
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change" id="project"
+                                            name="project">
+                                        <option value="">Select</option>
+                                        {% for item in projects %}
+                                            <option value="{{ item.projectId }}">{{ item.projectNumber }}
+                                                - {{ item.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4" id="select-contact-project">
+                                    <label>
+                                        Contact Project
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change" id="contact-project"
+                                            name="contactproject">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 m--hide" id="div-day">
+                                    <label>
+                                        Day
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class='input-group date'>
+                                        <input type='text' class="form-control m-input date-picker event-change"
+                                               placeholder="Select a date" autocomplete="off"
+                                               id="day" name="day"/>
+                                        <div class="input-group-append">
                                                     <span class="input-group-text">
                                                         <i class="la la-calendar glyphicon-th"></i>
                                                     </span>
-                                                </div>
-                                            </div>
                                         </div>
-                                        <div class="col-md-2">
-                                            <label>
-                                                Stop Date
-                                                <span class="ic-small italic">(required)</span>
-                                            </label>
-                                            <div class='input-group date'>
-                                                <input type='text' class="form-control m-input date-picker event-change"
-                                                       placeholder="Date Stop" autocomplete="off"
-                                                       id="date-stop" name="datestop"/>
-                                                <div class="input-group-append">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 date-new">
+                                    <label>
+                                        Start Date
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class='input-group date'>
+                                        <input type='text' class="form-control m-input date-picker event-change"
+                                               placeholder="Date Start" autocomplete="off"
+                                               id="date-start" name="datestart"/>
+                                        <div class="input-group-append">
                                                     <span class="input-group-text">
                                                         <i class="la la-calendar glyphicon-th"></i>
                                                     </span>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>
-                                                <span class="ic-step-number">2</span>
-                                                Work Description
-                                                <span class="ic-small italic">(required)</span>
-                                            </label>
-                                            <input type="text" class="form-control event-change" id="description"
-                                                   name="description">
+                                <div class="col-md-2 date-new">
+                                    <label>
+                                        Stop Date
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class='input-group date'>
+                                        <input type='text' class="form-control m-input date-picker event-change"
+                                               placeholder="Date Stop" autocomplete="off"
+                                               id="date-stop" name="datestop"/>
+                                        <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="la la-calendar glyphicon-th"></i>
+                                                    </span>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label>
-                                                Location
-                                                <span class="ic-small italic">(required)</span>
-                                            </label>
-                                            <div class="input-group m-input-group">
-                                                <div class="input-group-prepend"><span class="input-group-text"><i
-                                                                class="flaticon-location"></i></span></div>
-                                                <input type="text" class="form-control event-change" id="location" name="location">
-
-                                            </div>
-                                        </div>
-
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
-                                        <div class="col-md-4" id="select-concrete-vendor">
-                                            <label>
-                                                <span class="ic-step-number">3</span>
-                                                Concrete Vendor
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <select class="form-control m-select2 event-change" id="concrete-vendor"
-                                                    name="concretevendor">
-                                                <option value="">Select</option>
-                                                {% for item in concrete_vendors %}
-                                                    <option value="{{ item.vendorId }}">{{ item.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-8" id="select-contact-concrete-vendor">
-                                            <label>
-                                                Contacts Concrete Vendor
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <select class="form-control m-select2 event-change"
-                                                    id="contact-concrete-vendor" name="contactconcretevendor" multiple>
+                        <div class="form-group m-form__group ic-form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>
+                                        <span class="ic-step-number">2</span>
+                                        Work Description
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <input type="text" class="form-control event-change" id="description"
+                                           name="description">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>
+                                        Location
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="flaticon-location"></i></span></div>
+                                        <input type="text" class="form-control event-change" id="location" name="location">
 
-                                            </select>
-                                        </div>
                                     </div>
                                 </div>
 
                             </div>
+                        </div>
 
-                        </form>
+                        <div class="form-group m-form__group ic-form-group">
+                            <div class="row">
+                                <div class="col-md-4" id="select-concrete-vendor">
+                                    <label>
+                                        <span class="ic-step-number">3</span>
+                                        Concrete Vendor
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change" id="concrete-vendor"
+                                            name="concretevendor">
+                                        <option value="">Select</option>
+                                        {% for item in concrete_vendors %}
+                                            <option value="{{ item.vendorId }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-8" id="select-contact-concrete-vendor">
+                                    <label>
+                                        Contacts Concrete Vendor
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change"
+                                            id="contact-concrete-vendor" name="contactconcretevendor" multiple>
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <div class="row">
+                                <div class="col-md-2" id="select-hour">
+                                    <label>
+                                        Hour
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change" id="hour" name="hour">
+                                        <option value="">Select</option>
+                                        {% for h in 0..23 %}
+                                            {% for m in [0, 15, 30, 45] %}
+                                                {% set hour = "%02d:%02d"|format(h, m) %}
+                                                <option value="{{ hour }}">{{ hour }}</option>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>
+                                        Quantity
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="quantity" name="quantity">
+                                </div>
+                                <div class="col-md-7">
+                                    <label>
+                                        Notes
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <textarea class="form-control form-control-text" rows="3" id="notes" name="notes"> </textarea>
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
-                </div>
 
-                <div class="m-form">
-                    <div class="m-form__actions text-center">
-                        <button id="btn-wizard-anterior"
-                                class="btn btn-info m--hide" type="button">
-                            Back
-                        </button>
-
-                        <button id="btn-wizard-siguiente"
-                                class="btn btn-primary" type="button">
-                            Next
-                        </button>
+                    <div class="m-form__actions">
                         {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-wizard-finalizar" class="btn btn-success" type="button">
+                            <button id="btn-salvar-schedule" class="btn btn-success" type="button">
                                 Save
                             </button>
                         {% endif %}
-                        <button class="btn btn-danger cerrar-form-schedule" type="button">
+                        <button class="btn btn-danger cerrar-form-advertisement" type="button">
                             Cancel
                         </button>
                     </div>
                 </div>
-            </div>
+            </form>
 
         </div>
 

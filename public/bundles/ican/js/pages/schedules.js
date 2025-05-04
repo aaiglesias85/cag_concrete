@@ -27,9 +27,12 @@ var Schedules = function () {
                 title: "Project",
             },
             {
+                field: "concreteVendor",
+                title: "Conc. Vendor",
+            },
+            {
                 field: "description",
                 title: "Description",
-                width: 250,
             },
             {
                 field: "location",
@@ -37,14 +40,23 @@ var Schedules = function () {
                 width: 250,
             },
             {
-                field: "dateStart",
-                title: "Start Date",
+                field: "day",
+                title: "Date",
                 width: 100,
             },
             {
-                field: "dateStop",
-                title: "Stop Date",
+                field: "hour",
+                title: "Hour",
                 width: 100,
+            },
+            {
+                field: "quantity",
+                title: "Quantity",
+                width: 100,
+            },
+            {
+                field: "notes",
+                title: "Notes",
             },
             {
                 field: "acciones",
@@ -149,6 +161,8 @@ var Schedules = function () {
             $('#filtro-project').val('');
             $('#filtro-project').trigger('change');
 
+            $('#filtro-concrete-vendor').val('');
+            $('#filtro-concrete-vendor').trigger('change');
 
             $('#fechaInicial').val('');
             $('#fechaFin').val('');
@@ -166,6 +180,9 @@ var Schedules = function () {
 
         var project_id = $('#filtro-project').val();
         query.project_id = project_id;
+
+        var vendor_id = $('#filtro-concrete-vendor').val();
+        query.vendor_id = vendor_id;
 
         var fechaInicial = $('#fechaInicial').val();
         query.fechaInicial = fechaInicial;
@@ -210,13 +227,13 @@ var Schedules = function () {
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
-        //Mostrar el primer tab
-        resetWizard();
-
         event_change = false;
 
         latitud = '';
         longitud = '';
+
+        $('.date-new').removeClass('m--hide');
+        $('#div-day').removeClass('m--hide').addClass('m--hide');
 
     };
 
@@ -225,16 +242,13 @@ var Schedules = function () {
         //Validacion
         $("#schedule-form").validate({
             rules: {
-                datestart: {
-                    required: true
-                },
-                datestop: {
-                    required: true
-                },
                 descripcion: {
                     required: true
                 },
                 location: {
+                    required: true
+                },
+                quantity: {
                     required: true
                 },
             },
@@ -289,8 +303,8 @@ var Schedules = function () {
     };
     //Salvar
     var initAccionSalvar = function () {
-        $(document).off('click', "#btn-wizard-finalizar");
-        $(document).on('click', "#btn-wizard-finalizar", function (e) {
+        $(document).off('click', "#btn-salvar-schedule");
+        $(document).on('click', "#btn-salvar-schedule", function (e) {
             btnClickSalvarForm();
         });
 
@@ -300,10 +314,16 @@ var Schedules = function () {
             event_change = false;
 
             var project_id = $('#project').val();
+            var hour = $('#hour').val();
 
-            if ($('#schedule-form').valid() && project_id !== '') {
+            if ($('#schedule-form').valid() && project_id !== '' && hour !== '' && isValidFechas()) {
 
-                SalvarSchedule();
+                var schedule_id = $('#schedule_id').val();
+                if (schedule_id === '') {
+                    SalvarSchedule();
+                } else {
+                    ActualizarSchedule();
+                }
 
             } else {
                 if (project_id === "") {
@@ -318,12 +338,83 @@ var Schedules = function () {
                     $element.closest('.form-group')
                         .removeClass('has-success').addClass('has-error');
                 }
+                if (hour === "") {
+                    var $element = $('#select-hour .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
             }
         };
     }
 
-    var SalvarSchedule = function () {
+    var isValidFechas = function () {
+        var valid = true;
+
+
         var schedule_id = $('#schedule_id').val();
+        if (schedule_id === '') {
+            // new
+            var date_start = $('#date-start').val();
+            var date_stop = $('#date-stop').val();
+
+            if (date_start === '' || date_stop === '') {
+                valid = false;
+
+                if (date_start === '') {
+                    var $element = $('#date-start');
+                    $element.tooltip("dispose")
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        });
+                    $element.closest('.form-group').removeClass('has-success').addClass('has-error');
+                }
+                if (date_stop === '') {
+                    var $element = $('#date-stop');
+                    $element.tooltip("dispose")
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        });
+                    $element.closest('.form-group').removeClass('has-success').addClass('has-error');
+                }
+
+
+            }
+        } else {
+            // edit
+            var day = $('#day').val();
+            if (day === '') {
+                valid = false;
+
+                if (day === '') {
+                    var $element = $('#day');
+                    $element.tooltip("dispose")
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        });
+                    $element.closest('.form-group').removeClass('has-success').addClass('has-error');
+                }
+
+
+            }
+        }
+
+        return valid;
+    }
+
+    var SalvarSchedule = function () {
 
         var project_id = $('#project').val();
         var project_contact_id = $('#contact-project').val();
@@ -337,6 +428,10 @@ var Schedules = function () {
         var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
         concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
 
+        var hour = $('#hour').val();
+        var quantity = $('#quantity').val();
+        var notes = $('#notes').val();
+
         MyApp.block('#form-schedule');
 
         $.ajax({
@@ -344,7 +439,6 @@ var Schedules = function () {
             url: "schedule/salvar",
             dataType: "json",
             data: {
-                'schedule_id': schedule_id,
                 'project_id': project_id,
                 'project_contact_id': project_contact_id,
                 'description': description,
@@ -354,7 +448,71 @@ var Schedules = function () {
                 'latitud': latitud,
                 'longitud': longitud,
                 'vendor_id': vendor_id,
-                'concrete_vendor_contacts_id': concrete_vendor_contacts_id
+                'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
+                'hour': hour,
+                'quantity': quantity,
+                'notes': notes,
+
+            },
+            success: function (response) {
+                mApp.unblock('#form-schedule');
+                if (response.success) {
+
+                    toastr.success(response.message, "Success");
+
+                    cerrarForms();
+                    btnClickFiltrar();
+
+                } else {
+                    toastr.error(response.error, "");
+                }
+            },
+            failure: function (response) {
+                mApp.unblock('#form-schedule');
+
+                toastr.error(response.error, "");
+            }
+        });
+    }
+    var ActualizarSchedule = function () {
+
+        var schedule_id = $('#schedule_id').val();
+        var project_id = $('#project').val();
+        var project_contact_id = $('#contact-project').val();
+        var day = $('#day').val();
+
+        var description = $('#description').val();
+        var location = $('#location').val();
+
+        var vendor_id = $('#concrete-vendor').val();
+        var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
+        concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
+
+        var hour = $('#hour').val();
+        var quantity = $('#quantity').val();
+        var notes = $('#notes').val();
+
+        MyApp.block('#form-schedule');
+
+        $.ajax({
+            type: "POST",
+            url: "schedule/actualizar",
+            dataType: "json",
+            data: {
+                'schedule_id': schedule_id,
+                'project_id': project_id,
+                'project_contact_id': project_contact_id,
+                'description': description,
+                'location': location,
+                'day': day,
+                'latitud': latitud,
+                'longitud': longitud,
+                'vendor_id': vendor_id,
+                'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
+                'hour': hour,
+                'quantity': quantity,
+                'notes': notes,
+
             },
             success: function (response) {
                 mApp.unblock('#form-schedule');
@@ -489,6 +647,16 @@ var Schedules = function () {
                     $('#contact-concrete-vendor').trigger('change');
 
                     $(document).on('change', "#concrete-vendor", changeConcreteVendor);
+
+                    $('#day').val(response.schedule.day);
+                    $('#div-day').removeClass('m--hide');
+                    $('.date-new').addClass('m--hide');
+
+                    $('#hour').val(response.schedule.hour);
+                    $('#hour').trigger('change');
+
+                    $('#quantity').val(response.schedule.quantity);
+                    $('#notes').val(response.schedule.notes);
 
                 } else {
                     toastr.error(response.error, "");
@@ -810,148 +978,6 @@ var Schedules = function () {
         });
     }
 
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 1;
-    var initWizard = function () {
-        $(document).off('click', "#form-schedule .wizard-tab");
-        $(document).on('click', "#form-schedule .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab === totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    // actualizarTableListaItems()
-                    break;
-                case 3:
-                    // actualizarTableListaContacts();
-                    break;
-                case 4:
-                    // btnClickFiltrarNotes();
-                    break;
-                case 5:
-                    // actualizarTableListaInvoices();
-                    break;
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab === totalTabs) {
-                    $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab === 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    // $('#tab-items').tab('show');
-                    // actualizarTableListaItems();
-                    break;
-                case 3:
-                    // $('#tab-contacts').tab('show');
-                    break;
-                case 4:
-                    // $('#tab-notes').tab('show');
-                    // btnClickFiltrarNotes();
-                    break;
-                case 5:
-                    // $('#tab-invoices').tab('show');
-                    // actualizarTableListaInvoices();
-                    break;
-
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 1;
-        mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab === 1) {
-
-            var project_id = $('#project').val();
-            if (!$('#schedule-form').valid() || project_id === '') {
-                result = false;
-
-                if (project_id === "") {
-
-                    var $element = $('#select-project .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-            }
-
-        }
-
-        return result;
-    }
-
 
     return {
         //main function to initiate the module
@@ -960,7 +986,6 @@ var Schedules = function () {
             initWidgets();
             initTable();
             initForm();
-            initWizard();
 
             initAccionNuevo();
             initAccionSalvar();

@@ -26,11 +26,14 @@ class Schedule
     #[ORM\Column(name: 'longitud', type: 'string', length: 50)]
     private ?string $longitud;
 
-    #[ORM\Column(name: 'date_start', type: 'date')]
-    private ?\DateTimeInterface $dateStart;
+    #[ORM\Column(name: 'day', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $day;
 
-    #[ORM\Column(name: 'date_stop', type: 'date')]
-    private ?\DateTimeInterface $dateStop;
+    #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
+    private ?float $quantity;
+
+    #[ORM\Column(name: 'notes', type: 'text', nullable: true)]
+    private ?string $notes;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
     #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
@@ -89,24 +92,14 @@ class Schedule
         $this->longitud = $longitud;
     }
 
-    public function getDateStart(): ?\DateTimeInterface
+    public function getDay(): ?\DateTimeInterface
     {
-        return $this->dateStart;
+        return $this->day;
     }
 
-    public function setDateStart(?\DateTimeInterface $startDate): void
+    public function setDay(?\DateTimeInterface $day): void
     {
-        $this->dateStart = $startDate;
-    }
-
-    public function getDateStop(): ?\DateTimeInterface
-    {
-        return $this->dateStop;
-    }
-
-    public function setDateStop(?\DateTimeInterface $endDate): void
-    {
-        $this->dateStop = $endDate;
+        $this->day = $day;
     }
 
     public function getProject(): ?Project
@@ -137,5 +130,25 @@ class Schedule
     public function setConcreteVendor(?ConcreteVendor $vendor): void
     {
         $this->concreteVendor = $vendor;
+    }
+
+    public function getQuantity(): ?float
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(?float $quantity): void
+    {
+        $this->quantity = $quantity;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): void
+    {
+        $this->notes = $notes;
     }
 }

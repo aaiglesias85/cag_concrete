@@ -13,10 +13,12 @@ CREATE TABLE schedule
     location VARCHAR(255),
     latitud VARCHAR(50),
     longitud VARCHAR(50),
-    date_start DATE,
-    date_stop DATE,
+    day DATETIME,
+    quantity DECIMAL(18,6),
+    notes TEXT,
     project_id INT(11),
-    project_contact_id INT(11)
+    project_contact_id INT(11),
+    vendor_id INT(11)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4;
@@ -27,7 +29,6 @@ ALTER TABLE `schedule` ADD CONSTRAINT `Refscheduleprojectid` FOREIGN KEY (`proje
 ALTER TABLE `schedule` ADD CONSTRAINT `Refscheduleprojectcontactid` FOREIGN KEY (`project_contact_id`)
     REFERENCES `project_contact`(`contact_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE `schedule` ADD `vendor_id` INT(11) NULL AFTER `project_contact_id`, ADD INDEX (`vendor_id`);
 ALTER TABLE `schedule` ADD CONSTRAINT `Refscheduleconcvendorid` FOREIGN KEY (`vendor_id`)
     REFERENCES `concrete_vendor`(`vendor_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
@@ -45,4 +46,3 @@ ALTER TABLE `schedule_concrete_vendor_contact` ADD CONSTRAINT `Refs_chedule_conc
 
 ALTER TABLE `schedule_concrete_vendor_contact` ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_contactid` FOREIGN KEY (`contact_id`)
     REFERENCES `concrete_vendor_contact`(`contact_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-
