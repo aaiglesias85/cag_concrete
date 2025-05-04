@@ -35,6 +35,14 @@ var ConcreteVendor = function () {
                 }
             },
             {
+                field: "contactEmail",
+                title: "Email",
+                width: 200,
+                template: function (row) {
+                    return row.contactEmail ? '<a class="m-link" href="mailto:' + row.contactEmail + '">' + row.contactEmail + '</a>' : '';
+                }
+            },
+            {
                 field: "address",
                 title: "Address"
             },
@@ -166,6 +174,9 @@ var ConcreteVendor = function () {
             rules: {
                 name: {
                     required: true
+                },
+                contactemail: {
+                    email: true
                 }
             },
             showErrors: function (errorMap, errorList) {
