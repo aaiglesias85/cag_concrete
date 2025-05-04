@@ -648,8 +648,13 @@ var Schedules = function () {
     // google maps
     var latitud = '';
     var longitud = '';
-    var inicializarAutocomplete = function () {
+    var inicializarAutocomplete = async function () {
+
+        // Cargar librería de Places
+        await google.maps.importLibrary("places");
+
         const input = document.getElementById('location');
+
         const autocomplete = new google.maps.places.Autocomplete(input, {
             types: ['address'], // Solo direcciones
             componentRestrictions: {country: 'us'} // Opcional: restringir a país (ej: Chile)

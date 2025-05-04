@@ -97,7 +97,8 @@
                         <select class="form-control m-select2" id="filtro-project">
                             <option value="">Projects</option>
                             {% for item in projects %}
-                                <option value="{{ item.projectId }}">{{ item.projectNumber }} - {{ item.description }}</option>
+                                <option value="{{ item.projectId }}">{{ item.projectNumber }}
+                                    - {{ item.description }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -197,19 +198,22 @@
                                                 Project
                                                 <span class="ic-small italic">(required)</span>
                                             </label>
-                                            <select class="form-control m-select2 event-change" id="project" name="project">
+                                            <select class="form-control m-select2 event-change" id="project"
+                                                    name="project">
                                                 <option value="">Select</option>
                                                 {% for item in projects %}
-                                                    <option value="{{ item.projectId }}">{{ item.projectNumber }} - {{ item.description }}</option>
+                                                    <option value="{{ item.projectId }}">{{ item.projectNumber }}
+                                                        - {{ item.description }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                         <div class="col-md-4" id="select-contact-project">
                                             <label>
-                                               Contact Project
+                                                Contact Project
                                                 <span class="ic-small italic">(optional)</span>
                                             </label>
-                                            <select class="form-control m-select2 event-change" id="contact-project" name="contactproject">
+                                            <select class="form-control m-select2 event-change" id="contact-project"
+                                                    name="contactproject">
                                                 <option value="">Select</option>
                                             </select>
                                         </div>
@@ -256,7 +260,8 @@
                                                 Work Description
                                                 <span class="ic-small italic">(required)</span>
                                             </label>
-                                            <input type="text" class="form-control event-change" id="description" name="description">
+                                            <input type="text" class="form-control event-change" id="description"
+                                                   name="description">
                                         </div>
                                         <div class="col-md-6">
                                             <label>
@@ -264,8 +269,10 @@
                                                 <span class="ic-small italic">(required)</span>
                                             </label>
                                             <div class="input-group m-input-group">
-                                                <div class="input-group-prepend"><span class="input-group-text"><i class="flaticon-location"></i></span></div>
+                                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                                                class="flaticon-location"></i></span></div>
                                                 <input type="text" class="form-control event-change" id="location" name="location">
+
                                             </div>
                                         </div>
 
@@ -280,7 +287,8 @@
                                                 Concrete Vendor
                                                 <span class="ic-small italic">(optional)</span>
                                             </label>
-                                            <select class="form-control m-select2 event-change" id="concrete-vendor" name="concretevendor">
+                                            <select class="form-control m-select2 event-change" id="concrete-vendor"
+                                                    name="concretevendor">
                                                 <option value="">Select</option>
                                                 {% for item in concrete_vendors %}
                                                     <option value="{{ item.vendorId }}">{{ item.name }}</option>
@@ -292,7 +300,8 @@
                                                 Contacts Concrete Vendor
                                                 <span class="ic-small italic">(optional)</span>
                                             </label>
-                                            <select class="form-control m-select2 event-change" id="contact-concrete-vendor" name="contactconcretevendor" multiple>
+                                            <select class="form-control m-select2 event-change"
+                                                    id="contact-concrete-vendor" name="contactconcretevendor" multiple>
 
                                             </select>
                                         </div>
@@ -338,7 +347,25 @@
 {% block javascriptsspecific %}
 
     <!-- Google maps-->
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places,drawing,geometry,visualization&language=en&region=US"></script>
+    <script>(g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })
+        ({key: "{{ google_maps_api_key }}", v: "weekly"});</script>
 
     <script src="{{ asset('bundles/ican/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
     <script>

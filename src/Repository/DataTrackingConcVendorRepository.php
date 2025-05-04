@@ -46,6 +46,30 @@ class DataTrackingConcVendorRepository extends EntityRepository
     }
 
     /**
+     * ListarProjectsDeConcVendor: Lista los projects de conc vendor
+     *
+     * @return DataTrackingConcVendor[]
+     */
+    public function ListarProjectsDeConcVendor($vendor_id)
+    {
+        $consulta = $this->createQueryBuilder('d_t_c_v')
+            ->leftJoin('d_t_c_v.dataTracking', 'd_t')
+            ->leftJoin('d_t.project', 'p')
+            ->leftJoin('d_t_c_v.concreteVendor', 'c_v');
+
+        if ($vendor_id != '') {
+            $consulta->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
+        }
+
+        $consulta->groupBy('p.projectId');
+
+        $consulta->orderBy('p.name', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * TotalConcUsed: Total de conc used de la BD
      *
      * @param string $data_tracking_id

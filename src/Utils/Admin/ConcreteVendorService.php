@@ -5,6 +5,7 @@ namespace App\Utils\Admin;
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingConcVendor;
+use App\Entity\Project;
 use App\Entity\Schedule;
 use App\Entity\ScheduleConcreteVendorContact;
 use App\Utils\Base;
@@ -103,11 +104,53 @@ class ConcreteVendorService extends Base
             $contacts = $this->ListarContactsDeConcreteVendor($vendor_id);
             $arreglo_resultado['contacts'] = $contacts;
 
+            // projects
+            $projects = $this->ListarProjects($vendor_id);
+            $arreglo_resultado['projects'] = $projects;
+
             $resultado['success'] = true;
             $resultado['vendor'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarProjects
+     * @param $vendor_id
+     * @return array
+     */
+    public function ListarProjects($vendor_id)
+    {
+        $projects = [];
+
+        $vendor_projects = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->ListarProjectsDeConcVendor($vendor_id);
+
+        foreach ($vendor_projects as $key => $vendor_project) {
+            $value = $vendor_project->getDataTracking()->getProject();
+            $project_id = $value->getProjectId();
+
+            // listar ultima nota del proyecto
+            $nota = $this->ListarUltimaNotaDeProject($project_id);
+
+            $projects[] = [
+                "id" => $project_id,
+                "projectNumber" => $value->getProjectNumber(),
+                "name" => $value->getName(),
+                "description" => $value->getDescription(),
+                "company" => $value->getCompany()->getName(),
+                "county" => $value->getCounty(),
+                "status" => $value->getStatus(),
+                "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
+                "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',
+                "dueDate" => $value->getDueDate() != '' ? $value->getDueDate()->format('m/d/Y') : '',
+                'nota' => $nota,
+                'posicion' => $key
+            ];
+        }
+
+        return $projects;
     }
 
     /**

@@ -607,6 +607,7 @@ var Companies = function () {
     }
     var resetWizard = function () {
         activeTab = 1;
+        totalTabs = 2;
         mostrarTab();
         // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
