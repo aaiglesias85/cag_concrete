@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ConcreteVendor;
 use App\Entity\Project;
 use App\Utils\Admin\ScheduleService;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,9 +29,15 @@ class ScheduleController extends AbstractController
                 $projects = $this->scheduleService->getDoctrine()->getRepository(Project::class)
                     ->ListarOrdenados();
 
+                // concrete vendors
+                $concrete_vendors = $this->scheduleService->getDoctrine()->getRepository(ConcreteVendor::class)
+                    ->ListarOrdenados();
+
+
                 return $this->render('admin/schedule/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
+                    'concrete_vendors' => $concrete_vendors
                 ));
             }
         } else {
@@ -120,14 +127,17 @@ class ScheduleController extends AbstractController
         $latitud = $request->get('latitud');
         $longitud = $request->get('longitud');
 
+        $vendor_id = $request->get('vendor_id');
+        $concrete_vendor_contacts_id = $request->get('concrete_vendor_contacts_id');
+
         try {
 
             if ($schedule_id == "") {
                 $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
-                    $date_stop, $description, $location, $latitud, $longitud);
+                    $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id);
             } else {
                 $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $date_start,
-                    $date_stop, $description, $location, $latitud, $longitud);
+                    $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id);
             }
 
             if ($resultado['success']) {

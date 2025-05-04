@@ -190,12 +190,22 @@ var Schedules = function () {
         $('#project').val('');
         $('#project').trigger('change');
 
+        $('#concrete-vendor').val('');
+        $('#concrete-vendor').trigger('change');
+
         // reset
         $('#contact-project option').each(function (e) {
             if ($(this).val() !== "")
                 $(this).remove();
         });
         $('#contact-project').select2();
+
+        $('#contact-concrete-vendor option').each(function (e) {
+            $(this).remove();
+        });
+        $('#contact-concrete-vendor').select2({
+            placeholder: 'Select contacts',
+        });
 
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
@@ -323,6 +333,10 @@ var Schedules = function () {
         var description = $('#description').val();
         var location = $('#location').val();
 
+        var vendor_id = $('#concrete-vendor').val();
+        var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
+        concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
+
         MyApp.block('#form-schedule');
 
         $.ajax({
@@ -339,6 +353,8 @@ var Schedules = function () {
                 'date_stop': date_stop,
                 'latitud': latitud,
                 'longitud': longitud,
+                'vendor_id': vendor_id,
+                'concrete_vendor_contacts_id': concrete_vendor_contacts_id
             },
             success: function (response) {
                 mApp.unblock('#form-schedule');
@@ -460,6 +476,19 @@ var Schedules = function () {
 
                     latitud = response.schedule.latitud;
                     longitud = response.schedule.longitud;
+
+                    // concrete vendor
+                    $(document).off('change', "#concrete-vendor", changeConcreteVendor);
+
+                    $('#concrete-vendor').val(response.schedule.vendor_id);
+                    $('#concrete-vendor').trigger('change');
+
+                    // contacts concrete vendor
+                    actualizarSelectContactConcreteVendor(response.schedule.concrete_vendor_contacts);
+                    $('#contact-concrete-vendor').val(response.schedule.schedule_concrete_vendor_contacts_id);
+                    $('#contact-concrete-vendor').trigger('change');
+
+                    $(document).on('change', "#concrete-vendor", changeConcreteVendor);
 
                 } else {
                     toastr.error(response.error, "");
@@ -600,12 +629,19 @@ var Schedules = function () {
 
         $('.m-select2').select2();
 
+        $('#contact-concrete-vendor').select2({
+            placeholder: 'Select contacts',
+        });
+
         // google maps
         inicializarAutocomplete();
 
         // change
         $(document).off('change', "#project");
         $(document).on('change', "#project", changeProject);
+
+        $(document).off('change', "#concrete-vendor");
+        $(document).on('change', "#concrete-vendor", changeConcreteVendor);
 
     }
 
@@ -616,7 +652,7 @@ var Schedules = function () {
         const input = document.getElementById('location');
         const autocomplete = new google.maps.places.Autocomplete(input, {
             types: ['address'], // Solo direcciones
-            componentRestrictions: { country: 'us' } // Opcional: restringir a país (ej: Chile)
+            componentRestrictions: {country: 'us'} // Opcional: restringir a país (ej: Chile)
         });
 
         autocomplete.addListener('place_changed', function () {
@@ -692,6 +728,70 @@ var Schedules = function () {
             $(select).append(new Option(contacts[i].name, contacts[i].contact_id, false, false));
         }
         $(select).select2();
+    }
+
+    // change concrete vendor
+    var changeConcreteVendor = function (e) {
+        var vendor_id = $('#concrete-vendor').val();
+
+        // reset
+        $('#contact-concrete-vendor option').each(function (e) {
+            $(this).remove();
+        });
+        $('#contact-concrete-vendor').select2({
+            placeholder: 'Select contacts',
+        });
+
+        if (vendor_id !== '') {
+            listarContactsDeConcreteVendor(vendor_id);
+        }
+    }
+    var listarContactsDeConcreteVendor = function (vendor_id) {
+        MyApp.block('#select-contact-concrete-vendor');
+
+        $.ajax({
+            type: "POST",
+            url: "concrete-vendor/listarContacts",
+            dataType: "json",
+            data: {
+                'vendor_id': vendor_id
+            },
+            success: function (response) {
+                mApp.unblock('#select-contact-concrete-vendor');
+                if (response.success) {
+
+                    //Llenar select
+                    actualizarSelectContactConcreteVendor(response.contacts);
+
+                } else {
+                    toastr.error(response.error, "");
+                }
+            },
+            failure: function (response) {
+                mApp.unblock('#select-contact-concrete-vendor');
+
+                toastr.error(response.error, "");
+            }
+        });
+    }
+    var actualizarSelectContactConcreteVendor = function (contacts) {
+        const select = '#contact-concrete-vendor';
+
+        // reset
+        $(select + ' option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+        $(select).select2({
+            placeholder: 'Select contacts',
+        });
+
+        for (var i = 0; i < contacts.length; i++) {
+            $(select).append(new Option(contacts[i].name, contacts[i].contact_id, false, false));
+        }
+        $(select).select2({
+            placeholder: 'Select contacts',
+        });
     }
 
     var initPortlets = function () {

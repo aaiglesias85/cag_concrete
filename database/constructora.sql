@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 03-05-2025 a las 17:07:40
+-- Tiempo de generación: 04-05-2025 a las 01:03:52
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -97,6 +97,22 @@ CREATE TABLE `concrete_vendor` (
   `phone` varchar(50) DEFAULT NULL,
   `contact_name` varchar(255) DEFAULT NULL,
   `contact_email` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `concrete_vendor_contact`
+--
+
+CREATE TABLE `concrete_vendor_contact` (
+  `contact_id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  `notes` text,
+  `vendor_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -366,7 +382,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (18, 'subcontractor', 'Subcontractor'),
 (19, 'reporte_subcontractor', 'Subcontractors'),
 (20, 'reporte_employee', 'Employees'),
-(21, 'conc_vendor', 'Concrete Vendors');
+(21, 'conc_vendor', 'Concrete Vendors'),
+(22, 'schedule', 'Schedule Document');
 
 -- --------------------------------------------------------
 
@@ -1203,7 +1220,39 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (30, 1, 1, 1, 1, 1, 18),
 (31, 1, 1, 1, 1, 1, 19),
 (32, 1, 1, 1, 1, 1, 20),
-(33, 1, 1, 1, 1, 1, 21);
+(33, 1, 1, 1, 1, 1, 21),
+(34, 1, 1, 1, 1, 1, 22);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `schedule`
+--
+
+CREATE TABLE `schedule` (
+  `schedule_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `latitud` varchar(50) DEFAULT NULL,
+  `longitud` varchar(50) DEFAULT NULL,
+  `date_start` date DEFAULT NULL,
+  `date_stop` date DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `project_contact_id` int(11) DEFAULT NULL,
+  `vendor_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `schedule_concrete_vendor_contact`
+--
+
+CREATE TABLE `schedule_concrete_vendor_contact` (
+  `id` int(11) NOT NULL,
+  `schedule_id` int(11) DEFAULT NULL,
+  `contact_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1341,7 +1390,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (22, 1, 1, 1, 1, 1, 18),
 (23, 1, 1, 1, 1, 1, 19),
 (24, 1, 1, 1, 1, 1, 20),
-(25, 1, 1, 1, 1, 1, 21);
+(25, 1, 1, 1, 1, 1, 21),
+(26, 1, 1, 1, 1, 1, 22);
 
 --
 -- Índices para tablas volcadas
@@ -1371,6 +1421,13 @@ ALTER TABLE `company_contact`
 --
 ALTER TABLE `concrete_vendor`
   ADD PRIMARY KEY (`vendor_id`);
+
+--
+-- Indices de la tabla `concrete_vendor_contact`
+--
+ALTER TABLE `concrete_vendor_contact`
+  ADD PRIMARY KEY (`contact_id`),
+  ADD KEY `Refcontactconcvendor1` (`vendor_id`);
 
 --
 -- Indices de la tabla `data_tracking`
@@ -1544,6 +1601,23 @@ ALTER TABLE `rol_permission`
   ADD KEY `Ref192` (`function_id`);
 
 --
+-- Indices de la tabla `schedule`
+--
+ALTER TABLE `schedule`
+  ADD PRIMARY KEY (`schedule_id`),
+  ADD KEY `Refscheduleprojectid` (`project_id`),
+  ADD KEY `Refscheduleprojectcontactid` (`project_contact_id`),
+  ADD KEY `vendor_id` (`vendor_id`);
+
+--
+-- Indices de la tabla `schedule_concrete_vendor_contact`
+--
+ALTER TABLE `schedule_concrete_vendor_contact`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refs_chedule_concrete_vendor_contacts_cheduleid` (`schedule_id`),
+  ADD KEY `Refs_chedule_concrete_vendor_contacts_contactid` (`contact_id`);
+
+--
 -- Indices de la tabla `subcontractor`
 --
 ALTER TABLE `subcontractor`
@@ -1613,6 +1687,12 @@ ALTER TABLE `concrete_vendor`
   MODIFY `vendor_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `concrete_vendor_contact`
+--
+ALTER TABLE `concrete_vendor_contact`
+  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -1664,7 +1744,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -1748,7 +1828,19 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT de la tabla `schedule`
+--
+ALTER TABLE `schedule`
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `schedule_concrete_vendor_contact`
+--
+ALTER TABLE `schedule_concrete_vendor_contact`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -1784,7 +1876,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Restricciones para tablas volcadas
@@ -1795,6 +1887,12 @@ ALTER TABLE `user_permission`
 --
 ALTER TABLE `company_contact`
   ADD CONSTRAINT `Refcontractor74` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`);
+
+--
+-- Filtros para la tabla `concrete_vendor_contact`
+--
+ALTER TABLE `concrete_vendor_contact`
+  ADD CONSTRAINT `Refcontactconcvendor1` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`);
 
 --
 -- Filtros para la tabla `data_tracking`
@@ -1913,6 +2011,21 @@ ALTER TABLE `project_notes`
 ALTER TABLE `rol_permission`
   ADD CONSTRAINT `Reffunction2` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refrol1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`);
+
+--
+-- Filtros para la tabla `schedule`
+--
+ALTER TABLE `schedule`
+  ADD CONSTRAINT `Refscheduleconcvendorid` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`),
+  ADD CONSTRAINT `Refscheduleprojectcontactid` FOREIGN KEY (`project_contact_id`) REFERENCES `project_contact` (`contact_id`),
+  ADD CONSTRAINT `Refscheduleprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `schedule_concrete_vendor_contact`
+--
+ALTER TABLE `schedule_concrete_vendor_contact`
+  ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_cheduleid` FOREIGN KEY (`schedule_id`) REFERENCES `schedule` (`schedule_id`),
+  ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_contactid` FOREIGN KEY (`contact_id`) REFERENCES `concrete_vendor_contact` (`contact_id`);
 
 --
 -- Filtros para la tabla `subcontractor_employee`

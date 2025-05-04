@@ -26,3 +26,23 @@ ALTER TABLE `schedule` ADD CONSTRAINT `Refscheduleprojectid` FOREIGN KEY (`proje
 
 ALTER TABLE `schedule` ADD CONSTRAINT `Refscheduleprojectcontactid` FOREIGN KEY (`project_contact_id`)
     REFERENCES `project_contact`(`contact_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `schedule` ADD `vendor_id` INT(11) NULL AFTER `project_contact_id`, ADD INDEX (`vendor_id`);
+ALTER TABLE `schedule` ADD CONSTRAINT `Refscheduleconcvendorid` FOREIGN KEY (`vendor_id`)
+    REFERENCES `concrete_vendor`(`vendor_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE TABLE schedule_concrete_vendor_contact
+(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    schedule_id INT(11),
+    contact_id INT(11)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4;
+
+ALTER TABLE `schedule_concrete_vendor_contact` ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_cheduleid` FOREIGN KEY (`schedule_id`)
+    REFERENCES `schedule`(`schedule_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `schedule_concrete_vendor_contact` ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_contactid` FOREIGN KEY (`contact_id`)
+    REFERENCES `concrete_vendor_contact`(`contact_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+

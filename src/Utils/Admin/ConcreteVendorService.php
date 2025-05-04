@@ -5,6 +5,8 @@ namespace App\Utils\Admin;
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingConcVendor;
+use App\Entity\Schedule;
+use App\Entity\ScheduleConcreteVendorContact;
 use App\Utils\Base;
 
 class ConcreteVendorService extends Base
@@ -25,6 +27,13 @@ class ConcreteVendorService extends Base
         if ($entity != null) {
 
             $contact_name = $entity->getName();
+
+            // schedules
+            $schedules = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
+                ->ListarSchedulesDeContact($contact_id);
+            foreach ($schedules as $schedule) {
+                $em->remove($schedule);
+            }
 
             $em->remove($entity);
             $em->flush();
@@ -146,6 +155,14 @@ class ConcreteVendorService extends Base
         $contacts = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
             ->ListarContacts($vendor_id);
         foreach ($contacts as $contact) {
+
+            // schedules
+            $schedules_contact = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
+                ->ListarSchedulesDeContact($contact->getContactId());
+            foreach ($schedules_contact as $schedule_contact) {
+                $em->remove($schedule_contact);
+            }
+
             $em->remove($contact);
         }
 
@@ -156,6 +173,12 @@ class ConcreteVendorService extends Base
             $em->remove($data_tracking);
         }
 
+        // schedules
+        $schedules = $this->getDoctrine()->getRepository(Schedule::class)
+            ->ListarSchedulesDeConcreteVendor($vendor_id);
+        foreach ($schedules as $schedule) {
+            $schedule->setConcreteVendor(NULL);
+        }
 
     }
 

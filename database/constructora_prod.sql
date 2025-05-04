@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 03-05-2025 a las 17:07:33
+-- Tiempo de generación: 04-05-2025 a las 01:03:39
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -159,7 +159,7 @@ CREATE TABLE `concrete_vendor` (
 INSERT INTO `concrete_vendor` (`vendor_id`, `name`, `address`, `phone`, `contact_name`, `contact_email`) VALUES
 (1, 'ARGOS', '', '', '', ''),
 (2, 'ERNST', '', '', '', ''),
-(3, 'ARG', '', '', '', ''),
+(3, 'ARG', '', '', NULL, NULL),
 (4, 'WDC', '', '', '', ''),
 (5, 'USA', '', '', '', ''),
 (6, 'PLATINUM', '', '', '', ''),
@@ -177,6 +177,30 @@ INSERT INTO `concrete_vendor` (`vendor_id`, `name`, `address`, `phone`, `contact
 (18, 'NA', '', '', '', ''),
 (19, 'LYONS/EVANS', '', '', '', ''),
 (20, 'CONCRETE ENTERPRISES', '', '', '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `concrete_vendor_contact`
+--
+
+CREATE TABLE `concrete_vendor_contact` (
+  `contact_id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  `notes` text,
+  `vendor_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `concrete_vendor_contact`
+--
+
+INSERT INTO `concrete_vendor_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `notes`, `vendor_id`) VALUES
+(2, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(955)383-3543', 'sad fsdfsd', 'f sdf sd fdsf f df dsf', 3),
+(3, 'Andres Iglesisas', 'admin@admin.com', '(234)324-2343', '', '', 3);
 
 -- --------------------------------------------------------
 
@@ -2968,7 +2992,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (18, 'subcontractor', 'Subcontractor'),
 (19, 'reporte_subcontractor', 'Subcontractors'),
 (20, 'reporte_employee', 'Employees'),
-(21, 'conc_vendor', 'Concrete Vendors');
+(21, 'conc_vendor', 'Concrete Vendors'),
+(22, 'schedule', 'Schedule Document');
 
 -- --------------------------------------------------------
 
@@ -4031,7 +4056,18 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3259, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-03 16:59:55', 1),
 (3260, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-03 17:07:07', 1),
 (3261, 'Delete', 'Data Tracking', 'The conc vendor of the data tracking is deleted, Conc Vendor: CONCRETE ENTERPRISES, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-03 17:07:13', 1),
-(3262, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-03 17:07:15', 1);
+(3262, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-03 17:07:15', 1),
+(3263, 'Add', 'Schedule', 'The schedule is added: Prueba', '::1', '2025-05-03 19:46:35', 1),
+(3264, 'Update', 'Schedule', 'The schedule is modified: Prueba', '::1', '2025-05-03 19:49:21', 1),
+(3265, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-05-03 19:49:55', 1),
+(3266, 'Add', 'Schedule', 'The schedule is added: Prueba', '::1', '2025-05-03 19:59:14', 1),
+(3267, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-03 20:48:44', 1),
+(3268, 'Delete', 'Concrete Vendor Contact', 'The concrete vendor contact is deleted: Marcel Curbelo Carmona', '::1', '2025-05-03 20:48:49', 1),
+(3269, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-03 20:49:30', 1),
+(3270, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-03 20:51:03', 1),
+(3271, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-03 20:51:25', 1),
+(3272, 'Update', 'Schedule', 'The schedule is modified: Prueba', '::1', '2025-05-04 01:03:10', 1),
+(3273, 'Update', 'Schedule', 'The schedule is modified: Prueba', '::1', '2025-05-04 01:03:28', 1);
 
 -- --------------------------------------------------------
 
@@ -6929,7 +6965,53 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (171, 1, 1, 1, 1, 4, 14),
 (172, 1, 1, 1, 1, 4, 15),
 (173, 1, 1, 1, 1, 4, 16),
-(174, 1, 1, 1, 1, 1, 21);
+(174, 1, 1, 1, 1, 1, 21),
+(175, 1, 1, 1, 1, 1, 22);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `schedule`
+--
+
+CREATE TABLE `schedule` (
+  `schedule_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `latitud` varchar(50) DEFAULT NULL,
+  `longitud` varchar(50) DEFAULT NULL,
+  `date_start` date DEFAULT NULL,
+  `date_stop` date DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `project_contact_id` int(11) DEFAULT NULL,
+  `vendor_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `schedule`
+--
+
+INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `date_start`, `date_stop`, `project_id`, `project_contact_id`, `vendor_id`) VALUES
+(2, 'Prueba', '1600 Amphitheatre Parkway, Mountain View, CA', '37.4216443', '-122.080638', '2025-05-03', '2025-05-31', 263, NULL, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `schedule_concrete_vendor_contact`
+--
+
+CREATE TABLE `schedule_concrete_vendor_contact` (
+  `id` int(11) NOT NULL,
+  `schedule_id` int(11) DEFAULT NULL,
+  `contact_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `schedule_concrete_vendor_contact`
+--
+
+INSERT INTO `schedule_concrete_vendor_contact` (`id`, `schedule_id`, `contact_id`) VALUES
+(3, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -7100,7 +7182,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (790, 1, 1, 1, 1, 1, 18),
 (791, 1, 1, 1, 1, 1, 19),
 (792, 1, 1, 1, 1, 1, 20),
-(793, 1, 1, 1, 1, 1, 21);
+(793, 1, 1, 1, 1, 1, 21),
+(794, 1, 1, 1, 1, 1, 22);
 
 --
 -- Índices para tablas volcadas
@@ -7130,6 +7213,13 @@ ALTER TABLE `company_contact`
 --
 ALTER TABLE `concrete_vendor`
   ADD PRIMARY KEY (`vendor_id`);
+
+--
+-- Indices de la tabla `concrete_vendor_contact`
+--
+ALTER TABLE `concrete_vendor_contact`
+  ADD PRIMARY KEY (`contact_id`),
+  ADD KEY `Refcontactconcvendor1` (`vendor_id`);
 
 --
 -- Indices de la tabla `data_tracking`
@@ -7300,6 +7390,23 @@ ALTER TABLE `rol_permission`
   ADD KEY `Ref192` (`function_id`);
 
 --
+-- Indices de la tabla `schedule`
+--
+ALTER TABLE `schedule`
+  ADD PRIMARY KEY (`schedule_id`),
+  ADD KEY `Refscheduleprojectid` (`project_id`),
+  ADD KEY `Refscheduleprojectcontactid` (`project_contact_id`),
+  ADD KEY `vendor_id` (`vendor_id`);
+
+--
+-- Indices de la tabla `schedule_concrete_vendor_contact`
+--
+ALTER TABLE `schedule_concrete_vendor_contact`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refs_chedule_concrete_vendor_contacts_cheduleid` (`schedule_id`),
+  ADD KEY `Refs_chedule_concrete_vendor_contacts_contactid` (`contact_id`);
+
+--
 -- Indices de la tabla `subcontractor`
 --
 ALTER TABLE `subcontractor`
@@ -7369,6 +7476,12 @@ ALTER TABLE `concrete_vendor`
   MODIFY `vendor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
+-- AUTO_INCREMENT de la tabla `concrete_vendor_contact`
+--
+ALTER TABLE `concrete_vendor_contact`
+  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -7420,7 +7533,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -7450,7 +7563,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3263;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3274;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -7504,7 +7617,19 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+
+--
+-- AUTO_INCREMENT de la tabla `schedule`
+--
+ALTER TABLE `schedule`
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `schedule_concrete_vendor_contact`
+--
+ALTER TABLE `schedule_concrete_vendor_contact`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -7540,7 +7665,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=794;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=795;
 
 --
 -- Restricciones para tablas volcadas
@@ -7551,6 +7676,12 @@ ALTER TABLE `user_permission`
 --
 ALTER TABLE `company_contact`
   ADD CONSTRAINT `Refcontractor74` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`);
+
+--
+-- Filtros para la tabla `concrete_vendor_contact`
+--
+ALTER TABLE `concrete_vendor_contact`
+  ADD CONSTRAINT `Refcontactconcvendor1` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`);
 
 --
 -- Filtros para la tabla `data_tracking`
@@ -7656,6 +7787,21 @@ ALTER TABLE `project_notes`
 ALTER TABLE `rol_permission`
   ADD CONSTRAINT `Reffunction2` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refrol1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`);
+
+--
+-- Filtros para la tabla `schedule`
+--
+ALTER TABLE `schedule`
+  ADD CONSTRAINT `Refscheduleconcvendorid` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`),
+  ADD CONSTRAINT `Refscheduleprojectcontactid` FOREIGN KEY (`project_contact_id`) REFERENCES `project_contact` (`contact_id`),
+  ADD CONSTRAINT `Refscheduleprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `schedule_concrete_vendor_contact`
+--
+ALTER TABLE `schedule_concrete_vendor_contact`
+  ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_cheduleid` FOREIGN KEY (`schedule_id`) REFERENCES `schedule` (`schedule_id`),
+  ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_contactid` FOREIGN KEY (`contact_id`) REFERENCES `concrete_vendor_contact` (`contact_id`);
 
 --
 -- Filtros para la tabla `subcontractor_employee`

@@ -2,9 +2,12 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\ConcreteVendor;
+use App\Entity\ConcreteVendorContact;
 use App\Entity\Project;
 use App\Entity\ProjectContact;
 use App\Entity\Schedule;
+use App\Entity\ScheduleConcreteVendorContact;
 use App\Utils\Base;
 
 class ScheduleService extends Base
@@ -39,15 +42,40 @@ class ScheduleService extends Base
             $arreglo_resultado['latitud'] = $entity->getLatitud();
             $arreglo_resultado['longitud'] = $entity->getLongitud();
 
+            $vendor_id = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId() : '';
+            $arreglo_resultado['vendor_id'] = $vendor_id;
+
+            // schedule concrete vendor contacts ids
+            $schedule_concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
+            $arreglo_resultado['schedule_concrete_vendor_contacts_id'] = $schedule_concrete_vendor_contacts_id;
+
             // project contacts
             $contacts_project = $this->ListarContactsDeProject($project_id);
             $arreglo_resultado['contacts_project'] = $contacts_project;
+
+            // concrete vendor contacts
+            $concrete_vendor_contacts = $this->ListarContactsDeConcreteVendor($vendor_id);
+            $arreglo_resultado['concrete_vendor_contacts'] = $concrete_vendor_contacts;
 
             $resultado['success'] = true;
             $resultado['schedule'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    // listar los contactos del schedule
+    private function ListarSchedulesConcreteVendorContactsId($schedule_id)
+    {
+        $ids = [];
+
+        $schedule_concrete_vendor_contacts = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
+            ->ListarContactosDeSchedule($schedule_id);
+        foreach ($schedule_concrete_vendor_contacts as $concrete_vendor_contact) {
+            $ids[] = $concrete_vendor_contact->getContact()->getContactId();
+        }
+
+        return $ids;
     }
 
     /**
@@ -63,6 +91,9 @@ class ScheduleService extends Base
             ->find($schedule_id);
         /**@var Schedule $entity */
         if ($entity != null) {
+
+            // eliminar informacion relacionada
+            $this->EliminarInformacionRelacionada($schedule_id);
 
             $schedule_descripcion = $entity->getDescription();
 
@@ -106,6 +137,9 @@ class ScheduleService extends Base
                     /**@var Schedule $entity */
                     if ($entity != null) {
 
+                        // eliminar informacion relacionada
+                        $this->EliminarInformacionRelacionada($schedule_id);
+
                         $schedule_descripcion = $entity->getDescription();
 
                         $em->remove($entity);
@@ -136,12 +170,27 @@ class ScheduleService extends Base
         return $resultado;
     }
 
+    // eliminar informacion relacionada
+    private function EliminarInformacionRelacionada($schedule_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // contacts
+        $schedules_contact = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
+            ->ListarContactosDeSchedule($schedule_id);
+        foreach ($schedules_contact as $schedule_contact) {
+            $em->remove($schedule_contact);
+        }
+
+    }
+
     /**
      * ActualizarSchedule: Actuializa los datos del rol en la BD
      * @param int $schedule_id Id
      * @author Marcel
      */
-    public function ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $date_start, $date_stop, $description, $location, $latitud, $longitud)
+    public function ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $date_start, $date_stop,
+                                       $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -168,6 +217,13 @@ class ScheduleService extends Base
                 $entity->setContactProject($project_contact);
             }
 
+            $entity->setConcreteVendor(NULL);
+            if ($vendor_id != '') {
+                $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                    ->find($vendor_id);
+                $entity->setConcreteVendor($concrete_vendor);
+            }
+
             if ($date_start != '') {
                 $date_start = \DateTime::createFromFormat('m/d/Y', $date_start);
                 $entity->setDateStart($date_start);
@@ -177,6 +233,9 @@ class ScheduleService extends Base
                 $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop);
                 $entity->setDateStop($date_stop);
             }
+
+            // salvar contactos
+            $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id, false);
 
             $em->flush();
 
@@ -197,7 +256,8 @@ class ScheduleService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarSchedule($project_id, $project_contact_id, $date_start, $date_stop, $description, $location, $latitud, $longitud)
+    public function SalvarSchedule($project_id, $project_contact_id, $date_start, $date_stop, $description, $location, $latitud,
+                                   $longitud, $vendor_id, $concrete_vendor_contacts_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -219,6 +279,12 @@ class ScheduleService extends Base
             $entity->setContactProject($project_contact);
         }
 
+        if ($vendor_id != '') {
+            $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                ->find($vendor_id);
+            $entity->setConcreteVendor($concrete_vendor);
+        }
+
         if ($date_start != '') {
             $date_start = \DateTime::createFromFormat('m/d/Y', $date_start);
             $entity->setDateStart($date_start);
@@ -231,6 +297,9 @@ class ScheduleService extends Base
 
         $em->persist($entity);
 
+        // salvar contactos
+        $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
+
         $em->flush();
 
         //Salvar log
@@ -242,6 +311,37 @@ class ScheduleService extends Base
         $resultado['success'] = true;
 
         return $resultado;
+    }
+
+    // salvar concrete vendor contacts
+    public function SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id, $is_new = true)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // eliminar anteriores
+        if (!$is_new) {
+            $schedules_contact = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
+                ->ListarContactosDeSchedule($entity->getScheduleId());
+            foreach ($schedules_contact as $schedule_contact) {
+                $em->remove($schedule_contact);
+            }
+        }
+
+        if ($concrete_vendor_contacts_id !== '') {
+            $concrete_vendor_contacts_id = explode(',', $concrete_vendor_contacts_id);
+            foreach ($concrete_vendor_contacts_id as $contact_id) {
+                $contact_entity = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
+                    ->find($contact_id);
+                if ($contact_entity !== null) {
+                    $concrete_vendor_contact_entity = new ScheduleConcreteVendorContact();
+
+                    $concrete_vendor_contact_entity->setSchedule($entity);
+                    $concrete_vendor_contact_entity->setContact($contact_entity);
+
+                    $em->persist($concrete_vendor_contact_entity);
+                }
+            }
+        }
     }
 
 
@@ -271,6 +371,7 @@ class ScheduleService extends Base
                 "id" => $schedule_id,
                 "project" => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
                 "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
+                "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
                 "description" => $value->getDescription(),
                 "location" => $value->getLocation(),
                 "dateStart" => $value->getDateStart() != '' ? $value->getDateStart()->format('m/d/Y') : '',

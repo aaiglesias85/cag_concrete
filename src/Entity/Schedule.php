@@ -40,6 +40,10 @@ class Schedule
     #[ORM\JoinColumn(name: 'project_contact_id', referencedColumnName: 'contact_id')]
     private ?ProjectContact $contactProject;
 
+    #[ORM\ManyToOne(targetEntity: "App\Entity\ConcreteVendor")]
+    #[ORM\JoinColumn(name: "vendor_id", referencedColumnName: "vendor_id", nullable: true)]
+    private ?ConcreteVendor $concreteVendor;
+
     public function getScheduleId(): ?int
     {
         return $this->scheduleId;
@@ -123,5 +127,15 @@ class Schedule
     public function setContactProject(?ProjectContact $inspector): void
     {
         $this->contactProject = $inspector;
+    }
+
+    public function getConcreteVendor(): ?ConcreteVendor
+    {
+        return $this->concreteVendor;
+    }
+
+    public function setConcreteVendor(?ConcreteVendor $vendor): void
+    {
+        $this->concreteVendor = $vendor;
     }
 }

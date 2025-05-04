@@ -64,6 +64,26 @@ class ScheduleRepository extends EntityRepository
     }
 
     /**
+     * ListarSchedulesDeConcreteVendor: Lista el schedule de un concrete vendor
+     *
+     * @return Schedule[]
+     */
+    public function ListarSchedulesDeConcreteVendor($vendor_id)
+    {
+        $consulta = $this->createQueryBuilder('s')
+            ->leftJoin('s.concreteVendor', 'c_v');
+
+        if ($vendor_id != '') {
+            $consulta->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
+        }
+
+        $consulta->orderBy('s.dateStart', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarSchedules: Lista los schedules
      * @param int $start Inicio
      * @param int $limit Limite
@@ -75,7 +95,8 @@ class ScheduleRepository extends EntityRepository
     {
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.project', 'p')
-            ->leftJoin('s.contactProject', 'p_c');
+            ->leftJoin('s.contactProject', 'p_c')
+            ->leftJoin('s.concreteVendor', 'c_v');
 
         if ($sSearch != "") {
             $consulta->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
@@ -110,6 +131,9 @@ class ScheduleRepository extends EntityRepository
                 break;
             case "contactProject":
                 $consulta->orderBy("p_c.name", $sSortDir_0);
+                break;
+            case "concreteVendor":
+                $consulta->orderBy("c_v.name", $sSortDir_0);
                 break;
             default:
                 $consulta->orderBy("s.$iSortCol_0", $sSortDir_0);
