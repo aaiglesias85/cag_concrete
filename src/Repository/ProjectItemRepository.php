@@ -164,6 +164,8 @@ class ProjectItemRepository extends EntityRepository
                 break;
         }
 
+        $qb->groupBy('p.projectId');
+
         // Paginación
         if ($limit > 0) {
             $qb->setMaxResults($limit);
