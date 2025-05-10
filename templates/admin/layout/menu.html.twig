@@ -28,7 +28,7 @@
             {% endif %}
 
             <!-- menu projects -->
-            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor or menu.menuSchedule %}
+            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor %}
                 <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
                     m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
@@ -79,17 +79,19 @@
                                 </li>
                             {% endif %}
 
-                            {% if menu.menuSchedule %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('schedule') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Schedule </span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
                         </ul>
                     </div>
+                </li>
+            {% endif %}
+
+            <!-- menu schedule -->
+            {% if menu.menuSchedule %}
+                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
+                    <a href="{{ url('schedule') }}" class="m-menu__link menu-tooltip" data-title="Schedule">
+                        <i class="m-menu__link-icon flaticon-calendar"></i>
+                        <span class="m-menu__link-text">Schedule</span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
                 </li>
             {% endif %}
 
