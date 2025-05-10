@@ -3,6 +3,190 @@ var Schedules = function () {
     var oTable;
     var rowDelete = null;
 
+    // calendario
+    var calendar = null;
+    var schedules = [];
+    var mostrar_calendario = false;
+    var initAccionesCalendario = function () {
+
+        $(document).off('click', "#btn-calendario");
+        $(document).on('click', "#btn-calendario", function (e) {
+            mostrar_calendario = !mostrar_calendario;
+
+            if (mostrar_calendario) {
+                $('#div-lista-schedule').addClass('m--hide');
+                $('#div-calendario').removeClass('m--hide');
+
+                listarCalendario();
+
+                $(this).html('<span><i class="la la-calendar mr-1"></i><span>Hide Calendar</span></span>');
+
+            } else {
+                $('#div-lista-schedule').removeClass('m--hide');
+                $('#div-calendario').addClass('m--hide');
+
+                btnClickFiltrar();
+
+                $(this).html('<span><i class="la la-calendar mr-1"></i><span>Show Calendar</span></span>');
+            }
+        });
+
+        // Editar
+        $(document).off('click', ".fc-event, .fc-list-item");
+        $(document).on('click', ".fc-event, .fc-list-item", function (e) {
+
+            resetForms();
+
+            var schedule_id = $(this).data('id');
+            $('#schedule_id').val(schedule_id);
+
+            $('#form-schedule').removeClass('m--hide');
+            $('#lista-schedule').addClass('m--hide');
+
+            editRow(schedule_id);
+
+        });
+
+    };
+    var listarCalendario = function () {
+        var search = $('#lista-schedule .m_form_search').val();
+        var project_id = $('#filtro-project').val();
+        var vendor_id = $('#filtro-concrete-vendor').val();
+        var fecha_inicial = $('#fechaInicial').val();
+        var fecha_fin = $('#fechaFin').val();
+
+        // loading
+        MyApp.block('#lista-schedule');
+
+        $.ajax({
+            type: "POST",
+            url: "schedule/listarParaCalendario",
+            dataType: "json",
+            data: {
+                'search': search,
+                'project_id': project_id,
+                'vendor_id': vendor_id,
+                'fecha_inicial': fecha_inicial,
+                'fecha_fin': fecha_fin
+            },
+            success: function (response) {
+                mApp.unblock('#lista-schedule');
+                if (response.success) {
+
+                    schedules = response.schedules;
+                    actualizarCalendario();
+
+                } else {
+                    toastr.error(response.error, "");
+                }
+            },
+            failure: function (response) {
+                mApp.unblock('#lista-schedule');
+
+                toastr.error(response.error, "");
+            }
+        });
+    }
+
+    var initCalendario = function () {
+
+        // default date
+        var todayDate = moment().startOf('day');
+
+        // poner fecha del filtro inicial si lo selecciono, esto para que el calendario empiece ahi
+        var fechaInicial = $('#fechaInicial').val();
+        if (fechaInicial !== "") {
+            todayDate = MyApp.convertirStringAFecha(fechaInicial, 'Y-m-d');
+        }
+
+        var TODAY = todayDate.format('YYYY-MM-DD');
+
+        var calendarEl = document.getElementById('calendario');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+
+            isRTL: false,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            hiddenDays: [0], // 0 = domingo
+            height: 800,
+            contentHeight: 780,
+            aspectRatio: 3,  // see: https://fullcalendar.io/docs/aspectRatio
+
+            nowIndicator: true,
+            now: TODAY + 'T09:25:00', // just for demo
+
+            views: {
+                dayGridMonth: { buttonText: 'month' },
+                timeGridWeek: { buttonText: 'week' },
+                timeGridDay: { buttonText: 'day' }
+            },
+
+            defaultView: 'dayGridMonth',
+            defaultDate: TODAY,
+
+            editable: true,
+            eventLimit: true, // allow "more" link when too many events
+            navLinks: true,
+            events: schedules,
+
+            eventRender: function(info) {
+                var element = $(info.el);
+
+                //Para editar
+                $(element).attr('data-id', info.event.id);
+
+                // console.log(info.event);
+
+                if (info.event.extendedProps && info.event.extendedProps.description) {
+
+                    var content = `
+                        <b>Hour:</b> ${info.event.extendedProps.hour} <br>
+                        <b>Location:</b>${info.event.extendedProps.location} <br>
+                        <b>Description:</b>${info.event.extendedProps.description} <br>
+                        <b>Conc. Vendor:</b>${info.event.extendedProps.concreteVendor} <br>
+                        `;
+
+                    if (element.hasClass('fc-day-grid-event')) {
+
+                        element.data('content', content);
+                        element.data('placement', 'top');
+
+                        // mApp.initPopover(element, {html: true});
+
+                        element.popover({trigger: 'hover', html: true});
+
+
+                    } else if (element.hasClass('fc-time-grid-event')) {
+
+                        element.find('.fc-title').append('<div class="fc-description">' + content + '</div>');
+                        element.css({
+                            height: '150px',
+                            overflow: 'auto'
+                        });
+
+                    } else if (element.find('.fc-list-item-title').lenght !== 0) {
+                        element.find('.fc-list-item-title').append('<div class="fc-description">' + content + '</div>');
+                    }
+                }
+            }
+        });
+
+        calendar.render();
+
+    }
+    var actualizarCalendario = function () {
+        // destroy
+        if(calendar){
+            calendar.destroy();
+        }
+
+        initCalendario();
+    }
+
     //Inicializar table
     var initTable = function () {
         MyApp.block('#schedule-table-editable');
@@ -192,6 +376,9 @@ var Schedules = function () {
 
         oTable.setDataSourceQuery(query);
         oTable.load();
+
+        // calendario
+        listarCalendario();
     }
 
     //Reset forms
@@ -461,6 +648,7 @@ var Schedules = function () {
                     toastr.success(response.message, "Success");
 
                     cerrarForms();
+
                     btnClickFiltrar();
 
                 } else {
@@ -521,6 +709,7 @@ var Schedules = function () {
                     toastr.success(response.message, "Success");
 
                     cerrarForms();
+
                     btnClickFiltrar();
 
                 } else {
@@ -996,6 +1185,8 @@ var Schedules = function () {
             initAccionResetFiltrar();
 
             initAccionChange();
+
+            initAccionesCalendario();
         }
 
     };

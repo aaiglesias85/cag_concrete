@@ -3,7 +3,7 @@
 {% block subtitle %} - Schedules{% endblock %}
 
 {% block stylesheetspecific %}
-
+    <link href="{{ asset('bundles/ican/plugins/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -45,15 +45,18 @@
                             Schedules
                         </h3>
                     </div>
-                    <div class="col-md-1">
-                        <a href="javascript:;" id="btn-reset-filtrar"
-                           class="btn">
+
+                    <a href="javascript:;" id="btn-reset-filtrar" class="btn mr-1">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>Reset filters</span>
                             </span>
-                        </a>
-                    </div>
+                    </a>
+
+                    <a href="javascript:;" id="btn-calendario" class="btn">
+                        <span><i class="la la-calendar mr-1"></i><span>Show Calendar</span></span>
+                    </a>
+
                 </div>
                 <div class="m-portlet__head-tools">
                     <ul class="m-portlet__nav">
@@ -152,9 +155,19 @@
                     </div>
                 </div>
                 <!--end: Search Form -->
+
+
                 <!--begin: Datatable -->
-                <div class="m_datatable" id="schedule-table-editable"></div>
+                <div id="div-lista-schedule">
+                    <div class="m_datatable" id="schedule-table-editable"></div>
+                </div>
                 <!--end: Datatable -->
+
+                <div class="row mt-5 m--hide" id="div-calendario">
+                    <div class="col-md-12">
+                        <div id="calendario"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -364,7 +377,7 @@
                                 Save
                             </button>
                         {% endif %}
-                        <button class="btn btn-danger cerrar-form-advertisement" type="button">
+                        <button class="btn btn-danger cerrar-form-schedule" type="button">
                             Cancel
                         </button>
                     </div>
@@ -400,6 +413,11 @@
             d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
         })
         ({key: "{{ google_maps_api_key }}", v: "weekly"});</script>
+
+    <!-- calendario -->
+    <script src="{{ asset('bundles/ican/plugins/moment/moment.min.js') }}"></script>
+    <script src="{{ asset('bundles/ican/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
+    <script src="{{ asset('bundles/ican/plugins/fullcalendar/fullcalendar.bundle.js') }}"></script>
 
     <script src="{{ asset('bundles/ican/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
     <script>

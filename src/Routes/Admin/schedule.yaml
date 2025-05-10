@@ -25,3 +25,7 @@ eliminarSchedulesAdmin:
 cargarDatosScheduleAdmin:
   path: /schedule/cargarDatos
   defaults: { _controller: App\Controller\Admin\ScheduleController::cargarDatos, _format: json }
+
+listarScheduleParaCalendarioAdmin:
+  path: /schedule/listarParaCalendario
+  defaults: { _controller: App\Controller\Admin\ScheduleController::listarParaCalendario, _format: json }

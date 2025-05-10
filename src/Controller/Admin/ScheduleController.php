@@ -293,4 +293,32 @@ class ScheduleController extends AbstractController
             return $this->json($resultadoJson);
         }
     }
+
+    /**
+     * listarParaCalendario Acción que lista el schedule para el calendario en la BD
+     *
+     */
+    public function listarParaCalendario(Request $request)
+    {
+        $search = $request->get('search');
+        $project_id = $request->get('project_id');
+        $vendor_id = $request->get('vendor_id');
+        $fecha_inicial = $request->get('fecha_inicial');
+        $fecha_fin = $request->get('fecha_fin');
+
+        try {
+            $schedules = $this->scheduleService->ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['schedules'] = $schedules;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

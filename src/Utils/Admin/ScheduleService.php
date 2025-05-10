@@ -14,6 +14,50 @@ class ScheduleService extends Base
 {
 
     /**
+     * ListarSchedulesParaCalendario: Listar los schedules para el calendario
+     *
+     * @author Marcel
+     */
+    public function ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin)
+    {
+        $arreglo_resultado = array();
+        $cont = 0;
+
+        $lista = $this->getDoctrine()->getRepository(Schedule::class)
+            ->ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
+
+        foreach ($lista as $value) {
+            $schedule_id = $value->getScheduleId();
+
+            $day = $value->getDay();
+            $project = $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription();
+
+            $className = "fc-event-primary";
+
+            $arreglo_resultado[$cont] = array(
+                "id" => $schedule_id,
+                "title" => $project,
+                'start' => $day->format('Y-m-d H:i'),
+                'end' => $day->format('Y-m-d H:i'),
+                'className' => $className,
+                "location" => $value->getLocation(),
+                "description" => $value->getDescription(),
+                "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
+                "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
+                "day" => $value->getDay()->format('m/d/Y'),
+                "hour" => $value->getDay()->format('H:i'),
+                "quantity" => $value->getQuantity(),
+                "notes" => $value->getNotes(),
+            );
+
+
+            $cont++;
+        }
+
+        return $arreglo_resultado;
+    }
+
+    /**
      * CargarDatosSchedule: Carga los datos de un schedule
      *
      * @param int $schedule_id Id
