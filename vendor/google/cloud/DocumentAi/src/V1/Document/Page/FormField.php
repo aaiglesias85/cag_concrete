@@ -22,14 +22,14 @@ class FormField extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Layout field_name = 1;</code>
      */
-    private $field_name = null;
+    protected $field_name = null;
     /**
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout] for the
      * [FormField][google.cloud.documentai.v1.Document.Page.FormField] value.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Layout field_value = 2;</code>
      */
-    private $field_value = null;
+    protected $field_value = null;
     /**
      * A list of detected languages for name together with confidence.
      *
@@ -45,19 +45,35 @@ class FormField extends \Google\Protobuf\Internal\Message
     /**
      * If the value is non-textual, this field represents the type. Current
      * valid values are:
-     * - blank (this indicates the field_value is normal text)
-     * - "unfilled_checkbox"
-     * - "filled_checkbox"
+     * - blank (this indicates the `field_value` is normal text)
+     * - `unfilled_checkbox`
+     * - `filled_checkbox`
      *
      * Generated from protobuf field <code>string value_type = 5;</code>
      */
-    private $value_type = '';
+    protected $value_type = '';
+    /**
+     * Created for Labeling UI to export key text.
+     * If corrections were made to the text identified by the
+     * `field_name.text_anchor`, this field will contain the correction.
+     *
+     * Generated from protobuf field <code>string corrected_key_text = 6;</code>
+     */
+    protected $corrected_key_text = '';
+    /**
+     * Created for Labeling UI to export value text.
+     * If corrections were made to the text identified by the
+     * `field_value.text_anchor`, this field will contain the correction.
+     *
+     * Generated from protobuf field <code>string corrected_value_text = 7;</code>
+     */
+    protected $corrected_value_text = '';
     /**
      * The history of this annotation.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 8;</code>
      */
-    private $provenance = null;
+    protected $provenance = null;
 
     /**
      * Constructor.
@@ -72,16 +88,24 @@ class FormField extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Layout $field_value
      *           [Layout][google.cloud.documentai.v1.Document.Page.Layout] for the
      *           [FormField][google.cloud.documentai.v1.Document.Page.FormField] value.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $name_detected_languages
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $name_detected_languages
      *           A list of detected languages for name together with confidence.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $value_detected_languages
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $value_detected_languages
      *           A list of detected languages for value together with confidence.
      *     @type string $value_type
      *           If the value is non-textual, this field represents the type. Current
      *           valid values are:
-     *           - blank (this indicates the field_value is normal text)
-     *           - "unfilled_checkbox"
-     *           - "filled_checkbox"
+     *           - blank (this indicates the `field_value` is normal text)
+     *           - `unfilled_checkbox`
+     *           - `filled_checkbox`
+     *     @type string $corrected_key_text
+     *           Created for Labeling UI to export key text.
+     *           If corrections were made to the text identified by the
+     *           `field_name.text_anchor`, this field will contain the correction.
+     *     @type string $corrected_value_text
+     *           Created for Labeling UI to export value text.
+     *           If corrections were made to the text identified by the
+     *           `field_value.text_anchor`, this field will contain the correction.
      *     @type \Google\Cloud\DocumentAI\V1\Document\Provenance $provenance
      *           The history of this annotation.
      * }
@@ -184,7 +208,7 @@ class FormField extends \Google\Protobuf\Internal\Message
      * A list of detected languages for name together with confidence.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedLanguage name_detected_languages = 3;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNameDetectedLanguages($var)
@@ -210,7 +234,7 @@ class FormField extends \Google\Protobuf\Internal\Message
      * A list of detected languages for value together with confidence.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedLanguage value_detected_languages = 4;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setValueDetectedLanguages($var)
@@ -224,9 +248,9 @@ class FormField extends \Google\Protobuf\Internal\Message
     /**
      * If the value is non-textual, this field represents the type. Current
      * valid values are:
-     * - blank (this indicates the field_value is normal text)
-     * - "unfilled_checkbox"
-     * - "filled_checkbox"
+     * - blank (this indicates the `field_value` is normal text)
+     * - `unfilled_checkbox`
+     * - `filled_checkbox`
      *
      * Generated from protobuf field <code>string value_type = 5;</code>
      * @return string
@@ -239,9 +263,9 @@ class FormField extends \Google\Protobuf\Internal\Message
     /**
      * If the value is non-textual, this field represents the type. Current
      * valid values are:
-     * - blank (this indicates the field_value is normal text)
-     * - "unfilled_checkbox"
-     * - "filled_checkbox"
+     * - blank (this indicates the `field_value` is normal text)
+     * - `unfilled_checkbox`
+     * - `filled_checkbox`
      *
      * Generated from protobuf field <code>string value_type = 5;</code>
      * @param string $var
@@ -251,6 +275,66 @@ class FormField extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->value_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Created for Labeling UI to export key text.
+     * If corrections were made to the text identified by the
+     * `field_name.text_anchor`, this field will contain the correction.
+     *
+     * Generated from protobuf field <code>string corrected_key_text = 6;</code>
+     * @return string
+     */
+    public function getCorrectedKeyText()
+    {
+        return $this->corrected_key_text;
+    }
+
+    /**
+     * Created for Labeling UI to export key text.
+     * If corrections were made to the text identified by the
+     * `field_name.text_anchor`, this field will contain the correction.
+     *
+     * Generated from protobuf field <code>string corrected_key_text = 6;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCorrectedKeyText($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->corrected_key_text = $var;
+
+        return $this;
+    }
+
+    /**
+     * Created for Labeling UI to export value text.
+     * If corrections were made to the text identified by the
+     * `field_value.text_anchor`, this field will contain the correction.
+     *
+     * Generated from protobuf field <code>string corrected_value_text = 7;</code>
+     * @return string
+     */
+    public function getCorrectedValueText()
+    {
+        return $this->corrected_value_text;
+    }
+
+    /**
+     * Created for Labeling UI to export value text.
+     * If corrections were made to the text identified by the
+     * `field_value.text_anchor`, this field will contain the correction.
+     *
+     * Generated from protobuf field <code>string corrected_value_text = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCorrectedValueText($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->corrected_value_text = $var;
 
         return $this;
     }

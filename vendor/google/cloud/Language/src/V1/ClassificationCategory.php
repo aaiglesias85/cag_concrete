@@ -16,19 +16,18 @@ use Google\Protobuf\Internal\GPBUtil;
 class ClassificationCategory extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The name of the category representing the document, from the [predefined
-     * taxonomy](https://cloud.google.com/natural-language/docs/categories).
+     * The name of the category representing the document.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The classifier's confidence of the category. Number represents how certain
      * the classifier is that this category represents the given text.
      *
      * Generated from protobuf field <code>float confidence = 2;</code>
      */
-    private $confidence = 0.0;
+    protected $confidence = 0.0;
 
     /**
      * Constructor.
@@ -37,8 +36,7 @@ class ClassificationCategory extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           The name of the category representing the document, from the [predefined
-     *           taxonomy](https://cloud.google.com/natural-language/docs/categories).
+     *           The name of the category representing the document.
      *     @type float $confidence
      *           The classifier's confidence of the category. Number represents how certain
      *           the classifier is that this category represents the given text.
@@ -50,8 +48,7 @@ class ClassificationCategory extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name of the category representing the document, from the [predefined
-     * taxonomy](https://cloud.google.com/natural-language/docs/categories).
+     * The name of the category representing the document.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @return string
@@ -62,8 +59,7 @@ class ClassificationCategory extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name of the category representing the document, from the [predefined
-     * taxonomy](https://cloud.google.com/natural-language/docs/categories).
+     * The name of the category representing the document.
      *
      * Generated from protobuf field <code>string name = 1;</code>
      * @param string $var

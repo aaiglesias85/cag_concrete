@@ -16,13 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Transfer configuration name in the form:
+     * Required. Transfer configuration name in the form:
      * `projects/{project_id}/transferConfigs/{config_id}` or
      * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *
-     * Generated from protobuf field <code>string parent = 1 [(.google.api.resource_reference) = {</code>
+     * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     protected $time;
 
     /**
@@ -32,14 +32,19 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Transfer configuration name in the form:
+     *           Required. Transfer configuration name in the form:
      *           `projects/{project_id}/transferConfigs/{config_id}` or
      *           `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *     @type \Google\Cloud\BigQuery\DataTransfer\V1\StartManualTransferRunsRequest\TimeRange $requested_time_range
-     *           Time range for the transfer runs that should be started.
+     *           A time_range start and end timestamp for historical data files or reports
+     *           that are scheduled to be transferred by the scheduled transfer run.
+     *           requested_time_range must be a past time and cannot include future time
+     *           values.
      *     @type \Google\Protobuf\Timestamp $requested_run_time
-     *           Specific run_time for a transfer run to be started. The
-     *           requested_run_time must not be in the future.
+     *           A run_time timestamp for historical data files or reports
+     *           that are scheduled to be transferred by the scheduled transfer run.
+     *           requested_run_time must be a past time and cannot include future time
+     *           values.
      * }
      */
     public function __construct($data = NULL) {
@@ -48,11 +53,11 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Transfer configuration name in the form:
+     * Required. Transfer configuration name in the form:
      * `projects/{project_id}/transferConfigs/{config_id}` or
      * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *
-     * Generated from protobuf field <code>string parent = 1 [(.google.api.resource_reference) = {</code>
+     * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
      */
     public function getParent()
@@ -61,11 +66,11 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Transfer configuration name in the form:
+     * Required. Transfer configuration name in the form:
      * `projects/{project_id}/transferConfigs/{config_id}` or
      * `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
      *
-     * Generated from protobuf field <code>string parent = 1 [(.google.api.resource_reference) = {</code>
+     * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
      * @return $this
      */
@@ -78,7 +83,10 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Time range for the transfer runs that should be started.
+     * A time_range start and end timestamp for historical data files or reports
+     * that are scheduled to be transferred by the scheduled transfer run.
+     * requested_time_range must be a past time and cannot include future time
+     * values.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.datatransfer.v1.StartManualTransferRunsRequest.TimeRange requested_time_range = 3;</code>
      * @return \Google\Cloud\BigQuery\DataTransfer\V1\StartManualTransferRunsRequest\TimeRange|null
@@ -94,7 +102,10 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Time range for the transfer runs that should be started.
+     * A time_range start and end timestamp for historical data files or reports
+     * that are scheduled to be transferred by the scheduled transfer run.
+     * requested_time_range must be a past time and cannot include future time
+     * values.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.datatransfer.v1.StartManualTransferRunsRequest.TimeRange requested_time_range = 3;</code>
      * @param \Google\Cloud\BigQuery\DataTransfer\V1\StartManualTransferRunsRequest\TimeRange $var
@@ -109,8 +120,10 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Specific run_time for a transfer run to be started. The
-     * requested_run_time must not be in the future.
+     * A run_time timestamp for historical data files or reports
+     * that are scheduled to be transferred by the scheduled transfer run.
+     * requested_run_time must be a past time and cannot include future time
+     * values.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp requested_run_time = 4;</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -126,8 +139,10 @@ class StartManualTransferRunsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Specific run_time for a transfer run to be started. The
-     * requested_run_time must not be in the future.
+     * A run_time timestamp for historical data files or reports
+     * that are scheduled to be transferred by the scheduled transfer run.
+     * requested_run_time must be a past time and cannot include future time
+     * values.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp requested_run_time = 4;</code>
      * @param \Google\Protobuf\Timestamp $var

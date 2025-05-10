@@ -30,7 +30,7 @@ class Network extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string instance_tag = 2;</code>
      */
-    private $instance_tag = '';
+    protected $instance_tag = '';
     /**
      * Google Compute Engine network where the virtual machines are created.
      * Specify the short name, not the resource path.
@@ -38,7 +38,7 @@ class Network extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 3;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Google Cloud Platform sub-network where the virtual machines are created.
      * Specify the short name, not the resource path.
@@ -58,14 +58,14 @@ class Network extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string subnetwork_name = 4;</code>
      */
-    private $subnetwork_name = '';
+    protected $subnetwork_name = '';
     /**
      * Enable session affinity.
      * Only applicable in the App Engine flexible environment.
      *
      * Generated from protobuf field <code>bool session_affinity = 5;</code>
      */
-    private $session_affinity = false;
+    protected $session_affinity = false;
 
     /**
      * Constructor.
@@ -73,7 +73,7 @@ class Network extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $forwarded_ports
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $forwarded_ports
      *           List of ports, or port pairs, to forward from the virtual machine to the
      *           application container.
      *           Only applicable in the App Engine flexible environment.
@@ -129,7 +129,7 @@ class Network extends \Google\Protobuf\Internal\Message
      * Only applicable in the App Engine flexible environment.
      *
      * Generated from protobuf field <code>repeated string forwarded_ports = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setForwardedPorts($var)

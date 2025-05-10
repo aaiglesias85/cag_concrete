@@ -29,7 +29,7 @@ class ListTablesResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ class ListTablesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Bigtable\Admin\V2\Table[]|\Google\Protobuf\Internal\RepeatedField $tables
+     *     @type array<\Google\Cloud\Bigtable\Admin\V2\Table>|\Google\Protobuf\Internal\RepeatedField $tables
      *           The tables present in the requested instance.
      *     @type string $next_page_token
      *           Set if not all tables could be returned in a single response.
@@ -65,7 +65,7 @@ class ListTablesResponse extends \Google\Protobuf\Internal\Message
      * The tables present in the requested instance.
      *
      * Generated from protobuf field <code>repeated .google.bigtable.admin.v2.Table tables = 1;</code>
-     * @param \Google\Cloud\Bigtable\Admin\V2\Table[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Bigtable\Admin\V2\Table>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTables($var)

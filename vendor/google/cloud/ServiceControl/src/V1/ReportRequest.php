@@ -24,7 +24,7 @@ class ReportRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_name = 1;</code>
      */
-    private $service_name = '';
+    protected $service_name = '';
     /**
      * Operations to be reported.
      * Typically the service should report one operation per request.
@@ -47,7 +47,7 @@ class ReportRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_config_id = 3;</code>
      */
-    private $service_config_id = '';
+    protected $service_config_id = '';
 
     /**
      * Constructor.
@@ -61,7 +61,7 @@ class ReportRequest extends \Google\Protobuf\Internal\Message
      *           See
      *           [google.api.Service](https://cloud.google.com/service-management/reference/rpc/google.api#google.api.Service)
      *           for the definition of a service name.
-     *     @type \Google\Cloud\ServiceControl\V1\Operation[]|\Google\Protobuf\Internal\RepeatedField $operations
+     *     @type array<\Google\Cloud\ServiceControl\V1\Operation>|\Google\Protobuf\Internal\RepeatedField $operations
      *           Operations to be reported.
      *           Typically the service should report one operation per request.
      *           Putting multiple operations into a single request is allowed, but should
@@ -148,7 +148,7 @@ class ReportRequest extends \Google\Protobuf\Internal\Message
      * for partial failure behavior.
      *
      * Generated from protobuf field <code>repeated .google.api.servicecontrol.v1.Operation operations = 2;</code>
-     * @param \Google\Cloud\ServiceControl\V1\Operation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ServiceControl\V1\Operation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOperations($var)

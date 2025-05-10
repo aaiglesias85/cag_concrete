@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A `DeliveryPipeline` resource in the Google Cloud Deploy API.
+ * A `DeliveryPipeline` resource in the Cloud Deploy API.
  * A `DeliveryPipeline` defines a pipeline through which a Skaffold
  * configuration can progress.
  *
@@ -18,37 +18,37 @@ use Google\Protobuf\Internal\GPBUtil;
 class DeliveryPipeline extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Optional. Name of the `DeliveryPipeline`. Format is projects/{project}/
-     * locations/{location}/deliveryPipelines/[a-z][a-z0-9\-]{0,62}.
+     * Identifier. Name of the `DeliveryPipeline`. Format is
+     * `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`.
+     * The `deliveryPipeline` component must match
+     * `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Unique identifier of the `DeliveryPipeline`.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $uid = '';
+    protected $uid = '';
     /**
-     * Description of the `DeliveryPipeline`. Max length is 255 characters.
+     * Optional. Description of the `DeliveryPipeline`. Max length is 255
+     * characters.
      *
-     * Generated from protobuf field <code>string description = 3;</code>
+     * Generated from protobuf field <code>string description = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
-     * User annotations. These attributes can only be set and used by the
-     * user, and not by Google Cloud Deploy. See
-     * https://google.aip.dev/128#annotations for more details such as format and
-     * size limitations.
+     * Optional. User annotations. These attributes can only be set and used by
+     * the user, and not by Cloud Deploy.
      *
-     * Generated from protobuf field <code>map<string, string> annotations = 4;</code>
+     * Generated from protobuf field <code>map<string, string> annotations = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $annotations;
     /**
      * Labels are attributes that can be set and used by both the
-     * user and by Google Cloud Deploy. Labels must meet the following
-     * constraints:
+     * user and by Cloud Deploy. Labels must meet the following constraints:
      * * Keys and values can contain only lowercase letters, numeric characters,
      * underscores, and dashes.
      * * All characters must use UTF-8 encoding, and international characters are
@@ -65,19 +65,19 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Most recent time at which the pipeline was updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Output only. Information around the state of the Delivery Pipeline.
      *
      * Generated from protobuf field <code>.google.cloud.deploy.v1.PipelineCondition condition = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $condition = null;
+    protected $condition = null;
     /**
      * This checksum is computed by the server based on the value of other
      * fields, and may be sent on update and delete requests to ensure the
@@ -85,7 +85,14 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 10;</code>
      */
-    private $etag = '';
+    protected $etag = '';
+    /**
+     * Optional. When suspended, no new releases or rollouts can be created,
+     * but in-progress ones will complete.
+     *
+     * Generated from protobuf field <code>bool suspended = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $suspended = false;
     protected $pipeline;
 
     /**
@@ -95,21 +102,21 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Optional. Name of the `DeliveryPipeline`. Format is projects/{project}/
-     *           locations/{location}/deliveryPipelines/[a-z][a-z0-9\-]{0,62}.
+     *           Identifier. Name of the `DeliveryPipeline`. Format is
+     *           `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`.
+     *           The `deliveryPipeline` component must match
+     *           `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`
      *     @type string $uid
      *           Output only. Unique identifier of the `DeliveryPipeline`.
      *     @type string $description
-     *           Description of the `DeliveryPipeline`. Max length is 255 characters.
+     *           Optional. Description of the `DeliveryPipeline`. Max length is 255
+     *           characters.
      *     @type array|\Google\Protobuf\Internal\MapField $annotations
-     *           User annotations. These attributes can only be set and used by the
-     *           user, and not by Google Cloud Deploy. See
-     *           https://google.aip.dev/128#annotations for more details such as format and
-     *           size limitations.
+     *           Optional. User annotations. These attributes can only be set and used by
+     *           the user, and not by Cloud Deploy.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Labels are attributes that can be set and used by both the
-     *           user and by Google Cloud Deploy. Labels must meet the following
-     *           constraints:
+     *           user and by Cloud Deploy. Labels must meet the following constraints:
      *           * Keys and values can contain only lowercase letters, numeric characters,
      *           underscores, and dashes.
      *           * All characters must use UTF-8 encoding, and international characters are
@@ -122,7 +129,7 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Most recent time at which the pipeline was updated.
      *     @type \Google\Cloud\Deploy\V1\SerialPipeline $serial_pipeline
-     *           SerialPipeline defines a sequential set of stages for a
+     *           Optional. SerialPipeline defines a sequential set of stages for a
      *           `DeliveryPipeline`.
      *     @type \Google\Cloud\Deploy\V1\PipelineCondition $condition
      *           Output only. Information around the state of the Delivery Pipeline.
@@ -130,6 +137,9 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
      *           This checksum is computed by the server based on the value of other
      *           fields, and may be sent on update and delete requests to ensure the
      *           client has an up-to-date value before proceeding.
+     *     @type bool $suspended
+     *           Optional. When suspended, no new releases or rollouts can be created,
+     *           but in-progress ones will complete.
      * }
      */
     public function __construct($data = NULL) {
@@ -138,10 +148,12 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Name of the `DeliveryPipeline`. Format is projects/{project}/
-     * locations/{location}/deliveryPipelines/[a-z][a-z0-9\-]{0,62}.
+     * Identifier. Name of the `DeliveryPipeline`. Format is
+     * `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`.
+     * The `deliveryPipeline` component must match
+     * `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @return string
      */
     public function getName()
@@ -150,10 +162,12 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Name of the `DeliveryPipeline`. Format is projects/{project}/
-     * locations/{location}/deliveryPipelines/[a-z][a-z0-9\-]{0,62}.
+     * Identifier. Name of the `DeliveryPipeline`. Format is
+     * `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`.
+     * The `deliveryPipeline` component must match
+     * `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @param string $var
      * @return $this
      */
@@ -192,9 +206,10 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Description of the `DeliveryPipeline`. Max length is 255 characters.
+     * Optional. Description of the `DeliveryPipeline`. Max length is 255
+     * characters.
      *
-     * Generated from protobuf field <code>string description = 3;</code>
+     * Generated from protobuf field <code>string description = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getDescription()
@@ -203,9 +218,10 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Description of the `DeliveryPipeline`. Max length is 255 characters.
+     * Optional. Description of the `DeliveryPipeline`. Max length is 255
+     * characters.
      *
-     * Generated from protobuf field <code>string description = 3;</code>
+     * Generated from protobuf field <code>string description = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */
@@ -218,12 +234,10 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * User annotations. These attributes can only be set and used by the
-     * user, and not by Google Cloud Deploy. See
-     * https://google.aip.dev/128#annotations for more details such as format and
-     * size limitations.
+     * Optional. User annotations. These attributes can only be set and used by
+     * the user, and not by Cloud Deploy.
      *
-     * Generated from protobuf field <code>map<string, string> annotations = 4;</code>
+     * Generated from protobuf field <code>map<string, string> annotations = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\MapField
      */
     public function getAnnotations()
@@ -232,12 +246,10 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * User annotations. These attributes can only be set and used by the
-     * user, and not by Google Cloud Deploy. See
-     * https://google.aip.dev/128#annotations for more details such as format and
-     * size limitations.
+     * Optional. User annotations. These attributes can only be set and used by
+     * the user, and not by Cloud Deploy.
      *
-     * Generated from protobuf field <code>map<string, string> annotations = 4;</code>
+     * Generated from protobuf field <code>map<string, string> annotations = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
      * @return $this
      */
@@ -251,8 +263,7 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
 
     /**
      * Labels are attributes that can be set and used by both the
-     * user and by Google Cloud Deploy. Labels must meet the following
-     * constraints:
+     * user and by Cloud Deploy. Labels must meet the following constraints:
      * * Keys and values can contain only lowercase letters, numeric characters,
      * underscores, and dashes.
      * * All characters must use UTF-8 encoding, and international characters are
@@ -271,8 +282,7 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
 
     /**
      * Labels are attributes that can be set and used by both the
-     * user and by Google Cloud Deploy. Labels must meet the following
-     * constraints:
+     * user and by Cloud Deploy. Labels must meet the following constraints:
      * * Keys and values can contain only lowercase letters, numeric characters,
      * underscores, and dashes.
      * * All characters must use UTF-8 encoding, and international characters are
@@ -366,10 +376,10 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * SerialPipeline defines a sequential set of stages for a
+     * Optional. SerialPipeline defines a sequential set of stages for a
      * `DeliveryPipeline`.
      *
-     * Generated from protobuf field <code>.google.cloud.deploy.v1.SerialPipeline serial_pipeline = 8;</code>
+     * Generated from protobuf field <code>.google.cloud.deploy.v1.SerialPipeline serial_pipeline = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Cloud\Deploy\V1\SerialPipeline|null
      */
     public function getSerialPipeline()
@@ -383,10 +393,10 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * SerialPipeline defines a sequential set of stages for a
+     * Optional. SerialPipeline defines a sequential set of stages for a
      * `DeliveryPipeline`.
      *
-     * Generated from protobuf field <code>.google.cloud.deploy.v1.SerialPipeline serial_pipeline = 8;</code>
+     * Generated from protobuf field <code>.google.cloud.deploy.v1.SerialPipeline serial_pipeline = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Cloud\Deploy\V1\SerialPipeline $var
      * @return $this
      */
@@ -460,6 +470,34 @@ class DeliveryPipeline extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->etag = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. When suspended, no new releases or rollouts can be created,
+     * but in-progress ones will complete.
+     *
+     * Generated from protobuf field <code>bool suspended = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getSuspended()
+    {
+        return $this->suspended;
+    }
+
+    /**
+     * Optional. When suspended, no new releases or rollouts can be created,
+     * but in-progress ones will complete.
+     *
+     * Generated from protobuf field <code>bool suspended = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSuspended($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->suspended = $var;
 
         return $this;
     }

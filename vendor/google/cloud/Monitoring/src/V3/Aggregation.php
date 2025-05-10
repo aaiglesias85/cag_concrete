@@ -52,7 +52,7 @@ class Aggregation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration alignment_period = 1;</code>
      */
-    private $alignment_period = null;
+    protected $alignment_period = null;
     /**
      * An `Aligner` describes how to bring the data points in a single
      * time series into temporal alignment. Except for `ALIGN_NONE`, all
@@ -71,7 +71,7 @@ class Aggregation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.Aggregation.Aligner per_series_aligner = 2;</code>
      */
-    private $per_series_aligner = 0;
+    protected $per_series_aligner = 0;
     /**
      * The reduction operation to be used to combine time series into a single
      * time series, where the value of each data point in the resulting series is
@@ -88,7 +88,7 @@ class Aggregation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.Aggregation.Reducer cross_series_reducer = 4;</code>
      */
-    private $cross_series_reducer = 0;
+    protected $cross_series_reducer = 0;
     /**
      * The set of fields to preserve when `cross_series_reducer` is
      * specified. The `group_by_fields` determine how the time series are
@@ -155,7 +155,7 @@ class Aggregation extends \Google\Protobuf\Internal\Message
      *           specified, then `per_series_aligner` must be specified, and must not be
      *           `ALIGN_NONE`. An `alignment_period` must also be specified; otherwise, an
      *           error is returned.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $group_by_fields
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $group_by_fields
      *           The set of fields to preserve when `cross_series_reducer` is
      *           specified. The `group_by_fields` determine how the time series are
      *           partitioned into subsets prior to applying the aggregation
@@ -374,7 +374,7 @@ class Aggregation extends \Google\Protobuf\Internal\Message
      * defined, this field is ignored.
      *
      * Generated from protobuf field <code>repeated string group_by_fields = 5;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setGroupByFields($var)

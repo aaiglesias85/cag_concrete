@@ -21,13 +21,43 @@ class GetEntryGroupRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The fields to return. If empty or omitted, all fields are returned.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask read_mask = 2;</code>
      */
-    private $read_mask = null;
+    protected $read_mask = null;
+
+    /**
+     * @param string $name Required. The name of the entry group to get. Please see
+     *                     {@see DataCatalogClient::entryGroupName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\GetEntryGroupRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
+
+    /**
+     * @param string                     $name     Required. The name of the entry group to get. Please see
+     *                                             {@see DataCatalogClient::entryGroupName()} for help formatting this field.
+     * @param \Google\Protobuf\FieldMask $readMask The fields to return. If empty or omitted, all fields are returned.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\GetEntryGroupRequest
+     *
+     * @experimental
+     */
+    public static function buildFromNameReadMask(string $name, \Google\Protobuf\FieldMask $readMask): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setReadMask($readMask);
+    }
 
     /**
      * Constructor.

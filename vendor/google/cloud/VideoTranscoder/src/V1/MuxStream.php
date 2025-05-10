@@ -21,7 +21,7 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string key = 1;</code>
      */
-    private $key = '';
+    protected $key = '';
     /**
      * The name of the generated file. The default is `MuxStream.key` with the
      * extension suffix corresponding to the `MuxStream.container`.
@@ -30,7 +30,7 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string file_name = 2;</code>
      */
-    private $file_name = '';
+    protected $file_name = '';
     /**
      * The container format. The default is `mp4`
      * Supported container formats:
@@ -38,10 +38,13 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      * - `fmp4`- the corresponding file extension is `.m4s`
      * - `mp4`
      * - `vtt`
+     * See also:
+     * [Supported input and output
+     * formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats)
      *
      * Generated from protobuf field <code>string container = 3;</code>
      */
-    private $container = '';
+    protected $container = '';
     /**
      * List of `ElementaryStream.key`s multiplexed in this stream.
      *
@@ -53,7 +56,14 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.video.transcoder.v1.SegmentSettings segment_settings = 5;</code>
      */
-    private $segment_settings = null;
+    protected $segment_settings = null;
+    /**
+     * Identifier of the encryption configuration to use. If omitted, output will
+     * be unencrypted.
+     *
+     * Generated from protobuf field <code>string encryption_id = 7;</code>
+     */
+    protected $encryption_id = '';
 
     /**
      * Constructor.
@@ -76,10 +86,16 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      *           - `fmp4`- the corresponding file extension is `.m4s`
      *           - `mp4`
      *           - `vtt`
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $elementary_streams
+     *           See also:
+     *           [Supported input and output
+     *           formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats)
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $elementary_streams
      *           List of `ElementaryStream.key`s multiplexed in this stream.
      *     @type \Google\Cloud\Video\Transcoder\V1\SegmentSettings $segment_settings
      *           Segment settings for `ts`, `fmp4` and `vtt`.
+     *     @type string $encryption_id
+     *           Identifier of the encryption configuration to use. If omitted, output will
+     *           be unencrypted.
      * }
      */
     public function __construct($data = NULL) {
@@ -154,6 +170,9 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      * - `fmp4`- the corresponding file extension is `.m4s`
      * - `mp4`
      * - `vtt`
+     * See also:
+     * [Supported input and output
+     * formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats)
      *
      * Generated from protobuf field <code>string container = 3;</code>
      * @return string
@@ -170,6 +189,9 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      * - `fmp4`- the corresponding file extension is `.m4s`
      * - `mp4`
      * - `vtt`
+     * See also:
+     * [Supported input and output
+     * formats](https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats)
      *
      * Generated from protobuf field <code>string container = 3;</code>
      * @param string $var
@@ -198,7 +220,7 @@ class MuxStream extends \Google\Protobuf\Internal\Message
      * List of `ElementaryStream.key`s multiplexed in this stream.
      *
      * Generated from protobuf field <code>repeated string elementary_streams = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setElementaryStreams($var)
@@ -241,6 +263,34 @@ class MuxStream extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Video\Transcoder\V1\SegmentSettings::class);
         $this->segment_settings = $var;
+
+        return $this;
+    }
+
+    /**
+     * Identifier of the encryption configuration to use. If omitted, output will
+     * be unencrypted.
+     *
+     * Generated from protobuf field <code>string encryption_id = 7;</code>
+     * @return string
+     */
+    public function getEncryptionId()
+    {
+        return $this->encryption_id;
+    }
+
+    /**
+     * Identifier of the encryption configuration to use. If omitted, output will
+     * be unencrypted.
+     *
+     * Generated from protobuf field <code>string encryption_id = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setEncryptionId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->encryption_id = $var;
 
         return $this;
     }

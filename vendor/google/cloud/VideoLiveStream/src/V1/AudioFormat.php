@@ -20,13 +20,13 @@ class AudioFormat extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string codec = 1;</code>
      */
-    private $codec = '';
+    protected $codec = '';
     /**
      * The number of audio channels.
      *
      * Generated from protobuf field <code>int32 channel_count = 2;</code>
      */
-    private $channel_count = 0;
+    protected $channel_count = 0;
     /**
      * A list of channel names specifying the layout of the audio channels.
      *
@@ -44,7 +44,7 @@ class AudioFormat extends \Google\Protobuf\Internal\Message
      *           Audio codec used in this audio stream.
      *     @type int $channel_count
      *           The number of audio channels.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $channel_layout
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $channel_layout
      *           A list of channel names specifying the layout of the audio channels.
      * }
      */
@@ -120,7 +120,7 @@ class AudioFormat extends \Google\Protobuf\Internal\Message
      * A list of channel names specifying the layout of the audio channels.
      *
      * Generated from protobuf field <code>repeated string channel_layout = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setChannelLayout($var)

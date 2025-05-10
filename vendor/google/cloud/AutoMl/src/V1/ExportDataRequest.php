@@ -20,13 +20,29 @@ class ExportDataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The desired output location.
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.OutputConfig output_config = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $output_config = null;
+    protected $output_config = null;
+
+    /**
+     * @param string                               $name         Required. The resource name of the dataset. Please see
+     *                                                           {@see AutoMlClient::datasetName()} for help formatting this field.
+     * @param \Google\Cloud\AutoMl\V1\OutputConfig $outputConfig Required. The desired output location.
+     *
+     * @return \Google\Cloud\AutoMl\V1\ExportDataRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\AutoMl\V1\OutputConfig $outputConfig): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setOutputConfig($outputConfig);
+    }
 
     /**
      * Constructor.

@@ -21,21 +21,22 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. Specify the entity view to make a partial list request.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.ListEntitiesRequest.EntityView view = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $view = 0;
+    protected $view = 0;
     /**
-     * Optional. Maximum number of entities to return. The service may return fewer than
-     * this value. If unspecified, 100 entities will be returned by default. The
-     * maximum value is 500; larger values will will be truncated to 500.
+     * Optional. Maximum number of entities to return. The service may return
+     * fewer than this value. If unspecified, 100 entities will be returned by
+     * default. The maximum value is 500; larger values will will be truncated to
+     * 500.
      *
      * Generated from protobuf field <code>int32 page_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. Page token received from a previous `ListEntities` call. Provide
      * this to retrieve the subsequent page. When paginating, all other parameters
@@ -44,19 +45,34 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
-     * Optional. The following filter parameters can be added to the URL to limit the
-     * entities returned by the API:
+     * Optional. The following filter parameters can be added to the URL to limit
+     * the entities returned by the API:
      * - Entity ID: ?filter="id=entityID"
      * - Asset ID: ?filter="asset=assetID"
      * - Data path ?filter="data_path=gs://my-bucket"
-     * - Is HIVE compatible: ?filter=”hive_compatible=true”
-     * - Is BigQuery compatible: ?filter=”bigquery_compatible=true”
+     * - Is HIVE compatible: ?filter="hive_compatible=true"
+     * - Is BigQuery compatible: ?filter="bigquery_compatible=true"
      *
      * Generated from protobuf field <code>string filter = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $parent Required. The resource name of the parent zone:
+     *                       `projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`. Please see
+     *                       {@see MetadataServiceClient::zoneName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dataplex\V1\ListEntitiesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -70,22 +86,23 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
      *     @type int $view
      *           Required. Specify the entity view to make a partial list request.
      *     @type int $page_size
-     *           Optional. Maximum number of entities to return. The service may return fewer than
-     *           this value. If unspecified, 100 entities will be returned by default. The
-     *           maximum value is 500; larger values will will be truncated to 500.
+     *           Optional. Maximum number of entities to return. The service may return
+     *           fewer than this value. If unspecified, 100 entities will be returned by
+     *           default. The maximum value is 500; larger values will will be truncated to
+     *           500.
      *     @type string $page_token
      *           Optional. Page token received from a previous `ListEntities` call. Provide
      *           this to retrieve the subsequent page. When paginating, all other parameters
      *           provided to `ListEntities` must match the call that provided the
      *           page token.
      *     @type string $filter
-     *           Optional. The following filter parameters can be added to the URL to limit the
-     *           entities returned by the API:
+     *           Optional. The following filter parameters can be added to the URL to limit
+     *           the entities returned by the API:
      *           - Entity ID: ?filter="id=entityID"
      *           - Asset ID: ?filter="asset=assetID"
      *           - Data path ?filter="data_path=gs://my-bucket"
-     *           - Is HIVE compatible: ?filter=”hive_compatible=true”
-     *           - Is BigQuery compatible: ?filter=”bigquery_compatible=true”
+     *           - Is HIVE compatible: ?filter="hive_compatible=true"
+     *           - Is BigQuery compatible: ?filter="bigquery_compatible=true"
      * }
      */
     public function __construct($data = NULL) {
@@ -148,9 +165,10 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Maximum number of entities to return. The service may return fewer than
-     * this value. If unspecified, 100 entities will be returned by default. The
-     * maximum value is 500; larger values will will be truncated to 500.
+     * Optional. Maximum number of entities to return. The service may return
+     * fewer than this value. If unspecified, 100 entities will be returned by
+     * default. The maximum value is 500; larger values will will be truncated to
+     * 500.
      *
      * Generated from protobuf field <code>int32 page_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -161,9 +179,10 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Maximum number of entities to return. The service may return fewer than
-     * this value. If unspecified, 100 entities will be returned by default. The
-     * maximum value is 500; larger values will will be truncated to 500.
+     * Optional. Maximum number of entities to return. The service may return
+     * fewer than this value. If unspecified, 100 entities will be returned by
+     * default. The maximum value is 500; larger values will will be truncated to
+     * 500.
      *
      * Generated from protobuf field <code>int32 page_size = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -210,13 +229,13 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The following filter parameters can be added to the URL to limit the
-     * entities returned by the API:
+     * Optional. The following filter parameters can be added to the URL to limit
+     * the entities returned by the API:
      * - Entity ID: ?filter="id=entityID"
      * - Asset ID: ?filter="asset=assetID"
      * - Data path ?filter="data_path=gs://my-bucket"
-     * - Is HIVE compatible: ?filter=”hive_compatible=true”
-     * - Is BigQuery compatible: ?filter=”bigquery_compatible=true”
+     * - Is HIVE compatible: ?filter="hive_compatible=true"
+     * - Is BigQuery compatible: ?filter="bigquery_compatible=true"
      *
      * Generated from protobuf field <code>string filter = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -227,13 +246,13 @@ class ListEntitiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The following filter parameters can be added to the URL to limit the
-     * entities returned by the API:
+     * Optional. The following filter parameters can be added to the URL to limit
+     * the entities returned by the API:
      * - Entity ID: ?filter="id=entityID"
      * - Asset ID: ?filter="asset=assetID"
      * - Data path ?filter="data_path=gs://my-bucket"
-     * - Is HIVE compatible: ?filter=”hive_compatible=true”
-     * - Is BigQuery compatible: ?filter=”bigquery_compatible=true”
+     * - Is HIVE compatible: ?filter="hive_compatible=true"
+     * - Is BigQuery compatible: ?filter="bigquery_compatible=true"
      *
      * Generated from protobuf field <code>string filter = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var

@@ -9,36 +9,89 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [FeaturestoreService.CreateFeature][google.cloud.aiplatform.v1.FeaturestoreService.CreateFeature].
+ * Request message for
+ * [FeaturestoreService.CreateFeature][google.cloud.aiplatform.v1.FeaturestoreService.CreateFeature].
+ * Request message for
+ * [FeatureRegistryService.CreateFeature][google.cloud.aiplatform.v1.FeatureRegistryService.CreateFeature].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateFeatureRequest</code>
  */
 class CreateFeatureRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the EntityType to create a Feature.
-     * Format:
+     * Required. The resource name of the EntityType or FeatureGroup to create a
+     * Feature. Format for entity_type as parent:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     * Format for feature_group as parent:
+     * `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The Feature to create.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Feature feature = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $feature = null;
+    protected $feature = null;
     /**
-     * Required. The ID to use for the Feature, which will become the final component of
-     * the Feature's resource name.
-     * This value may be up to 60 characters, and valid characters are
+     * Required. The ID to use for the Feature, which will become the final
+     * component of the Feature's resource name.
+     * This value may be up to 128 characters, and valid characters are
      * `[a-z0-9_]`. The first character cannot be a number.
-     * The value must be unique within an EntityType.
+     * The value must be unique within an EntityType/FeatureGroup.
      *
      * Generated from protobuf field <code>string feature_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $feature_id = '';
+    protected $feature_id = '';
+
+    /**
+     * @param string                              $parent  Required. The resource name of the EntityType or FeatureGroup to create a
+     *                                                     Feature. Format for entity_type as parent:
+     *                                                     `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     *                                                     Format for feature_group as parent:
+     *                                                     `projects/{project}/locations/{location}/featureGroups/{feature_group}`
+     *                                                     Please see {@see FeaturestoreServiceClient::entityTypeName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\Feature $feature Required. The Feature to create.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\CreateFeatureRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AIPlatform\V1\Feature $feature): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setFeature($feature);
+    }
+
+    /**
+     * @param string                              $parent    Required. The resource name of the EntityType or FeatureGroup to create a
+     *                                                       Feature. Format for entity_type as parent:
+     *                                                       `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     *                                                       Format for feature_group as parent:
+     *                                                       `projects/{project}/locations/{location}/featureGroups/{feature_group}`
+     *                                                       Please see {@see FeaturestoreServiceClient::entityTypeName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\Feature $feature   Required. The Feature to create.
+     * @param string                              $featureId Required. The ID to use for the Feature, which will become the final
+     *                                                       component of the Feature's resource name.
+     *
+     *                                                       This value may be up to 128 characters, and valid characters are
+     *                                                       `[a-z0-9_]`. The first character cannot be a number.
+     *
+     *                                                       The value must be unique within an EntityType/FeatureGroup.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\CreateFeatureRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParentFeatureFeatureId(string $parent, \Google\Cloud\AIPlatform\V1\Feature $feature, string $featureId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setFeature($feature)
+            ->setFeatureId($featureId);
+    }
 
     /**
      * Constructor.
@@ -47,17 +100,19 @@ class CreateFeatureRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The resource name of the EntityType to create a Feature.
-     *           Format:
+     *           Required. The resource name of the EntityType or FeatureGroup to create a
+     *           Feature. Format for entity_type as parent:
      *           `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     *           Format for feature_group as parent:
+     *           `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *     @type \Google\Cloud\AIPlatform\V1\Feature $feature
      *           Required. The Feature to create.
      *     @type string $feature_id
-     *           Required. The ID to use for the Feature, which will become the final component of
-     *           the Feature's resource name.
-     *           This value may be up to 60 characters, and valid characters are
+     *           Required. The ID to use for the Feature, which will become the final
+     *           component of the Feature's resource name.
+     *           This value may be up to 128 characters, and valid characters are
      *           `[a-z0-9_]`. The first character cannot be a number.
-     *           The value must be unique within an EntityType.
+     *           The value must be unique within an EntityType/FeatureGroup.
      * }
      */
     public function __construct($data = NULL) {
@@ -66,9 +121,11 @@ class CreateFeatureRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the EntityType to create a Feature.
-     * Format:
+     * Required. The resource name of the EntityType or FeatureGroup to create a
+     * Feature. Format for entity_type as parent:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     * Format for feature_group as parent:
+     * `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -79,9 +136,11 @@ class CreateFeatureRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the EntityType to create a Feature.
-     * Format:
+     * Required. The resource name of the EntityType or FeatureGroup to create a
+     * Feature. Format for entity_type as parent:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     * Format for feature_group as parent:
+     * `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -132,11 +191,11 @@ class CreateFeatureRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the Feature, which will become the final component of
-     * the Feature's resource name.
-     * This value may be up to 60 characters, and valid characters are
+     * Required. The ID to use for the Feature, which will become the final
+     * component of the Feature's resource name.
+     * This value may be up to 128 characters, and valid characters are
      * `[a-z0-9_]`. The first character cannot be a number.
-     * The value must be unique within an EntityType.
+     * The value must be unique within an EntityType/FeatureGroup.
      *
      * Generated from protobuf field <code>string feature_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -147,11 +206,11 @@ class CreateFeatureRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the Feature, which will become the final component of
-     * the Feature's resource name.
-     * This value may be up to 60 characters, and valid characters are
+     * Required. The ID to use for the Feature, which will become the final
+     * component of the Feature's resource name.
+     * This value may be up to 128 characters, and valid characters are
      * `[a-z0-9_]`. The first character cannot be a number.
-     * The value must be unique within an EntityType.
+     * The value must be unique within an EntityType/FeatureGroup.
      *
      * Generated from protobuf field <code>string feature_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

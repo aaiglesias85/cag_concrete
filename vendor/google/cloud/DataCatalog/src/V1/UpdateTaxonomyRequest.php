@@ -22,7 +22,7 @@ class UpdateTaxonomyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.Taxonomy taxonomy = 1;</code>
      */
-    private $taxonomy = null;
+    protected $taxonomy = null;
     /**
      * Specifies fields to update. If not set, defaults to all fields you can
      * update.
@@ -31,7 +31,21 @@ class UpdateTaxonomyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\DataCatalog\V1\Taxonomy $taxonomy The taxonomy to update. You can update only its description, display name,
+     *                                                        and activated policy types.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\UpdateTaxonomyRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\DataCatalog\V1\Taxonomy $taxonomy): self
+    {
+        return (new self())
+            ->setTaxonomy($taxonomy);
+    }
 
     /**
      * Constructor.

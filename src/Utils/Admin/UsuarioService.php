@@ -12,6 +12,7 @@ use App\Entity\Usuario;
 use App\Entity\Rol;
 use App\Entity\Cotizacion;
 use App\Utils\Base;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 class UsuarioService extends Base
 {
@@ -246,22 +247,17 @@ class UsuarioService extends Base
             $contenido .= "Your new password is: " . $pass . ".<br>";
             $contenido .= "Thank you for preferring our service.";
 
-            $mensaje = new \Swift_Message();
-            $mensaje->setSubject($asunto)
-                ->setFrom($direccion_from)
-                ->setTo($email)
-                ->setBody(
-                    $this->renderView(
-                        'admin/mailing/mail.html.twig',
-                        array(
-                            'direccion_url' => $direccion_url,
-                            'asunto' => $asunto,
-                            'receptor' => $usuario->getNombreCompleto(),
-                            'contenido' => $contenido,
-                        )
-                    ),
-                    'text/html'
-                );
+            $mensaje = new TemplatedEmail();
+            $mensaje->subject($asunto)
+                ->from($direccion_from)
+                ->to($email)
+                ->htmlTemplate('admin/mailing/mail.html.twig')
+                ->context([
+                    'direccion_url' => $direccion_url,
+                    'asunto' => $asunto,
+                    'receptor' => $usuario->getNombreCompleto(),
+                    'contenido' => $contenido,
+                ]);
 
             $this->mailer->send($mensaje);
 

@@ -23,7 +23,23 @@ class DeleteConversationDatasetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The conversation dataset to delete. Format:
+     *                     `projects/<Project ID>/locations/<Location
+     *                     ID>/conversationDatasets/<Conversation Dataset ID>`
+     *                     Please see {@see ConversationDatasetsClient::conversationDatasetName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\DeleteConversationDatasetRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

@@ -24,7 +24,7 @@ use Google\Cloud\Bigtable\V2\ReadModifyWriteRule;
  * the specified rows contents are to be transformed into writes. Entries are
  * applied in order, meaning that earlier rules will affect the results of later
  * ones. This is intended to be used in combination with
- * {@see Google\Cloud\Bigtable\Table::readModifyWriteRow()}.
+ * {@see \Google\Cloud\Bigtable\Table::readModifyWriteRow()}.
  */
 class ReadModifyWriteRowRules
 {
@@ -45,7 +45,7 @@ class ReadModifyWriteRowRules
      */
     public function append($familyName, $qualifier, $value)
     {
-        $this->rules[] = (new ReadModifyWriteRule)
+        $this->rules[] = (new ReadModifyWriteRule())
             ->setFamilyName($familyName)
             ->setColumnQualifier($qualifier)
             ->setAppendValue($value);
@@ -65,7 +65,7 @@ class ReadModifyWriteRowRules
      */
     public function increment($familyName, $qualifier, $amount)
     {
-        $this->rules[] = (new ReadModifyWriteRule)
+        $this->rules[] = (new ReadModifyWriteRule())
             ->setFamilyName($familyName)
             ->setColumnQualifier($qualifier)
             ->setIncrementAmount($amount);

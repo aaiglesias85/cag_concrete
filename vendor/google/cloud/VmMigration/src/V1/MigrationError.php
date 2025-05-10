@@ -22,21 +22,22 @@ class MigrationError extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.MigrationError.ErrorCode code = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $code = 0;
+    protected $code = 0;
     /**
      * Output only. The localized error message.
      *
      * Generated from protobuf field <code>.google.rpc.LocalizedMessage error_message = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $error_message = null;
+    protected $error_message = null;
     /**
      * Output only. Suggested action for solving the error.
      *
      * Generated from protobuf field <code>.google.rpc.LocalizedMessage action_item = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $action_item = null;
+    protected $action_item = null;
     /**
-     * Output only. URL(s) pointing to additional information on handling the current error.
+     * Output only. URL(s) pointing to additional information on handling the
+     * current error.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Help.Link help_links = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
@@ -46,7 +47,7 @@ class MigrationError extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp error_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $error_time = null;
+    protected $error_time = null;
 
     /**
      * Constructor.
@@ -60,8 +61,9 @@ class MigrationError extends \Google\Protobuf\Internal\Message
      *           Output only. The localized error message.
      *     @type \Google\Rpc\LocalizedMessage $action_item
      *           Output only. Suggested action for solving the error.
-     *     @type \Google\Rpc\Help\Link[]|\Google\Protobuf\Internal\RepeatedField $help_links
-     *           Output only. URL(s) pointing to additional information on handling the current error.
+     *     @type array<\Google\Rpc\Help\Link>|\Google\Protobuf\Internal\RepeatedField $help_links
+     *           Output only. URL(s) pointing to additional information on handling the
+     *           current error.
      *     @type \Google\Protobuf\Timestamp $error_time
      *           Output only. The time the error occurred.
      * }
@@ -170,7 +172,8 @@ class MigrationError extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. URL(s) pointing to additional information on handling the current error.
+     * Output only. URL(s) pointing to additional information on handling the
+     * current error.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Help.Link help_links = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -181,10 +184,11 @@ class MigrationError extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. URL(s) pointing to additional information on handling the current error.
+     * Output only. URL(s) pointing to additional information on handling the
+     * current error.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Help.Link help_links = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Rpc\Help\Link[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Rpc\Help\Link>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setHelpLinks($var)

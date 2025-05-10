@@ -31,11 +31,18 @@ class Provider
      * Generated from protobuf enum <code>CLOUD_DNS = 2;</code>
      */
     const CLOUD_DNS = 2;
+    /**
+     * Use KubeDNS for DNS resolution.
+     *
+     * Generated from protobuf enum <code>KUBE_DNS = 3;</code>
+     */
+    const KUBE_DNS = 3;
 
     private static $valueToName = [
         self::PROVIDER_UNSPECIFIED => 'PROVIDER_UNSPECIFIED',
         self::PLATFORM_DEFAULT => 'PLATFORM_DEFAULT',
         self::CLOUD_DNS => 'CLOUD_DNS',
+        self::KUBE_DNS => 'KUBE_DNS',
     ];
 
     public static function name($value)
@@ -59,6 +66,4 @@ class Provider
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Provider::class, \Google\Cloud\Container\V1\DNSConfig_Provider::class);
 

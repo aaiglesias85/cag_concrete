@@ -43,6 +43,18 @@ class Category
      * Generated from protobuf enum <code>MANAGEABILITY = 4;</code>
      */
     const MANAGEABILITY = 4;
+    /**
+     * Indicates a potential increase or decrease in sustainability.
+     *
+     * Generated from protobuf enum <code>SUSTAINABILITY = 5;</code>
+     */
+    const SUSTAINABILITY = 5;
+    /**
+     * Indicates a potential increase or decrease in reliability.
+     *
+     * Generated from protobuf enum <code>RELIABILITY = 6;</code>
+     */
+    const RELIABILITY = 6;
 
     private static $valueToName = [
         self::CATEGORY_UNSPECIFIED => 'CATEGORY_UNSPECIFIED',
@@ -50,6 +62,8 @@ class Category
         self::SECURITY => 'SECURITY',
         self::PERFORMANCE => 'PERFORMANCE',
         self::MANAGEABILITY => 'MANAGEABILITY',
+        self::SUSTAINABILITY => 'SUSTAINABILITY',
+        self::RELIABILITY => 'RELIABILITY',
     ];
 
     public static function name($value)
@@ -73,6 +87,4 @@ class Category
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Category::class, \Google\Cloud\Recommender\V1\Impact_Category::class);
 

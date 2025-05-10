@@ -17,9 +17,9 @@ use Google\Protobuf\Internal\GPBUtil;
 class InputDataConfig extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The ID of the Dataset in the same Project and Location which data will be
-     * used to train the Model. The Dataset must use schema compatible with
-     * Model being trained, and what is compatible should be described in the
+     * Required. The ID of the Dataset in the same Project and Location which data
+     * will be used to train the Model. The Dataset must use schema compatible
+     * with Model being trained, and what is compatible should be described in the
      * used TrainingPipeline's [training_task_definition]
      * [google.cloud.aiplatform.v1.TrainingPipeline.training_task_definition].
      * For tabular Datasets, all their data is exported to training, to pick
@@ -27,7 +27,7 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string dataset_id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $dataset_id = '';
+    protected $dataset_id = '';
     /**
      * Applicable only to Datasets that have DataItems and Annotations.
      * A filter on Annotations of the Dataset. Only Annotations that both
@@ -35,13 +35,13 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      * are used in respectively training, validation or test role, depending on
      * the role of the DataItem they are on (for the auto-assigned that role is
      * decided by Vertex AI). A filter with same syntax as the one used in
-     * [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations] may be used, but note
-     * here it filters across all Annotations of the Dataset, and not just within
-     * a single DataItem.
+     * [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations]
+     * may be used, but note here it filters across all Annotations of the
+     * Dataset, and not just within a single DataItem.
      *
      * Generated from protobuf field <code>string annotations_filter = 6;</code>
      */
-    private $annotations_filter = '';
+    protected $annotations_filter = '';
     /**
      * Applicable only to custom training with Datasets that have DataItems and
      * Annotations.
@@ -51,18 +51,49 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      * The schema files that can be used here are found in
      * gs://google-cloud-aiplatform/schema/dataset/annotation/ , note that the
      * chosen schema must be consistent with
-     * [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the Dataset specified by
+     * [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the
+     * Dataset specified by
      * [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id].
      * Only Annotations that both match this schema and belong to DataItems not
      * ignored by the split method are used in respectively training, validation
      * or test role, depending on the role of the DataItem they are on.
-     * When used in conjunction with [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter], the Annotations used
-     * for training are filtered by both [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter] and
+     * When used in conjunction with
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     * the Annotations used for training are filtered by both
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter]
+     * and
      * [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri].
      *
      * Generated from protobuf field <code>string annotation_schema_uri = 9;</code>
      */
-    private $annotation_schema_uri = '';
+    protected $annotation_schema_uri = '';
+    /**
+     * Only applicable to Datasets that have SavedQueries.
+     * The ID of a SavedQuery (annotation set) under the Dataset specified by
+     * [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id] used
+     * for filtering Annotations for training.
+     * Only Annotations that are associated with this SavedQuery are used in
+     * respectively training. When used in conjunction with
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     * the Annotations used for training are filtered by both
+     * [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     * and
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter].
+     * Only one of
+     * [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     * and
+     * [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri]
+     * should be specified as both of them represent the same thing: problem type.
+     *
+     * Generated from protobuf field <code>string saved_query_id = 7;</code>
+     */
+    protected $saved_query_id = '';
+    /**
+     * Whether to persist the ML use assignment to data item system labels.
+     *
+     * Generated from protobuf field <code>bool persist_ml_use_assignment = 11;</code>
+     */
+    protected $persist_ml_use_assignment = false;
     protected $split;
     protected $destination;
 
@@ -119,9 +150,9 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      *           * AIP_TEST_DATA_URI =
      *           "bigquery_destination.dataset_<dataset-id>_<annotation-type>_<time>.test"
      *     @type string $dataset_id
-     *           Required. The ID of the Dataset in the same Project and Location which data will be
-     *           used to train the Model. The Dataset must use schema compatible with
-     *           Model being trained, and what is compatible should be described in the
+     *           Required. The ID of the Dataset in the same Project and Location which data
+     *           will be used to train the Model. The Dataset must use schema compatible
+     *           with Model being trained, and what is compatible should be described in the
      *           used TrainingPipeline's [training_task_definition]
      *           [google.cloud.aiplatform.v1.TrainingPipeline.training_task_definition].
      *           For tabular Datasets, all their data is exported to training, to pick
@@ -133,9 +164,9 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      *           are used in respectively training, validation or test role, depending on
      *           the role of the DataItem they are on (for the auto-assigned that role is
      *           decided by Vertex AI). A filter with same syntax as the one used in
-     *           [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations] may be used, but note
-     *           here it filters across all Annotations of the Dataset, and not just within
-     *           a single DataItem.
+     *           [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations]
+     *           may be used, but note here it filters across all Annotations of the
+     *           Dataset, and not just within a single DataItem.
      *     @type string $annotation_schema_uri
      *           Applicable only to custom training with Datasets that have DataItems and
      *           Annotations.
@@ -145,14 +176,37 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      *           The schema files that can be used here are found in
      *           gs://google-cloud-aiplatform/schema/dataset/annotation/ , note that the
      *           chosen schema must be consistent with
-     *           [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the Dataset specified by
+     *           [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the
+     *           Dataset specified by
      *           [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id].
      *           Only Annotations that both match this schema and belong to DataItems not
      *           ignored by the split method are used in respectively training, validation
      *           or test role, depending on the role of the DataItem they are on.
-     *           When used in conjunction with [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter], the Annotations used
-     *           for training are filtered by both [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter] and
+     *           When used in conjunction with
+     *           [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     *           the Annotations used for training are filtered by both
+     *           [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter]
+     *           and
      *           [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri].
+     *     @type string $saved_query_id
+     *           Only applicable to Datasets that have SavedQueries.
+     *           The ID of a SavedQuery (annotation set) under the Dataset specified by
+     *           [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id] used
+     *           for filtering Annotations for training.
+     *           Only Annotations that are associated with this SavedQuery are used in
+     *           respectively training. When used in conjunction with
+     *           [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     *           the Annotations used for training are filtered by both
+     *           [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     *           and
+     *           [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter].
+     *           Only one of
+     *           [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     *           and
+     *           [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri]
+     *           should be specified as both of them represent the same thing: problem type.
+     *     @type bool $persist_ml_use_assignment
+     *           Whether to persist the ML use assignment to data item system labels.
      * }
      */
     public function __construct($data = NULL) {
@@ -442,9 +496,9 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID of the Dataset in the same Project and Location which data will be
-     * used to train the Model. The Dataset must use schema compatible with
-     * Model being trained, and what is compatible should be described in the
+     * Required. The ID of the Dataset in the same Project and Location which data
+     * will be used to train the Model. The Dataset must use schema compatible
+     * with Model being trained, and what is compatible should be described in the
      * used TrainingPipeline's [training_task_definition]
      * [google.cloud.aiplatform.v1.TrainingPipeline.training_task_definition].
      * For tabular Datasets, all their data is exported to training, to pick
@@ -459,9 +513,9 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID of the Dataset in the same Project and Location which data will be
-     * used to train the Model. The Dataset must use schema compatible with
-     * Model being trained, and what is compatible should be described in the
+     * Required. The ID of the Dataset in the same Project and Location which data
+     * will be used to train the Model. The Dataset must use schema compatible
+     * with Model being trained, and what is compatible should be described in the
      * used TrainingPipeline's [training_task_definition]
      * [google.cloud.aiplatform.v1.TrainingPipeline.training_task_definition].
      * For tabular Datasets, all their data is exported to training, to pick
@@ -486,9 +540,9 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      * are used in respectively training, validation or test role, depending on
      * the role of the DataItem they are on (for the auto-assigned that role is
      * decided by Vertex AI). A filter with same syntax as the one used in
-     * [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations] may be used, but note
-     * here it filters across all Annotations of the Dataset, and not just within
-     * a single DataItem.
+     * [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations]
+     * may be used, but note here it filters across all Annotations of the
+     * Dataset, and not just within a single DataItem.
      *
      * Generated from protobuf field <code>string annotations_filter = 6;</code>
      * @return string
@@ -505,9 +559,9 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      * are used in respectively training, validation or test role, depending on
      * the role of the DataItem they are on (for the auto-assigned that role is
      * decided by Vertex AI). A filter with same syntax as the one used in
-     * [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations] may be used, but note
-     * here it filters across all Annotations of the Dataset, and not just within
-     * a single DataItem.
+     * [ListAnnotations][google.cloud.aiplatform.v1.DatasetService.ListAnnotations]
+     * may be used, but note here it filters across all Annotations of the
+     * Dataset, and not just within a single DataItem.
      *
      * Generated from protobuf field <code>string annotations_filter = 6;</code>
      * @param string $var
@@ -530,13 +584,17 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      * The schema files that can be used here are found in
      * gs://google-cloud-aiplatform/schema/dataset/annotation/ , note that the
      * chosen schema must be consistent with
-     * [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the Dataset specified by
+     * [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the
+     * Dataset specified by
      * [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id].
      * Only Annotations that both match this schema and belong to DataItems not
      * ignored by the split method are used in respectively training, validation
      * or test role, depending on the role of the DataItem they are on.
-     * When used in conjunction with [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter], the Annotations used
-     * for training are filtered by both [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter] and
+     * When used in conjunction with
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     * the Annotations used for training are filtered by both
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter]
+     * and
      * [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri].
      *
      * Generated from protobuf field <code>string annotation_schema_uri = 9;</code>
@@ -556,13 +614,17 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
      * The schema files that can be used here are found in
      * gs://google-cloud-aiplatform/schema/dataset/annotation/ , note that the
      * chosen schema must be consistent with
-     * [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the Dataset specified by
+     * [metadata][google.cloud.aiplatform.v1.Dataset.metadata_schema_uri] of the
+     * Dataset specified by
      * [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id].
      * Only Annotations that both match this schema and belong to DataItems not
      * ignored by the split method are used in respectively training, validation
      * or test role, depending on the role of the DataItem they are on.
-     * When used in conjunction with [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter], the Annotations used
-     * for training are filtered by both [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter] and
+     * When used in conjunction with
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     * the Annotations used for training are filtered by both
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter]
+     * and
      * [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri].
      *
      * Generated from protobuf field <code>string annotation_schema_uri = 9;</code>
@@ -573,6 +635,88 @@ class InputDataConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->annotation_schema_uri = $var;
+
+        return $this;
+    }
+
+    /**
+     * Only applicable to Datasets that have SavedQueries.
+     * The ID of a SavedQuery (annotation set) under the Dataset specified by
+     * [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id] used
+     * for filtering Annotations for training.
+     * Only Annotations that are associated with this SavedQuery are used in
+     * respectively training. When used in conjunction with
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     * the Annotations used for training are filtered by both
+     * [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     * and
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter].
+     * Only one of
+     * [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     * and
+     * [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri]
+     * should be specified as both of them represent the same thing: problem type.
+     *
+     * Generated from protobuf field <code>string saved_query_id = 7;</code>
+     * @return string
+     */
+    public function getSavedQueryId()
+    {
+        return $this->saved_query_id;
+    }
+
+    /**
+     * Only applicable to Datasets that have SavedQueries.
+     * The ID of a SavedQuery (annotation set) under the Dataset specified by
+     * [dataset_id][google.cloud.aiplatform.v1.InputDataConfig.dataset_id] used
+     * for filtering Annotations for training.
+     * Only Annotations that are associated with this SavedQuery are used in
+     * respectively training. When used in conjunction with
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter],
+     * the Annotations used for training are filtered by both
+     * [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     * and
+     * [annotations_filter][google.cloud.aiplatform.v1.InputDataConfig.annotations_filter].
+     * Only one of
+     * [saved_query_id][google.cloud.aiplatform.v1.InputDataConfig.saved_query_id]
+     * and
+     * [annotation_schema_uri][google.cloud.aiplatform.v1.InputDataConfig.annotation_schema_uri]
+     * should be specified as both of them represent the same thing: problem type.
+     *
+     * Generated from protobuf field <code>string saved_query_id = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSavedQueryId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->saved_query_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Whether to persist the ML use assignment to data item system labels.
+     *
+     * Generated from protobuf field <code>bool persist_ml_use_assignment = 11;</code>
+     * @return bool
+     */
+    public function getPersistMlUseAssignment()
+    {
+        return $this->persist_ml_use_assignment;
+    }
+
+    /**
+     * Whether to persist the ML use assignment to data item system labels.
+     *
+     * Generated from protobuf field <code>bool persist_ml_use_assignment = 11;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setPersistMlUseAssignment($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->persist_ml_use_assignment = $var;
 
         return $this;
     }

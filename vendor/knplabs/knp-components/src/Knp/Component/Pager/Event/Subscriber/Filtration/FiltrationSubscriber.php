@@ -22,8 +22,8 @@ class FiltrationSubscriber implements EventSubscriberInterface
         /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher */
         $dispatcher = $event->getEventDispatcher();
         // hook all standard filtration subscribers
-        $dispatcher->addSubscriber(new Doctrine\ORM\QuerySubscriber($event->getRequest()));
-        $dispatcher->addSubscriber(new PropelQuerySubscriber($event->getRequest()));
+        $dispatcher->addSubscriber(new Doctrine\ORM\QuerySubscriber());
+        $dispatcher->addSubscriber(new PropelQuerySubscriber());
 
         $this->isLoaded = true;
     }

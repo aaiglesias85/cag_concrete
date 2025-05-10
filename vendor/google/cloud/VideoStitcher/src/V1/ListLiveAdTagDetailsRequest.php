@@ -21,19 +21,34 @@ class ListLiveAdTagDetailsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of items to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The pagination token returned from a previous List request.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The resource parent in the form of
+     *                       `projects/{project}/locations/{location}/liveSessions/{live_session}`. Please see
+     *                       {@see VideoStitcherServiceClient::liveSessionName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Video\Stitcher\V1\ListLiveAdTagDetailsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

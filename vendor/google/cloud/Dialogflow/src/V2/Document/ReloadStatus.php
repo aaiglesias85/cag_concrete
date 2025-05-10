@@ -22,13 +22,13 @@ class ReloadStatus extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp time = 1;</code>
      */
-    private $time = null;
+    protected $time = null;
     /**
      * The status of a reload attempt or the initial load.
      *
      * Generated from protobuf field <code>.google.rpc.Status status = 2;</code>
      */
-    private $status = null;
+    protected $status = null;
 
     /**
      * Constructor.
@@ -127,6 +127,4 @@ class ReloadStatus extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ReloadStatus::class, \Google\Cloud\Dialogflow\V2\Document_ReloadStatus::class);
 

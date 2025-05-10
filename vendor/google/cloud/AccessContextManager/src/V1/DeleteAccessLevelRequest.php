@@ -23,7 +23,25 @@ class DeleteAccessLevelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. Resource name for the [Access Level]
+     *                     [google.identity.accesscontextmanager.v1.AccessLevel].
+     *
+     *                     Format:
+     *                     `accessPolicies/{policy_id}/accessLevels/{access_level_id}`
+     *                     Please see {@see AccessContextManagerClient::accessLevelName()} for help formatting this field.
+     *
+     * @return \Google\Identity\AccessContextManager\V1\DeleteAccessLevelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

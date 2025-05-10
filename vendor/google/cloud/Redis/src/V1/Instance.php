@@ -22,18 +22,20 @@ class Instance extends \Google\Protobuf\Internal\Message
      * Note: Redis instances are managed and addressed at regional level so
      * location_id here refers to a GCP region; however, users may choose which
      * specific zone (or collection of zones for cross-zone instances) an instance
-     * should be provisioned in. Refer to [location_id][google.cloud.redis.v1.Instance.location_id] and
-     * [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id] fields for more details.
+     * should be provisioned in. Refer to
+     * [location_id][google.cloud.redis.v1.Instance.location_id] and
+     * [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id]
+     * fields for more details.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * An arbitrary and optional user-provided name for the instance.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Resource labels to represent user provided metadata
      *
@@ -49,7 +51,7 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string location_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $location_id = '';
+    protected $location_id = '';
     /**
      * Optional. If specified, at least one node will be provisioned in this zone
      * in addition to the zone specified in location_id. Only applicable to
@@ -59,7 +61,7 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string alternative_location_id = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $alternative_location_id = '';
+    protected $alternative_location_id = '';
     /**
      * Optional. The version of Redis software.
      * If not provided, latest supported version will be used. Currently, the
@@ -71,7 +73,7 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string redis_version = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $redis_version = '';
+    protected $redis_version = '';
     /**
      * Optional. For DIRECT_PEERING mode, the CIDR range of internal addresses
      * that are reserved for this instance. Range must
@@ -84,30 +86,30 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string reserved_ip_range = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $reserved_ip_range = '';
+    protected $reserved_ip_range = '';
     /**
-     * Optional. Additional IP range for node placement. Required when enabling read
-     * replicas on an existing instance. For DIRECT_PEERING mode value must be a
-     * CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode value
-     * must be the name of an allocated address range associated with the private
-     * service access connection, or "auto".
+     * Optional. Additional IP range for node placement. Required when enabling
+     * read replicas on an existing instance. For DIRECT_PEERING mode value must
+     * be a CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode
+     * value must be the name of an allocated address range associated with the
+     * private service access connection, or "auto".
      *
      * Generated from protobuf field <code>string secondary_ip_range = 30 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $secondary_ip_range = '';
+    protected $secondary_ip_range = '';
     /**
      * Output only. Hostname or IP address of the exposed Redis endpoint used by
      * clients to connect to the service.
      *
      * Generated from protobuf field <code>string host = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $host = '';
+    protected $host = '';
     /**
      * Output only. The port number of the exposed Redis endpoint.
      *
      * Generated from protobuf field <code>int32 port = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $port = 0;
+    protected $port = 0;
     /**
      * Output only. The current zone where the Redis primary node is located. In
      * basic tier, this will always be the same as [location_id]. In
@@ -115,26 +117,26 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string current_location_id = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $current_location_id = '';
+    protected $current_location_id = '';
     /**
      * Output only. The time the instance was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The current state of this instance.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.State state = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. Additional information about the current status of this
      * instance, if available.
      *
      * Generated from protobuf field <code>string status_message = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $status_message = '';
+    protected $status_message = '';
     /**
      * Optional. Redis configuration parameters, according to
      * http://redis.io/topics/config. Currently, the only supported parameters
@@ -159,13 +161,13 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.Tier tier = 17 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $tier = 0;
+    protected $tier = 0;
     /**
      * Required. Redis memory size in GiB.
      *
      * Generated from protobuf field <code>int32 memory_size_gb = 18 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $memory_size_gb = 0;
+    protected $memory_size_gb = 0;
     /**
      * Optional. The full name of the Google Compute Engine
      * [network](https://cloud.google.com/vpc/docs/vpc) to which the
@@ -174,7 +176,7 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string authorized_network = 20 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $authorized_network = '';
+    protected $authorized_network = '';
     /**
      * Output only. Cloud IAM identity used by import / export operations to
      * transfer data to/from Cloud Storage. Format is
@@ -184,22 +186,22 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string persistence_iam_identity = 21 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $persistence_iam_identity = '';
+    protected $persistence_iam_identity = '';
     /**
      * Optional. The network connect mode of the Redis instance.
      * If not provided, the connect mode defaults to DIRECT_PEERING.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.ConnectMode connect_mode = 22 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $connect_mode = 0;
+    protected $connect_mode = 0;
     /**
-     * Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If set to
-     * "true" AUTH is enabled on the instance. Default value is "false" meaning
-     * AUTH is disabled.
+     * Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If
+     * set to "true" AUTH is enabled on the instance. Default value is "false"
+     * meaning AUTH is disabled.
      *
      * Generated from protobuf field <code>bool auth_enabled = 23 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $auth_enabled = false;
+    protected $auth_enabled = false;
     /**
      * Output only. List of server CA certificates for the instance.
      *
@@ -212,31 +214,31 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.TransitEncryptionMode transit_encryption_mode = 26 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $transit_encryption_mode = 0;
+    protected $transit_encryption_mode = 0;
     /**
      * Optional. The maintenance policy for the instance. If not provided,
      * maintenance events can be performed at any time.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.MaintenancePolicy maintenance_policy = 27 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $maintenance_policy = null;
+    protected $maintenance_policy = null;
     /**
      * Output only. Date and time of upcoming maintenance events which have been
      * scheduled.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.MaintenanceSchedule maintenance_schedule = 28 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $maintenance_schedule = null;
+    protected $maintenance_schedule = null;
     /**
-     * Optional. The number of replica nodes. The valid range for the Standard Tier with
-     * read replicas enabled is [1-5] and defaults to 2. If read replicas are not
-     * enabled for a Standard Tier instance, the only valid value is 1 and the
-     * default is 1. The valid value for basic tier is 0 and the default is also
-     * 0.
+     * Optional. The number of replica nodes. The valid range for the Standard
+     * Tier with read replicas enabled is [1-5] and defaults to 2. If read
+     * replicas are not enabled for a Standard Tier instance, the only valid value
+     * is 1 and the default is 1. The valid value for basic tier is 0 and the
+     * default is also 0.
      *
      * Generated from protobuf field <code>int32 replica_count = 31 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $replica_count = 0;
+    protected $replica_count = 0;
     /**
      * Output only. Info per node.
      *
@@ -251,20 +253,54 @@ class Instance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string read_endpoint = 33 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $read_endpoint = '';
+    protected $read_endpoint = '';
     /**
      * Output only. The port number of the exposed readonly redis
      * endpoint. Standard tier only. Write requests should target 'port'.
      *
      * Generated from protobuf field <code>int32 read_endpoint_port = 34 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $read_endpoint_port = 0;
+    protected $read_endpoint_port = 0;
     /**
-     * Optional. Read replicas mode for the instance. Defaults to READ_REPLICAS_DISABLED.
+     * Optional. Read replicas mode for the instance. Defaults to
+     * READ_REPLICAS_DISABLED.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.ReadReplicasMode read_replicas_mode = 35 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $read_replicas_mode = 0;
+    protected $read_replicas_mode = 0;
+    /**
+     * Optional. The KMS key reference that the customer provides when trying to
+     * create the instance.
+     *
+     * Generated from protobuf field <code>string customer_managed_key = 36 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $customer_managed_key = '';
+    /**
+     * Optional. Persistence configuration parameters
+     *
+     * Generated from protobuf field <code>.google.cloud.redis.v1.PersistenceConfig persistence_config = 37 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $persistence_config = null;
+    /**
+     * Optional. reasons that causes instance in "SUSPENDED" state.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.redis.v1.Instance.SuspensionReason suspension_reasons = 38 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $suspension_reasons;
+    /**
+     * Optional. The self service update maintenance version.
+     * The version is date based such as "20210712_00_00".
+     *
+     * Generated from protobuf field <code>string maintenance_version = 39 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $maintenance_version = '';
+    /**
+     * Optional. The available maintenance versions that an instance could update
+     * to.
+     *
+     * Generated from protobuf field <code>repeated string available_maintenance_versions = 40 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $available_maintenance_versions;
 
     /**
      * Constructor.
@@ -279,8 +315,10 @@ class Instance extends \Google\Protobuf\Internal\Message
      *           Note: Redis instances are managed and addressed at regional level so
      *           location_id here refers to a GCP region; however, users may choose which
      *           specific zone (or collection of zones for cross-zone instances) an instance
-     *           should be provisioned in. Refer to [location_id][google.cloud.redis.v1.Instance.location_id] and
-     *           [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id] fields for more details.
+     *           should be provisioned in. Refer to
+     *           [location_id][google.cloud.redis.v1.Instance.location_id] and
+     *           [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id]
+     *           fields for more details.
      *     @type string $display_name
      *           An arbitrary and optional user-provided name for the instance.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
@@ -315,11 +353,11 @@ class Instance extends \Google\Protobuf\Internal\Message
      *           example, 10.0.0.0/29 or 192.168.0.0/29.  For READ_REPLICAS_ENABLED
      *           the default block size is /28.
      *     @type string $secondary_ip_range
-     *           Optional. Additional IP range for node placement. Required when enabling read
-     *           replicas on an existing instance. For DIRECT_PEERING mode value must be a
-     *           CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode value
-     *           must be the name of an allocated address range associated with the private
-     *           service access connection, or "auto".
+     *           Optional. Additional IP range for node placement. Required when enabling
+     *           read replicas on an existing instance. For DIRECT_PEERING mode value must
+     *           be a CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode
+     *           value must be the name of an allocated address range associated with the
+     *           private service access connection, or "auto".
      *     @type string $host
      *           Output only. Hostname or IP address of the exposed Redis endpoint used by
      *           clients to connect to the service.
@@ -370,10 +408,10 @@ class Instance extends \Google\Protobuf\Internal\Message
      *           Optional. The network connect mode of the Redis instance.
      *           If not provided, the connect mode defaults to DIRECT_PEERING.
      *     @type bool $auth_enabled
-     *           Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If set to
-     *           "true" AUTH is enabled on the instance. Default value is "false" meaning
-     *           AUTH is disabled.
-     *     @type \Google\Cloud\Redis\V1\TlsCertificate[]|\Google\Protobuf\Internal\RepeatedField $server_ca_certs
+     *           Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If
+     *           set to "true" AUTH is enabled on the instance. Default value is "false"
+     *           meaning AUTH is disabled.
+     *     @type array<\Google\Cloud\Redis\V1\TlsCertificate>|\Google\Protobuf\Internal\RepeatedField $server_ca_certs
      *           Output only. List of server CA certificates for the instance.
      *     @type int $transit_encryption_mode
      *           Optional. The TLS mode of the Redis instance.
@@ -385,12 +423,12 @@ class Instance extends \Google\Protobuf\Internal\Message
      *           Output only. Date and time of upcoming maintenance events which have been
      *           scheduled.
      *     @type int $replica_count
-     *           Optional. The number of replica nodes. The valid range for the Standard Tier with
-     *           read replicas enabled is [1-5] and defaults to 2. If read replicas are not
-     *           enabled for a Standard Tier instance, the only valid value is 1 and the
-     *           default is 1. The valid value for basic tier is 0 and the default is also
-     *           0.
-     *     @type \Google\Cloud\Redis\V1\NodeInfo[]|\Google\Protobuf\Internal\RepeatedField $nodes
+     *           Optional. The number of replica nodes. The valid range for the Standard
+     *           Tier with read replicas enabled is [1-5] and defaults to 2. If read
+     *           replicas are not enabled for a Standard Tier instance, the only valid value
+     *           is 1 and the default is 1. The valid value for basic tier is 0 and the
+     *           default is also 0.
+     *     @type array<\Google\Cloud\Redis\V1\NodeInfo>|\Google\Protobuf\Internal\RepeatedField $nodes
      *           Output only. Info per node.
      *     @type string $read_endpoint
      *           Output only. Hostname or IP address of the exposed readonly Redis
@@ -401,7 +439,21 @@ class Instance extends \Google\Protobuf\Internal\Message
      *           Output only. The port number of the exposed readonly redis
      *           endpoint. Standard tier only. Write requests should target 'port'.
      *     @type int $read_replicas_mode
-     *           Optional. Read replicas mode for the instance. Defaults to READ_REPLICAS_DISABLED.
+     *           Optional. Read replicas mode for the instance. Defaults to
+     *           READ_REPLICAS_DISABLED.
+     *     @type string $customer_managed_key
+     *           Optional. The KMS key reference that the customer provides when trying to
+     *           create the instance.
+     *     @type \Google\Cloud\Redis\V1\PersistenceConfig $persistence_config
+     *           Optional. Persistence configuration parameters
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $suspension_reasons
+     *           Optional. reasons that causes instance in "SUSPENDED" state.
+     *     @type string $maintenance_version
+     *           Optional. The self service update maintenance version.
+     *           The version is date based such as "20210712_00_00".
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $available_maintenance_versions
+     *           Optional. The available maintenance versions that an instance could update
+     *           to.
      * }
      */
     public function __construct($data = NULL) {
@@ -416,8 +468,10 @@ class Instance extends \Google\Protobuf\Internal\Message
      * Note: Redis instances are managed and addressed at regional level so
      * location_id here refers to a GCP region; however, users may choose which
      * specific zone (or collection of zones for cross-zone instances) an instance
-     * should be provisioned in. Refer to [location_id][google.cloud.redis.v1.Instance.location_id] and
-     * [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id] fields for more details.
+     * should be provisioned in. Refer to
+     * [location_id][google.cloud.redis.v1.Instance.location_id] and
+     * [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id]
+     * fields for more details.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -434,8 +488,10 @@ class Instance extends \Google\Protobuf\Internal\Message
      * Note: Redis instances are managed and addressed at regional level so
      * location_id here refers to a GCP region; however, users may choose which
      * specific zone (or collection of zones for cross-zone instances) an instance
-     * should be provisioned in. Refer to [location_id][google.cloud.redis.v1.Instance.location_id] and
-     * [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id] fields for more details.
+     * should be provisioned in. Refer to
+     * [location_id][google.cloud.redis.v1.Instance.location_id] and
+     * [alternative_location_id][google.cloud.redis.v1.Instance.alternative_location_id]
+     * fields for more details.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -648,11 +704,11 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Additional IP range for node placement. Required when enabling read
-     * replicas on an existing instance. For DIRECT_PEERING mode value must be a
-     * CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode value
-     * must be the name of an allocated address range associated with the private
-     * service access connection, or "auto".
+     * Optional. Additional IP range for node placement. Required when enabling
+     * read replicas on an existing instance. For DIRECT_PEERING mode value must
+     * be a CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode
+     * value must be the name of an allocated address range associated with the
+     * private service access connection, or "auto".
      *
      * Generated from protobuf field <code>string secondary_ip_range = 30 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -663,11 +719,11 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Additional IP range for node placement. Required when enabling read
-     * replicas on an existing instance. For DIRECT_PEERING mode value must be a
-     * CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode value
-     * must be the name of an allocated address range associated with the private
-     * service access connection, or "auto".
+     * Optional. Additional IP range for node placement. Required when enabling
+     * read replicas on an existing instance. For DIRECT_PEERING mode value must
+     * be a CIDR range of size /28, or "auto". For PRIVATE_SERVICE_ACCESS mode
+     * value must be the name of an allocated address range associated with the
+     * private service access connection, or "auto".
      *
      * Generated from protobuf field <code>string secondary_ip_range = 30 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -1054,9 +1110,9 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If set to
-     * "true" AUTH is enabled on the instance. Default value is "false" meaning
-     * AUTH is disabled.
+     * Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If
+     * set to "true" AUTH is enabled on the instance. Default value is "false"
+     * meaning AUTH is disabled.
      *
      * Generated from protobuf field <code>bool auth_enabled = 23 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
@@ -1067,9 +1123,9 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If set to
-     * "true" AUTH is enabled on the instance. Default value is "false" meaning
-     * AUTH is disabled.
+     * Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If
+     * set to "true" AUTH is enabled on the instance. Default value is "false"
+     * meaning AUTH is disabled.
      *
      * Generated from protobuf field <code>bool auth_enabled = 23 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var
@@ -1098,7 +1154,7 @@ class Instance extends \Google\Protobuf\Internal\Message
      * Output only. List of server CA certificates for the instance.
      *
      * Generated from protobuf field <code>repeated .google.cloud.redis.v1.TlsCertificate server_ca_certs = 25 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\Redis\V1\TlsCertificate[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Redis\V1\TlsCertificate>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setServerCaCerts($var)
@@ -1214,11 +1270,11 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The number of replica nodes. The valid range for the Standard Tier with
-     * read replicas enabled is [1-5] and defaults to 2. If read replicas are not
-     * enabled for a Standard Tier instance, the only valid value is 1 and the
-     * default is 1. The valid value for basic tier is 0 and the default is also
-     * 0.
+     * Optional. The number of replica nodes. The valid range for the Standard
+     * Tier with read replicas enabled is [1-5] and defaults to 2. If read
+     * replicas are not enabled for a Standard Tier instance, the only valid value
+     * is 1 and the default is 1. The valid value for basic tier is 0 and the
+     * default is also 0.
      *
      * Generated from protobuf field <code>int32 replica_count = 31 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -1229,11 +1285,11 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The number of replica nodes. The valid range for the Standard Tier with
-     * read replicas enabled is [1-5] and defaults to 2. If read replicas are not
-     * enabled for a Standard Tier instance, the only valid value is 1 and the
-     * default is 1. The valid value for basic tier is 0 and the default is also
-     * 0.
+     * Optional. The number of replica nodes. The valid range for the Standard
+     * Tier with read replicas enabled is [1-5] and defaults to 2. If read
+     * replicas are not enabled for a Standard Tier instance, the only valid value
+     * is 1 and the default is 1. The valid value for basic tier is 0 and the
+     * default is also 0.
      *
      * Generated from protobuf field <code>int32 replica_count = 31 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -1262,7 +1318,7 @@ class Instance extends \Google\Protobuf\Internal\Message
      * Output only. Info per node.
      *
      * Generated from protobuf field <code>repeated .google.cloud.redis.v1.NodeInfo nodes = 32 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\Redis\V1\NodeInfo[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Redis\V1\NodeInfo>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNodes($var)
@@ -1334,7 +1390,8 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Read replicas mode for the instance. Defaults to READ_REPLICAS_DISABLED.
+     * Optional. Read replicas mode for the instance. Defaults to
+     * READ_REPLICAS_DISABLED.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.ReadReplicasMode read_replicas_mode = 35 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -1345,7 +1402,8 @@ class Instance extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Read replicas mode for the instance. Defaults to READ_REPLICAS_DISABLED.
+     * Optional. Read replicas mode for the instance. Defaults to
+     * READ_REPLICAS_DISABLED.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance.ReadReplicasMode read_replicas_mode = 35 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -1355,6 +1413,152 @@ class Instance extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Google\Cloud\Redis\V1\Instance\ReadReplicasMode::class);
         $this->read_replicas_mode = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The KMS key reference that the customer provides when trying to
+     * create the instance.
+     *
+     * Generated from protobuf field <code>string customer_managed_key = 36 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getCustomerManagedKey()
+    {
+        return $this->customer_managed_key;
+    }
+
+    /**
+     * Optional. The KMS key reference that the customer provides when trying to
+     * create the instance.
+     *
+     * Generated from protobuf field <code>string customer_managed_key = 36 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCustomerManagedKey($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->customer_managed_key = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Persistence configuration parameters
+     *
+     * Generated from protobuf field <code>.google.cloud.redis.v1.PersistenceConfig persistence_config = 37 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Redis\V1\PersistenceConfig|null
+     */
+    public function getPersistenceConfig()
+    {
+        return $this->persistence_config;
+    }
+
+    public function hasPersistenceConfig()
+    {
+        return isset($this->persistence_config);
+    }
+
+    public function clearPersistenceConfig()
+    {
+        unset($this->persistence_config);
+    }
+
+    /**
+     * Optional. Persistence configuration parameters
+     *
+     * Generated from protobuf field <code>.google.cloud.redis.v1.PersistenceConfig persistence_config = 37 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Redis\V1\PersistenceConfig $var
+     * @return $this
+     */
+    public function setPersistenceConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Redis\V1\PersistenceConfig::class);
+        $this->persistence_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. reasons that causes instance in "SUSPENDED" state.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.redis.v1.Instance.SuspensionReason suspension_reasons = 38 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getSuspensionReasons()
+    {
+        return $this->suspension_reasons;
+    }
+
+    /**
+     * Optional. reasons that causes instance in "SUSPENDED" state.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.redis.v1.Instance.SuspensionReason suspension_reasons = 38 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setSuspensionReasons($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::ENUM, \Google\Cloud\Redis\V1\Instance\SuspensionReason::class);
+        $this->suspension_reasons = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The self service update maintenance version.
+     * The version is date based such as "20210712_00_00".
+     *
+     * Generated from protobuf field <code>string maintenance_version = 39 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getMaintenanceVersion()
+    {
+        return $this->maintenance_version;
+    }
+
+    /**
+     * Optional. The self service update maintenance version.
+     * The version is date based such as "20210712_00_00".
+     *
+     * Generated from protobuf field <code>string maintenance_version = 39 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setMaintenanceVersion($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->maintenance_version = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The available maintenance versions that an instance could update
+     * to.
+     *
+     * Generated from protobuf field <code>repeated string available_maintenance_versions = 40 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAvailableMaintenanceVersions()
+    {
+        return $this->available_maintenance_versions;
+    }
+
+    /**
+     * Optional. The available maintenance versions that an instance could update
+     * to.
+     *
+     * Generated from protobuf field <code>repeated string available_maintenance_versions = 40 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAvailableMaintenanceVersions($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->available_maintenance_versions = $arr;
 
         return $this;
     }

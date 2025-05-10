@@ -53,6 +53,17 @@ class EgressTo extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.identity.accesscontextmanager.v1.ServicePerimeterConfig.ApiOperation operations = 2;</code>
      */
     private $operations;
+    /**
+     * A list of external resources that are allowed to be accessed. Only AWS
+     * and Azure resources are supported. For Amazon S3, the supported format is
+     * s3://BUCKET_NAME. For Azure Storage, the supported format is
+     * azure://myaccount.blob.core.windows.net/CONTAINER_NAME. A request matches
+     * if it contains an external resource in this list (Example:
+     * s3://bucket/path). Currently '*' is not allowed.
+     *
+     * Generated from protobuf field <code>repeated string external_resources = 3;</code>
+     */
+    private $external_resources;
 
     /**
      * Constructor.
@@ -60,7 +71,7 @@ class EgressTo extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $resources
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $resources
      *           A list of resources, currently only projects in the form
      *           `projects/<projectnumber>`, that are allowed to be accessed by sources
      *           defined in the corresponding [EgressFrom]
@@ -69,13 +80,20 @@ class EgressTo extends \Google\Protobuf\Internal\Message
      *           specified for `resources`, then this [EgressTo]
      *           [google.identity.accesscontextmanager.v1.ServicePerimeterConfig.EgressTo]
      *           rule will authorize access to all resources outside the perimeter.
-     *     @type \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\ApiOperation[]|\Google\Protobuf\Internal\RepeatedField $operations
+     *     @type array<\Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\ApiOperation>|\Google\Protobuf\Internal\RepeatedField $operations
      *           A list of [ApiOperations]
      *           [google.identity.accesscontextmanager.v1.ServicePerimeterConfig.ApiOperation]
      *           allowed to be performed by the sources specified in the corresponding
      *           [EgressFrom]
      *           [google.identity.accesscontextmanager.v1.ServicePerimeterConfig.EgressFrom].
      *           A request matches if it uses an operation/service in this list.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $external_resources
+     *           A list of external resources that are allowed to be accessed. Only AWS
+     *           and Azure resources are supported. For Amazon S3, the supported format is
+     *           s3://BUCKET_NAME. For Azure Storage, the supported format is
+     *           azure://myaccount.blob.core.windows.net/CONTAINER_NAME. A request matches
+     *           if it contains an external resource in this list (Example:
+     *           s3://bucket/path). Currently '*' is not allowed.
      * }
      */
     public function __construct($data = NULL) {
@@ -112,7 +130,7 @@ class EgressTo extends \Google\Protobuf\Internal\Message
      * rule will authorize access to all resources outside the perimeter.
      *
      * Generated from protobuf field <code>repeated string resources = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResources($var)
@@ -148,7 +166,7 @@ class EgressTo extends \Google\Protobuf\Internal\Message
      * A request matches if it uses an operation/service in this list.
      *
      * Generated from protobuf field <code>repeated .google.identity.accesscontextmanager.v1.ServicePerimeterConfig.ApiOperation operations = 2;</code>
-     * @param \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\ApiOperation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\ApiOperation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOperations($var)
@@ -159,8 +177,42 @@ class EgressTo extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * A list of external resources that are allowed to be accessed. Only AWS
+     * and Azure resources are supported. For Amazon S3, the supported format is
+     * s3://BUCKET_NAME. For Azure Storage, the supported format is
+     * azure://myaccount.blob.core.windows.net/CONTAINER_NAME. A request matches
+     * if it contains an external resource in this list (Example:
+     * s3://bucket/path). Currently '*' is not allowed.
+     *
+     * Generated from protobuf field <code>repeated string external_resources = 3;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getExternalResources()
+    {
+        return $this->external_resources;
+    }
+
+    /**
+     * A list of external resources that are allowed to be accessed. Only AWS
+     * and Azure resources are supported. For Amazon S3, the supported format is
+     * s3://BUCKET_NAME. For Azure Storage, the supported format is
+     * azure://myaccount.blob.core.windows.net/CONTAINER_NAME. A request matches
+     * if it contains an external resource in this list (Example:
+     * s3://bucket/path). Currently '*' is not allowed.
+     *
+     * Generated from protobuf field <code>repeated string external_resources = 3;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setExternalResources($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->external_resources = $arr;
+
+        return $this;
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(EgressTo::class, \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig_EgressTo::class);
 

@@ -4,96 +4,56 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Material
- *
- * @ORM\Table(name="material")
- * @ORM\Entity(repositoryClass="App\Repository\MaterialRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\MaterialRepository')]
+#[ORM\Table(name: 'material')]
 class Material
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="material_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $materialId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'material_id', type: 'integer')]
+    private ?int $materialId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: false)]
+    private ?string $name;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
+    private ?float $price;
 
-    /**
-     * @var Unit
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Unit")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="unit_id", referencedColumnName="unit_id")
-     * })
-     */
-    private $unit;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Unit')]
+    #[ORM\JoinColumn(name: 'unit_id', referencedColumnName: 'unit_id')]
+    private ?Unit $unit;
 
-
-    /**
-     * Get materialId
-     *
-     * @return integer 
-     */
-    public function getMaterialId()
+    public function getMaterialId(): ?int
     {
         return $this->materialId;
     }
 
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * Get name
-     *
-     * @return string 
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getPrice()
-    {
-        return $this->price;
-    }
-
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
 
-    public function getUnit(): Unit
+    public function getUnit(): ?Unit
     {
         return $this->unit;
     }
 
-    public function setUnit($unit): void
+    public function setUnit(?Unit $unit): void
     {
         $this->unit = $unit;
     }

@@ -20,7 +20,7 @@ class ImportDocumentTemplate extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string mime_type = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $mime_type = '';
+    protected $mime_type = '';
     /**
      * Required. The knowledge type of document content.
      *
@@ -45,7 +45,7 @@ class ImportDocumentTemplate extends \Google\Protobuf\Internal\Message
      *
      *     @type string $mime_type
      *           Required. The MIME type of the document.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $knowledge_types
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $knowledge_types
      *           Required. The knowledge type of document content.
      *     @type array|\Google\Protobuf\Internal\MapField $metadata
      *           Metadata for the document. The metadata supports arbitrary
@@ -100,7 +100,7 @@ class ImportDocumentTemplate extends \Google\Protobuf\Internal\Message
      * Required. The knowledge type of document content.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.Document.KnowledgeType knowledge_types = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setKnowledgeTypes($var)

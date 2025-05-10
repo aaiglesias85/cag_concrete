@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels].
+ * Request message for
+ * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListModelsRequest</code>
  */
@@ -21,46 +22,51 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * An expression for filtering the results of the request. For field names
      * both snake_case and camelCase are supported.
      *   * `model` supports = and !=. `model` represents the Model ID,
-     *     i.e. the last segment of the Model's [resource name][google.cloud.aiplatform.v1.Model.name].
+     *     i.e. the last segment of the Model's [resource
+     *     name][google.cloud.aiplatform.v1.Model.name].
      *   * `display_name` supports = and !=
      *   * `labels` supports general map functions that is:
      *     * `labels.key=value` - key:value equality
      *     * `labels.key:* or labels:key - key existence
      *     * A key including a space must be quoted. `labels."a key"`.
+     *   * `base_model_name` only supports =
      * Some examples:
      *   * `model=1234`
      *   * `displayName="myDisplayName"`
      *   * `labels.myKey="myValue"`
+     *   * `baseModelName="text-bison"`
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * The standard list page size.
      *
      * Generated from protobuf field <code>int32 page_size = 3;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The standard list page token.
      * Typically obtained via
-     * [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token] of the previous
-     * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels] call.
+     * [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token]
+     * of the previous
+     * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Mask specifying which fields to read.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask read_mask = 5;</code>
      */
-    private $read_mask = null;
+    protected $read_mask = null;
     /**
      * A comma-separated list of fields to order by, sorted in ascending order.
      * Use "desc" after a field name for descending.
@@ -72,7 +78,22 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string order_by = 6;</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
+
+    /**
+     * @param string $parent Required. The resource name of the Location to list the Models from.
+     *                       Format: `projects/{project}/locations/{location}`
+     *                       Please see {@see ModelServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListModelsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -87,23 +108,28 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
      *           An expression for filtering the results of the request. For field names
      *           both snake_case and camelCase are supported.
      *             * `model` supports = and !=. `model` represents the Model ID,
-     *               i.e. the last segment of the Model's [resource name][google.cloud.aiplatform.v1.Model.name].
+     *               i.e. the last segment of the Model's [resource
+     *               name][google.cloud.aiplatform.v1.Model.name].
      *             * `display_name` supports = and !=
      *             * `labels` supports general map functions that is:
      *               * `labels.key=value` - key:value equality
      *               * `labels.key:* or labels:key - key existence
      *               * A key including a space must be quoted. `labels."a key"`.
+     *             * `base_model_name` only supports =
      *           Some examples:
      *             * `model=1234`
      *             * `displayName="myDisplayName"`
      *             * `labels.myKey="myValue"`
+     *             * `baseModelName="text-bison"`
      *     @type int $page_size
      *           The standard list page size.
      *     @type string $page_token
      *           The standard list page token.
      *           Typically obtained via
-     *           [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token] of the previous
-     *           [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels] call.
+     *           [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token]
+     *           of the previous
+     *           [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels]
+     *           call.
      *     @type \Google\Protobuf\FieldMask $read_mask
      *           Mask specifying which fields to read.
      *     @type string $order_by
@@ -153,16 +179,19 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
      * An expression for filtering the results of the request. For field names
      * both snake_case and camelCase are supported.
      *   * `model` supports = and !=. `model` represents the Model ID,
-     *     i.e. the last segment of the Model's [resource name][google.cloud.aiplatform.v1.Model.name].
+     *     i.e. the last segment of the Model's [resource
+     *     name][google.cloud.aiplatform.v1.Model.name].
      *   * `display_name` supports = and !=
      *   * `labels` supports general map functions that is:
      *     * `labels.key=value` - key:value equality
      *     * `labels.key:* or labels:key - key existence
      *     * A key including a space must be quoted. `labels."a key"`.
+     *   * `base_model_name` only supports =
      * Some examples:
      *   * `model=1234`
      *   * `displayName="myDisplayName"`
      *   * `labels.myKey="myValue"`
+     *   * `baseModelName="text-bison"`
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      * @return string
@@ -176,16 +205,19 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
      * An expression for filtering the results of the request. For field names
      * both snake_case and camelCase are supported.
      *   * `model` supports = and !=. `model` represents the Model ID,
-     *     i.e. the last segment of the Model's [resource name][google.cloud.aiplatform.v1.Model.name].
+     *     i.e. the last segment of the Model's [resource
+     *     name][google.cloud.aiplatform.v1.Model.name].
      *   * `display_name` supports = and !=
      *   * `labels` supports general map functions that is:
      *     * `labels.key=value` - key:value equality
      *     * `labels.key:* or labels:key - key existence
      *     * A key including a space must be quoted. `labels."a key"`.
+     *   * `base_model_name` only supports =
      * Some examples:
      *   * `model=1234`
      *   * `displayName="myDisplayName"`
      *   * `labels.myKey="myValue"`
+     *   * `baseModelName="text-bison"`
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      * @param string $var
@@ -228,8 +260,10 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
     /**
      * The standard list page token.
      * Typically obtained via
-     * [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token] of the previous
-     * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels] call.
+     * [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token]
+     * of the previous
+     * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      * @return string
@@ -242,8 +276,10 @@ class ListModelsRequest extends \Google\Protobuf\Internal\Message
     /**
      * The standard list page token.
      * Typically obtained via
-     * [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token] of the previous
-     * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels] call.
+     * [ListModelsResponse.next_page_token][google.cloud.aiplatform.v1.ListModelsResponse.next_page_token]
+     * of the previous
+     * [ModelService.ListModels][google.cloud.aiplatform.v1.ModelService.ListModels]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      * @param string $var

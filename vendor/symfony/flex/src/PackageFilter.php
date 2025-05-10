@@ -80,6 +80,7 @@ class PackageFilter
                 !isset($knownVersions['splits'][$name])
                 || array_intersect($versions, $lockedVersions[$name] ?? [])
                 || (isset($rootConstraints[$name]) && !Intervals::haveIntersections($this->symfonyConstraints, $rootConstraints[$name]))
+                || ('symfony/psr-http-message-bridge' === $name && 6.4 > $versions[0])
             )) {
                 $filteredPackages[] = $package;
                 continue;
@@ -100,7 +101,7 @@ class PackageFilter
             if ('symfony/symfony' === $name) {
                 $symfonyPackages[] = $package;
             } elseif (null !== $this->io) {
-                $this->io->writeError(sprintf('<info>Restricting packages listed in "symfony/symfony" to "%s"</>', $this->symfonyRequire));
+                $this->io->writeError(\sprintf('<info>Restricting packages listed in "symfony/symfony" to "%s"</>', $this->symfonyRequire));
                 $this->io = null;
             }
         }

@@ -21,20 +21,35 @@ class ListPredictionApiKeyRegistrationsRequest extends \Google\Protobuf\Internal
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. Maximum number of results to return per page. If unset, the
      * service will choose a reasonable default.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The previous `ListPredictionApiKeyRegistration.nextPageToken`.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The parent placement resource name such as
+     *                       `projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store`
+     *                       Please see {@see PredictionApiKeyRegistryClient::eventStoreName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\ListPredictionApiKeyRegistrationsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

@@ -10,16 +10,26 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * Represents the spec of a CustomJob.
- * Next Id: 14
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CustomJobSpec</code>
  */
 class CustomJobSpec extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The spec of the worker pools including machine type and Docker image.
-     * All worker pools except the first one are optional and can be skipped by
-     * providing an empty value.
+     * Optional. The ID of the PersistentResource in the same Project and Location
+     * which to run
+     * If this is specified, the job will be run on existing machines held by the
+     * PersistentResource instead of on-demand short-live machines.
+     * The network and CMEK configs on the job should be consistent with those on
+     * the PersistentResource, otherwise, the job will be rejected.
+     *
+     * Generated from protobuf field <code>string persistent_resource_id = 14 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     */
+    protected $persistent_resource_id = '';
+    /**
+     * Required. The spec of the worker pools including machine type and Docker
+     * image. All worker pools except the first one are optional and can be
+     * skipped by providing an empty value.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.WorkerPoolSpec worker_pool_specs = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
@@ -29,7 +39,7 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Scheduling scheduling = 3;</code>
      */
-    private $scheduling = null;
+    protected $scheduling = null;
     /**
      * Specifies the service account for workload run-as account.
      * Users submitting jobs must have act-as permission on this run-as account.
@@ -39,12 +49,12 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 4;</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
-     * The full name of the Compute Engine
-     * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the Job
+     * Optional. The full name of the Compute Engine
+     * [network](/compute/docs/networks-and-firewalls#networks) to which the Job
      * should be peered. For example, `projects/12345/global/networks/myVPC`.
-     * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     * [Format](/compute/docs/reference/rest/v1/networks/insert)
      * is of the form `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in `12345`, and {network} is a
      * network name.
@@ -53,9 +63,9 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * AI](https://cloud.google.com/vertex-ai/docs/general/vpc-peering).
      * If this field is left unspecified, the job is not peered with any network.
      *
-     * Generated from protobuf field <code>string network = 5 [(.google.api.resource_reference) = {</code>
+     * Generated from protobuf field <code>string network = 5 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
      * Optional. A list of names for the reserved ip ranges under the VPC network
      * that can be used for this job.
@@ -72,8 +82,8 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * HyperparameterTuningJob. For HyperparameterTuningJob,
      * the baseOutputDirectory of
      * each child CustomJob backing a Trial is set to a subdirectory of name
-     * [id][google.cloud.aiplatform.v1.Trial.id] under its parent HyperparameterTuningJob's
-     * baseOutputDirectory.
+     * [id][google.cloud.aiplatform.v1.Trial.id] under its parent
+     * HyperparameterTuningJob's baseOutputDirectory.
      * The following Vertex AI environment variables will be passed to
      * containers or python modules when this field is set:
      *   For CustomJob:
@@ -87,27 +97,87 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GcsDestination base_output_directory = 6;</code>
      */
-    private $base_output_directory = null;
+    protected $base_output_directory = null;
     /**
-     * Optional. The name of a Vertex AI [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which this CustomJob
-     * will upload Tensorboard logs.
-     * Format:
+     * The ID of the location to store protected artifacts. e.g. us-central1.
+     * Populate only when the location is different than CustomJob location.
+     * List of supported locations:
+     * https://cloud.google.com/vertex-ai/docs/general/locations
+     *
+     * Generated from protobuf field <code>string protected_artifact_location_id = 19;</code>
+     */
+    protected $protected_artifact_location_id = '';
+    /**
+     * Optional. The name of a Vertex AI
+     * [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which
+     * this CustomJob will upload Tensorboard logs. Format:
      * `projects/{project}/locations/{location}/tensorboards/{tensorboard}`
      *
      * Generated from protobuf field <code>string tensorboard = 7 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      */
-    private $tensorboard = '';
+    protected $tensorboard = '';
     /**
      * Optional. Whether you want Vertex AI to enable [interactive shell
      * access](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      * to training containers.
      * If set to `true`, you can access interactive shells at the URIs given
-     * by [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris] or [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris] (within
+     * by
+     * [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     * or
+     * [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     * (within
      * [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
      *
      * Generated from protobuf field <code>bool enable_web_access = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $enable_web_access = false;
+    protected $enable_web_access = false;
+    /**
+     * Optional. Whether you want Vertex AI to enable access to the customized
+     * dashboard in training chief container.
+     * If set to `true`, you can access the dashboard at the URIs given
+     * by
+     * [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     * or
+     * [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     * (within
+     * [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
+     *
+     * Generated from protobuf field <code>bool enable_dashboard_access = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $enable_dashboard_access = false;
+    /**
+     * Optional. The Experiment associated with this job.
+     * Format:
+     * `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}`
+     *
+     * Generated from protobuf field <code>string experiment = 17 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     */
+    protected $experiment = '';
+    /**
+     * Optional. The Experiment Run associated with this job.
+     * Format:
+     * `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}-{experiment-run-name}`
+     *
+     * Generated from protobuf field <code>string experiment_run = 18 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     */
+    protected $experiment_run = '';
+    /**
+     * Optional. The name of the Model resources for which to generate a mapping
+     * to artifact URIs. Applicable only to some of the Google-provided custom
+     * jobs. Format: `projects/{project}/locations/{location}/models/{model}`
+     * In order to retrieve a specific version of the model, also provide
+     * the version ID or version alias.
+     *   Example: `projects/{project}/locations/{location}/models/{model}&#64;2`
+     *              or
+     *            `projects/{project}/locations/{location}/models/{model}&#64;golden`
+     * If no version ID or alias is specified, the "default" version will be
+     * returned. The "default" version alias is created for the first version of
+     * the model, and can be moved to other versions later on. There will be
+     * exactly one default version.
+     *
+     * Generated from protobuf field <code>repeated string models = 20 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     */
+    private $models;
 
     /**
      * Constructor.
@@ -115,10 +185,17 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\WorkerPoolSpec[]|\Google\Protobuf\Internal\RepeatedField $worker_pool_specs
-     *           Required. The spec of the worker pools including machine type and Docker image.
-     *           All worker pools except the first one are optional and can be skipped by
-     *           providing an empty value.
+     *     @type string $persistent_resource_id
+     *           Optional. The ID of the PersistentResource in the same Project and Location
+     *           which to run
+     *           If this is specified, the job will be run on existing machines held by the
+     *           PersistentResource instead of on-demand short-live machines.
+     *           The network and CMEK configs on the job should be consistent with those on
+     *           the PersistentResource, otherwise, the job will be rejected.
+     *     @type array<\Google\Cloud\AIPlatform\V1\WorkerPoolSpec>|\Google\Protobuf\Internal\RepeatedField $worker_pool_specs
+     *           Required. The spec of the worker pools including machine type and Docker
+     *           image. All worker pools except the first one are optional and can be
+     *           skipped by providing an empty value.
      *     @type \Google\Cloud\AIPlatform\V1\Scheduling $scheduling
      *           Scheduling options for a CustomJob.
      *     @type string $service_account
@@ -128,10 +205,10 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *           Agent](https://cloud.google.com/vertex-ai/docs/general/access-control#service-agents)
      *           for the CustomJob's project is used.
      *     @type string $network
-     *           The full name of the Compute Engine
-     *           [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the Job
+     *           Optional. The full name of the Compute Engine
+     *           [network](/compute/docs/networks-and-firewalls#networks) to which the Job
      *           should be peered. For example, `projects/12345/global/networks/myVPC`.
-     *           [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     *           [Format](/compute/docs/reference/rest/v1/networks/insert)
      *           is of the form `projects/{project}/global/networks/{network}`.
      *           Where {project} is a project number, as in `12345`, and {network} is a
      *           network name.
@@ -139,7 +216,7 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *           Peering for Vertex
      *           AI](https://cloud.google.com/vertex-ai/docs/general/vpc-peering).
      *           If this field is left unspecified, the job is not peered with any network.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $reserved_ip_ranges
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $reserved_ip_ranges
      *           Optional. A list of names for the reserved ip ranges under the VPC network
      *           that can be used for this job.
      *           If set, we will deploy the job within the provided ip ranges. Otherwise,
@@ -151,8 +228,8 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *           HyperparameterTuningJob. For HyperparameterTuningJob,
      *           the baseOutputDirectory of
      *           each child CustomJob backing a Trial is set to a subdirectory of name
-     *           [id][google.cloud.aiplatform.v1.Trial.id] under its parent HyperparameterTuningJob's
-     *           baseOutputDirectory.
+     *           [id][google.cloud.aiplatform.v1.Trial.id] under its parent
+     *           HyperparameterTuningJob's baseOutputDirectory.
      *           The following Vertex AI environment variables will be passed to
      *           containers or python modules when this field is set:
      *             For CustomJob:
@@ -163,18 +240,58 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      *             * AIP_MODEL_DIR = `<base_output_directory>/<trial_id>/model/`
      *             * AIP_CHECKPOINT_DIR = `<base_output_directory>/<trial_id>/checkpoints/`
      *             * AIP_TENSORBOARD_LOG_DIR = `<base_output_directory>/<trial_id>/logs/`
+     *     @type string $protected_artifact_location_id
+     *           The ID of the location to store protected artifacts. e.g. us-central1.
+     *           Populate only when the location is different than CustomJob location.
+     *           List of supported locations:
+     *           https://cloud.google.com/vertex-ai/docs/general/locations
      *     @type string $tensorboard
-     *           Optional. The name of a Vertex AI [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which this CustomJob
-     *           will upload Tensorboard logs.
-     *           Format:
+     *           Optional. The name of a Vertex AI
+     *           [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which
+     *           this CustomJob will upload Tensorboard logs. Format:
      *           `projects/{project}/locations/{location}/tensorboards/{tensorboard}`
      *     @type bool $enable_web_access
      *           Optional. Whether you want Vertex AI to enable [interactive shell
      *           access](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      *           to training containers.
      *           If set to `true`, you can access interactive shells at the URIs given
-     *           by [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris] or [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris] (within
+     *           by
+     *           [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     *           or
+     *           [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     *           (within
      *           [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
+     *     @type bool $enable_dashboard_access
+     *           Optional. Whether you want Vertex AI to enable access to the customized
+     *           dashboard in training chief container.
+     *           If set to `true`, you can access the dashboard at the URIs given
+     *           by
+     *           [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     *           or
+     *           [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     *           (within
+     *           [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
+     *     @type string $experiment
+     *           Optional. The Experiment associated with this job.
+     *           Format:
+     *           `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}`
+     *     @type string $experiment_run
+     *           Optional. The Experiment Run associated with this job.
+     *           Format:
+     *           `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}-{experiment-run-name}`
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $models
+     *           Optional. The name of the Model resources for which to generate a mapping
+     *           to artifact URIs. Applicable only to some of the Google-provided custom
+     *           jobs. Format: `projects/{project}/locations/{location}/models/{model}`
+     *           In order to retrieve a specific version of the model, also provide
+     *           the version ID or version alias.
+     *             Example: `projects/{project}/locations/{location}/models/{model}&#64;2`
+     *                        or
+     *                      `projects/{project}/locations/{location}/models/{model}&#64;golden`
+     *           If no version ID or alias is specified, the "default" version will be
+     *           returned. The "default" version alias is created for the first version of
+     *           the model, and can be moved to other versions later on. There will be
+     *           exactly one default version.
      * }
      */
     public function __construct($data = NULL) {
@@ -183,9 +300,45 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The spec of the worker pools including machine type and Docker image.
-     * All worker pools except the first one are optional and can be skipped by
-     * providing an empty value.
+     * Optional. The ID of the PersistentResource in the same Project and Location
+     * which to run
+     * If this is specified, the job will be run on existing machines held by the
+     * PersistentResource instead of on-demand short-live machines.
+     * The network and CMEK configs on the job should be consistent with those on
+     * the PersistentResource, otherwise, the job will be rejected.
+     *
+     * Generated from protobuf field <code>string persistent_resource_id = 14 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getPersistentResourceId()
+    {
+        return $this->persistent_resource_id;
+    }
+
+    /**
+     * Optional. The ID of the PersistentResource in the same Project and Location
+     * which to run
+     * If this is specified, the job will be run on existing machines held by the
+     * PersistentResource instead of on-demand short-live machines.
+     * The network and CMEK configs on the job should be consistent with those on
+     * the PersistentResource, otherwise, the job will be rejected.
+     *
+     * Generated from protobuf field <code>string persistent_resource_id = 14 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPersistentResourceId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->persistent_resource_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Required. The spec of the worker pools including machine type and Docker
+     * image. All worker pools except the first one are optional and can be
+     * skipped by providing an empty value.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.WorkerPoolSpec worker_pool_specs = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -196,12 +349,12 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The spec of the worker pools including machine type and Docker image.
-     * All worker pools except the first one are optional and can be skipped by
-     * providing an empty value.
+     * Required. The spec of the worker pools including machine type and Docker
+     * image. All worker pools except the first one are optional and can be
+     * skipped by providing an empty value.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.WorkerPoolSpec worker_pool_specs = 1 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\AIPlatform\V1\WorkerPoolSpec[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\WorkerPoolSpec>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setWorkerPoolSpecs($var)
@@ -283,10 +436,10 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The full name of the Compute Engine
-     * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the Job
+     * Optional. The full name of the Compute Engine
+     * [network](/compute/docs/networks-and-firewalls#networks) to which the Job
      * should be peered. For example, `projects/12345/global/networks/myVPC`.
-     * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     * [Format](/compute/docs/reference/rest/v1/networks/insert)
      * is of the form `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in `12345`, and {network} is a
      * network name.
@@ -295,7 +448,7 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * AI](https://cloud.google.com/vertex-ai/docs/general/vpc-peering).
      * If this field is left unspecified, the job is not peered with any network.
      *
-     * Generated from protobuf field <code>string network = 5 [(.google.api.resource_reference) = {</code>
+     * Generated from protobuf field <code>string network = 5 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      * @return string
      */
     public function getNetwork()
@@ -304,10 +457,10 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The full name of the Compute Engine
-     * [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the Job
+     * Optional. The full name of the Compute Engine
+     * [network](/compute/docs/networks-and-firewalls#networks) to which the Job
      * should be peered. For example, `projects/12345/global/networks/myVPC`.
-     * [Format](https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert)
+     * [Format](/compute/docs/reference/rest/v1/networks/insert)
      * is of the form `projects/{project}/global/networks/{network}`.
      * Where {project} is a project number, as in `12345`, and {network} is a
      * network name.
@@ -316,7 +469,7 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * AI](https://cloud.google.com/vertex-ai/docs/general/vpc-peering).
      * If this field is left unspecified, the job is not peered with any network.
      *
-     * Generated from protobuf field <code>string network = 5 [(.google.api.resource_reference) = {</code>
+     * Generated from protobuf field <code>string network = 5 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      * @param string $var
      * @return $this
      */
@@ -353,7 +506,7 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * Example: ['vertex-ai-ip-range'].
      *
      * Generated from protobuf field <code>repeated string reserved_ip_ranges = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setReservedIpRanges($var)
@@ -369,8 +522,8 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * HyperparameterTuningJob. For HyperparameterTuningJob,
      * the baseOutputDirectory of
      * each child CustomJob backing a Trial is set to a subdirectory of name
-     * [id][google.cloud.aiplatform.v1.Trial.id] under its parent HyperparameterTuningJob's
-     * baseOutputDirectory.
+     * [id][google.cloud.aiplatform.v1.Trial.id] under its parent
+     * HyperparameterTuningJob's baseOutputDirectory.
      * The following Vertex AI environment variables will be passed to
      * containers or python modules when this field is set:
      *   For CustomJob:
@@ -405,8 +558,8 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * HyperparameterTuningJob. For HyperparameterTuningJob,
      * the baseOutputDirectory of
      * each child CustomJob backing a Trial is set to a subdirectory of name
-     * [id][google.cloud.aiplatform.v1.Trial.id] under its parent HyperparameterTuningJob's
-     * baseOutputDirectory.
+     * [id][google.cloud.aiplatform.v1.Trial.id] under its parent
+     * HyperparameterTuningJob's baseOutputDirectory.
      * The following Vertex AI environment variables will be passed to
      * containers or python modules when this field is set:
      *   For CustomJob:
@@ -431,9 +584,41 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The name of a Vertex AI [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which this CustomJob
-     * will upload Tensorboard logs.
-     * Format:
+     * The ID of the location to store protected artifacts. e.g. us-central1.
+     * Populate only when the location is different than CustomJob location.
+     * List of supported locations:
+     * https://cloud.google.com/vertex-ai/docs/general/locations
+     *
+     * Generated from protobuf field <code>string protected_artifact_location_id = 19;</code>
+     * @return string
+     */
+    public function getProtectedArtifactLocationId()
+    {
+        return $this->protected_artifact_location_id;
+    }
+
+    /**
+     * The ID of the location to store protected artifacts. e.g. us-central1.
+     * Populate only when the location is different than CustomJob location.
+     * List of supported locations:
+     * https://cloud.google.com/vertex-ai/docs/general/locations
+     *
+     * Generated from protobuf field <code>string protected_artifact_location_id = 19;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setProtectedArtifactLocationId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->protected_artifact_location_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The name of a Vertex AI
+     * [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which
+     * this CustomJob will upload Tensorboard logs. Format:
      * `projects/{project}/locations/{location}/tensorboards/{tensorboard}`
      *
      * Generated from protobuf field <code>string tensorboard = 7 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
@@ -445,9 +630,9 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The name of a Vertex AI [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which this CustomJob
-     * will upload Tensorboard logs.
-     * Format:
+     * Optional. The name of a Vertex AI
+     * [Tensorboard][google.cloud.aiplatform.v1.Tensorboard] resource to which
+     * this CustomJob will upload Tensorboard logs. Format:
      * `projects/{project}/locations/{location}/tensorboards/{tensorboard}`
      *
      * Generated from protobuf field <code>string tensorboard = 7 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
@@ -467,7 +652,11 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * access](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      * to training containers.
      * If set to `true`, you can access interactive shells at the URIs given
-     * by [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris] or [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris] (within
+     * by
+     * [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     * or
+     * [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     * (within
      * [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
      *
      * Generated from protobuf field <code>bool enable_web_access = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -483,7 +672,11 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
      * access](https://cloud.google.com/vertex-ai/docs/training/monitor-debug-interactive-shell)
      * to training containers.
      * If set to `true`, you can access interactive shells at the URIs given
-     * by [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris] or [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris] (within
+     * by
+     * [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     * or
+     * [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     * (within
      * [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
      *
      * Generated from protobuf field <code>bool enable_web_access = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -494,6 +687,156 @@ class CustomJobSpec extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->enable_web_access = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Whether you want Vertex AI to enable access to the customized
+     * dashboard in training chief container.
+     * If set to `true`, you can access the dashboard at the URIs given
+     * by
+     * [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     * or
+     * [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     * (within
+     * [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
+     *
+     * Generated from protobuf field <code>bool enable_dashboard_access = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getEnableDashboardAccess()
+    {
+        return $this->enable_dashboard_access;
+    }
+
+    /**
+     * Optional. Whether you want Vertex AI to enable access to the customized
+     * dashboard in training chief container.
+     * If set to `true`, you can access the dashboard at the URIs given
+     * by
+     * [CustomJob.web_access_uris][google.cloud.aiplatform.v1.CustomJob.web_access_uris]
+     * or
+     * [Trial.web_access_uris][google.cloud.aiplatform.v1.Trial.web_access_uris]
+     * (within
+     * [HyperparameterTuningJob.trials][google.cloud.aiplatform.v1.HyperparameterTuningJob.trials]).
+     *
+     * Generated from protobuf field <code>bool enable_dashboard_access = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setEnableDashboardAccess($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->enable_dashboard_access = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The Experiment associated with this job.
+     * Format:
+     * `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}`
+     *
+     * Generated from protobuf field <code>string experiment = 17 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getExperiment()
+    {
+        return $this->experiment;
+    }
+
+    /**
+     * Optional. The Experiment associated with this job.
+     * Format:
+     * `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}`
+     *
+     * Generated from protobuf field <code>string experiment = 17 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setExperiment($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->experiment = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The Experiment Run associated with this job.
+     * Format:
+     * `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}-{experiment-run-name}`
+     *
+     * Generated from protobuf field <code>string experiment_run = 18 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getExperimentRun()
+    {
+        return $this->experiment_run;
+    }
+
+    /**
+     * Optional. The Experiment Run associated with this job.
+     * Format:
+     * `projects/{project}/locations/{location}/metadataStores/{metadataStores}/contexts/{experiment-name}-{experiment-run-name}`
+     *
+     * Generated from protobuf field <code>string experiment_run = 18 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setExperimentRun($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->experiment_run = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The name of the Model resources for which to generate a mapping
+     * to artifact URIs. Applicable only to some of the Google-provided custom
+     * jobs. Format: `projects/{project}/locations/{location}/models/{model}`
+     * In order to retrieve a specific version of the model, also provide
+     * the version ID or version alias.
+     *   Example: `projects/{project}/locations/{location}/models/{model}&#64;2`
+     *              or
+     *            `projects/{project}/locations/{location}/models/{model}&#64;golden`
+     * If no version ID or alias is specified, the "default" version will be
+     * returned. The "default" version alias is created for the first version of
+     * the model, and can be moved to other versions later on. There will be
+     * exactly one default version.
+     *
+     * Generated from protobuf field <code>repeated string models = 20 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getModels()
+    {
+        return $this->models;
+    }
+
+    /**
+     * Optional. The name of the Model resources for which to generate a mapping
+     * to artifact URIs. Applicable only to some of the Google-provided custom
+     * jobs. Format: `projects/{project}/locations/{location}/models/{model}`
+     * In order to retrieve a specific version of the model, also provide
+     * the version ID or version alias.
+     *   Example: `projects/{project}/locations/{location}/models/{model}&#64;2`
+     *              or
+     *            `projects/{project}/locations/{location}/models/{model}&#64;golden`
+     * If no version ID or alias is specified, the "default" version will be
+     * returned. The "default" version alias is created for the first version of
+     * the model, and can be moved to other versions later on. There will be
+     * exactly one default version.
+     *
+     * Generated from protobuf field <code>repeated string models = 20 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setModels($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->models = $arr;
 
         return $this;
     }

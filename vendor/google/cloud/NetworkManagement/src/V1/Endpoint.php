@@ -17,44 +17,119 @@ class Endpoint extends \Google\Protobuf\Internal\Message
 {
     /**
      * The IP address of the endpoint, which can be an external or internal IP.
-     * An IPv6 address is only allowed when the test's destination is a
-     * [global load balancer VIP](https://cloud.google.com/load-balancing/docs/load-balancing-overview).
      *
      * Generated from protobuf field <code>string ip_address = 1;</code>
      */
-    private $ip_address = '';
+    protected $ip_address = '';
     /**
      * The IP protocol port of the endpoint.
      * Only applicable when protocol is TCP or UDP.
      *
      * Generated from protobuf field <code>int32 port = 2;</code>
      */
-    private $port = 0;
+    protected $port = 0;
     /**
      * A Compute Engine instance URI.
      *
      * Generated from protobuf field <code>string instance = 3;</code>
      */
-    private $instance = '';
+    protected $instance = '';
     /**
-     * A cluster URI for [Google Kubernetes Engine
-     * master](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     * A forwarding rule and its corresponding IP address represent the frontend
+     * configuration of a Google Cloud load balancer. Forwarding rules are also
+     * used for protocol forwarding, Private Service Connect and other network
+     * services to provide forwarding information in the control plane. Applicable
+     * only to destination endpoint. Format:
+     *  projects/{project}/global/forwardingRules/{id} or
+     *  projects/{project}/regions/{region}/forwardingRules/{id}
+     *
+     * Generated from protobuf field <code>string forwarding_rule = 13;</code>
+     */
+    protected $forwarding_rule = '';
+    /**
+     * Output only. Specifies the type of the target of the forwarding rule.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.networkmanagement.v1.Endpoint.ForwardingRuleTarget forwarding_rule_target = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $forwarding_rule_target = null;
+    /**
+     * Output only. ID of the load balancer the forwarding rule points to. Empty
+     * for forwarding rules not related to load balancers.
+     *
+     * Generated from protobuf field <code>optional string load_balancer_id = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $load_balancer_id = null;
+    /**
+     * Output only. Type of the load balancer the forwarding rule points to.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.networkmanagement.v1.LoadBalancerType load_balancer_type = 16 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $load_balancer_type = null;
+    /**
+     * A cluster URI for [Google Kubernetes Engine cluster control
+     * plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
      *
      * Generated from protobuf field <code>string gke_master_cluster = 7;</code>
      */
-    private $gke_master_cluster = '';
+    protected $gke_master_cluster = '';
+    /**
+     * DNS endpoint of [Google Kubernetes Engine cluster control
+     * plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     * Requires gke_master_cluster to be set, can't be used simultaneoulsly with
+     * ip_address or network. Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string fqdn = 19;</code>
+     */
+    protected $fqdn = '';
     /**
      * A [Cloud SQL](https://cloud.google.com/sql) instance URI.
      *
      * Generated from protobuf field <code>string cloud_sql_instance = 8;</code>
      */
-    private $cloud_sql_instance = '';
+    protected $cloud_sql_instance = '';
     /**
-     * A Compute Engine network URI.
+     * A [Redis Instance](https://cloud.google.com/memorystore/docs/redis) URI.
+     * Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string redis_instance = 17;</code>
+     */
+    protected $redis_instance = '';
+    /**
+     * A [Redis Cluster](https://cloud.google.com/memorystore/docs/cluster) URI.
+     * Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string redis_cluster = 18;</code>
+     */
+    protected $redis_cluster = '';
+    /**
+     * A [Cloud Function](https://cloud.google.com/functions). Applicable only to
+     * source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.CloudFunctionEndpoint cloud_function = 10;</code>
+     */
+    protected $cloud_function = null;
+    /**
+     * An [App Engine](https://cloud.google.com/appengine) [service
+     * version](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions).
+     * Applicable only to source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.AppEngineVersionEndpoint app_engine_version = 11;</code>
+     */
+    protected $app_engine_version = null;
+    /**
+     * A [Cloud Run](https://cloud.google.com/run)
+     * [revision](https://cloud.google.com/run/docs/reference/rest/v1/namespaces.revisions/get)
+     * Applicable only to source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.CloudRunRevisionEndpoint cloud_run_revision = 12;</code>
+     */
+    protected $cloud_run_revision = null;
+    /**
+     * A VPC network URI.
      *
      * Generated from protobuf field <code>string network = 4;</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
      * Type of the network where the endpoint is located.
      * Applicable only to source endpoint, as destination network type can be
@@ -62,21 +137,21 @@ class Endpoint extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.NetworkType network_type = 5;</code>
      */
-    private $network_type = 0;
+    protected $network_type = 0;
     /**
      * Project ID where the endpoint is located.
-     * The Project ID can be derived from the URI if you provide a VM instance or
+     * The project ID can be derived from the URI if you provide a endpoint or
      * network URI.
-     * The following are two cases where you must provide the project ID:
-     * 1. Only the IP address is specified, and the IP address is within a GCP
-     * project.
+     * The following are two cases where you may need to provide the project ID:
+     * 1. Only the IP address is specified, and the IP address is within a Google
+     * Cloud project.
      * 2. When you are using Shared VPC and the IP address that you provide is
      * from the service project. In this case, the network that the IP address
      * resides in is defined in the host project.
      *
      * Generated from protobuf field <code>string project_id = 6;</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
 
     /**
      * Constructor.
@@ -86,31 +161,66 @@ class Endpoint extends \Google\Protobuf\Internal\Message
      *
      *     @type string $ip_address
      *           The IP address of the endpoint, which can be an external or internal IP.
-     *           An IPv6 address is only allowed when the test's destination is a
-     *           [global load balancer VIP](https://cloud.google.com/load-balancing/docs/load-balancing-overview).
      *     @type int $port
      *           The IP protocol port of the endpoint.
      *           Only applicable when protocol is TCP or UDP.
      *     @type string $instance
      *           A Compute Engine instance URI.
+     *     @type string $forwarding_rule
+     *           A forwarding rule and its corresponding IP address represent the frontend
+     *           configuration of a Google Cloud load balancer. Forwarding rules are also
+     *           used for protocol forwarding, Private Service Connect and other network
+     *           services to provide forwarding information in the control plane. Applicable
+     *           only to destination endpoint. Format:
+     *            projects/{project}/global/forwardingRules/{id} or
+     *            projects/{project}/regions/{region}/forwardingRules/{id}
+     *     @type int $forwarding_rule_target
+     *           Output only. Specifies the type of the target of the forwarding rule.
+     *     @type string $load_balancer_id
+     *           Output only. ID of the load balancer the forwarding rule points to. Empty
+     *           for forwarding rules not related to load balancers.
+     *     @type int $load_balancer_type
+     *           Output only. Type of the load balancer the forwarding rule points to.
      *     @type string $gke_master_cluster
-     *           A cluster URI for [Google Kubernetes Engine
-     *           master](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     *           A cluster URI for [Google Kubernetes Engine cluster control
+     *           plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     *     @type string $fqdn
+     *           DNS endpoint of [Google Kubernetes Engine cluster control
+     *           plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     *           Requires gke_master_cluster to be set, can't be used simultaneoulsly with
+     *           ip_address or network. Applicable only to destination endpoint.
      *     @type string $cloud_sql_instance
      *           A [Cloud SQL](https://cloud.google.com/sql) instance URI.
+     *     @type string $redis_instance
+     *           A [Redis Instance](https://cloud.google.com/memorystore/docs/redis) URI.
+     *           Applicable only to destination endpoint.
+     *     @type string $redis_cluster
+     *           A [Redis Cluster](https://cloud.google.com/memorystore/docs/cluster) URI.
+     *           Applicable only to destination endpoint.
+     *     @type \Google\Cloud\NetworkManagement\V1\Endpoint\CloudFunctionEndpoint $cloud_function
+     *           A [Cloud Function](https://cloud.google.com/functions). Applicable only to
+     *           source endpoint.
+     *     @type \Google\Cloud\NetworkManagement\V1\Endpoint\AppEngineVersionEndpoint $app_engine_version
+     *           An [App Engine](https://cloud.google.com/appengine) [service
+     *           version](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions).
+     *           Applicable only to source endpoint.
+     *     @type \Google\Cloud\NetworkManagement\V1\Endpoint\CloudRunRevisionEndpoint $cloud_run_revision
+     *           A [Cloud Run](https://cloud.google.com/run)
+     *           [revision](https://cloud.google.com/run/docs/reference/rest/v1/namespaces.revisions/get)
+     *           Applicable only to source endpoint.
      *     @type string $network
-     *           A Compute Engine network URI.
+     *           A VPC network URI.
      *     @type int $network_type
      *           Type of the network where the endpoint is located.
      *           Applicable only to source endpoint, as destination network type can be
      *           inferred from the source.
      *     @type string $project_id
      *           Project ID where the endpoint is located.
-     *           The Project ID can be derived from the URI if you provide a VM instance or
+     *           The project ID can be derived from the URI if you provide a endpoint or
      *           network URI.
-     *           The following are two cases where you must provide the project ID:
-     *           1. Only the IP address is specified, and the IP address is within a GCP
-     *           project.
+     *           The following are two cases where you may need to provide the project ID:
+     *           1. Only the IP address is specified, and the IP address is within a Google
+     *           Cloud project.
      *           2. When you are using Shared VPC and the IP address that you provide is
      *           from the service project. In this case, the network that the IP address
      *           resides in is defined in the host project.
@@ -123,8 +233,6 @@ class Endpoint extends \Google\Protobuf\Internal\Message
 
     /**
      * The IP address of the endpoint, which can be an external or internal IP.
-     * An IPv6 address is only allowed when the test's destination is a
-     * [global load balancer VIP](https://cloud.google.com/load-balancing/docs/load-balancing-overview).
      *
      * Generated from protobuf field <code>string ip_address = 1;</code>
      * @return string
@@ -136,8 +244,6 @@ class Endpoint extends \Google\Protobuf\Internal\Message
 
     /**
      * The IP address of the endpoint, which can be an external or internal IP.
-     * An IPv6 address is only allowed when the test's destination is a
-     * [global load balancer VIP](https://cloud.google.com/load-balancing/docs/load-balancing-overview).
      *
      * Generated from protobuf field <code>string ip_address = 1;</code>
      * @param string $var
@@ -206,8 +312,156 @@ class Endpoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A cluster URI for [Google Kubernetes Engine
-     * master](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     * A forwarding rule and its corresponding IP address represent the frontend
+     * configuration of a Google Cloud load balancer. Forwarding rules are also
+     * used for protocol forwarding, Private Service Connect and other network
+     * services to provide forwarding information in the control plane. Applicable
+     * only to destination endpoint. Format:
+     *  projects/{project}/global/forwardingRules/{id} or
+     *  projects/{project}/regions/{region}/forwardingRules/{id}
+     *
+     * Generated from protobuf field <code>string forwarding_rule = 13;</code>
+     * @return string
+     */
+    public function getForwardingRule()
+    {
+        return $this->forwarding_rule;
+    }
+
+    /**
+     * A forwarding rule and its corresponding IP address represent the frontend
+     * configuration of a Google Cloud load balancer. Forwarding rules are also
+     * used for protocol forwarding, Private Service Connect and other network
+     * services to provide forwarding information in the control plane. Applicable
+     * only to destination endpoint. Format:
+     *  projects/{project}/global/forwardingRules/{id} or
+     *  projects/{project}/regions/{region}/forwardingRules/{id}
+     *
+     * Generated from protobuf field <code>string forwarding_rule = 13;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setForwardingRule($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->forwarding_rule = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Specifies the type of the target of the forwarding rule.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.networkmanagement.v1.Endpoint.ForwardingRuleTarget forwarding_rule_target = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return int
+     */
+    public function getForwardingRuleTarget()
+    {
+        return isset($this->forwarding_rule_target) ? $this->forwarding_rule_target : 0;
+    }
+
+    public function hasForwardingRuleTarget()
+    {
+        return isset($this->forwarding_rule_target);
+    }
+
+    public function clearForwardingRuleTarget()
+    {
+        unset($this->forwarding_rule_target);
+    }
+
+    /**
+     * Output only. Specifies the type of the target of the forwarding rule.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.networkmanagement.v1.Endpoint.ForwardingRuleTarget forwarding_rule_target = 14 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setForwardingRuleTarget($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\NetworkManagement\V1\Endpoint\ForwardingRuleTarget::class);
+        $this->forwarding_rule_target = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. ID of the load balancer the forwarding rule points to. Empty
+     * for forwarding rules not related to load balancers.
+     *
+     * Generated from protobuf field <code>optional string load_balancer_id = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return string
+     */
+    public function getLoadBalancerId()
+    {
+        return isset($this->load_balancer_id) ? $this->load_balancer_id : '';
+    }
+
+    public function hasLoadBalancerId()
+    {
+        return isset($this->load_balancer_id);
+    }
+
+    public function clearLoadBalancerId()
+    {
+        unset($this->load_balancer_id);
+    }
+
+    /**
+     * Output only. ID of the load balancer the forwarding rule points to. Empty
+     * for forwarding rules not related to load balancers.
+     *
+     * Generated from protobuf field <code>optional string load_balancer_id = 15 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setLoadBalancerId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->load_balancer_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Type of the load balancer the forwarding rule points to.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.networkmanagement.v1.LoadBalancerType load_balancer_type = 16 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return int
+     */
+    public function getLoadBalancerType()
+    {
+        return isset($this->load_balancer_type) ? $this->load_balancer_type : 0;
+    }
+
+    public function hasLoadBalancerType()
+    {
+        return isset($this->load_balancer_type);
+    }
+
+    public function clearLoadBalancerType()
+    {
+        unset($this->load_balancer_type);
+    }
+
+    /**
+     * Output only. Type of the load balancer the forwarding rule points to.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.networkmanagement.v1.LoadBalancerType load_balancer_type = 16 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setLoadBalancerType($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\NetworkManagement\V1\LoadBalancerType::class);
+        $this->load_balancer_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * A cluster URI for [Google Kubernetes Engine cluster control
+     * plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
      *
      * Generated from protobuf field <code>string gke_master_cluster = 7;</code>
      * @return string
@@ -218,8 +472,8 @@ class Endpoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A cluster URI for [Google Kubernetes Engine
-     * master](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     * A cluster URI for [Google Kubernetes Engine cluster control
+     * plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
      *
      * Generated from protobuf field <code>string gke_master_cluster = 7;</code>
      * @param string $var
@@ -229,6 +483,38 @@ class Endpoint extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->gke_master_cluster = $var;
+
+        return $this;
+    }
+
+    /**
+     * DNS endpoint of [Google Kubernetes Engine cluster control
+     * plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     * Requires gke_master_cluster to be set, can't be used simultaneoulsly with
+     * ip_address or network. Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string fqdn = 19;</code>
+     * @return string
+     */
+    public function getFqdn()
+    {
+        return $this->fqdn;
+    }
+
+    /**
+     * DNS endpoint of [Google Kubernetes Engine cluster control
+     * plane](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture).
+     * Requires gke_master_cluster to be set, can't be used simultaneoulsly with
+     * ip_address or network. Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string fqdn = 19;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setFqdn($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->fqdn = $var;
 
         return $this;
     }
@@ -260,7 +546,181 @@ class Endpoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A Compute Engine network URI.
+     * A [Redis Instance](https://cloud.google.com/memorystore/docs/redis) URI.
+     * Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string redis_instance = 17;</code>
+     * @return string
+     */
+    public function getRedisInstance()
+    {
+        return $this->redis_instance;
+    }
+
+    /**
+     * A [Redis Instance](https://cloud.google.com/memorystore/docs/redis) URI.
+     * Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string redis_instance = 17;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setRedisInstance($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->redis_instance = $var;
+
+        return $this;
+    }
+
+    /**
+     * A [Redis Cluster](https://cloud.google.com/memorystore/docs/cluster) URI.
+     * Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string redis_cluster = 18;</code>
+     * @return string
+     */
+    public function getRedisCluster()
+    {
+        return $this->redis_cluster;
+    }
+
+    /**
+     * A [Redis Cluster](https://cloud.google.com/memorystore/docs/cluster) URI.
+     * Applicable only to destination endpoint.
+     *
+     * Generated from protobuf field <code>string redis_cluster = 18;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setRedisCluster($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->redis_cluster = $var;
+
+        return $this;
+    }
+
+    /**
+     * A [Cloud Function](https://cloud.google.com/functions). Applicable only to
+     * source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.CloudFunctionEndpoint cloud_function = 10;</code>
+     * @return \Google\Cloud\NetworkManagement\V1\Endpoint\CloudFunctionEndpoint|null
+     */
+    public function getCloudFunction()
+    {
+        return $this->cloud_function;
+    }
+
+    public function hasCloudFunction()
+    {
+        return isset($this->cloud_function);
+    }
+
+    public function clearCloudFunction()
+    {
+        unset($this->cloud_function);
+    }
+
+    /**
+     * A [Cloud Function](https://cloud.google.com/functions). Applicable only to
+     * source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.CloudFunctionEndpoint cloud_function = 10;</code>
+     * @param \Google\Cloud\NetworkManagement\V1\Endpoint\CloudFunctionEndpoint $var
+     * @return $this
+     */
+    public function setCloudFunction($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\NetworkManagement\V1\Endpoint\CloudFunctionEndpoint::class);
+        $this->cloud_function = $var;
+
+        return $this;
+    }
+
+    /**
+     * An [App Engine](https://cloud.google.com/appengine) [service
+     * version](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions).
+     * Applicable only to source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.AppEngineVersionEndpoint app_engine_version = 11;</code>
+     * @return \Google\Cloud\NetworkManagement\V1\Endpoint\AppEngineVersionEndpoint|null
+     */
+    public function getAppEngineVersion()
+    {
+        return $this->app_engine_version;
+    }
+
+    public function hasAppEngineVersion()
+    {
+        return isset($this->app_engine_version);
+    }
+
+    public function clearAppEngineVersion()
+    {
+        unset($this->app_engine_version);
+    }
+
+    /**
+     * An [App Engine](https://cloud.google.com/appengine) [service
+     * version](https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions).
+     * Applicable only to source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.AppEngineVersionEndpoint app_engine_version = 11;</code>
+     * @param \Google\Cloud\NetworkManagement\V1\Endpoint\AppEngineVersionEndpoint $var
+     * @return $this
+     */
+    public function setAppEngineVersion($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\NetworkManagement\V1\Endpoint\AppEngineVersionEndpoint::class);
+        $this->app_engine_version = $var;
+
+        return $this;
+    }
+
+    /**
+     * A [Cloud Run](https://cloud.google.com/run)
+     * [revision](https://cloud.google.com/run/docs/reference/rest/v1/namespaces.revisions/get)
+     * Applicable only to source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.CloudRunRevisionEndpoint cloud_run_revision = 12;</code>
+     * @return \Google\Cloud\NetworkManagement\V1\Endpoint\CloudRunRevisionEndpoint|null
+     */
+    public function getCloudRunRevision()
+    {
+        return $this->cloud_run_revision;
+    }
+
+    public function hasCloudRunRevision()
+    {
+        return isset($this->cloud_run_revision);
+    }
+
+    public function clearCloudRunRevision()
+    {
+        unset($this->cloud_run_revision);
+    }
+
+    /**
+     * A [Cloud Run](https://cloud.google.com/run)
+     * [revision](https://cloud.google.com/run/docs/reference/rest/v1/namespaces.revisions/get)
+     * Applicable only to source endpoint.
+     *
+     * Generated from protobuf field <code>.google.cloud.networkmanagement.v1.Endpoint.CloudRunRevisionEndpoint cloud_run_revision = 12;</code>
+     * @param \Google\Cloud\NetworkManagement\V1\Endpoint\CloudRunRevisionEndpoint $var
+     * @return $this
+     */
+    public function setCloudRunRevision($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\NetworkManagement\V1\Endpoint\CloudRunRevisionEndpoint::class);
+        $this->cloud_run_revision = $var;
+
+        return $this;
+    }
+
+    /**
+     * A VPC network URI.
      *
      * Generated from protobuf field <code>string network = 4;</code>
      * @return string
@@ -271,7 +731,7 @@ class Endpoint extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A Compute Engine network URI.
+     * A VPC network URI.
      *
      * Generated from protobuf field <code>string network = 4;</code>
      * @param string $var
@@ -317,11 +777,11 @@ class Endpoint extends \Google\Protobuf\Internal\Message
 
     /**
      * Project ID where the endpoint is located.
-     * The Project ID can be derived from the URI if you provide a VM instance or
+     * The project ID can be derived from the URI if you provide a endpoint or
      * network URI.
-     * The following are two cases where you must provide the project ID:
-     * 1. Only the IP address is specified, and the IP address is within a GCP
-     * project.
+     * The following are two cases where you may need to provide the project ID:
+     * 1. Only the IP address is specified, and the IP address is within a Google
+     * Cloud project.
      * 2. When you are using Shared VPC and the IP address that you provide is
      * from the service project. In this case, the network that the IP address
      * resides in is defined in the host project.
@@ -336,11 +796,11 @@ class Endpoint extends \Google\Protobuf\Internal\Message
 
     /**
      * Project ID where the endpoint is located.
-     * The Project ID can be derived from the URI if you provide a VM instance or
+     * The project ID can be derived from the URI if you provide a endpoint or
      * network URI.
-     * The following are two cases where you must provide the project ID:
-     * 1. Only the IP address is specified, and the IP address is within a GCP
-     * project.
+     * The following are two cases where you may need to provide the project ID:
+     * 1. Only the IP address is specified, and the IP address is within a Google
+     * Cloud project.
      * 2. When you are using Shared VPC and the IP address that you provide is
      * from the service project. In this case, the network that the IP address
      * resides in is defined in the host project.

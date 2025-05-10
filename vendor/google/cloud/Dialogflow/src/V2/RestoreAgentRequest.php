@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Agents.RestoreAgent][google.cloud.dialogflow.v2.Agents.RestoreAgent].
+ * The request message for
+ * [Agents.RestoreAgent][google.cloud.dialogflow.v2.Agents.RestoreAgent].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.RestoreAgentRequest</code>
  */
@@ -21,7 +22,7 @@ class RestoreAgentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     protected $agent;
 
     /**

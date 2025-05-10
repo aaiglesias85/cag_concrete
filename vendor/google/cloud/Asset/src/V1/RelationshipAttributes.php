@@ -9,9 +9,13 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * DEPRECATED. This message only presents for the purpose of
+ * backward-compatibility. The server will never populate this message in
+ * responses.
  * The relationship attributes which include  `type`, `source_resource_type`,
  * `target_resource_type` and `action`.
  *
+ * @deprecated
  * Generated from protobuf message <code>google.cloud.asset.v1.RelationshipAttributes</code>
  */
 class RelationshipAttributes extends \Google\Protobuf\Internal\Message
@@ -22,25 +26,25 @@ class RelationshipAttributes extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string type = 4;</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
      * The source asset type. Example: `compute.googleapis.com/Instance`
      *
      * Generated from protobuf field <code>string source_resource_type = 1;</code>
      */
-    private $source_resource_type = '';
+    protected $source_resource_type = '';
     /**
      * The target asset type. Example: `compute.googleapis.com/Disk`
      *
      * Generated from protobuf field <code>string target_resource_type = 2;</code>
      */
-    private $target_resource_type = '';
+    protected $target_resource_type = '';
     /**
      * The detail of the relationship, e.g. `contains`, `attaches`
      *
      * Generated from protobuf field <code>string action = 3;</code>
      */
-    private $action = '';
+    protected $action = '';
 
     /**
      * Constructor.

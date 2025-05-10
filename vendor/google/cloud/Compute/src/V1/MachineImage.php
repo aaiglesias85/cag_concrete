@@ -64,6 +64,12 @@ class MachineImage extends \Google\Protobuf\Internal\Message
      */
     private $name = null;
     /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>optional bool satisfies_pzi = 480964257;</code>
+     */
+    private $satisfies_pzi = null;
+    /**
      * [Output Only] Reserved for future use.
      *
      * Generated from protobuf field <code>optional bool satisfies_pzs = 480964267;</code>
@@ -141,13 +147,15 @@ class MachineImage extends \Google\Protobuf\Internal\Message
      *           Encrypts the machine image using a customer-supplied encryption key. After you encrypt a machine image using a customer-supplied key, you must provide the same key if you use the machine image later. For example, you must provide the encryption key when you create an instance from the encrypted machine image in a future request. Customer-supplied encryption keys do not protect access to metadata of the machine image. If you do not provide an encryption key when creating the machine image, then the machine image will be encrypted using an automatically generated key and you do not need to provide a key to use the machine image later.
      *     @type string $name
      *           Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      *     @type bool $satisfies_pzs
      *           [Output Only] Reserved for future use.
-     *     @type \Google\Cloud\Compute\V1\SavedDisk[]|\Google\Protobuf\Internal\RepeatedField $saved_disks
+     *     @type array<\Google\Cloud\Compute\V1\SavedDisk>|\Google\Protobuf\Internal\RepeatedField $saved_disks
      *           An array of Machine Image specific properties for disks attached to the source instance
      *     @type string $self_link
      *           [Output Only] The URL for this machine image. The server defines this URL.
-     *     @type \Google\Cloud\Compute\V1\SourceDiskEncryptionKey[]|\Google\Protobuf\Internal\RepeatedField $source_disk_encryption_keys
+     *     @type array<\Google\Cloud\Compute\V1\SourceDiskEncryptionKey>|\Google\Protobuf\Internal\RepeatedField $source_disk_encryption_keys
      *           [Input Only] The customer-supplied encryption key of the disks attached to the source instance. Required if the source disk is protected by a customer-supplied encryption key.
      *     @type string $source_instance
      *           The source instance used to create the machine image. You can provide this as a partial or full URL to the resource. For example, the following are valid values: - https://www.googleapis.com/compute/v1/projects/project/zones/zone /instances/instance - projects/project/zones/zone/instances/instance 
@@ -156,7 +164,7 @@ class MachineImage extends \Google\Protobuf\Internal\Message
      *     @type string $status
      *           [Output Only] The status of the machine image. One of the following values: INVALID, CREATING, READY, DELETING, and UPLOADING.
      *           Check the Status enum for the list of possible values.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $storage_locations
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $storage_locations
      *           The regional or multi-regional Cloud Storage bucket location where the machine image is stored.
      *     @type int|string $total_storage_bytes
      *           [Output Only] Total size of the storage used by the machine image.
@@ -456,6 +464,42 @@ class MachineImage extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>optional bool satisfies_pzi = 480964257;</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return isset($this->satisfies_pzi) ? $this->satisfies_pzi : false;
+    }
+
+    public function hasSatisfiesPzi()
+    {
+        return isset($this->satisfies_pzi);
+    }
+
+    public function clearSatisfiesPzi()
+    {
+        unset($this->satisfies_pzi);
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>optional bool satisfies_pzi = 480964257;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] Reserved for future use.
      *
      * Generated from protobuf field <code>optional bool satisfies_pzs = 480964267;</code>
@@ -506,7 +550,7 @@ class MachineImage extends \Google\Protobuf\Internal\Message
      * An array of Machine Image specific properties for disks attached to the source instance
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.SavedDisk saved_disks = 397424318;</code>
-     * @param \Google\Cloud\Compute\V1\SavedDisk[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\SavedDisk>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSavedDisks($var)
@@ -568,7 +612,7 @@ class MachineImage extends \Google\Protobuf\Internal\Message
      * [Input Only] The customer-supplied encryption key of the disks attached to the source instance. Required if the source disk is protected by a customer-supplied encryption key.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.SourceDiskEncryptionKey source_disk_encryption_keys = 370408498;</code>
-     * @param \Google\Cloud\Compute\V1\SourceDiskEncryptionKey[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\SourceDiskEncryptionKey>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSourceDiskEncryptionKeys($var)
@@ -704,7 +748,7 @@ class MachineImage extends \Google\Protobuf\Internal\Message
      * The regional or multi-regional Cloud Storage bucket location where the machine image is stored.
      *
      * Generated from protobuf field <code>repeated string storage_locations = 328005274;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setStorageLocations($var)

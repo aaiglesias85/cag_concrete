@@ -9,47 +9,47 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Encapsulation of billing information for a GCP Console project. A project
- * has at most one associated billing account at a time (but a billing account
- * can be assigned to multiple projects).
+ * Encapsulation of billing information for a Google Cloud Console project. A
+ * project has at most one associated billing account at a time (but a billing
+ * account can be assigned to multiple projects).
  *
  * Generated from protobuf message <code>google.cloud.billing.v1.ProjectBillingInfo</code>
  */
 class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The resource name for the `ProjectBillingInfo`; has the form
+     * Output only. The resource name for the `ProjectBillingInfo`; has the form
      * `projects/{project_id}/billingInfo`. For example, the resource name for the
      * billing information for project `tokyo-rain-123` would be
-     * `projects/tokyo-rain-123/billingInfo`. This field is read-only.
+     * `projects/tokyo-rain-123/billingInfo`.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * The ID of the project that this `ProjectBillingInfo` represents, such as
-     * `tokyo-rain-123`. This is a convenience field so that you don't need to
-     * parse the `name` field to obtain a project ID. This field is read-only.
+     * Output only. The ID of the project that this `ProjectBillingInfo`
+     * represents, such as `tokyo-rain-123`. This is a convenience field so that
+     * you don't need to parse the `name` field to obtain a project ID.
      *
-     * Generated from protobuf field <code>string project_id = 2;</code>
+     * Generated from protobuf field <code>string project_id = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
     /**
      * The resource name of the billing account associated with the project, if
      * any. For example, `billingAccounts/012345-567890-ABCDEF`.
      *
      * Generated from protobuf field <code>string billing_account_name = 3;</code>
      */
-    private $billing_account_name = '';
+    protected $billing_account_name = '';
     /**
-     * True if the project is associated with an open billing account, to which
-     * usage on the project is charged. False if the project is associated with a
-     * closed billing account, or no billing account at all, and therefore cannot
-     * use paid services. This field is read-only.
+     * Output only. True if the project is associated with an open billing
+     * account, to which usage on the project is charged. False if the project is
+     * associated with a closed billing account, or no billing account at all, and
+     * therefore cannot use paid services.
      *
-     * Generated from protobuf field <code>bool billing_enabled = 4;</code>
+     * Generated from protobuf field <code>bool billing_enabled = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $billing_enabled = false;
+    protected $billing_enabled = false;
 
     /**
      * Constructor.
@@ -58,22 +58,22 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           The resource name for the `ProjectBillingInfo`; has the form
+     *           Output only. The resource name for the `ProjectBillingInfo`; has the form
      *           `projects/{project_id}/billingInfo`. For example, the resource name for the
      *           billing information for project `tokyo-rain-123` would be
-     *           `projects/tokyo-rain-123/billingInfo`. This field is read-only.
+     *           `projects/tokyo-rain-123/billingInfo`.
      *     @type string $project_id
-     *           The ID of the project that this `ProjectBillingInfo` represents, such as
-     *           `tokyo-rain-123`. This is a convenience field so that you don't need to
-     *           parse the `name` field to obtain a project ID. This field is read-only.
+     *           Output only. The ID of the project that this `ProjectBillingInfo`
+     *           represents, such as `tokyo-rain-123`. This is a convenience field so that
+     *           you don't need to parse the `name` field to obtain a project ID.
      *     @type string $billing_account_name
      *           The resource name of the billing account associated with the project, if
      *           any. For example, `billingAccounts/012345-567890-ABCDEF`.
      *     @type bool $billing_enabled
-     *           True if the project is associated with an open billing account, to which
-     *           usage on the project is charged. False if the project is associated with a
-     *           closed billing account, or no billing account at all, and therefore cannot
-     *           use paid services. This field is read-only.
+     *           Output only. True if the project is associated with an open billing
+     *           account, to which usage on the project is charged. False if the project is
+     *           associated with a closed billing account, or no billing account at all, and
+     *           therefore cannot use paid services.
      * }
      */
     public function __construct($data = NULL) {
@@ -82,12 +82,12 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The resource name for the `ProjectBillingInfo`; has the form
+     * Output only. The resource name for the `ProjectBillingInfo`; has the form
      * `projects/{project_id}/billingInfo`. For example, the resource name for the
      * billing information for project `tokyo-rain-123` would be
-     * `projects/tokyo-rain-123/billingInfo`. This field is read-only.
+     * `projects/tokyo-rain-123/billingInfo`.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getName()
@@ -96,12 +96,12 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The resource name for the `ProjectBillingInfo`; has the form
+     * Output only. The resource name for the `ProjectBillingInfo`; has the form
      * `projects/{project_id}/billingInfo`. For example, the resource name for the
      * billing information for project `tokyo-rain-123` would be
-     * `projects/tokyo-rain-123/billingInfo`. This field is read-only.
+     * `projects/tokyo-rain-123/billingInfo`.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -114,11 +114,11 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The ID of the project that this `ProjectBillingInfo` represents, such as
-     * `tokyo-rain-123`. This is a convenience field so that you don't need to
-     * parse the `name` field to obtain a project ID. This field is read-only.
+     * Output only. The ID of the project that this `ProjectBillingInfo`
+     * represents, such as `tokyo-rain-123`. This is a convenience field so that
+     * you don't need to parse the `name` field to obtain a project ID.
      *
-     * Generated from protobuf field <code>string project_id = 2;</code>
+     * Generated from protobuf field <code>string project_id = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getProjectId()
@@ -127,11 +127,11 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The ID of the project that this `ProjectBillingInfo` represents, such as
-     * `tokyo-rain-123`. This is a convenience field so that you don't need to
-     * parse the `name` field to obtain a project ID. This field is read-only.
+     * Output only. The ID of the project that this `ProjectBillingInfo`
+     * represents, such as `tokyo-rain-123`. This is a convenience field so that
+     * you don't need to parse the `name` field to obtain a project ID.
      *
-     * Generated from protobuf field <code>string project_id = 2;</code>
+     * Generated from protobuf field <code>string project_id = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -172,12 +172,12 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * True if the project is associated with an open billing account, to which
-     * usage on the project is charged. False if the project is associated with a
-     * closed billing account, or no billing account at all, and therefore cannot
-     * use paid services. This field is read-only.
+     * Output only. True if the project is associated with an open billing
+     * account, to which usage on the project is charged. False if the project is
+     * associated with a closed billing account, or no billing account at all, and
+     * therefore cannot use paid services.
      *
-     * Generated from protobuf field <code>bool billing_enabled = 4;</code>
+     * Generated from protobuf field <code>bool billing_enabled = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return bool
      */
     public function getBillingEnabled()
@@ -186,12 +186,12 @@ class ProjectBillingInfo extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * True if the project is associated with an open billing account, to which
-     * usage on the project is charged. False if the project is associated with a
-     * closed billing account, or no billing account at all, and therefore cannot
-     * use paid services. This field is read-only.
+     * Output only. True if the project is associated with an open billing
+     * account, to which usage on the project is charged. False if the project is
+     * associated with a closed billing account, or no billing account at all, and
+     * therefore cannot use paid services.
      *
-     * Generated from protobuf field <code>bool billing_enabled = 4;</code>
+     * Generated from protobuf field <code>bool billing_enabled = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param bool $var
      * @return $this
      */

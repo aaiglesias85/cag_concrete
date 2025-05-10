@@ -21,7 +21,22 @@ class GetJobTriggerRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. Resource name of the project and the triggeredJob, for example
+     *                     `projects/dlp-test-project/jobTriggers/53234423`. Please see
+     *                     {@see DlpServiceClient::jobTriggerName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dlp\V2\GetJobTriggerRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

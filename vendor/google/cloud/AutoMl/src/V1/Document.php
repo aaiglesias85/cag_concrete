@@ -20,13 +20,13 @@ class Document extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.DocumentInputConfig input_config = 1;</code>
      */
-    private $input_config = null;
+    protected $input_config = null;
     /**
      * The plain text version of this document.
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.TextSnippet document_text = 2;</code>
      */
-    private $document_text = null;
+    protected $document_text = null;
     /**
      * Describes the layout of the document.
      * Sorted by [page_number][].
@@ -39,13 +39,13 @@ class Document extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.DocumentDimensions document_dimensions = 4;</code>
      */
-    private $document_dimensions = null;
+    protected $document_dimensions = null;
     /**
      * Number of pages in the document.
      *
      * Generated from protobuf field <code>int32 page_count = 5;</code>
      */
-    private $page_count = 0;
+    protected $page_count = 0;
 
     /**
      * Constructor.
@@ -57,7 +57,7 @@ class Document extends \Google\Protobuf\Internal\Message
      *           An input config specifying the content of the document.
      *     @type \Google\Cloud\AutoMl\V1\TextSnippet $document_text
      *           The plain text version of this document.
-     *     @type \Google\Cloud\AutoMl\V1\Document\Layout[]|\Google\Protobuf\Internal\RepeatedField $layout
+     *     @type array<\Google\Cloud\AutoMl\V1\Document\Layout>|\Google\Protobuf\Internal\RepeatedField $layout
      *           Describes the layout of the document.
      *           Sorted by [page_number][].
      *     @type \Google\Cloud\AutoMl\V1\DocumentDimensions $document_dimensions
@@ -160,7 +160,7 @@ class Document extends \Google\Protobuf\Internal\Message
      * Sorted by [page_number][].
      *
      * Generated from protobuf field <code>repeated .google.cloud.automl.v1.Document.Layout layout = 3;</code>
-     * @param \Google\Cloud\AutoMl\V1\Document\Layout[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AutoMl\V1\Document\Layout>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLayout($var)

@@ -18,16 +18,16 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
 {
     /**
      * Indicates whether _this policy_ provides the specified permission to the
-     * specified member for the specified resource.
-     * This field does _not_ indicate whether the member actually has the
+     * specified principal for the specified resource.
+     * This field does _not_ indicate whether the principal actually has the
      * permission for the resource. There might be another policy that overrides
-     * this policy. To determine whether the member actually has the permission,
-     * use the `access` field in the
+     * this policy. To determine whether the principal actually has the
+     * permission, use the `access` field in the
      * [TroubleshootIamPolicyResponse][IamChecker.TroubleshootIamPolicyResponse].
      *
      * Generated from protobuf field <code>.google.cloud.policytroubleshooter.v1.AccessState access = 1;</code>
      */
-    private $access = 0;
+    protected $access = 0;
     /**
      * The full resource name that identifies the resource. For example,
      * `//compute.googleapis.com/projects/my-project/zones/us-central1-a/instances/my-instance`.
@@ -38,7 +38,7 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string full_resource_name = 2;</code>
      */
-    private $full_resource_name = '';
+    protected $full_resource_name = '';
     /**
      * The IAM policy attached to the resource.
      * If the sender of the request does not have access to the policy, this field
@@ -46,10 +46,10 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.iam.v1.Policy policy = 3;</code>
      */
-    private $policy = null;
+    protected $policy = null;
     /**
-     * Details about how each binding in the policy affects the member's ability,
-     * or inability, to use the permission for the resource.
+     * Details about how each binding in the policy affects the principal's
+     * ability, or inability, to use the permission for the resource.
      * If the sender of the request does not have access to the policy, this field
      * is omitted.
      *
@@ -64,7 +64,7 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.policytroubleshooter.v1.HeuristicRelevance relevance = 5;</code>
      */
-    private $relevance = 0;
+    protected $relevance = 0;
 
     /**
      * Constructor.
@@ -74,11 +74,11 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
      *
      *     @type int $access
      *           Indicates whether _this policy_ provides the specified permission to the
-     *           specified member for the specified resource.
-     *           This field does _not_ indicate whether the member actually has the
+     *           specified principal for the specified resource.
+     *           This field does _not_ indicate whether the principal actually has the
      *           permission for the resource. There might be another policy that overrides
-     *           this policy. To determine whether the member actually has the permission,
-     *           use the `access` field in the
+     *           this policy. To determine whether the principal actually has the
+     *           permission, use the `access` field in the
      *           [TroubleshootIamPolicyResponse][IamChecker.TroubleshootIamPolicyResponse].
      *     @type string $full_resource_name
      *           The full resource name that identifies the resource. For example,
@@ -91,9 +91,9 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
      *           The IAM policy attached to the resource.
      *           If the sender of the request does not have access to the policy, this field
      *           is empty.
-     *     @type \Google\Cloud\PolicyTroubleshooter\V1\BindingExplanation[]|\Google\Protobuf\Internal\RepeatedField $binding_explanations
-     *           Details about how each binding in the policy affects the member's ability,
-     *           or inability, to use the permission for the resource.
+     *     @type array<\Google\Cloud\PolicyTroubleshooter\V1\BindingExplanation>|\Google\Protobuf\Internal\RepeatedField $binding_explanations
+     *           Details about how each binding in the policy affects the principal's
+     *           ability, or inability, to use the permission for the resource.
      *           If the sender of the request does not have access to the policy, this field
      *           is omitted.
      *     @type int $relevance
@@ -110,11 +110,11 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
 
     /**
      * Indicates whether _this policy_ provides the specified permission to the
-     * specified member for the specified resource.
-     * This field does _not_ indicate whether the member actually has the
+     * specified principal for the specified resource.
+     * This field does _not_ indicate whether the principal actually has the
      * permission for the resource. There might be another policy that overrides
-     * this policy. To determine whether the member actually has the permission,
-     * use the `access` field in the
+     * this policy. To determine whether the principal actually has the
+     * permission, use the `access` field in the
      * [TroubleshootIamPolicyResponse][IamChecker.TroubleshootIamPolicyResponse].
      *
      * Generated from protobuf field <code>.google.cloud.policytroubleshooter.v1.AccessState access = 1;</code>
@@ -127,11 +127,11 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
 
     /**
      * Indicates whether _this policy_ provides the specified permission to the
-     * specified member for the specified resource.
-     * This field does _not_ indicate whether the member actually has the
+     * specified principal for the specified resource.
+     * This field does _not_ indicate whether the principal actually has the
      * permission for the resource. There might be another policy that overrides
-     * this policy. To determine whether the member actually has the permission,
-     * use the `access` field in the
+     * this policy. To determine whether the principal actually has the
+     * permission, use the `access` field in the
      * [TroubleshootIamPolicyResponse][IamChecker.TroubleshootIamPolicyResponse].
      *
      * Generated from protobuf field <code>.google.cloud.policytroubleshooter.v1.AccessState access = 1;</code>
@@ -223,8 +223,8 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Details about how each binding in the policy affects the member's ability,
-     * or inability, to use the permission for the resource.
+     * Details about how each binding in the policy affects the principal's
+     * ability, or inability, to use the permission for the resource.
      * If the sender of the request does not have access to the policy, this field
      * is omitted.
      *
@@ -237,13 +237,13 @@ class ExplainedPolicy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Details about how each binding in the policy affects the member's ability,
-     * or inability, to use the permission for the resource.
+     * Details about how each binding in the policy affects the principal's
+     * ability, or inability, to use the permission for the resource.
      * If the sender of the request does not have access to the policy, this field
      * is omitted.
      *
      * Generated from protobuf field <code>repeated .google.cloud.policytroubleshooter.v1.BindingExplanation binding_explanations = 4;</code>
-     * @param \Google\Cloud\PolicyTroubleshooter\V1\BindingExplanation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\PolicyTroubleshooter\V1\BindingExplanation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBindingExplanations($var)

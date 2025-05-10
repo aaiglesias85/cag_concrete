@@ -20,7 +20,7 @@ class WorkflowNode extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string step_id = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $step_id = '';
+    protected $step_id = '';
     /**
      * Output only. Node's prerequisite nodes.
      *
@@ -32,19 +32,19 @@ class WorkflowNode extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string job_id = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $job_id = '';
+    protected $job_id = '';
     /**
      * Output only. The node state.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.WorkflowNode.NodeState state = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. The error detail.
      *
      * Generated from protobuf field <code>string error = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $error = '';
+    protected $error = '';
 
     /**
      * Constructor.
@@ -54,7 +54,7 @@ class WorkflowNode extends \Google\Protobuf\Internal\Message
      *
      *     @type string $step_id
      *           Output only. The name of the node.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $prerequisite_step_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $prerequisite_step_ids
      *           Output only. Node's prerequisite nodes.
      *     @type string $job_id
      *           Output only. The job id; populated after the node enters RUNNING state.
@@ -110,7 +110,7 @@ class WorkflowNode extends \Google\Protobuf\Internal\Message
      * Output only. Node's prerequisite nodes.
      *
      * Generated from protobuf field <code>repeated string prerequisite_step_ids = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPrerequisiteStepIds($var)

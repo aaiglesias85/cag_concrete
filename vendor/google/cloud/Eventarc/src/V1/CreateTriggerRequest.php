@@ -20,26 +20,44 @@ class CreateTriggerRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The trigger to create.
      *
      * Generated from protobuf field <code>.google.cloud.eventarc.v1.Trigger trigger = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $trigger = null;
+    protected $trigger = null;
     /**
      * Required. The user-provided ID to be assigned to the trigger.
      *
      * Generated from protobuf field <code>string trigger_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $trigger_id = '';
+    protected $trigger_id = '';
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+
+    /**
+     * @param string                            $parent    Required. The parent collection in which to add this trigger. Please see
+     *                                                     {@see EventarcClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Eventarc\V1\Trigger $trigger   Required. The trigger to create.
+     * @param string                            $triggerId Required. The user-provided ID to be assigned to the trigger.
+     *
+     * @return \Google\Cloud\Eventarc\V1\CreateTriggerRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Eventarc\V1\Trigger $trigger, string $triggerId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setTrigger($trigger)
+            ->setTriggerId($triggerId);
+    }
 
     /**
      * Constructor.
@@ -54,7 +72,7 @@ class CreateTriggerRequest extends \Google\Protobuf\Internal\Message
      *     @type string $trigger_id
      *           Required. The user-provided ID to be assigned to the trigger.
      *     @type bool $validate_only
-     *           Required. If set, validate the request and preview the review, but do not
+     *           Optional. If set, validate the request and preview the review, but do not
      *           post it.
      * }
      */
@@ -152,10 +170,10 @@ class CreateTriggerRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
      */
     public function getValidateOnly()
@@ -164,10 +182,10 @@ class CreateTriggerRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var
      * @return $this
      */

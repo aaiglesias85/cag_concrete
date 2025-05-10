@@ -21,7 +21,7 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string project_id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
     /**
      * Client-assigned labels.
      *
@@ -29,8 +29,9 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * Required. The full resource URL of the external storage location. Currently, only
-     * Google Cloud Storage is supported. So input_url should be of the form:
+     * Required. The full resource URL of the external storage location.
+     * Currently, only Google Cloud Storage is supported. So input_url should be
+     * of the form:
      * `gs://BUCKET_NAME[/NAMESPACE_PATH]/OVERALL_EXPORT_METADATA_FILE`, where
      * `BUCKET_NAME` is the name of the Cloud Storage bucket, `NAMESPACE_PATH` is
      * an optional Cloud Storage namespace path (this is not a Cloud Datastore
@@ -44,7 +45,7 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string input_url = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $input_url = '';
+    protected $input_url = '';
     /**
      * Optionally specify which kinds/namespaces are to be imported. If provided,
      * the list must be a subset of the EntityFilter used in creating the export,
@@ -53,7 +54,42 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.datastore.admin.v1.EntityFilter entity_filter = 4;</code>
      */
-    private $entity_filter = null;
+    protected $entity_filter = null;
+
+    /**
+     * @param string                                        $projectId    Required. Project ID against which to make the request.
+     * @param array                                         $labels       Client-assigned labels.
+     * @param string                                        $inputUrl     Required. The full resource URL of the external storage location.
+     *                                                                    Currently, only Google Cloud Storage is supported. So input_url should be
+     *                                                                    of the form:
+     *                                                                    `gs://BUCKET_NAME[/NAMESPACE_PATH]/OVERALL_EXPORT_METADATA_FILE`, where
+     *                                                                    `BUCKET_NAME` is the name of the Cloud Storage bucket, `NAMESPACE_PATH` is
+     *                                                                    an optional Cloud Storage namespace path (this is not a Cloud Datastore
+     *                                                                    namespace), and `OVERALL_EXPORT_METADATA_FILE` is the metadata file written
+     *                                                                    by the ExportEntities operation. For more information about Cloud Storage
+     *                                                                    namespace paths, see
+     *                                                                    [Object name
+     *                                                                    considerations](https://cloud.google.com/storage/docs/naming#object-considerations).
+     *
+     *                                                                    For more information, see
+     *                                                                    [google.datastore.admin.v1.ExportEntitiesResponse.output_url][google.datastore.admin.v1.ExportEntitiesResponse.output_url].
+     * @param \Google\Cloud\Datastore\Admin\V1\EntityFilter $entityFilter Optionally specify which kinds/namespaces are to be imported. If provided,
+     *                                                                    the list must be a subset of the EntityFilter used in creating the export,
+     *                                                                    otherwise a FAILED_PRECONDITION error will be returned. If no filter is
+     *                                                                    specified then all entities from the export are imported.
+     *
+     * @return \Google\Cloud\Datastore\Admin\V1\ImportEntitiesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, array $labels, string $inputUrl, \Google\Cloud\Datastore\Admin\V1\EntityFilter $entityFilter): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setLabels($labels)
+            ->setInputUrl($inputUrl)
+            ->setEntityFilter($entityFilter);
+    }
 
     /**
      * Constructor.
@@ -66,8 +102,9 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Client-assigned labels.
      *     @type string $input_url
-     *           Required. The full resource URL of the external storage location. Currently, only
-     *           Google Cloud Storage is supported. So input_url should be of the form:
+     *           Required. The full resource URL of the external storage location.
+     *           Currently, only Google Cloud Storage is supported. So input_url should be
+     *           of the form:
      *           `gs://BUCKET_NAME[/NAMESPACE_PATH]/OVERALL_EXPORT_METADATA_FILE`, where
      *           `BUCKET_NAME` is the name of the Cloud Storage bucket, `NAMESPACE_PATH` is
      *           an optional Cloud Storage namespace path (this is not a Cloud Datastore
@@ -143,8 +180,9 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The full resource URL of the external storage location. Currently, only
-     * Google Cloud Storage is supported. So input_url should be of the form:
+     * Required. The full resource URL of the external storage location.
+     * Currently, only Google Cloud Storage is supported. So input_url should be
+     * of the form:
      * `gs://BUCKET_NAME[/NAMESPACE_PATH]/OVERALL_EXPORT_METADATA_FILE`, where
      * `BUCKET_NAME` is the name of the Cloud Storage bucket, `NAMESPACE_PATH` is
      * an optional Cloud Storage namespace path (this is not a Cloud Datastore
@@ -165,8 +203,9 @@ class ImportEntitiesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The full resource URL of the external storage location. Currently, only
-     * Google Cloud Storage is supported. So input_url should be of the form:
+     * Required. The full resource URL of the external storage location.
+     * Currently, only Google Cloud Storage is supported. So input_url should be
+     * of the form:
      * `gs://BUCKET_NAME[/NAMESPACE_PATH]/OVERALL_EXPORT_METADATA_FILE`, where
      * `BUCKET_NAME` is the name of the Cloud Storage bucket, `NAMESPACE_PATH` is
      * an optional Cloud Storage namespace path (this is not a Cloud Datastore

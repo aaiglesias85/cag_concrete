@@ -24,22 +24,22 @@ class OrganizationSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * A flag that indicates if Asset Discovery should be enabled. If the flag is
-     * set to `true`, then discovery of assets will occur. If it is set to `false,
-     * all historical assets will remain, but discovery of future assets will not
-     * occur.
+     * set to `true`, then discovery of assets will occur. If it is set to
+     * `false`, all historical assets will remain, but discovery of future assets
+     * will not occur.
      *
      * Generated from protobuf field <code>bool enable_asset_discovery = 2;</code>
      */
-    private $enable_asset_discovery = false;
+    protected $enable_asset_discovery = false;
     /**
      * The configuration used for Asset Discovery runs.
      *
      * Generated from protobuf field <code>.google.cloud.securitycenter.v1.OrganizationSettings.AssetDiscoveryConfig asset_discovery_config = 3;</code>
      */
-    private $asset_discovery_config = null;
+    protected $asset_discovery_config = null;
 
     /**
      * Constructor.
@@ -54,9 +54,9 @@ class OrganizationSettings extends \Google\Protobuf\Internal\Message
      *           "organizations/{organization_id}/organizationSettings".
      *     @type bool $enable_asset_discovery
      *           A flag that indicates if Asset Discovery should be enabled. If the flag is
-     *           set to `true`, then discovery of assets will occur. If it is set to `false,
-     *           all historical assets will remain, but discovery of future assets will not
-     *           occur.
+     *           set to `true`, then discovery of assets will occur. If it is set to
+     *           `false`, all historical assets will remain, but discovery of future assets
+     *           will not occur.
      *     @type \Google\Cloud\SecurityCenter\V1\OrganizationSettings\AssetDiscoveryConfig $asset_discovery_config
      *           The configuration used for Asset Discovery runs.
      * }
@@ -100,9 +100,9 @@ class OrganizationSettings extends \Google\Protobuf\Internal\Message
 
     /**
      * A flag that indicates if Asset Discovery should be enabled. If the flag is
-     * set to `true`, then discovery of assets will occur. If it is set to `false,
-     * all historical assets will remain, but discovery of future assets will not
-     * occur.
+     * set to `true`, then discovery of assets will occur. If it is set to
+     * `false`, all historical assets will remain, but discovery of future assets
+     * will not occur.
      *
      * Generated from protobuf field <code>bool enable_asset_discovery = 2;</code>
      * @return bool
@@ -114,9 +114,9 @@ class OrganizationSettings extends \Google\Protobuf\Internal\Message
 
     /**
      * A flag that indicates if Asset Discovery should be enabled. If the flag is
-     * set to `true`, then discovery of assets will occur. If it is set to `false,
-     * all historical assets will remain, but discovery of future assets will not
-     * occur.
+     * set to `true`, then discovery of assets will occur. If it is set to
+     * `false`, all historical assets will remain, but discovery of future assets
+     * will not occur.
      *
      * Generated from protobuf field <code>bool enable_asset_discovery = 2;</code>
      * @param bool $var

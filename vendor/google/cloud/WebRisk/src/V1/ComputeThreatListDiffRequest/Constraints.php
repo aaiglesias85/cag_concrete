@@ -22,7 +22,7 @@ class Constraints extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 max_diff_entries = 1;</code>
      */
-    private $max_diff_entries = 0;
+    protected $max_diff_entries = 0;
     /**
      * Sets the maximum number of entries that the client is willing to have
      * in the local database. This should be a power of 2 between 2**10 and
@@ -30,7 +30,7 @@ class Constraints extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 max_database_entries = 2;</code>
      */
-    private $max_database_entries = 0;
+    protected $max_database_entries = 0;
     /**
      * The compression types supported by the client.
      *
@@ -52,7 +52,7 @@ class Constraints extends \Google\Protobuf\Internal\Message
      *           Sets the maximum number of entries that the client is willing to have
      *           in the local database. This should be a power of 2 between 2**10 and
      *           2**20. If zero, no database size limit is set.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $supported_compressions
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $supported_compressions
      *           The compression types supported by the client.
      * }
      */
@@ -136,7 +136,7 @@ class Constraints extends \Google\Protobuf\Internal\Message
      * The compression types supported by the client.
      *
      * Generated from protobuf field <code>repeated .google.cloud.webrisk.v1.CompressionType supported_compressions = 3;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSupportedCompressions($var)
@@ -149,6 +149,4 @@ class Constraints extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Constraints::class, \Google\Cloud\WebRisk\V1\ComputeThreatListDiffRequest_Constraints::class);
 

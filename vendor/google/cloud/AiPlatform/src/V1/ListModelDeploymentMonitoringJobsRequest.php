@@ -22,31 +22,61 @@ class ListModelDeploymentMonitoringJobsRequest extends \Google\Protobuf\Internal
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The standard list filter.
+     * Supported fields:
+     *   * `display_name` supports `=`, `!=` comparisons, and `:` wildcard.
+     *   * `state` supports `=`, `!=` comparisons.
+     *   * `create_time` supports `=`, `!=`,`<`, `<=`,`>`, `>=` comparisons.
+     *     `create_time` must be in RFC 3339 format.
+     *   * `labels` supports general map functions that is:
+     *     `labels.key=value` - key:value equality
+     *     `labels.key:* - key existence
+     * Some examples of using the filter are:
+     *   * `state="JOB_STATE_SUCCEEDED" AND display_name:"my_job_*"`
+     *   * `state!="JOB_STATE_FAILED" OR display_name="my_job"`
+     *   * `NOT display_name="my_job"`
+     *   * `create_time>"2021-05-18T00:00:00Z"`
+     *   * `labels.keyA=valueA`
+     *   * `labels.keyB:*`
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * The standard list page size.
      *
      * Generated from protobuf field <code>int32 page_size = 3;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The standard list page token.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Mask specifying which fields to read
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask read_mask = 5;</code>
      */
-    private $read_mask = null;
+    protected $read_mask = null;
+
+    /**
+     * @param string $parent Required. The parent of the ModelDeploymentMonitoringJob.
+     *                       Format: `projects/{project}/locations/{location}`
+     *                       Please see {@see JobServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListModelDeploymentMonitoringJobsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -59,6 +89,21 @@ class ListModelDeploymentMonitoringJobsRequest extends \Google\Protobuf\Internal
      *           Format: `projects/{project}/locations/{location}`
      *     @type string $filter
      *           The standard list filter.
+     *           Supported fields:
+     *             * `display_name` supports `=`, `!=` comparisons, and `:` wildcard.
+     *             * `state` supports `=`, `!=` comparisons.
+     *             * `create_time` supports `=`, `!=`,`<`, `<=`,`>`, `>=` comparisons.
+     *               `create_time` must be in RFC 3339 format.
+     *             * `labels` supports general map functions that is:
+     *               `labels.key=value` - key:value equality
+     *               `labels.key:* - key existence
+     *           Some examples of using the filter are:
+     *             * `state="JOB_STATE_SUCCEEDED" AND display_name:"my_job_*"`
+     *             * `state!="JOB_STATE_FAILED" OR display_name="my_job"`
+     *             * `NOT display_name="my_job"`
+     *             * `create_time>"2021-05-18T00:00:00Z"`
+     *             * `labels.keyA=valueA`
+     *             * `labels.keyB:*`
      *     @type int $page_size
      *           The standard list page size.
      *     @type string $page_token
@@ -102,6 +147,21 @@ class ListModelDeploymentMonitoringJobsRequest extends \Google\Protobuf\Internal
 
     /**
      * The standard list filter.
+     * Supported fields:
+     *   * `display_name` supports `=`, `!=` comparisons, and `:` wildcard.
+     *   * `state` supports `=`, `!=` comparisons.
+     *   * `create_time` supports `=`, `!=`,`<`, `<=`,`>`, `>=` comparisons.
+     *     `create_time` must be in RFC 3339 format.
+     *   * `labels` supports general map functions that is:
+     *     `labels.key=value` - key:value equality
+     *     `labels.key:* - key existence
+     * Some examples of using the filter are:
+     *   * `state="JOB_STATE_SUCCEEDED" AND display_name:"my_job_*"`
+     *   * `state!="JOB_STATE_FAILED" OR display_name="my_job"`
+     *   * `NOT display_name="my_job"`
+     *   * `create_time>"2021-05-18T00:00:00Z"`
+     *   * `labels.keyA=valueA`
+     *   * `labels.keyB:*`
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      * @return string
@@ -113,6 +173,21 @@ class ListModelDeploymentMonitoringJobsRequest extends \Google\Protobuf\Internal
 
     /**
      * The standard list filter.
+     * Supported fields:
+     *   * `display_name` supports `=`, `!=` comparisons, and `:` wildcard.
+     *   * `state` supports `=`, `!=` comparisons.
+     *   * `create_time` supports `=`, `!=`,`<`, `<=`,`>`, `>=` comparisons.
+     *     `create_time` must be in RFC 3339 format.
+     *   * `labels` supports general map functions that is:
+     *     `labels.key=value` - key:value equality
+     *     `labels.key:* - key existence
+     * Some examples of using the filter are:
+     *   * `state="JOB_STATE_SUCCEEDED" AND display_name:"my_job_*"`
+     *   * `state!="JOB_STATE_FAILED" OR display_name="my_job"`
+     *   * `NOT display_name="my_job"`
+     *   * `create_time>"2021-05-18T00:00:00Z"`
+     *   * `labels.keyA=valueA`
+     *   * `labels.keyB:*`
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      * @param string $var

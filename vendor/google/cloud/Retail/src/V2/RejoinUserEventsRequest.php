@@ -21,16 +21,16 @@ class RejoinUserEventsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The type of the user event rejoin to define the scope and range of the user
      * events to be rejoined with the latest product catalog. Defaults to
-     * USER_EVENT_REJOIN_SCOPE_UNSPECIFIED if this field is not set, or set to an
-     * invalid integer value.
+     * `USER_EVENT_REJOIN_SCOPE_UNSPECIFIED` if this field is not set, or set to
+     * an invalid integer value.
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.RejoinUserEventsRequest.UserEventRejoinScope user_event_rejoin_scope = 2;</code>
      */
-    private $user_event_rejoin_scope = 0;
+    protected $user_event_rejoin_scope = 0;
 
     /**
      * Constructor.
@@ -44,8 +44,8 @@ class RejoinUserEventsRequest extends \Google\Protobuf\Internal\Message
      *     @type int $user_event_rejoin_scope
      *           The type of the user event rejoin to define the scope and range of the user
      *           events to be rejoined with the latest product catalog. Defaults to
-     *           USER_EVENT_REJOIN_SCOPE_UNSPECIFIED if this field is not set, or set to an
-     *           invalid integer value.
+     *           `USER_EVENT_REJOIN_SCOPE_UNSPECIFIED` if this field is not set, or set to
+     *           an invalid integer value.
      * }
      */
     public function __construct($data = NULL) {
@@ -84,8 +84,8 @@ class RejoinUserEventsRequest extends \Google\Protobuf\Internal\Message
     /**
      * The type of the user event rejoin to define the scope and range of the user
      * events to be rejoined with the latest product catalog. Defaults to
-     * USER_EVENT_REJOIN_SCOPE_UNSPECIFIED if this field is not set, or set to an
-     * invalid integer value.
+     * `USER_EVENT_REJOIN_SCOPE_UNSPECIFIED` if this field is not set, or set to
+     * an invalid integer value.
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.RejoinUserEventsRequest.UserEventRejoinScope user_event_rejoin_scope = 2;</code>
      * @return int
@@ -98,8 +98,8 @@ class RejoinUserEventsRequest extends \Google\Protobuf\Internal\Message
     /**
      * The type of the user event rejoin to define the scope and range of the user
      * events to be rejoined with the latest product catalog. Defaults to
-     * USER_EVENT_REJOIN_SCOPE_UNSPECIFIED if this field is not set, or set to an
-     * invalid integer value.
+     * `USER_EVENT_REJOIN_SCOPE_UNSPECIFIED` if this field is not set, or set to
+     * an invalid integer value.
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.RejoinUserEventsRequest.UserEventRejoinScope user_event_rejoin_scope = 2;</code>
      * @param int $var

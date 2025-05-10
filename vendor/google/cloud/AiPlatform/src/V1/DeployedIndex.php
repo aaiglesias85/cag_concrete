@@ -23,57 +23,58 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Required. The name of the Index this is the deployment of.
      * We may refer to this Index as the DeployedIndex's "original" Index.
      *
      * Generated from protobuf field <code>string index = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $index = '';
+    protected $index = '';
     /**
      * The display name of the DeployedIndex. If not provided upon creation,
      * the Index's display_name is used.
      *
      * Generated from protobuf field <code>string display_name = 3;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. Timestamp when the DeployedIndex was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
-     * Output only. Provides paths for users to send requests directly to the deployed index
-     * services running on Cloud via private services access. This field is
-     * populated if [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
+     * Output only. Provides paths for users to send requests directly to the
+     * deployed index services running on Cloud via private services access. This
+     * field is populated if
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.IndexPrivateEndpoints private_endpoints = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $private_endpoints = null;
+    protected $private_endpoints = null;
     /**
-     * Output only. The DeployedIndex may depend on various data on its original Index.
-     * Additionally when certain changes to the original Index are being done
-     * (e.g. when what the Index contains is being changed) the DeployedIndex may
-     * be asynchronously updated in the background to reflect this changes.
-     * If this timestamp's value is at least the [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
+     * Output only. The DeployedIndex may depend on various data on its original
+     * Index. Additionally when certain changes to the original Index are being
+     * done (e.g. when what the Index contains is being changed) the DeployedIndex
+     * may be asynchronously updated in the background to reflect these changes.
+     * If this timestamp's value is at least the
+     * [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
      * original Index, it means that this DeployedIndex and the original Index are
      * in sync. If this timestamp is older, then to see which updates this
-     * DeployedIndex already contains (and which not), one must
-     * [list][Operations.ListOperations] [Operations][Operation]
-     * [working][Operation.name] on the original Index. Only
-     * the successfully completed Operations with
-     * [Operations.metadata.generic_metadata.update_time]
-     * [google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
+     * DeployedIndex already contains (and which it does not), one must
+     * [list][google.longrunning.Operations.ListOperations] the operations that
+     * are running on the original Index. Only the successfully completed
+     * Operations with
+     * [update_time][google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
      * equal or before this sync time are contained in this DeployedIndex.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp index_sync_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $index_sync_time = null;
+    protected $index_sync_time = null;
     /**
-     * Optional. A description of resources that the DeployedIndex uses, which to large
-     * degree are decided by Vertex AI, and optionally allows only a modest
+     * Optional. A description of resources that the DeployedIndex uses, which to
+     * large degree are decided by Vertex AI, and optionally allows only a modest
      * additional configuration.
      * If min_replica_count is not set, the default value is 2 (we don't provide
      * SLA when min_replica_count=1). If max_replica_count is not set, the
@@ -82,47 +83,55 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.AutomaticResources automatic_resources = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $automatic_resources = null;
+    protected $automatic_resources = null;
     /**
-     * Optional. A description of resources that are dedicated to the DeployedIndex, and
-     * that need a higher degree of manual configuration.
-     * If min_replica_count is not set, the default value is 2 (we don't provide
-     * SLA when min_replica_count=1). If max_replica_count is not set, the
-     * default value is min_replica_count. The max allowed replica count is
-     * 1000.
-     * Available machine types:
-     * n1-standard-16
-     * n1-standard-32
+     * Optional. A description of resources that are dedicated to the
+     * DeployedIndex, and that need a higher degree of manual configuration. The
+     * field min_replica_count must be set to a value strictly greater than 0, or
+     * else validation will fail. We don't provide SLA when min_replica_count=1.
+     * If max_replica_count is not set, the default value is min_replica_count.
+     * The max allowed replica count is 1000.
+     * Available machine types for SMALL shard:
+     * e2-standard-2 and all machine types available for MEDIUM and LARGE shard.
+     * Available machine types for MEDIUM shard:
+     * e2-standard-16 and all machine types available for LARGE shard.
+     * Available machine types for LARGE shard:
+     * e2-highmem-16, n2d-standard-32.
+     * n1-standard-16 and n1-standard-32 are still available, but we recommend
+     * e2-standard-16 and e2-highmem-16 for cost efficiency.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DedicatedResources dedicated_resources = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $dedicated_resources = null;
+    protected $dedicated_resources = null;
     /**
-     * Optional. If true, private endpoint's access logs are sent to StackDriver Logging.
+     * Optional. If true, private endpoint's access logs are sent to Cloud
+     * Logging.
      * These logs are like standard server access logs, containing
      * information like timestamp and latency for each MatchRequest.
-     * Note that Stackdriver logs may incur a cost, especially if the deployed
+     * Note that logs may incur a cost, especially if the deployed
      * index receives a high queries per second rate (QPS).
      * Estimate your costs before enabling this option.
      *
      * Generated from protobuf field <code>bool enable_access_logging = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $enable_access_logging = false;
+    protected $enable_access_logging = false;
     /**
      * Optional. If set, the authentication is enabled for the private endpoint.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DeployedIndexAuthConfig deployed_index_auth_config = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $deployed_index_auth_config = null;
+    protected $deployed_index_auth_config = null;
     /**
      * Optional. A list of reserved ip ranges under the VPC network that can be
      * used for this DeployedIndex.
      * If set, we will deploy the index within the provided ip ranges. Otherwise,
      * the index might be deployed to any ip ranges under the provided VPC
      * network.
-     * The value sohuld be the name of the address
+     * The value should be the name of the address
      * (https://cloud.google.com/compute/docs/reference/rest/v1/addresses)
-     * Example: 'vertex-ai-ip-range'.
+     * Example: ['vertex-ai-ip-range'].
+     * For more information about subnets and network IP ranges, please see
+     * https://cloud.google.com/vpc/docs/subnets#manually_created_subnet_ip_ranges.
      *
      * Generated from protobuf field <code>repeated string reserved_ip_ranges = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
@@ -141,7 +150,15 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string deployment_group = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $deployment_group = '';
+    protected $deployment_group = '';
+    /**
+     * Optional. If set for PSC deployed index, PSC connection will be
+     * automatically created after deployment is done and the endpoint information
+     * is populated in private_endpoints.psc_automated_endpoints.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PSCAutomationConfig psc_automation_configs = 19 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $psc_automation_configs;
 
     /**
      * Constructor.
@@ -163,60 +180,69 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $create_time
      *           Output only. Timestamp when the DeployedIndex was created.
      *     @type \Google\Cloud\AIPlatform\V1\IndexPrivateEndpoints $private_endpoints
-     *           Output only. Provides paths for users to send requests directly to the deployed index
-     *           services running on Cloud via private services access. This field is
-     *           populated if [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
+     *           Output only. Provides paths for users to send requests directly to the
+     *           deployed index services running on Cloud via private services access. This
+     *           field is populated if
+     *           [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
      *     @type \Google\Protobuf\Timestamp $index_sync_time
-     *           Output only. The DeployedIndex may depend on various data on its original Index.
-     *           Additionally when certain changes to the original Index are being done
-     *           (e.g. when what the Index contains is being changed) the DeployedIndex may
-     *           be asynchronously updated in the background to reflect this changes.
-     *           If this timestamp's value is at least the [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
+     *           Output only. The DeployedIndex may depend on various data on its original
+     *           Index. Additionally when certain changes to the original Index are being
+     *           done (e.g. when what the Index contains is being changed) the DeployedIndex
+     *           may be asynchronously updated in the background to reflect these changes.
+     *           If this timestamp's value is at least the
+     *           [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
      *           original Index, it means that this DeployedIndex and the original Index are
      *           in sync. If this timestamp is older, then to see which updates this
-     *           DeployedIndex already contains (and which not), one must
-     *           [list][Operations.ListOperations] [Operations][Operation]
-     *           [working][Operation.name] on the original Index. Only
-     *           the successfully completed Operations with
-     *           [Operations.metadata.generic_metadata.update_time]
-     *           [google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
+     *           DeployedIndex already contains (and which it does not), one must
+     *           [list][google.longrunning.Operations.ListOperations] the operations that
+     *           are running on the original Index. Only the successfully completed
+     *           Operations with
+     *           [update_time][google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
      *           equal or before this sync time are contained in this DeployedIndex.
      *     @type \Google\Cloud\AIPlatform\V1\AutomaticResources $automatic_resources
-     *           Optional. A description of resources that the DeployedIndex uses, which to large
-     *           degree are decided by Vertex AI, and optionally allows only a modest
+     *           Optional. A description of resources that the DeployedIndex uses, which to
+     *           large degree are decided by Vertex AI, and optionally allows only a modest
      *           additional configuration.
      *           If min_replica_count is not set, the default value is 2 (we don't provide
      *           SLA when min_replica_count=1). If max_replica_count is not set, the
      *           default value is min_replica_count. The max allowed replica count is
      *           1000.
      *     @type \Google\Cloud\AIPlatform\V1\DedicatedResources $dedicated_resources
-     *           Optional. A description of resources that are dedicated to the DeployedIndex, and
-     *           that need a higher degree of manual configuration.
-     *           If min_replica_count is not set, the default value is 2 (we don't provide
-     *           SLA when min_replica_count=1). If max_replica_count is not set, the
-     *           default value is min_replica_count. The max allowed replica count is
-     *           1000.
-     *           Available machine types:
-     *           n1-standard-16
-     *           n1-standard-32
+     *           Optional. A description of resources that are dedicated to the
+     *           DeployedIndex, and that need a higher degree of manual configuration. The
+     *           field min_replica_count must be set to a value strictly greater than 0, or
+     *           else validation will fail. We don't provide SLA when min_replica_count=1.
+     *           If max_replica_count is not set, the default value is min_replica_count.
+     *           The max allowed replica count is 1000.
+     *           Available machine types for SMALL shard:
+     *           e2-standard-2 and all machine types available for MEDIUM and LARGE shard.
+     *           Available machine types for MEDIUM shard:
+     *           e2-standard-16 and all machine types available for LARGE shard.
+     *           Available machine types for LARGE shard:
+     *           e2-highmem-16, n2d-standard-32.
+     *           n1-standard-16 and n1-standard-32 are still available, but we recommend
+     *           e2-standard-16 and e2-highmem-16 for cost efficiency.
      *     @type bool $enable_access_logging
-     *           Optional. If true, private endpoint's access logs are sent to StackDriver Logging.
+     *           Optional. If true, private endpoint's access logs are sent to Cloud
+     *           Logging.
      *           These logs are like standard server access logs, containing
      *           information like timestamp and latency for each MatchRequest.
-     *           Note that Stackdriver logs may incur a cost, especially if the deployed
+     *           Note that logs may incur a cost, especially if the deployed
      *           index receives a high queries per second rate (QPS).
      *           Estimate your costs before enabling this option.
      *     @type \Google\Cloud\AIPlatform\V1\DeployedIndexAuthConfig $deployed_index_auth_config
      *           Optional. If set, the authentication is enabled for the private endpoint.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $reserved_ip_ranges
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $reserved_ip_ranges
      *           Optional. A list of reserved ip ranges under the VPC network that can be
      *           used for this DeployedIndex.
      *           If set, we will deploy the index within the provided ip ranges. Otherwise,
      *           the index might be deployed to any ip ranges under the provided VPC
      *           network.
-     *           The value sohuld be the name of the address
+     *           The value should be the name of the address
      *           (https://cloud.google.com/compute/docs/reference/rest/v1/addresses)
-     *           Example: 'vertex-ai-ip-range'.
+     *           Example: ['vertex-ai-ip-range'].
+     *           For more information about subnets and network IP ranges, please see
+     *           https://cloud.google.com/vpc/docs/subnets#manually_created_subnet_ip_ranges.
      *     @type string $deployment_group
      *           Optional. The deployment group can be no longer than 64 characters (eg:
      *           'test', 'prod'). If not set, we will use the 'default' deployment group.
@@ -228,6 +254,10 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      *           has been used with reserved_ip_ranges: [a, b, c], using it with [a, b] or
      *           [d, e] is disallowed.
      *           Note: we only support up to 5 deployment groups(not including 'default').
+     *     @type array<\Google\Cloud\AIPlatform\V1\PSCAutomationConfig>|\Google\Protobuf\Internal\RepeatedField $psc_automation_configs
+     *           Optional. If set for PSC deployed index, PSC connection will be
+     *           automatically created after deployment is done and the endpoint information
+     *           is populated in private_endpoints.psc_automated_endpoints.
      * }
      */
     public function __construct($data = NULL) {
@@ -360,9 +390,10 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Provides paths for users to send requests directly to the deployed index
-     * services running on Cloud via private services access. This field is
-     * populated if [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
+     * Output only. Provides paths for users to send requests directly to the
+     * deployed index services running on Cloud via private services access. This
+     * field is populated if
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.IndexPrivateEndpoints private_endpoints = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Cloud\AIPlatform\V1\IndexPrivateEndpoints|null
@@ -383,9 +414,10 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Provides paths for users to send requests directly to the deployed index
-     * services running on Cloud via private services access. This field is
-     * populated if [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
+     * Output only. Provides paths for users to send requests directly to the
+     * deployed index services running on Cloud via private services access. This
+     * field is populated if
+     * [network][google.cloud.aiplatform.v1.IndexEndpoint.network] is configured.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.IndexPrivateEndpoints private_endpoints = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Cloud\AIPlatform\V1\IndexPrivateEndpoints $var
@@ -400,19 +432,19 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The DeployedIndex may depend on various data on its original Index.
-     * Additionally when certain changes to the original Index are being done
-     * (e.g. when what the Index contains is being changed) the DeployedIndex may
-     * be asynchronously updated in the background to reflect this changes.
-     * If this timestamp's value is at least the [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
+     * Output only. The DeployedIndex may depend on various data on its original
+     * Index. Additionally when certain changes to the original Index are being
+     * done (e.g. when what the Index contains is being changed) the DeployedIndex
+     * may be asynchronously updated in the background to reflect these changes.
+     * If this timestamp's value is at least the
+     * [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
      * original Index, it means that this DeployedIndex and the original Index are
      * in sync. If this timestamp is older, then to see which updates this
-     * DeployedIndex already contains (and which not), one must
-     * [list][Operations.ListOperations] [Operations][Operation]
-     * [working][Operation.name] on the original Index. Only
-     * the successfully completed Operations with
-     * [Operations.metadata.generic_metadata.update_time]
-     * [google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
+     * DeployedIndex already contains (and which it does not), one must
+     * [list][google.longrunning.Operations.ListOperations] the operations that
+     * are running on the original Index. Only the successfully completed
+     * Operations with
+     * [update_time][google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
      * equal or before this sync time are contained in this DeployedIndex.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp index_sync_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -434,19 +466,19 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The DeployedIndex may depend on various data on its original Index.
-     * Additionally when certain changes to the original Index are being done
-     * (e.g. when what the Index contains is being changed) the DeployedIndex may
-     * be asynchronously updated in the background to reflect this changes.
-     * If this timestamp's value is at least the [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
+     * Output only. The DeployedIndex may depend on various data on its original
+     * Index. Additionally when certain changes to the original Index are being
+     * done (e.g. when what the Index contains is being changed) the DeployedIndex
+     * may be asynchronously updated in the background to reflect these changes.
+     * If this timestamp's value is at least the
+     * [Index.update_time][google.cloud.aiplatform.v1.Index.update_time] of the
      * original Index, it means that this DeployedIndex and the original Index are
      * in sync. If this timestamp is older, then to see which updates this
-     * DeployedIndex already contains (and which not), one must
-     * [list][Operations.ListOperations] [Operations][Operation]
-     * [working][Operation.name] on the original Index. Only
-     * the successfully completed Operations with
-     * [Operations.metadata.generic_metadata.update_time]
-     * [google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
+     * DeployedIndex already contains (and which it does not), one must
+     * [list][google.longrunning.Operations.ListOperations] the operations that
+     * are running on the original Index. Only the successfully completed
+     * Operations with
+     * [update_time][google.cloud.aiplatform.v1.GenericOperationMetadata.update_time]
      * equal or before this sync time are contained in this DeployedIndex.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp index_sync_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -462,8 +494,8 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A description of resources that the DeployedIndex uses, which to large
-     * degree are decided by Vertex AI, and optionally allows only a modest
+     * Optional. A description of resources that the DeployedIndex uses, which to
+     * large degree are decided by Vertex AI, and optionally allows only a modest
      * additional configuration.
      * If min_replica_count is not set, the default value is 2 (we don't provide
      * SLA when min_replica_count=1). If max_replica_count is not set, the
@@ -489,8 +521,8 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A description of resources that the DeployedIndex uses, which to large
-     * degree are decided by Vertex AI, and optionally allows only a modest
+     * Optional. A description of resources that the DeployedIndex uses, which to
+     * large degree are decided by Vertex AI, and optionally allows only a modest
      * additional configuration.
      * If min_replica_count is not set, the default value is 2 (we don't provide
      * SLA when min_replica_count=1). If max_replica_count is not set, the
@@ -510,15 +542,20 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A description of resources that are dedicated to the DeployedIndex, and
-     * that need a higher degree of manual configuration.
-     * If min_replica_count is not set, the default value is 2 (we don't provide
-     * SLA when min_replica_count=1). If max_replica_count is not set, the
-     * default value is min_replica_count. The max allowed replica count is
-     * 1000.
-     * Available machine types:
-     * n1-standard-16
-     * n1-standard-32
+     * Optional. A description of resources that are dedicated to the
+     * DeployedIndex, and that need a higher degree of manual configuration. The
+     * field min_replica_count must be set to a value strictly greater than 0, or
+     * else validation will fail. We don't provide SLA when min_replica_count=1.
+     * If max_replica_count is not set, the default value is min_replica_count.
+     * The max allowed replica count is 1000.
+     * Available machine types for SMALL shard:
+     * e2-standard-2 and all machine types available for MEDIUM and LARGE shard.
+     * Available machine types for MEDIUM shard:
+     * e2-standard-16 and all machine types available for LARGE shard.
+     * Available machine types for LARGE shard:
+     * e2-highmem-16, n2d-standard-32.
+     * n1-standard-16 and n1-standard-32 are still available, but we recommend
+     * e2-standard-16 and e2-highmem-16 for cost efficiency.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DedicatedResources dedicated_resources = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Cloud\AIPlatform\V1\DedicatedResources|null
@@ -539,15 +576,20 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A description of resources that are dedicated to the DeployedIndex, and
-     * that need a higher degree of manual configuration.
-     * If min_replica_count is not set, the default value is 2 (we don't provide
-     * SLA when min_replica_count=1). If max_replica_count is not set, the
-     * default value is min_replica_count. The max allowed replica count is
-     * 1000.
-     * Available machine types:
-     * n1-standard-16
-     * n1-standard-32
+     * Optional. A description of resources that are dedicated to the
+     * DeployedIndex, and that need a higher degree of manual configuration. The
+     * field min_replica_count must be set to a value strictly greater than 0, or
+     * else validation will fail. We don't provide SLA when min_replica_count=1.
+     * If max_replica_count is not set, the default value is min_replica_count.
+     * The max allowed replica count is 1000.
+     * Available machine types for SMALL shard:
+     * e2-standard-2 and all machine types available for MEDIUM and LARGE shard.
+     * Available machine types for MEDIUM shard:
+     * e2-standard-16 and all machine types available for LARGE shard.
+     * Available machine types for LARGE shard:
+     * e2-highmem-16, n2d-standard-32.
+     * n1-standard-16 and n1-standard-32 are still available, but we recommend
+     * e2-standard-16 and e2-highmem-16 for cost efficiency.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DedicatedResources dedicated_resources = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Cloud\AIPlatform\V1\DedicatedResources $var
@@ -562,10 +604,11 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If true, private endpoint's access logs are sent to StackDriver Logging.
+     * Optional. If true, private endpoint's access logs are sent to Cloud
+     * Logging.
      * These logs are like standard server access logs, containing
      * information like timestamp and latency for each MatchRequest.
-     * Note that Stackdriver logs may incur a cost, especially if the deployed
+     * Note that logs may incur a cost, especially if the deployed
      * index receives a high queries per second rate (QPS).
      * Estimate your costs before enabling this option.
      *
@@ -578,10 +621,11 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If true, private endpoint's access logs are sent to StackDriver Logging.
+     * Optional. If true, private endpoint's access logs are sent to Cloud
+     * Logging.
      * These logs are like standard server access logs, containing
      * information like timestamp and latency for each MatchRequest.
-     * Note that Stackdriver logs may incur a cost, especially if the deployed
+     * Note that logs may incur a cost, especially if the deployed
      * index receives a high queries per second rate (QPS).
      * Estimate your costs before enabling this option.
      *
@@ -639,9 +683,11 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      * If set, we will deploy the index within the provided ip ranges. Otherwise,
      * the index might be deployed to any ip ranges under the provided VPC
      * network.
-     * The value sohuld be the name of the address
+     * The value should be the name of the address
      * (https://cloud.google.com/compute/docs/reference/rest/v1/addresses)
-     * Example: 'vertex-ai-ip-range'.
+     * Example: ['vertex-ai-ip-range'].
+     * For more information about subnets and network IP ranges, please see
+     * https://cloud.google.com/vpc/docs/subnets#manually_created_subnet_ip_ranges.
      *
      * Generated from protobuf field <code>repeated string reserved_ip_ranges = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -657,12 +703,14 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
      * If set, we will deploy the index within the provided ip ranges. Otherwise,
      * the index might be deployed to any ip ranges under the provided VPC
      * network.
-     * The value sohuld be the name of the address
+     * The value should be the name of the address
      * (https://cloud.google.com/compute/docs/reference/rest/v1/addresses)
-     * Example: 'vertex-ai-ip-range'.
+     * Example: ['vertex-ai-ip-range'].
+     * For more information about subnets and network IP ranges, please see
+     * https://cloud.google.com/vpc/docs/subnets#manually_created_subnet_ip_ranges.
      *
      * Generated from protobuf field <code>repeated string reserved_ip_ranges = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setReservedIpRanges($var)
@@ -713,6 +761,36 @@ class DeployedIndex extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->deployment_group = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. If set for PSC deployed index, PSC connection will be
+     * automatically created after deployment is done and the endpoint information
+     * is populated in private_endpoints.psc_automated_endpoints.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PSCAutomationConfig psc_automation_configs = 19 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getPscAutomationConfigs()
+    {
+        return $this->psc_automation_configs;
+    }
+
+    /**
+     * Optional. If set for PSC deployed index, PSC connection will be
+     * automatically created after deployment is done and the endpoint information
+     * is populated in private_endpoints.psc_automated_endpoints.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.PSCAutomationConfig psc_automation_configs = 19 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<\Google\Cloud\AIPlatform\V1\PSCAutomationConfig>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setPscAutomationConfigs($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\AIPlatform\V1\PSCAutomationConfig::class);
+        $this->psc_automation_configs = $arr;
 
         return $this;
     }

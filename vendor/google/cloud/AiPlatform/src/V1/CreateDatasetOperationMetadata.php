@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Runtime operation information for [DatasetService.CreateDataset][google.cloud.aiplatform.v1.DatasetService.CreateDataset].
+ * Runtime operation information for
+ * [DatasetService.CreateDataset][google.cloud.aiplatform.v1.DatasetService.CreateDataset].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateDatasetOperationMetadata</code>
  */
@@ -20,7 +21,7 @@ class CreateDatasetOperationMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GenericOperationMetadata generic_metadata = 1;</code>
      */
-    private $generic_metadata = null;
+    protected $generic_metadata = null;
 
     /**
      * Constructor.

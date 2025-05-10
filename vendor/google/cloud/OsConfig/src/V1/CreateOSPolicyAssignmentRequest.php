@@ -21,13 +21,13 @@ class CreateOSPolicyAssignmentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The OS policy assignment to be created.
      *
      * Generated from protobuf field <code>.google.cloud.osconfig.v1.OSPolicyAssignment os_policy_assignment = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $os_policy_assignment = null;
+    protected $os_policy_assignment = null;
     /**
      * Required. The logical name of the OS policy assignment in the project
      * with the following restrictions:
@@ -39,7 +39,33 @@ class CreateOSPolicyAssignmentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string os_policy_assignment_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $os_policy_assignment_id = '';
+    protected $os_policy_assignment_id = '';
+
+    /**
+     * @param string                                       $parent               Required. The parent resource name in the form:
+     *                                                                           projects/{project}/locations/{location}
+     *                                                                           Please see {@see OsConfigZonalServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\OsConfig\V1\OSPolicyAssignment $osPolicyAssignment   Required. The OS policy assignment to be created.
+     * @param string                                       $osPolicyAssignmentId Required. The logical name of the OS policy assignment in the project
+     *                                                                           with the following restrictions:
+     *
+     *                                                                           * Must contain only lowercase letters, numbers, and hyphens.
+     *                                                                           * Must start with a letter.
+     *                                                                           * Must be between 1-63 characters.
+     *                                                                           * Must end with a number or a letter.
+     *                                                                           * Must be unique within the project.
+     *
+     * @return \Google\Cloud\OsConfig\V1\CreateOSPolicyAssignmentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\OsConfig\V1\OSPolicyAssignment $osPolicyAssignment, string $osPolicyAssignmentId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setOsPolicyAssignment($osPolicyAssignment)
+            ->setOsPolicyAssignmentId($osPolicyAssignmentId);
+    }
 
     /**
      * Constructor.

@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-pubsub/v/stable)](https://packagist.org/packages/google/cloud-pubsub) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-pubsub.svg)](https://packagist.org/packages/google/cloud-pubsub)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-pubsub/latest)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-pubsub/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -16,16 +16,10 @@ A fully-managed real-time messaging service that allows you to send and receive 
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-pubsub
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take advantage of the benefits offered by gRPC (such as streaming methods)
@@ -68,10 +62,17 @@ foreach ($messages as $message) {
 }
 ```
 
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
+
 ### Version
 
 This component is considered GA (generally available). As such, it will not introduce backwards-incompatible changes in
 any minor or patch releases. We will address issues and requests with the highest priority.
+
+Please see the [migration guide](./MIGRATING.md) to upgrade from **V1** of the library to **V2**.
 
 ### Next Steps
 

@@ -9,35 +9,35 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [MigrationService.SearchMigratableResources][google.cloud.aiplatform.v1.MigrationService.SearchMigratableResources].
+ * Request message for
+ * [MigrationService.SearchMigratableResources][google.cloud.aiplatform.v1.MigrationService.SearchMigratableResources].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.SearchMigratableResourcesRequest</code>
  */
 class SearchMigratableResourcesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The location that the migratable resources should be searched from.
-     * It's the Vertex AI location that the resources can be migrated to, not
-     * the resources' original location.
-     * Format:
+     * Required. The location that the migratable resources should be searched
+     * from. It's the Vertex AI location that the resources can be migrated to,
+     * not the resources' original location. Format:
      * `projects/{project}/locations/{location}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The standard page size.
      * The default and maximum value is 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The standard page token.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * A filter for your search. You can use the following types of filters:
      * *   Resource type filters. The following strings filter for a specific type
@@ -53,7 +53,24 @@ class SearchMigratableResourcesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $parent Required. The location that the migratable resources should be searched
+     *                       from. It's the Vertex AI location that the resources can be migrated to,
+     *                       not the resources' original location. Format:
+     *                       `projects/{project}/locations/{location}`
+     *                       Please see {@see MigrationServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\SearchMigratableResourcesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -62,10 +79,9 @@ class SearchMigratableResourcesRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The location that the migratable resources should be searched from.
-     *           It's the Vertex AI location that the resources can be migrated to, not
-     *           the resources' original location.
-     *           Format:
+     *           Required. The location that the migratable resources should be searched
+     *           from. It's the Vertex AI location that the resources can be migrated to,
+     *           not the resources' original location. Format:
      *           `projects/{project}/locations/{location}`
      *     @type int $page_size
      *           The standard page size.
@@ -92,10 +108,9 @@ class SearchMigratableResourcesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The location that the migratable resources should be searched from.
-     * It's the Vertex AI location that the resources can be migrated to, not
-     * the resources' original location.
-     * Format:
+     * Required. The location that the migratable resources should be searched
+     * from. It's the Vertex AI location that the resources can be migrated to,
+     * not the resources' original location. Format:
      * `projects/{project}/locations/{location}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
@@ -107,10 +122,9 @@ class SearchMigratableResourcesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The location that the migratable resources should be searched from.
-     * It's the Vertex AI location that the resources can be migrated to, not
-     * the resources' original location.
-     * Format:
+     * Required. The location that the migratable resources should be searched
+     * from. It's the Vertex AI location that the resources can be migrated to,
+     * not the resources' original location. Format:
      * `projects/{project}/locations/{location}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>

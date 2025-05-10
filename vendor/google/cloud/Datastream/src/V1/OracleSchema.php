@@ -20,7 +20,7 @@ class OracleSchema extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string schema = 1;</code>
      */
-    private $schema = '';
+    protected $schema = '';
     /**
      * Tables in the schema.
      *
@@ -36,7 +36,7 @@ class OracleSchema extends \Google\Protobuf\Internal\Message
      *
      *     @type string $schema
      *           Schema name.
-     *     @type \Google\Cloud\Datastream\V1\OracleTable[]|\Google\Protobuf\Internal\RepeatedField $oracle_tables
+     *     @type array<\Google\Cloud\Datastream\V1\OracleTable>|\Google\Protobuf\Internal\RepeatedField $oracle_tables
      *           Tables in the schema.
      * }
      */
@@ -86,7 +86,7 @@ class OracleSchema extends \Google\Protobuf\Internal\Message
      * Tables in the schema.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datastream.v1.OracleTable oracle_tables = 2;</code>
-     * @param \Google\Cloud\Datastream\V1\OracleTable[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastream\V1\OracleTable>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOracleTables($var)

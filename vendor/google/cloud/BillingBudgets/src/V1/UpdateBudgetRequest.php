@@ -21,7 +21,7 @@ class UpdateBudgetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.billing.budgets.v1.Budget budget = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $budget = null;
+    protected $budget = null;
     /**
      * Optional. Indicates which fields in the provided budget to update.
      * Read-only fields (such as `name`) cannot be changed. If this is not
@@ -32,7 +32,28 @@ class UpdateBudgetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Billing\Budgets\V1\Budget $budget     Required. The updated budget object.
+     *                                                            The budget to update is specified by the budget name in the budget.
+     * @param \Google\Protobuf\FieldMask              $updateMask Optional. Indicates which fields in the provided budget to update.
+     *                                                            Read-only fields (such as `name`) cannot be changed. If this is not
+     *                                                            provided, then only fields with non-default values from the request are
+     *                                                            updated. See
+     *                                                            https://developers.google.com/protocol-buffers/docs/proto3#default for more
+     *                                                            details about default values.
+     *
+     * @return \Google\Cloud\Billing\Budgets\V1\UpdateBudgetRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Billing\Budgets\V1\Budget $budget, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setBudget($budget)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

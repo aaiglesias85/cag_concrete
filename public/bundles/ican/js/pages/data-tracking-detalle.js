@@ -659,7 +659,7 @@ var DataTrackingDetalle = function () {
 
         var aoColumns = [
             {
-                field: "conc_vendor",
+                field: "vendor",
                 title: "Conc Vendor",
             },
             {

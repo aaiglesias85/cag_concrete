@@ -21,7 +21,7 @@ class GenerateIdTokenRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The sequence of service accounts in a delegation chain. Each service
      * account must be granted the `roles/iam.serviceAccountTokenCreator` role
@@ -42,14 +42,48 @@ class GenerateIdTokenRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string audience = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $audience = '';
+    protected $audience = '';
     /**
      * Include the service account email in the token. If set to `true`, the
      * token will contain `email` and `email_verified` claims.
      *
      * Generated from protobuf field <code>bool include_email = 4;</code>
      */
-    private $include_email = false;
+    protected $include_email = false;
+
+    /**
+     * @param string   $name         Required. The resource name of the service account for which the credentials
+     *                               are requested, in the following format:
+     *                               `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+     *                               character is required; replacing it with a project ID is invalid. Please see
+     *                               {@see IAMCredentialsClient::serviceAccountName()} for help formatting this field.
+     * @param string[] $delegates    The sequence of service accounts in a delegation chain. Each service
+     *                               account must be granted the `roles/iam.serviceAccountTokenCreator` role
+     *                               on its next service account in the chain. The last service account in the
+     *                               chain must be granted the `roles/iam.serviceAccountTokenCreator` role
+     *                               on the service account that is specified in the `name` field of the
+     *                               request.
+     *
+     *                               The delegates must have the following format:
+     *                               `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+     *                               character is required; replacing it with a project ID is invalid.
+     * @param string   $audience     Required. The audience for the token, such as the API or account that this token
+     *                               grants access to.
+     * @param bool     $includeEmail Include the service account email in the token. If set to `true`, the
+     *                               token will contain `email` and `email_verified` claims.
+     *
+     * @return \Google\Cloud\Iam\Credentials\V1\GenerateIdTokenRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, array $delegates, string $audience, bool $includeEmail): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setDelegates($delegates)
+            ->setAudience($audience)
+            ->setIncludeEmail($includeEmail);
+    }
 
     /**
      * Constructor.
@@ -62,7 +96,7 @@ class GenerateIdTokenRequest extends \Google\Protobuf\Internal\Message
      *           are requested, in the following format:
      *           `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
      *           character is required; replacing it with a project ID is invalid.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $delegates
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $delegates
      *           The sequence of service accounts in a delegation chain. Each service
      *           account must be granted the `roles/iam.serviceAccountTokenCreator` role
      *           on its next service account in the chain. The last service account in the
@@ -148,7 +182,7 @@ class GenerateIdTokenRequest extends \Google\Protobuf\Internal\Message
      * character is required; replacing it with a project ID is invalid.
      *
      * Generated from protobuf field <code>repeated string delegates = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDelegates($var)

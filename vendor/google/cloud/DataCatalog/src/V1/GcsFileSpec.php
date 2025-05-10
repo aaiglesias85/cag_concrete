@@ -20,19 +20,20 @@ class GcsFileSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string file_path = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $file_path = '';
+    protected $file_path = '';
     /**
-     * Output only. Creation, modification, and expiration timestamps of a Cloud Storage file.
+     * Output only. Creation, modification, and expiration timestamps of a Cloud
+     * Storage file.
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.SystemTimestamps gcs_timestamps = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $gcs_timestamps = null;
+    protected $gcs_timestamps = null;
     /**
      * Output only. File size in bytes.
      *
      * Generated from protobuf field <code>int64 size_bytes = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $size_bytes = 0;
+    protected $size_bytes = 0;
 
     /**
      * Constructor.
@@ -43,7 +44,8 @@ class GcsFileSpec extends \Google\Protobuf\Internal\Message
      *     @type string $file_path
      *           Required. Full file path. Example: `gs://bucket_name/a/b.txt`.
      *     @type \Google\Cloud\DataCatalog\V1\SystemTimestamps $gcs_timestamps
-     *           Output only. Creation, modification, and expiration timestamps of a Cloud Storage file.
+     *           Output only. Creation, modification, and expiration timestamps of a Cloud
+     *           Storage file.
      *     @type int|string $size_bytes
      *           Output only. File size in bytes.
      * }
@@ -80,7 +82,8 @@ class GcsFileSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Creation, modification, and expiration timestamps of a Cloud Storage file.
+     * Output only. Creation, modification, and expiration timestamps of a Cloud
+     * Storage file.
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.SystemTimestamps gcs_timestamps = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Cloud\DataCatalog\V1\SystemTimestamps|null
@@ -101,7 +104,8 @@ class GcsFileSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Creation, modification, and expiration timestamps of a Cloud Storage file.
+     * Output only. Creation, modification, and expiration timestamps of a Cloud
+     * Storage file.
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.SystemTimestamps gcs_timestamps = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Cloud\DataCatalog\V1\SystemTimestamps $var

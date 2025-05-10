@@ -22,20 +22,20 @@ class UsableSubnetwork extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string subnetwork = 1;</code>
      */
-    private $subnetwork = '';
+    protected $subnetwork = '';
     /**
      * Network Name.
      * Example: projects/my-project/global/networks/my-network
      *
      * Generated from protobuf field <code>string network = 2;</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
      * The range of internal addresses that are owned by this subnetwork.
      *
      * Generated from protobuf field <code>string ip_cidr_range = 3;</code>
      */
-    private $ip_cidr_range = '';
+    protected $ip_cidr_range = '';
     /**
      * Secondary IP ranges.
      *
@@ -50,7 +50,7 @@ class UsableSubnetwork extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string status_message = 5;</code>
      */
-    private $status_message = '';
+    protected $status_message = '';
 
     /**
      * Constructor.
@@ -66,7 +66,7 @@ class UsableSubnetwork extends \Google\Protobuf\Internal\Message
      *           Example: projects/my-project/global/networks/my-network
      *     @type string $ip_cidr_range
      *           The range of internal addresses that are owned by this subnetwork.
-     *     @type \Google\Cloud\Container\V1\UsableSubnetworkSecondaryRange[]|\Google\Protobuf\Internal\RepeatedField $secondary_ip_ranges
+     *     @type array<\Google\Cloud\Container\V1\UsableSubnetworkSecondaryRange>|\Google\Protobuf\Internal\RepeatedField $secondary_ip_ranges
      *           Secondary IP ranges.
      *     @type string $status_message
      *           A human readable status message representing the reasons for cases where
@@ -177,7 +177,7 @@ class UsableSubnetwork extends \Google\Protobuf\Internal\Message
      * Secondary IP ranges.
      *
      * Generated from protobuf field <code>repeated .google.container.v1.UsableSubnetworkSecondaryRange secondary_ip_ranges = 4;</code>
-     * @param \Google\Cloud\Container\V1\UsableSubnetworkSecondaryRange[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Container\V1\UsableSubnetworkSecondaryRange>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSecondaryIpRanges($var)

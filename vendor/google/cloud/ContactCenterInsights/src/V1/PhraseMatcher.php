@@ -22,7 +22,7 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Immutable. The revision ID of the phrase matcher.
      * A new revision is committed whenever the matcher is changed, except when it
@@ -31,39 +31,39 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string revision_id = 2 [(.google.api.field_behavior) = IMMUTABLE, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $revision_id = '';
+    protected $revision_id = '';
     /**
      * The customized version tag to use for the phrase matcher. If not specified,
      * it will default to `revision_id`.
      *
      * Generated from protobuf field <code>string version_tag = 3;</code>
      */
-    private $version_tag = '';
+    protected $version_tag = '';
     /**
-     * Output only. The timestamp of when the revision was created. It is also the create time
-     * when a new matcher is added.
+     * Output only. The timestamp of when the revision was created. It is also the
+     * create time when a new matcher is added.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp revision_create_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $revision_create_time = null;
+    protected $revision_create_time = null;
     /**
      * The human-readable name of the phrase matcher.
      *
      * Generated from protobuf field <code>string display_name = 5;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Required. The type of this phrase matcher.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.PhraseMatcher.PhraseMatcherType type = 6 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
      * Applies the phrase matcher only when it is active.
      *
      * Generated from protobuf field <code>bool active = 7;</code>
      */
-    private $active = false;
+    protected $active = false;
     /**
      * A list of phase match rule groups that are included in this matcher.
      *
@@ -71,11 +71,12 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
      */
     private $phrase_match_rule_groups;
     /**
-     * Output only. The most recent time at which the activation status was updated.
+     * Output only. The most recent time at which the activation status was
+     * updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp activation_update_time = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $activation_update_time = null;
+    protected $activation_update_time = null;
     /**
      * The role whose utterances the phrase matcher should be matched
      * against. If the role is ROLE_UNSPECIFIED it will be matched against any
@@ -83,13 +84,13 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationParticipant.Role role_match = 10;</code>
      */
-    private $role_match = 0;
+    protected $role_match = 0;
     /**
      * Output only. The most recent time at which the phrase matcher was updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
 
     /**
      * Constructor.
@@ -110,18 +111,19 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
      *           The customized version tag to use for the phrase matcher. If not specified,
      *           it will default to `revision_id`.
      *     @type \Google\Protobuf\Timestamp $revision_create_time
-     *           Output only. The timestamp of when the revision was created. It is also the create time
-     *           when a new matcher is added.
+     *           Output only. The timestamp of when the revision was created. It is also the
+     *           create time when a new matcher is added.
      *     @type string $display_name
      *           The human-readable name of the phrase matcher.
      *     @type int $type
      *           Required. The type of this phrase matcher.
      *     @type bool $active
      *           Applies the phrase matcher only when it is active.
-     *     @type \Google\Cloud\ContactCenterInsights\V1\PhraseMatchRuleGroup[]|\Google\Protobuf\Internal\RepeatedField $phrase_match_rule_groups
+     *     @type array<\Google\Cloud\ContactCenterInsights\V1\PhraseMatchRuleGroup>|\Google\Protobuf\Internal\RepeatedField $phrase_match_rule_groups
      *           A list of phase match rule groups that are included in this matcher.
      *     @type \Google\Protobuf\Timestamp $activation_update_time
-     *           Output only. The most recent time at which the activation status was updated.
+     *           Output only. The most recent time at which the activation status was
+     *           updated.
      *     @type int $role_match
      *           The role whose utterances the phrase matcher should be matched
      *           against. If the role is ROLE_UNSPECIFIED it will be matched against any
@@ -226,8 +228,8 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The timestamp of when the revision was created. It is also the create time
-     * when a new matcher is added.
+     * Output only. The timestamp of when the revision was created. It is also the
+     * create time when a new matcher is added.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp revision_create_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -248,8 +250,8 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The timestamp of when the revision was created. It is also the create time
-     * when a new matcher is added.
+     * Output only. The timestamp of when the revision was created. It is also the
+     * create time when a new matcher is added.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp revision_create_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var
@@ -356,7 +358,7 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
      * A list of phase match rule groups that are included in this matcher.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.PhraseMatchRuleGroup phrase_match_rule_groups = 8;</code>
-     * @param \Google\Cloud\ContactCenterInsights\V1\PhraseMatchRuleGroup[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ContactCenterInsights\V1\PhraseMatchRuleGroup>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPhraseMatchRuleGroups($var)
@@ -368,7 +370,8 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The most recent time at which the activation status was updated.
+     * Output only. The most recent time at which the activation status was
+     * updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp activation_update_time = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -389,7 +392,8 @@ class PhraseMatcher extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The most recent time at which the activation status was updated.
+     * Output only. The most recent time at which the activation status was
+     * updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp activation_update_time = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Protobuf\Timestamp $var

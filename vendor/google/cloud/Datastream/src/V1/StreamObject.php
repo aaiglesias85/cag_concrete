@@ -16,29 +16,29 @@ use Google\Protobuf\Internal\GPBUtil;
 class StreamObject extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The object resource's name.
+     * Output only. Identifier. The object resource's name.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. The creation time of the object.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The last update time of the object.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Required. Display name.
      *
      * Generated from protobuf field <code>string display_name = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. Active errors on the object.
      *
@@ -50,13 +50,13 @@ class StreamObject extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.BackfillJob backfill_job = 7;</code>
      */
-    private $backfill_job = null;
+    protected $backfill_job = null;
     /**
      * The object identifier in the data source.
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier source_object = 8;</code>
      */
-    private $source_object = null;
+    protected $source_object = null;
 
     /**
      * Constructor.
@@ -65,14 +65,14 @@ class StreamObject extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Output only. The object resource's name.
+     *           Output only. Identifier. The object resource's name.
      *     @type \Google\Protobuf\Timestamp $create_time
      *           Output only. The creation time of the object.
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. The last update time of the object.
      *     @type string $display_name
      *           Required. Display name.
-     *     @type \Google\Cloud\Datastream\V1\Error[]|\Google\Protobuf\Internal\RepeatedField $errors
+     *     @type array<\Google\Cloud\Datastream\V1\Error>|\Google\Protobuf\Internal\RepeatedField $errors
      *           Output only. Active errors on the object.
      *     @type \Google\Cloud\Datastream\V1\BackfillJob $backfill_job
      *           The latest backfill job that was initiated for the stream object.
@@ -86,9 +86,9 @@ class StreamObject extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The object resource's name.
+     * Output only. Identifier. The object resource's name.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getName()
@@ -97,9 +97,9 @@ class StreamObject extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The object resource's name.
+     * Output only. Identifier. The object resource's name.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -224,7 +224,7 @@ class StreamObject extends \Google\Protobuf\Internal\Message
      * Output only. Active errors on the object.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datastream.v1.Error errors = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\Datastream\V1\Error[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastream\V1\Error>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrors($var)

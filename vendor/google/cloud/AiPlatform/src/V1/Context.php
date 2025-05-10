@@ -16,25 +16,25 @@ use Google\Protobuf\Internal\GPBUtil;
 class Context extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The resource name of the Context.
+     * Immutable. The resource name of the Context.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * User provided display name of the Context.
      * May be up to 128 Unicode characters.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * An eTag used to perform consistent read-modify-write updates. If not set, a
      * blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 8;</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
      * The labels with user-defined metadata to organize your Contexts.
      * Label keys and values can be no longer than 64 characters
@@ -51,16 +51,16 @@ class Context extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this Context was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * Output only. A list of resource names of Contexts that are parents of this Context.
-     * A Context may have at most 10 parent_contexts.
+     * Output only. A list of resource names of Contexts that are parents of this
+     * Context. A Context may have at most 10 parent_contexts.
      *
      * Generated from protobuf field <code>repeated string parent_contexts = 12 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
@@ -73,7 +73,7 @@ class Context extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string schema_title = 13;</code>
      */
-    private $schema_title = '';
+    protected $schema_title = '';
     /**
      * The version of the schema in schema_name to use.
      * Schema title and version is expected to be registered in earlier Create
@@ -82,20 +82,21 @@ class Context extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string schema_version = 14;</code>
      */
-    private $schema_version = '';
+    protected $schema_version = '';
     /**
      * Properties of the Context.
+     * Top level metadata keys' heading and trailing spaces will be trimmed.
      * The size of this field should not exceed 200KB.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct metadata = 15;</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
     /**
      * Description of the Context
      *
      * Generated from protobuf field <code>string description = 16;</code>
      */
-    private $description = '';
+    protected $description = '';
 
     /**
      * Constructor.
@@ -104,7 +105,7 @@ class Context extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Output only. The resource name of the Context.
+     *           Immutable. The resource name of the Context.
      *     @type string $display_name
      *           User provided display name of the Context.
      *           May be up to 128 Unicode characters.
@@ -122,9 +123,9 @@ class Context extends \Google\Protobuf\Internal\Message
      *           Output only. Timestamp when this Context was created.
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Timestamp when this Context was last updated.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $parent_contexts
-     *           Output only. A list of resource names of Contexts that are parents of this Context.
-     *           A Context may have at most 10 parent_contexts.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $parent_contexts
+     *           Output only. A list of resource names of Contexts that are parents of this
+     *           Context. A Context may have at most 10 parent_contexts.
      *     @type string $schema_title
      *           The title of the schema describing the metadata.
      *           Schema title and version is expected to be registered in earlier Create
@@ -137,6 +138,7 @@ class Context extends \Google\Protobuf\Internal\Message
      *           schemas within the local metadata store.
      *     @type \Google\Protobuf\Struct $metadata
      *           Properties of the Context.
+     *           Top level metadata keys' heading and trailing spaces will be trimmed.
      *           The size of this field should not exceed 200KB.
      *     @type string $description
      *           Description of the Context
@@ -148,9 +150,9 @@ class Context extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The resource name of the Context.
+     * Immutable. The resource name of the Context.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return string
      */
     public function getName()
@@ -159,9 +161,9 @@ class Context extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The resource name of the Context.
+     * Immutable. The resource name of the Context.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @param string $var
      * @return $this
      */
@@ -338,8 +340,8 @@ class Context extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A list of resource names of Contexts that are parents of this Context.
-     * A Context may have at most 10 parent_contexts.
+     * Output only. A list of resource names of Contexts that are parents of this
+     * Context. A Context may have at most 10 parent_contexts.
      *
      * Generated from protobuf field <code>repeated string parent_contexts = 12 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -350,11 +352,11 @@ class Context extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. A list of resource names of Contexts that are parents of this Context.
-     * A Context may have at most 10 parent_contexts.
+     * Output only. A list of resource names of Contexts that are parents of this
+     * Context. A Context may have at most 10 parent_contexts.
      *
      * Generated from protobuf field <code>repeated string parent_contexts = 12 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setParentContexts($var)
@@ -431,6 +433,7 @@ class Context extends \Google\Protobuf\Internal\Message
 
     /**
      * Properties of the Context.
+     * Top level metadata keys' heading and trailing spaces will be trimmed.
      * The size of this field should not exceed 200KB.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct metadata = 15;</code>
@@ -453,6 +456,7 @@ class Context extends \Google\Protobuf\Internal\Message
 
     /**
      * Properties of the Context.
+     * Top level metadata keys' heading and trailing spaces will be trimmed.
      * The size of this field should not exceed 200KB.
      *
      * Generated from protobuf field <code>.google.protobuf.Struct metadata = 15;</code>

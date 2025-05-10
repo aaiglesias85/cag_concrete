@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-data-catalog/v/stable)](https://packagist.org/packages/google/cloud-data-catalog) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-data-catalog.svg)](https://packagist.org/packages/google/cloud-data-catalog)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-data-catalog/latest/datacatalog/readme)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-data-catalog/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -14,16 +14,10 @@ that project.
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-data-catalog
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take advantage of the benefits offered by gRPC (such as streaming methods)
@@ -48,6 +42,11 @@ $entryGroup = $client->createEntryGroup($location, 'sample_entry_group');
 
 printf('Created entry group: %s' . PHP_EOL, $entryGroup->getName());
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

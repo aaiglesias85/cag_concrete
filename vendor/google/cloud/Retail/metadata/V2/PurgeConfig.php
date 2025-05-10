@@ -16,19 +16,34 @@ class PurgeConfig
         }
         \GPBMetadata\Google\Api\FieldBehavior::initOnce();
         \GPBMetadata\Google\Api\Resource::initOnce();
+        \GPBMetadata\Google\Protobuf\Timestamp::initOnce();
         $pool->internalAddGeneratedFile(
             '
-Ï
-)google/cloud/retail/v2/purge_config.protogoogle.cloud.retail.v2google/api/resource.proto"
-PurgeMetadata"s
+á
+)google/cloud/retail/v2/purge_config.protogoogle.cloud.retail.v2google/api/resource.protogoogle/protobuf/timestamp.proto"
+PurgeMetadata"ß
+PurgeProductsMetadata/
+create_time (2.google.protobuf.Timestamp/
+update_time (2.google.protobuf.Timestamp
+success_count (
+failure_count ("p
+PurgeProductsRequest4
+parent (	B$‡A˙A
+retail.googleapis.com/Branch
+filter (	B‡A
+force ("f
+PurgeProductsResponse
+purge_count (8
+purge_sample (	B"˙A
+retail.googleapis.com/Product"s
 PurgeUserEventsRequest5
 parent (	B%‡A˙A
 retail.googleapis.com/Catalog
 filter (	B‡A
 force ("6
 PurgeUserEventsResponse
-purged_events_count (B≈
-com.google.cloud.retail.v2BPurgeConfigProtoPZ<google.golang.org/genproto/googleapis/cloud/retail/v2;retail¢RETAIL™Google.Cloud.Retail.V2 Google\\Cloud\\Retail\\V2ÍGoogle::Cloud::Retail::V2bproto3'
+purged_events_count (Bª
+com.google.cloud.retail.v2BPurgeConfigProtoPZ2cloud.google.com/go/retail/apiv2/retailpb;retailpb¢RETAIL™Google.Cloud.Retail.V2 Google\\Cloud\\Retail\\V2ÍGoogle::Cloud::Retail::V2bproto3'
         , true);
 
         static::$is_initialized = true;

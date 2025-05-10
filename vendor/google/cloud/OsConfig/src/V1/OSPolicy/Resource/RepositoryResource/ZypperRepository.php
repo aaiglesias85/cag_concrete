@@ -25,19 +25,19 @@ class ZypperRepository extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * The display name of the repository.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Required. The location of the repository directory.
      *
      * Generated from protobuf field <code>string base_url = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $base_url = '';
+    protected $base_url = '';
     /**
      * URIs of GPG keys.
      *
@@ -60,7 +60,7 @@ class ZypperRepository extends \Google\Protobuf\Internal\Message
      *           The display name of the repository.
      *     @type string $base_url
      *           Required. The location of the repository directory.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $gpg_keys
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $gpg_keys
      *           URIs of GPG keys.
      * }
      */
@@ -168,7 +168,7 @@ class ZypperRepository extends \Google\Protobuf\Internal\Message
      * URIs of GPG keys.
      *
      * Generated from protobuf field <code>repeated string gpg_keys = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setGpgKeys($var)

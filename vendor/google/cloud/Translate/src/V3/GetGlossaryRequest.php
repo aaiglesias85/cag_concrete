@@ -20,7 +20,21 @@ class GetGlossaryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the glossary to retrieve. Please see
+     *                     {@see TranslationServiceClient::glossaryName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Translate\V3\GetGlossaryRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

@@ -17,10 +17,10 @@ use Google\Protobuf\Internal\GPBUtil;
 class NodeConfig extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Optional. The Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones) in which
+     * Optional. The Compute Engine [zone](/compute/docs/regions-zones) in which
      * to deploy the VMs used to run the Apache Airflow software, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/zones/{zoneId}".
      * This `location` must belong to the enclosing environment's project and
      * location. If both this field and `nodeConfig.machineType` are specified,
@@ -30,16 +30,18 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * both fields. If only one field (`location` or `nodeConfig.machineType`) is
      * specified, the location information from the specified field will be
      * propagated to the unspecified field.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>string location = 1;</code>
      */
-    private $location = '';
+    protected $location = '';
     /**
      * Optional. The Compute Engine
-     * [machine type](https://cloud.google.com/compute/docs/machine-types) used for cluster instances,
+     * [machine type](/compute/docs/machine-types) used for cluster instances,
      * specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/zones/{zoneId}/machineTypes/{machineTypeId}".
      * The `machineType` must belong to the enclosing environment's project and
      * location. If both this field and `nodeConfig.location` are specified,
@@ -50,52 +52,58 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * specified, the location information from the specified field will be
      * propagated to the unspecified field.
      * The `machineTypeId` must not be a [shared-core machine
-     * type](https://cloud.google.com/compute/docs/machine-types#sharedcore).
+     * type](/compute/docs/machine-types#sharedcore).
      * If this field is unspecified, the `machineTypeId` defaults
      * to "n1-standard-1".
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>string machine_type = 2;</code>
      */
-    private $machine_type = '';
+    protected $machine_type = '';
     /**
      * Optional. The Compute Engine network to be used for machine
      * communications, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/global/networks/{networkId}".
      * If unspecified, the "default" network ID in the environment's project is
-     * used. If a [Custom Subnet Network](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets)
+     * used. If a [Custom Subnet Network](/vpc/docs/vpc#vpc_networks_and_subnets)
      * is provided, `nodeConfig.subnetwork` must also be provided. For
-     * [Shared VPC](https://cloud.google.com/vpc/docs/shared-vpc) subnetwork requirements, see
+     * [Shared VPC](/vpc/docs/shared-vpc) subnetwork requirements, see
      * `nodeConfig.subnetwork`.
      *
-     * Generated from protobuf field <code>string network = 3;</code>
+     * Generated from protobuf field <code>string network = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $network = '';
+    protected $network = '';
     /**
      * Optional. The Compute Engine subnetwork to be used for machine
      * communications, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
      * If a subnetwork is provided, `nodeConfig.network` must also be provided,
      * and the subnetwork must belong to the enclosing environment's project and
      * location.
      *
-     * Generated from protobuf field <code>string subnetwork = 4;</code>
+     * Generated from protobuf field <code>string subnetwork = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $subnetwork = '';
+    protected $subnetwork = '';
     /**
-     * Optional. The disk size in GB used for node VMs. Minimum size is 20GB.
+     * Optional. The disk size in GB used for node VMs. Minimum size is 30GB.
      * If unspecified, defaults to 100GB. Cannot be updated.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>int32 disk_size_gb = 5;</code>
      */
-    private $disk_size_gb = 0;
+    protected $disk_size_gb = 0;
     /**
      * Optional. The set of Google API scopes to be made available on all
      * node VMs. If `oauth_scopes` is empty, defaults to
      * ["https://www.googleapis.com/auth/cloud-platform"]. Cannot be updated.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>repeated string oauth_scopes = 6;</code>
      */
@@ -105,9 +113,9 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * VMs. If a service account is not specified, the "default" Compute Engine
      * service account is used. Cannot be updated.
      *
-     * Generated from protobuf field <code>string service_account = 7;</code>
+     * Generated from protobuf field <code>string service_account = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
      * Optional. The list of instance tags applied to all node VMs. Tags are used
      * to identify valid sources or targets for network firewalls. Each tag within
@@ -118,11 +126,49 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      */
     private $tags;
     /**
-     * Optional. The configuration for controlling how IPs are allocated in the GKE cluster.
+     * Optional. The configuration for controlling how IPs are allocated in the
+     * GKE cluster.
      *
      * Generated from protobuf field <code>.google.cloud.orchestration.airflow.service.v1.IPAllocationPolicy ip_allocation_policy = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $ip_allocation_policy = null;
+    protected $ip_allocation_policy = null;
+    /**
+     * Optional. Deploys 'ip-masq-agent' daemon set in the GKE cluster and defines
+     * nonMasqueradeCIDRs equals to pod IP range so IP masquerading is used for
+     * all destination addresses, except between pods traffic.
+     * See:
+     * https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent
+     *
+     * Generated from protobuf field <code>bool enable_ip_masq_agent = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $enable_ip_masq_agent = false;
+    /**
+     * Optional. Network Attachment that Cloud Composer environment is connected
+     * to, which provides connectivity with a user's VPC network. Takes precedence
+     * over network and subnetwork settings. If not provided, but network and
+     * subnetwork are defined during environment, it will be provisioned. If not
+     * provided and network and subnetwork are also empty, then connectivity to
+     * user's VPC network is disabled. Network attachment must be provided in
+     * format
+     * projects/{project}/regions/{region}/networkAttachments/{networkAttachment}.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-3-airflow-*.*.*-build.* and newer.
+     *
+     * Generated from protobuf field <code>string composer_network_attachment = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $composer_network_attachment = '';
+    /**
+     * Optional. The IP range in CIDR notation to use internally by Cloud
+     * Composer. IP addresses are not reserved - and the same range can be used by
+     * multiple Cloud Composer environments. In case of overlap, IPs from this
+     * range will not be accessible in the user's VPC network. Cannot be updated.
+     * If not specified, the default value of '100.64.128.0/20' is used.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-3-airflow-*.*.*-build.* and newer.
+     *
+     * Generated from protobuf field <code>string composer_internal_ipv4_cidr_block = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $composer_internal_ipv4_cidr_block = '';
 
     /**
      * Constructor.
@@ -131,10 +177,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $location
-     *           Optional. The Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones) in which
+     *           Optional. The Compute Engine [zone](/compute/docs/regions-zones) in which
      *           to deploy the VMs used to run the Apache Airflow software, specified as a
      *           [relative resource
-     *           name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     *           name](/apis/design/resource_names#relative_resource_name). For example:
      *           "projects/{projectId}/zones/{zoneId}".
      *           This `location` must belong to the enclosing environment's project and
      *           location. If both this field and `nodeConfig.machineType` are specified,
@@ -144,12 +190,14 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      *           both fields. If only one field (`location` or `nodeConfig.machineType`) is
      *           specified, the location information from the specified field will be
      *           propagated to the unspecified field.
+     *           This field is supported for Cloud Composer environments in versions
+     *           composer-1.*.*-airflow-*.*.*.
      *     @type string $machine_type
      *           Optional. The Compute Engine
-     *           [machine type](https://cloud.google.com/compute/docs/machine-types) used for cluster instances,
+     *           [machine type](/compute/docs/machine-types) used for cluster instances,
      *           specified as a
      *           [relative resource
-     *           name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     *           name](/apis/design/resource_names#relative_resource_name). For example:
      *           "projects/{projectId}/zones/{zoneId}/machineTypes/{machineTypeId}".
      *           The `machineType` must belong to the enclosing environment's project and
      *           location. If both this field and `nodeConfig.location` are specified,
@@ -160,47 +208,79 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      *           specified, the location information from the specified field will be
      *           propagated to the unspecified field.
      *           The `machineTypeId` must not be a [shared-core machine
-     *           type](https://cloud.google.com/compute/docs/machine-types#sharedcore).
+     *           type](/compute/docs/machine-types#sharedcore).
      *           If this field is unspecified, the `machineTypeId` defaults
      *           to "n1-standard-1".
+     *           This field is supported for Cloud Composer environments in versions
+     *           composer-1.*.*-airflow-*.*.*.
      *     @type string $network
      *           Optional. The Compute Engine network to be used for machine
      *           communications, specified as a
      *           [relative resource
-     *           name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     *           name](/apis/design/resource_names#relative_resource_name). For example:
      *           "projects/{projectId}/global/networks/{networkId}".
      *           If unspecified, the "default" network ID in the environment's project is
-     *           used. If a [Custom Subnet Network](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets)
+     *           used. If a [Custom Subnet Network](/vpc/docs/vpc#vpc_networks_and_subnets)
      *           is provided, `nodeConfig.subnetwork` must also be provided. For
-     *           [Shared VPC](https://cloud.google.com/vpc/docs/shared-vpc) subnetwork requirements, see
+     *           [Shared VPC](/vpc/docs/shared-vpc) subnetwork requirements, see
      *           `nodeConfig.subnetwork`.
      *     @type string $subnetwork
      *           Optional. The Compute Engine subnetwork to be used for machine
      *           communications, specified as a
      *           [relative resource
-     *           name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     *           name](/apis/design/resource_names#relative_resource_name). For example:
      *           "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
      *           If a subnetwork is provided, `nodeConfig.network` must also be provided,
      *           and the subnetwork must belong to the enclosing environment's project and
      *           location.
      *     @type int $disk_size_gb
-     *           Optional. The disk size in GB used for node VMs. Minimum size is 20GB.
+     *           Optional. The disk size in GB used for node VMs. Minimum size is 30GB.
      *           If unspecified, defaults to 100GB. Cannot be updated.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $oauth_scopes
+     *           This field is supported for Cloud Composer environments in versions
+     *           composer-1.*.*-airflow-*.*.*.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $oauth_scopes
      *           Optional. The set of Google API scopes to be made available on all
      *           node VMs. If `oauth_scopes` is empty, defaults to
      *           ["https://www.googleapis.com/auth/cloud-platform"]. Cannot be updated.
+     *           This field is supported for Cloud Composer environments in versions
+     *           composer-1.*.*-airflow-*.*.*.
      *     @type string $service_account
      *           Optional. The Google Cloud Platform Service Account to be used by the node
      *           VMs. If a service account is not specified, the "default" Compute Engine
      *           service account is used. Cannot be updated.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $tags
      *           Optional. The list of instance tags applied to all node VMs. Tags are used
      *           to identify valid sources or targets for network firewalls. Each tag within
      *           the list must comply with [RFC1035](https://www.ietf.org/rfc/rfc1035.txt).
      *           Cannot be updated.
      *     @type \Google\Cloud\Orchestration\Airflow\Service\V1\IPAllocationPolicy $ip_allocation_policy
-     *           Optional. The configuration for controlling how IPs are allocated in the GKE cluster.
+     *           Optional. The configuration for controlling how IPs are allocated in the
+     *           GKE cluster.
+     *     @type bool $enable_ip_masq_agent
+     *           Optional. Deploys 'ip-masq-agent' daemon set in the GKE cluster and defines
+     *           nonMasqueradeCIDRs equals to pod IP range so IP masquerading is used for
+     *           all destination addresses, except between pods traffic.
+     *           See:
+     *           https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent
+     *     @type string $composer_network_attachment
+     *           Optional. Network Attachment that Cloud Composer environment is connected
+     *           to, which provides connectivity with a user's VPC network. Takes precedence
+     *           over network and subnetwork settings. If not provided, but network and
+     *           subnetwork are defined during environment, it will be provisioned. If not
+     *           provided and network and subnetwork are also empty, then connectivity to
+     *           user's VPC network is disabled. Network attachment must be provided in
+     *           format
+     *           projects/{project}/regions/{region}/networkAttachments/{networkAttachment}.
+     *           This field is supported for Cloud Composer environments in versions
+     *           composer-3-airflow-*.*.*-build.* and newer.
+     *     @type string $composer_internal_ipv4_cidr_block
+     *           Optional. The IP range in CIDR notation to use internally by Cloud
+     *           Composer. IP addresses are not reserved - and the same range can be used by
+     *           multiple Cloud Composer environments. In case of overlap, IPs from this
+     *           range will not be accessible in the user's VPC network. Cannot be updated.
+     *           If not specified, the default value of '100.64.128.0/20' is used.
+     *           This field is supported for Cloud Composer environments in versions
+     *           composer-3-airflow-*.*.*-build.* and newer.
      * }
      */
     public function __construct($data = NULL) {
@@ -209,10 +289,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones) in which
+     * Optional. The Compute Engine [zone](/compute/docs/regions-zones) in which
      * to deploy the VMs used to run the Apache Airflow software, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/zones/{zoneId}".
      * This `location` must belong to the enclosing environment's project and
      * location. If both this field and `nodeConfig.machineType` are specified,
@@ -222,6 +302,8 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * both fields. If only one field (`location` or `nodeConfig.machineType`) is
      * specified, the location information from the specified field will be
      * propagated to the unspecified field.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>string location = 1;</code>
      * @return string
@@ -232,10 +314,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones) in which
+     * Optional. The Compute Engine [zone](/compute/docs/regions-zones) in which
      * to deploy the VMs used to run the Apache Airflow software, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/zones/{zoneId}".
      * This `location` must belong to the enclosing environment's project and
      * location. If both this field and `nodeConfig.machineType` are specified,
@@ -245,6 +327,8 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * both fields. If only one field (`location` or `nodeConfig.machineType`) is
      * specified, the location information from the specified field will be
      * propagated to the unspecified field.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>string location = 1;</code>
      * @param string $var
@@ -260,10 +344,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. The Compute Engine
-     * [machine type](https://cloud.google.com/compute/docs/machine-types) used for cluster instances,
+     * [machine type](/compute/docs/machine-types) used for cluster instances,
      * specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/zones/{zoneId}/machineTypes/{machineTypeId}".
      * The `machineType` must belong to the enclosing environment's project and
      * location. If both this field and `nodeConfig.location` are specified,
@@ -274,9 +358,11 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * specified, the location information from the specified field will be
      * propagated to the unspecified field.
      * The `machineTypeId` must not be a [shared-core machine
-     * type](https://cloud.google.com/compute/docs/machine-types#sharedcore).
+     * type](/compute/docs/machine-types#sharedcore).
      * If this field is unspecified, the `machineTypeId` defaults
      * to "n1-standard-1".
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>string machine_type = 2;</code>
      * @return string
@@ -288,10 +374,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. The Compute Engine
-     * [machine type](https://cloud.google.com/compute/docs/machine-types) used for cluster instances,
+     * [machine type](/compute/docs/machine-types) used for cluster instances,
      * specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/zones/{zoneId}/machineTypes/{machineTypeId}".
      * The `machineType` must belong to the enclosing environment's project and
      * location. If both this field and `nodeConfig.location` are specified,
@@ -302,9 +388,11 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * specified, the location information from the specified field will be
      * propagated to the unspecified field.
      * The `machineTypeId` must not be a [shared-core machine
-     * type](https://cloud.google.com/compute/docs/machine-types#sharedcore).
+     * type](/compute/docs/machine-types#sharedcore).
      * If this field is unspecified, the `machineTypeId` defaults
      * to "n1-standard-1".
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>string machine_type = 2;</code>
      * @param string $var
@@ -322,15 +410,15 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Optional. The Compute Engine network to be used for machine
      * communications, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/global/networks/{networkId}".
      * If unspecified, the "default" network ID in the environment's project is
-     * used. If a [Custom Subnet Network](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets)
+     * used. If a [Custom Subnet Network](/vpc/docs/vpc#vpc_networks_and_subnets)
      * is provided, `nodeConfig.subnetwork` must also be provided. For
-     * [Shared VPC](https://cloud.google.com/vpc/docs/shared-vpc) subnetwork requirements, see
+     * [Shared VPC](/vpc/docs/shared-vpc) subnetwork requirements, see
      * `nodeConfig.subnetwork`.
      *
-     * Generated from protobuf field <code>string network = 3;</code>
+     * Generated from protobuf field <code>string network = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getNetwork()
@@ -342,15 +430,15 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Optional. The Compute Engine network to be used for machine
      * communications, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/global/networks/{networkId}".
      * If unspecified, the "default" network ID in the environment's project is
-     * used. If a [Custom Subnet Network](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets)
+     * used. If a [Custom Subnet Network](/vpc/docs/vpc#vpc_networks_and_subnets)
      * is provided, `nodeConfig.subnetwork` must also be provided. For
-     * [Shared VPC](https://cloud.google.com/vpc/docs/shared-vpc) subnetwork requirements, see
+     * [Shared VPC](/vpc/docs/shared-vpc) subnetwork requirements, see
      * `nodeConfig.subnetwork`.
      *
-     * Generated from protobuf field <code>string network = 3;</code>
+     * Generated from protobuf field <code>string network = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */
@@ -366,13 +454,13 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Optional. The Compute Engine subnetwork to be used for machine
      * communications, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
      * If a subnetwork is provided, `nodeConfig.network` must also be provided,
      * and the subnetwork must belong to the enclosing environment's project and
      * location.
      *
-     * Generated from protobuf field <code>string subnetwork = 4;</code>
+     * Generated from protobuf field <code>string subnetwork = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getSubnetwork()
@@ -384,13 +472,13 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Optional. The Compute Engine subnetwork to be used for machine
      * communications, specified as a
      * [relative resource
-     * name](https://cloud.google.com/apis/design/resource_names#relative_resource_name). For example:
+     * name](/apis/design/resource_names#relative_resource_name). For example:
      * "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
      * If a subnetwork is provided, `nodeConfig.network` must also be provided,
      * and the subnetwork must belong to the enclosing environment's project and
      * location.
      *
-     * Generated from protobuf field <code>string subnetwork = 4;</code>
+     * Generated from protobuf field <code>string subnetwork = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */
@@ -403,8 +491,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The disk size in GB used for node VMs. Minimum size is 20GB.
+     * Optional. The disk size in GB used for node VMs. Minimum size is 30GB.
      * If unspecified, defaults to 100GB. Cannot be updated.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>int32 disk_size_gb = 5;</code>
      * @return int
@@ -415,8 +505,10 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The disk size in GB used for node VMs. Minimum size is 20GB.
+     * Optional. The disk size in GB used for node VMs. Minimum size is 30GB.
      * If unspecified, defaults to 100GB. Cannot be updated.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>int32 disk_size_gb = 5;</code>
      * @param int $var
@@ -434,6 +526,8 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Optional. The set of Google API scopes to be made available on all
      * node VMs. If `oauth_scopes` is empty, defaults to
      * ["https://www.googleapis.com/auth/cloud-platform"]. Cannot be updated.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>repeated string oauth_scopes = 6;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -447,9 +541,11 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Optional. The set of Google API scopes to be made available on all
      * node VMs. If `oauth_scopes` is empty, defaults to
      * ["https://www.googleapis.com/auth/cloud-platform"]. Cannot be updated.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-1.*.*-airflow-*.*.*.
      *
      * Generated from protobuf field <code>repeated string oauth_scopes = 6;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOauthScopes($var)
@@ -465,7 +561,7 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * VMs. If a service account is not specified, the "default" Compute Engine
      * service account is used. Cannot be updated.
      *
-     * Generated from protobuf field <code>string service_account = 7;</code>
+     * Generated from protobuf field <code>string service_account = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getServiceAccount()
@@ -478,7 +574,7 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * VMs. If a service account is not specified, the "default" Compute Engine
      * service account is used. Cannot be updated.
      *
-     * Generated from protobuf field <code>string service_account = 7;</code>
+     * Generated from protobuf field <code>string service_account = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */
@@ -511,7 +607,7 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
      * Cannot be updated.
      *
      * Generated from protobuf field <code>repeated string tags = 8;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTags($var)
@@ -523,7 +619,8 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The configuration for controlling how IPs are allocated in the GKE cluster.
+     * Optional. The configuration for controlling how IPs are allocated in the
+     * GKE cluster.
      *
      * Generated from protobuf field <code>.google.cloud.orchestration.airflow.service.v1.IPAllocationPolicy ip_allocation_policy = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Cloud\Orchestration\Airflow\Service\V1\IPAllocationPolicy|null
@@ -544,7 +641,8 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The configuration for controlling how IPs are allocated in the GKE cluster.
+     * Optional. The configuration for controlling how IPs are allocated in the
+     * GKE cluster.
      *
      * Generated from protobuf field <code>.google.cloud.orchestration.airflow.service.v1.IPAllocationPolicy ip_allocation_policy = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Cloud\Orchestration\Airflow\Service\V1\IPAllocationPolicy $var
@@ -554,6 +652,122 @@ class NodeConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Orchestration\Airflow\Service\V1\IPAllocationPolicy::class);
         $this->ip_allocation_policy = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Deploys 'ip-masq-agent' daemon set in the GKE cluster and defines
+     * nonMasqueradeCIDRs equals to pod IP range so IP masquerading is used for
+     * all destination addresses, except between pods traffic.
+     * See:
+     * https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent
+     *
+     * Generated from protobuf field <code>bool enable_ip_masq_agent = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getEnableIpMasqAgent()
+    {
+        return $this->enable_ip_masq_agent;
+    }
+
+    /**
+     * Optional. Deploys 'ip-masq-agent' daemon set in the GKE cluster and defines
+     * nonMasqueradeCIDRs equals to pod IP range so IP masquerading is used for
+     * all destination addresses, except between pods traffic.
+     * See:
+     * https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent
+     *
+     * Generated from protobuf field <code>bool enable_ip_masq_agent = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setEnableIpMasqAgent($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->enable_ip_masq_agent = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Network Attachment that Cloud Composer environment is connected
+     * to, which provides connectivity with a user's VPC network. Takes precedence
+     * over network and subnetwork settings. If not provided, but network and
+     * subnetwork are defined during environment, it will be provisioned. If not
+     * provided and network and subnetwork are also empty, then connectivity to
+     * user's VPC network is disabled. Network attachment must be provided in
+     * format
+     * projects/{project}/regions/{region}/networkAttachments/{networkAttachment}.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-3-airflow-*.*.*-build.* and newer.
+     *
+     * Generated from protobuf field <code>string composer_network_attachment = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getComposerNetworkAttachment()
+    {
+        return $this->composer_network_attachment;
+    }
+
+    /**
+     * Optional. Network Attachment that Cloud Composer environment is connected
+     * to, which provides connectivity with a user's VPC network. Takes precedence
+     * over network and subnetwork settings. If not provided, but network and
+     * subnetwork are defined during environment, it will be provisioned. If not
+     * provided and network and subnetwork are also empty, then connectivity to
+     * user's VPC network is disabled. Network attachment must be provided in
+     * format
+     * projects/{project}/regions/{region}/networkAttachments/{networkAttachment}.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-3-airflow-*.*.*-build.* and newer.
+     *
+     * Generated from protobuf field <code>string composer_network_attachment = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setComposerNetworkAttachment($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->composer_network_attachment = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The IP range in CIDR notation to use internally by Cloud
+     * Composer. IP addresses are not reserved - and the same range can be used by
+     * multiple Cloud Composer environments. In case of overlap, IPs from this
+     * range will not be accessible in the user's VPC network. Cannot be updated.
+     * If not specified, the default value of '100.64.128.0/20' is used.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-3-airflow-*.*.*-build.* and newer.
+     *
+     * Generated from protobuf field <code>string composer_internal_ipv4_cidr_block = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getComposerInternalIpv4CidrBlock()
+    {
+        return $this->composer_internal_ipv4_cidr_block;
+    }
+
+    /**
+     * Optional. The IP range in CIDR notation to use internally by Cloud
+     * Composer. IP addresses are not reserved - and the same range can be used by
+     * multiple Cloud Composer environments. In case of overlap, IPs from this
+     * range will not be accessible in the user's VPC network. Cannot be updated.
+     * If not specified, the default value of '100.64.128.0/20' is used.
+     * This field is supported for Cloud Composer environments in versions
+     * composer-3-airflow-*.*.*-build.* and newer.
+     *
+     * Generated from protobuf field <code>string composer_internal_ipv4_cidr_block = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setComposerInternalIpv4CidrBlock($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->composer_internal_ipv4_cidr_block = $var;
 
         return $this;
     }

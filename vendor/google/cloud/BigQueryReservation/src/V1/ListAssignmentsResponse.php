@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The response for [ReservationService.ListAssignments][google.cloud.bigquery.reservation.v1.ReservationService.ListAssignments].
+ * The response for
+ * [ReservationService.ListAssignments][google.cloud.bigquery.reservation.v1.ReservationService.ListAssignments].
  *
  * Generated from protobuf message <code>google.cloud.bigquery.reservation.v1.ListAssignmentsResponse</code>
  */
@@ -27,7 +28,7 @@ class ListAssignmentsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,7 +36,7 @@ class ListAssignmentsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\BigQuery\Reservation\V1\Assignment[]|\Google\Protobuf\Internal\RepeatedField $assignments
+     *     @type array<\Google\Cloud\BigQuery\Reservation\V1\Assignment>|\Google\Protobuf\Internal\RepeatedField $assignments
      *           List of assignments visible to the user.
      *     @type string $next_page_token
      *           Token to retrieve the next page of results, or empty if there are no
@@ -62,7 +63,7 @@ class ListAssignmentsResponse extends \Google\Protobuf\Internal\Message
      * List of assignments visible to the user.
      *
      * Generated from protobuf field <code>repeated .google.cloud.bigquery.reservation.v1.Assignment assignments = 1;</code>
-     * @param \Google\Cloud\BigQuery\Reservation\V1\Assignment[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\BigQuery\Reservation\V1\Assignment>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAssignments($var)

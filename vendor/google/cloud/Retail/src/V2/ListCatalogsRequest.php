@@ -26,7 +26,7 @@ class ListCatalogsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Maximum number of [Catalog][google.cloud.retail.v2.Catalog]s to return. If
      * unspecified, defaults to 50. The maximum allowed value is 1000. Values
@@ -35,7 +35,7 @@ class ListCatalogsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * A page token
      * [ListCatalogsResponse.next_page_token][google.cloud.retail.v2.ListCatalogsResponse.next_page_token],
@@ -49,7 +49,26 @@ class ListCatalogsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The account resource name with an associated location.
+     *
+     *                       If the caller does not have permission to list
+     *                       [Catalog][google.cloud.retail.v2.Catalog]s under this location, regardless
+     *                       of whether or not this location exists, a PERMISSION_DENIED error is
+     *                       returned. Please see
+     *                       {@see CatalogServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Retail\V2\ListCatalogsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

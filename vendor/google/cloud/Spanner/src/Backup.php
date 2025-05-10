@@ -17,16 +17,16 @@
 
 namespace Google\Cloud\Spanner;
 
+use DateTimeInterface;
 use Google\ApiCore\ValidationException;
 use Google\Cloud\Core\ArrayTrait;
 use Google\Cloud\Core\Exception\NotFoundException;
-use Google\Cloud\Spanner\Admin\Database\V1\Backup\State;
-use Google\Cloud\Spanner\Admin\Database\V1\DatabaseAdminClient;
-use Google\Cloud\Spanner\Connection\ConnectionInterface;
 use Google\Cloud\Core\LongRunning\LongRunningConnectionInterface;
 use Google\Cloud\Core\LongRunning\LongRunningOperation;
 use Google\Cloud\Core\LongRunning\LROTrait;
-use DateTimeInterface;
+use Google\Cloud\Spanner\Admin\Database\V1\Backup\State;
+use Google\Cloud\Spanner\Admin\Database\V1\DatabaseAdminClient;
+use Google\Cloud\Spanner\Connection\ConnectionInterface;
 
 /**
  * Represents a Cloud Spanner Backup.
@@ -85,6 +85,7 @@ class Backup
 
     /**
      * @var ConnectionInterface
+     * @internal
      */
     private $connection;
 
@@ -112,7 +113,8 @@ class Backup
      * Create an object representing a Backup.
      *
      * @param ConnectionInterface $connection The connection to the
-     *        Cloud Spanner Admin API.
+     *        Cloud Spanner Admin API. This object is created by SpannerClient,
+     *        and should not be instantiated outside of this client.
      * @param Instance $instance The instance in which the backup exists.
      * @param LongRunningConnectionInterface $lroConnection An implementation
      *        mapping to methods which handle LRO resolution in the service.
@@ -327,7 +329,7 @@ class Backup
      * When backups are created, they may take some time before
      * they are ready for use. This method allows for checking whether a
      * backup is ready. Note that this value is cached within the class instance,
-     * so if you are polling it, first call {@see Google\Cloud\Spanner\Backup::reload()}
+     * so if you are polling it, first call {@see \Google\Cloud\Spanner\Backup::reload()}
      * to refresh the cached value.
      *
      * Example:
@@ -392,7 +394,7 @@ class Backup
                 $instance,
                 $name
             );
-        //@codeCoverageIgnoreStart
+            //@codeCoverageIgnoreStart
         } catch (ValidationException $e) {
             return $name;
         }

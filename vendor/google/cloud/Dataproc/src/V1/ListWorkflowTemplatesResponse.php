@@ -28,7 +28,15 @@ class ListWorkflowTemplatesResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
+    /**
+     * Output only. List of workflow templates that could not be included in the
+     * response. Attempting to get one of these resources may indicate why it was
+     * not included in the list response.
+     *
+     * Generated from protobuf field <code>repeated string unreachable = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $unreachable;
 
     /**
      * Constructor.
@@ -36,12 +44,16 @@ class ListWorkflowTemplatesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dataproc\V1\WorkflowTemplate[]|\Google\Protobuf\Internal\RepeatedField $templates
+     *     @type array<\Google\Cloud\Dataproc\V1\WorkflowTemplate>|\Google\Protobuf\Internal\RepeatedField $templates
      *           Output only. WorkflowTemplates list.
      *     @type string $next_page_token
      *           Output only. This token is included in the response if there are more
      *           results to fetch. To fetch additional results, provide this value as the
      *           page_token in a subsequent <code>ListWorkflowTemplatesRequest</code>.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unreachable
+     *           Output only. List of workflow templates that could not be included in the
+     *           response. Attempting to get one of these resources may indicate why it was
+     *           not included in the list response.
      * }
      */
     public function __construct($data = NULL) {
@@ -64,7 +76,7 @@ class ListWorkflowTemplatesResponse extends \Google\Protobuf\Internal\Message
      * Output only. WorkflowTemplates list.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dataproc.v1.WorkflowTemplate templates = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\Dataproc\V1\WorkflowTemplate[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dataproc\V1\WorkflowTemplate>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTemplates($var)
@@ -101,6 +113,36 @@ class ListWorkflowTemplatesResponse extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->next_page_token = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. List of workflow templates that could not be included in the
+     * response. Attempting to get one of these resources may indicate why it was
+     * not included in the list response.
+     *
+     * Generated from protobuf field <code>repeated string unreachable = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getUnreachable()
+    {
+        return $this->unreachable;
+    }
+
+    /**
+     * Output only. List of workflow templates that could not be included in the
+     * response. Attempting to get one of these resources may indicate why it was
+     * not included in the list response.
+     *
+     * Generated from protobuf field <code>repeated string unreachable = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setUnreachable($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->unreachable = $arr;
 
         return $this;
     }

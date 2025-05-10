@@ -9,16 +9,16 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Account Defender risk assessment.
+ * Account defender risk assessment.
  *
  * Generated from protobuf message <code>google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment</code>
  */
 class AccountDefenderAssessment extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Labels for this request.
+     * Output only. Labels for this request.
      *
-     * Generated from protobuf field <code>repeated .google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment.AccountDefenderLabel labels = 1;</code>
+     * Generated from protobuf field <code>repeated .google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment.AccountDefenderLabel labels = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
     private $labels;
 
@@ -28,8 +28,8 @@ class AccountDefenderAssessment extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $labels
-     *           Labels for this request.
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $labels
+     *           Output only. Labels for this request.
      * }
      */
     public function __construct($data = NULL) {
@@ -38,9 +38,9 @@ class AccountDefenderAssessment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Labels for this request.
+     * Output only. Labels for this request.
      *
-     * Generated from protobuf field <code>repeated .google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment.AccountDefenderLabel labels = 1;</code>
+     * Generated from protobuf field <code>repeated .google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment.AccountDefenderLabel labels = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getLabels()
@@ -49,10 +49,10 @@ class AccountDefenderAssessment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Labels for this request.
+     * Output only. Labels for this request.
      *
-     * Generated from protobuf field <code>repeated .google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment.AccountDefenderLabel labels = 1;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated .google.cloud.recaptchaenterprise.v1.AccountDefenderAssessment.AccountDefenderLabel labels = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLabels($var)

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -24,45 +25,82 @@ use Symfony\Component\Form\FormInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    protected $type;
-    protected $options;
-    protected $allowAdd;
-    protected $allowDelete;
+    protected array $prototypeOptions;
 
-    private $deleteEmpty;
+    private \Closure|bool $deleteEmpty;
+    // BC, to be removed in 8.0
+    private bool $overridden = true;
+    private bool $usePreSetData = false;
 
-    /**
-     * @param bool          $allowAdd    Whether children could be added to the group
-     * @param bool          $allowDelete Whether children could be removed from the group
-     * @param bool|callable $deleteEmpty
-     */
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false)
-    {
-        $this->type = $type;
-        $this->allowAdd = $allowAdd;
-        $this->allowDelete = $allowDelete;
-        $this->options = $options;
-        $this->deleteEmpty = $deleteEmpty;
+    public function __construct(
+        private string $type,
+        private array $options = [],
+        private bool $allowAdd = false,
+        private bool $allowDelete = false,
+        bool|callable $deleteEmpty = false,
+        ?array $prototypeOptions = null,
+        private bool $keepAsList = false,
+    ) {
+        $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
+        $this->prototypeOptions = $prototypeOptions ?? $options;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSetData',
+            FormEvents::PRE_SET_DATA => 'preSetData', // deprecated
+            FormEvents::POST_SET_DATA => ['postSetData', 255], // as early as possible
             FormEvents::PRE_SUBMIT => 'preSubmit',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
             FormEvents::SUBMIT => ['onSubmit', 50],
         ];
     }
 
-    public function preSetData(FormEvent $event)
+    /**
+     * @deprecated Since Symfony 7.2, use {@see postSetData()} instead.
+     */
+    public function preSetData(FormEvent $event): void
     {
-        $form = $event->getForm();
-        $data = $event->getData();
-
-        if (null === $data) {
-            $data = [];
+        if (__CLASS__ === static::class
+            || __CLASS__ === (new \ReflectionClass($this))->getMethod('preSetData')->getDeclaringClass()->name
+        ) {
+            // not a child class, or child class does not overload PRE_SET_DATA
+            return;
         }
+
+        trigger_deprecation('symfony/form', '7.2', 'Calling "%s()" is deprecated, use "%s::postSetData()" instead.', __METHOD__, __CLASS__);
+        // parent::preSetData() has been called
+        $this->overridden = false;
+        try {
+            $this->postSetData($event);
+        } finally {
+            $this->usePreSetData = true;
+        }
+    }
+
+    /**
+     * Remove FormEvent type hint in 8.0.
+     *
+     * @final since Symfony 7.2
+     */
+    public function postSetData(FormEvent|PostSetDataEvent $event): void
+    {
+        if (__CLASS__ !== static::class) {
+            if ($this->overridden) {
+                trigger_deprecation('symfony/form', '7.2', 'Calling "%s::preSetData()" is deprecated, use "%s::postSetData()" instead.', static::class, __CLASS__);
+                // parent::preSetData() has not been called, noop
+
+                return;
+            }
+
+            if ($this->usePreSetData) {
+                // nothing else to do
+                return;
+            }
+        }
+
+        $form = $event->getForm();
+        $data = $event->getData() ?? [];
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
@@ -81,7 +119,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -105,24 +143,20 @@ class ResizeFormListener implements EventSubscriberInterface
                 if (!$form->has($name)) {
                     $form->add($name, $this->type, array_replace([
                         'property_path' => '['.$name.']',
-                    ], $this->options));
+                    ], $this->prototypeOptions));
                 }
             }
         }
     }
 
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
-        $data = $event->getData();
+        $data = $event->getData() ?? [];
 
         // At this point, $data is an array or an array-like object that already contains the
         // new entries, which were added by the data mapper. The data mapper ignores existing
         // entries, so we need to manually unset removed entries in the collection.
-
-        if (null === $data) {
-            $data = [];
-        }
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
@@ -162,6 +196,20 @@ class ResizeFormListener implements EventSubscriberInterface
             foreach ($toDelete as $name) {
                 unset($data[$name]);
             }
+        }
+
+        if ($this->keepAsList) {
+            $formReindex = [];
+            foreach ($form as $name => $child) {
+                $formReindex[] = $child;
+                $form->remove($name);
+            }
+            foreach ($formReindex as $index => $child) {
+                $form->add($index, $this->type, array_replace([
+                    'property_path' => '['.$index.']',
+                ], $this->options));
+            }
+            $data = array_values($data);
         }
 
         $event->setData($data);

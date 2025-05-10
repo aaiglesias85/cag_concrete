@@ -7,7 +7,4 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Unirest\\' => array($vendorDir . '/mashape/unirest-php/src'),
-    'Twig_Extensions_' => array($vendorDir . '/twig/extensions/lib'),
-    'Twig_' => array($vendorDir . '/twig/twig/lib'),
-    'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
 );

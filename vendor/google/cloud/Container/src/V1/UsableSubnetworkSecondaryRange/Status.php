@@ -26,8 +26,9 @@ class Status
      */
     const UNUSED = 1;
     /**
-     * IN_USE_SERVICE denotes that this range is claimed by a cluster for
-     * services. It cannot be used for other clusters.
+     * IN_USE_SERVICE denotes that this range is claimed by cluster(s) for
+     * services. User-managed services range can be shared between clusters
+     * within the same subnetwork.
      *
      * Generated from protobuf enum <code>IN_USE_SERVICE = 2;</code>
      */
@@ -77,6 +78,4 @@ class Status
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Status::class, \Google\Cloud\Container\V1\UsableSubnetworkSecondaryRange_Status::class);
 

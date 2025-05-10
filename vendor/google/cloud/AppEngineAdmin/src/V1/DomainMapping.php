@@ -22,21 +22,21 @@ class DomainMapping extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Relative name of the domain serving the application. Example:
      * `example.com`.
      *
      * Generated from protobuf field <code>string id = 2;</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * SSL configuration for this domain. If unconfigured, this domain will not
      * serve with SSL.
      *
      * Generated from protobuf field <code>.google.appengine.v1.SslSettings ssl_settings = 3;</code>
      */
-    private $ssl_settings = null;
+    protected $ssl_settings = null;
     /**
      * The resource records required to configure this domain mapping. These
      * records must be added to the domain's DNS configuration in order to
@@ -63,7 +63,7 @@ class DomainMapping extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\AppEngine\V1\SslSettings $ssl_settings
      *           SSL configuration for this domain. If unconfigured, this domain will not
      *           serve with SSL.
-     *     @type \Google\Cloud\AppEngine\V1\ResourceRecord[]|\Google\Protobuf\Internal\RepeatedField $resource_records
+     *     @type array<\Google\Cloud\AppEngine\V1\ResourceRecord>|\Google\Protobuf\Internal\RepeatedField $resource_records
      *           The resource records required to configure this domain mapping. These
      *           records must be added to the domain's DNS configuration in order to
      *           serve the application via this domain mapping.
@@ -192,7 +192,7 @@ class DomainMapping extends \Google\Protobuf\Internal\Message
      * &#64;OutputOnly
      *
      * Generated from protobuf field <code>repeated .google.appengine.v1.ResourceRecord resource_records = 4;</code>
-     * @param \Google\Cloud\AppEngine\V1\ResourceRecord[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AppEngine\V1\ResourceRecord>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResourceRecords($var)

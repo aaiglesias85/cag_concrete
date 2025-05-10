@@ -4,136 +4,96 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * ProjectContact
- *
- * @ORM\Table(name="project_contact")
- * @ORM\Entity(repositoryClass="App\Repository\ProjectContactRepository")
- */
+#[ORM\Table(name: "project_contact")]
+#[ORM\Entity(repositoryClass: "App\Repository\ProjectContactRepository")]
 class ProjectContact
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="contact_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $contactId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "contact_id", type: "integer", nullable: false)]
+    private ?int $contactId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    private ?string $name;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="phone", type="string", length=50, nullable=false)
-     */
-    private $phone;
+    #[ORM\Column(name: "phone", type: "string", length: 50, nullable: true)]
+    private ?string $phone;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="email", type="string", length=255, nullable=false)
-     */
-    private $email;
+    #[ORM\Column(name: "email", type: "string", length: 255, nullable: true)]
+    private ?string $email;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="role", type="string", length=255, nullable=false)
-     */
-    private $role;
+    #[ORM\Column(name: "role", type: "string", length: 255, nullable: true)]
+    private ?string $role;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="notes", type="text", nullable=false)
-     */
-    private $notes;
+    #[ORM\Column(name: "notes", type: "text", nullable: true)]
+    private ?string $notes;
 
-    /**
-     * @var Project
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_id", referencedColumnName="project_id")
-     * })
-     */
-    private $project;
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
+    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
+    private ?Project $project;
 
-    /**
-     * Get contactId
-     *
-     * @return integer
-     */
-    public function getContactId()
+    public function getContactId(): ?int
     {
         return $this->contactId;
     }
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName($name): void
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    public function getPhone()
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function setPhone($phone): void
+    public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
     }
 
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail($email): void
+    public function setEmail(?string $email): void
     {
         $this->email = $email;
     }
 
-    public function getProject(): Project
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    public function setProject($project)
+    public function setProject(?Project $project): void
     {
         $this->project = $project;
     }
 
-    public function getRole()
+    public function getRole(): ?string
     {
         return $this->role;
     }
 
-    public function setRole($role)
+    public function setRole(?string $role): void
     {
         $this->role = $role;
     }
 
-    public function getNotes()
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes($notes)
+    public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
     }
-
 }

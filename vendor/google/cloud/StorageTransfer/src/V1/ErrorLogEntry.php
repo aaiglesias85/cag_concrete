@@ -21,7 +21,7 @@ class ErrorLogEntry extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string url = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $url = '';
+    protected $url = '';
     /**
      * A list of messages that carry the error details.
      *
@@ -38,7 +38,7 @@ class ErrorLogEntry extends \Google\Protobuf\Internal\Message
      *     @type string $url
      *           Required. A URL that refers to the target (a data source, a data sink,
      *           or an object) with which the error is associated.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $error_details
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $error_details
      *           A list of messages that carry the error details.
      * }
      */
@@ -90,7 +90,7 @@ class ErrorLogEntry extends \Google\Protobuf\Internal\Message
      * A list of messages that carry the error details.
      *
      * Generated from protobuf field <code>repeated string error_details = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrorDetails($var)

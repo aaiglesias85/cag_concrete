@@ -23,21 +23,43 @@ class CreateImportJobRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. It must be unique within a KeyRing and match the regular
      * expression `[a-zA-Z0-9_-]{1,63}`
      *
      * Generated from protobuf field <code>string import_job_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $import_job_id = '';
+    protected $import_job_id = '';
     /**
      * Required. An [ImportJob][google.cloud.kms.v1.ImportJob] with initial field
      * values.
      *
      * Generated from protobuf field <code>.google.cloud.kms.v1.ImportJob import_job = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $import_job = null;
+    protected $import_job = null;
+
+    /**
+     * @param string                         $parent      Required. The [name][google.cloud.kms.v1.KeyRing.name] of the
+     *                                                    [KeyRing][google.cloud.kms.v1.KeyRing] associated with the
+     *                                                    [ImportJobs][google.cloud.kms.v1.ImportJob]. Please see
+     *                                                    {@see KeyManagementServiceClient::keyRingName()} for help formatting this field.
+     * @param string                         $importJobId Required. It must be unique within a KeyRing and match the regular
+     *                                                    expression `[a-zA-Z0-9_-]{1,63}`
+     * @param \Google\Cloud\Kms\V1\ImportJob $importJob   Required. An [ImportJob][google.cloud.kms.v1.ImportJob] with initial field
+     *                                                    values.
+     *
+     * @return \Google\Cloud\Kms\V1\CreateImportJobRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $importJobId, \Google\Cloud\Kms\V1\ImportJob $importJob): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setImportJobId($importJobId)
+            ->setImportJob($importJob);
+    }
 
     /**
      * Constructor.

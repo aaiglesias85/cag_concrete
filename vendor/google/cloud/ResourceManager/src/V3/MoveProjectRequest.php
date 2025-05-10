@@ -22,13 +22,29 @@ class MoveProjectRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The new parent to move the Project under.
      *
      * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $destination_parent = '';
+    protected $destination_parent = '';
+
+    /**
+     * @param string $name              Required. The name of the project to move. Please see
+     *                                  {@see ProjectsClient::projectName()} for help formatting this field.
+     * @param string $destinationParent Required. The new parent to move the Project under.
+     *
+     * @return \Google\Cloud\ResourceManager\V3\MoveProjectRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, string $destinationParent): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setDestinationParent($destinationParent);
+    }
 
     /**
      * Constructor.

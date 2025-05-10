@@ -26,14 +26,14 @@ class ListTenantsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * Additional information for the API invocation, such as the request
      * tracking id.
      *
      * Generated from protobuf field <code>.google.cloud.talent.v4.ResponseMetadata metadata = 3;</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
 
     /**
      * Constructor.
@@ -41,7 +41,7 @@ class ListTenantsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Talent\V4\Tenant[]|\Google\Protobuf\Internal\RepeatedField $tenants
+     *     @type array<\Google\Cloud\Talent\V4\Tenant>|\Google\Protobuf\Internal\RepeatedField $tenants
      *           Tenants for the current client.
      *     @type string $next_page_token
      *           A token to retrieve the next page of results.
@@ -70,7 +70,7 @@ class ListTenantsResponse extends \Google\Protobuf\Internal\Message
      * Tenants for the current client.
      *
      * Generated from protobuf field <code>repeated .google.cloud.talent.v4.Tenant tenants = 1;</code>
-     * @param \Google\Cloud\Talent\V4\Tenant[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Talent\V4\Tenant>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTenants($var)

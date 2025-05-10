@@ -56,7 +56,7 @@ class UsuarioController extends AbstractController
                     $token = new RememberMeToken($entity, 'main', "21c48f7d24c39c9137bb0b14b4060a0c");
                     $this->container->get('security.token_storage')->setToken($token);
                 } else {
-                    $token = new UsernamePasswordToken($entity, null, 'main', $entity->getRoles());
+                    $token = new UsernamePasswordToken($entity,  'main', $entity->getRoles());
                     $this->container->get('security.token_storage')->setToken($token);
                 }
 

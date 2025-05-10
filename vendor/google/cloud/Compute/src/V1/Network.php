@@ -46,7 +46,13 @@ class Network extends \Google\Protobuf\Internal\Message
      */
     private $enable_ula_internal_ipv6 = null;
     /**
-     * [Output Only] The gateway address for default routing out of the network, selected by GCP.
+     * [Output Only] URL of the firewall policy the network is associated with.
+     *
+     * Generated from protobuf field <code>optional string firewall_policy = 498173265;</code>
+     */
+    private $firewall_policy = null;
+    /**
+     * [Output Only] The gateway address for default routing out of the network, selected by Google Cloud.
      *
      * Generated from protobuf field <code>optional string gateway_i_pv4 = 178678877;</code>
      */
@@ -70,7 +76,7 @@ class Network extends \Google\Protobuf\Internal\Message
      */
     private $kind = null;
     /**
-     * Maximum Transmission Unit in bytes. The minimum value for this field is 1460 and the maximum value is 1500 bytes. If unspecified, defaults to 1460.
+     * Maximum Transmission Unit in bytes. The minimum value for this field is 1300 and the maximum value is 8896. The suggested value is 1500, which is the default MTU used on the Internet, or 8896 if you want to use Jumbo frames. If unspecified, the value defaults to 1460.
      *
      * Generated from protobuf field <code>optional int32 mtu = 108462;</code>
      */
@@ -88,6 +94,12 @@ class Network extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string network_firewall_policy_enforcement_order = 6504784;</code>
      */
     private $network_firewall_policy_enforcement_order = null;
+    /**
+     * A full or partial URL of the network profile to apply to this network. This field can be set only at resource creation time. For example, the following are valid URLs: - https://www.googleapis.com/compute/{api_version}/projects/{project_id}/global/networkProfiles/{network_profile_name} - projects/{project_id}/global/networkProfiles/{network_profile_name} 
+     *
+     * Generated from protobuf field <code>optional string network_profile = 173112472;</code>
+     */
+    private $network_profile = null;
     /**
      * [Output Only] A list of network peerings for the resource.
      *
@@ -135,8 +147,10 @@ class Network extends \Google\Protobuf\Internal\Message
      *           An optional description of this resource. Provide this field when you create the resource.
      *     @type bool $enable_ula_internal_ipv6
      *           Enable ULA internal ipv6 on this network. Enabling this feature will assign a /48 from google defined ULA prefix fd20::/20. .
+     *     @type string $firewall_policy
+     *           [Output Only] URL of the firewall policy the network is associated with.
      *     @type string $gateway_i_pv4
-     *           [Output Only] The gateway address for default routing out of the network, selected by GCP.
+     *           [Output Only] The gateway address for default routing out of the network, selected by Google Cloud.
      *     @type int|string $id
      *           [Output Only] The unique identifier for the resource. This identifier is defined by the server.
      *     @type string $internal_ipv6_range
@@ -144,13 +158,15 @@ class Network extends \Google\Protobuf\Internal\Message
      *     @type string $kind
      *           [Output Only] Type of the resource. Always compute#network for networks.
      *     @type int $mtu
-     *           Maximum Transmission Unit in bytes. The minimum value for this field is 1460 and the maximum value is 1500 bytes. If unspecified, defaults to 1460.
+     *           Maximum Transmission Unit in bytes. The minimum value for this field is 1300 and the maximum value is 8896. The suggested value is 1500, which is the default MTU used on the Internet, or 8896 if you want to use Jumbo frames. If unspecified, the value defaults to 1460.
      *     @type string $name
      *           Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character must be a lowercase letter, and all following characters (except for the last character) must be a dash, lowercase letter, or digit. The last character must be a lowercase letter or digit.
      *     @type string $network_firewall_policy_enforcement_order
      *           The network firewall policy enforcement order. Can be either AFTER_CLASSIC_FIREWALL or BEFORE_CLASSIC_FIREWALL. Defaults to AFTER_CLASSIC_FIREWALL if the field is not specified.
      *           Check the NetworkFirewallPolicyEnforcementOrder enum for the list of possible values.
-     *     @type \Google\Cloud\Compute\V1\NetworkPeering[]|\Google\Protobuf\Internal\RepeatedField $peerings
+     *     @type string $network_profile
+     *           A full or partial URL of the network profile to apply to this network. This field can be set only at resource creation time. For example, the following are valid URLs: - https://www.googleapis.com/compute/{api_version}/projects/{project_id}/global/networkProfiles/{network_profile_name} - projects/{project_id}/global/networkProfiles/{network_profile_name} 
+     *     @type array<\Google\Cloud\Compute\V1\NetworkPeering>|\Google\Protobuf\Internal\RepeatedField $peerings
      *           [Output Only] A list of network peerings for the resource.
      *     @type \Google\Cloud\Compute\V1\NetworkRoutingConfig $routing_config
      *           The network-level routing configuration for this network. Used by Cloud Router to determine what type of network-wide routing behavior to enforce.
@@ -158,7 +174,7 @@ class Network extends \Google\Protobuf\Internal\Message
      *           [Output Only] Server-defined URL for the resource.
      *     @type string $self_link_with_id
      *           [Output Only] Server-defined URL for this resource with the resource id.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $subnetworks
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $subnetworks
      *           [Output Only] Server-defined fully-qualified URLs for all subnetworks in this VPC network.
      * }
      */
@@ -348,7 +364,43 @@ class Network extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] The gateway address for default routing out of the network, selected by GCP.
+     * [Output Only] URL of the firewall policy the network is associated with.
+     *
+     * Generated from protobuf field <code>optional string firewall_policy = 498173265;</code>
+     * @return string
+     */
+    public function getFirewallPolicy()
+    {
+        return isset($this->firewall_policy) ? $this->firewall_policy : '';
+    }
+
+    public function hasFirewallPolicy()
+    {
+        return isset($this->firewall_policy);
+    }
+
+    public function clearFirewallPolicy()
+    {
+        unset($this->firewall_policy);
+    }
+
+    /**
+     * [Output Only] URL of the firewall policy the network is associated with.
+     *
+     * Generated from protobuf field <code>optional string firewall_policy = 498173265;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setFirewallPolicy($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->firewall_policy = $var;
+
+        return $this;
+    }
+
+    /**
+     * [Output Only] The gateway address for default routing out of the network, selected by Google Cloud.
      *
      * Generated from protobuf field <code>optional string gateway_i_pv4 = 178678877;</code>
      * @return string
@@ -369,7 +421,7 @@ class Network extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output Only] The gateway address for default routing out of the network, selected by GCP.
+     * [Output Only] The gateway address for default routing out of the network, selected by Google Cloud.
      *
      * Generated from protobuf field <code>optional string gateway_i_pv4 = 178678877;</code>
      * @param string $var
@@ -492,7 +544,7 @@ class Network extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum Transmission Unit in bytes. The minimum value for this field is 1460 and the maximum value is 1500 bytes. If unspecified, defaults to 1460.
+     * Maximum Transmission Unit in bytes. The minimum value for this field is 1300 and the maximum value is 8896. The suggested value is 1500, which is the default MTU used on the Internet, or 8896 if you want to use Jumbo frames. If unspecified, the value defaults to 1460.
      *
      * Generated from protobuf field <code>optional int32 mtu = 108462;</code>
      * @return int
@@ -513,7 +565,7 @@ class Network extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum Transmission Unit in bytes. The minimum value for this field is 1460 and the maximum value is 1500 bytes. If unspecified, defaults to 1460.
+     * Maximum Transmission Unit in bytes. The minimum value for this field is 1300 and the maximum value is 8896. The suggested value is 1500, which is the default MTU used on the Internet, or 8896 if you want to use Jumbo frames. If unspecified, the value defaults to 1460.
      *
      * Generated from protobuf field <code>optional int32 mtu = 108462;</code>
      * @param int $var
@@ -602,6 +654,42 @@ class Network extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * A full or partial URL of the network profile to apply to this network. This field can be set only at resource creation time. For example, the following are valid URLs: - https://www.googleapis.com/compute/{api_version}/projects/{project_id}/global/networkProfiles/{network_profile_name} - projects/{project_id}/global/networkProfiles/{network_profile_name} 
+     *
+     * Generated from protobuf field <code>optional string network_profile = 173112472;</code>
+     * @return string
+     */
+    public function getNetworkProfile()
+    {
+        return isset($this->network_profile) ? $this->network_profile : '';
+    }
+
+    public function hasNetworkProfile()
+    {
+        return isset($this->network_profile);
+    }
+
+    public function clearNetworkProfile()
+    {
+        unset($this->network_profile);
+    }
+
+    /**
+     * A full or partial URL of the network profile to apply to this network. This field can be set only at resource creation time. For example, the following are valid URLs: - https://www.googleapis.com/compute/{api_version}/projects/{project_id}/global/networkProfiles/{network_profile_name} - projects/{project_id}/global/networkProfiles/{network_profile_name} 
+     *
+     * Generated from protobuf field <code>optional string network_profile = 173112472;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setNetworkProfile($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->network_profile = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] A list of network peerings for the resource.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.NetworkPeering peerings = 69883187;</code>
@@ -616,7 +704,7 @@ class Network extends \Google\Protobuf\Internal\Message
      * [Output Only] A list of network peerings for the resource.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.NetworkPeering peerings = 69883187;</code>
-     * @param \Google\Cloud\Compute\V1\NetworkPeering[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\NetworkPeering>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPeerings($var)
@@ -750,7 +838,7 @@ class Network extends \Google\Protobuf\Internal\Message
      * [Output Only] Server-defined fully-qualified URLs for all subnetworks in this VPC network.
      *
      * Generated from protobuf field <code>repeated string subnetworks = 415853125;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSubnetworks($var)

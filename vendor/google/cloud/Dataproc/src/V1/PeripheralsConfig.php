@@ -20,15 +20,15 @@ class PeripheralsConfig extends \Google\Protobuf\Internal\Message
      * Example:
      * * `projects/[project_id]/locations/[region]/services/[service_id]`
      *
-     * Generated from protobuf field <code>string metastore_service = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string metastore_service = 1 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      */
-    private $metastore_service = '';
+    protected $metastore_service = '';
     /**
      * Optional. The Spark History Server configuration for the workload.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.SparkHistoryServerConfig spark_history_server_config = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $spark_history_server_config = null;
+    protected $spark_history_server_config = null;
 
     /**
      * Constructor.
@@ -54,7 +54,7 @@ class PeripheralsConfig extends \Google\Protobuf\Internal\Message
      * Example:
      * * `projects/[project_id]/locations/[region]/services/[service_id]`
      *
-     * Generated from protobuf field <code>string metastore_service = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string metastore_service = 1 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      * @return string
      */
     public function getMetastoreService()
@@ -67,7 +67,7 @@ class PeripheralsConfig extends \Google\Protobuf\Internal\Message
      * Example:
      * * `projects/[project_id]/locations/[region]/services/[service_id]`
      *
-     * Generated from protobuf field <code>string metastore_service = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string metastore_service = 1 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
      * @param string $var
      * @return $this
      */

@@ -17,7 +17,7 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -63,13 +63,15 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string node_version = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $node_version = '';
+    protected $node_version = '';
     /**
-     * Required. The desired image type for the node pool.
+     * Required. The desired image type for the node pool. Please see
+     * https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     * available image types.
      *
      * Generated from protobuf field <code>string image_type = 6 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $image_type = '';
+    protected $image_type = '';
     /**
      * The name (project, location, cluster, node pool) of the node pool to
      * update. Specified in the format
@@ -77,7 +79,7 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 8;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The desired list of Google Compute Engine
      * [zones](https://cloud.google.com/compute/docs/zones#available) in which the
@@ -93,37 +95,171 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.container.v1.WorkloadMetadataConfig workload_metadata_config = 14;</code>
      */
-    private $workload_metadata_config = null;
+    protected $workload_metadata_config = null;
     /**
      * Upgrade settings control disruption and speed of the upgrade.
      *
      * Generated from protobuf field <code>.google.container.v1.NodePool.UpgradeSettings upgrade_settings = 15;</code>
      */
-    private $upgrade_settings = null;
+    protected $upgrade_settings = null;
+    /**
+     * The desired network tags to be applied to all nodes in the node pool.
+     * If this field is not present, the tags will not be changed. Otherwise,
+     * the existing network tags will be *replaced* with the provided tags.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NetworkTags tags = 16;</code>
+     */
+    protected $tags = null;
+    /**
+     * The desired node taints to be applied to all nodes in the node pool.
+     * If this field is not present, the taints will not be changed. Otherwise,
+     * the existing node taints will be *replaced* with the provided taints.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeTaints taints = 17;</code>
+     */
+    protected $taints = null;
+    /**
+     * The desired node labels to be applied to all nodes in the node pool.
+     * If this field is not present, the labels will not be changed. Otherwise,
+     * the existing node labels will be *replaced* with the provided labels.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeLabels labels = 18;</code>
+     */
+    protected $labels = null;
     /**
      * Parameters that can be configured on Linux nodes.
      *
      * Generated from protobuf field <code>.google.container.v1.LinuxNodeConfig linux_node_config = 19;</code>
      */
-    private $linux_node_config = null;
+    protected $linux_node_config = null;
     /**
      * Node kubelet configs.
      *
      * Generated from protobuf field <code>.google.container.v1.NodeKubeletConfig kubelet_config = 20;</code>
      */
-    private $kubelet_config = null;
+    protected $kubelet_config = null;
+    /**
+     * Node network config.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeNetworkConfig node_network_config = 21;</code>
+     */
+    protected $node_network_config = null;
     /**
      * GCFS config.
      *
      * Generated from protobuf field <code>.google.container.v1.GcfsConfig gcfs_config = 22;</code>
      */
-    private $gcfs_config = null;
+    protected $gcfs_config = null;
+    /**
+     * Confidential nodes config.
+     * All the nodes in the node pool will be Confidential VM once enabled.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ConfidentialNodes confidential_nodes = 23;</code>
+     */
+    protected $confidential_nodes = null;
     /**
      * Enable or disable gvnic on the node pool.
      *
      * Generated from protobuf field <code>.google.container.v1.VirtualNIC gvnic = 29;</code>
      */
-    private $gvnic = null;
+    protected $gvnic = null;
+    /**
+     * The current etag of the node pool.
+     * If an etag is provided and does not match the current etag of the node
+     * pool, update will be blocked and an ABORTED error will be returned.
+     *
+     * Generated from protobuf field <code>string etag = 30;</code>
+     */
+    protected $etag = '';
+    /**
+     * Enable or disable NCCL fast socket for the node pool.
+     *
+     * Generated from protobuf field <code>.google.container.v1.FastSocket fast_socket = 31;</code>
+     */
+    protected $fast_socket = null;
+    /**
+     * Logging configuration.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePoolLoggingConfig logging_config = 32;</code>
+     */
+    protected $logging_config = null;
+    /**
+     * The resource labels for the node pool to use to annotate any related
+     * Google Compute Engine resources.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ResourceLabels resource_labels = 33;</code>
+     */
+    protected $resource_labels = null;
+    /**
+     * Parameters that can be configured on Windows nodes.
+     *
+     * Generated from protobuf field <code>.google.container.v1.WindowsNodeConfig windows_node_config = 34;</code>
+     */
+    protected $windows_node_config = null;
+    /**
+     * A list of hardware accelerators to be attached to each node.
+     * See https://cloud.google.com/compute/docs/gpus for more information about
+     * support for GPUs.
+     *
+     * Generated from protobuf field <code>repeated .google.container.v1.AcceleratorConfig accelerators = 35;</code>
+     */
+    private $accelerators;
+    /**
+     * Optional. The desired [Google Compute Engine machine
+     * type](https://cloud.google.com/compute/docs/machine-types) for nodes in the
+     * node pool. Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified machine type.
+     *
+     * Generated from protobuf field <code>string machine_type = 36 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $machine_type = '';
+    /**
+     * Optional. The desired disk type (e.g. 'pd-standard', 'pd-ssd' or
+     * 'pd-balanced') for nodes in the node pool.
+     * Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified disk type.
+     *
+     * Generated from protobuf field <code>string disk_type = 37 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $disk_type = '';
+    /**
+     * Optional. The desired disk size for nodes in the node pool specified in GB.
+     * The smallest allowed disk size is 10GB.
+     * Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified disk size.
+     *
+     * Generated from protobuf field <code>int64 disk_size_gb = 38 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $disk_size_gb = 0;
+    /**
+     * Desired resource manager tag keys and values to be attached to the nodes
+     * for managing Compute Engine firewalls using Network Firewall Policies.
+     * Existing tags will be replaced with new values.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ResourceManagerTags resource_manager_tags = 39;</code>
+     */
+    protected $resource_manager_tags = null;
+    /**
+     * The desired containerd config for nodes in the node pool.
+     * Initiates an upgrade operation that recreates the nodes with the new
+     * config.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ContainerdConfig containerd_config = 40;</code>
+     */
+    protected $containerd_config = null;
+    /**
+     * Specifies the configuration of queued provisioning.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePool.QueuedProvisioning queued_provisioning = 42;</code>
+     */
+    protected $queued_provisioning = null;
+    /**
+     * List of Storage Pools where boot disks are provisioned.
+     * Existing Storage Pools will be replaced with storage-pools.
+     *
+     * Generated from protobuf field <code>repeated string storage_pools = 43;</code>
+     */
+    private $storage_pools;
 
     /**
      * Constructor.
@@ -133,7 +269,7 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Deprecated. The Google Developers Console [project ID or project
-     *           number](https://support.google.com/cloud/answer/6158840).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *           This field has been deprecated and replaced by the name field.
      *     @type string $zone
      *           Deprecated. The name of the Google Compute Engine
@@ -157,12 +293,14 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      *           - "1.X.Y-gke.N": picks an explicit Kubernetes version
      *           - "-": picks the Kubernetes master version
      *     @type string $image_type
-     *           Required. The desired image type for the node pool.
+     *           Required. The desired image type for the node pool. Please see
+     *           https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     *           available image types.
      *     @type string $name
      *           The name (project, location, cluster, node pool) of the node pool to
      *           update. Specified in the format
      *           `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;&#47;nodePools/&#42;`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $locations
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $locations
      *           The desired list of Google Compute Engine
      *           [zones](https://cloud.google.com/compute/docs/zones#available) in which the
      *           node pool's nodes should be located. Changing the locations for a node pool
@@ -172,14 +310,76 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      *           The desired workload metadata config for the node pool.
      *     @type \Google\Cloud\Container\V1\NodePool\UpgradeSettings $upgrade_settings
      *           Upgrade settings control disruption and speed of the upgrade.
+     *     @type \Google\Cloud\Container\V1\NetworkTags $tags
+     *           The desired network tags to be applied to all nodes in the node pool.
+     *           If this field is not present, the tags will not be changed. Otherwise,
+     *           the existing network tags will be *replaced* with the provided tags.
+     *     @type \Google\Cloud\Container\V1\NodeTaints $taints
+     *           The desired node taints to be applied to all nodes in the node pool.
+     *           If this field is not present, the taints will not be changed. Otherwise,
+     *           the existing node taints will be *replaced* with the provided taints.
+     *     @type \Google\Cloud\Container\V1\NodeLabels $labels
+     *           The desired node labels to be applied to all nodes in the node pool.
+     *           If this field is not present, the labels will not be changed. Otherwise,
+     *           the existing node labels will be *replaced* with the provided labels.
      *     @type \Google\Cloud\Container\V1\LinuxNodeConfig $linux_node_config
      *           Parameters that can be configured on Linux nodes.
      *     @type \Google\Cloud\Container\V1\NodeKubeletConfig $kubelet_config
      *           Node kubelet configs.
+     *     @type \Google\Cloud\Container\V1\NodeNetworkConfig $node_network_config
+     *           Node network config.
      *     @type \Google\Cloud\Container\V1\GcfsConfig $gcfs_config
      *           GCFS config.
+     *     @type \Google\Cloud\Container\V1\ConfidentialNodes $confidential_nodes
+     *           Confidential nodes config.
+     *           All the nodes in the node pool will be Confidential VM once enabled.
      *     @type \Google\Cloud\Container\V1\VirtualNIC $gvnic
      *           Enable or disable gvnic on the node pool.
+     *     @type string $etag
+     *           The current etag of the node pool.
+     *           If an etag is provided and does not match the current etag of the node
+     *           pool, update will be blocked and an ABORTED error will be returned.
+     *     @type \Google\Cloud\Container\V1\FastSocket $fast_socket
+     *           Enable or disable NCCL fast socket for the node pool.
+     *     @type \Google\Cloud\Container\V1\NodePoolLoggingConfig $logging_config
+     *           Logging configuration.
+     *     @type \Google\Cloud\Container\V1\ResourceLabels $resource_labels
+     *           The resource labels for the node pool to use to annotate any related
+     *           Google Compute Engine resources.
+     *     @type \Google\Cloud\Container\V1\WindowsNodeConfig $windows_node_config
+     *           Parameters that can be configured on Windows nodes.
+     *     @type array<\Google\Cloud\Container\V1\AcceleratorConfig>|\Google\Protobuf\Internal\RepeatedField $accelerators
+     *           A list of hardware accelerators to be attached to each node.
+     *           See https://cloud.google.com/compute/docs/gpus for more information about
+     *           support for GPUs.
+     *     @type string $machine_type
+     *           Optional. The desired [Google Compute Engine machine
+     *           type](https://cloud.google.com/compute/docs/machine-types) for nodes in the
+     *           node pool. Initiates an upgrade operation that migrates the nodes in the
+     *           node pool to the specified machine type.
+     *     @type string $disk_type
+     *           Optional. The desired disk type (e.g. 'pd-standard', 'pd-ssd' or
+     *           'pd-balanced') for nodes in the node pool.
+     *           Initiates an upgrade operation that migrates the nodes in the
+     *           node pool to the specified disk type.
+     *     @type int|string $disk_size_gb
+     *           Optional. The desired disk size for nodes in the node pool specified in GB.
+     *           The smallest allowed disk size is 10GB.
+     *           Initiates an upgrade operation that migrates the nodes in the
+     *           node pool to the specified disk size.
+     *     @type \Google\Cloud\Container\V1\ResourceManagerTags $resource_manager_tags
+     *           Desired resource manager tag keys and values to be attached to the nodes
+     *           for managing Compute Engine firewalls using Network Firewall Policies.
+     *           Existing tags will be replaced with new values.
+     *     @type \Google\Cloud\Container\V1\ContainerdConfig $containerd_config
+     *           The desired containerd config for nodes in the node pool.
+     *           Initiates an upgrade operation that recreates the nodes with the new
+     *           config.
+     *     @type \Google\Cloud\Container\V1\NodePool\QueuedProvisioning $queued_provisioning
+     *           Specifies the configuration of queued provisioning.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $storage_pools
+     *           List of Storage Pools where boot disks are provisioned.
+     *           Existing Storage Pools will be replaced with storage-pools.
      * }
      */
     public function __construct($data = NULL) {
@@ -189,7 +389,7 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -204,7 +404,7 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -364,7 +564,9 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The desired image type for the node pool.
+     * Required. The desired image type for the node pool. Please see
+     * https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     * available image types.
      *
      * Generated from protobuf field <code>string image_type = 6 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -375,7 +577,9 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The desired image type for the node pool.
+     * Required. The desired image type for the node pool. Please see
+     * https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     * available image types.
      *
      * Generated from protobuf field <code>string image_type = 6 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -442,7 +646,7 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
      * depending on whether locations are being added or removed.
      *
      * Generated from protobuf field <code>repeated string locations = 13;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLocations($var)
@@ -526,6 +730,126 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The desired network tags to be applied to all nodes in the node pool.
+     * If this field is not present, the tags will not be changed. Otherwise,
+     * the existing network tags will be *replaced* with the provided tags.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NetworkTags tags = 16;</code>
+     * @return \Google\Cloud\Container\V1\NetworkTags|null
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    public function hasTags()
+    {
+        return isset($this->tags);
+    }
+
+    public function clearTags()
+    {
+        unset($this->tags);
+    }
+
+    /**
+     * The desired network tags to be applied to all nodes in the node pool.
+     * If this field is not present, the tags will not be changed. Otherwise,
+     * the existing network tags will be *replaced* with the provided tags.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NetworkTags tags = 16;</code>
+     * @param \Google\Cloud\Container\V1\NetworkTags $var
+     * @return $this
+     */
+    public function setTags($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\NetworkTags::class);
+        $this->tags = $var;
+
+        return $this;
+    }
+
+    /**
+     * The desired node taints to be applied to all nodes in the node pool.
+     * If this field is not present, the taints will not be changed. Otherwise,
+     * the existing node taints will be *replaced* with the provided taints.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeTaints taints = 17;</code>
+     * @return \Google\Cloud\Container\V1\NodeTaints|null
+     */
+    public function getTaints()
+    {
+        return $this->taints;
+    }
+
+    public function hasTaints()
+    {
+        return isset($this->taints);
+    }
+
+    public function clearTaints()
+    {
+        unset($this->taints);
+    }
+
+    /**
+     * The desired node taints to be applied to all nodes in the node pool.
+     * If this field is not present, the taints will not be changed. Otherwise,
+     * the existing node taints will be *replaced* with the provided taints.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeTaints taints = 17;</code>
+     * @param \Google\Cloud\Container\V1\NodeTaints $var
+     * @return $this
+     */
+    public function setTaints($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\NodeTaints::class);
+        $this->taints = $var;
+
+        return $this;
+    }
+
+    /**
+     * The desired node labels to be applied to all nodes in the node pool.
+     * If this field is not present, the labels will not be changed. Otherwise,
+     * the existing node labels will be *replaced* with the provided labels.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeLabels labels = 18;</code>
+     * @return \Google\Cloud\Container\V1\NodeLabels|null
+     */
+    public function getLabels()
+    {
+        return $this->labels;
+    }
+
+    public function hasLabels()
+    {
+        return isset($this->labels);
+    }
+
+    public function clearLabels()
+    {
+        unset($this->labels);
+    }
+
+    /**
+     * The desired node labels to be applied to all nodes in the node pool.
+     * If this field is not present, the labels will not be changed. Otherwise,
+     * the existing node labels will be *replaced* with the provided labels.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeLabels labels = 18;</code>
+     * @param \Google\Cloud\Container\V1\NodeLabels $var
+     * @return $this
+     */
+    public function setLabels($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\NodeLabels::class);
+        $this->labels = $var;
+
+        return $this;
+    }
+
+    /**
      * Parameters that can be configured on Linux nodes.
      *
      * Generated from protobuf field <code>.google.container.v1.LinuxNodeConfig linux_node_config = 19;</code>
@@ -598,6 +922,42 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Node network config.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeNetworkConfig node_network_config = 21;</code>
+     * @return \Google\Cloud\Container\V1\NodeNetworkConfig|null
+     */
+    public function getNodeNetworkConfig()
+    {
+        return $this->node_network_config;
+    }
+
+    public function hasNodeNetworkConfig()
+    {
+        return isset($this->node_network_config);
+    }
+
+    public function clearNodeNetworkConfig()
+    {
+        unset($this->node_network_config);
+    }
+
+    /**
+     * Node network config.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodeNetworkConfig node_network_config = 21;</code>
+     * @param \Google\Cloud\Container\V1\NodeNetworkConfig $var
+     * @return $this
+     */
+    public function setNodeNetworkConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\NodeNetworkConfig::class);
+        $this->node_network_config = $var;
+
+        return $this;
+    }
+
+    /**
      * GCFS config.
      *
      * Generated from protobuf field <code>.google.container.v1.GcfsConfig gcfs_config = 22;</code>
@@ -634,6 +994,44 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Confidential nodes config.
+     * All the nodes in the node pool will be Confidential VM once enabled.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ConfidentialNodes confidential_nodes = 23;</code>
+     * @return \Google\Cloud\Container\V1\ConfidentialNodes|null
+     */
+    public function getConfidentialNodes()
+    {
+        return $this->confidential_nodes;
+    }
+
+    public function hasConfidentialNodes()
+    {
+        return isset($this->confidential_nodes);
+    }
+
+    public function clearConfidentialNodes()
+    {
+        unset($this->confidential_nodes);
+    }
+
+    /**
+     * Confidential nodes config.
+     * All the nodes in the node pool will be Confidential VM once enabled.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ConfidentialNodes confidential_nodes = 23;</code>
+     * @param \Google\Cloud\Container\V1\ConfidentialNodes $var
+     * @return $this
+     */
+    public function setConfidentialNodes($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\ConfidentialNodes::class);
+        $this->confidential_nodes = $var;
+
+        return $this;
+    }
+
+    /**
      * Enable or disable gvnic on the node pool.
      *
      * Generated from protobuf field <code>.google.container.v1.VirtualNIC gvnic = 29;</code>
@@ -665,6 +1063,452 @@ class UpdateNodePoolRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\VirtualNIC::class);
         $this->gvnic = $var;
+
+        return $this;
+    }
+
+    /**
+     * The current etag of the node pool.
+     * If an etag is provided and does not match the current etag of the node
+     * pool, update will be blocked and an ABORTED error will be returned.
+     *
+     * Generated from protobuf field <code>string etag = 30;</code>
+     * @return string
+     */
+    public function getEtag()
+    {
+        return $this->etag;
+    }
+
+    /**
+     * The current etag of the node pool.
+     * If an etag is provided and does not match the current etag of the node
+     * pool, update will be blocked and an ABORTED error will be returned.
+     *
+     * Generated from protobuf field <code>string etag = 30;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setEtag($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->etag = $var;
+
+        return $this;
+    }
+
+    /**
+     * Enable or disable NCCL fast socket for the node pool.
+     *
+     * Generated from protobuf field <code>.google.container.v1.FastSocket fast_socket = 31;</code>
+     * @return \Google\Cloud\Container\V1\FastSocket|null
+     */
+    public function getFastSocket()
+    {
+        return $this->fast_socket;
+    }
+
+    public function hasFastSocket()
+    {
+        return isset($this->fast_socket);
+    }
+
+    public function clearFastSocket()
+    {
+        unset($this->fast_socket);
+    }
+
+    /**
+     * Enable or disable NCCL fast socket for the node pool.
+     *
+     * Generated from protobuf field <code>.google.container.v1.FastSocket fast_socket = 31;</code>
+     * @param \Google\Cloud\Container\V1\FastSocket $var
+     * @return $this
+     */
+    public function setFastSocket($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\FastSocket::class);
+        $this->fast_socket = $var;
+
+        return $this;
+    }
+
+    /**
+     * Logging configuration.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePoolLoggingConfig logging_config = 32;</code>
+     * @return \Google\Cloud\Container\V1\NodePoolLoggingConfig|null
+     */
+    public function getLoggingConfig()
+    {
+        return $this->logging_config;
+    }
+
+    public function hasLoggingConfig()
+    {
+        return isset($this->logging_config);
+    }
+
+    public function clearLoggingConfig()
+    {
+        unset($this->logging_config);
+    }
+
+    /**
+     * Logging configuration.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePoolLoggingConfig logging_config = 32;</code>
+     * @param \Google\Cloud\Container\V1\NodePoolLoggingConfig $var
+     * @return $this
+     */
+    public function setLoggingConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\NodePoolLoggingConfig::class);
+        $this->logging_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * The resource labels for the node pool to use to annotate any related
+     * Google Compute Engine resources.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ResourceLabels resource_labels = 33;</code>
+     * @return \Google\Cloud\Container\V1\ResourceLabels|null
+     */
+    public function getResourceLabels()
+    {
+        return $this->resource_labels;
+    }
+
+    public function hasResourceLabels()
+    {
+        return isset($this->resource_labels);
+    }
+
+    public function clearResourceLabels()
+    {
+        unset($this->resource_labels);
+    }
+
+    /**
+     * The resource labels for the node pool to use to annotate any related
+     * Google Compute Engine resources.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ResourceLabels resource_labels = 33;</code>
+     * @param \Google\Cloud\Container\V1\ResourceLabels $var
+     * @return $this
+     */
+    public function setResourceLabels($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\ResourceLabels::class);
+        $this->resource_labels = $var;
+
+        return $this;
+    }
+
+    /**
+     * Parameters that can be configured on Windows nodes.
+     *
+     * Generated from protobuf field <code>.google.container.v1.WindowsNodeConfig windows_node_config = 34;</code>
+     * @return \Google\Cloud\Container\V1\WindowsNodeConfig|null
+     */
+    public function getWindowsNodeConfig()
+    {
+        return $this->windows_node_config;
+    }
+
+    public function hasWindowsNodeConfig()
+    {
+        return isset($this->windows_node_config);
+    }
+
+    public function clearWindowsNodeConfig()
+    {
+        unset($this->windows_node_config);
+    }
+
+    /**
+     * Parameters that can be configured on Windows nodes.
+     *
+     * Generated from protobuf field <code>.google.container.v1.WindowsNodeConfig windows_node_config = 34;</code>
+     * @param \Google\Cloud\Container\V1\WindowsNodeConfig $var
+     * @return $this
+     */
+    public function setWindowsNodeConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\WindowsNodeConfig::class);
+        $this->windows_node_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * A list of hardware accelerators to be attached to each node.
+     * See https://cloud.google.com/compute/docs/gpus for more information about
+     * support for GPUs.
+     *
+     * Generated from protobuf field <code>repeated .google.container.v1.AcceleratorConfig accelerators = 35;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAccelerators()
+    {
+        return $this->accelerators;
+    }
+
+    /**
+     * A list of hardware accelerators to be attached to each node.
+     * See https://cloud.google.com/compute/docs/gpus for more information about
+     * support for GPUs.
+     *
+     * Generated from protobuf field <code>repeated .google.container.v1.AcceleratorConfig accelerators = 35;</code>
+     * @param array<\Google\Cloud\Container\V1\AcceleratorConfig>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAccelerators($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Container\V1\AcceleratorConfig::class);
+        $this->accelerators = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The desired [Google Compute Engine machine
+     * type](https://cloud.google.com/compute/docs/machine-types) for nodes in the
+     * node pool. Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified machine type.
+     *
+     * Generated from protobuf field <code>string machine_type = 36 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getMachineType()
+    {
+        return $this->machine_type;
+    }
+
+    /**
+     * Optional. The desired [Google Compute Engine machine
+     * type](https://cloud.google.com/compute/docs/machine-types) for nodes in the
+     * node pool. Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified machine type.
+     *
+     * Generated from protobuf field <code>string machine_type = 36 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setMachineType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->machine_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The desired disk type (e.g. 'pd-standard', 'pd-ssd' or
+     * 'pd-balanced') for nodes in the node pool.
+     * Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified disk type.
+     *
+     * Generated from protobuf field <code>string disk_type = 37 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getDiskType()
+    {
+        return $this->disk_type;
+    }
+
+    /**
+     * Optional. The desired disk type (e.g. 'pd-standard', 'pd-ssd' or
+     * 'pd-balanced') for nodes in the node pool.
+     * Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified disk type.
+     *
+     * Generated from protobuf field <code>string disk_type = 37 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDiskType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->disk_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The desired disk size for nodes in the node pool specified in GB.
+     * The smallest allowed disk size is 10GB.
+     * Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified disk size.
+     *
+     * Generated from protobuf field <code>int64 disk_size_gb = 38 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return int|string
+     */
+    public function getDiskSizeGb()
+    {
+        return $this->disk_size_gb;
+    }
+
+    /**
+     * Optional. The desired disk size for nodes in the node pool specified in GB.
+     * The smallest allowed disk size is 10GB.
+     * Initiates an upgrade operation that migrates the nodes in the
+     * node pool to the specified disk size.
+     *
+     * Generated from protobuf field <code>int64 disk_size_gb = 38 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setDiskSizeGb($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->disk_size_gb = $var;
+
+        return $this;
+    }
+
+    /**
+     * Desired resource manager tag keys and values to be attached to the nodes
+     * for managing Compute Engine firewalls using Network Firewall Policies.
+     * Existing tags will be replaced with new values.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ResourceManagerTags resource_manager_tags = 39;</code>
+     * @return \Google\Cloud\Container\V1\ResourceManagerTags|null
+     */
+    public function getResourceManagerTags()
+    {
+        return $this->resource_manager_tags;
+    }
+
+    public function hasResourceManagerTags()
+    {
+        return isset($this->resource_manager_tags);
+    }
+
+    public function clearResourceManagerTags()
+    {
+        unset($this->resource_manager_tags);
+    }
+
+    /**
+     * Desired resource manager tag keys and values to be attached to the nodes
+     * for managing Compute Engine firewalls using Network Firewall Policies.
+     * Existing tags will be replaced with new values.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ResourceManagerTags resource_manager_tags = 39;</code>
+     * @param \Google\Cloud\Container\V1\ResourceManagerTags $var
+     * @return $this
+     */
+    public function setResourceManagerTags($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\ResourceManagerTags::class);
+        $this->resource_manager_tags = $var;
+
+        return $this;
+    }
+
+    /**
+     * The desired containerd config for nodes in the node pool.
+     * Initiates an upgrade operation that recreates the nodes with the new
+     * config.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ContainerdConfig containerd_config = 40;</code>
+     * @return \Google\Cloud\Container\V1\ContainerdConfig|null
+     */
+    public function getContainerdConfig()
+    {
+        return $this->containerd_config;
+    }
+
+    public function hasContainerdConfig()
+    {
+        return isset($this->containerd_config);
+    }
+
+    public function clearContainerdConfig()
+    {
+        unset($this->containerd_config);
+    }
+
+    /**
+     * The desired containerd config for nodes in the node pool.
+     * Initiates an upgrade operation that recreates the nodes with the new
+     * config.
+     *
+     * Generated from protobuf field <code>.google.container.v1.ContainerdConfig containerd_config = 40;</code>
+     * @param \Google\Cloud\Container\V1\ContainerdConfig $var
+     * @return $this
+     */
+    public function setContainerdConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\ContainerdConfig::class);
+        $this->containerd_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Specifies the configuration of queued provisioning.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePool.QueuedProvisioning queued_provisioning = 42;</code>
+     * @return \Google\Cloud\Container\V1\NodePool\QueuedProvisioning|null
+     */
+    public function getQueuedProvisioning()
+    {
+        return $this->queued_provisioning;
+    }
+
+    public function hasQueuedProvisioning()
+    {
+        return isset($this->queued_provisioning);
+    }
+
+    public function clearQueuedProvisioning()
+    {
+        unset($this->queued_provisioning);
+    }
+
+    /**
+     * Specifies the configuration of queued provisioning.
+     *
+     * Generated from protobuf field <code>.google.container.v1.NodePool.QueuedProvisioning queued_provisioning = 42;</code>
+     * @param \Google\Cloud\Container\V1\NodePool\QueuedProvisioning $var
+     * @return $this
+     */
+    public function setQueuedProvisioning($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Container\V1\NodePool\QueuedProvisioning::class);
+        $this->queued_provisioning = $var;
+
+        return $this;
+    }
+
+    /**
+     * List of Storage Pools where boot disks are provisioned.
+     * Existing Storage Pools will be replaced with storage-pools.
+     *
+     * Generated from protobuf field <code>repeated string storage_pools = 43;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getStoragePools()
+    {
+        return $this->storage_pools;
+    }
+
+    /**
+     * List of Storage Pools where boot disks are provisioned.
+     * Existing Storage Pools will be replaced with storage-pools.
+     *
+     * Generated from protobuf field <code>repeated string storage_pools = 43;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setStoragePools($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->storage_pools = $arr;
 
         return $this;
     }

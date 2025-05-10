@@ -21,20 +21,20 @@ class LDiversityHistogramBucket extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 sensitive_value_frequency_lower_bound = 1;</code>
      */
-    private $sensitive_value_frequency_lower_bound = 0;
+    protected $sensitive_value_frequency_lower_bound = 0;
     /**
      * Upper bound on the sensitive value frequencies of the equivalence
      * classes in this bucket.
      *
      * Generated from protobuf field <code>int64 sensitive_value_frequency_upper_bound = 2;</code>
      */
-    private $sensitive_value_frequency_upper_bound = 0;
+    protected $sensitive_value_frequency_upper_bound = 0;
     /**
      * Total number of equivalence classes in this bucket.
      *
      * Generated from protobuf field <code>int64 bucket_size = 3;</code>
      */
-    private $bucket_size = 0;
+    protected $bucket_size = 0;
     /**
      * Sample of equivalence classes in this bucket. The total number of
      * classes returned per bucket is capped at 20.
@@ -47,7 +47,7 @@ class LDiversityHistogramBucket extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 bucket_value_count = 5;</code>
      */
-    private $bucket_value_count = 0;
+    protected $bucket_value_count = 0;
 
     /**
      * Constructor.
@@ -63,7 +63,7 @@ class LDiversityHistogramBucket extends \Google\Protobuf\Internal\Message
      *           classes in this bucket.
      *     @type int|string $bucket_size
      *           Total number of equivalence classes in this bucket.
-     *     @type \Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails\LDiversityResult\LDiversityEquivalenceClass[]|\Google\Protobuf\Internal\RepeatedField $bucket_values
+     *     @type array<\Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails\LDiversityResult\LDiversityEquivalenceClass>|\Google\Protobuf\Internal\RepeatedField $bucket_values
      *           Sample of equivalence classes in this bucket. The total number of
      *           classes returned per bucket is capped at 20.
      *     @type int|string $bucket_value_count
@@ -174,7 +174,7 @@ class LDiversityHistogramBucket extends \Google\Protobuf\Internal\Message
      * classes returned per bucket is capped at 20.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.AnalyzeDataSourceRiskDetails.LDiversityResult.LDiversityEquivalenceClass bucket_values = 4;</code>
-     * @param \Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails\LDiversityResult\LDiversityEquivalenceClass[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails\LDiversityResult\LDiversityEquivalenceClass>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBucketValues($var)
@@ -213,6 +213,4 @@ class LDiversityHistogramBucket extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(LDiversityHistogramBucket::class, \Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails_LDiversityResult_LDiversityHistogramBucket::class);
 

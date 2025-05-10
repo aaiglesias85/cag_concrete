@@ -7,7 +7,8 @@ namespace Google\Cloud\Dialogflow\V2;
 use UnexpectedValueException;
 
 /**
- * Variant of the specified [Speech model][google.cloud.dialogflow.v2.InputAudioConfig.model] to use.
+ * Variant of the specified [Speech
+ * model][google.cloud.dialogflow.v2.InputAudioConfig.model] to use.
  * See the [Cloud Speech
  * documentation](https://cloud.google.com/speech-to-text/docs/enhanced-models)
  * for which models have different variants. For example, the "phone_call" model
@@ -26,8 +27,8 @@ class SpeechModelVariant
      */
     const SPEECH_MODEL_VARIANT_UNSPECIFIED = 0;
     /**
-     * Use the best available variant of the [Speech
-     * model][InputAudioConfig.model] that the caller is eligible for.
+     * Use the best available variant of the [Speech model][model] that the caller
+     * is eligible for.
      * Please see the [Dialogflow
      * docs](https://cloud.google.com/dialogflow/docs/data-logging) for
      * how to make your project eligible for enhanced models.
@@ -47,8 +48,8 @@ class SpeechModelVariant
     /**
      * Use an enhanced model variant:
      * * If an enhanced variant does not exist for the given
-     *   [model][google.cloud.dialogflow.v2.InputAudioConfig.model] and request language, Dialogflow falls
-     *   back to the standard variant.
+     *   [model][google.cloud.dialogflow.v2.InputAudioConfig.model] and request
+     *   language, Dialogflow falls back to the standard variant.
      *   The [Cloud Speech
      *   documentation](https://cloud.google.com/speech-to-text/docs/enhanced-models)
      *   describes which models have enhanced variants.

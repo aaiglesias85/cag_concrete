@@ -20,14 +20,28 @@ class GetUtilizationReportRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. The level of details of the report.
      * Defaults to FULL
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.UtilizationReportView view = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $view = 0;
+    protected $view = 0;
+
+    /**
+     * @param string $name Required. The Utilization Report name. Please see
+     *                     {@see VmMigrationClient::utilizationReportName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\VMMigration\V1\GetUtilizationReportRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

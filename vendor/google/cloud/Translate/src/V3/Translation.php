@@ -22,7 +22,7 @@ class Translation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string translated_text = 1;</code>
      */
-    private $translated_text = '';
+    protected $translated_text = '';
     /**
      * Only present when `model` is present in the request.
      * `model` here is normalized to have project number.
@@ -34,22 +34,22 @@ class Translation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string model = 2;</code>
      */
-    private $model = '';
+    protected $model = '';
     /**
-     * The BCP-47 language code of source text in the initial request, detected
+     * The ISO-639 language code of source text in the initial request, detected
      * automatically, if no source language was passed within the initial
      * request. If the source language was passed, auto-detection of the language
      * does not occur and this field is empty.
      *
      * Generated from protobuf field <code>string detected_language_code = 4;</code>
      */
-    private $detected_language_code = '';
+    protected $detected_language_code = '';
     /**
      * The `glossary_config` used for this translation.
      *
      * Generated from protobuf field <code>.google.cloud.translation.v3.TranslateTextGlossaryConfig glossary_config = 3;</code>
      */
-    private $glossary_config = null;
+    protected $glossary_config = null;
 
     /**
      * Constructor.
@@ -70,7 +70,7 @@ class Translation extends \Google\Protobuf\Internal\Message
      *           `model` here would be normalized to
      *           `projects/{project-number}/locations/{location-id}/models/general/nmt`.
      *     @type string $detected_language_code
-     *           The BCP-47 language code of source text in the initial request, detected
+     *           The ISO-639 language code of source text in the initial request, detected
      *           automatically, if no source language was passed within the initial
      *           request. If the source language was passed, auto-detection of the language
      *           does not occur and this field is empty.
@@ -152,7 +152,7 @@ class Translation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The BCP-47 language code of source text in the initial request, detected
+     * The ISO-639 language code of source text in the initial request, detected
      * automatically, if no source language was passed within the initial
      * request. If the source language was passed, auto-detection of the language
      * does not occur and this field is empty.
@@ -166,7 +166,7 @@ class Translation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The BCP-47 language code of source text in the initial request, detected
+     * The ISO-639 language code of source text in the initial request, detected
      * automatically, if no source language was passed within the initial
      * request. If the source language was passed, auto-detection of the language
      * does not occur and this field is empty.

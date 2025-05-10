@@ -24,7 +24,7 @@ class MessageAnalysisConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enable_entity_extraction = 2;</code>
      */
-    private $enable_entity_extraction = false;
+    protected $enable_entity_extraction = false;
     /**
      * Enable sentiment analysis in conversation messages on [agent assist
      * stage](https://cloud.google.com/dialogflow/priv/docs/contact-center/basics#stages).
@@ -32,18 +32,24 @@ class MessageAnalysisConfig extends \Google\Protobuf\Internal\Message
      * and identifies the prevailing subjective opinion, especially to determine
      * a user's attitude as positive, negative, or neutral:
      * https://cloud.google.com/natural-language/docs/basics#sentiment_analysis
-     * For [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent] method, result will be in
+     * For
+     * [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent]
+     * method, result will be in
      * [StreamingAnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.StreamingAnalyzeContentResponse.message].
-     * For [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent] method, result will be in
+     * For
+     * [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent]
+     * method, result will be in
      * [AnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.AnalyzeContentResponse.message]
-     * For [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages] method, result will be in
+     * For
+     * [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages]
+     * method, result will be in
      * [ListMessagesResponse.messages.SentimentAnalysisResult][google.cloud.dialogflow.v2.ListMessagesResponse.messages]
      * If Pub/Sub notification is configured, result will be in
      * [ConversationEvent.new_message_payload.SentimentAnalysisResult][google.cloud.dialogflow.v2.ConversationEvent.new_message_payload].
      *
      * Generated from protobuf field <code>bool enable_sentiment_analysis = 3;</code>
      */
-    private $enable_sentiment_analysis = false;
+    protected $enable_sentiment_analysis = false;
 
     /**
      * Constructor.
@@ -64,11 +70,17 @@ class MessageAnalysisConfig extends \Google\Protobuf\Internal\Message
      *           and identifies the prevailing subjective opinion, especially to determine
      *           a user's attitude as positive, negative, or neutral:
      *           https://cloud.google.com/natural-language/docs/basics#sentiment_analysis
-     *           For [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent] method, result will be in
+     *           For
+     *           [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent]
+     *           method, result will be in
      *           [StreamingAnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.StreamingAnalyzeContentResponse.message].
-     *           For [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent] method, result will be in
+     *           For
+     *           [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent]
+     *           method, result will be in
      *           [AnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.AnalyzeContentResponse.message]
-     *           For [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages] method, result will be in
+     *           For
+     *           [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages]
+     *           method, result will be in
      *           [ListMessagesResponse.messages.SentimentAnalysisResult][google.cloud.dialogflow.v2.ListMessagesResponse.messages]
      *           If Pub/Sub notification is configured, result will be in
      *           [ConversationEvent.new_message_payload.SentimentAnalysisResult][google.cloud.dialogflow.v2.ConversationEvent.new_message_payload].
@@ -120,11 +132,17 @@ class MessageAnalysisConfig extends \Google\Protobuf\Internal\Message
      * and identifies the prevailing subjective opinion, especially to determine
      * a user's attitude as positive, negative, or neutral:
      * https://cloud.google.com/natural-language/docs/basics#sentiment_analysis
-     * For [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent] method, result will be in
+     * For
+     * [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent]
+     * method, result will be in
      * [StreamingAnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.StreamingAnalyzeContentResponse.message].
-     * For [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent] method, result will be in
+     * For
+     * [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent]
+     * method, result will be in
      * [AnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.AnalyzeContentResponse.message]
-     * For [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages] method, result will be in
+     * For
+     * [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages]
+     * method, result will be in
      * [ListMessagesResponse.messages.SentimentAnalysisResult][google.cloud.dialogflow.v2.ListMessagesResponse.messages]
      * If Pub/Sub notification is configured, result will be in
      * [ConversationEvent.new_message_payload.SentimentAnalysisResult][google.cloud.dialogflow.v2.ConversationEvent.new_message_payload].
@@ -144,11 +162,17 @@ class MessageAnalysisConfig extends \Google\Protobuf\Internal\Message
      * and identifies the prevailing subjective opinion, especially to determine
      * a user's attitude as positive, negative, or neutral:
      * https://cloud.google.com/natural-language/docs/basics#sentiment_analysis
-     * For [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent] method, result will be in
+     * For
+     * [Participants.StreamingAnalyzeContent][google.cloud.dialogflow.v2.Participants.StreamingAnalyzeContent]
+     * method, result will be in
      * [StreamingAnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.StreamingAnalyzeContentResponse.message].
-     * For [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent] method, result will be in
+     * For
+     * [Participants.AnalyzeContent][google.cloud.dialogflow.v2.Participants.AnalyzeContent]
+     * method, result will be in
      * [AnalyzeContentResponse.message.SentimentAnalysisResult][google.cloud.dialogflow.v2.AnalyzeContentResponse.message]
-     * For [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages] method, result will be in
+     * For
+     * [Conversations.ListMessages][google.cloud.dialogflow.v2.Conversations.ListMessages]
+     * method, result will be in
      * [ListMessagesResponse.messages.SentimentAnalysisResult][google.cloud.dialogflow.v2.ListMessagesResponse.messages]
      * If Pub/Sub notification is configured, result will be in
      * [ConversationEvent.new_message_payload.SentimentAnalysisResult][google.cloud.dialogflow.v2.ConversationEvent.new_message_payload].
@@ -167,6 +191,4 @@ class MessageAnalysisConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(MessageAnalysisConfig::class, \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig_MessageAnalysisConfig::class);
 

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [ReservationService.CreateAssignment][google.cloud.bigquery.reservation.v1.ReservationService.CreateAssignment].
+ * The request for
+ * [ReservationService.CreateAssignment][google.cloud.bigquery.reservation.v1.ReservationService.CreateAssignment].
  * Note: "bigquery.reservationAssignments.create" permission is required on the
  * related assignee.
  *
@@ -23,13 +24,13 @@ class CreateAssignmentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Assignment resource to create.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.reservation.v1.Assignment assignment = 2;</code>
      */
-    private $assignment = null;
+    protected $assignment = null;
     /**
      * The optional assignment ID. Assignment name will be generated automatically
      * if this field is empty.
@@ -38,7 +39,24 @@ class CreateAssignmentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string assignment_id = 4;</code>
      */
-    private $assignment_id = '';
+    protected $assignment_id = '';
+
+    /**
+     * @param string                                           $parent     Required. The parent resource name of the assignment
+     *                                                                     E.g. `projects/myproject/locations/US/reservations/team1-prod`
+     *                                                                     Please see {@see ReservationServiceClient::reservationName()} for help formatting this field.
+     * @param \Google\Cloud\BigQuery\Reservation\V1\Assignment $assignment Assignment resource to create.
+     *
+     * @return \Google\Cloud\BigQuery\Reservation\V1\CreateAssignmentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\BigQuery\Reservation\V1\Assignment $assignment): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setAssignment($assignment);
+    }
 
     /**
      * Constructor.

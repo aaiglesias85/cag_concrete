@@ -16,19 +16,24 @@ class MachineResources
         }
         \GPBMetadata\Google\Api\FieldBehavior::initOnce();
         \GPBMetadata\Google\Cloud\Aiplatform\V1\AcceleratorType::initOnce();
+        \GPBMetadata\Google\Cloud\Aiplatform\V1\ReservationAffinity::initOnce();
         $pool->internalAddGeneratedFile(
             '
-ó	
-2google/cloud/aiplatform/v1/machine_resources.protogoogle.cloud.aiplatform.v11google/cloud/aiplatform/v1/accelerator_type.proto"
+½
+2google/cloud/aiplatform/v1/machine_resources.protogoogle.cloud.aiplatform.v11google/cloud/aiplatform/v1/accelerator_type.proto5google/cloud/aiplatform/v1/reservation_affinity.proto"
 MachineSpec
 machine_type (	BàAJ
 accelerator_type (2+.google.cloud.aiplatform.v1.AcceleratorTypeBàA
-accelerator_count ("ø
+accelerator_count (
+tpu_topology (	BàAU
+reservation_affinity (2/.google.cloud.aiplatform.v1.ReservationAffinityBàAàA"°
 DedicatedResourcesE
 machine_spec (2\'.google.cloud.aiplatform.v1.MachineSpecBàAàA!
 min_replica_count (BàAàA
-max_replica_count (BàAX
-autoscaling_metric_specs (21.google.cloud.aiplatform.v1.AutoscalingMetricSpecBàA"T
+max_replica_count (BàA#
+required_replica_count	 (BàAX
+autoscaling_metric_specs (21.google.cloud.aiplatform.v1.AutoscalingMetricSpecBàA
+spot (BàA"T
 AutomaticResources
 min_replica_count (BàA
 max_replica_count (BàA"¥
@@ -40,15 +45,20 @@ class MachineResources
 replica_hours (BàA"=
 DiskSpec
 boot_disk_type (	
-boot_disk_size_gb ("L
+boot_disk_size_gb ("=
+PersistentDiskSpec
+	disk_type (	
+disk_size_gb ("L
 NfsMount
 server (	BàA
 path (	BàA
 mount_point (	BàA"A
 AutoscalingMetricSpec
 metric_name (	BàA
-target (BÙ
-com.google.cloud.aiplatform.v1BMachineResourcesProtoPZDgoogle.golang.org/genproto/googleapis/cloud/aiplatform/v1;aiplatformªGoogle.Cloud.AIPlatform.V1ÊGoogle\\Cloud\\AIPlatform\\V1êGoogle::Cloud::AIPlatform::V1bproto3'
+target (".
+ShieldedVmConfig
+enable_secure_boot (BÓ
+com.google.cloud.aiplatform.v1BMachineResourcesProtoPZ>cloud.google.com/go/aiplatform/apiv1/aiplatformpb;aiplatformpbªGoogle.Cloud.AIPlatform.V1ÊGoogle\\Cloud\\AIPlatform\\V1êGoogle::Cloud::AIPlatform::V1bproto3'
         , true);
 
         static::$is_initialized = true;

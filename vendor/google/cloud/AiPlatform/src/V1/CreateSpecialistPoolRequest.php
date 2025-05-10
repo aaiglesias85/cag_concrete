@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [SpecialistPoolService.CreateSpecialistPool][google.cloud.aiplatform.v1.SpecialistPoolService.CreateSpecialistPool].
+ * Request message for
+ * [SpecialistPoolService.CreateSpecialistPool][google.cloud.aiplatform.v1.SpecialistPoolService.CreateSpecialistPool].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateSpecialistPoolRequest</code>
  */
@@ -21,13 +22,30 @@ class CreateSpecialistPoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The SpecialistPool to create.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.SpecialistPool specialist_pool = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $specialist_pool = null;
+    protected $specialist_pool = null;
+
+    /**
+     * @param string                                     $parent         Required. The parent Project name for the new SpecialistPool.
+     *                                                                   The form is `projects/{project}/locations/{location}`. Please see
+     *                                                                   {@see SpecialistPoolServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\SpecialistPool $specialistPool Required. The SpecialistPool to create.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\CreateSpecialistPoolRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AIPlatform\V1\SpecialistPool $specialistPool): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setSpecialistPool($specialistPool);
+    }
 
     /**
      * Constructor.

@@ -20,13 +20,28 @@ class UpdateModelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.Model model = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $model = null;
+    protected $model = null;
     /**
      * Required. The update mask applies to the resource.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\AutoMl\V1\Model $model      Required. The model which replaces the resource on the server.
+     * @param \Google\Protobuf\FieldMask    $updateMask Required. The update mask applies to the resource.
+     *
+     * @return \Google\Cloud\AutoMl\V1\UpdateModelRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\AutoMl\V1\Model $model, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setModel($model)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

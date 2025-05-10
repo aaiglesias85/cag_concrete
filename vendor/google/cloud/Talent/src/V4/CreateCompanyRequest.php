@@ -22,13 +22,32 @@ class CreateCompanyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The company to be created.
      *
      * Generated from protobuf field <code>.google.cloud.talent.v4.Company company = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $company = null;
+    protected $company = null;
+
+    /**
+     * @param string                          $parent  Required. Resource name of the tenant under which the company is created.
+     *
+     *                                                 The format is "projects/{project_id}/tenants/{tenant_id}", for example,
+     *                                                 "projects/foo/tenants/bar". Please see
+     *                                                 {@see CompanyServiceClient::tenantName()} for help formatting this field.
+     * @param \Google\Cloud\Talent\V4\Company $company Required. The company to be created.
+     *
+     * @return \Google\Cloud\Talent\V4\CreateCompanyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Talent\V4\Company $company): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setCompany($company);
+    }
 
     /**
      * Constructor.

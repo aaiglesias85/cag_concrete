@@ -52,6 +52,12 @@ class Region extends \Google\Protobuf\Internal\Message
      */
     private $name = null;
     /**
+     * [Output Only] Warning of fetching the `quotas` field for this region. This field is populated only if fetching of the `quotas` field fails.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.QuotaStatusWarning quota_status_warning = 302941430;</code>
+     */
+    private $quota_status_warning = null;
+    /**
      * [Output Only] Quotas assigned to this region.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.Quota quotas = 125341947;</code>
@@ -101,7 +107,9 @@ class Region extends \Google\Protobuf\Internal\Message
      *           [Output Only] Type of the resource. Always compute#region for regions.
      *     @type string $name
      *           [Output Only] Name of the resource.
-     *     @type \Google\Cloud\Compute\V1\Quota[]|\Google\Protobuf\Internal\RepeatedField $quotas
+     *     @type \Google\Cloud\Compute\V1\QuotaStatusWarning $quota_status_warning
+     *           [Output Only] Warning of fetching the `quotas` field for this region. This field is populated only if fetching of the `quotas` field fails.
+     *     @type array<\Google\Cloud\Compute\V1\Quota>|\Google\Protobuf\Internal\RepeatedField $quotas
      *           [Output Only] Quotas assigned to this region.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
@@ -110,7 +118,7 @@ class Region extends \Google\Protobuf\Internal\Message
      *           Check the Status enum for the list of possible values.
      *     @type bool $supports_pzs
      *           [Output Only] Reserved for future use.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $zones
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $zones
      *           [Output Only] A list of zones available in this region, in the form of resource URLs.
      * }
      */
@@ -336,6 +344,42 @@ class Region extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * [Output Only] Warning of fetching the `quotas` field for this region. This field is populated only if fetching of the `quotas` field fails.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.QuotaStatusWarning quota_status_warning = 302941430;</code>
+     * @return \Google\Cloud\Compute\V1\QuotaStatusWarning|null
+     */
+    public function getQuotaStatusWarning()
+    {
+        return $this->quota_status_warning;
+    }
+
+    public function hasQuotaStatusWarning()
+    {
+        return isset($this->quota_status_warning);
+    }
+
+    public function clearQuotaStatusWarning()
+    {
+        unset($this->quota_status_warning);
+    }
+
+    /**
+     * [Output Only] Warning of fetching the `quotas` field for this region. This field is populated only if fetching of the `quotas` field fails.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.compute.v1.QuotaStatusWarning quota_status_warning = 302941430;</code>
+     * @param \Google\Cloud\Compute\V1\QuotaStatusWarning $var
+     * @return $this
+     */
+    public function setQuotaStatusWarning($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\QuotaStatusWarning::class);
+        $this->quota_status_warning = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] Quotas assigned to this region.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.Quota quotas = 125341947;</code>
@@ -350,7 +394,7 @@ class Region extends \Google\Protobuf\Internal\Message
      * [Output Only] Quotas assigned to this region.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.Quota quotas = 125341947;</code>
-     * @param \Google\Cloud\Compute\V1\Quota[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\Quota>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuotas($var)
@@ -486,7 +530,7 @@ class Region extends \Google\Protobuf\Internal\Message
      * [Output Only] A list of zones available in this region, in the form of resource URLs.
      *
      * Generated from protobuf field <code>repeated string zones = 116085319;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setZones($var)

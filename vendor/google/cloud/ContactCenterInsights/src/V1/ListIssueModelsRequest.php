@@ -20,7 +20,21 @@ class ListIssueModelsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
+
+    /**
+     * @param string $parent Required. The parent resource of the issue model. Please see
+     *                       {@see ContactCenterInsightsClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\ContactCenterInsights\V1\ListIssueModelsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

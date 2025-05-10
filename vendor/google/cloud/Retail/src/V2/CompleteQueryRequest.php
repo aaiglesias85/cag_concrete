@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Auto-complete parameters.
+ * Autocomplete parameters.
  *
  * Generated from protobuf message <code>google.cloud.retail.v2.CompleteQueryRequest</code>
  */
@@ -22,14 +22,14 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string catalog = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $catalog = '';
+    protected $catalog = '';
     /**
      * Required. The query used to generate suggestions.
      * The maximum number of allowed characters is 255.
      *
      * Generated from protobuf field <code>string query = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $query = '';
+    protected $query = '';
     /**
      * Required field. A unique identifier for tracking visitors. For example,
      * this could be implemented with an HTTP cookie, which should be able to
@@ -40,8 +40,10 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string visitor_id = 7;</code>
      */
-    private $visitor_id = '';
+    protected $visitor_id = '';
     /**
+     * Note that this field applies for `user-data` dataset only. For requests
+     * with `cloud-retail` dataset, setting this field has no effect.
      * The language filters applied to the output suggestions. If set, it should
      * contain the language of the query. If not set, suggestions are returned
      * without considering language restrictions. This is the BCP-47 language
@@ -53,8 +55,9 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      */
     private $language_codes;
     /**
-     * The device type context for completion suggestions.
-     * It is useful to apply different suggestions on different device types, e.g.
+     * The device type context for completion suggestions. We recommend that you
+     * leave this field empty.
+     * It can apply different suggestions on different device types, e.g.
      * `DESKTOP`, `MOBILE`. If it is empty, the suggestions are across all device
      * types.
      * Supported formats:
@@ -65,7 +68,7 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string device_type = 4;</code>
      */
-    private $device_type = '';
+    protected $device_type = '';
     /**
      * Determines which dataset to use for fetching completion. "user-data" will
      * use the imported dataset through
@@ -80,16 +83,35 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string dataset = 6;</code>
      */
-    private $dataset = '';
+    protected $dataset = '';
     /**
      * Completion max suggestions. If left unset or set to 0, then will fallback
-     * to the configured value [CompletionConfig.max_suggestions][].
+     * to the configured value
+     * [CompletionConfig.max_suggestions][google.cloud.retail.v2.CompletionConfig.max_suggestions].
      * The maximum allowed max suggestions is 20. If it is set higher, it will be
      * capped by 20.
      *
      * Generated from protobuf field <code>int32 max_suggestions = 5;</code>
      */
-    private $max_suggestions = 0;
+    protected $max_suggestions = 0;
+    /**
+     * If true, attribute suggestions are enabled and provided in the response.
+     * This field is only available for the "cloud-retail" dataset.
+     *
+     * Generated from protobuf field <code>bool enable_attribute_suggestions = 9;</code>
+     */
+    protected $enable_attribute_suggestions = false;
+    /**
+     * The entity for customers who run multiple entities, domains, sites, or
+     * regions, for example, `Google US`, `Google Ads`, `Waymo`,
+     * `google.com`, `youtube.com`, etc.
+     * If this is set, it must be an exact match with
+     * [UserEvent.entity][google.cloud.retail.v2.UserEvent.entity] to get
+     * per-entity autocomplete results.
+     *
+     * Generated from protobuf field <code>string entity = 10;</code>
+     */
+    protected $entity = '';
 
     /**
      * Constructor.
@@ -111,7 +133,9 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *           should not change if the visitor logs in or out of the website.
      *           The field must be a UTF-8 encoded string with a length limit of 128
      *           characters. Otherwise, an INVALID_ARGUMENT error is returned.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $language_codes
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $language_codes
+     *           Note that this field applies for `user-data` dataset only. For requests
+     *           with `cloud-retail` dataset, setting this field has no effect.
      *           The language filters applied to the output suggestions. If set, it should
      *           contain the language of the query. If not set, suggestions are returned
      *           without considering language restrictions. This is the BCP-47 language
@@ -119,8 +143,9 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *           Identifying Languages](https://tools.ietf.org/html/bcp47). The maximum
      *           number of language codes is 3.
      *     @type string $device_type
-     *           The device type context for completion suggestions.
-     *           It is useful to apply different suggestions on different device types, e.g.
+     *           The device type context for completion suggestions. We recommend that you
+     *           leave this field empty.
+     *           It can apply different suggestions on different device types, e.g.
      *           `DESKTOP`, `MOBILE`. If it is empty, the suggestions are across all device
      *           types.
      *           Supported formats:
@@ -141,9 +166,20 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      *             [guidelines](https://cloud.google.com/retail/docs/completion-overview#generated-completion-dataset).
      *     @type int $max_suggestions
      *           Completion max suggestions. If left unset or set to 0, then will fallback
-     *           to the configured value [CompletionConfig.max_suggestions][].
+     *           to the configured value
+     *           [CompletionConfig.max_suggestions][google.cloud.retail.v2.CompletionConfig.max_suggestions].
      *           The maximum allowed max suggestions is 20. If it is set higher, it will be
      *           capped by 20.
+     *     @type bool $enable_attribute_suggestions
+     *           If true, attribute suggestions are enabled and provided in the response.
+     *           This field is only available for the "cloud-retail" dataset.
+     *     @type string $entity
+     *           The entity for customers who run multiple entities, domains, sites, or
+     *           regions, for example, `Google US`, `Google Ads`, `Waymo`,
+     *           `google.com`, `youtube.com`, etc.
+     *           If this is set, it must be an exact match with
+     *           [UserEvent.entity][google.cloud.retail.v2.UserEvent.entity] to get
+     *           per-entity autocomplete results.
      * }
      */
     public function __construct($data = NULL) {
@@ -246,6 +282,8 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Note that this field applies for `user-data` dataset only. For requests
+     * with `cloud-retail` dataset, setting this field has no effect.
      * The language filters applied to the output suggestions. If set, it should
      * contain the language of the query. If not set, suggestions are returned
      * without considering language restrictions. This is the BCP-47 language
@@ -262,6 +300,8 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Note that this field applies for `user-data` dataset only. For requests
+     * with `cloud-retail` dataset, setting this field has no effect.
      * The language filters applied to the output suggestions. If set, it should
      * contain the language of the query. If not set, suggestions are returned
      * without considering language restrictions. This is the BCP-47 language
@@ -270,7 +310,7 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
      * number of language codes is 3.
      *
      * Generated from protobuf field <code>repeated string language_codes = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLanguageCodes($var)
@@ -282,8 +322,9 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The device type context for completion suggestions.
-     * It is useful to apply different suggestions on different device types, e.g.
+     * The device type context for completion suggestions. We recommend that you
+     * leave this field empty.
+     * It can apply different suggestions on different device types, e.g.
      * `DESKTOP`, `MOBILE`. If it is empty, the suggestions are across all device
      * types.
      * Supported formats:
@@ -301,8 +342,9 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The device type context for completion suggestions.
-     * It is useful to apply different suggestions on different device types, e.g.
+     * The device type context for completion suggestions. We recommend that you
+     * leave this field empty.
+     * It can apply different suggestions on different device types, e.g.
      * `DESKTOP`, `MOBILE`. If it is empty, the suggestions are across all device
      * types.
      * Supported formats:
@@ -369,7 +411,8 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Completion max suggestions. If left unset or set to 0, then will fallback
-     * to the configured value [CompletionConfig.max_suggestions][].
+     * to the configured value
+     * [CompletionConfig.max_suggestions][google.cloud.retail.v2.CompletionConfig.max_suggestions].
      * The maximum allowed max suggestions is 20. If it is set higher, it will be
      * capped by 20.
      *
@@ -383,7 +426,8 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Completion max suggestions. If left unset or set to 0, then will fallback
-     * to the configured value [CompletionConfig.max_suggestions][].
+     * to the configured value
+     * [CompletionConfig.max_suggestions][google.cloud.retail.v2.CompletionConfig.max_suggestions].
      * The maximum allowed max suggestions is 20. If it is set higher, it will be
      * capped by 20.
      *
@@ -395,6 +439,70 @@ class CompleteQueryRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkInt32($var);
         $this->max_suggestions = $var;
+
+        return $this;
+    }
+
+    /**
+     * If true, attribute suggestions are enabled and provided in the response.
+     * This field is only available for the "cloud-retail" dataset.
+     *
+     * Generated from protobuf field <code>bool enable_attribute_suggestions = 9;</code>
+     * @return bool
+     */
+    public function getEnableAttributeSuggestions()
+    {
+        return $this->enable_attribute_suggestions;
+    }
+
+    /**
+     * If true, attribute suggestions are enabled and provided in the response.
+     * This field is only available for the "cloud-retail" dataset.
+     *
+     * Generated from protobuf field <code>bool enable_attribute_suggestions = 9;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setEnableAttributeSuggestions($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->enable_attribute_suggestions = $var;
+
+        return $this;
+    }
+
+    /**
+     * The entity for customers who run multiple entities, domains, sites, or
+     * regions, for example, `Google US`, `Google Ads`, `Waymo`,
+     * `google.com`, `youtube.com`, etc.
+     * If this is set, it must be an exact match with
+     * [UserEvent.entity][google.cloud.retail.v2.UserEvent.entity] to get
+     * per-entity autocomplete results.
+     *
+     * Generated from protobuf field <code>string entity = 10;</code>
+     * @return string
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    /**
+     * The entity for customers who run multiple entities, domains, sites, or
+     * regions, for example, `Google US`, `Google Ads`, `Waymo`,
+     * `google.com`, `youtube.com`, etc.
+     * If this is set, it must be an exact match with
+     * [UserEvent.entity][google.cloud.retail.v2.UserEvent.entity] to get
+     * per-entity autocomplete results.
+     *
+     * Generated from protobuf field <code>string entity = 10;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setEntity($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->entity = $var;
 
         return $this;
     }

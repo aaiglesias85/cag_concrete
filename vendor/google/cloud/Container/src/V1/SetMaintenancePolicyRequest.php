@@ -17,11 +17,11 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Required. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *
      * Generated from protobuf field <code>string project_id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $project_id = '';
+    protected $project_id = '';
     /**
      * Required. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/zones#available) in which the
@@ -29,28 +29,69 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string zone = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $zone = '';
+    protected $zone = '';
     /**
      * Required. The name of the cluster to update.
      *
      * Generated from protobuf field <code>string cluster_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $cluster_id = '';
+    protected $cluster_id = '';
     /**
      * Required. The maintenance policy to be set for the cluster. An empty field
      * clears the existing maintenance policy.
      *
      * Generated from protobuf field <code>.google.container.v1.MaintenancePolicy maintenance_policy = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $maintenance_policy = null;
+    protected $maintenance_policy = null;
     /**
-     * The name (project, location, cluster id) of the cluster to set maintenance
-     * policy.
+     * The name (project, location, cluster name) of the cluster to set
+     * maintenance policy.
      * Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string name = 5;</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string                                       $projectId         Required. The Google Developers Console [project ID or project
+     *                                                                        number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+     * @param string                                       $zone              Required. The name of the Google Compute Engine
+     *                                                                        [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+     *                                                                        cluster resides.
+     * @param string                                       $clusterId         Required. The name of the cluster to update.
+     * @param \Google\Cloud\Container\V1\MaintenancePolicy $maintenancePolicy Required. The maintenance policy to be set for the cluster. An empty field
+     *                                                                        clears the existing maintenance policy.
+     *
+     * @return \Google\Cloud\Container\V1\SetMaintenancePolicyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, string $zone, string $clusterId, \Google\Cloud\Container\V1\MaintenancePolicy $maintenancePolicy): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setZone($zone)
+            ->setClusterId($clusterId)
+            ->setMaintenancePolicy($maintenancePolicy);
+    }
+
+    /**
+     * @param string                                       $name              The name (project, location, cluster name) of the cluster to set
+     *                                                                        maintenance policy.
+     *                                                                        Specified in the format `projects/&#42;/locations/&#42;/clusters/*`.
+     * @param \Google\Cloud\Container\V1\MaintenancePolicy $maintenancePolicy Required. The maintenance policy to be set for the cluster. An empty field
+     *                                                                        clears the existing maintenance policy.
+     *
+     * @return \Google\Cloud\Container\V1\SetMaintenancePolicyRequest
+     *
+     * @experimental
+     */
+    public static function buildFromNameMaintenancePolicy(string $name, \Google\Cloud\Container\V1\MaintenancePolicy $maintenancePolicy): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setMaintenancePolicy($maintenancePolicy);
+    }
 
     /**
      * Constructor.
@@ -60,7 +101,7 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Required. The Google Developers Console [project ID or project
-     *           number](https://support.google.com/cloud/answer/6158840).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *     @type string $zone
      *           Required. The name of the Google Compute Engine
      *           [zone](https://cloud.google.com/compute/docs/zones#available) in which the
@@ -71,8 +112,8 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
      *           Required. The maintenance policy to be set for the cluster. An empty field
      *           clears the existing maintenance policy.
      *     @type string $name
-     *           The name (project, location, cluster id) of the cluster to set maintenance
-     *           policy.
+     *           The name (project, location, cluster name) of the cluster to set
+     *           maintenance policy.
      *           Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      * }
      */
@@ -83,7 +124,7 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *
      * Generated from protobuf field <code>string project_id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -95,7 +136,7 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *
      * Generated from protobuf field <code>string project_id = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -204,8 +245,8 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name (project, location, cluster id) of the cluster to set maintenance
-     * policy.
+     * The name (project, location, cluster name) of the cluster to set
+     * maintenance policy.
      * Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string name = 5;</code>
@@ -217,8 +258,8 @@ class SetMaintenancePolicyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name (project, location, cluster id) of the cluster to set maintenance
-     * policy.
+     * The name (project, location, cluster name) of the cluster to set
+     * maintenance policy.
      * Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string name = 5;</code>

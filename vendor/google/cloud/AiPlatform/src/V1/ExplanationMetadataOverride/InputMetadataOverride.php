@@ -9,8 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The [input metadata][google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata] entries to be
- * overridden.
+ * The [input
+ * metadata][google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata]
+ * entries to be overridden.
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ExplanationMetadataOverride.InputMetadataOverride</code>
  */
@@ -33,7 +34,7 @@ class InputMetadataOverride extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Protobuf\Value[]|\Google\Protobuf\Internal\RepeatedField $input_baselines
+     *     @type array<\Google\Protobuf\Value>|\Google\Protobuf\Internal\RepeatedField $input_baselines
      *           Baseline inputs for this feature.
      *           This overrides the `input_baseline` field of the
      *           [ExplanationMetadata.InputMetadata][google.cloud.aiplatform.v1.ExplanationMetadata.InputMetadata]
@@ -69,7 +70,7 @@ class InputMetadataOverride extends \Google\Protobuf\Internal\Message
      * specified, the original baselines are not overridden.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Value input_baselines = 1;</code>
-     * @param \Google\Protobuf\Value[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Protobuf\Value>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInputBaselines($var)

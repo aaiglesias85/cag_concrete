@@ -8,8 +8,13 @@ use Closure;
  * @todo: find a way to avoid exposing private member setters
  *
  * Sliding pagination
+ *
+ * @template TKey
+ * @template TValue
+ *
+ * @template-extends AbstractPagination<TKey, TValue>
  */
-final class SlidingPagination extends AbstractPagination
+final class SlidingPagination extends AbstractPagination implements \Stringable
 {
     /**
      * Pagination page range
@@ -37,9 +42,12 @@ final class SlidingPagination extends AbstractPagination
             $output = call_user_func($this->renderer, $data);
         }
 
-        return $output;
+        return (string) $output;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getPaginationData(): array
     {
         $pageCount = (int) ceil($this->totalCount / $this->numItemsPerPage);

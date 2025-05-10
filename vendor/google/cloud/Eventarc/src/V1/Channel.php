@@ -19,54 +19,71 @@ use Google\Protobuf\Internal\GPBUtil;
 class Channel extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the channel. Must be unique within the location
-     * on the project and must be in
+     * Required. The resource name of the channel. Must be unique within the
+     * location on the project and must be in
      * `projects/{project}/locations/{location}/channels/{channel_id}` format.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Output only. Server assigned unique identifier for the channel. The value is a UUID4
-     * string and guaranteed to remain unchanged until the resource is deleted.
+     * Output only. Server assigned unique identifier for the channel. The value
+     * is a UUID4 string and guaranteed to remain unchanged until the resource is
+     * deleted.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $uid = '';
+    protected $uid = '';
     /**
      * Output only. The creation time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The last-modified time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * Required. The name of the event provider (e.g. Eventarc SaaS partner) associated
+     * The name of the event provider (e.g. Eventarc SaaS partner) associated
      * with the channel. This provider will be granted permissions to publish
      * events to the channel. Format:
      * `projects/{project}/locations/{location}/providers/{provider_id}`.
      *
-     * Generated from protobuf field <code>string provider = 7 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string provider = 7;</code>
      */
-    private $provider = '';
+    protected $provider = '';
     /**
      * Output only. The state of a Channel.
      *
      * Generated from protobuf field <code>.google.cloud.eventarc.v1.Channel.State state = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
-     * Output only. The activation token for the channel. The token must be used by the
-     * provider to register the channel for publishing.
+     * Output only. The activation token for the channel. The token must be used
+     * by the provider to register the channel for publishing.
      *
      * Generated from protobuf field <code>string activation_token = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $activation_token = '';
+    protected $activation_token = '';
+    /**
+     * Resource name of a KMS crypto key (managed by the user) used to
+     * encrypt/decrypt their event data.
+     * It must match the pattern
+     * `projects/&#42;&#47;locations/&#42;&#47;keyRings/&#42;&#47;cryptoKeys/&#42;`.
+     *
+     * Generated from protobuf field <code>string crypto_key_name = 11 [(.google.api.resource_reference) = {</code>
+     */
+    protected $crypto_key_name = '';
+    /**
+     * Output only. Whether or not this Channel satisfies the requirements of
+     * physical zone separation
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
     protected $transport;
 
     /**
@@ -76,30 +93,39 @@ class Channel extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Required. The resource name of the channel. Must be unique within the location
-     *           on the project and must be in
+     *           Required. The resource name of the channel. Must be unique within the
+     *           location on the project and must be in
      *           `projects/{project}/locations/{location}/channels/{channel_id}` format.
      *     @type string $uid
-     *           Output only. Server assigned unique identifier for the channel. The value is a UUID4
-     *           string and guaranteed to remain unchanged until the resource is deleted.
+     *           Output only. Server assigned unique identifier for the channel. The value
+     *           is a UUID4 string and guaranteed to remain unchanged until the resource is
+     *           deleted.
      *     @type \Google\Protobuf\Timestamp $create_time
      *           Output only. The creation time.
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. The last-modified time.
      *     @type string $provider
-     *           Required. The name of the event provider (e.g. Eventarc SaaS partner) associated
+     *           The name of the event provider (e.g. Eventarc SaaS partner) associated
      *           with the channel. This provider will be granted permissions to publish
      *           events to the channel. Format:
      *           `projects/{project}/locations/{location}/providers/{provider_id}`.
      *     @type string $pubsub_topic
-     *           Output only. The name of the Pub/Sub topic created and managed by Eventarc system as
-     *           a transport for the event delivery. Format:
+     *           Output only. The name of the Pub/Sub topic created and managed by
+     *           Eventarc system as a transport for the event delivery. Format:
      *           `projects/{project}/topics/{topic_id}`.
      *     @type int $state
      *           Output only. The state of a Channel.
      *     @type string $activation_token
-     *           Output only. The activation token for the channel. The token must be used by the
-     *           provider to register the channel for publishing.
+     *           Output only. The activation token for the channel. The token must be used
+     *           by the provider to register the channel for publishing.
+     *     @type string $crypto_key_name
+     *           Resource name of a KMS crypto key (managed by the user) used to
+     *           encrypt/decrypt their event data.
+     *           It must match the pattern
+     *           `projects/&#42;&#47;locations/&#42;&#47;keyRings/&#42;&#47;cryptoKeys/&#42;`.
+     *     @type bool $satisfies_pzs
+     *           Output only. Whether or not this Channel satisfies the requirements of
+     *           physical zone separation
      * }
      */
     public function __construct($data = NULL) {
@@ -108,8 +134,8 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the channel. Must be unique within the location
-     * on the project and must be in
+     * Required. The resource name of the channel. Must be unique within the
+     * location on the project and must be in
      * `projects/{project}/locations/{location}/channels/{channel_id}` format.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -121,8 +147,8 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the channel. Must be unique within the location
-     * on the project and must be in
+     * Required. The resource name of the channel. Must be unique within the
+     * location on the project and must be in
      * `projects/{project}/locations/{location}/channels/{channel_id}` format.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -138,8 +164,9 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Server assigned unique identifier for the channel. The value is a UUID4
-     * string and guaranteed to remain unchanged until the resource is deleted.
+     * Output only. Server assigned unique identifier for the channel. The value
+     * is a UUID4 string and guaranteed to remain unchanged until the resource is
+     * deleted.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -150,8 +177,9 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Server assigned unique identifier for the channel. The value is a UUID4
-     * string and guaranteed to remain unchanged until the resource is deleted.
+     * Output only. Server assigned unique identifier for the channel. The value
+     * is a UUID4 string and guaranteed to remain unchanged until the resource is
+     * deleted.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -238,12 +266,12 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of the event provider (e.g. Eventarc SaaS partner) associated
+     * The name of the event provider (e.g. Eventarc SaaS partner) associated
      * with the channel. This provider will be granted permissions to publish
      * events to the channel. Format:
      * `projects/{project}/locations/{location}/providers/{provider_id}`.
      *
-     * Generated from protobuf field <code>string provider = 7 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string provider = 7;</code>
      * @return string
      */
     public function getProvider()
@@ -252,12 +280,12 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of the event provider (e.g. Eventarc SaaS partner) associated
+     * The name of the event provider (e.g. Eventarc SaaS partner) associated
      * with the channel. This provider will be granted permissions to publish
      * events to the channel. Format:
      * `projects/{project}/locations/{location}/providers/{provider_id}`.
      *
-     * Generated from protobuf field <code>string provider = 7 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string provider = 7;</code>
      * @param string $var
      * @return $this
      */
@@ -270,8 +298,8 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The name of the Pub/Sub topic created and managed by Eventarc system as
-     * a transport for the event delivery. Format:
+     * Output only. The name of the Pub/Sub topic created and managed by
+     * Eventarc system as a transport for the event delivery. Format:
      * `projects/{project}/topics/{topic_id}`.
      *
      * Generated from protobuf field <code>string pubsub_topic = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -288,8 +316,8 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The name of the Pub/Sub topic created and managed by Eventarc system as
-     * a transport for the event delivery. Format:
+     * Output only. The name of the Pub/Sub topic created and managed by
+     * Eventarc system as a transport for the event delivery. Format:
      * `projects/{project}/topics/{topic_id}`.
      *
      * Generated from protobuf field <code>string pubsub_topic = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -331,8 +359,8 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The activation token for the channel. The token must be used by the
-     * provider to register the channel for publishing.
+     * Output only. The activation token for the channel. The token must be used
+     * by the provider to register the channel for publishing.
      *
      * Generated from protobuf field <code>string activation_token = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -343,8 +371,8 @@ class Channel extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The activation token for the channel. The token must be used by the
-     * provider to register the channel for publishing.
+     * Output only. The activation token for the channel. The token must be used
+     * by the provider to register the channel for publishing.
      *
      * Generated from protobuf field <code>string activation_token = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -354,6 +382,66 @@ class Channel extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->activation_token = $var;
+
+        return $this;
+    }
+
+    /**
+     * Resource name of a KMS crypto key (managed by the user) used to
+     * encrypt/decrypt their event data.
+     * It must match the pattern
+     * `projects/&#42;&#47;locations/&#42;&#47;keyRings/&#42;&#47;cryptoKeys/&#42;`.
+     *
+     * Generated from protobuf field <code>string crypto_key_name = 11 [(.google.api.resource_reference) = {</code>
+     * @return string
+     */
+    public function getCryptoKeyName()
+    {
+        return $this->crypto_key_name;
+    }
+
+    /**
+     * Resource name of a KMS crypto key (managed by the user) used to
+     * encrypt/decrypt their event data.
+     * It must match the pattern
+     * `projects/&#42;&#47;locations/&#42;&#47;keyRings/&#42;&#47;cryptoKeys/&#42;`.
+     *
+     * Generated from protobuf field <code>string crypto_key_name = 11 [(.google.api.resource_reference) = {</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCryptoKeyName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->crypto_key_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Whether or not this Channel satisfies the requirements of
+     * physical zone separation
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Whether or not this Channel satisfies the requirements of
+     * physical zone separation
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
 
         return $this;
     }

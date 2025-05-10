@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Describes the status of a user-managed replica for the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+ * Describes the status of a user-managed replica for the
+ * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
  *
  * Generated from protobuf message <code>google.cloud.secretmanager.v1.ReplicationStatus.UserManagedStatus.ReplicaStatus</code>
  */
@@ -21,14 +22,15 @@ class ReplicaStatus extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string location = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $location = '';
+    protected $location = '';
     /**
-     * Output only. The customer-managed encryption status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     * Output only. The customer-managed encryption status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
      * populated if customer-managed encryption is used.
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus customer_managed_encryption = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $customer_managed_encryption = null;
+    protected $customer_managed_encryption = null;
 
     /**
      * Constructor.
@@ -40,7 +42,8 @@ class ReplicaStatus extends \Google\Protobuf\Internal\Message
      *           Output only. The canonical ID of the replica location.
      *           For example: `"us-east1"`.
      *     @type \Google\Cloud\SecretManager\V1\CustomerManagedEncryptionStatus $customer_managed_encryption
-     *           Output only. The customer-managed encryption status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     *           Output only. The customer-managed encryption status of the
+     *           [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
      *           populated if customer-managed encryption is used.
      * }
      */
@@ -78,7 +81,8 @@ class ReplicaStatus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The customer-managed encryption status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     * Output only. The customer-managed encryption status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
      * populated if customer-managed encryption is used.
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus customer_managed_encryption = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -100,7 +104,8 @@ class ReplicaStatus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The customer-managed encryption status of the [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+     * Output only. The customer-managed encryption status of the
+     * [SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
      * populated if customer-managed encryption is used.
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus customer_managed_encryption = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -117,6 +122,4 @@ class ReplicaStatus extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ReplicaStatus::class, \Google\Cloud\SecretManager\V1\ReplicationStatus_UserManagedStatus_ReplicaStatus::class);
 

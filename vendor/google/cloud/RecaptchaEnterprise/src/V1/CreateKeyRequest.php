@@ -16,18 +16,35 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreateKeyRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The name of the project in which the key will be created, in the
-     * format "projects/{project}".
+     * Required. The name of the project in which the key is created, in the
+     * format `projects/{project}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. Information to create a reCAPTCHA Enterprise key.
      *
      * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.Key key = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $key = null;
+    protected $key = null;
+
+    /**
+     * @param string                                   $parent Required. The name of the project in which the key is created, in the
+     *                                                         format `projects/{project}`. Please see
+     *                                                         {@see RecaptchaEnterpriseServiceClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\RecaptchaEnterprise\V1\Key $key    Required. Information to create a reCAPTCHA Enterprise key.
+     *
+     * @return \Google\Cloud\RecaptchaEnterprise\V1\CreateKeyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\RecaptchaEnterprise\V1\Key $key): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setKey($key);
+    }
 
     /**
      * Constructor.
@@ -36,8 +53,8 @@ class CreateKeyRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The name of the project in which the key will be created, in the
-     *           format "projects/{project}".
+     *           Required. The name of the project in which the key is created, in the
+     *           format `projects/{project}`.
      *     @type \Google\Cloud\RecaptchaEnterprise\V1\Key $key
      *           Required. Information to create a reCAPTCHA Enterprise key.
      * }
@@ -48,8 +65,8 @@ class CreateKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of the project in which the key will be created, in the
-     * format "projects/{project}".
+     * Required. The name of the project in which the key is created, in the
+     * format `projects/{project}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -60,8 +77,8 @@ class CreateKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of the project in which the key will be created, in the
-     * format "projects/{project}".
+     * Required. The name of the project in which the key is created, in the
+     * format `projects/{project}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

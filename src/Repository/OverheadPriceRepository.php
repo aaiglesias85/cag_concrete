@@ -5,82 +5,71 @@ namespace App\Repository;
 use App\Entity\OverheadPrice;
 use Doctrine\ORM\EntityRepository;
 
-
 class OverheadPriceRepository extends EntityRepository
 {
-
     /**
-     * ListarOrdenados: Lista los overheads
+     * ListarOrdenados: Lista los overheads ordenados por nombre
      *
      * @return OverheadPrice[]
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('o')
-            ->orderBy('o.name', "ASC");
-
-        return $consulta->getQuery()->getResult();
+        return $this->createQueryBuilder('o')
+            ->orderBy('o.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarOverheads: Lista los overheads
+     * ListarOverheads: Lista los overheads con filtros, paginación y ordenación
      * @param int $start Inicio
      * @param int $limit Limite
      * @param string $sSearch Para buscar
+     * @param string $iSortCol_0 Columna para ordenar
+     * @param string $sSortDir_0 Dirección de ordenamiento
      *
      * @return OverheadPrice[]
      */
-    public function ListarOverheads($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarOverheads(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array
     {
-        $consulta = $this->createQueryBuilder('m');
+        $qb = $this->createQueryBuilder('o');
 
-        if ($sSearch != "")
-            $consulta->andWhere('o.name LIKE :name')
-                ->setParameter('name', "%{$sSearch}%")
-                ;
-
-        $consulta->orderBy("o.$iSortCol_0", $sSortDir_0);
-        
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+        // Filtro por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('o.name LIKE :name')
+                ->setParameter('name', "%{$sSearch}%");
         }
 
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        // Ordenación
+        $qb->orderBy("o.$iSortCol_0", $sSortDir_0);
+
+        // Paginación
+        if ($limit > 0) {
+            $qb->setMaxResults($limit);
+        }
+
+        return $qb->setFirstResult($start)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * TotalOverheads: Total de overheads de la BD
+     * TotalOverheads: Devuelve el total de overheads según el filtro de búsqueda
      * @param string $sSearch Para buscar
      *
-     * @author Marcel
+     * @return int
      */
-    public function TotalOverheads($sSearch)
+    public function TotalOverheads(?string $sSearch): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(o.materialId) FROM App\Entity\OverheadPrice o ';
-        $join = ' ';
-        $where = '';
+        $qb = $this->createQueryBuilder('o')
+            ->select('COUNT(o.overheadId)');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (o.name LIKE :name) ';
-            else
-                $where .= 'AND (o.name LIKE :name) ';
+        // Filtro por búsqueda
+        if ($sSearch) {
+            $qb->andWhere('o.name LIKE :name')
+                ->setParameter('name', "%{$sSearch}%");
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_name = substr_count($consulta, ':name');
-        if ($esta_query_name == 1)
-            $query->setParameter(':name', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

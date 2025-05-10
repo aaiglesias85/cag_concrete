@@ -23,13 +23,32 @@ class CreateViewRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The view resource to create.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.View view = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $view = null;
+    protected $view = null;
+
+    /**
+     * @param string                                      $parent Required. The parent resource of the view. Required. The location to create
+     *                                                            a view for.
+     *                                                            Format: `projects/<Project ID>/locations/<Location ID>` or
+     *                                                            `projects/<Project Number>/locations/<Location ID>`
+     *                                                            Please see {@see ContactCenterInsightsClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\ContactCenterInsights\V1\View $view   Required. The view resource to create.
+     *
+     * @return \Google\Cloud\ContactCenterInsights\V1\CreateViewRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\ContactCenterInsights\V1\View $view): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setView($view);
+    }
 
     /**
      * Constructor.

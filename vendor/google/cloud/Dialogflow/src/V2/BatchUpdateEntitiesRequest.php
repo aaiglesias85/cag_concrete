@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [EntityTypes.BatchUpdateEntities][google.cloud.dialogflow.v2.EntityTypes.BatchUpdateEntities].
+ * The request message for
+ * [EntityTypes.BatchUpdateEntities][google.cloud.dialogflow.v2.EntityTypes.BatchUpdateEntities].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.BatchUpdateEntitiesRequest</code>
  */
@@ -21,7 +22,7 @@ class BatchUpdateEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The entities to update or create.
      *
@@ -37,13 +38,53 @@ class BatchUpdateEntitiesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * Optional. The mask to control which fields get updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param string                                          $parent   Required. The name of the entity type to update or create entities in.
+     *                                                                  Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`. Please see
+     *                                                                  {@see EntityTypesClient::entityTypeName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\EntityType\Entity[] $entities Required. The entities to update or create.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\BatchUpdateEntitiesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, array $entities): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setEntities($entities);
+    }
+
+    /**
+     * @param string                                          $parent       Required. The name of the entity type to update or create entities in.
+     *                                                                      Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`. Please see
+     *                                                                      {@see EntityTypesClient::entityTypeName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\EntityType\Entity[] $entities     Required. The entities to update or create.
+     * @param string                                          $languageCode Optional. The language used to access language-specific data.
+     *                                                                      If not specified, the agent's default language is used.
+     *                                                                      For more information, see
+     *                                                                      [Multilingual intent and entity
+     *                                                                      data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+     *
+     * @return \Google\Cloud\Dialogflow\V2\BatchUpdateEntitiesRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParentEntitiesLanguageCode(string $parent, array $entities, string $languageCode): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setEntities($entities)
+            ->setLanguageCode($languageCode);
+    }
 
     /**
      * Constructor.
@@ -54,7 +95,7 @@ class BatchUpdateEntitiesRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Required. The name of the entity type to update or create entities in.
      *           Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`.
-     *     @type \Google\Cloud\Dialogflow\V2\EntityType\Entity[]|\Google\Protobuf\Internal\RepeatedField $entities
+     *     @type array<\Google\Cloud\Dialogflow\V2\EntityType\Entity>|\Google\Protobuf\Internal\RepeatedField $entities
      *           Required. The entities to update or create.
      *     @type string $language_code
      *           Optional. The language used to access language-specific data.
@@ -114,7 +155,7 @@ class BatchUpdateEntitiesRequest extends \Google\Protobuf\Internal\Message
      * Required. The entities to update or create.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.EntityType.Entity entities = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\Dialogflow\V2\EntityType\Entity[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\EntityType\Entity>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEntities($var)

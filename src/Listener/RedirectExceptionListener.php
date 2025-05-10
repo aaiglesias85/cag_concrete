@@ -23,7 +23,7 @@ class RedirectExceptionListener {
     public function checkRedirect(ExceptionEvent $event) {
         $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
-            $response = new RedirectResponse($this->serviceContainer->get('router')->generate('error404'));
+            $response = new RedirectResponse($this->serviceContainer->get('router')->generate('home'));
             $event->setResponse($response);
         }
     }

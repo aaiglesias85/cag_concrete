@@ -28,7 +28,7 @@ class PointData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.TimeInterval time_interval = 2;</code>
      */
-    private $time_interval = null;
+    protected $time_interval = null;
 
     /**
      * Constructor.
@@ -36,7 +36,7 @@ class PointData extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Monitoring\V3\TypedValue[]|\Google\Protobuf\Internal\RepeatedField $values
+     *     @type array<\Google\Cloud\Monitoring\V3\TypedValue>|\Google\Protobuf\Internal\RepeatedField $values
      *           The values that make up the point.
      *     @type \Google\Cloud\Monitoring\V3\TimeInterval $time_interval
      *           The time interval associated with the point.
@@ -62,7 +62,7 @@ class PointData extends \Google\Protobuf\Internal\Message
      * The values that make up the point.
      *
      * Generated from protobuf field <code>repeated .google.monitoring.v3.TypedValue values = 1;</code>
-     * @param \Google\Cloud\Monitoring\V3\TypedValue[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Monitoring\V3\TypedValue>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setValues($var)
@@ -111,6 +111,4 @@ class PointData extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(PointData::class, \Google\Cloud\Monitoring\V3\TimeSeriesData_PointData::class);
 

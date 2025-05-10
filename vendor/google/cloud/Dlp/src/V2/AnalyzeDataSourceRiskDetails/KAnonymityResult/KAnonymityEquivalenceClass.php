@@ -29,7 +29,7 @@ class KAnonymityEquivalenceClass extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 equivalence_class_size = 2;</code>
      */
-    private $equivalence_class_size = 0;
+    protected $equivalence_class_size = 0;
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ class KAnonymityEquivalenceClass extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dlp\V2\Value[]|\Google\Protobuf\Internal\RepeatedField $quasi_ids_values
+     *     @type array<\Google\Cloud\Dlp\V2\Value>|\Google\Protobuf\Internal\RepeatedField $quasi_ids_values
      *           Set of values defining the equivalence class. One value per
      *           quasi-identifier column in the original KAnonymity metric message.
      *           The order is always the same as the original request.
@@ -70,7 +70,7 @@ class KAnonymityEquivalenceClass extends \Google\Protobuf\Internal\Message
      * The order is always the same as the original request.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.Value quasi_ids_values = 1;</code>
-     * @param \Google\Cloud\Dlp\V2\Value[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\Value>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuasiIdsValues($var)
@@ -111,6 +111,4 @@ class KAnonymityEquivalenceClass extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(KAnonymityEquivalenceClass::class, \Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails_KAnonymityResult_KAnonymityEquivalenceClass::class);
 

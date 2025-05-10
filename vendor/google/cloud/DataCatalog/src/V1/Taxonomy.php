@@ -35,12 +35,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class Taxonomy extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. Resource name of this taxonomy in URL format.
+     * Identifier. Resource name of this taxonomy in URL format.
      * Note: Policy tag manager generates unique taxonomy IDs.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. User-defined name of this taxonomy.
      * The name can't start or end with spaces, must contain only Unicode letters,
@@ -50,7 +50,7 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Optional. Description of this taxonomy. If not set, defaults to empty.
      * The description must contain only Unicode characters, tabs, newlines,
@@ -59,26 +59,34 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. Number of policy tags in this taxonomy.
      *
      * Generated from protobuf field <code>int32 policy_tag_count = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $policy_tag_count = 0;
+    protected $policy_tag_count = 0;
     /**
      * Output only. Creation and modification timestamps of this taxonomy.
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.SystemTimestamps taxonomy_timestamps = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $taxonomy_timestamps = null;
+    protected $taxonomy_timestamps = null;
     /**
-     * Optional. A list of policy types that are activated for this taxonomy. If not set,
-     * defaults to an empty list.
+     * Optional. A list of policy types that are activated for this taxonomy. If
+     * not set, defaults to an empty list.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datacatalog.v1.Taxonomy.PolicyType activated_policy_types = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $activated_policy_types;
+    /**
+     * Output only. Identity of the service which owns the Taxonomy. This field is
+     * only populated when the taxonomy is created by a Google Cloud service.
+     * Currently only 'DATAPLEX' is supported.
+     *
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.Taxonomy.Service service = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $service = null;
 
     /**
      * Constructor.
@@ -87,7 +95,7 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Output only. Resource name of this taxonomy in URL format.
+     *           Identifier. Resource name of this taxonomy in URL format.
      *           Note: Policy tag manager generates unique taxonomy IDs.
      *     @type string $display_name
      *           Required. User-defined name of this taxonomy.
@@ -104,9 +112,13 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
      *           Output only. Number of policy tags in this taxonomy.
      *     @type \Google\Cloud\DataCatalog\V1\SystemTimestamps $taxonomy_timestamps
      *           Output only. Creation and modification timestamps of this taxonomy.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $activated_policy_types
-     *           Optional. A list of policy types that are activated for this taxonomy. If not set,
-     *           defaults to an empty list.
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $activated_policy_types
+     *           Optional. A list of policy types that are activated for this taxonomy. If
+     *           not set, defaults to an empty list.
+     *     @type \Google\Cloud\DataCatalog\V1\Taxonomy\Service $service
+     *           Output only. Identity of the service which owns the Taxonomy. This field is
+     *           only populated when the taxonomy is created by a Google Cloud service.
+     *           Currently only 'DATAPLEX' is supported.
      * }
      */
     public function __construct($data = NULL) {
@@ -115,10 +127,10 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Resource name of this taxonomy in URL format.
+     * Identifier. Resource name of this taxonomy in URL format.
      * Note: Policy tag manager generates unique taxonomy IDs.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @return string
      */
     public function getName()
@@ -127,10 +139,10 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Resource name of this taxonomy in URL format.
+     * Identifier. Resource name of this taxonomy in URL format.
      * Note: Policy tag manager generates unique taxonomy IDs.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @param string $var
      * @return $this
      */
@@ -271,8 +283,8 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A list of policy types that are activated for this taxonomy. If not set,
-     * defaults to an empty list.
+     * Optional. A list of policy types that are activated for this taxonomy. If
+     * not set, defaults to an empty list.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datacatalog.v1.Taxonomy.PolicyType activated_policy_types = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -283,17 +295,57 @@ class Taxonomy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A list of policy types that are activated for this taxonomy. If not set,
-     * defaults to an empty list.
+     * Optional. A list of policy types that are activated for this taxonomy. If
+     * not set, defaults to an empty list.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datacatalog.v1.Taxonomy.PolicyType activated_policy_types = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setActivatedPolicyTypes($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::ENUM, \Google\Cloud\DataCatalog\V1\Taxonomy\PolicyType::class);
         $this->activated_policy_types = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Identity of the service which owns the Taxonomy. This field is
+     * only populated when the taxonomy is created by a Google Cloud service.
+     * Currently only 'DATAPLEX' is supported.
+     *
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.Taxonomy.Service service = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\DataCatalog\V1\Taxonomy\Service|null
+     */
+    public function getService()
+    {
+        return $this->service;
+    }
+
+    public function hasService()
+    {
+        return isset($this->service);
+    }
+
+    public function clearService()
+    {
+        unset($this->service);
+    }
+
+    /**
+     * Output only. Identity of the service which owns the Taxonomy. This field is
+     * only populated when the taxonomy is created by a Google Cloud service.
+     * Currently only 'DATAPLEX' is supported.
+     *
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.Taxonomy.Service service = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\DataCatalog\V1\Taxonomy\Service $var
+     * @return $this
+     */
+    public function setService($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\DataCatalog\V1\Taxonomy\Service::class);
+        $this->service = $var;
 
         return $this;
     }

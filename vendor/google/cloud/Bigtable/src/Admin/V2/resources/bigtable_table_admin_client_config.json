@@ -25,6 +25,16 @@
                     "retry_codes_name": "non_idempotent",
                     "retry_params_name": "default"
                 },
+                "CopyBackup": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "non_idempotent",
+                    "retry_params_name": "default"
+                },
+                "CreateAuthorizedView": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "non_idempotent",
+                    "retry_params_name": "default"
+                },
                 "CreateBackup": {
                     "timeout_millis": 60000,
                     "retry_codes_name": "non_idempotent",
@@ -36,6 +46,11 @@
                     "retry_params_name": "default"
                 },
                 "CreateTableFromSnapshot": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "non_idempotent",
+                    "retry_params_name": "default"
+                },
+                "DeleteAuthorizedView": {
                     "timeout_millis": 60000,
                     "retry_codes_name": "non_idempotent",
                     "retry_params_name": "default"
@@ -65,6 +80,11 @@
                     "retry_codes_name": "non_idempotent",
                     "retry_params_name": "default"
                 },
+                "GetAuthorizedView": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "idempotent",
+                    "retry_params_name": "default"
+                },
                 "GetBackup": {
                     "timeout_millis": 60000,
                     "retry_codes_name": "idempotent",
@@ -81,6 +101,11 @@
                     "retry_params_name": "default"
                 },
                 "GetTable": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "idempotent",
+                    "retry_params_name": "default"
+                },
+                "ListAuthorizedViews": {
                     "timeout_millis": 60000,
                     "retry_codes_name": "idempotent",
                     "retry_params_name": "default"
@@ -125,7 +150,22 @@
                     "retry_codes_name": "non_idempotent",
                     "retry_params_name": "default"
                 },
+                "UndeleteTable": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "non_idempotent",
+                    "retry_params_name": "default"
+                },
+                "UpdateAuthorizedView": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "non_idempotent",
+                    "retry_params_name": "default"
+                },
                 "UpdateBackup": {
+                    "timeout_millis": 60000,
+                    "retry_codes_name": "non_idempotent",
+                    "retry_params_name": "default"
+                },
+                "UpdateTable": {
                     "timeout_millis": 60000,
                     "retry_codes_name": "non_idempotent",
                     "retry_params_name": "default"

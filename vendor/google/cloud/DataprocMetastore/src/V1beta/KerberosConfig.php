@@ -21,7 +21,7 @@ class KerberosConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1beta.Secret keytab = 1;</code>
      */
-    private $keytab = null;
+    protected $keytab = null;
     /**
      * A Kerberos principal that exists in the both the keytab the KDC
      * to authenticate as. A typical principal is of the form
@@ -29,15 +29,15 @@ class KerberosConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string principal = 2;</code>
      */
-    private $principal = '';
+    protected $principal = '';
     /**
      * A Cloud Storage URI that specifies the path to a
-     * krb5.conf file. It is of the form gs://{bucket_name}/path/to/krb5.conf,
+     * krb5.conf file. It is of the form `gs://{bucket_name}/path/to/krb5.conf`,
      * although the file does not need to be named krb5.conf explicitly.
      *
      * Generated from protobuf field <code>string krb5_config_gcs_uri = 3;</code>
      */
-    private $krb5_config_gcs_uri = '';
+    protected $krb5_config_gcs_uri = '';
 
     /**
      * Constructor.
@@ -54,7 +54,7 @@ class KerberosConfig extends \Google\Protobuf\Internal\Message
      *           `primary/instance&#64;REALM`, but there is no exact format.
      *     @type string $krb5_config_gcs_uri
      *           A Cloud Storage URI that specifies the path to a
-     *           krb5.conf file. It is of the form gs://{bucket_name}/path/to/krb5.conf,
+     *           krb5.conf file. It is of the form `gs://{bucket_name}/path/to/krb5.conf`,
      *           although the file does not need to be named krb5.conf explicitly.
      * }
      */
@@ -133,7 +133,7 @@ class KerberosConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * A Cloud Storage URI that specifies the path to a
-     * krb5.conf file. It is of the form gs://{bucket_name}/path/to/krb5.conf,
+     * krb5.conf file. It is of the form `gs://{bucket_name}/path/to/krb5.conf`,
      * although the file does not need to be named krb5.conf explicitly.
      *
      * Generated from protobuf field <code>string krb5_config_gcs_uri = 3;</code>
@@ -146,7 +146,7 @@ class KerberosConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * A Cloud Storage URI that specifies the path to a
-     * krb5.conf file. It is of the form gs://{bucket_name}/path/to/krb5.conf,
+     * krb5.conf file. It is of the form `gs://{bucket_name}/path/to/krb5.conf`,
      * although the file does not need to be named krb5.conf explicitly.
      *
      * Generated from protobuf field <code>string krb5_config_gcs_uri = 3;</code>

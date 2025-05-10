@@ -23,14 +23,30 @@ class GetTableRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The view to be applied to the returned table's fields.
      * Defaults to `SCHEMA_VIEW` if unspecified.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.Table.View view = 2;</code>
      */
-    private $view = 0;
+    protected $view = 0;
+
+    /**
+     * @param string $name Required. The unique name of the requested table.
+     *                     Values are of the form
+     *                     `projects/{project}/instances/{instance}/tables/{table}`. Please see
+     *                     {@see BigtableTableAdminClient::tableName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Bigtable\Admin\V2\GetTableRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

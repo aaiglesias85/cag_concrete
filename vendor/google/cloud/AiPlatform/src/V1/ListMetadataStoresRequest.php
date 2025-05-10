@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores].
+ * Request message for
+ * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListMetadataStoresRequest</code>
  */
@@ -22,7 +23,7 @@ class ListMetadataStoresRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of Metadata Stores to return. The service may return
      * fewer.
@@ -30,18 +31,34 @@ class ListMetadataStoresRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * A page token, received from a previous
-     * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores] call. Provide this to retrieve the
-     * subsequent page.
+     * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores]
+     * call. Provide this to retrieve the subsequent page.
      * When paginating, all other provided parameters must match the call that
      * provided the page token. (Otherwise the request will fail with
      * INVALID_ARGUMENT error.)
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The Location whose MetadataStores should be listed.
+     *                       Format:
+     *                       `projects/{project}/locations/{location}`
+     *                       Please see {@see MetadataServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListMetadataStoresRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -59,8 +76,8 @@ class ListMetadataStoresRequest extends \Google\Protobuf\Internal\Message
      *           Must be in range 1-1000, inclusive. Defaults to 100.
      *     @type string $page_token
      *           A page token, received from a previous
-     *           [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores] call. Provide this to retrieve the
-     *           subsequent page.
+     *           [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores]
+     *           call. Provide this to retrieve the subsequent page.
      *           When paginating, all other provided parameters must match the call that
      *           provided the page token. (Otherwise the request will fail with
      *           INVALID_ARGUMENT error.)
@@ -133,8 +150,8 @@ class ListMetadataStoresRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * A page token, received from a previous
-     * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores] call. Provide this to retrieve the
-     * subsequent page.
+     * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores]
+     * call. Provide this to retrieve the subsequent page.
      * When paginating, all other provided parameters must match the call that
      * provided the page token. (Otherwise the request will fail with
      * INVALID_ARGUMENT error.)
@@ -149,8 +166,8 @@ class ListMetadataStoresRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * A page token, received from a previous
-     * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores] call. Provide this to retrieve the
-     * subsequent page.
+     * [MetadataService.ListMetadataStores][google.cloud.aiplatform.v1.MetadataService.ListMetadataStores]
+     * call. Provide this to retrieve the subsequent page.
      * When paginating, all other provided parameters must match the call that
      * provided the page token. (Otherwise the request will fail with
      * INVALID_ARGUMENT error.)

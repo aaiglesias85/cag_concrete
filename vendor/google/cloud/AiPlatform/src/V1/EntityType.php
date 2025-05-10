@@ -28,27 +28,28 @@ class EntityType extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. Description of the EntityType.
      *
      * Generated from protobuf field <code>string description = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. Timestamp when this EntityType was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. Timestamp when this EntityType was most recently updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * Optional. The labels with user-defined metadata to organize your EntityTypes.
+     * Optional. The labels with user-defined metadata to organize your
+     * EntityTypes.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
@@ -62,16 +63,17 @@ class EntityType extends \Google\Protobuf\Internal\Message
      */
     private $labels;
     /**
-     * Optional. Used to perform a consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform a consistent read-modify-write updates. If not
+     * set, a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $etag = '';
+    protected $etag = '';
     /**
-     * Optional. The default monitoring configuration for all Features with value type
-     * ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL, STRING, DOUBLE or INT64 under this
-     * EntityType.
+     * Optional. The default monitoring configuration for all Features with value
+     * type
+     * ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL,
+     * STRING, DOUBLE or INT64 under this EntityType.
      * If this is populated with
      * [FeaturestoreMonitoringConfig.monitoring_interval] specified, snapshot
      * analysis monitoring is enabled. Otherwise, snapshot analysis monitoring is
@@ -79,7 +81,29 @@ class EntityType extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig monitoring_config = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $monitoring_config = null;
+    protected $monitoring_config = null;
+    /**
+     * Optional. Config for data retention policy in offline storage.
+     * TTL in days for feature values that will be stored in offline storage.
+     * The Feature Store offline storage periodically removes obsolete feature
+     * values older than `offline_storage_ttl_days` since the feature generation
+     * time. If unset (or explicitly set to 0), default to 4000 days TTL.
+     *
+     * Generated from protobuf field <code>int32 offline_storage_ttl_days = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $offline_storage_ttl_days = 0;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzs = false;
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $satisfies_pzi = false;
 
     /**
      * Constructor.
@@ -102,7 +126,8 @@ class EntityType extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. Timestamp when this EntityType was most recently updated.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
-     *           Optional. The labels with user-defined metadata to organize your EntityTypes.
+     *           Optional. The labels with user-defined metadata to organize your
+     *           EntityTypes.
      *           Label keys and values can be no longer than 64 characters
      *           (Unicode codepoints), can only contain lowercase letters, numeric
      *           characters, underscores and dashes. International characters are allowed.
@@ -112,16 +137,27 @@ class EntityType extends \Google\Protobuf\Internal\Message
      *           System reserved label keys are prefixed with "aiplatform.googleapis.com/"
      *           and are immutable.
      *     @type string $etag
-     *           Optional. Used to perform a consistent read-modify-write updates. If not set, a blind
-     *           "overwrite" update happens.
+     *           Optional. Used to perform a consistent read-modify-write updates. If not
+     *           set, a blind "overwrite" update happens.
      *     @type \Google\Cloud\AIPlatform\V1\FeaturestoreMonitoringConfig $monitoring_config
-     *           Optional. The default monitoring configuration for all Features with value type
-     *           ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL, STRING, DOUBLE or INT64 under this
-     *           EntityType.
+     *           Optional. The default monitoring configuration for all Features with value
+     *           type
+     *           ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL,
+     *           STRING, DOUBLE or INT64 under this EntityType.
      *           If this is populated with
      *           [FeaturestoreMonitoringConfig.monitoring_interval] specified, snapshot
      *           analysis monitoring is enabled. Otherwise, snapshot analysis monitoring is
      *           disabled.
+     *     @type int $offline_storage_ttl_days
+     *           Optional. Config for data retention policy in offline storage.
+     *           TTL in days for feature values that will be stored in offline storage.
+     *           The Feature Store offline storage periodically removes obsolete feature
+     *           values older than `offline_storage_ttl_days` since the feature generation
+     *           time. If unset (or explicitly set to 0), default to 4000 days TTL.
+     *     @type bool $satisfies_pzs
+     *           Output only. Reserved for future use.
+     *     @type bool $satisfies_pzi
+     *           Output only. Reserved for future use.
      * }
      */
     public function __construct($data = NULL) {
@@ -266,7 +302,8 @@ class EntityType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The labels with user-defined metadata to organize your EntityTypes.
+     * Optional. The labels with user-defined metadata to organize your
+     * EntityTypes.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
@@ -285,7 +322,8 @@ class EntityType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The labels with user-defined metadata to organize your EntityTypes.
+     * Optional. The labels with user-defined metadata to organize your
+     * EntityTypes.
      * Label keys and values can be no longer than 64 characters
      * (Unicode codepoints), can only contain lowercase letters, numeric
      * characters, underscores and dashes. International characters are allowed.
@@ -308,8 +346,8 @@ class EntityType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Used to perform a consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform a consistent read-modify-write updates. If not
+     * set, a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -320,8 +358,8 @@ class EntityType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Used to perform a consistent read-modify-write updates. If not set, a blind
-     * "overwrite" update happens.
+     * Optional. Used to perform a consistent read-modify-write updates. If not
+     * set, a blind "overwrite" update happens.
      *
      * Generated from protobuf field <code>string etag = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -336,9 +374,10 @@ class EntityType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The default monitoring configuration for all Features with value type
-     * ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL, STRING, DOUBLE or INT64 under this
-     * EntityType.
+     * Optional. The default monitoring configuration for all Features with value
+     * type
+     * ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL,
+     * STRING, DOUBLE or INT64 under this EntityType.
      * If this is populated with
      * [FeaturestoreMonitoringConfig.monitoring_interval] specified, snapshot
      * analysis monitoring is enabled. Otherwise, snapshot analysis monitoring is
@@ -363,9 +402,10 @@ class EntityType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The default monitoring configuration for all Features with value type
-     * ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL, STRING, DOUBLE or INT64 under this
-     * EntityType.
+     * Optional. The default monitoring configuration for all Features with value
+     * type
+     * ([Feature.ValueType][google.cloud.aiplatform.v1.Feature.ValueType]) BOOL,
+     * STRING, DOUBLE or INT64 under this EntityType.
      * If this is populated with
      * [FeaturestoreMonitoringConfig.monitoring_interval] specified, snapshot
      * analysis monitoring is enabled. Otherwise, snapshot analysis monitoring is
@@ -379,6 +419,92 @@ class EntityType extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\AIPlatform\V1\FeaturestoreMonitoringConfig::class);
         $this->monitoring_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Config for data retention policy in offline storage.
+     * TTL in days for feature values that will be stored in offline storage.
+     * The Feature Store offline storage periodically removes obsolete feature
+     * values older than `offline_storage_ttl_days` since the feature generation
+     * time. If unset (or explicitly set to 0), default to 4000 days TTL.
+     *
+     * Generated from protobuf field <code>int32 offline_storage_ttl_days = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return int
+     */
+    public function getOfflineStorageTtlDays()
+    {
+        return $this->offline_storage_ttl_days;
+    }
+
+    /**
+     * Optional. Config for data retention policy in offline storage.
+     * TTL in days for feature values that will be stored in offline storage.
+     * The Feature Store offline storage periodically removes obsolete feature
+     * values older than `offline_storage_ttl_days` since the feature generation
+     * time. If unset (or explicitly set to 0), default to 4000 days TTL.
+     *
+     * Generated from protobuf field <code>int32 offline_storage_ttl_days = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setOfflineStorageTtlDays($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->offline_storage_ttl_days = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzs()
+    {
+        return $this->satisfies_pzs;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzs = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzs($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzs = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return bool
+     */
+    public function getSatisfiesPzi()
+    {
+        return $this->satisfies_pzi;
+    }
+
+    /**
+     * Output only. Reserved for future use.
+     *
+     * Generated from protobuf field <code>bool satisfies_pzi = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setSatisfiesPzi($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->satisfies_pzi = $var;
 
         return $this;
     }

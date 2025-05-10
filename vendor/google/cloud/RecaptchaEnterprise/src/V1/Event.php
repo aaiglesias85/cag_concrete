@@ -9,52 +9,129 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
+ * The event being assessed.
+ *
  * Generated from protobuf message <code>google.cloud.recaptchaenterprise.v1.Event</code>
  */
 class Event extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Optional. The user response token provided by the reCAPTCHA client-side integration
-     * on your site.
+     * Optional. The user response token provided by the reCAPTCHA Enterprise
+     * client-side integration on your site.
      *
      * Generated from protobuf field <code>string token = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $token = '';
+    protected $token = '';
     /**
-     * Optional. The site key that was used to invoke reCAPTCHA on your site and generate
-     * the token.
+     * Optional. The site key that was used to invoke reCAPTCHA Enterprise on your
+     * site and generate the token.
      *
      * Generated from protobuf field <code>string site_key = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $site_key = '';
+    protected $site_key = '';
     /**
-     * Optional. The user agent present in the request from the user's device related to
-     * this event.
+     * Optional. The user agent present in the request from the user's device
+     * related to this event.
      *
      * Generated from protobuf field <code>string user_agent = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $user_agent = '';
+    protected $user_agent = '';
     /**
-     * Optional. The IP address in the request from the user's device related to this event.
+     * Optional. The IP address in the request from the user's device related to
+     * this event.
      *
-     * Generated from protobuf field <code>string user_ip_address = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string user_ip_address = 4 [(.google.api.field_behavior) = OPTIONAL, (.google.api.field_info) = {</code>
      */
-    private $user_ip_address = '';
+    protected $user_ip_address = '';
     /**
-     * Optional. The expected action for this type of event. This should be the same action
-     * provided at token generation time on client-side platforms already
-     * integrated with recaptcha enterprise.
+     * Optional. The expected action for this type of event. This should be the
+     * same action provided at token generation time on client-side platforms
+     * already integrated with recaptcha enterprise.
      *
      * Generated from protobuf field <code>string expected_action = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $expected_action = '';
+    protected $expected_action = '';
     /**
-     * Optional. Optional unique stable hashed user identifier for the request. The
-     * identifier should ideally be hashed using sha256 with stable secret.
+     * Optional. Deprecated: use `user_info.account_id` instead.
+     * Unique stable hashed user identifier for the request. The identifier must
+     * be hashed using hmac-sha256 with stable secret.
      *
-     * Generated from protobuf field <code>bytes hashed_account_id = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>bytes hashed_account_id = 6 [deprecated = true, (.google.api.field_behavior) = OPTIONAL];</code>
+     * @deprecated
      */
-    private $hashed_account_id = '';
+    protected $hashed_account_id = '';
+    /**
+     * Optional. Flag for a reCAPTCHA express request for an assessment without a
+     * token. If enabled, `site_key` must reference an Express site key.
+     *
+     * Generated from protobuf field <code>bool express = 14 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $express = false;
+    /**
+     * Optional. The URI resource the user requested that triggered an assessment.
+     *
+     * Generated from protobuf field <code>string requested_uri = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $requested_uri = '';
+    /**
+     * Optional. Flag for running WAF token assessment.
+     * If enabled, the token must be specified, and have been created by a
+     * WAF-enabled key.
+     *
+     * Generated from protobuf field <code>bool waf_token_assessment = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $waf_token_assessment = false;
+    /**
+     * Optional. JA3 fingerprint for SSL clients. To learn how to compute this
+     * fingerprint, please refer to https://github.com/salesforce/ja3.
+     *
+     * Generated from protobuf field <code>string ja3 = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $ja3 = '';
+    /**
+     * Optional. JA4 fingerprint for SSL clients. To learn how to compute this
+     * fingerprint, please refer to https://github.com/FoxIO-LLC/ja4.
+     *
+     * Generated from protobuf field <code>string ja4 = 18 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $ja4 = '';
+    /**
+     * Optional. HTTP header information about the request.
+     *
+     * Generated from protobuf field <code>repeated string headers = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $headers;
+    /**
+     * Optional. Flag for enabling firewall policy config assessment.
+     * If this flag is enabled, the firewall policy is evaluated and a
+     * suggested firewall action is returned in the response.
+     *
+     * Generated from protobuf field <code>bool firewall_policy_evaluation = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $firewall_policy_evaluation = false;
+    /**
+     * Optional. Data describing a payment transaction to be assessed. Sending
+     * this data enables reCAPTCHA Enterprise Fraud Prevention and the
+     * FraudPreventionAssessment component in the response.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TransactionData transaction_data = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $transaction_data = null;
+    /**
+     * Optional. Information about the user that generates this event, when they
+     * can be identified. They are often identified through the use of an account
+     * for logged-in requests or login/registration requests, or by providing user
+     * identifiers for guest actions like checkout.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.UserInfo user_info = 15 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $user_info = null;
+    /**
+     * Optional. The Fraud Prevention setting for this assessment.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.Event.FraudPrevention fraud_prevention = 17 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $fraud_prevention = 0;
 
     /**
      * Constructor.
@@ -63,23 +140,57 @@ class Event extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $token
-     *           Optional. The user response token provided by the reCAPTCHA client-side integration
-     *           on your site.
+     *           Optional. The user response token provided by the reCAPTCHA Enterprise
+     *           client-side integration on your site.
      *     @type string $site_key
-     *           Optional. The site key that was used to invoke reCAPTCHA on your site and generate
-     *           the token.
+     *           Optional. The site key that was used to invoke reCAPTCHA Enterprise on your
+     *           site and generate the token.
      *     @type string $user_agent
-     *           Optional. The user agent present in the request from the user's device related to
-     *           this event.
+     *           Optional. The user agent present in the request from the user's device
+     *           related to this event.
      *     @type string $user_ip_address
-     *           Optional. The IP address in the request from the user's device related to this event.
+     *           Optional. The IP address in the request from the user's device related to
+     *           this event.
      *     @type string $expected_action
-     *           Optional. The expected action for this type of event. This should be the same action
-     *           provided at token generation time on client-side platforms already
-     *           integrated with recaptcha enterprise.
+     *           Optional. The expected action for this type of event. This should be the
+     *           same action provided at token generation time on client-side platforms
+     *           already integrated with recaptcha enterprise.
      *     @type string $hashed_account_id
-     *           Optional. Optional unique stable hashed user identifier for the request. The
-     *           identifier should ideally be hashed using sha256 with stable secret.
+     *           Optional. Deprecated: use `user_info.account_id` instead.
+     *           Unique stable hashed user identifier for the request. The identifier must
+     *           be hashed using hmac-sha256 with stable secret.
+     *     @type bool $express
+     *           Optional. Flag for a reCAPTCHA express request for an assessment without a
+     *           token. If enabled, `site_key` must reference an Express site key.
+     *     @type string $requested_uri
+     *           Optional. The URI resource the user requested that triggered an assessment.
+     *     @type bool $waf_token_assessment
+     *           Optional. Flag for running WAF token assessment.
+     *           If enabled, the token must be specified, and have been created by a
+     *           WAF-enabled key.
+     *     @type string $ja3
+     *           Optional. JA3 fingerprint for SSL clients. To learn how to compute this
+     *           fingerprint, please refer to https://github.com/salesforce/ja3.
+     *     @type string $ja4
+     *           Optional. JA4 fingerprint for SSL clients. To learn how to compute this
+     *           fingerprint, please refer to https://github.com/FoxIO-LLC/ja4.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $headers
+     *           Optional. HTTP header information about the request.
+     *     @type bool $firewall_policy_evaluation
+     *           Optional. Flag for enabling firewall policy config assessment.
+     *           If this flag is enabled, the firewall policy is evaluated and a
+     *           suggested firewall action is returned in the response.
+     *     @type \Google\Cloud\RecaptchaEnterprise\V1\TransactionData $transaction_data
+     *           Optional. Data describing a payment transaction to be assessed. Sending
+     *           this data enables reCAPTCHA Enterprise Fraud Prevention and the
+     *           FraudPreventionAssessment component in the response.
+     *     @type \Google\Cloud\RecaptchaEnterprise\V1\UserInfo $user_info
+     *           Optional. Information about the user that generates this event, when they
+     *           can be identified. They are often identified through the use of an account
+     *           for logged-in requests or login/registration requests, or by providing user
+     *           identifiers for guest actions like checkout.
+     *     @type int $fraud_prevention
+     *           Optional. The Fraud Prevention setting for this assessment.
      * }
      */
     public function __construct($data = NULL) {
@@ -88,8 +199,8 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The user response token provided by the reCAPTCHA client-side integration
-     * on your site.
+     * Optional. The user response token provided by the reCAPTCHA Enterprise
+     * client-side integration on your site.
      *
      * Generated from protobuf field <code>string token = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -100,8 +211,8 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The user response token provided by the reCAPTCHA client-side integration
-     * on your site.
+     * Optional. The user response token provided by the reCAPTCHA Enterprise
+     * client-side integration on your site.
      *
      * Generated from protobuf field <code>string token = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -116,8 +227,8 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The site key that was used to invoke reCAPTCHA on your site and generate
-     * the token.
+     * Optional. The site key that was used to invoke reCAPTCHA Enterprise on your
+     * site and generate the token.
      *
      * Generated from protobuf field <code>string site_key = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -128,8 +239,8 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The site key that was used to invoke reCAPTCHA on your site and generate
-     * the token.
+     * Optional. The site key that was used to invoke reCAPTCHA Enterprise on your
+     * site and generate the token.
      *
      * Generated from protobuf field <code>string site_key = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -144,8 +255,8 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The user agent present in the request from the user's device related to
-     * this event.
+     * Optional. The user agent present in the request from the user's device
+     * related to this event.
      *
      * Generated from protobuf field <code>string user_agent = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -156,8 +267,8 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The user agent present in the request from the user's device related to
-     * this event.
+     * Optional. The user agent present in the request from the user's device
+     * related to this event.
      *
      * Generated from protobuf field <code>string user_agent = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -172,9 +283,10 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The IP address in the request from the user's device related to this event.
+     * Optional. The IP address in the request from the user's device related to
+     * this event.
      *
-     * Generated from protobuf field <code>string user_ip_address = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string user_ip_address = 4 [(.google.api.field_behavior) = OPTIONAL, (.google.api.field_info) = {</code>
      * @return string
      */
     public function getUserIpAddress()
@@ -183,9 +295,10 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The IP address in the request from the user's device related to this event.
+     * Optional. The IP address in the request from the user's device related to
+     * this event.
      *
-     * Generated from protobuf field <code>string user_ip_address = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>string user_ip_address = 4 [(.google.api.field_behavior) = OPTIONAL, (.google.api.field_info) = {</code>
      * @param string $var
      * @return $this
      */
@@ -198,9 +311,9 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The expected action for this type of event. This should be the same action
-     * provided at token generation time on client-side platforms already
-     * integrated with recaptcha enterprise.
+     * Optional. The expected action for this type of event. This should be the
+     * same action provided at token generation time on client-side platforms
+     * already integrated with recaptcha enterprise.
      *
      * Generated from protobuf field <code>string expected_action = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -211,9 +324,9 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The expected action for this type of event. This should be the same action
-     * provided at token generation time on client-side platforms already
-     * integrated with recaptcha enterprise.
+     * Optional. The expected action for this type of event. This should be the
+     * same action provided at token generation time on client-side platforms
+     * already integrated with recaptcha enterprise.
      *
      * Generated from protobuf field <code>string expected_action = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
@@ -228,29 +341,339 @@ class Event extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Optional unique stable hashed user identifier for the request. The
-     * identifier should ideally be hashed using sha256 with stable secret.
+     * Optional. Deprecated: use `user_info.account_id` instead.
+     * Unique stable hashed user identifier for the request. The identifier must
+     * be hashed using hmac-sha256 with stable secret.
      *
-     * Generated from protobuf field <code>bytes hashed_account_id = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>bytes hashed_account_id = 6 [deprecated = true, (.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
+     * @deprecated
      */
     public function getHashedAccountId()
     {
+        @trigger_error('hashed_account_id is deprecated.', E_USER_DEPRECATED);
         return $this->hashed_account_id;
     }
 
     /**
-     * Optional. Optional unique stable hashed user identifier for the request. The
-     * identifier should ideally be hashed using sha256 with stable secret.
+     * Optional. Deprecated: use `user_info.account_id` instead.
+     * Unique stable hashed user identifier for the request. The identifier must
+     * be hashed using hmac-sha256 with stable secret.
      *
-     * Generated from protobuf field <code>bytes hashed_account_id = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * Generated from protobuf field <code>bytes hashed_account_id = 6 [deprecated = true, (.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
+     * @deprecated
      */
     public function setHashedAccountId($var)
     {
+        @trigger_error('hashed_account_id is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkString($var, False);
         $this->hashed_account_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Flag for a reCAPTCHA express request for an assessment without a
+     * token. If enabled, `site_key` must reference an Express site key.
+     *
+     * Generated from protobuf field <code>bool express = 14 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getExpress()
+    {
+        return $this->express;
+    }
+
+    /**
+     * Optional. Flag for a reCAPTCHA express request for an assessment without a
+     * token. If enabled, `site_key` must reference an Express site key.
+     *
+     * Generated from protobuf field <code>bool express = 14 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setExpress($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->express = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The URI resource the user requested that triggered an assessment.
+     *
+     * Generated from protobuf field <code>string requested_uri = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getRequestedUri()
+    {
+        return $this->requested_uri;
+    }
+
+    /**
+     * Optional. The URI resource the user requested that triggered an assessment.
+     *
+     * Generated from protobuf field <code>string requested_uri = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setRequestedUri($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->requested_uri = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Flag for running WAF token assessment.
+     * If enabled, the token must be specified, and have been created by a
+     * WAF-enabled key.
+     *
+     * Generated from protobuf field <code>bool waf_token_assessment = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getWafTokenAssessment()
+    {
+        return $this->waf_token_assessment;
+    }
+
+    /**
+     * Optional. Flag for running WAF token assessment.
+     * If enabled, the token must be specified, and have been created by a
+     * WAF-enabled key.
+     *
+     * Generated from protobuf field <code>bool waf_token_assessment = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setWafTokenAssessment($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->waf_token_assessment = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. JA3 fingerprint for SSL clients. To learn how to compute this
+     * fingerprint, please refer to https://github.com/salesforce/ja3.
+     *
+     * Generated from protobuf field <code>string ja3 = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getJa3()
+    {
+        return $this->ja3;
+    }
+
+    /**
+     * Optional. JA3 fingerprint for SSL clients. To learn how to compute this
+     * fingerprint, please refer to https://github.com/salesforce/ja3.
+     *
+     * Generated from protobuf field <code>string ja3 = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setJa3($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ja3 = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. JA4 fingerprint for SSL clients. To learn how to compute this
+     * fingerprint, please refer to https://github.com/FoxIO-LLC/ja4.
+     *
+     * Generated from protobuf field <code>string ja4 = 18 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getJa4()
+    {
+        return $this->ja4;
+    }
+
+    /**
+     * Optional. JA4 fingerprint for SSL clients. To learn how to compute this
+     * fingerprint, please refer to https://github.com/FoxIO-LLC/ja4.
+     *
+     * Generated from protobuf field <code>string ja4 = 18 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setJa4($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->ja4 = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. HTTP header information about the request.
+     *
+     * Generated from protobuf field <code>repeated string headers = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Optional. HTTP header information about the request.
+     *
+     * Generated from protobuf field <code>repeated string headers = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setHeaders($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->headers = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Flag for enabling firewall policy config assessment.
+     * If this flag is enabled, the firewall policy is evaluated and a
+     * suggested firewall action is returned in the response.
+     *
+     * Generated from protobuf field <code>bool firewall_policy_evaluation = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return bool
+     */
+    public function getFirewallPolicyEvaluation()
+    {
+        return $this->firewall_policy_evaluation;
+    }
+
+    /**
+     * Optional. Flag for enabling firewall policy config assessment.
+     * If this flag is enabled, the firewall policy is evaluated and a
+     * suggested firewall action is returned in the response.
+     *
+     * Generated from protobuf field <code>bool firewall_policy_evaluation = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setFirewallPolicyEvaluation($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->firewall_policy_evaluation = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Data describing a payment transaction to be assessed. Sending
+     * this data enables reCAPTCHA Enterprise Fraud Prevention and the
+     * FraudPreventionAssessment component in the response.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TransactionData transaction_data = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\RecaptchaEnterprise\V1\TransactionData|null
+     */
+    public function getTransactionData()
+    {
+        return $this->transaction_data;
+    }
+
+    public function hasTransactionData()
+    {
+        return isset($this->transaction_data);
+    }
+
+    public function clearTransactionData()
+    {
+        unset($this->transaction_data);
+    }
+
+    /**
+     * Optional. Data describing a payment transaction to be assessed. Sending
+     * this data enables reCAPTCHA Enterprise Fraud Prevention and the
+     * FraudPreventionAssessment component in the response.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.TransactionData transaction_data = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\RecaptchaEnterprise\V1\TransactionData $var
+     * @return $this
+     */
+    public function setTransactionData($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\RecaptchaEnterprise\V1\TransactionData::class);
+        $this->transaction_data = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Information about the user that generates this event, when they
+     * can be identified. They are often identified through the use of an account
+     * for logged-in requests or login/registration requests, or by providing user
+     * identifiers for guest actions like checkout.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.UserInfo user_info = 15 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\RecaptchaEnterprise\V1\UserInfo|null
+     */
+    public function getUserInfo()
+    {
+        return $this->user_info;
+    }
+
+    public function hasUserInfo()
+    {
+        return isset($this->user_info);
+    }
+
+    public function clearUserInfo()
+    {
+        unset($this->user_info);
+    }
+
+    /**
+     * Optional. Information about the user that generates this event, when they
+     * can be identified. They are often identified through the use of an account
+     * for logged-in requests or login/registration requests, or by providing user
+     * identifiers for guest actions like checkout.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.UserInfo user_info = 15 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\RecaptchaEnterprise\V1\UserInfo $var
+     * @return $this
+     */
+    public function setUserInfo($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\RecaptchaEnterprise\V1\UserInfo::class);
+        $this->user_info = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The Fraud Prevention setting for this assessment.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.Event.FraudPrevention fraud_prevention = 17 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return int
+     */
+    public function getFraudPrevention()
+    {
+        return $this->fraud_prevention;
+    }
+
+    /**
+     * Optional. The Fraud Prevention setting for this assessment.
+     *
+     * Generated from protobuf field <code>.google.cloud.recaptchaenterprise.v1.Event.FraudPrevention fraud_prevention = 17 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setFraudPrevention($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\RecaptchaEnterprise\V1\Event\FraudPrevention::class);
+        $this->fraud_prevention = $var;
 
         return $this;
     }

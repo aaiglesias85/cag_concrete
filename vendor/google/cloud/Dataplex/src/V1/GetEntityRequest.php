@@ -21,14 +21,29 @@ class GetEntityRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. Used to select the subset of entity information to return.
      * Defaults to `BASIC`.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.GetEntityRequest.EntityView view = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $view = 0;
+    protected $view = 0;
+
+    /**
+     * @param string $name Required. The resource name of the entity:
+     *                     `projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/entities/{entity_id}.`
+     *                     Please see {@see MetadataServiceClient::entityName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dataplex\V1\GetEntityRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

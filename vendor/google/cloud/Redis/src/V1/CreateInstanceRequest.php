@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request for [CreateInstance][google.cloud.redis.v1.CloudRedis.CreateInstance].
+ * Request for
+ * [CreateInstance][google.cloud.redis.v1.CloudRedis.CreateInstance].
  *
  * Generated from protobuf message <code>google.cloud.redis.v1.CreateInstanceRequest</code>
  */
@@ -22,7 +23,7 @@ class CreateInstanceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The logical name of the Redis instance in the customer project
      * with the following restrictions:
@@ -34,13 +35,40 @@ class CreateInstanceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string instance_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $instance_id = '';
+    protected $instance_id = '';
     /**
      * Required. A Redis [Instance] resource
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.Instance instance = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $instance = null;
+    protected $instance = null;
+
+    /**
+     * @param string                          $parent     Required. The resource name of the instance location using the form:
+     *                                                    `projects/{project_id}/locations/{location_id}`
+     *                                                    where `location_id` refers to a GCP region. Please see
+     *                                                    {@see CloudRedisClient::locationName()} for help formatting this field.
+     * @param string                          $instanceId Required. The logical name of the Redis instance in the customer project
+     *                                                    with the following restrictions:
+     *
+     *                                                    * Must contain only lowercase letters, numbers, and hyphens.
+     *                                                    * Must start with a letter.
+     *                                                    * Must be between 1-40 characters.
+     *                                                    * Must end with a number or a letter.
+     *                                                    * Must be unique within the customer project / location
+     * @param \Google\Cloud\Redis\V1\Instance $instance   Required. A Redis [Instance] resource
+     *
+     * @return \Google\Cloud\Redis\V1\CreateInstanceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $instanceId, \Google\Cloud\Redis\V1\Instance $instance): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setInstanceId($instanceId)
+            ->setInstance($instance);
+    }
 
     /**
      * Constructor.

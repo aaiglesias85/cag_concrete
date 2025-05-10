@@ -35,9 +35,9 @@ class UpdateAlertPolicyRequest extends \Google\Protobuf\Internal\Message
      *     `[CONDITION_ID]`. If the supplied condition omits the `name` field,
      *     then a new `[CONDITION_ID]` is created.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Required. The updated alerting policy or the updated values for the
      * fields listed in `update_mask`.
@@ -46,7 +46,45 @@ class UpdateAlertPolicyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy alert_policy = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $alert_policy = null;
+    protected $alert_policy = null;
+
+    /**
+     * @param \Google\Protobuf\FieldMask              $updateMask  Optional. A list of alerting policy field names. If this field is not
+     *                                                             empty, each listed field in the existing alerting policy is set to the
+     *                                                             value of the corresponding field in the supplied policy (`alert_policy`),
+     *                                                             or to the field's default value if the field is not in the supplied
+     *                                                             alerting policy.  Fields not listed retain their previous value.
+     *
+     *                                                             Examples of valid field masks include `display_name`, `documentation`,
+     *                                                             `documentation.content`, `documentation.mime_type`, `user_labels`,
+     *                                                             `user_label.nameofkey`, `enabled`, `conditions`, `combiner`, etc.
+     *
+     *                                                             If this field is empty, then the supplied alerting policy replaces the
+     *                                                             existing policy. It is the same as deleting the existing policy and
+     *                                                             adding the supplied policy, except for the following:
+     *
+     *                                                             +   The new policy will have the same `[ALERT_POLICY_ID]` as the former
+     *                                                             policy. This gives you continuity with the former policy in your
+     *                                                             notifications and incidents.
+     *                                                             +   Conditions in the new policy will keep their former `[CONDITION_ID]` if
+     *                                                             the supplied condition includes the `name` field with that
+     *                                                             `[CONDITION_ID]`. If the supplied condition omits the `name` field,
+     *                                                             then a new `[CONDITION_ID]` is created.
+     * @param \Google\Cloud\Monitoring\V3\AlertPolicy $alertPolicy Required. The updated alerting policy or the updated values for the
+     *                                                             fields listed in `update_mask`.
+     *                                                             If `update_mask` is not empty, any fields in this policy that are
+     *                                                             not in `update_mask` are ignored.
+     *
+     * @return \Google\Cloud\Monitoring\V3\UpdateAlertPolicyRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Protobuf\FieldMask $updateMask, \Google\Cloud\Monitoring\V3\AlertPolicy $alertPolicy): self
+    {
+        return (new self())
+            ->setUpdateMask($updateMask)
+            ->setAlertPolicy($alertPolicy);
+    }
 
     /**
      * Constructor.
@@ -105,7 +143,7 @@ class UpdateAlertPolicyRequest extends \Google\Protobuf\Internal\Message
      *     `[CONDITION_ID]`. If the supplied condition omits the `name` field,
      *     then a new `[CONDITION_ID]` is created.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\FieldMask|null
      */
     public function getUpdateMask()
@@ -143,7 +181,7 @@ class UpdateAlertPolicyRequest extends \Google\Protobuf\Internal\Message
      *     `[CONDITION_ID]`. If the supplied condition omits the `name` field,
      *     then a new `[CONDITION_ID]` is created.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Protobuf\FieldMask $var
      * @return $this
      */

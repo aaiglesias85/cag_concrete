@@ -1,4 +1,24 @@
 <?php
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * GENERATED CODE WARNING
+ * This file was automatically generated - do not edit!
+ */
 
 return [
     'interfaces' => [
@@ -17,6 +37,27 @@ return [
             'Delete' => [
                 'method' => 'delete',
                 'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
+            'DeleteRoutePolicy' => [
+                'method' => 'post',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/deleteRoutePolicy',
                 'placeholders' => [
                     'project' => [
                         'getters' => [
@@ -56,9 +97,51 @@ return [
                     ],
                 ],
             ],
+            'GetNatIpInfo' => [
+                'method' => 'get',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/getNatIpInfo',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
             'GetNatMappingInfo' => [
                 'method' => 'get',
                 'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/getNatMappingInfo',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
+            'GetRoutePolicy' => [
+                'method' => 'get',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/getRoutePolicy',
                 'placeholders' => [
                     'project' => [
                         'getters' => [
@@ -131,10 +214,74 @@ return [
                     ],
                 ],
             ],
+            'ListBgpRoutes' => [
+                'method' => 'get',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/listBgpRoutes',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
+            'ListRoutePolicies' => [
+                'method' => 'get',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/listRoutePolicies',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
             'Patch' => [
                 'method' => 'patch',
                 'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}',
                 'body' => 'router_resource',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
+            'PatchRoutePolicy' => [
+                'method' => 'post',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/patchRoutePolicy',
+                'body' => 'route_policy_resource',
                 'placeholders' => [
                     'project' => [
                         'getters' => [
@@ -179,6 +326,28 @@ return [
                 'method' => 'put',
                 'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}',
                 'body' => 'router_resource',
+                'placeholders' => [
+                    'project' => [
+                        'getters' => [
+                            'getProject',
+                        ],
+                    ],
+                    'region' => [
+                        'getters' => [
+                            'getRegion',
+                        ],
+                    ],
+                    'router' => [
+                        'getters' => [
+                            'getRouter',
+                        ],
+                    ],
+                ],
+            ],
+            'UpdateRoutePolicy' => [
+                'method' => 'post',
+                'uriTemplate' => '/compute/v1/projects/{project}/regions/{region}/routers/{router}/updateRoutePolicy',
+                'body' => 'route_policy_resource',
                 'placeholders' => [
                     'project' => [
                         'getters' => [

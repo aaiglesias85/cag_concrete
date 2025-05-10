@@ -21,7 +21,22 @@ class GetCertificateMapRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. A name of the certificate map to describe. Must be in the format
+     *                     `projects/&#42;/locations/&#42;/certificateMaps/*`. Please see
+     *                     {@see CertificateManagerClient::certificateMapName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\CertificateManager\V1\GetCertificateMapRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

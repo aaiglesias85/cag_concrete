@@ -20,19 +20,19 @@ class ModelMonitoringStatsAnomalies extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType objective = 1;</code>
      */
-    private $objective = 0;
+    protected $objective = 0;
     /**
      * Deployed Model ID.
      *
      * Generated from protobuf field <code>string deployed_model_id = 2;</code>
      */
-    private $deployed_model_id = '';
+    protected $deployed_model_id = '';
     /**
      * Number of anomalies within all stats.
      *
      * Generated from protobuf field <code>int32 anomaly_count = 3;</code>
      */
-    private $anomaly_count = 0;
+    protected $anomaly_count = 0;
     /**
      * A list of historical Stats and Anomalies generated for all Features.
      *
@@ -52,7 +52,7 @@ class ModelMonitoringStatsAnomalies extends \Google\Protobuf\Internal\Message
      *           Deployed Model ID.
      *     @type int $anomaly_count
      *           Number of anomalies within all stats.
-     *     @type \Google\Cloud\AIPlatform\V1\ModelMonitoringStatsAnomalies\FeatureHistoricStatsAnomalies[]|\Google\Protobuf\Internal\RepeatedField $feature_stats
+     *     @type array<\Google\Cloud\AIPlatform\V1\ModelMonitoringStatsAnomalies\FeatureHistoricStatsAnomalies>|\Google\Protobuf\Internal\RepeatedField $feature_stats
      *           A list of historical Stats and Anomalies generated for all Features.
      * }
      */
@@ -154,7 +154,7 @@ class ModelMonitoringStatsAnomalies extends \Google\Protobuf\Internal\Message
      * A list of historical Stats and Anomalies generated for all Features.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.ModelMonitoringStatsAnomalies.FeatureHistoricStatsAnomalies feature_stats = 4;</code>
-     * @param \Google\Cloud\AIPlatform\V1\ModelMonitoringStatsAnomalies\FeatureHistoricStatsAnomalies[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\ModelMonitoringStatsAnomalies\FeatureHistoricStatsAnomalies>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFeatureStats($var)

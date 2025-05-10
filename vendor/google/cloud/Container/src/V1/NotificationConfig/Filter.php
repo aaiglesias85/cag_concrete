@@ -31,7 +31,7 @@ class Filter extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $event_type
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $event_type
      *           Event types to allowlist.
      * }
      */
@@ -55,7 +55,7 @@ class Filter extends \Google\Protobuf\Internal\Message
      * Event types to allowlist.
      *
      * Generated from protobuf field <code>repeated .google.container.v1.NotificationConfig.EventType event_type = 1;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEventType($var)
@@ -68,6 +68,4 @@ class Filter extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Filter::class, \Google\Cloud\Container\V1\NotificationConfig_Filter::class);
 

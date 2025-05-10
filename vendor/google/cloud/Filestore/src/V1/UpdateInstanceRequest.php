@@ -22,16 +22,43 @@ class UpdateInstanceRequest extends \Google\Protobuf\Internal\Message
      * * "description"
      * * "file_shares"
      * * "labels"
+     * * "performance_config"
+     * * "deletion_protection_enabled"
+     * * "deletion_protection_reason"
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Only fields specified in update_mask are updated.
      *
      * Generated from protobuf field <code>.google.cloud.filestore.v1.Instance instance = 2;</code>
      */
-    private $instance = null;
+    protected $instance = null;
+
+    /**
+     * @param \Google\Cloud\Filestore\V1\Instance $instance   Only fields specified in update_mask are updated.
+     * @param \Google\Protobuf\FieldMask          $updateMask Mask of fields to update.  At least one path must be supplied in this
+     *                                                        field.  The elements of the repeated paths field may only include these
+     *                                                        fields:
+     *
+     *                                                        * "description"
+     *                                                        * "file_shares"
+     *                                                        * "labels"
+     *                                                        * "performance_config"
+     *                                                        * "deletion_protection_enabled"
+     *                                                        * "deletion_protection_reason"
+     *
+     * @return \Google\Cloud\Filestore\V1\UpdateInstanceRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Filestore\V1\Instance $instance, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setInstance($instance)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -46,6 +73,9 @@ class UpdateInstanceRequest extends \Google\Protobuf\Internal\Message
      *           * "description"
      *           * "file_shares"
      *           * "labels"
+     *           * "performance_config"
+     *           * "deletion_protection_enabled"
+     *           * "deletion_protection_reason"
      *     @type \Google\Cloud\Filestore\V1\Instance $instance
      *           Only fields specified in update_mask are updated.
      * }
@@ -62,6 +92,9 @@ class UpdateInstanceRequest extends \Google\Protobuf\Internal\Message
      * * "description"
      * * "file_shares"
      * * "labels"
+     * * "performance_config"
+     * * "deletion_protection_enabled"
+     * * "deletion_protection_reason"
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      * @return \Google\Protobuf\FieldMask|null
@@ -88,6 +121,9 @@ class UpdateInstanceRequest extends \Google\Protobuf\Internal\Message
      * * "description"
      * * "file_shares"
      * * "labels"
+     * * "performance_config"
+     * * "deletion_protection_enabled"
+     * * "deletion_protection_reason"
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      * @param \Google\Protobuf\FieldMask $var

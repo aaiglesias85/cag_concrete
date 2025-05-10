@@ -23,11 +23,14 @@ use Google\Protobuf\Internal\GPBUtil;
  * agent assistant suggestion generated.
  * A typical workflow for customers provide feedback to an answer is:
  * 1. For human agent assistant, customers get suggestion via ListSuggestions
- *    API. Together with the answers, [AnswerRecord.name][google.cloud.dialogflow.v2.AnswerRecord.name] are returned to the
- *    customers.
- * 2. The customer uses the [AnswerRecord.name][google.cloud.dialogflow.v2.AnswerRecord.name] to call the
- *    [UpdateAnswerRecord][] method to send feedback about a specific answer
- *    that they believe is wrong.
+ *    API. Together with the answers,
+ *    [AnswerRecord.name][google.cloud.dialogflow.v2.AnswerRecord.name] are
+ *    returned to the customers.
+ * 2. The customer uses the
+ * [AnswerRecord.name][google.cloud.dialogflow.v2.AnswerRecord.name] to call the
+ *    [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord]
+ *    method to send feedback about a specific answer that they believe is
+ *    wrong.
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.AnswerRecord</code>
  */
@@ -40,15 +43,15 @@ class AnswerRecord extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The AnswerFeedback for this record. You can set this with
-     * [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord] in order to give us feedback about
-     * this answer.
+     * [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord]
+     * in order to give us feedback about this answer.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AnswerFeedback answer_feedback = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $answer_feedback = null;
+    protected $answer_feedback = null;
     protected $record;
 
     /**
@@ -63,8 +66,8 @@ class AnswerRecord extends \Google\Protobuf\Internal\Message
      *           ID>/answerRecords/<Answer Record ID>`.
      *     @type \Google\Cloud\Dialogflow\V2\AnswerFeedback $answer_feedback
      *           Required. The AnswerFeedback for this record. You can set this with
-     *           [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord] in order to give us feedback about
-     *           this answer.
+     *           [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord]
+     *           in order to give us feedback about this answer.
      *     @type \Google\Cloud\Dialogflow\V2\AgentAssistantRecord $agent_assistant_record
      *           Output only. The record for human agent assistant.
      * }
@@ -106,8 +109,8 @@ class AnswerRecord extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The AnswerFeedback for this record. You can set this with
-     * [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord] in order to give us feedback about
-     * this answer.
+     * [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord]
+     * in order to give us feedback about this answer.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AnswerFeedback answer_feedback = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\Dialogflow\V2\AnswerFeedback|null
@@ -129,8 +132,8 @@ class AnswerRecord extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The AnswerFeedback for this record. You can set this with
-     * [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord] in order to give us feedback about
-     * this answer.
+     * [AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2.AnswerRecords.UpdateAnswerRecord]
+     * in order to give us feedback about this answer.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.AnswerFeedback answer_feedback = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\Dialogflow\V2\AnswerFeedback $var

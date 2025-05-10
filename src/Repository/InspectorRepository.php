@@ -5,94 +5,73 @@ namespace App\Repository;
 use App\Entity\Inspector;
 use Doctrine\ORM\EntityRepository;
 
-
 class InspectorRepository extends EntityRepository
 {
-
     /**
-     * ListarOrdenados: Lista los inspectors
+     * ListarOrdenados: Lista los inspectores con estado activo y los ordena por nombre.
      *
      * @return Inspector[]
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('i')
+        return $this->createQueryBuilder('i')
             ->where('i.status = 1')
-            ->orderBy('i.name', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarInspectors: Lista los inspectors
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * ListarInspectors: Lista los inspectores con filtros, paginación y ordenación.
+     *
+     * @param int $start El inicio de la paginación
+     * @param int $limit El límite de resultados
+     * @param string|null $sSearch El término de búsqueda (opcional)
+     * @param string $iSortCol_0 Columna para ordenar
+     * @param string $sSortDir_0 Dirección del orden (ASC/DESC)
      *
      * @return Inspector[]
      */
-    public function ListarInspectors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarInspectors(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array
     {
-        $consulta = $this->createQueryBuilder('i');
+        $qb = $this->createQueryBuilder('i');
 
-        if ($sSearch != "") {
-            $consulta->andWhere('i.name LIKE :name OR i.email LIKE :email OR i.phone LIKE :phone')
-                ->setParameter('name', "%{$sSearch}%")
-                ->setParameter('email', "%{$sSearch}%")
-                ->setParameter('phone', "%{$sSearch}%");
+        // Agregar filtro de búsqueda si es necesario
+        if (!empty($sSearch)) {
+            $qb->andWhere('i.name LIKE :search OR i.email LIKE :search OR i.phone LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
-        $consulta->orderBy("i.$iSortCol_0", $sSortDir_0);
+        // Ordenar por la columna seleccionada
+        $qb->orderBy("i.$iSortCol_0", $sSortDir_0);
 
+        // Limitar los resultados con paginación
         if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+            $qb->setMaxResults($limit)
+                ->setFirstResult($start);
         }
 
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return $qb->getQuery()->getResult();
     }
 
     /**
-     * TotalInspectors: Total de inspectors de la BD
-     * @param string $sSearch Para buscar
+     * TotalInspectors: Obtiene el total de inspectores en la BD con filtro de búsqueda.
      *
-     * @author Marcel
+     * @param string|null $sSearch El término de búsqueda (opcional)
+     *
+     * @return int El número total de inspectores
      */
-    public function TotalInspectors($sSearch)
+    public function TotalInspectors(?string $sSearch): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(i.inspectorId) FROM App\Entity\Inspector i ';
-        $join = '';
-        $where = '';
+        $qb = $this->createQueryBuilder('i')
+            ->select('COUNT(i.inspectorId)');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (i.name LIKE :name OR i.email LIKE :email OR i.phone LIKE :phone) ';
-            else
-                $where .= 'AND (i.name LIKE :name OR i.email LIKE :email OR i.phone LIKE :phone) ';
+        // Agregar filtro de búsqueda si es necesario
+        if (!empty($sSearch)) {
+            $qb->andWhere('i.name LIKE :search OR i.email LIKE :search OR i.phone LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_name = substr_count($consulta, ':name');
-        if ($esta_query_name == 1)
-            $query->setParameter(':name', "%{$sSearch}%");
-
-        $esta_query_email = substr_count($consulta, ':email');
-        if ($esta_query_email == 1)
-            $query->setParameter(':email', "%{$sSearch}%");
-
-        $esta_query_phone = substr_count($consulta, ':phone');
-        if ($esta_query_phone == 1)
-            $query->setParameter(':phone', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

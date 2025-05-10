@@ -20,19 +20,19 @@ class Resources extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double cpu = 1;</code>
      */
-    private $cpu = 0.0;
+    protected $cpu = 0.0;
     /**
      * Disk size (GB) needed.
      *
      * Generated from protobuf field <code>double disk_gb = 2;</code>
      */
-    private $disk_gb = 0.0;
+    protected $disk_gb = 0.0;
     /**
      * Memory (GB) needed.
      *
      * Generated from protobuf field <code>double memory_gb = 3;</code>
      */
-    private $memory_gb = 0.0;
+    protected $memory_gb = 0.0;
     /**
      * User specified volumes.
      *
@@ -45,7 +45,7 @@ class Resources extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string kms_key_reference = 5;</code>
      */
-    private $kms_key_reference = '';
+    protected $kms_key_reference = '';
 
     /**
      * Constructor.
@@ -59,7 +59,7 @@ class Resources extends \Google\Protobuf\Internal\Message
      *           Disk size (GB) needed.
      *     @type float $memory_gb
      *           Memory (GB) needed.
-     *     @type \Google\Cloud\AppEngine\V1\Volume[]|\Google\Protobuf\Internal\RepeatedField $volumes
+     *     @type array<\Google\Cloud\AppEngine\V1\Volume>|\Google\Protobuf\Internal\RepeatedField $volumes
      *           User specified volumes.
      *     @type string $kms_key_reference
      *           The name of the encryption key that is stored in Google Cloud KMS.
@@ -164,7 +164,7 @@ class Resources extends \Google\Protobuf\Internal\Message
      * User specified volumes.
      *
      * Generated from protobuf field <code>repeated .google.appengine.v1.Volume volumes = 4;</code>
-     * @param \Google\Cloud\AppEngine\V1\Volume[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AppEngine\V1\Volume>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVolumes($var)

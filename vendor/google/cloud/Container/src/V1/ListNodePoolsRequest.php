@@ -17,7 +17,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://developers.google.com/console/help/new/#projectnumber).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the parent field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -43,12 +43,49 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
      */
     protected $cluster_id = '';
     /**
-     * The parent (project, location, cluster id) where the node pools will be
+     * The parent (project, location, cluster name) where the node pools will be
      * listed. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string parent = 5;</code>
      */
-    private $parent = '';
+    protected $parent = '';
+
+    /**
+     * @param string $projectId Deprecated. The Google Developers Console [project ID or project
+     *                          number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+     *                          This field has been deprecated and replaced by the parent field.
+     * @param string $zone      Deprecated. The name of the Google Compute Engine
+     *                          [zone](https://cloud.google.com/compute/docs/zones#available) in which the
+     *                          cluster resides. This field has been deprecated and replaced by the parent
+     *                          field.
+     * @param string $clusterId Deprecated. The name of the cluster.
+     *                          This field has been deprecated and replaced by the parent field.
+     *
+     * @return \Google\Cloud\Container\V1\ListNodePoolsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, string $zone, string $clusterId): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setZone($zone)
+            ->setClusterId($clusterId);
+    }
+
+    /**
+     * @param string $parent The parent (project, location, cluster name) where the node pools will be
+     *                       listed. Specified in the format `projects/&#42;/locations/&#42;/clusters/*`.
+     *
+     * @return \Google\Cloud\Container\V1\ListNodePoolsRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParent(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -58,7 +95,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Deprecated. The Google Developers Console [project ID or project
-     *           number](https://developers.google.com/console/help/new/#projectnumber).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *           This field has been deprecated and replaced by the parent field.
      *     @type string $zone
      *           Deprecated. The name of the Google Compute Engine
@@ -69,7 +106,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
      *           Deprecated. The name of the cluster.
      *           This field has been deprecated and replaced by the parent field.
      *     @type string $parent
-     *           The parent (project, location, cluster id) where the node pools will be
+     *           The parent (project, location, cluster name) where the node pools will be
      *           listed. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      * }
      */
@@ -80,7 +117,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://developers.google.com/console/help/new/#projectnumber).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the parent field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -95,7 +132,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://developers.google.com/console/help/new/#projectnumber).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the parent field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -181,7 +218,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The parent (project, location, cluster id) where the node pools will be
+     * The parent (project, location, cluster name) where the node pools will be
      * listed. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string parent = 5;</code>
@@ -193,7 +230,7 @@ class ListNodePoolsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The parent (project, location, cluster id) where the node pools will be
+     * The parent (project, location, cluster name) where the node pools will be
      * listed. Specified in the format `projects/&#42;&#47;locations/&#42;&#47;clusters/&#42;`.
      *
      * Generated from protobuf field <code>string parent = 5;</code>

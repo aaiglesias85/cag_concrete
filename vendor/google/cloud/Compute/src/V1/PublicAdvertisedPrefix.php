@@ -16,6 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
 {
     /**
+     * [Output Only] The version of BYOIP API.
+     * Check the ByoipApiVersion enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string byoip_api_version = 162683283;</code>
+     */
+    private $byoip_api_version = null;
+    /**
      * [Output Only] Creation timestamp in RFC3339 text format.
      *
      * Generated from protobuf field <code>optional string creation_timestamp = 30525366;</code>
@@ -28,7 +35,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
      */
     private $description = null;
     /**
-     * The IPv4 address to be used for reverse DNS verification.
+     * The address to be used for reverse DNS verification.
      *
      * Generated from protobuf field <code>optional string dns_verification_ip = 241011381;</code>
      */
@@ -46,7 +53,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
      */
     private $id = null;
     /**
-     * The IPv4 address range, in CIDR format, represented by this public advertised prefix.
+     * The address range, in CIDR format, represented by this public advertised prefix.
      *
      * Generated from protobuf field <code>optional string ip_cidr_range = 98117322;</code>
      */
@@ -63,6 +70,13 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string name = 3373707;</code>
      */
     private $name = null;
+    /**
+     * Specifies how child public delegated prefix will be scoped. It could be one of following values: - `REGIONAL`: The public delegated prefix is regional only. The provisioning will take a few minutes. - `GLOBAL`: The public delegated prefix is global only. The provisioning will take ~4 weeks. - `GLOBAL_AND_REGIONAL` [output only]: The public delegated prefixes is BYOIP V1 legacy prefix. This is output only value and no longer supported in BYOIP V2.
+     * Check the PdpScope enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string pdp_scope = 524264785;</code>
+     */
+    private $pdp_scope = null;
     /**
      * [Output Only] The list of public delegated prefixes that exist for this public advertised prefix.
      *
@@ -95,23 +109,29 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type string $byoip_api_version
+     *           [Output Only] The version of BYOIP API.
+     *           Check the ByoipApiVersion enum for the list of possible values.
      *     @type string $creation_timestamp
      *           [Output Only] Creation timestamp in RFC3339 text format.
      *     @type string $description
      *           An optional description of this resource. Provide this property when you create the resource.
      *     @type string $dns_verification_ip
-     *           The IPv4 address to be used for reverse DNS verification.
+     *           The address to be used for reverse DNS verification.
      *     @type string $fingerprint
      *           Fingerprint of this resource. A hash of the contents stored in this object. This field is used in optimistic locking. This field will be ignored when inserting a new PublicAdvertisedPrefix. An up-to-date fingerprint must be provided in order to update the PublicAdvertisedPrefix, otherwise the request will fail with error 412 conditionNotMet. To see the latest fingerprint, make a get() request to retrieve a PublicAdvertisedPrefix.
      *     @type int|string $id
      *           [Output Only] The unique identifier for the resource type. The server generates this identifier.
      *     @type string $ip_cidr_range
-     *           The IPv4 address range, in CIDR format, represented by this public advertised prefix.
+     *           The address range, in CIDR format, represented by this public advertised prefix.
      *     @type string $kind
      *           [Output Only] Type of the resource. Always compute#publicAdvertisedPrefix for public advertised prefixes.
      *     @type string $name
      *           Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
-     *     @type \Google\Cloud\Compute\V1\PublicAdvertisedPrefixPublicDelegatedPrefix[]|\Google\Protobuf\Internal\RepeatedField $public_delegated_prefixs
+     *     @type string $pdp_scope
+     *           Specifies how child public delegated prefix will be scoped. It could be one of following values: - `REGIONAL`: The public delegated prefix is regional only. The provisioning will take a few minutes. - `GLOBAL`: The public delegated prefix is global only. The provisioning will take ~4 weeks. - `GLOBAL_AND_REGIONAL` [output only]: The public delegated prefixes is BYOIP V1 legacy prefix. This is output only value and no longer supported in BYOIP V2.
+     *           Check the PdpScope enum for the list of possible values.
+     *     @type array<\Google\Cloud\Compute\V1\PublicAdvertisedPrefixPublicDelegatedPrefix>|\Google\Protobuf\Internal\RepeatedField $public_delegated_prefixs
      *           [Output Only] The list of public delegated prefixes that exist for this public advertised prefix.
      *     @type string $self_link
      *           [Output Only] Server-defined URL for the resource.
@@ -125,6 +145,44 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Cloud\Compute\V1\Compute::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * [Output Only] The version of BYOIP API.
+     * Check the ByoipApiVersion enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string byoip_api_version = 162683283;</code>
+     * @return string
+     */
+    public function getByoipApiVersion()
+    {
+        return isset($this->byoip_api_version) ? $this->byoip_api_version : '';
+    }
+
+    public function hasByoipApiVersion()
+    {
+        return isset($this->byoip_api_version);
+    }
+
+    public function clearByoipApiVersion()
+    {
+        unset($this->byoip_api_version);
+    }
+
+    /**
+     * [Output Only] The version of BYOIP API.
+     * Check the ByoipApiVersion enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string byoip_api_version = 162683283;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setByoipApiVersion($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->byoip_api_version = $var;
+
+        return $this;
     }
 
     /**
@@ -200,7 +258,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The IPv4 address to be used for reverse DNS verification.
+     * The address to be used for reverse DNS verification.
      *
      * Generated from protobuf field <code>optional string dns_verification_ip = 241011381;</code>
      * @return string
@@ -221,7 +279,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The IPv4 address to be used for reverse DNS verification.
+     * The address to be used for reverse DNS verification.
      *
      * Generated from protobuf field <code>optional string dns_verification_ip = 241011381;</code>
      * @param string $var
@@ -308,7 +366,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The IPv4 address range, in CIDR format, represented by this public advertised prefix.
+     * The address range, in CIDR format, represented by this public advertised prefix.
      *
      * Generated from protobuf field <code>optional string ip_cidr_range = 98117322;</code>
      * @return string
@@ -329,7 +387,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The IPv4 address range, in CIDR format, represented by this public advertised prefix.
+     * The address range, in CIDR format, represented by this public advertised prefix.
      *
      * Generated from protobuf field <code>optional string ip_cidr_range = 98117322;</code>
      * @param string $var
@@ -416,6 +474,44 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Specifies how child public delegated prefix will be scoped. It could be one of following values: - `REGIONAL`: The public delegated prefix is regional only. The provisioning will take a few minutes. - `GLOBAL`: The public delegated prefix is global only. The provisioning will take ~4 weeks. - `GLOBAL_AND_REGIONAL` [output only]: The public delegated prefixes is BYOIP V1 legacy prefix. This is output only value and no longer supported in BYOIP V2.
+     * Check the PdpScope enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string pdp_scope = 524264785;</code>
+     * @return string
+     */
+    public function getPdpScope()
+    {
+        return isset($this->pdp_scope) ? $this->pdp_scope : '';
+    }
+
+    public function hasPdpScope()
+    {
+        return isset($this->pdp_scope);
+    }
+
+    public function clearPdpScope()
+    {
+        unset($this->pdp_scope);
+    }
+
+    /**
+     * Specifies how child public delegated prefix will be scoped. It could be one of following values: - `REGIONAL`: The public delegated prefix is regional only. The provisioning will take a few minutes. - `GLOBAL`: The public delegated prefix is global only. The provisioning will take ~4 weeks. - `GLOBAL_AND_REGIONAL` [output only]: The public delegated prefixes is BYOIP V1 legacy prefix. This is output only value and no longer supported in BYOIP V2.
+     * Check the PdpScope enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string pdp_scope = 524264785;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPdpScope($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->pdp_scope = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] The list of public delegated prefixes that exist for this public advertised prefix.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.PublicAdvertisedPrefixPublicDelegatedPrefix public_delegated_prefixs = 425811723;</code>
@@ -430,7 +526,7 @@ class PublicAdvertisedPrefix extends \Google\Protobuf\Internal\Message
      * [Output Only] The list of public delegated prefixes that exist for this public advertised prefix.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.PublicAdvertisedPrefixPublicDelegatedPrefix public_delegated_prefixs = 425811723;</code>
-     * @param \Google\Cloud\Compute\V1\PublicAdvertisedPrefixPublicDelegatedPrefix[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\PublicAdvertisedPrefixPublicDelegatedPrefix>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPublicDelegatedPrefixs($var)

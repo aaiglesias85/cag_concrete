@@ -22,31 +22,31 @@ class View extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The human-readable display name of the view.
      *
      * Generated from protobuf field <code>string display_name = 2;</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. The time at which this view was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The most recent time at which the view was updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
-     * String with specific view properties.
+     * String with specific view properties, must be non-empty.
      *
      * Generated from protobuf field <code>string value = 5;</code>
      */
-    private $value = '';
+    protected $value = '';
 
     /**
      * Constructor.
@@ -65,7 +65,7 @@ class View extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $update_time
      *           Output only. The most recent time at which the view was updated.
      *     @type string $value
-     *           String with specific view properties.
+     *           String with specific view properties, must be non-empty.
      * }
      */
     public function __construct($data = NULL) {
@@ -202,7 +202,7 @@ class View extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * String with specific view properties.
+     * String with specific view properties, must be non-empty.
      *
      * Generated from protobuf field <code>string value = 5;</code>
      * @return string
@@ -213,7 +213,7 @@ class View extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * String with specific view properties.
+     * String with specific view properties, must be non-empty.
      *
      * Generated from protobuf field <code>string value = 5;</code>
      * @param string $var

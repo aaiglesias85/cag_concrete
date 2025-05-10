@@ -17,7 +17,7 @@ class SetNodePoolSizeRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -55,7 +55,7 @@ class SetNodePoolSizeRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 node_count = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $node_count = 0;
+    protected $node_count = 0;
     /**
      * The name (project, location, cluster, node pool id) of the node pool to set
      * size.
@@ -63,7 +63,7 @@ class SetNodePoolSizeRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 7;</code>
      */
-    private $name = '';
+    protected $name = '';
 
     /**
      * Constructor.
@@ -73,7 +73,7 @@ class SetNodePoolSizeRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Deprecated. The Google Developers Console [project ID or project
-     *           number](https://support.google.com/cloud/answer/6158840).
+     *           number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      *           This field has been deprecated and replaced by the name field.
      *     @type string $zone
      *           Deprecated. The name of the Google Compute Engine
@@ -101,7 +101,7 @@ class SetNodePoolSizeRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>
@@ -116,7 +116,7 @@ class SetNodePoolSizeRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Deprecated. The Google Developers Console [project ID or project
-     * number](https://support.google.com/cloud/answer/6158840).
+     * number](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
      * This field has been deprecated and replaced by the name field.
      *
      * Generated from protobuf field <code>string project_id = 1 [deprecated = true];</code>

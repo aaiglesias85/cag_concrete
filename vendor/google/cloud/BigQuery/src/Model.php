@@ -32,6 +32,7 @@ class Model
 
     /**
      * @var ConnectionInterface Represents a connection to BigQuery.
+     * @internal
      */
     private $connection;
 
@@ -52,6 +53,8 @@ class Model
 
     /**
      * @param ConnectionInterface $connection Represents a connection to BigQuery.
+     *        This object is created by BigQueryClient,
+     *        and should not be instantiated outside of this client.
      * @param string $id The model's ID.
      * @param string $datasetId The dataset's ID.
      * @param string $projectId The project's ID.
@@ -82,7 +85,7 @@ class Model
      *
      * Please note that Model instances created by list calls may not contain a
      * full representation of the model resource. To obtain a full resource on a
-     * Model instance, call {@see Google\Cloud\BigQuery\Model::reload()}.
+     * Model instance, call {@see Model::reload()}.
      *
      * Example:
      * ```
@@ -241,9 +244,11 @@ class Model
     }
 
     /**
-     * Returns an extract job configuration to be passed to either
-     * {@see Google\Cloud\BigQuery\BigQueryClient::runJob()} or
-     * {@see Google\Cloud\BigQuery\BigQueryClient::startJob()}. A
+     * Returns a BigQuery extract job configuration.
+     *
+     * The job configuration is passed to either
+     * {@see BigQueryClient::runJob()} or
+     * {@see BigQueryClient::startJob()}. A
      * configuration can be built using fluent setters or by providing a full
      * set of options at once.
      *
@@ -256,7 +261,7 @@ class Model
      * @see https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert Jobs insert API Documentation.
      *
      * @param string|StorageObject $destination The destination object. May be
-     *        a {@see Google\Cloud\Storage\StorageObject} or a URI pointing to
+     *        a {@see StorageObject} or a URI pointing to
      *        a Google Cloud Storage object in the format of
      *        `gs://{bucket-name}/{object-name}`.
      * @param array $options [optional] Please see the

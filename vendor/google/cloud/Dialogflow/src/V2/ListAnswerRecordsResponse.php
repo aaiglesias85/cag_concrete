@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [AnswerRecords.ListAnswerRecords][google.cloud.dialogflow.v2.AnswerRecords.ListAnswerRecords].
+ * Response message for
+ * [AnswerRecords.ListAnswerRecords][google.cloud.dialogflow.v2.AnswerRecords.ListAnswerRecords].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListAnswerRecordsResponse</code>
  */
@@ -31,7 +32,7 @@ class ListAnswerRecordsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -39,7 +40,7 @@ class ListAnswerRecordsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dialogflow\V2\AnswerRecord[]|\Google\Protobuf\Internal\RepeatedField $answer_records
+     *     @type array<\Google\Cloud\Dialogflow\V2\AnswerRecord>|\Google\Protobuf\Internal\RepeatedField $answer_records
      *           The list of answer records.
      *     @type string $next_page_token
      *           A token to retrieve next page of results. Or empty if there are no more
@@ -70,7 +71,7 @@ class ListAnswerRecordsResponse extends \Google\Protobuf\Internal\Message
      * The list of answer records.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.AnswerRecord answer_records = 1;</code>
-     * @param \Google\Cloud\Dialogflow\V2\AnswerRecord[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\AnswerRecord>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAnswerRecords($var)

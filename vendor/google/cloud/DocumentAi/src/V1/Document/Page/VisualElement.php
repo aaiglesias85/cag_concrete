@@ -22,14 +22,14 @@ class VisualElement extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Layout layout = 1;</code>
      */
-    private $layout = null;
+    protected $layout = null;
     /**
      * Type of the
      * [VisualElement][google.cloud.documentai.v1.Document.Page.VisualElement].
      *
      * Generated from protobuf field <code>string type = 2;</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
      * A list of detected languages together with confidence.
      *
@@ -49,7 +49,7 @@ class VisualElement extends \Google\Protobuf\Internal\Message
      *     @type string $type
      *           Type of the
      *           [VisualElement][google.cloud.documentai.v1.Document.Page.VisualElement].
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $detected_languages
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $detected_languages
      *           A list of detected languages together with confidence.
      * }
      */
@@ -139,7 +139,7 @@ class VisualElement extends \Google\Protobuf\Internal\Message
      * A list of detected languages together with confidence.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedLanguage detected_languages = 3;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDetectedLanguages($var)

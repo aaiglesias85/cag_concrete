@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [ConnectionService.CreateConnection][google.cloud.bigquery.connection.v1.ConnectionService.CreateConnection].
+ * The request for
+ * [ConnectionService.CreateConnection][google.cloud.bigquery.connection.v1.ConnectionService.CreateConnection].
  *
  * Generated from protobuf message <code>google.cloud.bigquery.connection.v1.CreateConnectionRequest</code>
  */
@@ -21,19 +22,38 @@ class CreateConnectionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. Connection id that should be assigned to the created connection.
      *
      * Generated from protobuf field <code>string connection_id = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $connection_id = '';
+    protected $connection_id = '';
     /**
      * Required. Connection to create.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.connection.v1.Connection connection = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $connection = null;
+    protected $connection = null;
+
+    /**
+     * @param string                                          $parent       Required. Parent resource name.
+     *                                                                      Must be in the format `projects/{project_id}/locations/{location_id}`
+     *                                                                      Please see {@see ConnectionServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\BigQuery\Connection\V1\Connection $connection   Required. Connection to create.
+     * @param string                                          $connectionId Optional. Connection id that should be assigned to the created connection.
+     *
+     * @return \Google\Cloud\BigQuery\Connection\V1\CreateConnectionRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\BigQuery\Connection\V1\Connection $connection, string $connectionId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setConnection($connection)
+            ->setConnectionId($connectionId);
+    }
 
     /**
      * Constructor.

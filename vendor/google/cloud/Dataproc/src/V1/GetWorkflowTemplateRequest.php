@@ -27,7 +27,7 @@ class GetWorkflowTemplateRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. The version of workflow template to retrieve. Only previously
      * instantiated versions can be retrieved.
@@ -35,7 +35,30 @@ class GetWorkflowTemplateRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 version = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $version = 0;
+    protected $version = 0;
+
+    /**
+     * @param string $name Required. The resource name of the workflow template, as described
+     *                     in https://cloud.google.com/apis/design/resource_names.
+     *
+     *                     * For `projects.regions.workflowTemplates.get`, the resource name of the
+     *                     template has the following format:
+     *                     `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}`
+     *
+     *                     * For `projects.locations.workflowTemplates.get`, the resource name of the
+     *                     template has the following format:
+     *                     `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
+     *                     Please see {@see WorkflowTemplateServiceClient::workflowTemplateName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dataproc\V1\GetWorkflowTemplateRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

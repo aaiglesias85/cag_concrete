@@ -9,16 +9,16 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [MetadataService.QueryArtifactLineageSubgraph][google.cloud.aiplatform.v1.MetadataService.QueryArtifactLineageSubgraph].
+ * Request message for
+ * [MetadataService.QueryArtifactLineageSubgraph][google.cloud.aiplatform.v1.MetadataService.QueryArtifactLineageSubgraph].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.QueryArtifactLineageSubgraphRequest</code>
  */
 class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the Artifact whose Lineage needs to be retrieved as a
-     * LineageSubgraph.
-     * Format:
+     * Required. The resource name of the Artifact whose Lineage needs to be
+     * retrieved as a LineageSubgraph. Format:
      * `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
      * The request may error with FAILED_PRECONDITION if the number of Artifacts,
      * the number of Executions, or the number of Events that would be returned
@@ -26,7 +26,7 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *
      * Generated from protobuf field <code>string artifact = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $artifact = '';
+    protected $artifact = '';
     /**
      * Specifies the size of the lineage graph in terms of number of hops from the
      * specified artifact.
@@ -36,7 +36,7 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *
      * Generated from protobuf field <code>int32 max_hops = 2;</code>
      */
-    private $max_hops = 0;
+    protected $max_hops = 0;
     /**
      * Filter specifying the boolean condition for the Artifacts to satisfy in
      * order to be part of the Lineage Subgraph.
@@ -53,13 +53,37 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *    To filter on metadata fields use traversal operation as follows:
      *    `metadata.<field_name>.<type_value>`.
      *    For example: `metadata.field_1.number_value = 10.0`
+     *    In case the field name contains special characters (such as colon), one
+     *    can embed it inside double quote.
+     *    For example: `metadata."field:1".number_value = 10.0`
      * Each of the above supported filter types can be combined together using
-     * logical operators (`AND` & `OR`).
+     * logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     * is 5.
      * For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      *
      * Generated from protobuf field <code>string filter = 3;</code>
      */
-    private $filter = '';
+    protected $filter = '';
+
+    /**
+     * @param string $artifact Required. The resource name of the Artifact whose Lineage needs to be
+     *                         retrieved as a LineageSubgraph. Format:
+     *                         `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
+     *
+     *                         The request may error with FAILED_PRECONDITION if the number of Artifacts,
+     *                         the number of Executions, or the number of Events that would be returned
+     *                         for the Context exceeds 1000. Please see
+     *                         {@see MetadataServiceClient::artifactName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\QueryArtifactLineageSubgraphRequest
+     *
+     * @experimental
+     */
+    public static function build(string $artifact): self
+    {
+        return (new self())
+            ->setArtifact($artifact);
+    }
 
     /**
      * Constructor.
@@ -68,9 +92,8 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *     Optional. Data for populating the Message object.
      *
      *     @type string $artifact
-     *           Required. The resource name of the Artifact whose Lineage needs to be retrieved as a
-     *           LineageSubgraph.
-     *           Format:
+     *           Required. The resource name of the Artifact whose Lineage needs to be
+     *           retrieved as a LineageSubgraph. Format:
      *           `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
      *           The request may error with FAILED_PRECONDITION if the number of Artifacts,
      *           the number of Executions, or the number of Events that would be returned
@@ -97,8 +120,12 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *              To filter on metadata fields use traversal operation as follows:
      *              `metadata.<field_name>.<type_value>`.
      *              For example: `metadata.field_1.number_value = 10.0`
+     *              In case the field name contains special characters (such as colon), one
+     *              can embed it inside double quote.
+     *              For example: `metadata."field:1".number_value = 10.0`
      *           Each of the above supported filter types can be combined together using
-     *           logical operators (`AND` & `OR`).
+     *           logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     *           is 5.
      *           For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      * }
      */
@@ -108,9 +135,8 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
     }
 
     /**
-     * Required. The resource name of the Artifact whose Lineage needs to be retrieved as a
-     * LineageSubgraph.
-     * Format:
+     * Required. The resource name of the Artifact whose Lineage needs to be
+     * retrieved as a LineageSubgraph. Format:
      * `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
      * The request may error with FAILED_PRECONDITION if the number of Artifacts,
      * the number of Executions, or the number of Events that would be returned
@@ -125,9 +151,8 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
     }
 
     /**
-     * Required. The resource name of the Artifact whose Lineage needs to be retrieved as a
-     * LineageSubgraph.
-     * Format:
+     * Required. The resource name of the Artifact whose Lineage needs to be
+     * retrieved as a LineageSubgraph. Format:
      * `projects/{project}/locations/{location}/metadataStores/{metadatastore}/artifacts/{artifact}`
      * The request may error with FAILED_PRECONDITION if the number of Artifacts,
      * the number of Executions, or the number of Events that would be returned
@@ -195,8 +220,12 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *    To filter on metadata fields use traversal operation as follows:
      *    `metadata.<field_name>.<type_value>`.
      *    For example: `metadata.field_1.number_value = 10.0`
+     *    In case the field name contains special characters (such as colon), one
+     *    can embed it inside double quote.
+     *    For example: `metadata."field:1".number_value = 10.0`
      * Each of the above supported filter types can be combined together using
-     * logical operators (`AND` & `OR`).
+     * logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     * is 5.
      * For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      *
      * Generated from protobuf field <code>string filter = 3;</code>
@@ -223,8 +252,12 @@ class QueryArtifactLineageSubgraphRequest extends \Google\Protobuf\Internal\Mess
      *    To filter on metadata fields use traversal operation as follows:
      *    `metadata.<field_name>.<type_value>`.
      *    For example: `metadata.field_1.number_value = 10.0`
+     *    In case the field name contains special characters (such as colon), one
+     *    can embed it inside double quote.
+     *    For example: `metadata."field:1".number_value = 10.0`
      * Each of the above supported filter types can be combined together using
-     * logical operators (`AND` & `OR`).
+     * logical operators (`AND` & `OR`). Maximum nested expression depth allowed
+     * is 5.
      * For example: `display_name = "test" AND metadata.field1.bool_value = true`.
      *
      * Generated from protobuf field <code>string filter = 3;</code>

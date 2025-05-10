@@ -27,7 +27,7 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string product = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $product = '';
+    protected $product = '';
     /**
      * Required. The fulfillment type, including commonly used types (such as
      * pickup in store and same day delivery), and custom types.
@@ -43,11 +43,12 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      * * "custom-type-5"
      * If this field is set to an invalid value other than these, an
      * INVALID_ARGUMENT error is returned.
-     * This field directly corresponds to [Product.fulfillment_info.type][].
+     * This field directly corresponds to
+     * [Product.fulfillment_info.type][google.cloud.retail.v2.FulfillmentInfo.type].
      *
      * Generated from protobuf field <code>string type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
      * Required. The IDs for this
      * [type][google.cloud.retail.v2.AddFulfillmentPlacesRequest.type], such as
@@ -73,7 +74,7 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp add_time = 4;</code>
      */
-    private $add_time = null;
+    protected $add_time = null;
     /**
      * If set to true, and the [Product][google.cloud.retail.v2.Product] is not
      * found, the fulfillment information will still be processed and retained for
@@ -84,7 +85,27 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool allow_missing = 5;</code>
      */
-    private $allow_missing = false;
+    protected $allow_missing = false;
+
+    /**
+     * @param string $product Required. Full resource name of [Product][google.cloud.retail.v2.Product],
+     *                        such as
+     *                        `projects/&#42;/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`.
+     *
+     *                        If the caller does not have permission to access the
+     *                        [Product][google.cloud.retail.v2.Product], regardless of whether or not it
+     *                        exists, a PERMISSION_DENIED error is returned. Please see
+     *                        {@see ProductServiceClient::productName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Retail\V2\AddFulfillmentPlacesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $product): self
+    {
+        return (new self())
+            ->setProduct($product);
+    }
 
     /**
      * Constructor.
@@ -114,8 +135,9 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      *           * "custom-type-5"
      *           If this field is set to an invalid value other than these, an
      *           INVALID_ARGUMENT error is returned.
-     *           This field directly corresponds to [Product.fulfillment_info.type][].
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $place_ids
+     *           This field directly corresponds to
+     *           [Product.fulfillment_info.type][google.cloud.retail.v2.FulfillmentInfo.type].
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $place_ids
      *           Required. The IDs for this
      *           [type][google.cloud.retail.v2.AddFulfillmentPlacesRequest.type], such as
      *           the store IDs for "pickup-in-store" or the region IDs for
@@ -198,7 +220,8 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      * * "custom-type-5"
      * If this field is set to an invalid value other than these, an
      * INVALID_ARGUMENT error is returned.
-     * This field directly corresponds to [Product.fulfillment_info.type][].
+     * This field directly corresponds to
+     * [Product.fulfillment_info.type][google.cloud.retail.v2.FulfillmentInfo.type].
      *
      * Generated from protobuf field <code>string type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -223,7 +246,8 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      * * "custom-type-5"
      * If this field is set to an invalid value other than these, an
      * INVALID_ARGUMENT error is returned.
-     * This field directly corresponds to [Product.fulfillment_info.type][].
+     * This field directly corresponds to
+     * [Product.fulfillment_info.type][google.cloud.retail.v2.FulfillmentInfo.type].
      *
      * Generated from protobuf field <code>string type = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -276,7 +300,7 @@ class AddFulfillmentPlacesRequest extends \Google\Protobuf\Internal\Message
      * adding, then the update will be rejected.
      *
      * Generated from protobuf field <code>repeated string place_ids = 3 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPlaceIds($var)

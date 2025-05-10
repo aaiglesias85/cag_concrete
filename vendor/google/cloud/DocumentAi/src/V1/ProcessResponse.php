@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for the process document method.
+ * Response message for the
+ * [ProcessDocument][google.cloud.documentai.v1.DocumentProcessorService.ProcessDocument]
+ * method.
  *
  * Generated from protobuf message <code>google.cloud.documentai.v1.ProcessResponse</code>
  */
@@ -21,13 +23,13 @@ class ProcessResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document document = 1;</code>
      */
-    private $document = null;
+    protected $document = null;
     /**
      * The status of human review on the processed document.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.HumanReviewStatus human_review_status = 3;</code>
      */
-    private $human_review_status = null;
+    protected $human_review_status = null;
 
     /**
      * Constructor.

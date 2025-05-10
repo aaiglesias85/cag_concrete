@@ -22,7 +22,7 @@ class TopNMetrics extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 n = 1;</code>
      */
-    private $n = 0;
+    protected $n = 0;
     /**
      * Defined as `number of queries whose top n smart replies have at least one
      * similar (token match similarity above the defined threshold) reply as the
@@ -31,7 +31,7 @@ class TopNMetrics extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float recall = 2;</code>
      */
-    private $recall = 0.0;
+    protected $recall = 0.0;
 
     /**
      * Constructor.
@@ -119,6 +119,4 @@ class TopNMetrics extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(TopNMetrics::class, \Google\Cloud\Dialogflow\V2\SmartReplyMetrics_TopNMetrics::class);
 

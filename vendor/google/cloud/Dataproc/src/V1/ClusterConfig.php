@@ -30,17 +30,15 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string config_bucket = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $config_bucket = '';
+    protected $config_bucket = '';
     /**
-     * Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs data,
-     * such as Spark and MapReduce history files.
-     * If you do not specify a temp bucket,
-     * Dataproc will determine a Cloud Storage location (US,
-     * ASIA, or EU) for your cluster's temp bucket according to the
-     * Compute Engine zone where your cluster is deployed, and then create
-     * and manage this project-level, per-location bucket. The default bucket has
-     * a TTL of 90 days, but you can use any TTL (or none) if you specify a
-     * bucket (see
+     * Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs
+     * data, such as Spark and MapReduce history files. If you do not specify a
+     * temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or
+     * EU) for your cluster's temp bucket according to the Compute Engine zone
+     * where your cluster is deployed, and then create and manage this
+     * project-level, per-location bucket. The default bucket has a TTL of 90
+     * days, but you can use any TTL (or none) if you specify a bucket (see
      * [Dataproc staging and temp
      * buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
      * **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
@@ -48,41 +46,41 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string temp_bucket = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $temp_bucket = '';
+    protected $temp_bucket = '';
     /**
      * Optional. The shared Compute Engine config settings for
      * all instances in a cluster.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.GceClusterConfig gce_cluster_config = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $gce_cluster_config = null;
+    protected $gce_cluster_config = null;
     /**
      * Optional. The Compute Engine config settings for
      * the cluster's master instance.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.InstanceGroupConfig master_config = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $master_config = null;
+    protected $master_config = null;
     /**
      * Optional. The Compute Engine config settings for
      * the cluster's worker instances.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.InstanceGroupConfig worker_config = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $worker_config = null;
+    protected $worker_config = null;
     /**
      * Optional. The Compute Engine config settings for
      * a cluster's secondary worker instances
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.InstanceGroupConfig secondary_worker_config = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $secondary_worker_config = null;
+    protected $secondary_worker_config = null;
     /**
      * Optional. The config settings for cluster software.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.SoftwareConfig software_config = 13 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $software_config = null;
+    protected $software_config = null;
     /**
      * Optional. Commands to execute on each node after config is
      * completed. By default, executables are run on master and all worker nodes.
@@ -105,38 +103,50 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.EncryptionConfig encryption_config = 15 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $encryption_config = null;
+    protected $encryption_config = null;
     /**
      * Optional. Autoscaling config for the policy associated with the cluster.
      * Cluster does not autoscale if this field is unset.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.AutoscalingConfig autoscaling_config = 18 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $autoscaling_config = null;
+    protected $autoscaling_config = null;
     /**
      * Optional. Security settings for the cluster.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.SecurityConfig security_config = 16 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $security_config = null;
+    protected $security_config = null;
     /**
      * Optional. Lifecycle setting for the cluster.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.LifecycleConfig lifecycle_config = 17 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $lifecycle_config = null;
+    protected $lifecycle_config = null;
     /**
      * Optional. Port/endpoint configuration for this cluster
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.EndpointConfig endpoint_config = 19 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $endpoint_config = null;
+    protected $endpoint_config = null;
     /**
      * Optional. Metastore configuration.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.MetastoreConfig metastore_config = 20 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $metastore_config = null;
+    protected $metastore_config = null;
+    /**
+     * Optional. The config for Dataproc metrics.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.DataprocMetricConfig dataproc_metric_config = 23 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $dataproc_metric_config = null;
+    /**
+     * Optional. The node group settings.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.dataproc.v1.AuxiliaryNodeGroup auxiliary_node_groups = 25 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $auxiliary_node_groups;
 
     /**
      * Constructor.
@@ -157,15 +167,13 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *           **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
      *           a Cloud Storage bucket.**
      *     @type string $temp_bucket
-     *           Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs data,
-     *           such as Spark and MapReduce history files.
-     *           If you do not specify a temp bucket,
-     *           Dataproc will determine a Cloud Storage location (US,
-     *           ASIA, or EU) for your cluster's temp bucket according to the
-     *           Compute Engine zone where your cluster is deployed, and then create
-     *           and manage this project-level, per-location bucket. The default bucket has
-     *           a TTL of 90 days, but you can use any TTL (or none) if you specify a
-     *           bucket (see
+     *           Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs
+     *           data, such as Spark and MapReduce history files. If you do not specify a
+     *           temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or
+     *           EU) for your cluster's temp bucket according to the Compute Engine zone
+     *           where your cluster is deployed, and then create and manage this
+     *           project-level, per-location bucket. The default bucket has a TTL of 90
+     *           days, but you can use any TTL (or none) if you specify a bucket (see
      *           [Dataproc staging and temp
      *           buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
      *           **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
@@ -184,7 +192,7 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *           a cluster's secondary worker instances
      *     @type \Google\Cloud\Dataproc\V1\SoftwareConfig $software_config
      *           Optional. The config settings for cluster software.
-     *     @type \Google\Cloud\Dataproc\V1\NodeInitializationAction[]|\Google\Protobuf\Internal\RepeatedField $initialization_actions
+     *     @type array<\Google\Cloud\Dataproc\V1\NodeInitializationAction>|\Google\Protobuf\Internal\RepeatedField $initialization_actions
      *           Optional. Commands to execute on each node after config is
      *           completed. By default, executables are run on master and all worker nodes.
      *           You can test a node's `role` metadata to run an executable on
@@ -210,6 +218,10 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *           Optional. Port/endpoint configuration for this cluster
      *     @type \Google\Cloud\Dataproc\V1\MetastoreConfig $metastore_config
      *           Optional. Metastore configuration.
+     *     @type \Google\Cloud\Dataproc\V1\DataprocMetricConfig $dataproc_metric_config
+     *           Optional. The config for Dataproc metrics.
+     *     @type array<\Google\Cloud\Dataproc\V1\AuxiliaryNodeGroup>|\Google\Protobuf\Internal\RepeatedField $auxiliary_node_groups
+     *           Optional. The node group settings.
      * }
      */
     public function __construct($data = NULL) {
@@ -264,15 +276,13 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs data,
-     * such as Spark and MapReduce history files.
-     * If you do not specify a temp bucket,
-     * Dataproc will determine a Cloud Storage location (US,
-     * ASIA, or EU) for your cluster's temp bucket according to the
-     * Compute Engine zone where your cluster is deployed, and then create
-     * and manage this project-level, per-location bucket. The default bucket has
-     * a TTL of 90 days, but you can use any TTL (or none) if you specify a
-     * bucket (see
+     * Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs
+     * data, such as Spark and MapReduce history files. If you do not specify a
+     * temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or
+     * EU) for your cluster's temp bucket according to the Compute Engine zone
+     * where your cluster is deployed, and then create and manage this
+     * project-level, per-location bucket. The default bucket has a TTL of 90
+     * days, but you can use any TTL (or none) if you specify a bucket (see
      * [Dataproc staging and temp
      * buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
      * **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
@@ -287,15 +297,13 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs data,
-     * such as Spark and MapReduce history files.
-     * If you do not specify a temp bucket,
-     * Dataproc will determine a Cloud Storage location (US,
-     * ASIA, or EU) for your cluster's temp bucket according to the
-     * Compute Engine zone where your cluster is deployed, and then create
-     * and manage this project-level, per-location bucket. The default bucket has
-     * a TTL of 90 days, but you can use any TTL (or none) if you specify a
-     * bucket (see
+     * Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs
+     * data, such as Spark and MapReduce history files. If you do not specify a
+     * temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or
+     * EU) for your cluster's temp bucket according to the Compute Engine zone
+     * where your cluster is deployed, and then create and manage this
+     * project-level, per-location bucket. The default bucket has a TTL of 90
+     * days, but you can use any TTL (or none) if you specify a bucket (see
      * [Dataproc staging and temp
      * buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
      * **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
@@ -538,7 +546,7 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
      *     fi
      *
      * Generated from protobuf field <code>repeated .google.cloud.dataproc.v1.NodeInitializationAction initialization_actions = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\Dataproc\V1\NodeInitializationAction[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dataproc\V1\NodeInitializationAction>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInitializationActions($var)
@@ -763,6 +771,68 @@ class ClusterConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Dataproc\V1\MetastoreConfig::class);
         $this->metastore_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The config for Dataproc metrics.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.DataprocMetricConfig dataproc_metric_config = 23 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Dataproc\V1\DataprocMetricConfig|null
+     */
+    public function getDataprocMetricConfig()
+    {
+        return $this->dataproc_metric_config;
+    }
+
+    public function hasDataprocMetricConfig()
+    {
+        return isset($this->dataproc_metric_config);
+    }
+
+    public function clearDataprocMetricConfig()
+    {
+        unset($this->dataproc_metric_config);
+    }
+
+    /**
+     * Optional. The config for Dataproc metrics.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.DataprocMetricConfig dataproc_metric_config = 23 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Dataproc\V1\DataprocMetricConfig $var
+     * @return $this
+     */
+    public function setDataprocMetricConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dataproc\V1\DataprocMetricConfig::class);
+        $this->dataproc_metric_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The node group settings.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.dataproc.v1.AuxiliaryNodeGroup auxiliary_node_groups = 25 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getAuxiliaryNodeGroups()
+    {
+        return $this->auxiliary_node_groups;
+    }
+
+    /**
+     * Optional. The node group settings.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.dataproc.v1.AuxiliaryNodeGroup auxiliary_node_groups = 25 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<\Google\Cloud\Dataproc\V1\AuxiliaryNodeGroup>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setAuxiliaryNodeGroups($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Dataproc\V1\AuxiliaryNodeGroup::class);
+        $this->auxiliary_node_groups = $arr;
 
         return $this;
     }

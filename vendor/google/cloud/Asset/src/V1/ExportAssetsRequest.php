@@ -23,7 +23,7 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Timestamp to take an asset snapshot. This can only be set to a timestamp
      * between the current time and the current time minus 35 days (inclusive).
@@ -33,7 +33,7 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp read_time = 2;</code>
      */
-    private $read_time = null;
+    protected $read_time = null;
     /**
      * A list of asset types to take a snapshot for. For example:
      * "compute.googleapis.com/Disk".
@@ -59,13 +59,14 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.ContentType content_type = 4;</code>
      */
-    private $content_type = 0;
+    protected $content_type = 0;
     /**
-     * Required. Output configuration indicating where the results will be output to.
+     * Required. Output configuration indicating where the results will be output
+     * to.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.OutputConfig output_config = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $output_config = null;
+    protected $output_config = null;
     /**
      * A list of relationship types to export, for example:
      * `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
@@ -104,7 +105,7 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      *           If not specified, the current time will be used. Due to delays in resource
      *           data collection and indexing, there is a volatile window during which
      *           running the same query may get different results.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $asset_types
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $asset_types
      *           A list of asset types to take a snapshot for. For example:
      *           "compute.googleapis.com/Disk".
      *           Regular expressions are also supported. For example:
@@ -123,8 +124,9 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      *           Asset content type. If not specified, no content but the asset name will be
      *           returned.
      *     @type \Google\Cloud\Asset\V1\OutputConfig $output_config
-     *           Required. Output configuration indicating where the results will be output to.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $relationship_types
+     *           Required. Output configuration indicating where the results will be output
+     *           to.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $relationship_types
      *           A list of relationship types to export, for example:
      *           `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
      *           content_type=RELATIONSHIP.
@@ -264,7 +266,7 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      * for all supported asset types.
      *
      * Generated from protobuf field <code>repeated string asset_types = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAssetTypes($var)
@@ -304,7 +306,8 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Output configuration indicating where the results will be output to.
+     * Required. Output configuration indicating where the results will be output
+     * to.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.OutputConfig output_config = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\Asset\V1\OutputConfig|null
@@ -325,7 +328,8 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Output configuration indicating where the results will be output to.
+     * Required. Output configuration indicating where the results will be output
+     * to.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.OutputConfig output_config = 5 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\Asset\V1\OutputConfig $var
@@ -382,7 +386,7 @@ class ExportAssetsRequest extends \Google\Protobuf\Internal\Message
      * supported asset types and relationship types.
      *
      * Generated from protobuf field <code>repeated string relationship_types = 6;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRelationshipTypes($var)

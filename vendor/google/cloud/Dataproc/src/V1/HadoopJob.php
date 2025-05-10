@@ -22,7 +22,7 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
     /**
      * Optional. The arguments to pass to the driver. Do not
      * include arguments, such as `-libjars` or `-Dfoo=bar`, that can be set as
-     * job properties, since a collision may occur that causes an incorrect job
+     * job properties, since a collision might occur that causes an incorrect job
      * submission.
      *
      * Generated from protobuf field <code>repeated string args = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -53,8 +53,8 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
     private $archive_uris;
     /**
      * Optional. A mapping of property names to values, used to configure Hadoop.
-     * Properties that conflict with values set by the Dataproc API may be
-     * overwritten. Can include properties set in /etc/hadoop/conf/&#42;-site and
+     * Properties that conflict with values set by the Dataproc API might be
+     * overwritten. Can include properties set in `/etc/hadoop/conf/&#42;-site` and
      * classes in user code.
      *
      * Generated from protobuf field <code>map<string, string> properties = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -65,7 +65,7 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.LoggingConfig logging_config = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $logging_config = null;
+    protected $logging_config = null;
     protected $driver;
 
     /**
@@ -83,26 +83,26 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
      *     @type string $main_class
      *           The name of the driver's main class. The jar file containing the class
      *           must be in the default CLASSPATH or specified in `jar_file_uris`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $args
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $args
      *           Optional. The arguments to pass to the driver. Do not
      *           include arguments, such as `-libjars` or `-Dfoo=bar`, that can be set as
-     *           job properties, since a collision may occur that causes an incorrect job
+     *           job properties, since a collision might occur that causes an incorrect job
      *           submission.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $jar_file_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $jar_file_uris
      *           Optional. Jar file URIs to add to the CLASSPATHs of the
      *           Hadoop driver and tasks.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $file_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $file_uris
      *           Optional. HCFS (Hadoop Compatible Filesystem) URIs of files to be copied
      *           to the working directory of Hadoop drivers and distributed tasks. Useful
      *           for naively parallel tasks.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $archive_uris
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $archive_uris
      *           Optional. HCFS URIs of archives to be extracted in the working directory of
      *           Hadoop drivers and tasks. Supported file types:
      *           .jar, .tar, .tar.gz, .tgz, or .zip.
      *     @type array|\Google\Protobuf\Internal\MapField $properties
      *           Optional. A mapping of property names to values, used to configure Hadoop.
-     *           Properties that conflict with values set by the Dataproc API may be
-     *           overwritten. Can include properties set in /etc/hadoop/conf/&#42;-site and
+     *           Properties that conflict with values set by the Dataproc API might be
+     *           overwritten. Can include properties set in `/etc/hadoop/conf/&#42;-site` and
      *           classes in user code.
      *     @type \Google\Cloud\Dataproc\V1\LoggingConfig $logging_config
      *           Optional. The runtime log config for job execution.
@@ -188,7 +188,7 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
     /**
      * Optional. The arguments to pass to the driver. Do not
      * include arguments, such as `-libjars` or `-Dfoo=bar`, that can be set as
-     * job properties, since a collision may occur that causes an incorrect job
+     * job properties, since a collision might occur that causes an incorrect job
      * submission.
      *
      * Generated from protobuf field <code>repeated string args = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -202,11 +202,11 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
     /**
      * Optional. The arguments to pass to the driver. Do not
      * include arguments, such as `-libjars` or `-Dfoo=bar`, that can be set as
-     * job properties, since a collision may occur that causes an incorrect job
+     * job properties, since a collision might occur that causes an incorrect job
      * submission.
      *
      * Generated from protobuf field <code>repeated string args = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArgs($var)
@@ -234,7 +234,7 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
      * Hadoop driver and tasks.
      *
      * Generated from protobuf field <code>repeated string jar_file_uris = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setJarFileUris($var)
@@ -264,7 +264,7 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
      * for naively parallel tasks.
      *
      * Generated from protobuf field <code>repeated string file_uris = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFileUris($var)
@@ -294,7 +294,7 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
      * .jar, .tar, .tar.gz, .tgz, or .zip.
      *
      * Generated from protobuf field <code>repeated string archive_uris = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArchiveUris($var)
@@ -307,8 +307,8 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. A mapping of property names to values, used to configure Hadoop.
-     * Properties that conflict with values set by the Dataproc API may be
-     * overwritten. Can include properties set in /etc/hadoop/conf/&#42;-site and
+     * Properties that conflict with values set by the Dataproc API might be
+     * overwritten. Can include properties set in `/etc/hadoop/conf/&#42;-site` and
      * classes in user code.
      *
      * Generated from protobuf field <code>map<string, string> properties = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
@@ -321,8 +321,8 @@ class HadoopJob extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. A mapping of property names to values, used to configure Hadoop.
-     * Properties that conflict with values set by the Dataproc API may be
-     * overwritten. Can include properties set in /etc/hadoop/conf/&#42;-site and
+     * Properties that conflict with values set by the Dataproc API might be
+     * overwritten. Can include properties set in `/etc/hadoop/conf/&#42;-site` and
      * classes in user code.
      *
      * Generated from protobuf field <code>map<string, string> properties = 7 [(.google.api.field_behavior) = OPTIONAL];</code>

@@ -20,13 +20,29 @@ class CreateDatasetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The dataset to create.
      *
      * Generated from protobuf field <code>.google.cloud.automl.v1.Dataset dataset = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $dataset = null;
+    protected $dataset = null;
+
+    /**
+     * @param string                          $parent  Required. The resource name of the project to create the dataset for. Please see
+     *                                                 {@see AutoMlClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\AutoMl\V1\Dataset $dataset Required. The dataset to create.
+     *
+     * @return \Google\Cloud\AutoMl\V1\CreateDatasetRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AutoMl\V1\Dataset $dataset): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setDataset($dataset);
+    }
 
     /**
      * Constructor.

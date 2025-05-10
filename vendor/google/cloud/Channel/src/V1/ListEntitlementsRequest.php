@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements]
+ * Request message for
+ * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements]
  *
  * Generated from protobuf message <code>google.cloud.channel.v1.ListEntitlementsRequest</code>
  */
@@ -22,24 +23,26 @@ class ListEntitlementsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Optional. Requested page size. Server might return fewer results than requested.
-     * If unspecified, return at most 50 entitlements.
-     * The maximum value is 100; the server will coerce values above 100.
+     * Optional. Requested page size. Server might return fewer results than
+     * requested. If unspecified, return at most 50 entitlements. The maximum
+     * value is 100; the server will coerce values above 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. A token for a page of results other than the first page.
      * Obtained using
-     * [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token] of the previous
-     * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements] call.
+     * [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token]
+     * of the previous
+     * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
 
     /**
      * Constructor.
@@ -52,14 +55,16 @@ class ListEntitlementsRequest extends \Google\Protobuf\Internal\Message
      *           entitlements for.
      *           Parent uses the format: accounts/{account_id}/customers/{customer_id}
      *     @type int $page_size
-     *           Optional. Requested page size. Server might return fewer results than requested.
-     *           If unspecified, return at most 50 entitlements.
-     *           The maximum value is 100; the server will coerce values above 100.
+     *           Optional. Requested page size. Server might return fewer results than
+     *           requested. If unspecified, return at most 50 entitlements. The maximum
+     *           value is 100; the server will coerce values above 100.
      *     @type string $page_token
      *           Optional. A token for a page of results other than the first page.
      *           Obtained using
-     *           [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token] of the previous
-     *           [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements] call.
+     *           [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token]
+     *           of the previous
+     *           [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements]
+     *           call.
      * }
      */
     public function __construct($data = NULL) {
@@ -98,9 +103,9 @@ class ListEntitlementsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Requested page size. Server might return fewer results than requested.
-     * If unspecified, return at most 50 entitlements.
-     * The maximum value is 100; the server will coerce values above 100.
+     * Optional. Requested page size. Server might return fewer results than
+     * requested. If unspecified, return at most 50 entitlements. The maximum
+     * value is 100; the server will coerce values above 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -111,9 +116,9 @@ class ListEntitlementsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Requested page size. Server might return fewer results than requested.
-     * If unspecified, return at most 50 entitlements.
-     * The maximum value is 100; the server will coerce values above 100.
+     * Optional. Requested page size. Server might return fewer results than
+     * requested. If unspecified, return at most 50 entitlements. The maximum
+     * value is 100; the server will coerce values above 100.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -130,8 +135,10 @@ class ListEntitlementsRequest extends \Google\Protobuf\Internal\Message
     /**
      * Optional. A token for a page of results other than the first page.
      * Obtained using
-     * [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token] of the previous
-     * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements] call.
+     * [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token]
+     * of the previous
+     * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -144,8 +151,10 @@ class ListEntitlementsRequest extends \Google\Protobuf\Internal\Message
     /**
      * Optional. A token for a page of results other than the first page.
      * Obtained using
-     * [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token] of the previous
-     * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements] call.
+     * [ListEntitlementsResponse.next_page_token][google.cloud.channel.v1.ListEntitlementsResponse.next_page_token]
+     * of the previous
+     * [CloudChannelService.ListEntitlements][google.cloud.channel.v1.CloudChannelService.ListEntitlements]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var

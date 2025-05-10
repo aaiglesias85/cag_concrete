@@ -27,13 +27,13 @@ class Operation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string operation_id = 1;</code>
      */
-    private $operation_id = '';
+    protected $operation_id = '';
     /**
      * Fully qualified name of the operation. Reserved for future use.
      *
      * Generated from protobuf field <code>string operation_name = 2;</code>
      */
-    private $operation_name = '';
+    protected $operation_name = '';
     /**
      * Identity of the consumer who is using the service.
      * This field should be filled in for the operations initiated by a
@@ -49,13 +49,13 @@ class Operation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string consumer_id = 3;</code>
      */
-    private $consumer_id = '';
+    protected $consumer_id = '';
     /**
      * Required. Start time of the operation.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * End time of the operation.
      * Required when the operation is used in
@@ -65,7 +65,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 5;</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * Labels describing the operation. Only the following labels are allowed:
      * - Labels describing monitored resources as defined in
@@ -111,7 +111,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.servicecontrol.v1.Operation.Importance importance = 11;</code>
      */
-    private $importance = 0;
+    protected $importance = 0;
     /**
      * Unimplemented.
      *
@@ -172,7 +172,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      *               - `servicecontrol.googleapis.com/platform` describing the platform
      *                  where the API is served, such as App Engine, Compute Engine, or
      *                  Kubernetes Engine.
-     *     @type \Google\Cloud\ServiceControl\V1\MetricValueSet[]|\Google\Protobuf\Internal\RepeatedField $metric_value_sets
+     *     @type array<\Google\Cloud\ServiceControl\V1\MetricValueSet>|\Google\Protobuf\Internal\RepeatedField $metric_value_sets
      *           Represents information about this operation. Each MetricValueSet
      *           corresponds to a metric defined in the service configuration.
      *           The data type used in the MetricValueSet must agree with
@@ -182,11 +182,11 @@ class Operation extends \Google\Protobuf\Internal\Message
      *           label value combinations. If a request has such duplicated MetricValue
      *           instances, the entire request is rejected with
      *           an invalid argument error.
-     *     @type \Google\Cloud\ServiceControl\V1\LogEntry[]|\Google\Protobuf\Internal\RepeatedField $log_entries
+     *     @type array<\Google\Cloud\ServiceControl\V1\LogEntry>|\Google\Protobuf\Internal\RepeatedField $log_entries
      *           Represents information to be logged.
      *     @type int $importance
      *           DO NOT USE. This is an experimental field.
-     *     @type \Google\Protobuf\Any[]|\Google\Protobuf\Internal\RepeatedField $extensions
+     *     @type array<\Google\Protobuf\Any>|\Google\Protobuf\Internal\RepeatedField $extensions
      *           Unimplemented.
      * }
      */
@@ -472,7 +472,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      * an invalid argument error.
      *
      * Generated from protobuf field <code>repeated .google.api.servicecontrol.v1.MetricValueSet metric_value_sets = 7;</code>
-     * @param \Google\Cloud\ServiceControl\V1\MetricValueSet[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ServiceControl\V1\MetricValueSet>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMetricValueSets($var)
@@ -498,7 +498,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      * Represents information to be logged.
      *
      * Generated from protobuf field <code>repeated .google.api.servicecontrol.v1.LogEntry log_entries = 8;</code>
-     * @param \Google\Cloud\ServiceControl\V1\LogEntry[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ServiceControl\V1\LogEntry>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLogEntries($var)
@@ -550,7 +550,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      * Unimplemented.
      *
      * Generated from protobuf field <code>repeated .google.protobuf.Any extensions = 16;</code>
-     * @param \Google\Protobuf\Any[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Protobuf\Any>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setExtensions($var)

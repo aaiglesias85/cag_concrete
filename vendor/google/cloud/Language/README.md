@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-language/v/stable)](https://packagist.org/packages/google/cloud-language) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-language.svg)](https://packagist.org/packages/google/cloud-language)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-language/latest)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-language/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -17,16 +17,10 @@ entity sentiment analysis, content classification, and syntax analysis. This API
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-language
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 ### Authentication
@@ -66,11 +60,15 @@ foreach ($tokens as $token) {
 }
 ```
 
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
+
 ### Version
 
-This component is considered beta. As such, it should be expected to be mostly
-stable and we're working towards a release candidate. We will address issues
-and requests with a higher priority.
+This component is considered GA (generally available). As such, it will not introduce backwards-incompatible changes in
+any minor or patch releases. We will address issues and requests with the highest priority.
 
 ### Next Steps
 

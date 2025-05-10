@@ -5,87 +5,73 @@ namespace App\Repository;
 use App\Entity\Equation;
 use Doctrine\ORM\EntityRepository;
 
-
 class EquationRepository extends EntityRepository
 {
-
     /**
-     * ListarOrdenados: Lista las equations
+     * ListarOrdenados: Lista las ecuaciones con el estado 1 y las ordena por descripción.
      *
      * @return Equation[]
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('e')
+        return $this->createQueryBuilder('e')
             ->where('e.status = 1')
-            ->orderBy('e.description', "ASC");
-
-
-        return $consulta->getQuery()->getResult();
+            ->orderBy('e.description', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarEquations: Lista los equations
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * ListarEquations: Lista las ecuaciones con filtros, paginación y ordenación.
+     *
+     * @param int $start El inicio de la paginación
+     * @param int $limit El límite de resultados
+     * @param string|null $sSearch El término de búsqueda (opcional)
+     * @param string $iSortCol_0 Columna para ordenar
+     * @param string $sSortDir_0 Dirección del orden (ASC/DESC)
      *
      * @return Equation[]
      */
-    public function ListarEquations($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarEquations(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array
     {
-        $consulta = $this->createQueryBuilder('e');
+        $qb = $this->createQueryBuilder('e');
 
-        if ($sSearch != "")
-            $consulta->andWhere('e.description LIKE :description OR e.equation LIKE :equation')
-                ->setParameter('description', "%{$sSearch}%")
-                ->setParameter('equation', "%{$sSearch}%");
-
-        $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
-
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+        // Agregar filtro de búsqueda si es necesario
+        if (!empty($sSearch)) {
+            $qb->andWhere('e.description LIKE :search OR e.equation LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
-        return $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
+        // Ordenar por la columna seleccionada
+        $qb->orderBy("e.$iSortCol_0", $sSortDir_0);
+
+        // Limitar los resultados con paginación
+        if ($limit > 0) {
+            $qb->setMaxResults($limit)
+                ->setFirstResult($start);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
-     * TotalEquations: Total de equations de la BD
-     * @param string $sSearch Para buscar
+     * TotalEquations: Obtiene el total de ecuaciones en la BD con filtro de búsqueda.
      *
-     * @author Marcel
+     * @param string|null $sSearch El término de búsqueda (opcional)
+     *
+     * @return int El número total de ecuaciones
      */
-    public function TotalEquations($sSearch)
+    public function TotalEquations(?string $sSearch): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(e.equationId) FROM App\Entity\Equation e ';
-        $join = '';
-        $where = '';
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(e.equationId)');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE e.description LIKE :description OR e.equation LIKE :equation ';
-            else
-                $where .= 'AND e.description LIKE :description OR e.equation LIKE :equation ';
+        // Agregar filtro de búsqueda si es necesario
+        if (!empty($sSearch)) {
+            $qb->andWhere('e.description LIKE :search OR e.equation LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_description = substr_count($consulta, ':description');
-        if ($esta_query_description == 1)
-            $query->setParameter(':description', "%{$sSearch}%");
-
-        $esta_query_equation = substr_count($consulta, ':equation');
-        if ($esta_query_equation == 1)
-            $query->setParameter(':equation', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

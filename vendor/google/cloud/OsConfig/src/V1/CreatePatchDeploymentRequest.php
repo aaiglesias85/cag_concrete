@@ -21,7 +21,7 @@ class CreatePatchDeploymentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. A name for the patch deployment in the project. When creating a
      * name the following rules apply:
@@ -33,13 +33,38 @@ class CreatePatchDeploymentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string patch_deployment_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $patch_deployment_id = '';
+    protected $patch_deployment_id = '';
     /**
      * Required. The patch deployment to create.
      *
      * Generated from protobuf field <code>.google.cloud.osconfig.v1.PatchDeployment patch_deployment = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $patch_deployment = null;
+    protected $patch_deployment = null;
+
+    /**
+     * @param string                                    $parent            Required. The project to apply this patch deployment to in the form
+     *                                                                     `projects/*`. Please see
+     *                                                                     {@see OsConfigServiceClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\OsConfig\V1\PatchDeployment $patchDeployment   Required. The patch deployment to create.
+     * @param string                                    $patchDeploymentId Required. A name for the patch deployment in the project. When creating a
+     *                                                                     name the following rules apply:
+     *                                                                     * Must contain only lowercase letters, numbers, and hyphens.
+     *                                                                     * Must start with a letter.
+     *                                                                     * Must be between 1-63 characters.
+     *                                                                     * Must end with a number or a letter.
+     *                                                                     * Must be unique within the project.
+     *
+     * @return \Google\Cloud\OsConfig\V1\CreatePatchDeploymentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\OsConfig\V1\PatchDeployment $patchDeployment, string $patchDeploymentId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setPatchDeployment($patchDeployment)
+            ->setPatchDeploymentId($patchDeploymentId);
+    }
 
     /**
      * Constructor.

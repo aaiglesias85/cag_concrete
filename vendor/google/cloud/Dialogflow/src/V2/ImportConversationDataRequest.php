@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [ConversationDatasets.ImportConversationData][google.cloud.dialogflow.v2.ConversationDatasets.ImportConversationData].
+ * The request message for
+ * [ConversationDatasets.ImportConversationData][google.cloud.dialogflow.v2.ConversationDatasets.ImportConversationData].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ImportConversationDataRequest</code>
  */
@@ -22,13 +23,13 @@ class ImportConversationDataRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Configuration describing where to import data from.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.InputConfig input_config = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $input_config = null;
+    protected $input_config = null;
 
     /**
      * Constructor.

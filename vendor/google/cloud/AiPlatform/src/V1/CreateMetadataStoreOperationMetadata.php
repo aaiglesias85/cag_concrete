@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Details of operations that perform [MetadataService.CreateMetadataStore][google.cloud.aiplatform.v1.MetadataService.CreateMetadataStore].
+ * Details of operations that perform
+ * [MetadataService.CreateMetadataStore][google.cloud.aiplatform.v1.MetadataService.CreateMetadataStore].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateMetadataStoreOperationMetadata</code>
  */
@@ -20,7 +21,7 @@ class CreateMetadataStoreOperationMetadata extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GenericOperationMetadata generic_metadata = 1;</code>
      */
-    private $generic_metadata = null;
+    protected $generic_metadata = null;
 
     /**
      * Constructor.

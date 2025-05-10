@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Column properties for [TableCard][google.cloud.dialogflow.v2.Intent.Message.TableCard].
+ * Column properties for
+ * [TableCard][google.cloud.dialogflow.v2.Intent.Message.TableCard].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.Intent.Message.ColumnProperties</code>
  */
@@ -20,13 +21,13 @@ class ColumnProperties extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string header = 1;</code>
      */
-    private $header = '';
+    protected $header = '';
     /**
      * Optional. Defines text alignment for all cells in this column.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Intent.Message.ColumnProperties.HorizontalAlignment horizontal_alignment = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $horizontal_alignment = 0;
+    protected $horizontal_alignment = 0;
 
     /**
      * Constructor.
@@ -99,6 +100,4 @@ class ColumnProperties extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ColumnProperties::class, \Google\Cloud\Dialogflow\V2\Intent_Message_ColumnProperties::class);
 

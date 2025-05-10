@@ -23,19 +23,34 @@ class ListSnapshotsRequest extends \Google\Protobuf\Internal\Message
      */
     private $project = '';
     /**
-     * Maximum number of snapshots to return.
+     * Optional. Maximum number of snapshots to return.
      *
-     * Generated from protobuf field <code>int32 page_size = 2;</code>
+     * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $page_size = 0;
     /**
-     * The value returned by the last `ListSnapshotsResponse`; indicates that this
-     * is a continuation of a prior `ListSnapshots` call, and that the system
-     * should return the next page of data.
+     * Optional. The value returned by the last `ListSnapshotsResponse`; indicates
+     * that this is a continuation of a prior `ListSnapshots` call, and that the
+     * system should return the next page of data.
      *
-     * Generated from protobuf field <code>string page_token = 3;</code>
+     * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $page_token = '';
+
+    /**
+     * @param string $project Required. The name of the project in which to list snapshots.
+     *                        Format is `projects/{project-id}`. Please see
+     *                        {@see SubscriberClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\PubSub\V1\ListSnapshotsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $project): self
+    {
+        return (new self())
+            ->setProject($project);
+    }
 
     /**
      * Constructor.
@@ -47,11 +62,11 @@ class ListSnapshotsRequest extends \Google\Protobuf\Internal\Message
      *           Required. The name of the project in which to list snapshots.
      *           Format is `projects/{project-id}`.
      *     @type int $page_size
-     *           Maximum number of snapshots to return.
+     *           Optional. Maximum number of snapshots to return.
      *     @type string $page_token
-     *           The value returned by the last `ListSnapshotsResponse`; indicates that this
-     *           is a continuation of a prior `ListSnapshots` call, and that the system
-     *           should return the next page of data.
+     *           Optional. The value returned by the last `ListSnapshotsResponse`; indicates
+     *           that this is a continuation of a prior `ListSnapshots` call, and that the
+     *           system should return the next page of data.
      * }
      */
     public function __construct($data = NULL) {
@@ -88,9 +103,9 @@ class ListSnapshotsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum number of snapshots to return.
+     * Optional. Maximum number of snapshots to return.
      *
-     * Generated from protobuf field <code>int32 page_size = 2;</code>
+     * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
      */
     public function getPageSize()
@@ -99,9 +114,9 @@ class ListSnapshotsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Maximum number of snapshots to return.
+     * Optional. Maximum number of snapshots to return.
      *
-     * Generated from protobuf field <code>int32 page_size = 2;</code>
+     * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
      * @return $this
      */
@@ -114,11 +129,11 @@ class ListSnapshotsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The value returned by the last `ListSnapshotsResponse`; indicates that this
-     * is a continuation of a prior `ListSnapshots` call, and that the system
-     * should return the next page of data.
+     * Optional. The value returned by the last `ListSnapshotsResponse`; indicates
+     * that this is a continuation of a prior `ListSnapshots` call, and that the
+     * system should return the next page of data.
      *
-     * Generated from protobuf field <code>string page_token = 3;</code>
+     * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getPageToken()
@@ -127,11 +142,11 @@ class ListSnapshotsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The value returned by the last `ListSnapshotsResponse`; indicates that this
-     * is a continuation of a prior `ListSnapshots` call, and that the system
-     * should return the next page of data.
+     * Optional. The value returned by the last `ListSnapshotsResponse`; indicates
+     * that this is a continuation of a prior `ListSnapshots` call, and that the
+     * system should return the next page of data.
      *
-     * Generated from protobuf field <code>string page_token = 3;</code>
+     * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */

@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="6ce1737a-173e-4b5f-8020-e03c3ed0ffa5" activeEnvironment="Default" name="QA Azure GeoReferencia" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" resourceRoot="" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="34871fa7-7345-4c4f-965a-54ee91e8bf64" wsaVersion="NONE" name="BasicHttpBinding_ICorpGR" type="wsdl" bindingName="{http://tempuri.org/}BasicHttpBinding_ICorpGR" soapVersion="1_1" anonymous="optional" definition="https://testservices.wschilexpress.com/GeoReferencia?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="https://testservices.wschilexpress.com/GeoReferencia?wsdl"><con:part><con:url>https://testservices.wschilexpress.com/GeoReferencia?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CorpGR" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:i0="http://www.chilexpress.cl/CorpGR/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+  <wsdl:import namespace="http://www.chilexpress.cl/CorpGR/" location="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?wsdl=wsdl0"/>
+  <wsdl:types/>
+  <wsdl:binding name="BasicHttpBinding_ICorpGR" type="i0:ICorpGR">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ConsultarCoberturas">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarCoberturas" style="document"/>
+      <wsdl:input name="ConsultarCoberturasRequest1">
+        <soap:header message="i0:ConsultarCoberturasRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarCoberturasResponse1">
+        <soap:header message="i0:ConsultarCoberturasResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarRegiones">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarRegiones" style="document"/>
+      <wsdl:input name="ConsultarRegionesRequest1">
+        <soap:header message="i0:ConsultarRegionesRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarRegionesResponse1">
+        <soap:header message="i0:ConsultarRegionesResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarCalles">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarCalles" style="document"/>
+      <wsdl:input name="ConsultarCallesRequest1">
+        <soap:header message="i0:ConsultarCallesRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarCallesResponse1">
+        <soap:header message="i0:ConsultarCallesResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarNumeros">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarNumeros" style="document"/>
+      <wsdl:input name="ConsultarNumerosRequest1">
+        <soap:header message="i0:ConsultarNumerosRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarNumerosResponse1">
+        <soap:header message="i0:ConsultarNumerosResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarDirecciones">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarDirecciones" style="document"/>
+      <wsdl:input name="ConsultarDireccionesRequest1">
+        <soap:header message="i0:ConsultarDireccionesRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarDireccionesResponse1">
+        <soap:header message="i0:ConsultarDireccionesResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarOficinas">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarOficinas" style="document"/>
+      <wsdl:input name="ConsultarOficinasRequest1">
+        <soap:header message="i0:ConsultarOficinasRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarOficinasResponse1">
+        <soap:header message="i0:ConsultarOficinasResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarOficinas_REG">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarOficinas_REG" style="document"/>
+      <wsdl:input name="ConsultarOficinas_REGRequest1">
+        <soap:header message="i0:ConsultarOficinas_REGRequest1_Headers" part="headerRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarOficinas_REGResponse1">
+        <soap:header message="i0:ConsultarOficinas_REGResponse1_Headers" part="headerResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarLocalidades">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarLocalidades" style="document"/>
+      <wsdl:input name="ConsultarLocalidadesRequest">
+        <soap:header message="i0:ConsultarLocalidadesRequest_Headers" part="HeaderRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarLocalidadesResponse">
+        <soap:header message="i0:ConsultarLocalidadesResponse_Headers" part="HeaderResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarCallesFiltro">
+      <soap:operation soapAction="http://www.chilexpress.cl/CorpGR/ConsultarCallesFiltro" style="document"/>
+      <wsdl:input name="ConsultarCallesFiltroRequest">
+        <soap:header message="i0:ConsultarCallesFiltroRequest_Headers" part="HeaderRequest" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ConsultarCallesFiltroResponse">
+        <soap:header message="i0:ConsultarCallesFiltroResponse_Headers" part="HeaderResponse" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CorpGR">
+    <wsdl:port name="BasicHttpBinding_ICorpGR" binding="tns:BasicHttpBinding_ICorpGR">
+      <soap:address location="http://testservices.wschilexpress.com/GeoReferencia"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?wsdl=wsdl0</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://www.chilexpress.cl/CorpGR/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/CorpGR/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://www.chilexpress.cl/CorpGR/Imports">
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd0" namespace="http://www.chilexpress.cl/CorpGR/"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd1" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd2" namespace="http://www.chilexpress.cl/common/HeaderRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd3" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd4" namespace="http://www.chilexpress.cl/common/HeaderResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd5" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd6" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd7" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd8" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd9" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd10" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd11" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd12" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd13" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd14" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd15" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd16"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd17" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd18" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd19" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesResponse"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd20" namespace="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroRequest"/>
+      <xsd:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd21" namespace="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroResponse"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ConsultarCoberturasRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarCoberturas"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCoberturasRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCoberturasResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarCoberturasResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCoberturasResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarRegionesRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarRegiones"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarRegionesRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarRegionesResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarRegionesResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarRegionesResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarCalles"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarCallesResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarNumerosRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarNumeros"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarNumerosRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarNumerosResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarNumerosResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarNumerosResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarDireccionesRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarDirecciones"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarDireccionesRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarDireccionesResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarDireccionesResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarDireccionesResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinasRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarOficinas"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinasRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinasResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarOficinasResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinasResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinas_REGRequest1">
+    <wsdl:part name="parameters" element="tns:ConsultarOficinas_REG"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinas_REGRequest1_Headers">
+    <wsdl:part name="headerRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinas_REGResponse1">
+    <wsdl:part name="parameters" element="tns:ConsultarOficinas_REGResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarOficinas_REGResponse1_Headers">
+    <wsdl:part name="headerResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarLocalidadesRequest">
+    <wsdl:part name="parameters" element="tns:ConsultarLocalidades"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarLocalidadesRequest_Headers">
+    <wsdl:part name="HeaderRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarLocalidadesResponse">
+    <wsdl:part name="parameters" element="tns:ConsultarLocalidadesResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarLocalidadesResponse_Headers">
+    <wsdl:part name="HeaderResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesFiltroRequest">
+    <wsdl:part name="parameters" element="tns:ConsultarCallesFiltroRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesFiltroRequest_Headers">
+    <wsdl:part name="HeaderRequest" element="tns:headerRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesFiltroResponse">
+    <wsdl:part name="parameters" element="tns:ConsultarCallesFiltroResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ConsultarCallesFiltroResponse_Headers">
+    <wsdl:part name="HeaderResponse" element="tns:headerResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="ICorpGR">
+    <wsdl:operation name="ConsultarCoberturas">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarCoberturas" name="ConsultarCoberturasRequest1" message="tns:ConsultarCoberturasRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarCoberturasResponse" name="ConsultarCoberturasResponse1" message="tns:ConsultarCoberturasResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarRegiones">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarRegiones" name="ConsultarRegionesRequest1" message="tns:ConsultarRegionesRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarRegionesResponse" name="ConsultarRegionesResponse1" message="tns:ConsultarRegionesResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarCalles">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarCalles" name="ConsultarCallesRequest1" message="tns:ConsultarCallesRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarCallesResponse" name="ConsultarCallesResponse1" message="tns:ConsultarCallesResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarNumeros">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarNumeros" name="ConsultarNumerosRequest1" message="tns:ConsultarNumerosRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarNumerosResponse" name="ConsultarNumerosResponse1" message="tns:ConsultarNumerosResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarDirecciones">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarDirecciones" name="ConsultarDireccionesRequest1" message="tns:ConsultarDireccionesRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarDireccionesResponse" name="ConsultarDireccionesResponse1" message="tns:ConsultarDireccionesResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarOficinas">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas" name="ConsultarOficinasRequest1" message="tns:ConsultarOficinasRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarOficinasResponse" name="ConsultarOficinasResponse1" message="tns:ConsultarOficinasResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarOficinas_REG">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas_REG" name="ConsultarOficinas_REGRequest1" message="tns:ConsultarOficinas_REGRequest1"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas_REGResponse" name="ConsultarOficinas_REGResponse1" message="tns:ConsultarOficinas_REGResponse1"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarLocalidades">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarLocalidades" name="ConsultarLocalidadesRequest" message="tns:ConsultarLocalidadesRequest"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarLocalidadesResponse" name="ConsultarLocalidadesResponse" message="tns:ConsultarLocalidadesResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ConsultarCallesFiltro">
+      <wsdl:input wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarCallesFiltro" name="ConsultarCallesFiltroRequest" message="tns:ConsultarCallesFiltroRequest"/>
+      <wsdl:output wsam:Action="http://www.chilexpress.cl/CorpGR/ConsultarCallesFiltroResponse" name="ConsultarCallesFiltroResponse" message="tns:ConsultarCallesFiltroResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd0</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/CorpGR/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/CorpGR/">
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd1" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd2" namespace="http://www.chilexpress.cl/common/HeaderRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd3" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd4" namespace="http://www.chilexpress.cl/common/HeaderResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd5" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd6" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd7" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd8" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd9" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd10" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd11" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd12" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd13" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd14" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd15" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd16"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd18" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd19" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesResponse"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd20" namespace="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroRequest"/>
+  <xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd21" namespace="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroResponse"/>
+  <xs:element name="ConsultarCoberturas">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerCobertura" type="q1:ConsultarCoberturasRequest" xmlns:q1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="headerRequest" type="q2:DatosHeaderRequest" xmlns:q2="http://www.chilexpress.cl/common/HeaderRequest"/>
+  <xs:element name="ConsultarCoberturasResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerCobertura" type="q3:ConsultarCoberturasResponse" xmlns:q3="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="headerResponse" type="q4:DatosHeaderResponse" xmlns:q4="http://www.chilexpress.cl/common/HeaderResponse"/>
+  <xs:element name="ConsultarRegiones">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerRegion" type="q5:ConsultarRegionesRequest" xmlns:q5="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarRegionesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerRegion" type="q6:ConsultarRegionesResponse" xmlns:q6="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarCalles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerCalle" type="q7:ConsultarCallesRequest" xmlns:q7="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarCallesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerCalle" type="q8:ConsultarCallesResponse" xmlns:q8="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarNumeros">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerNumero" type="q9:ConsultarNumerosRequest" xmlns:q9="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarNumerosResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerNumero" type="tns:ConsultarNumerosResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ConsultarNumerosResponse">
+    <xs:annotation>
+      <xs:appinfo>
+        <keepNamespaceDeclarations>xmlns</keepNamespaceDeclarations>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" ref="q10:CodEstado" xmlns:q10="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse"/>
+      <xs:element minOccurs="0" maxOccurs="1" ref="q11:GlsEstado" xmlns:q11="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="q12:Numeros" xmlns:q12="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ConsultarDirecciones">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerDireccion" type="q13:ConsultarDireccionesRequest" xmlns:q13="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarDireccionesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerDireccion" type="q14:ConsultarDireccionesResponse" xmlns:q14="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarOficinas">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerOficinas" type="q15:ConsultarOficinasRequest" xmlns:q15="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarOficinasResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerOficinas" type="q16:ConsultarOficinasResponse" xmlns:q16="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarOficinas_REG">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerOficinas_REG" type="q17:ConsultarOficinas_REGRequest" xmlns:q17="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarOficinas_REGResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="respObtenerOficinas_REG"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarLocalidades">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqObtenerLocalidades" type="q18:ConsultarLocalidades" xmlns:q18="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarLocalidadesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respObtenerLocalidades" type="q19:ConsultarLocalidades" xmlns:q19="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarCallesFiltroRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="reqConsultarCallesFiltro" type="q20:ConsultarCallesFiltro" xmlns:q20="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroRequest"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConsultarCallesFiltroResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="respConsultarCallesFiltro" type="q21:ConsultarCallesFiltro" xmlns:q21="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroResponse"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd1</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaRequest">
+  <xs:complexType name="ConsultarCoberturasRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodTipoCobertura" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodRegion" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd2</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/common/HeaderRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/common/HeaderRequest">
+  <xs:complexType name="DatosHeaderRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="transaccion" type="tns:DatosTransaccion"/>
+    </xs:sequence>
+    <xs:anyAttribute/>
+  </xs:complexType>
+  <xs:complexType name="DatosTransaccion">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="fechaHora" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="idTransaccionNegocio" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="idTransaccionOSB" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="sistema" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="usuario" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="oficinaCaja" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="nodoHeader">
+        <xs:complexType>
+          <xs:complexContent mixed="true">
+            <xs:extension base="tns:AnyNode"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AnyNode" mixed="true"/>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd3</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaResponse">
+  <xs:complexType name="ConsultarCoberturasResponse">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Coberturas" type="tns:Coberturas"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Coberturas">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodRegion" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodComunaIne" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd4</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/common/HeaderResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/common/HeaderResponse">
+  <xs:complexType name="DatosHeaderResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="transaccion" type="tns:datosTransaccion"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datosTransaccion">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="internalCode" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="idTransaccionNegocio" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="fechaHoraInicioTrx" nillable="true" type="xs:dateTime"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="fechaHoraFinTrx" nillable="true" type="xs:dateTime"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="estado" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd5</con:url><con:content>&lt;xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionRequest">
+  &lt;xs:complexType name="ConsultarRegionesRequest"/>
+&lt;/xs:schema></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd6</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarRegionResponse">
+  <xs:complexType name="ConsultarRegionesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Regiones" type="tns:Regiones"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Regiones">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="idRegion" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsRegion" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd7</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleRequest">
+  <xs:complexType name="ConsultarCallesRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsCalle" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd8</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleResponse">
+  <xs:complexType name="ConsultarCallesResponse">
+    <xs:annotation>
+      <xs:appinfo>
+        <keepNamespaceDeclarations>xmlns</keepNamespaceDeclarations>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Calles" type="tns:Calles"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Calles">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="idNombreCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsCalle" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd9</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroRequest">
+  <xs:complexType name="ConsultarNumerosRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="idNombreCalle" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Numeracion" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd10</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroResponse">
+  <xs:element name="CodEstado" type="xs:int"/>
+  <xs:element name="GlsEstado" type="xs:string"/>
+  <xs:element name="Numeros" type="tns:Numeros"/>
+  <xs:complexType name="Numeros">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="CaN" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Numeracion" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CpN" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd11</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionRequest">
+  <xs:complexType name="ConsultarDireccionesRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CaN" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Numeracion" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CpN" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="Complemento" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd12</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionResponse">
+  <xs:complexType name="ConsultarDireccionesResponse">
+    <xs:annotation>
+      <xs:appinfo>
+        <keepNamespaceDeclarations>xmlns</keepNamespaceDeclarations>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Direcciones" type="tns:Direcciones"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Direcciones">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodResultado" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="idDireccion" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="idBlock" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Lat" type="xs:float"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Lon" type="xs:float"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd13</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasRequest">
+  <xs:complexType name="ConsultarOficinasRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd14</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasResponse">
+  <xs:complexType name="ConsultarOficinasResponse">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Calles" type="tns:Calles"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Calles">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="NombreCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="NombreOficina" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Numeracion" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CaN" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CpN" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="NombreComuna" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="IdDireccion" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="IdBlock" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Lat" type="xs:float"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Lon" type="xs:float"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd15</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGRequest">
+  <xs:complexType name="ConsultarOficinas_REGRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodRegion" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd16</con:url><con:content>&lt;xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  &lt;xs:import schemaLocation="http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd17" namespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGResponse"/>
+  &lt;xs:element name="respObtenerOficinas_REG" type="q1:ConsultarOficinas_REGResponse" xmlns:q1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGResponse"/>
+&lt;/xs:schema></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd17</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGResponse">
+  <xs:complexType name="ConsultarOficinas_REGResponse">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Calles" type="tns:Calles"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Calles">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="idCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="NombreOficina" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Numeracion" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CaN" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CpN" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodComunaIne" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="IdDireccion" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="IdBlock" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Lat" type="xs:float"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="Lon" type="xs:float"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsAlias" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd18</con:url><con:content>&lt;xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesRequest">
+  &lt;xs:complexType name="ConsultarLocalidades"/>
+&lt;/xs:schema></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd19</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarLocalidadesResponse">
+  <xs:complexType name="ConsultarLocalidades">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Localidades" type="tns:Localidades"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Localidades">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodComunaIne" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodOficina" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="CodScalfa" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsSector" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="IdRegion" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd20</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroRequest" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroRequest">
+  <xs:complexType name="ConsultarCallesFiltro">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsCalle" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="IndPuntoInteres" type="xs:boolean"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodTipoBusqueda" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="CantResultados" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part><con:part><con:url>http://cxpeussfint.eastus.cloudapp.azure.com/SoapAPI.GeoReference?xsd=xsd21</con:url><con:content><![CDATA[<xs:schema elementFormDefault="qualified" targetNamespace="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroResponse" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroResponse">
+  <xs:complexType name="ConsultarCallesFiltro">
+    <xs:annotation>
+      <xs:appinfo>
+        <keepNamespaceDeclarations>xmlns</keepNamespaceDeclarations>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="CodEstado" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsEstado" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Calles" type="tns:Calle"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Calle">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="idNombreCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsComuna" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsCalle" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="GlsTipoVia" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint></con:endpoints><con:operation id="52b330aa-af3f-4cc6-8946-d9250935b050" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarCalles" name="ConsultarCalles" bindingOperationName="ConsultarCalles" type="Request-Response" outputName="ConsultarCallesResponse1" inputName="ConsultarCallesRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="c70a47d4-38ba-470b-9929-9b0cf35f0d14" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:cor1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCalleRequest">\r
+   <soapenv:Header>\r
+      <cor:headerRequest>\r
+         <!--Optional:-->\r
+         <head:transaccion>\r
+            <!--Optional:-->\r
+            <head:fechaHora>?</head:fechaHora>\r
+            <!--Optional:-->\r
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>\r
+            <!--Optional:-->\r
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>\r
+            <!--Optional:-->\r
+            <head:sistema>?</head:sistema>\r
+            <!--Optional:-->\r
+            <head:usuario>?</head:usuario>\r
+            <!--Optional:-->\r
+            <head:oficinaCaja>?</head:oficinaCaja>\r
+            <!--Optional:-->\r
+            <head:nodoHeader>e gero</head:nodoHeader>\r
+         </head:transaccion>\r
+      </cor:headerRequest>\r
+   </soapenv:Header>\r
+   <soapenv:Body>\r
+      <cor:ConsultarCalles>\r
+         <!--Optional:-->\r
+         <reqObtenerCalle>\r
+            <!--Optional:-->\r
+            <cor1:GlsComuna>PROVIDENCIA</cor1:GlsComuna>\r
+            <!--Optional:-->\r
+            <cor1:GlsCalle>MANUEL MONTT</cor1:GlsCalle>\r
+         </reqObtenerCalle>\r
+      </cor:ConsultarCalles>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarCalles"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="2e33901a-295a-418f-b6e4-010089461351" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarCallesFiltro" name="ConsultarCallesFiltro" bindingOperationName="ConsultarCallesFiltro" type="Request-Response" outputName="ConsultarCallesFiltroResponse" inputName="ConsultarCallesFiltroRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="5dd58472-0c7b-4bd5-86a7-cbe07ff48e88" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:con="http://www.chilexpress.cl/PX100106/ConsultarCallesFiltroRequest">\r
+   <soapenv:Header>\r
+      <cor:headerRequest>\r
+         <!--Optional:-->\r
+         <head:transaccion>\r
+            <!--Optional:-->\r
+            <head:fechaHora>?</head:fechaHora>\r
+            <!--Optional:-->\r
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>\r
+            <!--Optional:-->\r
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>\r
+            <!--Optional:-->\r
+            <head:sistema>?</head:sistema>\r
+            <!--Optional:-->\r
+            <head:usuario>?</head:usuario>\r
+            <!--Optional:-->\r
+            <head:oficinaCaja>?</head:oficinaCaja>\r
+            <!--Optional:-->\r
+            <head:nodoHeader>e gero</head:nodoHeader>\r
+         </head:transaccion>\r
+      </cor:headerRequest>\r
+   </soapenv:Header>\r
+   <soapenv:Body>\r
+      <cor:ConsultarCallesFiltroRequest>\r
+         <!--Optional:-->\r
+         <reqConsultarCallesFiltro>\r
+            <!--Optional:-->\r
+            <con:GlsComuna>PROVIDENCIA</con:GlsComuna>\r
+            <!--Optional:-->\r
+            <con:GlsCalle>MANUEL MONTT</con:GlsCalle>\r
+            <con:IndPuntoInteres>1</con:IndPuntoInteres>\r
+            <con:CodTipoBusqueda>1</con:CodTipoBusqueda>\r
+            <con:CantResultados>5</con:CantResultados>\r
+         </reqConsultarCallesFiltro>\r
+      </cor:ConsultarCallesFiltroRequest>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarCallesFiltro"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ddb4724a-9a0c-4029-8a3f-d62905fb030e" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarCoberturas" name="ConsultarCoberturas" bindingOperationName="ConsultarCoberturas" type="Request-Response" outputName="ConsultarCoberturasResponse1" inputName="ConsultarCoberturasRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="943aacab-d57e-49d1-bf68-ad297973a9fc" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:cor1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarCoberturaRequest">\r
+   <soapenv:Header>\r
+      <cor:headerRequest>\r
+         <!--Optional:-->\r
+         <head:transaccion>\r
+            <!--Optional:-->\r
+            <head:fechaHora>?</head:fechaHora>\r
+            <!--Optional:-->\r
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>\r
+            <!--Optional:-->\r
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>\r
+            <!--Optional:-->\r
+            <head:sistema>?</head:sistema>\r
+            <!--Optional:-->\r
+            <head:usuario>?</head:usuario>\r
+            <!--Optional:-->\r
+            <head:oficinaCaja>?</head:oficinaCaja>\r
+            <!--Optional:-->\r
+            <head:nodoHeader>e gero</head:nodoHeader>\r
+         </head:transaccion>\r
+      </cor:headerRequest>\r
+   </soapenv:Header>\r
+   <soapenv:Body>\r
+      <cor:ConsultarCoberturas>\r
+         <!--Optional:-->\r
+         <reqObtenerCobertura>\r
+            <!--Optional:-->\r
+            <cor1:CodTipoCobertura>0</cor1:CodTipoCobertura>\r
+            <cor1:CodRegion>RM</cor1:CodRegion>\r
+         </reqObtenerCobertura>\r
+      </cor:ConsultarCoberturas>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarCoberturas"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="70910c54-375a-40e0-a9ee-8402f2106ff3" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarDirecciones" name="ConsultarDirecciones" bindingOperationName="ConsultarDirecciones" type="Request-Response" outputName="ConsultarDireccionesResponse1" inputName="ConsultarDireccionesRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="f83a91e8-0f48-405a-84c3-0f58a3a8eb5e" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:cor1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarDireccionRequest">
+   <soapenv:Header>
+      <cor:headerRequest>
+         <head:transaccion>
+            <head:fechaHora>?</head:fechaHora>
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>
+            <!--Optional:-->
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>
+            <head:sistema>?</head:sistema>
+            <!--Optional:-->
+            <head:usuario>?</head:usuario>
+            <!--Optional:-->
+            <head:oficinaCaja>?</head:oficinaCaja>
+            <!--Optional:-->
+            <head:nodoHeader>
+?</head:nodoHeader>
+         </head:transaccion>
+      </cor:headerRequest>
+   </soapenv:Header>
+   <soapenv:Body>
+      <cor:ConsultarDirecciones>
+         <reqObtenerDireccion>
+            <cor1:GlsComuna>PROVIDENCIA</cor1:GlsComuna>
+            <cor1:GlsCalle>AVENIDA MANUEL MONTT</cor1:GlsCalle>
+            <cor1:CaN>?</cor1:CaN>
+            <cor1:Numeracion>427</cor1:Numeracion>
+            <cor1:CpN>?</cor1:CpN>
+            <cor1:Complemento>?</cor1:Complemento>
+         </reqObtenerDireccion>
+      </cor:ConsultarDirecciones>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarDirecciones"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="a5e8f676-eea3-4dad-af97-37b752289f7c" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarLocalidades" name="ConsultarLocalidades" bindingOperationName="ConsultarLocalidades" type="Request-Response" outputName="ConsultarLocalidadesResponse" inputName="ConsultarLocalidadesRequest" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="f1526a7e-db5a-4eb5-b661-a5052b805cf2" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest">\r
+   <soapenv:Header>\r
+      <cor:headerRequest>\r
+         <!--Optional:-->\r
+         <head:transaccion>\r
+            <!--Optional:-->\r
+            <head:fechaHora>?</head:fechaHora>\r
+            <!--Optional:-->\r
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>\r
+            <!--Optional:-->\r
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>\r
+            <!--Optional:-->\r
+            <head:sistema>?</head:sistema>\r
+            <!--Optional:-->\r
+            <head:usuario>?</head:usuario>\r
+            <!--Optional:-->\r
+            <head:oficinaCaja>?</head:oficinaCaja>\r
+            <!--Optional:-->\r
+            <head:nodoHeader>?</head:nodoHeader>\r
+         </head:transaccion>\r
+      </cor:headerRequest>\r
+   </soapenv:Header>\r
+   <soapenv:Body>\r
+      <cor:ConsultarLocalidades>\r
+         <reqObtenerLocalidades/>\r
+      </cor:ConsultarLocalidades>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarLocalidades"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="a44c5b1d-c23a-460f-9182-309c276872ce" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarNumeros" name="ConsultarNumeros" bindingOperationName="ConsultarNumeros" type="Request-Response" outputName="ConsultarNumerosResponse1" inputName="ConsultarNumerosRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="2c689b7e-f8b6-48f1-a0ff-728b7538d58a" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:cor1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarNumeroRequest">
+   <soapenv:Header>
+      <cor:headerRequest>
+         <head:transaccion>
+            <head:fechaHora>?</head:fechaHora>
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>
+            <!--Optional:-->
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>
+            <head:sistema>?</head:sistema>
+            <!--Optional:-->
+            <head:usuario>?</head:usuario>
+            <!--Optional:-->
+            <head:oficinaCaja>?</head:oficinaCaja>
+            <!--Optional:-->
+            <head:nodoHeader>
+?</head:nodoHeader>
+         </head:transaccion>
+      </cor:headerRequest>
+   </soapenv:Header>
+   <soapenv:Body>
+      <cor:ConsultarNumeros>
+         <reqObtenerNumero>
+            <cor1:idNombreCalle>116354</cor1:idNombreCalle>
+            <cor1:Numeracion>427</cor1:Numeracion>
+         </reqObtenerNumero>
+      </cor:ConsultarNumeros>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarNumeros"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="4d810c64-dce9-4010-9ea8-6470e2d9f852" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas" name="ConsultarOficinas" bindingOperationName="ConsultarOficinas" type="Request-Response" outputName="ConsultarOficinasResponse1" inputName="ConsultarOficinasRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="42a4e6e1-a3a6-4102-a028-0e7794133ad4" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:cor1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinasRequest">\r
+   <soapenv:Header>\r
+      <cor:headerRequest>\r
+         <!--Optional:-->\r
+         <head:transaccion>\r
+            <!--Optional:-->\r
+            <head:fechaHora>?</head:fechaHora>\r
+            <!--Optional:-->\r
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>\r
+            <!--Optional:-->\r
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>\r
+            <!--Optional:-->\r
+            <head:sistema>?</head:sistema>\r
+            <!--Optional:-->\r
+            <head:usuario>?</head:usuario>\r
+            <!--Optional:-->\r
+            <head:oficinaCaja>?</head:oficinaCaja>\r
+            <!--Optional:-->\r
+            <head:nodoHeader>?</head:nodoHeader>\r
+         </head:transaccion>\r
+      </cor:headerRequest>\r
+   </soapenv:Header>\r
+   <soapenv:Body>\r
+      <cor:ConsultarOficinas>\r
+         <!--Optional:-->\r
+         <reqObtenerOficinas>\r
+            <!--Optional:-->\r
+            <cor1:GlsComuna>PROVIDENCIA</cor1:GlsComuna>\r
+         </reqObtenerOficinas>\r
+      </cor:ConsultarOficinas>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="8d21f930-c5ed-467f-92e7-bb82cfe8a873" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas_REG" name="ConsultarOficinas_REG" bindingOperationName="ConsultarOficinas_REG" type="Request-Response" outputName="ConsultarOficinas_REGResponse1" inputName="ConsultarOficinas_REGRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="d9edaf8f-754f-456b-92e7-1f8d4e61832e" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cor="http://www.chilexpress.cl/CorpGR/" xmlns:head="http://www.chilexpress.cl/common/HeaderRequest" xmlns:cor1="http://www.chilexpress.cl/PX000014/CorpGR_ConsultarOficinas_REGRequest">\r
+   <soapenv:Header>\r
+      <cor:headerRequest>\r
+         <!--Optional:-->\r
+         <head:transaccion>\r
+            <!--Optional:-->\r
+            <head:fechaHora>?</head:fechaHora>\r
+            <!--Optional:-->\r
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>\r
+            <!--Optional:-->\r
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>\r
+            <!--Optional:-->\r
+            <head:sistema>?</head:sistema>\r
+            <!--Optional:-->\r
+            <head:usuario>?</head:usuario>\r
+            <!--Optional:-->\r
+            <head:oficinaCaja>?</head:oficinaCaja>\r
+            <!--Optional:-->\r
+            <head:nodoHeader>?</head:nodoHeader>\r
+         </head:transaccion>\r
+      </cor:headerRequest>\r
+   </soapenv:Header>\r
+   <soapenv:Body>\r
+      <cor:ConsultarOficinas_REG>\r
+         <!--Optional:-->\r
+         <reqObtenerOficinas_REG>\r
+            <!--Optional:-->\r
+            <cor1:CodRegion>R1</cor1:CodRegion>\r
+         </reqObtenerOficinas_REG>\r
+      </cor:ConsultarOficinas_REG>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarOficinas_REG"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="829d5ca8-c590-4f82-a185-b473c876273f" isOneWay="false" action="http://www.chilexpress.cl/CorpGR/ConsultarRegiones" name="ConsultarRegiones" bindingOperationName="ConsultarRegiones" type="Request-Response" outputName="ConsultarRegionesResponse1" inputName="ConsultarRegionesRequest1" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="4dd3f942-0497-4de1-b362-1b177b658586" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://testservices.wschilexpress.com/GeoReferencia</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
+xmlns:cor="http://www.chilexpress.cl/CorpGR/" 
+xmlns:head="http://www.chilexpress.cl/common/HeaderRequest">
+   <soapenv:Header>
+      <cor:headerRequest>
+         <head:transaccion>
+            <head:fechaHora>?</head:fechaHora>
+            <head:idTransaccionNegocio>?</head:idTransaccionNegocio>
+            <!--Optional:-->
+            <head:idTransaccionOSB>?</head:idTransaccionOSB>
+            <head:sistema>?</head:sistema>
+            <!--Optional:-->
+            <head:usuario>?</head:usuario>
+            <!--Optional:-->
+            <head:oficinaCaja>?</head:oficinaCaja>
+            <!--Optional:-->
+            <head:nodoHeader>?</head:nodoHeader>
+         </head:transaccion>
+      </cor:headerRequest>
+   </soapenv:Header>
+   <soapenv:Body>
+      <cor:ConsultarRegiones>
+         <reqObtenerRegion/>
+      </cor:ConsultarRegiones>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.chilexpress.cl/CorpGR/ConsultarRegiones"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>

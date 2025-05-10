@@ -28,22 +28,28 @@ class Index extends \Google\Protobuf\Internal\Message
     /**
      * Indexes with a collection query scope specified allow queries
      * against a collection that is the child of a specific document, specified at
-     * query time, and that has the same collection id.
+     * query time, and that has the same collection ID.
      * Indexes with a collection group query scope specified allow queries against
      * all collections descended from a specific document, specified at query
-     * time, and that have the same collection id as this index.
+     * time, and that have the same collection ID as this index.
      *
      * Generated from protobuf field <code>.google.firestore.admin.v1.Index.QueryScope query_scope = 2;</code>
      */
     private $query_scope = 0;
     /**
+     * The API scope supported by this index.
+     *
+     * Generated from protobuf field <code>.google.firestore.admin.v1.Index.ApiScope api_scope = 5;</code>
+     */
+    private $api_scope = 0;
+    /**
      * The fields supported by this index.
-     * For composite indexes, this is always 2 or more fields.
-     * The last field entry is always for the field path `__name__`. If, on
-     * creation, `__name__` was not specified as the last field, it will be added
-     * automatically with the same direction as that of the last field defined. If
-     * the final field in a composite index is not directional, the `__name__`
-     * will be ordered ASCENDING (unless explicitly specified).
+     * For composite indexes, this requires a minimum of 2 and a maximum of 100
+     * fields. The last field entry is always for the field path `__name__`. If,
+     * on creation, `__name__` was not specified as the last field, it will be
+     * added automatically with the same direction as that of the last field
+     * defined. If the final field in a composite index is not directional, the
+     * `__name__` will be ordered ASCENDING (unless explicitly specified).
      * For single field indexes, this will always be exactly one entry with a
      * field path equal to the field path of the associated field.
      *
@@ -71,18 +77,20 @@ class Index extends \Google\Protobuf\Internal\Message
      *     @type int $query_scope
      *           Indexes with a collection query scope specified allow queries
      *           against a collection that is the child of a specific document, specified at
-     *           query time, and that has the same collection id.
+     *           query time, and that has the same collection ID.
      *           Indexes with a collection group query scope specified allow queries against
      *           all collections descended from a specific document, specified at query
-     *           time, and that have the same collection id as this index.
-     *     @type \Google\Cloud\Firestore\Admin\V1\Index\IndexField[]|\Google\Protobuf\Internal\RepeatedField $fields
+     *           time, and that have the same collection ID as this index.
+     *     @type int $api_scope
+     *           The API scope supported by this index.
+     *     @type array<\Google\Cloud\Firestore\Admin\V1\Index\IndexField>|\Google\Protobuf\Internal\RepeatedField $fields
      *           The fields supported by this index.
-     *           For composite indexes, this is always 2 or more fields.
-     *           The last field entry is always for the field path `__name__`. If, on
-     *           creation, `__name__` was not specified as the last field, it will be added
-     *           automatically with the same direction as that of the last field defined. If
-     *           the final field in a composite index is not directional, the `__name__`
-     *           will be ordered ASCENDING (unless explicitly specified).
+     *           For composite indexes, this requires a minimum of 2 and a maximum of 100
+     *           fields. The last field entry is always for the field path `__name__`. If,
+     *           on creation, `__name__` was not specified as the last field, it will be
+     *           added automatically with the same direction as that of the last field
+     *           defined. If the final field in a composite index is not directional, the
+     *           `__name__` will be ordered ASCENDING (unless explicitly specified).
      *           For single field indexes, this will always be exactly one entry with a
      *           field path equal to the field path of the associated field.
      *     @type int $state
@@ -129,10 +137,10 @@ class Index extends \Google\Protobuf\Internal\Message
     /**
      * Indexes with a collection query scope specified allow queries
      * against a collection that is the child of a specific document, specified at
-     * query time, and that has the same collection id.
+     * query time, and that has the same collection ID.
      * Indexes with a collection group query scope specified allow queries against
      * all collections descended from a specific document, specified at query
-     * time, and that have the same collection id as this index.
+     * time, and that have the same collection ID as this index.
      *
      * Generated from protobuf field <code>.google.firestore.admin.v1.Index.QueryScope query_scope = 2;</code>
      * @return int
@@ -145,10 +153,10 @@ class Index extends \Google\Protobuf\Internal\Message
     /**
      * Indexes with a collection query scope specified allow queries
      * against a collection that is the child of a specific document, specified at
-     * query time, and that has the same collection id.
+     * query time, and that has the same collection ID.
      * Indexes with a collection group query scope specified allow queries against
      * all collections descended from a specific document, specified at query
-     * time, and that have the same collection id as this index.
+     * time, and that have the same collection ID as this index.
      *
      * Generated from protobuf field <code>.google.firestore.admin.v1.Index.QueryScope query_scope = 2;</code>
      * @param int $var
@@ -163,13 +171,39 @@ class Index extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The API scope supported by this index.
+     *
+     * Generated from protobuf field <code>.google.firestore.admin.v1.Index.ApiScope api_scope = 5;</code>
+     * @return int
+     */
+    public function getApiScope()
+    {
+        return $this->api_scope;
+    }
+
+    /**
+     * The API scope supported by this index.
+     *
+     * Generated from protobuf field <code>.google.firestore.admin.v1.Index.ApiScope api_scope = 5;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setApiScope($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\Firestore\Admin\V1\Index\ApiScope::class);
+        $this->api_scope = $var;
+
+        return $this;
+    }
+
+    /**
      * The fields supported by this index.
-     * For composite indexes, this is always 2 or more fields.
-     * The last field entry is always for the field path `__name__`. If, on
-     * creation, `__name__` was not specified as the last field, it will be added
-     * automatically with the same direction as that of the last field defined. If
-     * the final field in a composite index is not directional, the `__name__`
-     * will be ordered ASCENDING (unless explicitly specified).
+     * For composite indexes, this requires a minimum of 2 and a maximum of 100
+     * fields. The last field entry is always for the field path `__name__`. If,
+     * on creation, `__name__` was not specified as the last field, it will be
+     * added automatically with the same direction as that of the last field
+     * defined. If the final field in a composite index is not directional, the
+     * `__name__` will be ordered ASCENDING (unless explicitly specified).
      * For single field indexes, this will always be exactly one entry with a
      * field path equal to the field path of the associated field.
      *
@@ -183,17 +217,17 @@ class Index extends \Google\Protobuf\Internal\Message
 
     /**
      * The fields supported by this index.
-     * For composite indexes, this is always 2 or more fields.
-     * The last field entry is always for the field path `__name__`. If, on
-     * creation, `__name__` was not specified as the last field, it will be added
-     * automatically with the same direction as that of the last field defined. If
-     * the final field in a composite index is not directional, the `__name__`
-     * will be ordered ASCENDING (unless explicitly specified).
+     * For composite indexes, this requires a minimum of 2 and a maximum of 100
+     * fields. The last field entry is always for the field path `__name__`. If,
+     * on creation, `__name__` was not specified as the last field, it will be
+     * added automatically with the same direction as that of the last field
+     * defined. If the final field in a composite index is not directional, the
+     * `__name__` will be ordered ASCENDING (unless explicitly specified).
      * For single field indexes, this will always be exactly one entry with a
      * field path equal to the field path of the associated field.
      *
      * Generated from protobuf field <code>repeated .google.firestore.admin.v1.Index.IndexField fields = 3;</code>
-     * @param \Google\Cloud\Firestore\Admin\V1\Index\IndexField[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Firestore\Admin\V1\Index\IndexField>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFields($var)

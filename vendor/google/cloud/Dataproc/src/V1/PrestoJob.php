@@ -26,14 +26,14 @@ class PrestoJob extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool continue_on_failure = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $continue_on_failure = false;
+    protected $continue_on_failure = false;
     /**
      * Optional. The format in which query output will be displayed. See the
      * Presto documentation for supported output formats
      *
      * Generated from protobuf field <code>string output_format = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $output_format = '';
+    protected $output_format = '';
     /**
      * Optional. Presto client tags to attach to this query
      *
@@ -53,7 +53,7 @@ class PrestoJob extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.LoggingConfig logging_config = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $logging_config = null;
+    protected $logging_config = null;
     protected $queries;
 
     /**
@@ -73,7 +73,7 @@ class PrestoJob extends \Google\Protobuf\Internal\Message
      *     @type string $output_format
      *           Optional. The format in which query output will be displayed. See the
      *           Presto documentation for supported output formats
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $client_tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $client_tags
      *           Optional. Presto client tags to attach to this query
      *     @type array|\Google\Protobuf\Internal\MapField $properties
      *           Optional. A mapping of property names to values. Used to set Presto
@@ -223,7 +223,7 @@ class PrestoJob extends \Google\Protobuf\Internal\Message
      * Optional. Presto client tags to attach to this query
      *
      * Generated from protobuf field <code>repeated string client_tags = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setClientTags($var)

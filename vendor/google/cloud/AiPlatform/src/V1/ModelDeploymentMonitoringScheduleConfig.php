@@ -16,12 +16,26 @@ use Google\Protobuf\Internal\GPBUtil;
 class ModelDeploymentMonitoringScheduleConfig extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The model monitoring job scheduling interval. It will be rounded up to next
-     * full hour. This defines how often the monitoring jobs are triggered.
+     * Required. The model monitoring job scheduling interval. It will be rounded
+     * up to next full hour. This defines how often the monitoring jobs are
+     * triggered.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration monitor_interval = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $monitor_interval = null;
+    protected $monitor_interval = null;
+    /**
+     * The time window of the prediction data being included in each prediction
+     * dataset. This window specifies how long the data should be collected from
+     * historical model results for each run. If not set,
+     * [ModelDeploymentMonitoringScheduleConfig.monitor_interval][google.cloud.aiplatform.v1.ModelDeploymentMonitoringScheduleConfig.monitor_interval]
+     * will be used. e.g. If currently the cutoff time is 2022-01-08 14:30:00 and
+     * the monitor_window is set to be 3600, then data from 2022-01-08 13:30:00 to
+     * 2022-01-08 14:30:00 will be retrieved and aggregated to calculate the
+     * monitoring statistics.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration monitor_window = 2;</code>
+     */
+    protected $monitor_window = null;
 
     /**
      * Constructor.
@@ -30,8 +44,18 @@ class ModelDeploymentMonitoringScheduleConfig extends \Google\Protobuf\Internal\
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Protobuf\Duration $monitor_interval
-     *           Required. The model monitoring job scheduling interval. It will be rounded up to next
-     *           full hour. This defines how often the monitoring jobs are triggered.
+     *           Required. The model monitoring job scheduling interval. It will be rounded
+     *           up to next full hour. This defines how often the monitoring jobs are
+     *           triggered.
+     *     @type \Google\Protobuf\Duration $monitor_window
+     *           The time window of the prediction data being included in each prediction
+     *           dataset. This window specifies how long the data should be collected from
+     *           historical model results for each run. If not set,
+     *           [ModelDeploymentMonitoringScheduleConfig.monitor_interval][google.cloud.aiplatform.v1.ModelDeploymentMonitoringScheduleConfig.monitor_interval]
+     *           will be used. e.g. If currently the cutoff time is 2022-01-08 14:30:00 and
+     *           the monitor_window is set to be 3600, then data from 2022-01-08 13:30:00 to
+     *           2022-01-08 14:30:00 will be retrieved and aggregated to calculate the
+     *           monitoring statistics.
      * }
      */
     public function __construct($data = NULL) {
@@ -40,8 +64,9 @@ class ModelDeploymentMonitoringScheduleConfig extends \Google\Protobuf\Internal\
     }
 
     /**
-     * Required. The model monitoring job scheduling interval. It will be rounded up to next
-     * full hour. This defines how often the monitoring jobs are triggered.
+     * Required. The model monitoring job scheduling interval. It will be rounded
+     * up to next full hour. This defines how often the monitoring jobs are
+     * triggered.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration monitor_interval = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Protobuf\Duration|null
@@ -62,8 +87,9 @@ class ModelDeploymentMonitoringScheduleConfig extends \Google\Protobuf\Internal\
     }
 
     /**
-     * Required. The model monitoring job scheduling interval. It will be rounded up to next
-     * full hour. This defines how often the monitoring jobs are triggered.
+     * Required. The model monitoring job scheduling interval. It will be rounded
+     * up to next full hour. This defines how often the monitoring jobs are
+     * triggered.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration monitor_interval = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Protobuf\Duration $var
@@ -73,6 +99,56 @@ class ModelDeploymentMonitoringScheduleConfig extends \Google\Protobuf\Internal\
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Duration::class);
         $this->monitor_interval = $var;
+
+        return $this;
+    }
+
+    /**
+     * The time window of the prediction data being included in each prediction
+     * dataset. This window specifies how long the data should be collected from
+     * historical model results for each run. If not set,
+     * [ModelDeploymentMonitoringScheduleConfig.monitor_interval][google.cloud.aiplatform.v1.ModelDeploymentMonitoringScheduleConfig.monitor_interval]
+     * will be used. e.g. If currently the cutoff time is 2022-01-08 14:30:00 and
+     * the monitor_window is set to be 3600, then data from 2022-01-08 13:30:00 to
+     * 2022-01-08 14:30:00 will be retrieved and aggregated to calculate the
+     * monitoring statistics.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration monitor_window = 2;</code>
+     * @return \Google\Protobuf\Duration|null
+     */
+    public function getMonitorWindow()
+    {
+        return $this->monitor_window;
+    }
+
+    public function hasMonitorWindow()
+    {
+        return isset($this->monitor_window);
+    }
+
+    public function clearMonitorWindow()
+    {
+        unset($this->monitor_window);
+    }
+
+    /**
+     * The time window of the prediction data being included in each prediction
+     * dataset. This window specifies how long the data should be collected from
+     * historical model results for each run. If not set,
+     * [ModelDeploymentMonitoringScheduleConfig.monitor_interval][google.cloud.aiplatform.v1.ModelDeploymentMonitoringScheduleConfig.monitor_interval]
+     * will be used. e.g. If currently the cutoff time is 2022-01-08 14:30:00 and
+     * the monitor_window is set to be 3600, then data from 2022-01-08 13:30:00 to
+     * 2022-01-08 14:30:00 will be retrieved and aggregated to calculate the
+     * monitoring statistics.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration monitor_window = 2;</code>
+     * @param \Google\Protobuf\Duration $var
+     * @return $this
+     */
+    public function setMonitorWindow($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Duration::class);
+        $this->monitor_window = $var;
 
         return $this;
     }

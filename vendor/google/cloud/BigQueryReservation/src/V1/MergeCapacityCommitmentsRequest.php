@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [ReservationService.MergeCapacityCommitments][google.cloud.bigquery.reservation.v1.ReservationService.MergeCapacityCommitments].
+ * The request for
+ * [ReservationService.MergeCapacityCommitments][google.cloud.bigquery.reservation.v1.ReservationService.MergeCapacityCommitments].
  *
  * Generated from protobuf message <code>google.cloud.bigquery.reservation.v1.MergeCapacityCommitmentsRequest</code>
  */
@@ -21,7 +22,7 @@ class MergeCapacityCommitmentsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Ids of capacity commitments to merge.
      * These capacity commitments must exist under admin project and location
@@ -34,6 +35,26 @@ class MergeCapacityCommitmentsRequest extends \Google\Protobuf\Internal\Message
     private $capacity_commitment_ids;
 
     /**
+     * @param string   $parent                Parent resource that identifies admin project and location e.g.,
+     *                                        `projects/myproject/locations/us`
+     * @param string[] $capacityCommitmentIds Ids of capacity commitments to merge.
+     *                                        These capacity commitments must exist under admin project and location
+     *                                        specified in the parent.
+     *                                        ID is the last portion of capacity commitment name e.g., 'abc' for
+     *                                        projects/myproject/locations/US/capacityCommitments/abc
+     *
+     * @return \Google\Cloud\BigQuery\Reservation\V1\MergeCapacityCommitmentsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, array $capacityCommitmentIds): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setCapacityCommitmentIds($capacityCommitmentIds);
+    }
+
+    /**
      * Constructor.
      *
      * @param array $data {
@@ -42,7 +63,7 @@ class MergeCapacityCommitmentsRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Parent resource that identifies admin project and location e.g.,
      *            `projects/myproject/locations/us`
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $capacity_commitment_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $capacity_commitment_ids
      *           Ids of capacity commitments to merge.
      *           These capacity commitments must exist under admin project and location
      *           specified in the parent.
@@ -106,7 +127,7 @@ class MergeCapacityCommitmentsRequest extends \Google\Protobuf\Internal\Message
      * projects/myproject/locations/US/capacityCommitments/abc
      *
      * Generated from protobuf field <code>repeated string capacity_commitment_ids = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCapacityCommitmentIds($var)

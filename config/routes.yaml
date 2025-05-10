@@ -6,7 +6,7 @@
 admin:
   resource: '../src/Routes/Admin/'
   type:     directory
-  prefix:   /
+  prefix:   /admin
 
 auntenticarUsuario:
   path:  /usuario/autenticar
@@ -46,3 +46,7 @@ definiryieldcalculationitem:
 definirsubcontractordatatrackingprojectitem:
   path:  /definir-subcontractor-datatracking-project-item
   defaults: { _controller: App\Controller\ScriptController::definirsubcontractordatatrackingprojectitem }
+
+definirconcretevendordatatracking:
+  path:  /definir-concrete-vendor-datatracking
+  defaults: { _controller: App\Controller\ScriptController::definirconcretevendordatatracking }

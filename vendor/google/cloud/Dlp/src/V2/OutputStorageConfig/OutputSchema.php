@@ -28,7 +28,7 @@ class OutputSchema
      */
     const BASIC_COLUMNS = 1;
     /**
-     * Schema tailored to findings from scanning Google Cloud Storage.
+     * Schema tailored to findings from scanning Cloud Storage.
      *
      * Generated from protobuf enum <code>GCS_COLUMNS = 2;</code>
      */
@@ -82,6 +82,4 @@ class OutputSchema
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(OutputSchema::class, \Google\Cloud\Dlp\V2\OutputStorageConfig_OutputSchema::class);
 

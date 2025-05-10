@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Details of operations that perform [MetadataService.DeleteMetadataStore][google.cloud.aiplatform.v1.MetadataService.DeleteMetadataStore].
+ * Details of operations that perform
+ * [MetadataService.DeleteMetadataStore][google.cloud.aiplatform.v1.MetadataService.DeleteMetadataStore].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.DeleteMetadataStoreOperationMetadata</code>
  */
@@ -20,7 +21,7 @@ class DeleteMetadataStoreOperationMetadata extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GenericOperationMetadata generic_metadata = 1;</code>
      */
-    private $generic_metadata = null;
+    protected $generic_metadata = null;
 
     /**
      * Constructor.

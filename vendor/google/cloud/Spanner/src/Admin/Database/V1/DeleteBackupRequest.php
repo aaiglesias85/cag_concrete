@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [DeleteBackup][google.spanner.admin.database.v1.DatabaseAdmin.DeleteBackup].
+ * The request for
+ * [DeleteBackup][google.spanner.admin.database.v1.DatabaseAdmin.DeleteBackup].
  *
  * Generated from protobuf message <code>google.spanner.admin.database.v1.DeleteBackupRequest</code>
  */
@@ -23,6 +24,22 @@ class DeleteBackupRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
     private $name = '';
+
+    /**
+     * @param string $name Required. Name of the backup to delete.
+     *                     Values are of the form
+     *                     `projects/<project>/instances/<instance>/backups/<backup>`. Please see
+     *                     {@see DatabaseAdminClient::backupName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\DeleteBackupRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

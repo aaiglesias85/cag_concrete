@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Metadata for a [ConversationDatasets.ImportConversationData][google.cloud.dialogflow.v2.ConversationDatasets.ImportConversationData] operation.
+ * Metadata for a
+ * [ConversationDatasets.ImportConversationData][google.cloud.dialogflow.v2.ConversationDatasets.ImportConversationData]
+ * operation.
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ImportConversationDataOperationMetadata</code>
  */
@@ -22,7 +24,7 @@ class ImportConversationDataOperationMetadata extends \Google\Protobuf\Internal\
      *
      * Generated from protobuf field <code>string conversation_dataset = 1 [(.google.api.resource_reference) = {</code>
      */
-    private $conversation_dataset = '';
+    protected $conversation_dataset = '';
     /**
      * Partial failures are failures that don't fail the whole long running
      * operation, e.g. single files that couldn't be read.
@@ -36,7 +38,7 @@ class ImportConversationDataOperationMetadata extends \Google\Protobuf\Internal\
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
 
     /**
      * Constructor.
@@ -48,7 +50,7 @@ class ImportConversationDataOperationMetadata extends \Google\Protobuf\Internal\
      *           The resource name of the imported conversation dataset. Format:
      *           `projects/<Project ID>/locations/<Location
      *           ID>/conversationDatasets/<Conversation Dataset Id>`
-     *     @type \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $partial_failures
+     *     @type array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $partial_failures
      *           Partial failures are failures that don't fail the whole long running
      *           operation, e.g. single files that couldn't be read.
      *     @type \Google\Protobuf\Timestamp $create_time
@@ -108,7 +110,7 @@ class ImportConversationDataOperationMetadata extends \Google\Protobuf\Internal\
      * operation, e.g. single files that couldn't be read.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Status partial_failures = 2;</code>
-     * @param \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPartialFailures($var)

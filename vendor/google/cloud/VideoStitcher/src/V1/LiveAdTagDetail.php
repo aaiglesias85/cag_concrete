@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Container for a live session's ad tag detail.
+ * Information related to the details for one ad tag. This resource is only
+ * available for live sessions that do not implement Google Ad Manager ad
+ * insertion.
  *
  * Generated from protobuf message <code>google.cloud.video.stitcher.v1.LiveAdTagDetail</code>
  */
@@ -21,7 +23,7 @@ class LiveAdTagDetail extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * A list of ad requests.
      *
@@ -38,7 +40,7 @@ class LiveAdTagDetail extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *           The resource name in the form of
      *           `projects/{project}/locations/{location}/liveSessions/{live_session}/liveAdTagDetails/{id}`.
-     *     @type \Google\Cloud\Video\Stitcher\V1\AdRequest[]|\Google\Protobuf\Internal\RepeatedField $ad_requests
+     *     @type array<\Google\Cloud\Video\Stitcher\V1\AdRequest>|\Google\Protobuf\Internal\RepeatedField $ad_requests
      *           A list of ad requests.
      * }
      */
@@ -90,7 +92,7 @@ class LiveAdTagDetail extends \Google\Protobuf\Internal\Message
      * A list of ad requests.
      *
      * Generated from protobuf field <code>repeated .google.cloud.video.stitcher.v1.AdRequest ad_requests = 2;</code>
-     * @param \Google\Cloud\Video\Stitcher\V1\AdRequest[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Video\Stitcher\V1\AdRequest>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAdRequests($var)

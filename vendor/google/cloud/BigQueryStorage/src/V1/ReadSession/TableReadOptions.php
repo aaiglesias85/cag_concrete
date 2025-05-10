@@ -16,10 +16,45 @@ use Google\Protobuf\Internal\GPBUtil;
 class TableReadOptions extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Names of the fields in the table that should be read. If empty, all
-     * fields will be read. If the specified field is a nested field, all
-     * the sub-fields in the field will be selected. The output field order is
-     * unrelated to the order of fields in selected_fields.
+     * Optional. The names of the fields in the table to be returned. If no
+     * field names are specified, then all fields in the table are returned.
+     * Nested fields -- the child elements of a STRUCT field -- can be selected
+     * individually using their fully-qualified names, and will be returned as
+     * record fields containing only the selected nested fields. If a STRUCT
+     * field is specified in the selected fields list, all of the child elements
+     * will be returned.
+     * As an example, consider a table with the following schema:
+     *   {
+     *       "name": "struct_field",
+     *       "type": "RECORD",
+     *       "mode": "NULLABLE",
+     *       "fields": [
+     *           {
+     *               "name": "string_field1",
+     *               "type": "STRING",
+     * .              "mode": "NULLABLE"
+     *           },
+     *           {
+     *               "name": "string_field2",
+     *               "type": "STRING",
+     *               "mode": "NULLABLE"
+     *           }
+     *       ]
+     *   }
+     * Specifying "struct_field" in the selected fields list will result in a
+     * read session schema with the following logical structure:
+     *   struct_field {
+     *       string_field1
+     *       string_field2
+     *   }
+     * Specifying "struct_field.string_field1" in the selected fields list will
+     * result in a read session schema with the following logical structure:
+     *   struct_field {
+     *       string_field1
+     *   }
+     * The order of the fields in the read session schema is derived from the
+     * table schema and does not correspond to the order in which the fields are
+     * specified in this list.
      *
      * Generated from protobuf field <code>repeated string selected_fields = 1;</code>
      */
@@ -36,7 +71,25 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string row_restriction = 2;</code>
      */
-    private $row_restriction = '';
+    protected $row_restriction = '';
+    /**
+     * Optional. Specifies a table sampling percentage. Specifically, the query
+     * planner will use TABLESAMPLE SYSTEM (sample_percentage PERCENT). The
+     * sampling percentage is applied at the data block granularity. It will
+     * randomly choose for each data block whether to read the rows in that data
+     * block. For more details, see
+     * https://cloud.google.com/bigquery/docs/table-sampling)
+     *
+     * Generated from protobuf field <code>optional double sample_percentage = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $sample_percentage = null;
+    /**
+     * Optional. Set response_compression_codec when creating a read session to
+     * enable application-level compression of ReadRows responses.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.bigquery.storage.v1.ReadSession.TableReadOptions.ResponseCompressionCodec response_compression_codec = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $response_compression_codec = null;
     protected $output_format_serialization_options;
 
     /**
@@ -45,11 +98,46 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $selected_fields
-     *           Names of the fields in the table that should be read. If empty, all
-     *           fields will be read. If the specified field is a nested field, all
-     *           the sub-fields in the field will be selected. The output field order is
-     *           unrelated to the order of fields in selected_fields.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $selected_fields
+     *           Optional. The names of the fields in the table to be returned. If no
+     *           field names are specified, then all fields in the table are returned.
+     *           Nested fields -- the child elements of a STRUCT field -- can be selected
+     *           individually using their fully-qualified names, and will be returned as
+     *           record fields containing only the selected nested fields. If a STRUCT
+     *           field is specified in the selected fields list, all of the child elements
+     *           will be returned.
+     *           As an example, consider a table with the following schema:
+     *             {
+     *                 "name": "struct_field",
+     *                 "type": "RECORD",
+     *                 "mode": "NULLABLE",
+     *                 "fields": [
+     *                     {
+     *                         "name": "string_field1",
+     *                         "type": "STRING",
+     *           .              "mode": "NULLABLE"
+     *                     },
+     *                     {
+     *                         "name": "string_field2",
+     *                         "type": "STRING",
+     *                         "mode": "NULLABLE"
+     *                     }
+     *                 ]
+     *             }
+     *           Specifying "struct_field" in the selected fields list will result in a
+     *           read session schema with the following logical structure:
+     *             struct_field {
+     *                 string_field1
+     *                 string_field2
+     *             }
+     *           Specifying "struct_field.string_field1" in the selected fields list will
+     *           result in a read session schema with the following logical structure:
+     *             struct_field {
+     *                 string_field1
+     *             }
+     *           The order of the fields in the read session schema is derived from the
+     *           table schema and does not correspond to the order in which the fields are
+     *           specified in this list.
      *     @type string $row_restriction
      *           SQL text filtering statement, similar to a WHERE clause in a query.
      *           Aggregates are not supported.
@@ -61,6 +149,18 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
      *           Restricted to a maximum length for 1 MB.
      *     @type \Google\Cloud\BigQuery\Storage\V1\ArrowSerializationOptions $arrow_serialization_options
      *           Optional. Options specific to the Apache Arrow output format.
+     *     @type \Google\Cloud\BigQuery\Storage\V1\AvroSerializationOptions $avro_serialization_options
+     *           Optional. Options specific to the Apache Avro output format
+     *     @type float $sample_percentage
+     *           Optional. Specifies a table sampling percentage. Specifically, the query
+     *           planner will use TABLESAMPLE SYSTEM (sample_percentage PERCENT). The
+     *           sampling percentage is applied at the data block granularity. It will
+     *           randomly choose for each data block whether to read the rows in that data
+     *           block. For more details, see
+     *           https://cloud.google.com/bigquery/docs/table-sampling)
+     *     @type int $response_compression_codec
+     *           Optional. Set response_compression_codec when creating a read session to
+     *           enable application-level compression of ReadRows responses.
      * }
      */
     public function __construct($data = NULL) {
@@ -69,10 +169,45 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Names of the fields in the table that should be read. If empty, all
-     * fields will be read. If the specified field is a nested field, all
-     * the sub-fields in the field will be selected. The output field order is
-     * unrelated to the order of fields in selected_fields.
+     * Optional. The names of the fields in the table to be returned. If no
+     * field names are specified, then all fields in the table are returned.
+     * Nested fields -- the child elements of a STRUCT field -- can be selected
+     * individually using their fully-qualified names, and will be returned as
+     * record fields containing only the selected nested fields. If a STRUCT
+     * field is specified in the selected fields list, all of the child elements
+     * will be returned.
+     * As an example, consider a table with the following schema:
+     *   {
+     *       "name": "struct_field",
+     *       "type": "RECORD",
+     *       "mode": "NULLABLE",
+     *       "fields": [
+     *           {
+     *               "name": "string_field1",
+     *               "type": "STRING",
+     * .              "mode": "NULLABLE"
+     *           },
+     *           {
+     *               "name": "string_field2",
+     *               "type": "STRING",
+     *               "mode": "NULLABLE"
+     *           }
+     *       ]
+     *   }
+     * Specifying "struct_field" in the selected fields list will result in a
+     * read session schema with the following logical structure:
+     *   struct_field {
+     *       string_field1
+     *       string_field2
+     *   }
+     * Specifying "struct_field.string_field1" in the selected fields list will
+     * result in a read session schema with the following logical structure:
+     *   struct_field {
+     *       string_field1
+     *   }
+     * The order of the fields in the read session schema is derived from the
+     * table schema and does not correspond to the order in which the fields are
+     * specified in this list.
      *
      * Generated from protobuf field <code>repeated string selected_fields = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -83,13 +218,48 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Names of the fields in the table that should be read. If empty, all
-     * fields will be read. If the specified field is a nested field, all
-     * the sub-fields in the field will be selected. The output field order is
-     * unrelated to the order of fields in selected_fields.
+     * Optional. The names of the fields in the table to be returned. If no
+     * field names are specified, then all fields in the table are returned.
+     * Nested fields -- the child elements of a STRUCT field -- can be selected
+     * individually using their fully-qualified names, and will be returned as
+     * record fields containing only the selected nested fields. If a STRUCT
+     * field is specified in the selected fields list, all of the child elements
+     * will be returned.
+     * As an example, consider a table with the following schema:
+     *   {
+     *       "name": "struct_field",
+     *       "type": "RECORD",
+     *       "mode": "NULLABLE",
+     *       "fields": [
+     *           {
+     *               "name": "string_field1",
+     *               "type": "STRING",
+     * .              "mode": "NULLABLE"
+     *           },
+     *           {
+     *               "name": "string_field2",
+     *               "type": "STRING",
+     *               "mode": "NULLABLE"
+     *           }
+     *       ]
+     *   }
+     * Specifying "struct_field" in the selected fields list will result in a
+     * read session schema with the following logical structure:
+     *   struct_field {
+     *       string_field1
+     *       string_field2
+     *   }
+     * Specifying "struct_field.string_field1" in the selected fields list will
+     * result in a read session schema with the following logical structure:
+     *   struct_field {
+     *       string_field1
+     *   }
+     * The order of the fields in the read session schema is derived from the
+     * table schema and does not correspond to the order in which the fields are
+     * specified in this list.
      *
      * Generated from protobuf field <code>repeated string selected_fields = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSelectedFields($var)
@@ -172,6 +342,121 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Optional. Options specific to the Apache Avro output format
+     *
+     * Generated from protobuf field <code>.google.cloud.bigquery.storage.v1.AvroSerializationOptions avro_serialization_options = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\BigQuery\Storage\V1\AvroSerializationOptions|null
+     */
+    public function getAvroSerializationOptions()
+    {
+        return $this->readOneof(4);
+    }
+
+    public function hasAvroSerializationOptions()
+    {
+        return $this->hasOneof(4);
+    }
+
+    /**
+     * Optional. Options specific to the Apache Avro output format
+     *
+     * Generated from protobuf field <code>.google.cloud.bigquery.storage.v1.AvroSerializationOptions avro_serialization_options = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\BigQuery\Storage\V1\AvroSerializationOptions $var
+     * @return $this
+     */
+    public function setAvroSerializationOptions($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\BigQuery\Storage\V1\AvroSerializationOptions::class);
+        $this->writeOneof(4, $var);
+
+        return $this;
+    }
+
+    /**
+     * Optional. Specifies a table sampling percentage. Specifically, the query
+     * planner will use TABLESAMPLE SYSTEM (sample_percentage PERCENT). The
+     * sampling percentage is applied at the data block granularity. It will
+     * randomly choose for each data block whether to read the rows in that data
+     * block. For more details, see
+     * https://cloud.google.com/bigquery/docs/table-sampling)
+     *
+     * Generated from protobuf field <code>optional double sample_percentage = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return float
+     */
+    public function getSamplePercentage()
+    {
+        return isset($this->sample_percentage) ? $this->sample_percentage : 0.0;
+    }
+
+    public function hasSamplePercentage()
+    {
+        return isset($this->sample_percentage);
+    }
+
+    public function clearSamplePercentage()
+    {
+        unset($this->sample_percentage);
+    }
+
+    /**
+     * Optional. Specifies a table sampling percentage. Specifically, the query
+     * planner will use TABLESAMPLE SYSTEM (sample_percentage PERCENT). The
+     * sampling percentage is applied at the data block granularity. It will
+     * randomly choose for each data block whether to read the rows in that data
+     * block. For more details, see
+     * https://cloud.google.com/bigquery/docs/table-sampling)
+     *
+     * Generated from protobuf field <code>optional double sample_percentage = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setSamplePercentage($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->sample_percentage = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Set response_compression_codec when creating a read session to
+     * enable application-level compression of ReadRows responses.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.bigquery.storage.v1.ReadSession.TableReadOptions.ResponseCompressionCodec response_compression_codec = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return int
+     */
+    public function getResponseCompressionCodec()
+    {
+        return isset($this->response_compression_codec) ? $this->response_compression_codec : 0;
+    }
+
+    public function hasResponseCompressionCodec()
+    {
+        return isset($this->response_compression_codec);
+    }
+
+    public function clearResponseCompressionCodec()
+    {
+        unset($this->response_compression_codec);
+    }
+
+    /**
+     * Optional. Set response_compression_codec when creating a read session to
+     * enable application-level compression of ReadRows responses.
+     *
+     * Generated from protobuf field <code>optional .google.cloud.bigquery.storage.v1.ReadSession.TableReadOptions.ResponseCompressionCodec response_compression_codec = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setResponseCompressionCodec($var)
+    {
+        GPBUtil::checkEnum($var, \Google\Cloud\BigQuery\Storage\V1\ReadSession\TableReadOptions\ResponseCompressionCodec::class);
+        $this->response_compression_codec = $var;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getOutputFormatSerializationOptions()
@@ -181,6 +466,4 @@ class TableReadOptions extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(TableReadOptions::class, \Google\Cloud\BigQuery\Storage\V1\ReadSession_TableReadOptions::class);
 

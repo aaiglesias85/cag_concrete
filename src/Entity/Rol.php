@@ -4,61 +4,30 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Rol
- *
- * @ORM\Table(name="rol")
- * @ORM\Entity(repositoryClass="App\Repository\RolRepository")
- */
+#[ORM\Table(name: "rol")]
+#[ORM\Entity(repositoryClass: "App\Repository\RolRepository")]
 class Rol
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="rol_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $rolId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "rol_id", type: "integer", nullable: false)]
+    private ?int $rolId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $nombre;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    private ?string $nombre;
 
-
-
-    /**
-     * Get rolId
-     *
-     * @return integer 
-     */
-    public function getRolId()
+    public function getRolId(): ?int
     {
         return $this->rolId;
     }
 
-    /**
-     * Set nombre
-     *
-     * @param string $nombre
-     * @return Rol
-     */
-    public function setNombre($nombre)
+    public function setNombre(?string $nombre): self
     {
         $this->nombre = $nombre;
-    
         return $this;
     }
 
-    /**
-     * Get nombre
-     *
-     * @return string 
-     */
-    public function getNombre()
+    public function getNombre(): ?string
     {
         return $this->nombre;
     }

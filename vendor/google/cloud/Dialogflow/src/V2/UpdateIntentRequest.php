@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Intents.UpdateIntent][google.cloud.dialogflow.v2.Intents.UpdateIntent].
+ * The request message for
+ * [Intents.UpdateIntent][google.cloud.dialogflow.v2.Intents.UpdateIntent].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.UpdateIntentRequest</code>
  */
@@ -20,7 +21,7 @@ class UpdateIntentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Intent intent = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $intent = null;
+    protected $intent = null;
     /**
      * Optional. The language used to access language-specific data.
      * If not specified, the agent's default language is used.
@@ -30,19 +31,59 @@ class UpdateIntentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * Optional. The mask to control which fields get updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Optional. The resource view to apply to the returned intent.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.IntentView intent_view = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $intent_view = 0;
+    protected $intent_view = 0;
+
+    /**
+     * @param \Google\Cloud\Dialogflow\V2\Intent $intent       Required. The intent to update.
+     * @param string                             $languageCode Optional. The language used to access language-specific data.
+     *                                                         If not specified, the agent's default language is used.
+     *                                                         For more information, see
+     *                                                         [Multilingual intent and entity
+     *                                                         data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+     *
+     * @return \Google\Cloud\Dialogflow\V2\UpdateIntentRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Dialogflow\V2\Intent $intent, string $languageCode): self
+    {
+        return (new self())
+            ->setIntent($intent)
+            ->setLanguageCode($languageCode);
+    }
+
+    /**
+     * @param \Google\Cloud\Dialogflow\V2\Intent $intent       Required. The intent to update.
+     * @param string                             $languageCode Optional. The language used to access language-specific data.
+     *                                                         If not specified, the agent's default language is used.
+     *                                                         For more information, see
+     *                                                         [Multilingual intent and entity
+     *                                                         data](https://cloud.google.com/dialogflow/docs/agents-multilingual#intent-entity).
+     * @param \Google\Protobuf\FieldMask         $updateMask   Optional. The mask to control which fields get updated.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\UpdateIntentRequest
+     *
+     * @experimental
+     */
+    public static function buildFromIntentLanguageCodeUpdateMask(\Google\Cloud\Dialogflow\V2\Intent $intent, string $languageCode, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setIntent($intent)
+            ->setLanguageCode($languageCode)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

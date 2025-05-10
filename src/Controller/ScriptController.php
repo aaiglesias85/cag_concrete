@@ -45,4 +45,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function definirconcretevendordatatracking()
+    {
+        $this->scriptService->DefinirConcreteVendorDataTracking();
+
+        return new Response('OK', 200);
+    }
 }

@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The sort options.
+ * Order bys define how rows will be sorted in the response. For example,
+ * ordering rows by descending event count is one ordering, and ordering rows by
+ * the event name string is a different ordering.
  *
  * Generated from protobuf message <code>google.analytics.data.v1beta.OrderBy</code>
  */
@@ -20,7 +22,7 @@ class OrderBy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool desc = 4;</code>
      */
-    private $desc = false;
+    protected $desc = false;
     protected $one_order_by;
 
     /**

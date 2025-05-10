@@ -20,7 +20,7 @@ class MarkRecommendationFailedRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * State properties to include with this state. Overwrites any existing
      * `state_metadata`.
@@ -35,7 +35,28 @@ class MarkRecommendationFailedRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $etag = '';
+    protected $etag = '';
+
+    /**
+     * @param string $name          Required. Name of the recommendation. Please see
+     *                              {@see RecommenderClient::recommendationName()} for help formatting this field.
+     * @param array  $stateMetadata State properties to include with this state. Overwrites any existing
+     *                              `state_metadata`.
+     *                              Keys must match the regex `/^[a-z0-9][a-z0-9_.-]{0,62}$/`.
+     *                              Values must match the regex `/^[a-zA-Z0-9_./-]{0,255}$/`.
+     * @param string $etag          Required. Fingerprint of the Recommendation. Provides optimistic locking.
+     *
+     * @return \Google\Cloud\Recommender\V1\MarkRecommendationFailedRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, array $stateMetadata, string $etag): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setStateMetadata($stateMetadata)
+            ->setEtag($etag);
+    }
 
     /**
      * Constructor.

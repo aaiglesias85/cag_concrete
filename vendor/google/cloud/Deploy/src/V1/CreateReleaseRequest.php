@@ -16,30 +16,30 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The parent collection in which the `Release` should be created.
-     * Format should be
-     * projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}.
+     * Required. The parent collection in which the `Release` is created.
+     * The format is
+     * `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. ID of the `Release`.
      *
      * Generated from protobuf field <code>string release_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $release_id = '';
+    protected $release_id = '';
     /**
      * Required. The `Release` to create.
      *
      * Generated from protobuf field <code>.google.cloud.deploy.v1.Release release = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $release = null;
+    protected $release = null;
     /**
      * Optional. A request ID to identify requests. Specify a unique request ID
-     * so that if you must retry your request, the server will know to ignore
-     * the request if it has already been completed. The server will guarantee
-     * that for at least 60 minutes since the first request.
+     * so that if you must retry your request, the server knows to ignore the
+     * request if it has already been completed. The server guarantees that for
+     * at least 60 minutes after the first request.
      * For example, consider a situation where you make an initial request and the
      * request times out. If you make the request again with the same request ID,
      * the server can check if original operation with the same request ID was
@@ -50,14 +50,41 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
     /**
-     * Optional. If set to true, the request is validated and the user is provided with
-     * an expected result, but no actual change is made.
+     * Optional. If set to true, the request is validated and the user is provided
+     * with an expected result, but no actual change is made.
      *
      * Generated from protobuf field <code>bool validate_only = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+    /**
+     * Optional. Deploy policies to override. Format is
+     * `projects/{project}/locations/{location}/deployPolicies/{deployPolicy}`.
+     *
+     * Generated from protobuf field <code>repeated string override_deploy_policy = 6 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     */
+    private $override_deploy_policy;
+
+    /**
+     * @param string                          $parent    Required. The parent collection in which the `Release` is created.
+     *                                                   The format is
+     *                                                   `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`. Please see
+     *                                                   {@see CloudDeployClient::deliveryPipelineName()} for help formatting this field.
+     * @param \Google\Cloud\Deploy\V1\Release $release   Required. The `Release` to create.
+     * @param string                          $releaseId Required. ID of the `Release`.
+     *
+     * @return \Google\Cloud\Deploy\V1\CreateReleaseRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Deploy\V1\Release $release, string $releaseId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setRelease($release)
+            ->setReleaseId($releaseId);
+    }
 
     /**
      * Constructor.
@@ -66,18 +93,18 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The parent collection in which the `Release` should be created.
-     *           Format should be
-     *           projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}.
+     *           Required. The parent collection in which the `Release` is created.
+     *           The format is
+     *           `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`.
      *     @type string $release_id
      *           Required. ID of the `Release`.
      *     @type \Google\Cloud\Deploy\V1\Release $release
      *           Required. The `Release` to create.
      *     @type string $request_id
      *           Optional. A request ID to identify requests. Specify a unique request ID
-     *           so that if you must retry your request, the server will know to ignore
-     *           the request if it has already been completed. The server will guarantee
-     *           that for at least 60 minutes since the first request.
+     *           so that if you must retry your request, the server knows to ignore the
+     *           request if it has already been completed. The server guarantees that for
+     *           at least 60 minutes after the first request.
      *           For example, consider a situation where you make an initial request and the
      *           request times out. If you make the request again with the same request ID,
      *           the server can check if original operation with the same request ID was
@@ -86,8 +113,11 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
      *           The request ID must be a valid UUID with the exception that zero UUID is
      *           not supported (00000000-0000-0000-0000-000000000000).
      *     @type bool $validate_only
-     *           Optional. If set to true, the request is validated and the user is provided with
-     *           an expected result, but no actual change is made.
+     *           Optional. If set to true, the request is validated and the user is provided
+     *           with an expected result, but no actual change is made.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $override_deploy_policy
+     *           Optional. Deploy policies to override. Format is
+     *           `projects/{project}/locations/{location}/deployPolicies/{deployPolicy}`.
      * }
      */
     public function __construct($data = NULL) {
@@ -96,9 +126,9 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent collection in which the `Release` should be created.
-     * Format should be
-     * projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}.
+     * Required. The parent collection in which the `Release` is created.
+     * The format is
+     * `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -109,9 +139,9 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent collection in which the `Release` should be created.
-     * Format should be
-     * projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}.
+     * Required. The parent collection in which the `Release` is created.
+     * The format is
+     * `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -189,9 +219,9 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. A request ID to identify requests. Specify a unique request ID
-     * so that if you must retry your request, the server will know to ignore
-     * the request if it has already been completed. The server will guarantee
-     * that for at least 60 minutes since the first request.
+     * so that if you must retry your request, the server knows to ignore the
+     * request if it has already been completed. The server guarantees that for
+     * at least 60 minutes after the first request.
      * For example, consider a situation where you make an initial request and the
      * request times out. If you make the request again with the same request ID,
      * the server can check if original operation with the same request ID was
@@ -210,9 +240,9 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. A request ID to identify requests. Specify a unique request ID
-     * so that if you must retry your request, the server will know to ignore
-     * the request if it has already been completed. The server will guarantee
-     * that for at least 60 minutes since the first request.
+     * so that if you must retry your request, the server knows to ignore the
+     * request if it has already been completed. The server guarantees that for
+     * at least 60 minutes after the first request.
      * For example, consider a situation where you make an initial request and the
      * request times out. If you make the request again with the same request ID,
      * the server can check if original operation with the same request ID was
@@ -234,8 +264,8 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If set to true, the request is validated and the user is provided with
-     * an expected result, but no actual change is made.
+     * Optional. If set to true, the request is validated and the user is provided
+     * with an expected result, but no actual change is made.
      *
      * Generated from protobuf field <code>bool validate_only = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
@@ -246,8 +276,8 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. If set to true, the request is validated and the user is provided with
-     * an expected result, but no actual change is made.
+     * Optional. If set to true, the request is validated and the user is provided
+     * with an expected result, but no actual change is made.
      *
      * Generated from protobuf field <code>bool validate_only = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var
@@ -257,6 +287,34 @@ class CreateReleaseRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->validate_only = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Deploy policies to override. Format is
+     * `projects/{project}/locations/{location}/deployPolicies/{deployPolicy}`.
+     *
+     * Generated from protobuf field <code>repeated string override_deploy_policy = 6 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getOverrideDeployPolicy()
+    {
+        return $this->override_deploy_policy;
+    }
+
+    /**
+     * Optional. Deploy policies to override. Format is
+     * `projects/{project}/locations/{location}/deployPolicies/{deployPolicy}`.
+     *
+     * Generated from protobuf field <code>repeated string override_deploy_policy = 6 [(.google.api.field_behavior) = OPTIONAL, (.google.api.resource_reference) = {</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setOverrideDeployPolicy($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->override_deploy_policy = $arr;
 
         return $this;
     }

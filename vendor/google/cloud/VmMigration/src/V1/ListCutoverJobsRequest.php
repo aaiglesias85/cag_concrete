@@ -20,16 +20,16 @@ class ListCutoverJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * Optional. The maximum number of cutover jobs to return. The service may return
-     * fewer than this value. If unspecified, at most 500 cutover jobs will be
-     * returned. The maximum value is 1000; values above 1000 will be coerced to
-     * 1000.
+     * Optional. The maximum number of cutover jobs to return. The service may
+     * return fewer than this value. If unspecified, at most 500 cutover jobs will
+     * be returned. The maximum value is 1000; values above 1000 will be coerced
+     * to 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Required. A page token, received from a previous `ListCutoverJobs` call.
      * Provide this to retrieve the subsequent page.
@@ -38,19 +38,33 @@ class ListCutoverJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Optional. The filter request.
      *
      * Generated from protobuf field <code>string filter = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Optional. the order by fields for the result.
      *
      * Generated from protobuf field <code>string order_by = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
+
+    /**
+     * @param string $parent Required. The parent, which owns this collection of migrating VMs. Please see
+     *                       {@see VmMigrationClient::migratingVmName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\VMMigration\V1\ListCutoverJobsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -61,10 +75,10 @@ class ListCutoverJobsRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Required. The parent, which owns this collection of migrating VMs.
      *     @type int $page_size
-     *           Optional. The maximum number of cutover jobs to return. The service may return
-     *           fewer than this value. If unspecified, at most 500 cutover jobs will be
-     *           returned. The maximum value is 1000; values above 1000 will be coerced to
-     *           1000.
+     *           Optional. The maximum number of cutover jobs to return. The service may
+     *           return fewer than this value. If unspecified, at most 500 cutover jobs will
+     *           be returned. The maximum value is 1000; values above 1000 will be coerced
+     *           to 1000.
      *     @type string $page_token
      *           Required. A page token, received from a previous `ListCutoverJobs` call.
      *           Provide this to retrieve the subsequent page.
@@ -108,10 +122,10 @@ class ListCutoverJobsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The maximum number of cutover jobs to return. The service may return
-     * fewer than this value. If unspecified, at most 500 cutover jobs will be
-     * returned. The maximum value is 1000; values above 1000 will be coerced to
-     * 1000.
+     * Optional. The maximum number of cutover jobs to return. The service may
+     * return fewer than this value. If unspecified, at most 500 cutover jobs will
+     * be returned. The maximum value is 1000; values above 1000 will be coerced
+     * to 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -122,10 +136,10 @@ class ListCutoverJobsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The maximum number of cutover jobs to return. The service may return
-     * fewer than this value. If unspecified, at most 500 cutover jobs will be
-     * returned. The maximum value is 1000; values above 1000 will be coerced to
-     * 1000.
+     * Optional. The maximum number of cutover jobs to return. The service may
+     * return fewer than this value. If unspecified, at most 500 cutover jobs will
+     * be returned. The maximum value is 1000; values above 1000 will be coerced
+     * to 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var

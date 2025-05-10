@@ -22,38 +22,53 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of items to return.
      * If not specified, a default value of 1000 will be used by the service.
-     * Regardless of the page_size value, the response may include a partial list
-     * and a caller should only rely on response's
-     * [next_page_token][CloudMemcache.ListInstancesResponse.next_page_token]
+     * Regardless of the `page_size` value, the response may include a partial
+     * list and a caller should only rely on response's
+     * [`next_page_token`][google.cloud.memcache.v1.ListInstancesResponse.next_page_token]
      * to determine if there are more instances left to be queried.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
-     * The next_page_token value returned from a previous List request,
-     * if any.
+     * The `next_page_token` value returned from a previous List request, if any.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * List filter. For example, exclude all Memcached instances with name as
-     * my-instance by specifying "name != my-instance".
+     * my-instance by specifying `"name != my-instance"`.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Sort results. Supported values are "name", "name desc" or "" (unsorted).
      *
      * Generated from protobuf field <code>string order_by = 5;</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
+
+    /**
+     * @param string $parent Required. The resource name of the instance location using the form:
+     *                       `projects/{project_id}/locations/{location_id}`
+     *                       where `location_id` refers to a GCP region
+     *                       Please see {@see CloudMemcacheClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Memcache\V1\ListInstancesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -68,16 +83,15 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
      *     @type int $page_size
      *           The maximum number of items to return.
      *           If not specified, a default value of 1000 will be used by the service.
-     *           Regardless of the page_size value, the response may include a partial list
-     *           and a caller should only rely on response's
-     *           [next_page_token][CloudMemcache.ListInstancesResponse.next_page_token]
+     *           Regardless of the `page_size` value, the response may include a partial
+     *           list and a caller should only rely on response's
+     *           [`next_page_token`][google.cloud.memcache.v1.ListInstancesResponse.next_page_token]
      *           to determine if there are more instances left to be queried.
      *     @type string $page_token
-     *           The next_page_token value returned from a previous List request,
-     *           if any.
+     *           The `next_page_token` value returned from a previous List request, if any.
      *     @type string $filter
      *           List filter. For example, exclude all Memcached instances with name as
-     *           my-instance by specifying "name != my-instance".
+     *           my-instance by specifying `"name != my-instance"`.
      *     @type string $order_by
      *           Sort results. Supported values are "name", "name desc" or "" (unsorted).
      * }
@@ -120,9 +134,9 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
     /**
      * The maximum number of items to return.
      * If not specified, a default value of 1000 will be used by the service.
-     * Regardless of the page_size value, the response may include a partial list
-     * and a caller should only rely on response's
-     * [next_page_token][CloudMemcache.ListInstancesResponse.next_page_token]
+     * Regardless of the `page_size` value, the response may include a partial
+     * list and a caller should only rely on response's
+     * [`next_page_token`][google.cloud.memcache.v1.ListInstancesResponse.next_page_token]
      * to determine if there are more instances left to be queried.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
@@ -136,9 +150,9 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
     /**
      * The maximum number of items to return.
      * If not specified, a default value of 1000 will be used by the service.
-     * Regardless of the page_size value, the response may include a partial list
-     * and a caller should only rely on response's
-     * [next_page_token][CloudMemcache.ListInstancesResponse.next_page_token]
+     * Regardless of the `page_size` value, the response may include a partial
+     * list and a caller should only rely on response's
+     * [`next_page_token`][google.cloud.memcache.v1.ListInstancesResponse.next_page_token]
      * to determine if there are more instances left to be queried.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
@@ -154,8 +168,7 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The next_page_token value returned from a previous List request,
-     * if any.
+     * The `next_page_token` value returned from a previous List request, if any.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      * @return string
@@ -166,8 +179,7 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The next_page_token value returned from a previous List request,
-     * if any.
+     * The `next_page_token` value returned from a previous List request, if any.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      * @param string $var
@@ -183,7 +195,7 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * List filter. For example, exclude all Memcached instances with name as
-     * my-instance by specifying "name != my-instance".
+     * my-instance by specifying `"name != my-instance"`.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      * @return string
@@ -195,7 +207,7 @@ class ListInstancesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * List filter. For example, exclude all Memcached instances with name as
-     * my-instance by specifying "name != my-instance".
+     * my-instance by specifying `"name != my-instance"`.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      * @param string $var

@@ -23,13 +23,13 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string resource_type_affected = 1;</code>
      */
-    private $resource_type_affected = '';
+    protected $resource_type_affected = '';
     /**
      * The ID of the bulletin corresponding to the vulnerability.
      *
      * Generated from protobuf field <code>string bulletin_id = 2;</code>
      */
-    private $bulletin_id = '';
+    protected $bulletin_id = '';
     /**
      * The CVEs associated with this bulletin.
      *
@@ -41,20 +41,20 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string severity = 4;</code>
      */
-    private $severity = '';
+    protected $severity = '';
     /**
      * The URI link to the bulletin on the website for more information.
      *
      * Generated from protobuf field <code>string bulletin_uri = 5;</code>
      */
-    private $bulletin_uri = '';
+    protected $bulletin_uri = '';
     /**
      * A brief description of the bulletin. See the bulletin pointed to by the
      * bulletin_uri field for an expanded description.
      *
      * Generated from protobuf field <code>string brief_description = 6;</code>
      */
-    private $brief_description = '';
+    protected $brief_description = '';
     /**
      * The GKE minor versions affected by this vulnerability.
      *
@@ -76,14 +76,14 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string suggested_upgrade_target = 9;</code>
      */
-    private $suggested_upgrade_target = '';
+    protected $suggested_upgrade_target = '';
     /**
      * If this field is specified, it means there are manual steps that the user
      * must take to make their clusters safe.
      *
      * Generated from protobuf field <code>bool manual_steps_required = 10;</code>
      */
-    private $manual_steps_required = false;
+    protected $manual_steps_required = false;
 
     /**
      * Constructor.
@@ -97,7 +97,7 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      *           vulnerability that affects > 1 resource type.
      *     @type string $bulletin_id
      *           The ID of the bulletin corresponding to the vulnerability.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $cve_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $cve_ids
      *           The CVEs associated with this bulletin.
      *     @type string $severity
      *           The severity of this bulletin as it relates to GKE.
@@ -106,9 +106,9 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      *     @type string $brief_description
      *           A brief description of the bulletin. See the bulletin pointed to by the
      *           bulletin_uri field for an expanded description.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $affected_supported_minors
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $affected_supported_minors
      *           The GKE minor versions affected by this vulnerability.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $patched_versions
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $patched_versions
      *           The GKE versions where this vulnerability is patched.
      *     @type string $suggested_upgrade_target
      *           This represents a version selected from the patched_versions field that
@@ -197,7 +197,7 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      * The CVEs associated with this bulletin.
      *
      * Generated from protobuf field <code>repeated string cve_ids = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCveIds($var)
@@ -303,7 +303,7 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      * The GKE minor versions affected by this vulnerability.
      *
      * Generated from protobuf field <code>repeated string affected_supported_minors = 7;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAffectedSupportedMinors($var)
@@ -329,7 +329,7 @@ class SecurityBulletinEvent extends \Google\Protobuf\Internal\Message
      * The GKE versions where this vulnerability is patched.
      *
      * Generated from protobuf field <code>repeated string patched_versions = 8;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPatchedVersions($var)

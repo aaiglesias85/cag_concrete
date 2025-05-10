@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [TensorboardService.BatchCreateTensorboardRuns][google.cloud.aiplatform.v1.TensorboardService.BatchCreateTensorboardRuns].
+ * Response message for
+ * [TensorboardService.BatchCreateTensorboardRuns][google.cloud.aiplatform.v1.TensorboardService.BatchCreateTensorboardRuns].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.BatchCreateTensorboardRunsResponse</code>
  */
@@ -28,7 +29,7 @@ class BatchCreateTensorboardRunsResponse extends \Google\Protobuf\Internal\Messa
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\TensorboardRun[]|\Google\Protobuf\Internal\RepeatedField $tensorboard_runs
+     *     @type array<\Google\Cloud\AIPlatform\V1\TensorboardRun>|\Google\Protobuf\Internal\RepeatedField $tensorboard_runs
      *           The created TensorboardRuns.
      * }
      */
@@ -52,7 +53,7 @@ class BatchCreateTensorboardRunsResponse extends \Google\Protobuf\Internal\Messa
      * The created TensorboardRuns.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.TensorboardRun tensorboard_runs = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\TensorboardRun[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\TensorboardRun>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTensorboardRuns($var)

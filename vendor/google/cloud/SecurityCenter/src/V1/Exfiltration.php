@@ -9,10 +9,10 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Exfiltration represents a data exfiltration attempt of one or more
- * sources to one or more targets.  Sources represent the source
- * of data that is exfiltrated, and Targets represents the destination the
- * data was copied to.
+ * Exfiltration represents a data exfiltration attempt from one or more sources
+ * to one or more targets. The `sources` attribute lists the sources of the
+ * exfiltrated data. The `targets` attribute lists the destinations the data was
+ * copied to.
  *
  * Generated from protobuf message <code>google.cloud.securitycenter.v1.Exfiltration</code>
  */
@@ -33,6 +33,12 @@ class Exfiltration extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ExfilResource targets = 2;</code>
      */
     private $targets;
+    /**
+     * Total exfiltrated bytes processed for the entire job.
+     *
+     * Generated from protobuf field <code>int64 total_exfiltrated_bytes = 3;</code>
+     */
+    protected $total_exfiltrated_bytes = 0;
 
     /**
      * Constructor.
@@ -40,13 +46,15 @@ class Exfiltration extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\SecurityCenter\V1\ExfilResource[]|\Google\Protobuf\Internal\RepeatedField $sources
+     *     @type array<\Google\Cloud\SecurityCenter\V1\ExfilResource>|\Google\Protobuf\Internal\RepeatedField $sources
      *           If there are multiple sources, then the data is considered "joined" between
      *           them. For instance, BigQuery can join multiple tables, and each
      *           table would be considered a source.
-     *     @type \Google\Cloud\SecurityCenter\V1\ExfilResource[]|\Google\Protobuf\Internal\RepeatedField $targets
+     *     @type array<\Google\Cloud\SecurityCenter\V1\ExfilResource>|\Google\Protobuf\Internal\RepeatedField $targets
      *           If there are multiple targets, each target would get a complete copy of the
      *           "joined" source data.
+     *     @type int|string $total_exfiltrated_bytes
+     *           Total exfiltrated bytes processed for the entire job.
      * }
      */
     public function __construct($data = NULL) {
@@ -73,7 +81,7 @@ class Exfiltration extends \Google\Protobuf\Internal\Message
      * table would be considered a source.
      *
      * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ExfilResource sources = 1;</code>
-     * @param \Google\Cloud\SecurityCenter\V1\ExfilResource[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\SecurityCenter\V1\ExfilResource>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSources($var)
@@ -101,13 +109,39 @@ class Exfiltration extends \Google\Protobuf\Internal\Message
      * "joined" source data.
      *
      * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ExfilResource targets = 2;</code>
-     * @param \Google\Cloud\SecurityCenter\V1\ExfilResource[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\SecurityCenter\V1\ExfilResource>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTargets($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\SecurityCenter\V1\ExfilResource::class);
         $this->targets = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Total exfiltrated bytes processed for the entire job.
+     *
+     * Generated from protobuf field <code>int64 total_exfiltrated_bytes = 3;</code>
+     * @return int|string
+     */
+    public function getTotalExfiltratedBytes()
+    {
+        return $this->total_exfiltrated_bytes;
+    }
+
+    /**
+     * Total exfiltrated bytes processed for the entire job.
+     *
+     * Generated from protobuf field <code>int64 total_exfiltrated_bytes = 3;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setTotalExfiltratedBytes($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->total_exfiltrated_bytes = $var;
 
         return $this;
     }

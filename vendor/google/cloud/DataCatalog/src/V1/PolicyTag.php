@@ -24,12 +24,12 @@ use Google\Protobuf\Internal\GPBUtil;
 class PolicyTag extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. Resource name of this policy tag in the URL format.
+     * Identifier. Resource name of this policy tag in the URL format.
      * The policy tag manager generates unique taxonomy IDs and policy tag IDs.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. User-defined name of this policy tag.
      * The name can't start or end with spaces and must be unique within the
@@ -38,7 +38,7 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string display_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Description of this policy tag. If not set, defaults to empty.
      * The description must contain only Unicode characters,
@@ -47,7 +47,7 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 3;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Resource name of this policy tag's parent policy tag. If empty, this is a
      * top level tag. If not set, defaults to an empty string.
@@ -57,7 +57,7 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent_policy_tag = 4;</code>
      */
-    private $parent_policy_tag = '';
+    protected $parent_policy_tag = '';
     /**
      * Output only. Resource names of child policy tags of this policy tag.
      *
@@ -72,7 +72,7 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Output only. Resource name of this policy tag in the URL format.
+     *           Identifier. Resource name of this policy tag in the URL format.
      *           The policy tag manager generates unique taxonomy IDs and policy tag IDs.
      *     @type string $display_name
      *           Required. User-defined name of this policy tag.
@@ -90,7 +90,7 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
      *           For example, for the "LatLong" policy tag in the example above, this field
      *           contains the resource name of the "Geolocation" policy tag, and, for
      *           "Geolocation", this field is empty.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $child_policy_tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $child_policy_tags
      *           Output only. Resource names of child policy tags of this policy tag.
      * }
      */
@@ -100,10 +100,10 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Resource name of this policy tag in the URL format.
+     * Identifier. Resource name of this policy tag in the URL format.
      * The policy tag manager generates unique taxonomy IDs and policy tag IDs.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @return string
      */
     public function getName()
@@ -112,10 +112,10 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Resource name of this policy tag in the URL format.
+     * Identifier. Resource name of this policy tag in the URL format.
      * The policy tag manager generates unique taxonomy IDs and policy tag IDs.
      *
-     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IDENTIFIER];</code>
      * @param string $var
      * @return $this
      */
@@ -240,7 +240,7 @@ class PolicyTag extends \Google\Protobuf\Internal\Message
      * Output only. Resource names of child policy tags of this policy tag.
      *
      * Generated from protobuf field <code>repeated string child_policy_tags = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setChildPolicyTags($var)

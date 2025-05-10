@@ -12,6 +12,8 @@
 namespace Symfony\Component\PropertyInfo;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\PropertyInfo\Util\LegacyTypeConverter;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Adds a PSR-6 cache layer on top of an extractor.
@@ -22,67 +24,82 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface
 {
-    private $propertyInfoExtractor;
-    private $cacheItemPool;
-    private $arrayCache = [];
+    private array $arrayCache = [];
 
-    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, CacheItemPoolInterface $cacheItemPool)
-    {
-        $this->propertyInfoExtractor = $propertyInfoExtractor;
-        $this->cacheItemPool = $cacheItemPool;
+    public function __construct(
+        private readonly PropertyInfoExtractorInterface $propertyInfoExtractor,
+        private readonly CacheItemPoolInterface $cacheItemPool,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isReadable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isReadable', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isWritable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isWritable', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract('getShortDescription', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         return $this->extract('getLongDescription', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProperties(string $class, array $context = []): ?array
     {
         return $this->extract('getProperties', [$class, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        try {
+            $serializedArguments = serialize([$class, $property, $context]);
+        } catch (\Exception) {
+            // If arguments are not serializable, skip the cache
+            if (method_exists($this->propertyInfoExtractor, 'getType')) {
+                return $this->propertyInfoExtractor->getType($class, $property, $context);
+            }
+
+            return LegacyTypeConverter::toTypeInfoType($this->propertyInfoExtractor->getTypes($class, $property, $context));
+        }
+
+        // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
+        $key = rawurlencode('getType.'.$serializedArguments);
+
+        if (\array_key_exists($key, $this->arrayCache)) {
+            return $this->arrayCache[$key];
+        }
+
+        $item = $this->cacheItemPool->getItem($key);
+
+        if ($item->isHit()) {
+            return $this->arrayCache[$key] = $item->get();
+        }
+
+        if (method_exists($this->propertyInfoExtractor, 'getType')) {
+            $value = $this->propertyInfoExtractor->getType($class, $property, $context);
+        } else {
+            $value = LegacyTypeConverter::toTypeInfoType($this->propertyInfoExtractor->getTypes($class, $property, $context));
+        }
+
+        $item->set($value);
+        $this->cacheItemPool->save($item);
+
+        return $this->arrayCache[$key] = $value;
+    }
+
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         return $this->extract('getTypes', [$class, $property, $context]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return $this->extract('isInitializable', [$class, $property, $context]);
@@ -90,14 +107,12 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
 
     /**
      * Retrieves the cached data if applicable or delegates to the decorated extractor.
-     *
-     * @return mixed
      */
-    private function extract(string $method, array $arguments)
+    private function extract(string $method, array $arguments): mixed
     {
         try {
             $serializedArguments = serialize($arguments);
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // If arguments are not serializable, skip the cache
             return $this->propertyInfoExtractor->{$method}(...$arguments);
         }

@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-bigquery-data-exchange/v/stable)](https://packagist.org/packages/google/cloud-bigquery-data-exchange) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-bigquery-data-exchange.svg)](https://packagist.org/packages/google/cloud-bigquery-data-exchange)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-bigquery-data-exchange/latest/bigquerydataexchange/readme)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-bigquery-data-exchange/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -27,6 +27,11 @@ please see our [gRPC installation guide](https://cloud.google.com/php/grpc).
 
 Please see our [Authentication guide](https://github.com/googleapis/google-cloud-php/blob/main/AUTHENTICATION.md) for more information
 on authenticating your client. Once authenticated, you'll be ready to start making requests.
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

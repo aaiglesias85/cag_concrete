@@ -17,8 +17,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListConstraintsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The Cloud resource that parents the constraint. Must be in one of the
-     * following forms:
+     * Required. The Google Cloud resource that parents the constraint. Must be in
+     * one of the following forms:
      * * `projects/{project_number}`
      * * `projects/{project_id}`
      * * `folders/{folder_id}`
@@ -26,7 +26,7 @@ class ListConstraintsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Size of the pages to be returned. This is currently unsupported and will
      * be ignored. The server may at any point start using this field to limit
@@ -34,14 +34,34 @@ class ListConstraintsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Page token used to retrieve the next page. This is currently unsupported
      * and will be ignored. The server may at any point start using this field.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The Google Cloud resource that parents the constraint. Must be in
+     *                       one of the following forms:
+     *
+     *                       * `projects/{project_number}`
+     *                       * `projects/{project_id}`
+     *                       * `folders/{folder_id}`
+     *                       * `organizations/{organization_id}`
+     *                       Please see {@see OrgPolicyClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\OrgPolicy\V2\ListConstraintsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -50,8 +70,8 @@ class ListConstraintsRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The Cloud resource that parents the constraint. Must be in one of the
-     *           following forms:
+     *           Required. The Google Cloud resource that parents the constraint. Must be in
+     *           one of the following forms:
      *           * `projects/{project_number}`
      *           * `projects/{project_id}`
      *           * `folders/{folder_id}`
@@ -71,8 +91,8 @@ class ListConstraintsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The Cloud resource that parents the constraint. Must be in one of the
-     * following forms:
+     * Required. The Google Cloud resource that parents the constraint. Must be in
+     * one of the following forms:
      * * `projects/{project_number}`
      * * `projects/{project_id}`
      * * `folders/{folder_id}`
@@ -87,8 +107,8 @@ class ListConstraintsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The Cloud resource that parents the constraint. Must be in one of the
-     * following forms:
+     * Required. The Google Cloud resource that parents the constraint. Must be in
+     * one of the following forms:
      * * `projects/{project_number}`
      * * `projects/{project_id}`
      * * `folders/{folder_id}`

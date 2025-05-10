@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The response for [Firestore.RunQuery][google.firestore.v1.Firestore.RunQuery].
+ * The response for
+ * [Firestore.RunQuery][google.firestore.v1.Firestore.RunQuery].
  *
  * Generated from protobuf message <code>google.firestore.v1.RunQueryResponse</code>
  */
@@ -18,8 +19,9 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
     /**
      * The transaction that was started as part of this request.
      * Can only be set in the first response, and only if
-     * [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction] was set in the request.
-     * If set, no other fields will be set in this response.
+     * [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction]
+     * was set in the request. If set, no other fields will be set in this
+     * response.
      *
      * Generated from protobuf field <code>bytes transaction = 2;</code>
      */
@@ -48,6 +50,14 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>int32 skipped_results = 4;</code>
      */
     private $skipped_results = 0;
+    /**
+     * Query explain metrics. This is only present when the
+     * [RunQueryRequest.explain_options][google.firestore.v1.RunQueryRequest.explain_options]
+     * is provided, and it is sent only once with the last response in the stream.
+     *
+     * Generated from protobuf field <code>.google.firestore.v1.ExplainMetrics explain_metrics = 11;</code>
+     */
+    private $explain_metrics = null;
     protected $continuation_selector;
 
     /**
@@ -59,8 +69,9 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
      *     @type string $transaction
      *           The transaction that was started as part of this request.
      *           Can only be set in the first response, and only if
-     *           [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction] was set in the request.
-     *           If set, no other fields will be set in this response.
+     *           [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction]
+     *           was set in the request. If set, no other fields will be set in this
+     *           response.
      *     @type \Google\Cloud\Firestore\V1\Document $document
      *           A query result, not set when reporting partial progress.
      *     @type \Google\Protobuf\Timestamp $read_time
@@ -76,6 +87,10 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
      *     @type bool $done
      *           If present, Firestore has completely finished the request and no more
      *           documents will be returned.
+     *     @type \Google\Cloud\Firestore\V1\ExplainMetrics $explain_metrics
+     *           Query explain metrics. This is only present when the
+     *           [RunQueryRequest.explain_options][google.firestore.v1.RunQueryRequest.explain_options]
+     *           is provided, and it is sent only once with the last response in the stream.
      * }
      */
     public function __construct($data = NULL) {
@@ -86,8 +101,9 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
     /**
      * The transaction that was started as part of this request.
      * Can only be set in the first response, and only if
-     * [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction] was set in the request.
-     * If set, no other fields will be set in this response.
+     * [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction]
+     * was set in the request. If set, no other fields will be set in this
+     * response.
      *
      * Generated from protobuf field <code>bytes transaction = 2;</code>
      * @return string
@@ -100,8 +116,9 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
     /**
      * The transaction that was started as part of this request.
      * Can only be set in the first response, and only if
-     * [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction] was set in the request.
-     * If set, no other fields will be set in this response.
+     * [RunQueryRequest.new_transaction][google.firestore.v1.RunQueryRequest.new_transaction]
+     * was set in the request. If set, no other fields will be set in this
+     * response.
      *
      * Generated from protobuf field <code>bytes transaction = 2;</code>
      * @param string $var
@@ -254,6 +271,46 @@ class RunQueryResponse extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->writeOneof(6, $var);
+
+        return $this;
+    }
+
+    /**
+     * Query explain metrics. This is only present when the
+     * [RunQueryRequest.explain_options][google.firestore.v1.RunQueryRequest.explain_options]
+     * is provided, and it is sent only once with the last response in the stream.
+     *
+     * Generated from protobuf field <code>.google.firestore.v1.ExplainMetrics explain_metrics = 11;</code>
+     * @return \Google\Cloud\Firestore\V1\ExplainMetrics|null
+     */
+    public function getExplainMetrics()
+    {
+        return $this->explain_metrics;
+    }
+
+    public function hasExplainMetrics()
+    {
+        return isset($this->explain_metrics);
+    }
+
+    public function clearExplainMetrics()
+    {
+        unset($this->explain_metrics);
+    }
+
+    /**
+     * Query explain metrics. This is only present when the
+     * [RunQueryRequest.explain_options][google.firestore.v1.RunQueryRequest.explain_options]
+     * is provided, and it is sent only once with the last response in the stream.
+     *
+     * Generated from protobuf field <code>.google.firestore.v1.ExplainMetrics explain_metrics = 11;</code>
+     * @param \Google\Cloud\Firestore\V1\ExplainMetrics $var
+     * @return $this
+     */
+    public function setExplainMetrics($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Firestore\V1\ExplainMetrics::class);
+        $this->explain_metrics = $var;
 
         return $this;
     }

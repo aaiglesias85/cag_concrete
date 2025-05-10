@@ -23,7 +23,7 @@ class GetAccessLevelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Whether to return `BasicLevels` in the Cloud Common Expression
      * Language rather than as `BasicLevels`. Defaults to AS_DEFINED, where
@@ -36,7 +36,25 @@ class GetAccessLevelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.identity.accesscontextmanager.v1.LevelFormat access_level_format = 2;</code>
      */
-    private $access_level_format = 0;
+    protected $access_level_format = 0;
+
+    /**
+     * @param string $name Required. Resource name for the [Access Level]
+     *                     [google.identity.accesscontextmanager.v1.AccessLevel].
+     *
+     *                     Format:
+     *                     `accessPolicies/{policy_id}/accessLevels/{access_level_id}`
+     *                     Please see {@see AccessContextManagerClient::accessLevelName()} for help formatting this field.
+     *
+     * @return \Google\Identity\AccessContextManager\V1\GetAccessLevelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

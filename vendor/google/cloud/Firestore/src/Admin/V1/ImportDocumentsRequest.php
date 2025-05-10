@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [FirestoreAdmin.ImportDocuments][google.firestore.admin.v1.FirestoreAdmin.ImportDocuments].
+ * The request for
+ * [FirestoreAdmin.ImportDocuments][google.firestore.admin.v1.FirestoreAdmin.ImportDocuments].
  *
  * Generated from protobuf message <code>google.firestore.admin.v1.ImportDocumentsRequest</code>
  */
@@ -23,8 +24,8 @@ class ImportDocumentsRequest extends \Google\Protobuf\Internal\Message
      */
     private $name = '';
     /**
-     * Which collection ids to import. Unspecified means all collections included
-     * in the import.
+     * Which collection IDs to import. Unspecified means all collections included
+     * in the import. Each collection ID in this list must be unique.
      *
      * Generated from protobuf field <code>repeated string collection_ids = 2;</code>
      */
@@ -39,6 +40,31 @@ class ImportDocumentsRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string input_uri_prefix = 3;</code>
      */
     private $input_uri_prefix = '';
+    /**
+     * An empty list represents all namespaces. This is the preferred
+     * usage for databases that don't use namespaces.
+     * An empty string element represents the default namespace. This should be
+     * used if the database has data in non-default namespaces, but doesn't want
+     * to include them. Each namespace in this list must be unique.
+     *
+     * Generated from protobuf field <code>repeated string namespace_ids = 4;</code>
+     */
+    private $namespace_ids;
+
+    /**
+     * @param string $name Required. Database to import into. Should be of the form:
+     *                     `projects/{project_id}/databases/{database_id}`. Please see
+     *                     {@see FirestoreAdminClient::databaseName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Firestore\Admin\V1\ImportDocumentsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -49,15 +75,21 @@ class ImportDocumentsRequest extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *           Required. Database to import into. Should be of the form:
      *           `projects/{project_id}/databases/{database_id}`.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $collection_ids
-     *           Which collection ids to import. Unspecified means all collections included
-     *           in the import.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $collection_ids
+     *           Which collection IDs to import. Unspecified means all collections included
+     *           in the import. Each collection ID in this list must be unique.
      *     @type string $input_uri_prefix
      *           Location of the exported files.
      *           This must match the output_uri_prefix of an ExportDocumentsResponse from
      *           an export that has completed successfully.
      *           See:
      *           [google.firestore.admin.v1.ExportDocumentsResponse.output_uri_prefix][google.firestore.admin.v1.ExportDocumentsResponse.output_uri_prefix].
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $namespace_ids
+     *           An empty list represents all namespaces. This is the preferred
+     *           usage for databases that don't use namespaces.
+     *           An empty string element represents the default namespace. This should be
+     *           used if the database has data in non-default namespaces, but doesn't want
+     *           to include them. Each namespace in this list must be unique.
      * }
      */
     public function __construct($data = NULL) {
@@ -94,8 +126,8 @@ class ImportDocumentsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Which collection ids to import. Unspecified means all collections included
-     * in the import.
+     * Which collection IDs to import. Unspecified means all collections included
+     * in the import. Each collection ID in this list must be unique.
      *
      * Generated from protobuf field <code>repeated string collection_ids = 2;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -106,11 +138,11 @@ class ImportDocumentsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Which collection ids to import. Unspecified means all collections included
-     * in the import.
+     * Which collection IDs to import. Unspecified means all collections included
+     * in the import. Each collection ID in this list must be unique.
      *
      * Generated from protobuf field <code>repeated string collection_ids = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCollectionIds($var)
@@ -151,6 +183,40 @@ class ImportDocumentsRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->input_uri_prefix = $var;
+
+        return $this;
+    }
+
+    /**
+     * An empty list represents all namespaces. This is the preferred
+     * usage for databases that don't use namespaces.
+     * An empty string element represents the default namespace. This should be
+     * used if the database has data in non-default namespaces, but doesn't want
+     * to include them. Each namespace in this list must be unique.
+     *
+     * Generated from protobuf field <code>repeated string namespace_ids = 4;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getNamespaceIds()
+    {
+        return $this->namespace_ids;
+    }
+
+    /**
+     * An empty list represents all namespaces. This is the preferred
+     * usage for databases that don't use namespaces.
+     * An empty string element represents the default namespace. This should be
+     * used if the database has data in non-default namespaces, but doesn't want
+     * to include them. Each namespace in this list must be unique.
+     *
+     * Generated from protobuf field <code>repeated string namespace_ids = 4;</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setNamespaceIds($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->namespace_ids = $arr;
 
         return $this;
     }

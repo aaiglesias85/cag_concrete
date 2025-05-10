@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The long running operation metadata for batch process method.
+ * The long-running operation metadata for
+ * [BatchProcessDocuments][google.cloud.documentai.v1.DocumentProcessorService.BatchProcessDocuments].
  *
  * Generated from protobuf message <code>google.cloud.documentai.v1.BatchProcessMetadata</code>
  */
@@ -20,26 +21,26 @@ class BatchProcessMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.BatchProcessMetadata.State state = 1;</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * A message providing more details about the current state of processing.
      * For example, the error message if the operation is failed.
      *
      * Generated from protobuf field <code>string state_message = 2;</code>
      */
-    private $state_message = '';
+    protected $state_message = '';
     /**
      * The creation time of the operation.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * The last update time of the operation.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4;</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * The list of response details of each document.
      *
@@ -62,7 +63,7 @@ class BatchProcessMetadata extends \Google\Protobuf\Internal\Message
      *           The creation time of the operation.
      *     @type \Google\Protobuf\Timestamp $update_time
      *           The last update time of the operation.
-     *     @type \Google\Cloud\DocumentAI\V1\BatchProcessMetadata\IndividualProcessStatus[]|\Google\Protobuf\Internal\RepeatedField $individual_process_statuses
+     *     @type array<\Google\Cloud\DocumentAI\V1\BatchProcessMetadata\IndividualProcessStatus>|\Google\Protobuf\Internal\RepeatedField $individual_process_statuses
      *           The list of response details of each document.
      * }
      */
@@ -212,7 +213,7 @@ class BatchProcessMetadata extends \Google\Protobuf\Internal\Message
      * The list of response details of each document.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.BatchProcessMetadata.IndividualProcessStatus individual_process_statuses = 5;</code>
-     * @param \Google\Cloud\DocumentAI\V1\BatchProcessMetadata\IndividualProcessStatus[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\BatchProcessMetadata\IndividualProcessStatus>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setIndividualProcessStatuses($var)

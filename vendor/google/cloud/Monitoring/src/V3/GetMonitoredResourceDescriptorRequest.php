@@ -23,7 +23,26 @@ class GetMonitoredResourceDescriptorRequest extends \Google\Protobuf\Internal\Me
      *
      * Generated from protobuf field <code>string name = 3 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The monitored resource descriptor to get.  The format is:
+     *
+     *                     projects/[PROJECT_ID_OR_NUMBER]/monitoredResourceDescriptors/[RESOURCE_TYPE]
+     *
+     *                     The `[RESOURCE_TYPE]` is a predefined type, such as
+     *                     `cloudsql_database`. Please see
+     *                     {@see MetricServiceClient::monitoredResourceDescriptorName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Monitoring\V3\GetMonitoredResourceDescriptorRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

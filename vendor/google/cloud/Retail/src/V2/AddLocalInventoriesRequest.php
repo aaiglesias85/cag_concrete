@@ -27,7 +27,7 @@ class AddLocalInventoriesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string product = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $product = '';
+    protected $product = '';
     /**
      * Required. A list of inventory information at difference places. Each place
      * is identified by its place ID. At most 3000 inventories are allowed per
@@ -51,7 +51,7 @@ class AddLocalInventoriesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask add_mask = 4;</code>
      */
-    private $add_mask = null;
+    protected $add_mask = null;
     /**
      * The time when the inventory updates are issued. Used to prevent
      * out-of-order updates on local inventory fields. If not provided, the
@@ -59,7 +59,7 @@ class AddLocalInventoriesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp add_time = 5;</code>
      */
-    private $add_time = null;
+    protected $add_time = null;
     /**
      * If set to true, and the [Product][google.cloud.retail.v2.Product] is not
      * found, the local inventory will still be processed and retained for at most
@@ -69,7 +69,27 @@ class AddLocalInventoriesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool allow_missing = 6;</code>
      */
-    private $allow_missing = false;
+    protected $allow_missing = false;
+
+    /**
+     * @param string $product Required. Full resource name of [Product][google.cloud.retail.v2.Product],
+     *                        such as
+     *                        `projects/&#42;/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`.
+     *
+     *                        If the caller does not have permission to access the
+     *                        [Product][google.cloud.retail.v2.Product], regardless of whether or not it
+     *                        exists, a PERMISSION_DENIED error is returned. Please see
+     *                        {@see ProductServiceClient::productName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Retail\V2\AddLocalInventoriesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $product): self
+    {
+        return (new self())
+            ->setProduct($product);
+    }
 
     /**
      * Constructor.
@@ -84,7 +104,7 @@ class AddLocalInventoriesRequest extends \Google\Protobuf\Internal\Message
      *           If the caller does not have permission to access the
      *           [Product][google.cloud.retail.v2.Product], regardless of whether or not it
      *           exists, a PERMISSION_DENIED error is returned.
-     *     @type \Google\Cloud\Retail\V2\LocalInventory[]|\Google\Protobuf\Internal\RepeatedField $local_inventories
+     *     @type array<\Google\Cloud\Retail\V2\LocalInventory>|\Google\Protobuf\Internal\RepeatedField $local_inventories
      *           Required. A list of inventory information at difference places. Each place
      *           is identified by its place ID. At most 3000 inventories are allowed per
      *           request.
@@ -172,7 +192,7 @@ class AddLocalInventoriesRequest extends \Google\Protobuf\Internal\Message
      * request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.LocalInventory local_inventories = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\Retail\V2\LocalInventory[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\LocalInventory>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLocalInventories($var)

@@ -20,19 +20,19 @@ class CreateConnectionProfileRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The connection profile identifier.
      *
      * Generated from protobuf field <code>string connection_profile_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $connection_profile_id = '';
+    protected $connection_profile_id = '';
     /**
      * Required. The connection profile resource to create.
      *
      * Generated from protobuf field <code>.google.cloud.datastream.v1.ConnectionProfile connection_profile = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $connection_profile = null;
+    protected $connection_profile = null;
     /**
      * Optional. A request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -48,20 +48,38 @@ class CreateConnectionProfileRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
     /**
-     * Optional. Only validate the connection profile, but don't create any resources.
-     * The default is false.
+     * Optional. Only validate the connection profile, but don't create any
+     * resources. The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
     /**
      * Optional. Create the connection profile without validating it.
      *
      * Generated from protobuf field <code>bool force = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $force = false;
+    protected $force = false;
+
+    /**
+     * @param string                                        $parent              Required. The parent that owns the collection of ConnectionProfiles. Please see
+     *                                                                           {@see DatastreamClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Datastream\V1\ConnectionProfile $connectionProfile   Required. The connection profile resource to create.
+     * @param string                                        $connectionProfileId Required. The connection profile identifier.
+     *
+     * @return \Google\Cloud\Datastream\V1\CreateConnectionProfileRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Datastream\V1\ConnectionProfile $connectionProfile, string $connectionProfileId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setConnectionProfile($connectionProfile)
+            ->setConnectionProfileId($connectionProfileId);
+    }
 
     /**
      * Constructor.
@@ -88,8 +106,8 @@ class CreateConnectionProfileRequest extends \Google\Protobuf\Internal\Message
      *           The request ID must be a valid UUID with the exception that zero UUID is
      *           not supported (00000000-0000-0000-0000-000000000000).
      *     @type bool $validate_only
-     *           Optional. Only validate the connection profile, but don't create any resources.
-     *           The default is false.
+     *           Optional. Only validate the connection profile, but don't create any
+     *           resources. The default is false.
      *     @type bool $force
      *           Optional. Create the connection profile without validating it.
      * }
@@ -234,8 +252,8 @@ class CreateConnectionProfileRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Only validate the connection profile, but don't create any resources.
-     * The default is false.
+     * Optional. Only validate the connection profile, but don't create any
+     * resources. The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
@@ -246,8 +264,8 @@ class CreateConnectionProfileRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Only validate the connection profile, but don't create any resources.
-     * The default is false.
+     * Optional. Only validate the connection profile, but don't create any
+     * resources. The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var

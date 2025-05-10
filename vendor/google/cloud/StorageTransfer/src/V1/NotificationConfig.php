@@ -12,16 +12,22 @@ use Google\Protobuf\Internal\GPBUtil;
  * Specification to configure notifications published to Pub/Sub.
  * Notifications are published to the customer-provided topic using the
  * following `PubsubMessage.attributes`:
- * * `"eventType"`: one of the [EventType][google.storagetransfer.v1.NotificationConfig.EventType] values
- * * `"payloadFormat"`: one of the [PayloadFormat][google.storagetransfer.v1.NotificationConfig.PayloadFormat] values
- * * `"projectId"`: the [project_id][google.storagetransfer.v1.TransferOperation.project_id] of the
+ * * `"eventType"`: one of the
+ * [EventType][google.storagetransfer.v1.NotificationConfig.EventType] values
+ * * `"payloadFormat"`: one of the
+ * [PayloadFormat][google.storagetransfer.v1.NotificationConfig.PayloadFormat]
+ * values
+ * * `"projectId"`: the
+ * [project_id][google.storagetransfer.v1.TransferOperation.project_id] of the
  * `TransferOperation`
  * * `"transferJobName"`: the
- * [transfer_job_name][google.storagetransfer.v1.TransferOperation.transfer_job_name] of the
+ * [transfer_job_name][google.storagetransfer.v1.TransferOperation.transfer_job_name]
+ * of the `TransferOperation`
+ * * `"transferOperationName"`: the
+ * [name][google.storagetransfer.v1.TransferOperation.name] of the
  * `TransferOperation`
- * * `"transferOperationName"`: the [name][google.storagetransfer.v1.TransferOperation.name] of the
- * `TransferOperation`
- * The `PubsubMessage.data` contains a [TransferOperation][google.storagetransfer.v1.TransferOperation] resource
+ * The `PubsubMessage.data` contains a
+ * [TransferOperation][google.storagetransfer.v1.TransferOperation] resource
  * formatted according to the specified `PayloadFormat`.
  *
  * Generated from protobuf message <code>google.storagetransfer.v1.NotificationConfig</code>
@@ -36,7 +42,7 @@ class NotificationConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string pubsub_topic = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $pubsub_topic = '';
+    protected $pubsub_topic = '';
     /**
      * Event types for which a notification is desired. If empty, send
      * notifications for all event types.
@@ -49,7 +55,7 @@ class NotificationConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.storagetransfer.v1.NotificationConfig.PayloadFormat payload_format = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $payload_format = 0;
+    protected $payload_format = 0;
 
     /**
      * Constructor.
@@ -62,7 +68,7 @@ class NotificationConfig extends \Google\Protobuf\Internal\Message
      *           notifications. Must be of the format: `projects/{project}/topics/{topic}`.
      *           Not matching this format results in an
      *           [INVALID_ARGUMENT][google.rpc.Code.INVALID_ARGUMENT] error.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $event_types
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $event_types
      *           Event types for which a notification is desired. If empty, send
      *           notifications for all event types.
      *     @type int $payload_format
@@ -123,7 +129,7 @@ class NotificationConfig extends \Google\Protobuf\Internal\Message
      * notifications for all event types.
      *
      * Generated from protobuf field <code>repeated .google.storagetransfer.v1.NotificationConfig.EventType event_types = 2;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEventTypes($var)

@@ -24,7 +24,7 @@ class Page extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_number = 1;</code>
      */
-    private $page_number = 0;
+    protected $page_number = 0;
     /**
      * Rendered image for this page. This image is preprocessed to remove any
      * skew, rotation, and distortions such that the annotation bounding boxes
@@ -32,7 +32,7 @@ class Page extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Image image = 13;</code>
      */
-    private $image = null;
+    protected $image = null;
     /**
      * Transformation matrices that were applied to the original document image
      * to produce [Page.image][google.cloud.documentai.v1.Document.Page.image].
@@ -45,13 +45,13 @@ class Page extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Dimension dimension = 2;</code>
      */
-    private $dimension = null;
+    protected $dimension = null;
     /**
      * [Layout][google.cloud.documentai.v1.Document.Page.Layout] for the page.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Layout layout = 3;</code>
      */
-    private $layout = null;
+    protected $layout = null;
     /**
      * A list of detected languages together with confidence.
      *
@@ -112,11 +112,24 @@ class Page extends \Google\Protobuf\Internal\Message
      */
     private $symbols;
     /**
+     * A list of detected barcodes.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedBarcode detected_barcodes = 15;</code>
+     */
+    private $detected_barcodes;
+    /**
+     * Image quality scores.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.ImageQualityScores image_quality_scores = 17;</code>
+     */
+    protected $image_quality_scores = null;
+    /**
      * The history of this page.
      *
-     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 16;</code>
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 16 [deprecated = true];</code>
+     * @deprecated
      */
-    private $provenance = null;
+    protected $provenance = null;
 
     /**
      * Constructor.
@@ -134,36 +147,40 @@ class Page extends \Google\Protobuf\Internal\Message
      *           Rendered image for this page. This image is preprocessed to remove any
      *           skew, rotation, and distortions such that the annotation bounding boxes
      *           can be upright and axis-aligned.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Matrix[]|\Google\Protobuf\Internal\RepeatedField $transforms
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Matrix>|\Google\Protobuf\Internal\RepeatedField $transforms
      *           Transformation matrices that were applied to the original document image
      *           to produce [Page.image][google.cloud.documentai.v1.Document.Page.image].
      *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Dimension $dimension
      *           Physical dimension of the page.
      *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Layout $layout
      *           [Layout][google.cloud.documentai.v1.Document.Page.Layout] for the page.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $detected_languages
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $detected_languages
      *           A list of detected languages together with confidence.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Block[]|\Google\Protobuf\Internal\RepeatedField $blocks
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Block>|\Google\Protobuf\Internal\RepeatedField $blocks
      *           A list of visually detected text blocks on the page.
      *           A block has a set of lines (collected into paragraphs) that have a common
      *           line-spacing and orientation.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Paragraph[]|\Google\Protobuf\Internal\RepeatedField $paragraphs
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Paragraph>|\Google\Protobuf\Internal\RepeatedField $paragraphs
      *           A list of visually detected text paragraphs on the page.
      *           A collection of lines that a human would perceive as a paragraph.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Line[]|\Google\Protobuf\Internal\RepeatedField $lines
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Line>|\Google\Protobuf\Internal\RepeatedField $lines
      *           A list of visually detected text lines on the page.
      *           A collection of tokens that a human would perceive as a line.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Token[]|\Google\Protobuf\Internal\RepeatedField $tokens
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Token>|\Google\Protobuf\Internal\RepeatedField $tokens
      *           A list of visually detected tokens on the page.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\VisualElement[]|\Google\Protobuf\Internal\RepeatedField $visual_elements
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\VisualElement>|\Google\Protobuf\Internal\RepeatedField $visual_elements
      *           A list of detected non-text visual elements e.g. checkbox,
      *           signature etc. on the page.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Table[]|\Google\Protobuf\Internal\RepeatedField $tables
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Table>|\Google\Protobuf\Internal\RepeatedField $tables
      *           A list of visually detected tables on the page.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\FormField[]|\Google\Protobuf\Internal\RepeatedField $form_fields
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\FormField>|\Google\Protobuf\Internal\RepeatedField $form_fields
      *           A list of visually detected form fields on the page.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Symbol[]|\Google\Protobuf\Internal\RepeatedField $symbols
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\Symbol>|\Google\Protobuf\Internal\RepeatedField $symbols
      *           A list of visually detected symbols on the page.
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedBarcode>|\Google\Protobuf\Internal\RepeatedField $detected_barcodes
+     *           A list of detected barcodes.
+     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\ImageQualityScores $image_quality_scores
+     *           Image quality scores.
      *     @type \Google\Cloud\DocumentAI\V1\Document\Provenance $provenance
      *           The history of this page.
      * }
@@ -264,7 +281,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * to produce [Page.image][google.cloud.documentai.v1.Document.Page.image].
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Matrix transforms = 14;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Matrix[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Matrix>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTransforms($var)
@@ -362,7 +379,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A list of detected languages together with confidence.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedLanguage detected_languages = 4;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDetectedLanguages($var)
@@ -392,7 +409,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * line-spacing and orientation.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Block blocks = 5;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Block[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Block>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBlocks($var)
@@ -420,7 +437,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A collection of lines that a human would perceive as a paragraph.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Paragraph paragraphs = 6;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Paragraph[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Paragraph>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setParagraphs($var)
@@ -448,7 +465,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A collection of tokens that a human would perceive as a line.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Line lines = 7;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Line[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Line>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setLines($var)
@@ -474,7 +491,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A list of visually detected tokens on the page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Token tokens = 8;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Token[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Token>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTokens($var)
@@ -502,7 +519,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * signature etc. on the page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.VisualElement visual_elements = 9;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\VisualElement[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\VisualElement>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVisualElements($var)
@@ -528,7 +545,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A list of visually detected tables on the page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Table tables = 10;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Table[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Table>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTables($var)
@@ -554,7 +571,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A list of visually detected form fields on the page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.FormField form_fields = 11;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\FormField[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\FormField>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFormFields($var)
@@ -580,7 +597,7 @@ class Page extends \Google\Protobuf\Internal\Message
      * A list of visually detected symbols on the page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.Symbol symbols = 12;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Symbol[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\Symbol>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSymbols($var)
@@ -592,35 +609,103 @@ class Page extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * A list of detected barcodes.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedBarcode detected_barcodes = 15;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getDetectedBarcodes()
+    {
+        return $this->detected_barcodes;
+    }
+
+    /**
+     * A list of detected barcodes.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedBarcode detected_barcodes = 15;</code>
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedBarcode>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setDetectedBarcodes($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\DocumentAI\V1\Document\Page\DetectedBarcode::class);
+        $this->detected_barcodes = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Image quality scores.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.ImageQualityScores image_quality_scores = 17;</code>
+     * @return \Google\Cloud\DocumentAI\V1\Document\Page\ImageQualityScores|null
+     */
+    public function getImageQualityScores()
+    {
+        return $this->image_quality_scores;
+    }
+
+    public function hasImageQualityScores()
+    {
+        return isset($this->image_quality_scores);
+    }
+
+    public function clearImageQualityScores()
+    {
+        unset($this->image_quality_scores);
+    }
+
+    /**
+     * Image quality scores.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.ImageQualityScores image_quality_scores = 17;</code>
+     * @param \Google\Cloud\DocumentAI\V1\Document\Page\ImageQualityScores $var
+     * @return $this
+     */
+    public function setImageQualityScores($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\DocumentAI\V1\Document\Page\ImageQualityScores::class);
+        $this->image_quality_scores = $var;
+
+        return $this;
+    }
+
+    /**
      * The history of this page.
      *
-     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 16;</code>
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 16 [deprecated = true];</code>
      * @return \Google\Cloud\DocumentAI\V1\Document\Provenance|null
+     * @deprecated
      */
     public function getProvenance()
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         return $this->provenance;
     }
 
     public function hasProvenance()
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         return isset($this->provenance);
     }
 
     public function clearProvenance()
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         unset($this->provenance);
     }
 
     /**
      * The history of this page.
      *
-     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 16;</code>
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 16 [deprecated = true];</code>
      * @param \Google\Cloud\DocumentAI\V1\Document\Provenance $var
      * @return $this
+     * @deprecated
      */
     public function setProvenance($var)
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkMessage($var, \Google\Cloud\DocumentAI\V1\Document\Provenance::class);
         $this->provenance = $var;
 

@@ -22,13 +22,30 @@ class ValidateTrustRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The domain trust to validate trust state for.
      *
      * Generated from protobuf field <code>.google.cloud.managedidentities.v1.Trust trust = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $trust = null;
+    protected $trust = null;
+
+    /**
+     * @param string                                   $name  Required. The resource domain name, project name, and location using the form:
+     *                                                        `projects/{project_id}/locations/global/domains/{domain_name}`
+     *                                                        Please see {@see ManagedIdentitiesServiceClient::domainName()} for help formatting this field.
+     * @param \Google\Cloud\ManagedIdentities\V1\Trust $trust Required. The domain trust to validate trust state for.
+     *
+     * @return \Google\Cloud\ManagedIdentities\V1\ValidateTrustRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\ManagedIdentities\V1\Trust $trust): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setTrust($trust);
+    }
 
     /**
      * Constructor.

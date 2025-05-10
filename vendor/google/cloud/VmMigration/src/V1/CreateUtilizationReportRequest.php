@@ -20,23 +20,23 @@ class CreateUtilizationReportRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The report to create.
      *
      * Generated from protobuf field <code>.google.cloud.vmmigration.v1.UtilizationReport utilization_report = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $utilization_report = null;
+    protected $utilization_report = null;
     /**
-     * Required. The ID to use for the report, which will become the final component of
-     * the reports's resource name.
+     * Required. The ID to use for the report, which will become the final
+     * component of the reports's resource name.
      * This value maximum length is 63 characters, and valid characters
      * are /[a-z][0-9]-/. It must start with an english letter and must not
      * end with a hyphen.
      *
      * Generated from protobuf field <code>string utilization_report_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $utilization_report_id = '';
+    protected $utilization_report_id = '';
     /**
      * A request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -52,7 +52,30 @@ class CreateUtilizationReportRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 4;</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                                         $parent              Required. The Utilization Report's parent. Please see
+     *                                                                            {@see VmMigrationClient::sourceName()} for help formatting this field.
+     * @param \Google\Cloud\VMMigration\V1\UtilizationReport $utilizationReport   Required. The report to create.
+     * @param string                                         $utilizationReportId Required. The ID to use for the report, which will become the final
+     *                                                                            component of the reports's resource name.
+     *
+     *                                                                            This value maximum length is 63 characters, and valid characters
+     *                                                                            are /[a-z][0-9]-/. It must start with an english letter and must not
+     *                                                                            end with a hyphen.
+     *
+     * @return \Google\Cloud\VMMigration\V1\CreateUtilizationReportRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\VMMigration\V1\UtilizationReport $utilizationReport, string $utilizationReportId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setUtilizationReport($utilizationReport)
+            ->setUtilizationReportId($utilizationReportId);
+    }
 
     /**
      * Constructor.
@@ -65,8 +88,8 @@ class CreateUtilizationReportRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\VMMigration\V1\UtilizationReport $utilization_report
      *           Required. The report to create.
      *     @type string $utilization_report_id
-     *           Required. The ID to use for the report, which will become the final component of
-     *           the reports's resource name.
+     *           Required. The ID to use for the report, which will become the final
+     *           component of the reports's resource name.
      *           This value maximum length is 63 characters, and valid characters
      *           are /[a-z][0-9]-/. It must start with an english letter and must not
      *           end with a hyphen.
@@ -152,8 +175,8 @@ class CreateUtilizationReportRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the report, which will become the final component of
-     * the reports's resource name.
+     * Required. The ID to use for the report, which will become the final
+     * component of the reports's resource name.
      * This value maximum length is 63 characters, and valid characters
      * are /[a-z][0-9]-/. It must start with an english letter and must not
      * end with a hyphen.
@@ -167,8 +190,8 @@ class CreateUtilizationReportRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the report, which will become the final component of
-     * the reports's resource name.
+     * Required. The ID to use for the report, which will become the final
+     * component of the reports's resource name.
      * This value maximum length is 63 characters, and valid characters
      * are /[a-z][0-9]-/. It must start with an english letter and must not
      * end with a hyphen.

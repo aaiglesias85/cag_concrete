@@ -44,6 +44,13 @@ class State
      * Generated from protobuf enum <code>DELETING = 4;</code>
      */
     const DELETING = 4;
+    /**
+     * Backup is not valid and cannot be used for creating new instances or
+     * restoring existing instances.
+     *
+     * Generated from protobuf enum <code>INVALID = 5;</code>
+     */
+    const INVALID = 5;
 
     private static $valueToName = [
         self::STATE_UNSPECIFIED => 'STATE_UNSPECIFIED',
@@ -51,6 +58,7 @@ class State
         self::FINALIZING => 'FINALIZING',
         self::READY => 'READY',
         self::DELETING => 'DELETING',
+        self::INVALID => 'INVALID',
     ];
 
     public static function name($value)
@@ -74,6 +82,4 @@ class State
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(State::class, \Google\Cloud\Filestore\V1\Backup_State::class);
 

@@ -5,110 +5,97 @@ namespace App\Repository;
 use App\Entity\Material;
 use Doctrine\ORM\EntityRepository;
 
-
 class MaterialRepository extends EntityRepository
 {
-
     /**
-     * ListarOrdenados: Lista los materials
+     * ListarOrdenados: Lista los materiales ordenados
      *
      * @return Material[]
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados(): array
     {
-        $consulta = $this->createQueryBuilder('m')
-            ->orderBy('m.name', "ASC");
-
-        return $consulta->getQuery()->getResult();
+        return $this->createQueryBuilder('m')
+            ->orderBy('m.name', "ASC")
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarMaterialsDeUnit: Lista los materials de una unidad
+     * ListarMaterialsDeUnit: Lista los materiales de una unidad
      *
+     * @param int $unit_id
      * @return Material[]
      */
-    public function ListarMaterialsDeUnit($unit_id)
+    public function ListarMaterialsDeUnit(int $unit_id): array
     {
-        $consulta = $this->createQueryBuilder('m')
+        return $this->createQueryBuilder('m')
             ->leftJoin('m.unit', 'u')
-            ->andWhere('u.unitId = :unit_id')
+            ->where('u.unitId = :unit_id')
             ->setParameter('unit_id', $unit_id)
-            ->orderBy('m.name', "ASC");
-
-        return $consulta->getQuery()->getResult();
+            ->orderBy('m.name', "ASC")
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * ListarMaterials: Lista los materials
+     * ListarMaterials: Lista los materiales con paginación, filtros y ordenación
      * @param int $start Inicio
      * @param int $limit Limite
      * @param string $sSearch Para buscar
+     * @param string $iSortCol_0 Columna para ordenar
+     * @param string $sSortDir_0 Dirección de ordenamiento
      *
      * @return Material[]
      */
-    public function ListarMaterials($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarMaterials(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array
     {
-        $consulta = $this->createQueryBuilder('m')
+        $qb = $this->createQueryBuilder('m')
             ->leftJoin('m.unit', 'u');
 
-        if ($sSearch != "")
-            $consulta->andWhere('m.name LIKE :name OR u.description LIKE :unit')
-                ->setParameter('name', "%{$sSearch}%")
-                ->setParameter('unit', "%{$sSearch}%");
+        // Agrupar el WHERE de búsqueda
+        if (!empty($sSearch)) {
+            $qb->andWhere('m.name LIKE :search OR u.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
 
+        // Ordenar resultados
         switch ($iSortCol_0) {
             case "unit":
-                $consulta->orderBy("u.description", $sSortDir_0);
+                $qb->orderBy("u.description", $sSortDir_0);
                 break;
             default:
-                $consulta->orderBy("m.$iSortCol_0", $sSortDir_0);
+                $qb->orderBy("m.$iSortCol_0", $sSortDir_0);
                 break;
         }
 
+        // Paginación
         if ($limit > 0) {
-            $consulta->setMaxResults($limit);
+            $qb->setMaxResults($limit);
         }
 
-        $lista = $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-        return $lista;
+        return $qb->setFirstResult($start)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
-     * TotalMaterials: Total de materials de la BD
+     * TotalMaterials: Devuelve el total de materiales en la base de datos con filtros de búsqueda
      * @param string $sSearch Para buscar
      *
-     * @author Marcel
+     * @return int
      */
-    public function TotalMaterials($sSearch)
+    public function TotalMaterials(?string $sSearch): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(m.materialId) FROM App\Entity\Material m ';
-        $join = ' LEFT JOIN m.unit u ';
-        $where = '';
+        $qb = $this->createQueryBuilder('m')
+            ->select('COUNT(m.materialId)')
+            ->leftJoin('m.unit', 'u');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= 'WHERE (m.name LIKE :name OR u.description LIKE :unit) ';
-            else
-                $where .= 'AND (m.name LIKE :name OR u.description LIKE :unit) ';
+        // Agrupar el WHERE de búsqueda
+        if (!empty($sSearch)) {
+            $qb->andWhere('m.name LIKE :search OR u.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch
-        $esta_query_name = substr_count($consulta, ':name');
-        if ($esta_query_name == 1)
-            $query->setParameter(':name', "%{$sSearch}%");
-
-        $esta_query_unit = substr_count($consulta, ':unit');
-        if ($esta_query_unit == 1)
-            $query->setParameter(':unit', "%{$sSearch}%");
-
-        $total = $query->getSingleScalarResult();
-        return $total;
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

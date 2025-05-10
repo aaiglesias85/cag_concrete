@@ -21,37 +21,43 @@ class Backup extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. The time when the backup was started.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The time when the backup finished creating.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * Output only. The current state of the backup.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1beta.Backup.State state = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Output only. The revision of the service at the time of backup.
      *
      * Generated from protobuf field <code>.google.cloud.metastore.v1beta.Service service_revision = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $service_revision = null;
+    protected $service_revision = null;
     /**
      * The description of the backup.
      *
      * Generated from protobuf field <code>string description = 6;</code>
      */
-    private $description = '';
+    protected $description = '';
+    /**
+     * Output only. Services that are restoring from the backup.
+     *
+     * Generated from protobuf field <code>repeated string restoring_services = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $restoring_services;
 
     /**
      * Constructor.
@@ -72,6 +78,8 @@ class Backup extends \Google\Protobuf\Internal\Message
      *           Output only. The revision of the service at the time of backup.
      *     @type string $description
      *           The description of the backup.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $restoring_services
+     *           Output only. Services that are restoring from the backup.
      * }
      */
     public function __construct($data = NULL) {
@@ -263,6 +271,32 @@ class Backup extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->description = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Services that are restoring from the backup.
+     *
+     * Generated from protobuf field <code>repeated string restoring_services = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getRestoringServices()
+    {
+        return $this->restoring_services;
+    }
+
+    /**
+     * Output only. Services that are restoring from the backup.
+     *
+     * Generated from protobuf field <code>repeated string restoring_services = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setRestoringServices($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->restoring_services = $arr;
 
         return $this;
     }

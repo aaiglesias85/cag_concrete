@@ -22,16 +22,19 @@ class UpdateInputRequest extends \Google\Protobuf\Internal\Message
      * * [`securityRules`](https://cloud.google.com/livestream/docs/reference/rest/v1/projects.locations.inputs#SecurityRule)
      * The fields specified in the update_mask are relative to the resource, not
      * the full request. A field will be overwritten if it is in the mask.
+     * If the mask is not present, then each field from the list above is updated
+     * if the field appears in the request payload. To unset a field, add the
+     * field to the update mask and remove it from the request payload.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Required. The input resource to be updated.
      *
      * Generated from protobuf field <code>.google.cloud.video.livestream.v1.Input input = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $input = null;
+    protected $input = null;
     /**
      * A request ID to identify requests. Specify a unique request ID
      * so that if you must retry your request, the server will know to ignore
@@ -47,7 +50,33 @@ class UpdateInputRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 3;</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param \Google\Cloud\Video\LiveStream\V1\Input $input      Required. The input resource to be updated.
+     * @param \Google\Protobuf\FieldMask              $updateMask Field mask is used to specify the fields to be overwritten in the Input
+     *                                                            resource by the update. You can only update the following fields:
+     *
+     *                                                            * [`preprocessingConfig`](https://cloud.google.com/livestream/docs/reference/rest/v1/projects.locations.inputs#PreprocessingConfig)
+     *                                                            * [`securityRules`](https://cloud.google.com/livestream/docs/reference/rest/v1/projects.locations.inputs#SecurityRule)
+     *
+     *                                                            The fields specified in the update_mask are relative to the resource, not
+     *                                                            the full request. A field will be overwritten if it is in the mask.
+     *
+     *                                                            If the mask is not present, then each field from the list above is updated
+     *                                                            if the field appears in the request payload. To unset a field, add the
+     *                                                            field to the update mask and remove it from the request payload.
+     *
+     * @return \Google\Cloud\Video\LiveStream\V1\UpdateInputRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Video\LiveStream\V1\Input $input, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setInput($input)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.
@@ -62,6 +91,9 @@ class UpdateInputRequest extends \Google\Protobuf\Internal\Message
      *           * [`securityRules`](https://cloud.google.com/livestream/docs/reference/rest/v1/projects.locations.inputs#SecurityRule)
      *           The fields specified in the update_mask are relative to the resource, not
      *           the full request. A field will be overwritten if it is in the mask.
+     *           If the mask is not present, then each field from the list above is updated
+     *           if the field appears in the request payload. To unset a field, add the
+     *           field to the update mask and remove it from the request payload.
      *     @type \Google\Cloud\Video\LiveStream\V1\Input $input
      *           Required. The input resource to be updated.
      *     @type string $request_id
@@ -90,6 +122,9 @@ class UpdateInputRequest extends \Google\Protobuf\Internal\Message
      * * [`securityRules`](https://cloud.google.com/livestream/docs/reference/rest/v1/projects.locations.inputs#SecurityRule)
      * The fields specified in the update_mask are relative to the resource, not
      * the full request. A field will be overwritten if it is in the mask.
+     * If the mask is not present, then each field from the list above is updated
+     * if the field appears in the request payload. To unset a field, add the
+     * field to the update mask and remove it from the request payload.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      * @return \Google\Protobuf\FieldMask|null
@@ -116,6 +151,9 @@ class UpdateInputRequest extends \Google\Protobuf\Internal\Message
      * * [`securityRules`](https://cloud.google.com/livestream/docs/reference/rest/v1/projects.locations.inputs#SecurityRule)
      * The fields specified in the update_mask are relative to the resource, not
      * the full request. A field will be overwritten if it is in the mask.
+     * If the mask is not present, then each field from the list above is updated
+     * if the field appears in the request payload. To unset a field, add the
+     * field to the update mask and remove it from the request payload.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1;</code>
      * @param \Google\Protobuf\FieldMask $var

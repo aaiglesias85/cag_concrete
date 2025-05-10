@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The response for [ReservationService.SplitCapacityCommitment][google.cloud.bigquery.reservation.v1.ReservationService.SplitCapacityCommitment].
+ * The response for
+ * [ReservationService.SplitCapacityCommitment][google.cloud.bigquery.reservation.v1.ReservationService.SplitCapacityCommitment].
  *
  * Generated from protobuf message <code>google.cloud.bigquery.reservation.v1.SplitCapacityCommitmentResponse</code>
  */
@@ -20,13 +21,13 @@ class SplitCapacityCommitmentResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.reservation.v1.CapacityCommitment first = 1;</code>
      */
-    private $first = null;
+    protected $first = null;
     /**
      * Second capacity commitment, result of a split.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.reservation.v1.CapacityCommitment second = 2;</code>
      */
-    private $second = null;
+    protected $second = null;
 
     /**
      * Constructor.

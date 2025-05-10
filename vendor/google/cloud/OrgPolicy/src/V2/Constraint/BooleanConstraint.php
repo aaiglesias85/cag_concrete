@@ -9,8 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A `Constraint` that is either enforced or not.
- * For example a constraint `constraints/compute.disableSerialPortAccess`.
+ * A constraint that is either enforced or not.
+ * For example, a constraint `constraints/compute.disableSerialPortAccess`.
  * If it is enforced on a VM instance, serial port connections will not be
  * opened to that instance.
  *
@@ -34,6 +34,4 @@ class BooleanConstraint extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(BooleanConstraint::class, \Google\Cloud\OrgPolicy\V2\Constraint_BooleanConstraint::class);
 

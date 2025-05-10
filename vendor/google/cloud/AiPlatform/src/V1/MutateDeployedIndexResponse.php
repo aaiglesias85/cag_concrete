@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [IndexEndpointService.MutateDeployedIndex][google.cloud.aiplatform.v1.IndexEndpointService.MutateDeployedIndex].
+ * Response message for
+ * [IndexEndpointService.MutateDeployedIndex][google.cloud.aiplatform.v1.IndexEndpointService.MutateDeployedIndex].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.MutateDeployedIndexResponse</code>
  */
@@ -20,7 +21,7 @@ class MutateDeployedIndexResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.DeployedIndex deployed_index = 1;</code>
      */
-    private $deployed_index = null;
+    protected $deployed_index = null;
 
     /**
      * Constructor.

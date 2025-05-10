@@ -22,25 +22,25 @@ class CertificateMapEntry extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * One or more paragraphs of text description of a certificate map entry.
      *
      * Generated from protobuf field <code>string description = 9;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Output only. The creation timestamp of a Certificate Map Entry.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The update timestamp of a Certificate Map Entry.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Set of labels associated with a Certificate Map Entry.
      *
@@ -49,7 +49,7 @@ class CertificateMapEntry extends \Google\Protobuf\Internal\Message
     private $labels;
     /**
      * A set of Certificates defines for the given `hostname`. There can be
-     * defined up to fifteen certificates in each Certificate Map Entry. Each
+     * defined up to four certificates in each Certificate Map Entry. Each
      * certificate must match pattern `projects/&#42;&#47;locations/&#42;&#47;certificates/&#42;`.
      *
      * Generated from protobuf field <code>repeated string certificates = 7 [(.google.api.resource_reference) = {</code>
@@ -60,7 +60,7 @@ class CertificateMapEntry extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.certificatemanager.v1.ServingState state = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     protected $match;
 
     /**
@@ -87,9 +87,9 @@ class CertificateMapEntry extends \Google\Protobuf\Internal\Message
      *           Server Name Indication (SNI) for selecting a proper certificate.
      *     @type int $matcher
      *           A predefined matcher for particular cases, other than SNI selection.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $certificates
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $certificates
      *           A set of Certificates defines for the given `hostname`. There can be
-     *           defined up to fifteen certificates in each Certificate Map Entry. Each
+     *           defined up to four certificates in each Certificate Map Entry. Each
      *           certificate must match pattern `projects/&#42;&#47;locations/&#42;&#47;certificates/&#42;`.
      *     @type int $state
      *           Output only. A serving state of this Certificate Map Entry.
@@ -322,7 +322,7 @@ class CertificateMapEntry extends \Google\Protobuf\Internal\Message
 
     /**
      * A set of Certificates defines for the given `hostname`. There can be
-     * defined up to fifteen certificates in each Certificate Map Entry. Each
+     * defined up to four certificates in each Certificate Map Entry. Each
      * certificate must match pattern `projects/&#42;&#47;locations/&#42;&#47;certificates/&#42;`.
      *
      * Generated from protobuf field <code>repeated string certificates = 7 [(.google.api.resource_reference) = {</code>
@@ -335,11 +335,11 @@ class CertificateMapEntry extends \Google\Protobuf\Internal\Message
 
     /**
      * A set of Certificates defines for the given `hostname`. There can be
-     * defined up to fifteen certificates in each Certificate Map Entry. Each
+     * defined up to four certificates in each Certificate Map Entry. Each
      * certificate must match pattern `projects/&#42;&#47;locations/&#42;&#47;certificates/&#42;`.
      *
      * Generated from protobuf field <code>repeated string certificates = 7 [(.google.api.resource_reference) = {</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCertificates($var)

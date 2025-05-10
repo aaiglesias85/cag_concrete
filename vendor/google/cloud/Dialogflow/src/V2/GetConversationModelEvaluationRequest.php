@@ -23,7 +23,22 @@ class GetConversationModelEvaluationRequest extends \Google\Protobuf\Internal\Me
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The conversation model evaluation resource name. Format:
+     *                     `projects/<Project ID>/conversationModels/<Conversation Model
+     *                     ID>/evaluations/<Evaluation ID>`
+     *
+     * @return \Google\Cloud\Dialogflow\V2\GetConversationModelEvaluationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

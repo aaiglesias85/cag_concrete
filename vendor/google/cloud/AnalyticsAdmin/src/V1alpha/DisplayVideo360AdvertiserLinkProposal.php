@@ -9,8 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A proposal for a link between a GA4 property and a Display & Video 360
- * advertiser.
+ * A proposal for a link between a Google Analytics property and a Display &
+ * Video 360 advertiser.
  * A proposal is converted to a DisplayVideo360AdvertiserLink once approved.
  * Google Analytics admins approve inbound proposals while Display & Video 360
  * admins approve outbound proposals.
@@ -20,58 +20,58 @@ use Google\Protobuf\Internal\GPBUtil;
 class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. The resource name for this DisplayVideo360AdvertiserLinkProposal resource.
-     * Format:
+     * Output only. The resource name for this
+     * DisplayVideo360AdvertiserLinkProposal resource. Format:
      * properties/{propertyId}/displayVideo360AdvertiserLinkProposals/{proposalId}
      * Note: proposalId is not the Display & Video 360 Advertiser ID
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Immutable. The Display & Video 360 Advertiser's advertiser ID.
      *
      * Generated from protobuf field <code>string advertiser_id = 2 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $advertiser_id = '';
+    protected $advertiser_id = '';
     /**
      * Output only. The status information for this link proposal.
      *
      * Generated from protobuf field <code>.google.analytics.admin.v1alpha.LinkProposalStatusDetails link_proposal_status_details = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $link_proposal_status_details = null;
+    protected $link_proposal_status_details = null;
     /**
      * Output only. The display name of the Display & Video Advertiser.
      * Only populated for proposals that originated from Display & Video 360.
      *
      * Generated from protobuf field <code>string advertiser_display_name = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $advertiser_display_name = '';
+    protected $advertiser_display_name = '';
     /**
-     * Input only. On a proposal being sent to Display & Video 360, this field must be set to
-     * the email address of an admin on the target advertiser. This is used to
-     * verify that the Google Analytics admin is aware of at least one admin on
-     * the Display & Video 360 Advertiser. This does not restrict approval of the
-     * proposal to a single user. Any admin on the Display & Video 360 Advertiser
-     * may approve the proposal.
+     * Input only. On a proposal being sent to Display & Video 360, this field
+     * must be set to the email address of an admin on the target advertiser. This
+     * is used to verify that the Google Analytics admin is aware of at least one
+     * admin on the Display & Video 360 Advertiser. This does not restrict
+     * approval of the proposal to a single user. Any admin on the Display & Video
+     * 360 Advertiser may approve the proposal.
      *
      * Generated from protobuf field <code>string validation_email = 5 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      */
-    private $validation_email = '';
+    protected $validation_email = '';
     /**
      * Immutable. Enables personalized advertising features with this integration.
      * If this field is not set on create, it will be defaulted to true.
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue ads_personalization_enabled = 6 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $ads_personalization_enabled = null;
+    protected $ads_personalization_enabled = null;
     /**
      * Immutable. Enables the import of campaign data from Display & Video 360.
      * If this field is not set on create, it will be defaulted to true.
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue campaign_data_sharing_enabled = 7 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $campaign_data_sharing_enabled = null;
+    protected $campaign_data_sharing_enabled = null;
     /**
      * Immutable. Enables the import of cost data from Display & Video 360.
      * This can only be enabled if campaign_data_sharing_enabled is enabled.
@@ -79,7 +79,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue cost_data_sharing_enabled = 8 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $cost_data_sharing_enabled = null;
+    protected $cost_data_sharing_enabled = null;
 
     /**
      * Constructor.
@@ -88,8 +88,8 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Output only. The resource name for this DisplayVideo360AdvertiserLinkProposal resource.
-     *           Format:
+     *           Output only. The resource name for this
+     *           DisplayVideo360AdvertiserLinkProposal resource. Format:
      *           properties/{propertyId}/displayVideo360AdvertiserLinkProposals/{proposalId}
      *           Note: proposalId is not the Display & Video 360 Advertiser ID
      *     @type string $advertiser_id
@@ -100,12 +100,12 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      *           Output only. The display name of the Display & Video Advertiser.
      *           Only populated for proposals that originated from Display & Video 360.
      *     @type string $validation_email
-     *           Input only. On a proposal being sent to Display & Video 360, this field must be set to
-     *           the email address of an admin on the target advertiser. This is used to
-     *           verify that the Google Analytics admin is aware of at least one admin on
-     *           the Display & Video 360 Advertiser. This does not restrict approval of the
-     *           proposal to a single user. Any admin on the Display & Video 360 Advertiser
-     *           may approve the proposal.
+     *           Input only. On a proposal being sent to Display & Video 360, this field
+     *           must be set to the email address of an admin on the target advertiser. This
+     *           is used to verify that the Google Analytics admin is aware of at least one
+     *           admin on the Display & Video 360 Advertiser. This does not restrict
+     *           approval of the proposal to a single user. Any admin on the Display & Video
+     *           360 Advertiser may approve the proposal.
      *     @type \Google\Protobuf\BoolValue $ads_personalization_enabled
      *           Immutable. Enables personalized advertising features with this integration.
      *           If this field is not set on create, it will be defaulted to true.
@@ -124,8 +124,8 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Output only. The resource name for this DisplayVideo360AdvertiserLinkProposal resource.
-     * Format:
+     * Output only. The resource name for this
+     * DisplayVideo360AdvertiserLinkProposal resource. Format:
      * properties/{propertyId}/displayVideo360AdvertiserLinkProposals/{proposalId}
      * Note: proposalId is not the Display & Video 360 Advertiser ID
      *
@@ -138,8 +138,8 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Output only. The resource name for this DisplayVideo360AdvertiserLinkProposal resource.
-     * Format:
+     * Output only. The resource name for this
+     * DisplayVideo360AdvertiserLinkProposal resource. Format:
      * properties/{propertyId}/displayVideo360AdvertiserLinkProposals/{proposalId}
      * Note: proposalId is not the Display & Video 360 Advertiser ID
      *
@@ -246,12 +246,12 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Input only. On a proposal being sent to Display & Video 360, this field must be set to
-     * the email address of an admin on the target advertiser. This is used to
-     * verify that the Google Analytics admin is aware of at least one admin on
-     * the Display & Video 360 Advertiser. This does not restrict approval of the
-     * proposal to a single user. Any admin on the Display & Video 360 Advertiser
-     * may approve the proposal.
+     * Input only. On a proposal being sent to Display & Video 360, this field
+     * must be set to the email address of an admin on the target advertiser. This
+     * is used to verify that the Google Analytics admin is aware of at least one
+     * admin on the Display & Video 360 Advertiser. This does not restrict
+     * approval of the proposal to a single user. Any admin on the Display & Video
+     * 360 Advertiser may approve the proposal.
      *
      * Generated from protobuf field <code>string validation_email = 5 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @return string
@@ -262,12 +262,12 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
     }
 
     /**
-     * Input only. On a proposal being sent to Display & Video 360, this field must be set to
-     * the email address of an admin on the target advertiser. This is used to
-     * verify that the Google Analytics admin is aware of at least one admin on
-     * the Display & Video 360 Advertiser. This does not restrict approval of the
-     * proposal to a single user. Any admin on the Display & Video 360 Advertiser
-     * may approve the proposal.
+     * Input only. On a proposal being sent to Display & Video 360, this field
+     * must be set to the email address of an admin on the target advertiser. This
+     * is used to verify that the Google Analytics admin is aware of at least one
+     * admin on the Display & Video 360 Advertiser. This does not restrict
+     * approval of the proposal to a single user. Any admin on the Display & Video
+     * 360 Advertiser may approve the proposal.
      *
      * Generated from protobuf field <code>string validation_email = 5 [(.google.api.field_behavior) = INPUT_ONLY];</code>
      * @param string $var
@@ -312,7 +312,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      * Generated from protobuf field <code>.google.protobuf.BoolValue ads_personalization_enabled = 6 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return bool|null
      */
-    public function getAdsPersonalizationEnabledValue()
+    public function getAdsPersonalizationEnabledUnwrapped()
     {
         return $this->readWrapperValue("ads_personalization_enabled");
     }
@@ -343,7 +343,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      * @param bool|null $var
      * @return $this
      */
-    public function setAdsPersonalizationEnabledValue($var)
+    public function setAdsPersonalizationEnabledUnwrapped($var)
     {
         $this->writeWrapperValue("ads_personalization_enabled", $var);
         return $this;}
@@ -379,7 +379,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      * Generated from protobuf field <code>.google.protobuf.BoolValue campaign_data_sharing_enabled = 7 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return bool|null
      */
-    public function getCampaignDataSharingEnabledValue()
+    public function getCampaignDataSharingEnabledUnwrapped()
     {
         return $this->readWrapperValue("campaign_data_sharing_enabled");
     }
@@ -410,7 +410,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      * @param bool|null $var
      * @return $this
      */
-    public function setCampaignDataSharingEnabledValue($var)
+    public function setCampaignDataSharingEnabledUnwrapped($var)
     {
         $this->writeWrapperValue("campaign_data_sharing_enabled", $var);
         return $this;}
@@ -448,7 +448,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      * Generated from protobuf field <code>.google.protobuf.BoolValue cost_data_sharing_enabled = 8 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return bool|null
      */
-    public function getCostDataSharingEnabledValue()
+    public function getCostDataSharingEnabledUnwrapped()
     {
         return $this->readWrapperValue("cost_data_sharing_enabled");
     }
@@ -481,7 +481,7 @@ class DisplayVideo360AdvertiserLinkProposal extends \Google\Protobuf\Internal\Me
      * @param bool|null $var
      * @return $this
      */
-    public function setCostDataSharingEnabledValue($var)
+    public function setCostDataSharingEnabledUnwrapped($var)
     {
         $this->writeWrapperValue("cost_data_sharing_enabled", $var);
         return $this;}

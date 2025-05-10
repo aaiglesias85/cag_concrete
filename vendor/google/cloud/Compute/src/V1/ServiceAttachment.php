@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Represents a ServiceAttachment resource. A service attachment represents a service that a producer has exposed. It encapsulates the load balancer which fronts the service runs and a list of NAT IP ranges that the producers uses to represent the consumers connecting to the service. next tag = 20
+ * Represents a ServiceAttachment resource. A service attachment represents a service that a producer has exposed. It encapsulates the load balancer which fronts the service runs and a list of NAT IP ranges that the producers uses to represent the consumers connecting to the service.
  *
  * Generated from protobuf message <code>google.cloud.compute.v1.ServiceAttachment</code>
  */
@@ -29,13 +29,13 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      */
     private $connection_preference = null;
     /**
-     * Projects that are allowed to connect to this service attachment.
+     * Specifies which consumer projects or networks are allowed to connect to the service attachment. Each project or network has a connection limit. A given service attachment can manage connections at either the project or network level. Therefore, both the accept and reject lists for a given service attachment must contain either only projects or only networks.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.ServiceAttachmentConsumerProjectLimit consumer_accept_lists = 402725703;</code>
      */
     private $consumer_accept_lists;
     /**
-     * Projects that are not allowed to connect to this service attachment. The project can be specified using its id or number.
+     * Specifies a list of projects or networks that are not allowed to connect to this service attachment. The project can be specified using its project ID or project number and the network can be specified using its URL. A given service attachment can manage connections at either the project or network level. Therefore, both the reject and accept lists for a given service attachment must contain either only projects or only networks.
      *
      * Generated from protobuf field <code>repeated string consumer_reject_lists = 204033182;</code>
      */
@@ -101,11 +101,23 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      */
     private $producer_forwarding_rule = null;
     /**
+     * The number of consumer spokes that connected Private Service Connect endpoints can be propagated to through Network Connectivity Center. This limit lets the service producer limit how many propagated Private Service Connect connections can be established to this service attachment from a single consumer. If the connection preference of the service attachment is ACCEPT_MANUAL, the limit applies to each project or network that is listed in the consumer accept list. If the connection preference of the service attachment is ACCEPT_AUTOMATIC, the limit applies to each project that contains a connected endpoint. If unspecified, the default propagated connection limit is 250.
+     *
+     * Generated from protobuf field <code>optional uint32 propagated_connection_limit = 332719230;</code>
+     */
+    private $propagated_connection_limit = null;
+    /**
      * [Output Only] An 128-bit global unique ID of the PSC service attachment.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.Uint128 psc_service_attachment_id = 527695214;</code>
      */
     private $psc_service_attachment_id = null;
+    /**
+     * This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints. - If false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified . - If true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list. For newly created service attachment, this boolean defaults to false.
+     *
+     * Generated from protobuf field <code>optional bool reconcile_connections = 125493732;</code>
+     */
+    private $reconcile_connections = null;
     /**
      * [Output Only] URL of the region where the service attachment resides. This field applies only to the region resource. You must specify this field as part of the HTTP request URL. It is not settable as a field in the request body.
      *
@@ -131,20 +143,20 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Compute\V1\ServiceAttachmentConnectedEndpoint[]|\Google\Protobuf\Internal\RepeatedField $connected_endpoints
+     *     @type array<\Google\Cloud\Compute\V1\ServiceAttachmentConnectedEndpoint>|\Google\Protobuf\Internal\RepeatedField $connected_endpoints
      *           [Output Only] An array of connections for all the consumers connected to this service attachment.
      *     @type string $connection_preference
      *           The connection preference of service attachment. The value can be set to ACCEPT_AUTOMATIC. An ACCEPT_AUTOMATIC service attachment is one that always accepts the connection from consumer forwarding rules.
      *           Check the ConnectionPreference enum for the list of possible values.
-     *     @type \Google\Cloud\Compute\V1\ServiceAttachmentConsumerProjectLimit[]|\Google\Protobuf\Internal\RepeatedField $consumer_accept_lists
-     *           Projects that are allowed to connect to this service attachment.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $consumer_reject_lists
-     *           Projects that are not allowed to connect to this service attachment. The project can be specified using its id or number.
+     *     @type array<\Google\Cloud\Compute\V1\ServiceAttachmentConsumerProjectLimit>|\Google\Protobuf\Internal\RepeatedField $consumer_accept_lists
+     *           Specifies which consumer projects or networks are allowed to connect to the service attachment. Each project or network has a connection limit. A given service attachment can manage connections at either the project or network level. Therefore, both the accept and reject lists for a given service attachment must contain either only projects or only networks.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $consumer_reject_lists
+     *           Specifies a list of projects or networks that are not allowed to connect to this service attachment. The project can be specified using its project ID or project number and the network can be specified using its URL. A given service attachment can manage connections at either the project or network level. Therefore, both the reject and accept lists for a given service attachment must contain either only projects or only networks.
      *     @type string $creation_timestamp
      *           [Output Only] Creation timestamp in RFC3339 text format.
      *     @type string $description
      *           An optional description of this resource. Provide this property when you create the resource.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $domain_names
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $domain_names
      *           If specified, the domain name will be used during the integration between the PSC connected endpoints and the Cloud DNS. For example, this is a valid domain name: "p.mycompany.com.". Current max number of domain names supported is 1.
      *     @type bool $enable_proxy_protocol
      *           If true, enable the proxy protocol which is for supplying client TCP/IP address data in TCP connections that traverse proxies on their way to destination servers.
@@ -156,12 +168,16 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      *           [Output Only] Type of the resource. Always compute#serviceAttachment for service attachments.
      *     @type string $name
      *           Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $nat_subnets
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $nat_subnets
      *           An array of URLs where each entry is the URL of a subnet provided by the service producer to use for NAT in this service attachment.
      *     @type string $producer_forwarding_rule
      *           The URL of a forwarding rule with loadBalancingScheme INTERNAL* that is serving the endpoint identified by this service attachment.
+     *     @type int $propagated_connection_limit
+     *           The number of consumer spokes that connected Private Service Connect endpoints can be propagated to through Network Connectivity Center. This limit lets the service producer limit how many propagated Private Service Connect connections can be established to this service attachment from a single consumer. If the connection preference of the service attachment is ACCEPT_MANUAL, the limit applies to each project or network that is listed in the consumer accept list. If the connection preference of the service attachment is ACCEPT_AUTOMATIC, the limit applies to each project that contains a connected endpoint. If unspecified, the default propagated connection limit is 250.
      *     @type \Google\Cloud\Compute\V1\Uint128 $psc_service_attachment_id
      *           [Output Only] An 128-bit global unique ID of the PSC service attachment.
+     *     @type bool $reconcile_connections
+     *           This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints. - If false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified . - If true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list. For newly created service attachment, this boolean defaults to false.
      *     @type string $region
      *           [Output Only] URL of the region where the service attachment resides. This field applies only to the region resource. You must specify this field as part of the HTTP request URL. It is not settable as a field in the request body.
      *     @type string $self_link
@@ -190,7 +206,7 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      * [Output Only] An array of connections for all the consumers connected to this service attachment.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.ServiceAttachmentConnectedEndpoint connected_endpoints = 72223688;</code>
-     * @param \Google\Cloud\Compute\V1\ServiceAttachmentConnectedEndpoint[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\ServiceAttachmentConnectedEndpoint>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConnectedEndpoints($var)
@@ -240,7 +256,7 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Projects that are allowed to connect to this service attachment.
+     * Specifies which consumer projects or networks are allowed to connect to the service attachment. Each project or network has a connection limit. A given service attachment can manage connections at either the project or network level. Therefore, both the accept and reject lists for a given service attachment must contain either only projects or only networks.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.ServiceAttachmentConsumerProjectLimit consumer_accept_lists = 402725703;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -251,10 +267,10 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Projects that are allowed to connect to this service attachment.
+     * Specifies which consumer projects or networks are allowed to connect to the service attachment. Each project or network has a connection limit. A given service attachment can manage connections at either the project or network level. Therefore, both the accept and reject lists for a given service attachment must contain either only projects or only networks.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.ServiceAttachmentConsumerProjectLimit consumer_accept_lists = 402725703;</code>
-     * @param \Google\Cloud\Compute\V1\ServiceAttachmentConsumerProjectLimit[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\ServiceAttachmentConsumerProjectLimit>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConsumerAcceptLists($var)
@@ -266,7 +282,7 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Projects that are not allowed to connect to this service attachment. The project can be specified using its id or number.
+     * Specifies a list of projects or networks that are not allowed to connect to this service attachment. The project can be specified using its project ID or project number and the network can be specified using its URL. A given service attachment can manage connections at either the project or network level. Therefore, both the reject and accept lists for a given service attachment must contain either only projects or only networks.
      *
      * Generated from protobuf field <code>repeated string consumer_reject_lists = 204033182;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -277,10 +293,10 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Projects that are not allowed to connect to this service attachment. The project can be specified using its id or number.
+     * Specifies a list of projects or networks that are not allowed to connect to this service attachment. The project can be specified using its project ID or project number and the network can be specified using its URL. A given service attachment can manage connections at either the project or network level. Therefore, both the reject and accept lists for a given service attachment must contain either only projects or only networks.
      *
      * Generated from protobuf field <code>repeated string consumer_reject_lists = 204033182;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConsumerRejectLists($var)
@@ -378,7 +394,7 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      * If specified, the domain name will be used during the integration between the PSC connected endpoints and the Cloud DNS. For example, this is a valid domain name: "p.mycompany.com.". Current max number of domain names supported is 1.
      *
      * Generated from protobuf field <code>repeated string domain_names = 6450189;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDomainNames($var)
@@ -584,7 +600,7 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
      * An array of URLs where each entry is the URL of a subnet provided by the service producer to use for NAT in this service attachment.
      *
      * Generated from protobuf field <code>repeated string nat_subnets = 374785944;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNatSubnets($var)
@@ -632,6 +648,42 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * The number of consumer spokes that connected Private Service Connect endpoints can be propagated to through Network Connectivity Center. This limit lets the service producer limit how many propagated Private Service Connect connections can be established to this service attachment from a single consumer. If the connection preference of the service attachment is ACCEPT_MANUAL, the limit applies to each project or network that is listed in the consumer accept list. If the connection preference of the service attachment is ACCEPT_AUTOMATIC, the limit applies to each project that contains a connected endpoint. If unspecified, the default propagated connection limit is 250.
+     *
+     * Generated from protobuf field <code>optional uint32 propagated_connection_limit = 332719230;</code>
+     * @return int
+     */
+    public function getPropagatedConnectionLimit()
+    {
+        return isset($this->propagated_connection_limit) ? $this->propagated_connection_limit : 0;
+    }
+
+    public function hasPropagatedConnectionLimit()
+    {
+        return isset($this->propagated_connection_limit);
+    }
+
+    public function clearPropagatedConnectionLimit()
+    {
+        unset($this->propagated_connection_limit);
+    }
+
+    /**
+     * The number of consumer spokes that connected Private Service Connect endpoints can be propagated to through Network Connectivity Center. This limit lets the service producer limit how many propagated Private Service Connect connections can be established to this service attachment from a single consumer. If the connection preference of the service attachment is ACCEPT_MANUAL, the limit applies to each project or network that is listed in the consumer accept list. If the connection preference of the service attachment is ACCEPT_AUTOMATIC, the limit applies to each project that contains a connected endpoint. If unspecified, the default propagated connection limit is 250.
+     *
+     * Generated from protobuf field <code>optional uint32 propagated_connection_limit = 332719230;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setPropagatedConnectionLimit($var)
+    {
+        GPBUtil::checkUint32($var);
+        $this->propagated_connection_limit = $var;
+
+        return $this;
+    }
+
+    /**
      * [Output Only] An 128-bit global unique ID of the PSC service attachment.
      *
      * Generated from protobuf field <code>optional .google.cloud.compute.v1.Uint128 psc_service_attachment_id = 527695214;</code>
@@ -663,6 +715,42 @@ class ServiceAttachment extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Compute\V1\Uint128::class);
         $this->psc_service_attachment_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints. - If false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified . - If true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list. For newly created service attachment, this boolean defaults to false.
+     *
+     * Generated from protobuf field <code>optional bool reconcile_connections = 125493732;</code>
+     * @return bool
+     */
+    public function getReconcileConnections()
+    {
+        return isset($this->reconcile_connections) ? $this->reconcile_connections : false;
+    }
+
+    public function hasReconcileConnections()
+    {
+        return isset($this->reconcile_connections);
+    }
+
+    public function clearReconcileConnections()
+    {
+        unset($this->reconcile_connections);
+    }
+
+    /**
+     * This flag determines whether a consumer accept/reject list change can reconcile the statuses of existing ACCEPTED or REJECTED PSC endpoints. - If false, connection policy update will only affect existing PENDING PSC endpoints. Existing ACCEPTED/REJECTED endpoints will remain untouched regardless how the connection policy is modified . - If true, update will affect both PENDING and ACCEPTED/REJECTED PSC endpoints. For example, an ACCEPTED PSC endpoint will be moved to REJECTED if its project is added to the reject list. For newly created service attachment, this boolean defaults to false.
+     *
+     * Generated from protobuf field <code>optional bool reconcile_connections = 125493732;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setReconcileConnections($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->reconcile_connections = $var;
 
         return $this;
     }

@@ -1390,11 +1390,21 @@
                                     <input type="text" class="form-control form-control-number"
                                            id="total_conc_used" name="total_conc_used">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" id="select-concrete-vendor">
                                     <label>
                                         Conc Vendor
+                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <input type="text" class="form-control" id="conc_vendor" name="conc_vendor">
+
+                                    <select class="form-control m-select2" id="concrete-vendor">
+                                        <option value="">Select</option>
+                                        {% for item in concrete_vendors %}
+                                            <option value="{{ item.vendorId }}">
+                                                {{ item.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
                                 </div>
                             </div>
                         </div>

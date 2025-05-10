@@ -22,44 +22,44 @@ class Task extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Output only. System generated globally unique ID for the task. This ID will be
-     * different if the task is deleted and re-created with the same name.
+     * Output only. System generated globally unique ID for the task. This ID will
+     * be different if the task is deleted and re-created with the same name.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $uid = '';
+    protected $uid = '';
     /**
      * Output only. The time when the task was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The time when the task was last updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Optional. Description of the task.
      *
      * Generated from protobuf field <code>string description = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Optional. User friendly display name.
      *
      * Generated from protobuf field <code>string display_name = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $display_name = '';
+    protected $display_name = '';
     /**
      * Output only. Current state of the task.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.State state = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $state = 0;
+    protected $state = 0;
     /**
      * Optional. User-defined labels for the task.
      *
@@ -71,13 +71,19 @@ class Task extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.TriggerSpec trigger_spec = 100 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $trigger_spec = null;
+    protected $trigger_spec = null;
     /**
      * Required. Spec related to how a task is executed.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.ExecutionSpec execution_spec = 101 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $execution_spec = null;
+    protected $execution_spec = null;
+    /**
+     * Output only. Status of the latest task executions.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.ExecutionStatus execution_status = 201 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $execution_status = null;
     protected $config;
 
     /**
@@ -91,8 +97,8 @@ class Task extends \Google\Protobuf\Internal\Message
      *           projects/{project_number}/locations/{location_id}/lakes/{lake_id}/
      *           tasks/{task_id}.
      *     @type string $uid
-     *           Output only. System generated globally unique ID for the task. This ID will be
-     *           different if the task is deleted and re-created with the same name.
+     *           Output only. System generated globally unique ID for the task. This ID will
+     *           be different if the task is deleted and re-created with the same name.
      *     @type \Google\Protobuf\Timestamp $create_time
      *           Output only. The time when the task was created.
      *     @type \Google\Protobuf\Timestamp $update_time
@@ -109,8 +115,12 @@ class Task extends \Google\Protobuf\Internal\Message
      *           Required. Spec related to how often and when a task should be triggered.
      *     @type \Google\Cloud\Dataplex\V1\Task\ExecutionSpec $execution_spec
      *           Required. Spec related to how a task is executed.
+     *     @type \Google\Cloud\Dataplex\V1\Task\ExecutionStatus $execution_status
+     *           Output only. Status of the latest task executions.
      *     @type \Google\Cloud\Dataplex\V1\Task\SparkTaskConfig $spark
      *           Config related to running custom Spark tasks.
+     *     @type \Google\Cloud\Dataplex\V1\Task\NotebookTaskConfig $notebook
+     *           Config related to running scheduled Notebooks.
      * }
      */
     public function __construct($data = NULL) {
@@ -149,8 +159,8 @@ class Task extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. System generated globally unique ID for the task. This ID will be
-     * different if the task is deleted and re-created with the same name.
+     * Output only. System generated globally unique ID for the task. This ID will
+     * be different if the task is deleted and re-created with the same name.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -161,8 +171,8 @@ class Task extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. System generated globally unique ID for the task. This ID will be
-     * different if the task is deleted and re-created with the same name.
+     * Output only. System generated globally unique ID for the task. This ID will
+     * be different if the task is deleted and re-created with the same name.
      *
      * Generated from protobuf field <code>string uid = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -425,6 +435,42 @@ class Task extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Output only. Status of the latest task executions.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.ExecutionStatus execution_status = 201 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\Dataplex\V1\Task\ExecutionStatus|null
+     */
+    public function getExecutionStatus()
+    {
+        return $this->execution_status;
+    }
+
+    public function hasExecutionStatus()
+    {
+        return isset($this->execution_status);
+    }
+
+    public function clearExecutionStatus()
+    {
+        unset($this->execution_status);
+    }
+
+    /**
+     * Output only. Status of the latest task executions.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.ExecutionStatus execution_status = 201 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\Dataplex\V1\Task\ExecutionStatus $var
+     * @return $this
+     */
+    public function setExecutionStatus($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dataplex\V1\Task\ExecutionStatus::class);
+        $this->execution_status = $var;
+
+        return $this;
+    }
+
+    /**
      * Config related to running custom Spark tasks.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.SparkTaskConfig spark = 300;</code>
@@ -451,6 +497,37 @@ class Task extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Dataplex\V1\Task\SparkTaskConfig::class);
         $this->writeOneof(300, $var);
+
+        return $this;
+    }
+
+    /**
+     * Config related to running scheduled Notebooks.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.NotebookTaskConfig notebook = 302;</code>
+     * @return \Google\Cloud\Dataplex\V1\Task\NotebookTaskConfig|null
+     */
+    public function getNotebook()
+    {
+        return $this->readOneof(302);
+    }
+
+    public function hasNotebook()
+    {
+        return $this->hasOneof(302);
+    }
+
+    /**
+     * Config related to running scheduled Notebooks.
+     *
+     * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.NotebookTaskConfig notebook = 302;</code>
+     * @param \Google\Cloud\Dataplex\V1\Task\NotebookTaskConfig $var
+     * @return $this
+     */
+    public function setNotebook($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dataplex\V1\Task\NotebookTaskConfig::class);
+        $this->writeOneof(302, $var);
 
         return $this;
     }

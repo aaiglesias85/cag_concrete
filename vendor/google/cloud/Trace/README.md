@@ -19,16 +19,10 @@ Google Cloud Platform Console.
 To begin, install the preferred dependency manager for PHP,
 [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-trace
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take
@@ -110,6 +104,11 @@ Tracer::start(new StackdriverExporter());
 See the [OpenCensus documentation][opencensus-php] for more configuration
 options and features.
 
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
+
 ### Version
 
 This component is considered GA (generally available). As such, it will not introduce backwards-incompatible changes in
@@ -122,8 +121,8 @@ any minor or patch releases. We will address issues and requests with the highes
 
 
 [stackdriver-trace]: https://cloud.google.com/trace/
-[homepage]: http://googleapis.github.io/google-cloud-php
-[api-docs]: http://googleapis.github.io/google-cloud-php/#/docs/cloud-trace/latest
+[homepage]: https://cloud.google.com/php/docs/reference
+[api-docs]: https://cloud.google.com/php/docs/reference/cloud-trace/latest
 [opencensus]: http://opencensus.io
 [opencensus-php]: https://github.com/census-instrumentation/opencensus-php
 [opencensus-migration]: http://opencensus.io/opencensus-php/migrating-stackdriver-trace

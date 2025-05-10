@@ -24,7 +24,7 @@ class ReplaceAccessLevelsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The desired [Access Levels]
      * [google.identity.accesscontextmanager.v1.AccessLevel] that should
@@ -47,7 +47,7 @@ class ReplaceAccessLevelsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 4;</code>
      */
-    private $etag = '';
+    protected $etag = '';
 
     /**
      * Constructor.
@@ -60,7 +60,7 @@ class ReplaceAccessLevelsRequest extends \Google\Protobuf\Internal\Message
      *           [Access Levels]
      *           [google.identity.accesscontextmanager.v1.AccessLevel].
      *           Format: `accessPolicies/{policy_id}`
-     *     @type \Google\Identity\AccessContextManager\V1\AccessLevel[]|\Google\Protobuf\Internal\RepeatedField $access_levels
+     *     @type array<\Google\Identity\AccessContextManager\V1\AccessLevel>|\Google\Protobuf\Internal\RepeatedField $access_levels
      *           Required. The desired [Access Levels]
      *           [google.identity.accesscontextmanager.v1.AccessLevel] that should
      *           replace all existing [Access Levels]
@@ -139,7 +139,7 @@ class ReplaceAccessLevelsRequest extends \Google\Protobuf\Internal\Message
      * [google.identity.accesscontextmanager.v1.AccessPolicy].
      *
      * Generated from protobuf field <code>repeated .google.identity.accesscontextmanager.v1.AccessLevel access_levels = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Identity\AccessContextManager\V1\AccessLevel[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Identity\AccessContextManager\V1\AccessLevel>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAccessLevels($var)

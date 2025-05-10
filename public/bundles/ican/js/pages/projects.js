@@ -2348,6 +2348,8 @@ var Projects = function () {
                 $('#contact-name').val(contacts[posicion].name);
                 $('#contact-email').val(contacts[posicion].email);
                 $('#contact-phone').val(contacts[posicion].phone);
+                $('#contact-role').val(contacts[posicion].role);
+                $('#contact-notes').val(contacts[posicion].notes);
 
                 // open modal
                 $('#modal-contact').modal('show');

@@ -21,7 +21,21 @@ class StarEntryRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the entry to mark as starred. Please see
+     *                     {@see DataCatalogClient::entryName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\StarEntryRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

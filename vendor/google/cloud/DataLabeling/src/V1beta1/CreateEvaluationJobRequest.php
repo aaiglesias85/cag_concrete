@@ -21,13 +21,30 @@ class CreateEvaluationJobRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The evaluation job to create.
      *
      * Generated from protobuf field <code>.google.cloud.datalabeling.v1beta1.EvaluationJob job = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $job = null;
+    protected $job = null;
+
+    /**
+     * @param string                                           $parent Required. Evaluation job resource parent. Format:
+     *                                                                 "projects/<var>{project_id}</var>"
+     *                                                                 Please see {@see DataLabelingServiceClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\DataLabeling\V1beta1\EvaluationJob $job    Required. The evaluation job to create.
+     *
+     * @return \Google\Cloud\DataLabeling\V1beta1\CreateEvaluationJobRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\DataLabeling\V1beta1\EvaluationJob $job): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setJob($job);
+    }
 
     /**
      * Constructor.

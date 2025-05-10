@@ -23,21 +23,43 @@ class CreateKeyRingRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. It must be unique within a location and match the regular
      * expression `[a-zA-Z0-9_-]{1,63}`
      *
      * Generated from protobuf field <code>string key_ring_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $key_ring_id = '';
+    protected $key_ring_id = '';
     /**
      * Required. A [KeyRing][google.cloud.kms.v1.KeyRing] with initial field
      * values.
      *
      * Generated from protobuf field <code>.google.cloud.kms.v1.KeyRing key_ring = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $key_ring = null;
+    protected $key_ring = null;
+
+    /**
+     * @param string                       $parent    Required. The resource name of the location associated with the
+     *                                                [KeyRings][google.cloud.kms.v1.KeyRing], in the format
+     *                                                `projects/&#42;/locations/*`. Please see
+     *                                                {@see KeyManagementServiceClient::locationName()} for help formatting this field.
+     * @param string                       $keyRingId Required. It must be unique within a location and match the regular
+     *                                                expression `[a-zA-Z0-9_-]{1,63}`
+     * @param \Google\Cloud\Kms\V1\KeyRing $keyRing   Required. A [KeyRing][google.cloud.kms.v1.KeyRing] with initial field
+     *                                                values.
+     *
+     * @return \Google\Cloud\Kms\V1\CreateKeyRingRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $keyRingId, \Google\Cloud\Kms\V1\KeyRing $keyRing): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setKeyRingId($keyRingId)
+            ->setKeyRing($keyRing);
+    }
 
     /**
      * Constructor.
