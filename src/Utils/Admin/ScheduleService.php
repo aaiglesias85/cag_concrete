@@ -30,7 +30,7 @@ class ScheduleService extends Base
             $schedule_id = $value->getScheduleId();
 
             $day = $value->getDay();
-            $project = $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription();
+            $project = $value->getProject()->getProjectNumber();
 
             $className = "fc-event-primary";
 
@@ -326,15 +326,7 @@ class ScheduleService extends Base
 
             $day = \DateTime::createFromFormat('Y-m-d H:i', $dia->format('Y-m-d') . ' ' . $hour);
 
-            // buscar si ya existe
-            $lista = $this->getDoctrine()->getRepository(Schedule::class)
-                ->ListarSchedulesRangoFecha($day->format('m/d/Y'), $day->format('m/d/Y'));
-            if (empty($lista)) {
-                $entity = new Schedule();
-            }else{
-                $entity = $lista[0];
-            }
-
+            $entity = new Schedule();
 
             $entity->setDescription($description);
             $entity->setLocation($location);
