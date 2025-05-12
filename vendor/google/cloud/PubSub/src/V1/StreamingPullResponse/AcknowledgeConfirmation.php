@@ -17,24 +17,31 @@ use Google\Protobuf\Internal\GPBUtil;
 class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Successfully processed acknowledgement IDs.
+     * Optional. Successfully processed acknowledgement IDs.
      *
-     * Generated from protobuf field <code>repeated string ack_ids = 1 [ctype = CORD];</code>
+     * Generated from protobuf field <code>repeated string ack_ids = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $ack_ids;
     /**
-     * List of acknowledgement IDs that were malformed or whose acknowledgement
-     * deadline has expired.
+     * Optional. List of acknowledgement IDs that were malformed or whose
+     * acknowledgement deadline has expired.
      *
-     * Generated from protobuf field <code>repeated string invalid_ack_ids = 2 [ctype = CORD];</code>
+     * Generated from protobuf field <code>repeated string invalid_ack_ids = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $invalid_ack_ids;
     /**
-     * List of acknowledgement IDs that were out of order.
+     * Optional. List of acknowledgement IDs that were out of order.
      *
-     * Generated from protobuf field <code>repeated string unordered_ack_ids = 3 [ctype = CORD];</code>
+     * Generated from protobuf field <code>repeated string unordered_ack_ids = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $unordered_ack_ids;
+    /**
+     * Optional. List of acknowledgement IDs that failed processing with
+     * temporary issues.
+     *
+     * Generated from protobuf field <code>repeated string temporary_failed_ack_ids = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $temporary_failed_ack_ids;
 
     /**
      * Constructor.
@@ -42,13 +49,16 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $ack_ids
-     *           Successfully processed acknowledgement IDs.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $invalid_ack_ids
-     *           List of acknowledgement IDs that were malformed or whose acknowledgement
-     *           deadline has expired.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $unordered_ack_ids
-     *           List of acknowledgement IDs that were out of order.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $ack_ids
+     *           Optional. Successfully processed acknowledgement IDs.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $invalid_ack_ids
+     *           Optional. List of acknowledgement IDs that were malformed or whose
+     *           acknowledgement deadline has expired.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unordered_ack_ids
+     *           Optional. List of acknowledgement IDs that were out of order.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $temporary_failed_ack_ids
+     *           Optional. List of acknowledgement IDs that failed processing with
+     *           temporary issues.
      * }
      */
     public function __construct($data = NULL) {
@@ -57,9 +67,9 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Successfully processed acknowledgement IDs.
+     * Optional. Successfully processed acknowledgement IDs.
      *
-     * Generated from protobuf field <code>repeated string ack_ids = 1 [ctype = CORD];</code>
+     * Generated from protobuf field <code>repeated string ack_ids = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getAckIds()
@@ -68,10 +78,10 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Successfully processed acknowledgement IDs.
+     * Optional. Successfully processed acknowledgement IDs.
      *
-     * Generated from protobuf field <code>repeated string ack_ids = 1 [ctype = CORD];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated string ack_ids = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAckIds($var)
@@ -83,10 +93,10 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of acknowledgement IDs that were malformed or whose acknowledgement
-     * deadline has expired.
+     * Optional. List of acknowledgement IDs that were malformed or whose
+     * acknowledgement deadline has expired.
      *
-     * Generated from protobuf field <code>repeated string invalid_ack_ids = 2 [ctype = CORD];</code>
+     * Generated from protobuf field <code>repeated string invalid_ack_ids = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getInvalidAckIds()
@@ -95,11 +105,11 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of acknowledgement IDs that were malformed or whose acknowledgement
-     * deadline has expired.
+     * Optional. List of acknowledgement IDs that were malformed or whose
+     * acknowledgement deadline has expired.
      *
-     * Generated from protobuf field <code>repeated string invalid_ack_ids = 2 [ctype = CORD];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated string invalid_ack_ids = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInvalidAckIds($var)
@@ -111,9 +121,9 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of acknowledgement IDs that were out of order.
+     * Optional. List of acknowledgement IDs that were out of order.
      *
-     * Generated from protobuf field <code>repeated string unordered_ack_ids = 3 [ctype = CORD];</code>
+     * Generated from protobuf field <code>repeated string unordered_ack_ids = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getUnorderedAckIds()
@@ -122,10 +132,10 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * List of acknowledgement IDs that were out of order.
+     * Optional. List of acknowledgement IDs that were out of order.
      *
-     * Generated from protobuf field <code>repeated string unordered_ack_ids = 3 [ctype = CORD];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated string unordered_ack_ids = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUnorderedAckIds($var)
@@ -136,8 +146,34 @@ class AcknowledgeConfirmation extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * Optional. List of acknowledgement IDs that failed processing with
+     * temporary issues.
+     *
+     * Generated from protobuf field <code>repeated string temporary_failed_ack_ids = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getTemporaryFailedAckIds()
+    {
+        return $this->temporary_failed_ack_ids;
+    }
+
+    /**
+     * Optional. List of acknowledgement IDs that failed processing with
+     * temporary issues.
+     *
+     * Generated from protobuf field <code>repeated string temporary_failed_ack_ids = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setTemporaryFailedAckIds($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->temporary_failed_ack_ids = $arr;
+
+        return $this;
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(AcknowledgeConfirmation::class, \Google\Cloud\PubSub\V1\StreamingPullResponse_AcknowledgeConfirmation::class);
 

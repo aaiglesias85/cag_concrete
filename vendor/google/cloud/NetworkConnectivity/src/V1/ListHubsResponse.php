@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response for [HubService.ListHubs][google.cloud.networkconnectivity.v1.HubService.ListHubs] method.
+ * Response for
+ * [HubService.ListHubs][google.cloud.networkconnectivity.v1.HubService.ListHubs]
+ * method.
  *
  * Generated from protobuf message <code>google.cloud.networkconnectivity.v1.ListHubsResponse</code>
  */
@@ -22,12 +24,13 @@ class ListHubsResponse extends \Google\Protobuf\Internal\Message
      */
     private $hubs;
     /**
-     * The next pagination token in the List response. It should be used as
-     * page_token for the following request. An empty value means no more result.
+     * The token for the next page of the response. To see more results,
+     * use this value as the page_token for your next request. If this value
+     * is empty, there are no more results.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * Locations that could not be reached.
      *
@@ -41,12 +44,13 @@ class ListHubsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\NetworkConnectivity\V1\Hub[]|\Google\Protobuf\Internal\RepeatedField $hubs
+     *     @type array<\Google\Cloud\NetworkConnectivity\V1\Hub>|\Google\Protobuf\Internal\RepeatedField $hubs
      *           The requested hubs.
      *     @type string $next_page_token
-     *           The next pagination token in the List response. It should be used as
-     *           page_token for the following request. An empty value means no more result.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $unreachable
+     *           The token for the next page of the response. To see more results,
+     *           use this value as the page_token for your next request. If this value
+     *           is empty, there are no more results.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unreachable
      *           Locations that could not be reached.
      * }
      */
@@ -70,7 +74,7 @@ class ListHubsResponse extends \Google\Protobuf\Internal\Message
      * The requested hubs.
      *
      * Generated from protobuf field <code>repeated .google.cloud.networkconnectivity.v1.Hub hubs = 1;</code>
-     * @param \Google\Cloud\NetworkConnectivity\V1\Hub[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\NetworkConnectivity\V1\Hub>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setHubs($var)
@@ -82,8 +86,9 @@ class ListHubsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The next pagination token in the List response. It should be used as
-     * page_token for the following request. An empty value means no more result.
+     * The token for the next page of the response. To see more results,
+     * use this value as the page_token for your next request. If this value
+     * is empty, there are no more results.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @return string
@@ -94,8 +99,9 @@ class ListHubsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The next pagination token in the List response. It should be used as
-     * page_token for the following request. An empty value means no more result.
+     * The token for the next page of the response. To see more results,
+     * use this value as the page_token for your next request. If this value
+     * is empty, there are no more results.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @param string $var
@@ -124,7 +130,7 @@ class ListHubsResponse extends \Google\Protobuf\Internal\Message
      * Locations that could not be reached.
      *
      * Generated from protobuf field <code>repeated string unreachable = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUnreachable($var)

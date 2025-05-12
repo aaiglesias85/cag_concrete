@@ -20,7 +20,21 @@ class CalculateIssueModelStatsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string issue_model = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $issue_model = '';
+    protected $issue_model = '';
+
+    /**
+     * @param string $issueModel Required. The resource name of the issue model to query against. Please see
+     *                           {@see ContactCenterInsightsClient::issueModelName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\ContactCenterInsights\V1\CalculateIssueModelStatsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $issueModel): self
+    {
+        return (new self())
+            ->setIssueModel($issueModel);
+    }
 
     /**
      * Constructor.

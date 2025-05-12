@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Metadata related to the progress of the Import operation. This will be
+ * Metadata related to the progress of the Import operation. This is
  * returned by the google.longrunning.Operation.metadata field.
  *
  * Generated from protobuf message <code>google.cloud.retail.v2.ImportMetadata</code>
@@ -21,26 +21,26 @@ class ImportMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 1;</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Operation last update time. If the operation is done, this is also the
      * finish time.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 2;</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * Count of entries that were processed successfully.
      *
      * Generated from protobuf field <code>int64 success_count = 3;</code>
      */
-    private $success_count = 0;
+    protected $success_count = 0;
     /**
      * Count of entries that encountered errors while processing.
      *
      * Generated from protobuf field <code>int64 failure_count = 4;</code>
      */
-    private $failure_count = 0;
+    protected $failure_count = 0;
     /**
      * Deprecated. This field is never set.
      *
@@ -50,14 +50,14 @@ class ImportMetadata extends \Google\Protobuf\Internal\Message
     protected $request_id = '';
     /**
      * Pub/Sub topic for receiving notification. If this field is set,
-     * when the import is finished, a notification will be sent to
-     * specified Pub/Sub topic. The message data will be JSON string of a
+     * when the import is finished, a notification is sent to
+     * specified Pub/Sub topic. The message data is JSON string of a
      * [Operation][google.longrunning.Operation].
      * Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`.
      *
      * Generated from protobuf field <code>string notification_pubsub_topic = 6;</code>
      */
-    private $notification_pubsub_topic = '';
+    protected $notification_pubsub_topic = '';
 
     /**
      * Constructor.
@@ -78,8 +78,8 @@ class ImportMetadata extends \Google\Protobuf\Internal\Message
      *           Deprecated. This field is never set.
      *     @type string $notification_pubsub_topic
      *           Pub/Sub topic for receiving notification. If this field is set,
-     *           when the import is finished, a notification will be sent to
-     *           specified Pub/Sub topic. The message data will be JSON string of a
+     *           when the import is finished, a notification is sent to
+     *           specified Pub/Sub topic. The message data is JSON string of a
      *           [Operation][google.longrunning.Operation].
      *           Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`.
      * }
@@ -247,8 +247,8 @@ class ImportMetadata extends \Google\Protobuf\Internal\Message
 
     /**
      * Pub/Sub topic for receiving notification. If this field is set,
-     * when the import is finished, a notification will be sent to
-     * specified Pub/Sub topic. The message data will be JSON string of a
+     * when the import is finished, a notification is sent to
+     * specified Pub/Sub topic. The message data is JSON string of a
      * [Operation][google.longrunning.Operation].
      * Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`.
      *
@@ -262,8 +262,8 @@ class ImportMetadata extends \Google\Protobuf\Internal\Message
 
     /**
      * Pub/Sub topic for receiving notification. If this field is set,
-     * when the import is finished, a notification will be sent to
-     * specified Pub/Sub topic. The message data will be JSON string of a
+     * when the import is finished, a notification is sent to
+     * specified Pub/Sub topic. The message data is JSON string of a
      * [Operation][google.longrunning.Operation].
      * Format of the Pub/Sub topic is `projects/{project}/topics/{topic}`.
      *

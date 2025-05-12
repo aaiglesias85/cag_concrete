@@ -18,18 +18,19 @@ class StatsAnomaliesObjective extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.ModelDeploymentMonitoringObjectiveType type = 1;</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
      * If set, all attribution scores between
-     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time] and
-     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time] are
-     * fetched, and page token doesn't take affect in this case.
-     * Only used to retrieve attribution score for the top Features which has
-     * the highest attribution score in the latest monitoring run.
+     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time]
+     * and
+     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time]
+     * are fetched, and page token doesn't take effect in this case. Only used
+     * to retrieve attribution score for the top Features which has the highest
+     * attribution score in the latest monitoring run.
      *
      * Generated from protobuf field <code>int32 top_feature_count = 4;</code>
      */
-    private $top_feature_count = 0;
+    protected $top_feature_count = 0;
 
     /**
      * Constructor.
@@ -40,11 +41,12 @@ class StatsAnomaliesObjective extends \Google\Protobuf\Internal\Message
      *     @type int $type
      *     @type int $top_feature_count
      *           If set, all attribution scores between
-     *           [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time] and
-     *           [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time] are
-     *           fetched, and page token doesn't take affect in this case.
-     *           Only used to retrieve attribution score for the top Features which has
-     *           the highest attribution score in the latest monitoring run.
+     *           [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time]
+     *           and
+     *           [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time]
+     *           are fetched, and page token doesn't take effect in this case. Only used
+     *           to retrieve attribution score for the top Features which has the highest
+     *           attribution score in the latest monitoring run.
      * }
      */
     public function __construct($data = NULL) {
@@ -76,11 +78,12 @@ class StatsAnomaliesObjective extends \Google\Protobuf\Internal\Message
 
     /**
      * If set, all attribution scores between
-     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time] and
-     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time] are
-     * fetched, and page token doesn't take affect in this case.
-     * Only used to retrieve attribution score for the top Features which has
-     * the highest attribution score in the latest monitoring run.
+     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time]
+     * and
+     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time]
+     * are fetched, and page token doesn't take effect in this case. Only used
+     * to retrieve attribution score for the top Features which has the highest
+     * attribution score in the latest monitoring run.
      *
      * Generated from protobuf field <code>int32 top_feature_count = 4;</code>
      * @return int
@@ -92,11 +95,12 @@ class StatsAnomaliesObjective extends \Google\Protobuf\Internal\Message
 
     /**
      * If set, all attribution scores between
-     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time] and
-     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time] are
-     * fetched, and page token doesn't take affect in this case.
-     * Only used to retrieve attribution score for the top Features which has
-     * the highest attribution score in the latest monitoring run.
+     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.start_time]
+     * and
+     * [SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time][google.cloud.aiplatform.v1.SearchModelDeploymentMonitoringStatsAnomaliesRequest.end_time]
+     * are fetched, and page token doesn't take effect in this case. Only used
+     * to retrieve attribution score for the top Features which has the highest
+     * attribution score in the latest monitoring run.
      *
      * Generated from protobuf field <code>int32 top_feature_count = 4;</code>
      * @param int $var

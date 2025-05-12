@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Represents a Replica for this [Secret][google.cloud.secretmanager.v1.Secret].
+ * Represents a Replica for this
+ * [Secret][google.cloud.secretmanager.v1.Secret].
  *
  * Generated from protobuf message <code>google.cloud.secretmanager.v1.Replication.UserManaged.Replica</code>
  */
@@ -21,18 +22,20 @@ class Replica extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string location = 1;</code>
      */
-    private $location = '';
+    protected $location = '';
     /**
-     * Optional. The customer-managed encryption configuration of the [User-Managed
-     * Replica][Replication.UserManaged.Replica]. If no configuration is
-     * provided, Google-managed default encryption is used.
-     * Updates to the [Secret][google.cloud.secretmanager.v1.Secret] encryption configuration only apply to
-     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added afterwards. They do not apply
-     * retroactively to existing [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
+     * Optional. The customer-managed encryption configuration of the
+     * [User-Managed Replica][Replication.UserManaged.Replica]. If no
+     * configuration is provided, Google-managed default encryption is used.
+     * Updates to the [Secret][google.cloud.secretmanager.v1.Secret]
+     * encryption configuration only apply to
+     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added
+     * afterwards. They do not apply retroactively to existing
+     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryption customer_managed_encryption = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $customer_managed_encryption = null;
+    protected $customer_managed_encryption = null;
 
     /**
      * Constructor.
@@ -44,12 +47,14 @@ class Replica extends \Google\Protobuf\Internal\Message
      *           The canonical IDs of the location to replicate data.
      *           For example: `"us-east1"`.
      *     @type \Google\Cloud\SecretManager\V1\CustomerManagedEncryption $customer_managed_encryption
-     *           Optional. The customer-managed encryption configuration of the [User-Managed
-     *           Replica][Replication.UserManaged.Replica]. If no configuration is
-     *           provided, Google-managed default encryption is used.
-     *           Updates to the [Secret][google.cloud.secretmanager.v1.Secret] encryption configuration only apply to
-     *           [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added afterwards. They do not apply
-     *           retroactively to existing [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
+     *           Optional. The customer-managed encryption configuration of the
+     *           [User-Managed Replica][Replication.UserManaged.Replica]. If no
+     *           configuration is provided, Google-managed default encryption is used.
+     *           Updates to the [Secret][google.cloud.secretmanager.v1.Secret]
+     *           encryption configuration only apply to
+     *           [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added
+     *           afterwards. They do not apply retroactively to existing
+     *           [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
      * }
      */
     public function __construct($data = NULL) {
@@ -86,12 +91,14 @@ class Replica extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The customer-managed encryption configuration of the [User-Managed
-     * Replica][Replication.UserManaged.Replica]. If no configuration is
-     * provided, Google-managed default encryption is used.
-     * Updates to the [Secret][google.cloud.secretmanager.v1.Secret] encryption configuration only apply to
-     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added afterwards. They do not apply
-     * retroactively to existing [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
+     * Optional. The customer-managed encryption configuration of the
+     * [User-Managed Replica][Replication.UserManaged.Replica]. If no
+     * configuration is provided, Google-managed default encryption is used.
+     * Updates to the [Secret][google.cloud.secretmanager.v1.Secret]
+     * encryption configuration only apply to
+     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added
+     * afterwards. They do not apply retroactively to existing
+     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryption customer_managed_encryption = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Cloud\SecretManager\V1\CustomerManagedEncryption|null
@@ -112,12 +119,14 @@ class Replica extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. The customer-managed encryption configuration of the [User-Managed
-     * Replica][Replication.UserManaged.Replica]. If no configuration is
-     * provided, Google-managed default encryption is used.
-     * Updates to the [Secret][google.cloud.secretmanager.v1.Secret] encryption configuration only apply to
-     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added afterwards. They do not apply
-     * retroactively to existing [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
+     * Optional. The customer-managed encryption configuration of the
+     * [User-Managed Replica][Replication.UserManaged.Replica]. If no
+     * configuration is provided, Google-managed default encryption is used.
+     * Updates to the [Secret][google.cloud.secretmanager.v1.Secret]
+     * encryption configuration only apply to
+     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added
+     * afterwards. They do not apply retroactively to existing
+     * [SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
      *
      * Generated from protobuf field <code>.google.cloud.secretmanager.v1.CustomerManagedEncryption customer_managed_encryption = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param \Google\Cloud\SecretManager\V1\CustomerManagedEncryption $var
@@ -133,6 +142,4 @@ class Replica extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Replica::class, \Google\Cloud\SecretManager\V1\Replication_UserManaged_Replica::class);
 

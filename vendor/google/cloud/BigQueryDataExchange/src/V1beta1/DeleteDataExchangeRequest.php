@@ -9,19 +9,34 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Message for deleting a DataExchange.
+ * Message for deleting a data exchange.
  *
  * Generated from protobuf message <code>google.cloud.bigquery.dataexchange.v1beta1.DeleteDataExchangeRequest</code>
  */
 class DeleteDataExchangeRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. Resource name of the DataExchange to delete.
-     * e.g. `projects/myproject/locations/US/dataExchanges/123`.
+     * Required. The full name of the data exchange resource that you want to delete.
+     * For example, `projects/myproject/locations/US/dataExchanges/123`.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The full name of the data exchange resource that you want to delete.
+     *                     For example, `projects/myproject/locations/US/dataExchanges/123`. Please see
+     *                     {@see AnalyticsHubServiceClient::dataExchangeName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\BigQuery\DataExchange\V1beta1\DeleteDataExchangeRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -30,8 +45,8 @@ class DeleteDataExchangeRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           Required. Resource name of the DataExchange to delete.
-     *           e.g. `projects/myproject/locations/US/dataExchanges/123`.
+     *           Required. The full name of the data exchange resource that you want to delete.
+     *           For example, `projects/myproject/locations/US/dataExchanges/123`.
      * }
      */
     public function __construct($data = NULL) {
@@ -40,8 +55,8 @@ class DeleteDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of the DataExchange to delete.
-     * e.g. `projects/myproject/locations/US/dataExchanges/123`.
+     * Required. The full name of the data exchange resource that you want to delete.
+     * For example, `projects/myproject/locations/US/dataExchanges/123`.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -52,8 +67,8 @@ class DeleteDataExchangeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Resource name of the DataExchange to delete.
-     * e.g. `projects/myproject/locations/US/dataExchanges/123`.
+     * Required. The full name of the data exchange resource that you want to delete.
+     * For example, `projects/myproject/locations/US/dataExchanges/123`.
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

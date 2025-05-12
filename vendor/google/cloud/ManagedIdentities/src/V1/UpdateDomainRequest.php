@@ -26,14 +26,35 @@ class UpdateDomainRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Required. Domain message with updated fields. Only supported fields specified in
      * update_mask are updated.
      *
      * Generated from protobuf field <code>.google.cloud.managedidentities.v1.Domain domain = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $domain = null;
+    protected $domain = null;
+
+    /**
+     * @param \Google\Cloud\ManagedIdentities\V1\Domain $domain     Required. Domain message with updated fields. Only supported fields specified in
+     *                                                              update_mask are updated.
+     * @param \Google\Protobuf\FieldMask                $updateMask Required. Mask of fields to update. At least one path must be supplied in this
+     *                                                              field. The elements of the repeated paths field may only include
+     *                                                              fields from [Domain][google.cloud.managedidentities.v1.Domain]:
+     *                                                              * `labels`
+     *                                                              * `locations`
+     *                                                              * `authorized_networks`
+     *
+     * @return \Google\Cloud\ManagedIdentities\V1\UpdateDomainRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\ManagedIdentities\V1\Domain $domain, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setDomain($domain)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

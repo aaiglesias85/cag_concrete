@@ -27,6 +27,12 @@ class SourceObjectIdentifier extends \Google\Protobuf\Internal\Message
      *           Oracle data source object identifier.
      *     @type \Google\Cloud\Datastream\V1\SourceObjectIdentifier\MysqlObjectIdentifier $mysql_identifier
      *           Mysql data source object identifier.
+     *     @type \Google\Cloud\Datastream\V1\SourceObjectIdentifier\PostgresqlObjectIdentifier $postgresql_identifier
+     *           PostgreSQL data source object identifier.
+     *     @type \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SqlServerObjectIdentifier $sql_server_identifier
+     *           SQLServer data source object identifier.
+     *     @type \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SalesforceObjectIdentifier $salesforce_identifier
+     *           Salesforce data source object identifier.
      * }
      */
     public function __construct($data = NULL) {
@@ -92,6 +98,99 @@ class SourceObjectIdentifier extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\SourceObjectIdentifier\MysqlObjectIdentifier::class);
         $this->writeOneof(2, $var);
+
+        return $this;
+    }
+
+    /**
+     * PostgreSQL data source object identifier.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier.PostgresqlObjectIdentifier postgresql_identifier = 3;</code>
+     * @return \Google\Cloud\Datastream\V1\SourceObjectIdentifier\PostgresqlObjectIdentifier|null
+     */
+    public function getPostgresqlIdentifier()
+    {
+        return $this->readOneof(3);
+    }
+
+    public function hasPostgresqlIdentifier()
+    {
+        return $this->hasOneof(3);
+    }
+
+    /**
+     * PostgreSQL data source object identifier.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier.PostgresqlObjectIdentifier postgresql_identifier = 3;</code>
+     * @param \Google\Cloud\Datastream\V1\SourceObjectIdentifier\PostgresqlObjectIdentifier $var
+     * @return $this
+     */
+    public function setPostgresqlIdentifier($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\SourceObjectIdentifier\PostgresqlObjectIdentifier::class);
+        $this->writeOneof(3, $var);
+
+        return $this;
+    }
+
+    /**
+     * SQLServer data source object identifier.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier.SqlServerObjectIdentifier sql_server_identifier = 4;</code>
+     * @return \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SqlServerObjectIdentifier|null
+     */
+    public function getSqlServerIdentifier()
+    {
+        return $this->readOneof(4);
+    }
+
+    public function hasSqlServerIdentifier()
+    {
+        return $this->hasOneof(4);
+    }
+
+    /**
+     * SQLServer data source object identifier.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier.SqlServerObjectIdentifier sql_server_identifier = 4;</code>
+     * @param \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SqlServerObjectIdentifier $var
+     * @return $this
+     */
+    public function setSqlServerIdentifier($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SqlServerObjectIdentifier::class);
+        $this->writeOneof(4, $var);
+
+        return $this;
+    }
+
+    /**
+     * Salesforce data source object identifier.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier.SalesforceObjectIdentifier salesforce_identifier = 5;</code>
+     * @return \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SalesforceObjectIdentifier|null
+     */
+    public function getSalesforceIdentifier()
+    {
+        return $this->readOneof(5);
+    }
+
+    public function hasSalesforceIdentifier()
+    {
+        return $this->hasOneof(5);
+    }
+
+    /**
+     * Salesforce data source object identifier.
+     *
+     * Generated from protobuf field <code>.google.cloud.datastream.v1.SourceObjectIdentifier.SalesforceObjectIdentifier salesforce_identifier = 5;</code>
+     * @param \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SalesforceObjectIdentifier $var
+     * @return $this
+     */
+    public function setSalesforceIdentifier($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastream\V1\SourceObjectIdentifier\SalesforceObjectIdentifier::class);
+        $this->writeOneof(5, $var);
 
         return $this;
     }

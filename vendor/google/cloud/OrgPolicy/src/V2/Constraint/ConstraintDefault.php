@@ -7,8 +7,8 @@ namespace Google\Cloud\OrgPolicy\V2\Constraint;
 use UnexpectedValueException;
 
 /**
- * Specifies the default behavior in the absence of any `Policy` for the
- * `Constraint`. This must not be `CONSTRAINT_DEFAULT_UNSPECIFIED`.
+ * Specifies the default behavior in the absence of any policy for the
+ * constraint. This must not be `CONSTRAINT_DEFAULT_UNSPECIFIED`.
  * Immutable after creation.
  *
  * Protobuf type <code>google.cloud.orgpolicy.v2.Constraint.ConstraintDefault</code>
@@ -64,6 +64,4 @@ class ConstraintDefault
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ConstraintDefault::class, \Google\Cloud\OrgPolicy\V2\Constraint_ConstraintDefault::class);
 

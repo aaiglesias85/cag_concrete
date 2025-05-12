@@ -16,16 +16,17 @@ class Exfiltration
         }
         $pool->internalAddGeneratedFile(
             '
-
-1google/cloud/securitycenter/v1/exfiltration.protogoogle.cloud.securitycenter.v1"Ž
+®
+1google/cloud/securitycenter/v1/exfiltration.protogoogle.cloud.securitycenter.v1"¯
 Exfiltration>
 sources (2-.google.cloud.securitycenter.v1.ExfilResource>
-targets (2-.google.cloud.securitycenter.v1.ExfilResource"1
+targets (2-.google.cloud.securitycenter.v1.ExfilResource
+total_exfiltrated_bytes ("1
 ExfilResource
 name (	
 
-components (	Bí
-"com.google.cloud.securitycenter.v1BExfiltrationProtoPZLgoogle.golang.org/genproto/googleapis/cloud/securitycenter/v1;securitycenterªGoogle.Cloud.SecurityCenter.V1ÊGoogle\\Cloud\\SecurityCenter\\V1ê!Google::Cloud::SecurityCenter::V1bproto3'
+components (	Bë
+"com.google.cloud.securitycenter.v1BExfiltrationProtoPZJcloud.google.com/go/securitycenter/apiv1/securitycenterpb;securitycenterpbªGoogle.Cloud.SecurityCenter.V1ÊGoogle\\Cloud\\SecurityCenter\\V1ê!Google::Cloud::SecurityCenter::V1bproto3'
         , true);
 
         static::$is_initialized = true;

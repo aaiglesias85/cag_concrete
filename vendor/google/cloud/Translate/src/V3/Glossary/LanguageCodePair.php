@@ -16,19 +16,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class LanguageCodePair extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The BCP-47 language code of the input text, for example,
+     * Required. The ISO-639 language code of the input text, for example,
      * "en-US". Expected to be an exact match for GlossaryTerm.language_code.
      *
      * Generated from protobuf field <code>string source_language_code = 1;</code>
      */
-    private $source_language_code = '';
+    protected $source_language_code = '';
     /**
-     * Required. The BCP-47 language code for translation output, for example,
+     * Required. The ISO-639 language code for translation output, for example,
      * "zh-CN". Expected to be an exact match for GlossaryTerm.language_code.
      *
      * Generated from protobuf field <code>string target_language_code = 2;</code>
      */
-    private $target_language_code = '';
+    protected $target_language_code = '';
 
     /**
      * Constructor.
@@ -37,10 +37,10 @@ class LanguageCodePair extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $source_language_code
-     *           Required. The BCP-47 language code of the input text, for example,
+     *           Required. The ISO-639 language code of the input text, for example,
      *           "en-US". Expected to be an exact match for GlossaryTerm.language_code.
      *     @type string $target_language_code
-     *           Required. The BCP-47 language code for translation output, for example,
+     *           Required. The ISO-639 language code for translation output, for example,
      *           "zh-CN". Expected to be an exact match for GlossaryTerm.language_code.
      * }
      */
@@ -50,7 +50,7 @@ class LanguageCodePair extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BCP-47 language code of the input text, for example,
+     * Required. The ISO-639 language code of the input text, for example,
      * "en-US". Expected to be an exact match for GlossaryTerm.language_code.
      *
      * Generated from protobuf field <code>string source_language_code = 1;</code>
@@ -62,7 +62,7 @@ class LanguageCodePair extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BCP-47 language code of the input text, for example,
+     * Required. The ISO-639 language code of the input text, for example,
      * "en-US". Expected to be an exact match for GlossaryTerm.language_code.
      *
      * Generated from protobuf field <code>string source_language_code = 1;</code>
@@ -78,7 +78,7 @@ class LanguageCodePair extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BCP-47 language code for translation output, for example,
+     * Required. The ISO-639 language code for translation output, for example,
      * "zh-CN". Expected to be an exact match for GlossaryTerm.language_code.
      *
      * Generated from protobuf field <code>string target_language_code = 2;</code>
@@ -90,7 +90,7 @@ class LanguageCodePair extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BCP-47 language code for translation output, for example,
+     * Required. The ISO-639 language code for translation output, for example,
      * "zh-CN". Expected to be an exact match for GlossaryTerm.language_code.
      *
      * Generated from protobuf field <code>string target_language_code = 2;</code>
@@ -107,6 +107,4 @@ class LanguageCodePair extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(LanguageCodePair::class, \Google\Cloud\Translate\V3\Glossary_LanguageCodePair::class);
 

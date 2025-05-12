@@ -21,7 +21,7 @@ class CreateZoneRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. Zone identifier.
      * This ID will be used to generate names such as database and dataset names
@@ -35,20 +35,47 @@ class CreateZoneRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string zone_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $zone_id = '';
+    protected $zone_id = '';
     /**
      * Required. Zone resource.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Zone zone = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $zone = null;
+    protected $zone = null;
     /**
      * Optional. Only validate the request, but do not perform mutations.
      * The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+
+    /**
+     * @param string                         $parent Required. The resource name of the parent lake:
+     *                                               `projects/{project_number}/locations/{location_id}/lakes/{lake_id}`. Please see
+     *                                               {@see DataplexServiceClient::lakeName()} for help formatting this field.
+     * @param \Google\Cloud\Dataplex\V1\Zone $zone   Required. Zone resource.
+     * @param string                         $zoneId Required. Zone identifier.
+     *                                               This ID will be used to generate names such as database and dataset names
+     *                                               when publishing metadata to Hive Metastore and BigQuery.
+     *                                               * Must contain only lowercase letters, numbers and hyphens.
+     *                                               * Must start with a letter.
+     *                                               * Must end with a number or a letter.
+     *                                               * Must be between 1-63 characters.
+     *                                               * Must be unique across all lakes from all locations in a project.
+     *                                               * Must not be one of the reserved IDs (i.e. "default", "global-temp")
+     *
+     * @return \Google\Cloud\Dataplex\V1\CreateZoneRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dataplex\V1\Zone $zone, string $zoneId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setZone($zone)
+            ->setZoneId($zoneId);
+    }
 
     /**
      * Constructor.

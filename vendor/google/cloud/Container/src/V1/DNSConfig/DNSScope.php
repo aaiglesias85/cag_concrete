@@ -20,6 +20,12 @@ class DNSScope
      */
     const DNS_SCOPE_UNSPECIFIED = 0;
     /**
+     * DNS records are accessible from within the cluster.
+     *
+     * Generated from protobuf enum <code>CLUSTER_SCOPE = 1;</code>
+     */
+    const CLUSTER_SCOPE = 1;
+    /**
      * DNS records are accessible from within the VPC.
      *
      * Generated from protobuf enum <code>VPC_SCOPE = 2;</code>
@@ -28,6 +34,7 @@ class DNSScope
 
     private static $valueToName = [
         self::DNS_SCOPE_UNSPECIFIED => 'DNS_SCOPE_UNSPECIFIED',
+        self::CLUSTER_SCOPE => 'CLUSTER_SCOPE',
         self::VPC_SCOPE => 'VPC_SCOPE',
     ];
 
@@ -52,6 +59,4 @@ class DNSScope
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(DNSScope::class, \Google\Cloud\Container\V1\DNSConfig_DNSScope::class);
 

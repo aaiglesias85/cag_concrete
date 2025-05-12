@@ -20,19 +20,20 @@ use Google\Protobuf\Internal\GPBUtil;
 class ContentMatcher extends \Google\Protobuf\Internal\Message
 {
     /**
-     * String or regex content to match. Maximum 1024 bytes. An empty `content`
-     * string indicates no content matching is to be performed.
+     * String, regex or JSON content to match. Maximum 1024 bytes. An empty
+     * `content` string indicates no content matching is to be performed.
      *
      * Generated from protobuf field <code>string content = 1;</code>
      */
-    private $content = '';
+    protected $content = '';
     /**
      * The type of content matcher that will be applied to the server output,
      * compared to the `content` string when the check is run.
      *
      * Generated from protobuf field <code>.google.monitoring.v3.UptimeCheckConfig.ContentMatcher.ContentMatcherOption matcher = 2;</code>
      */
-    private $matcher = 0;
+    protected $matcher = 0;
+    protected $additional_matcher_info;
 
     /**
      * Constructor.
@@ -41,11 +42,13 @@ class ContentMatcher extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $content
-     *           String or regex content to match. Maximum 1024 bytes. An empty `content`
-     *           string indicates no content matching is to be performed.
+     *           String, regex or JSON content to match. Maximum 1024 bytes. An empty
+     *           `content` string indicates no content matching is to be performed.
      *     @type int $matcher
      *           The type of content matcher that will be applied to the server output,
      *           compared to the `content` string when the check is run.
+     *     @type \Google\Cloud\Monitoring\V3\UptimeCheckConfig\ContentMatcher\JsonPathMatcher $json_path_matcher
+     *           Matcher information for `MATCHES_JSON_PATH` and `NOT_MATCHES_JSON_PATH`
      * }
      */
     public function __construct($data = NULL) {
@@ -54,8 +57,8 @@ class ContentMatcher extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * String or regex content to match. Maximum 1024 bytes. An empty `content`
-     * string indicates no content matching is to be performed.
+     * String, regex or JSON content to match. Maximum 1024 bytes. An empty
+     * `content` string indicates no content matching is to be performed.
      *
      * Generated from protobuf field <code>string content = 1;</code>
      * @return string
@@ -66,8 +69,8 @@ class ContentMatcher extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * String or regex content to match. Maximum 1024 bytes. An empty `content`
-     * string indicates no content matching is to be performed.
+     * String, regex or JSON content to match. Maximum 1024 bytes. An empty
+     * `content` string indicates no content matching is to be performed.
      *
      * Generated from protobuf field <code>string content = 1;</code>
      * @param string $var
@@ -109,8 +112,45 @@ class ContentMatcher extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
+    /**
+     * Matcher information for `MATCHES_JSON_PATH` and `NOT_MATCHES_JSON_PATH`
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.UptimeCheckConfig.ContentMatcher.JsonPathMatcher json_path_matcher = 3;</code>
+     * @return \Google\Cloud\Monitoring\V3\UptimeCheckConfig\ContentMatcher\JsonPathMatcher|null
+     */
+    public function getJsonPathMatcher()
+    {
+        return $this->readOneof(3);
+    }
+
+    public function hasJsonPathMatcher()
+    {
+        return $this->hasOneof(3);
+    }
+
+    /**
+     * Matcher information for `MATCHES_JSON_PATH` and `NOT_MATCHES_JSON_PATH`
+     *
+     * Generated from protobuf field <code>.google.monitoring.v3.UptimeCheckConfig.ContentMatcher.JsonPathMatcher json_path_matcher = 3;</code>
+     * @param \Google\Cloud\Monitoring\V3\UptimeCheckConfig\ContentMatcher\JsonPathMatcher $var
+     * @return $this
+     */
+    public function setJsonPathMatcher($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Monitoring\V3\UptimeCheckConfig\ContentMatcher\JsonPathMatcher::class);
+        $this->writeOneof(3, $var);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAdditionalMatcherInfo()
+    {
+        return $this->whichOneof("additional_matcher_info");
+    }
+
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ContentMatcher::class, \Google\Cloud\Monitoring\V3\UptimeCheckConfig_ContentMatcher::class);
 

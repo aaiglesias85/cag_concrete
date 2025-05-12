@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [PipelineService.ListTrainingPipelines][google.cloud.aiplatform.v1.PipelineService.ListTrainingPipelines]
+ * Response message for
+ * [PipelineService.ListTrainingPipelines][google.cloud.aiplatform.v1.PipelineService.ListTrainingPipelines]
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListTrainingPipelinesResponse</code>
  */
@@ -23,11 +24,13 @@ class ListTrainingPipelinesResponse extends \Google\Protobuf\Internal\Message
     private $training_pipelines;
     /**
      * A token to retrieve the next page of results.
-     * Pass to [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,11 +38,13 @@ class ListTrainingPipelinesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\TrainingPipeline[]|\Google\Protobuf\Internal\RepeatedField $training_pipelines
+     *     @type array<\Google\Cloud\AIPlatform\V1\TrainingPipeline>|\Google\Protobuf\Internal\RepeatedField $training_pipelines
      *           List of TrainingPipelines in the requested page.
      *     @type string $next_page_token
      *           A token to retrieve the next page of results.
-     *           Pass to [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token] to obtain that page.
+     *           Pass to
+     *           [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token]
+     *           to obtain that page.
      * }
      */
     public function __construct($data = NULL) {
@@ -62,7 +67,7 @@ class ListTrainingPipelinesResponse extends \Google\Protobuf\Internal\Message
      * List of TrainingPipelines in the requested page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.TrainingPipeline training_pipelines = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\TrainingPipeline[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\TrainingPipeline>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTrainingPipelines($var)
@@ -75,7 +80,9 @@ class ListTrainingPipelinesResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * A token to retrieve the next page of results.
-     * Pass to [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @return string
@@ -87,7 +94,9 @@ class ListTrainingPipelinesResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * A token to retrieve the next page of results.
-     * Pass to [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListTrainingPipelinesRequest.page_token][google.cloud.aiplatform.v1.ListTrainingPipelinesRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @param string $var

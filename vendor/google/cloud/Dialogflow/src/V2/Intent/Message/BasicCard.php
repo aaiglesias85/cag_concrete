@@ -20,25 +20,25 @@ class BasicCard extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string title = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $title = '';
+    protected $title = '';
     /**
      * Optional. The subtitle of the card.
      *
      * Generated from protobuf field <code>string subtitle = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $subtitle = '';
+    protected $subtitle = '';
     /**
      * Required, unless image is present. The body text of the card.
      *
      * Generated from protobuf field <code>string formatted_text = 3;</code>
      */
-    private $formatted_text = '';
+    protected $formatted_text = '';
     /**
      * Optional. The image for the card.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Intent.Message.Image image = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $image = null;
+    protected $image = null;
     /**
      * Optional. The collection of card buttons.
      *
@@ -60,7 +60,7 @@ class BasicCard extends \Google\Protobuf\Internal\Message
      *           Required, unless image is present. The body text of the card.
      *     @type \Google\Cloud\Dialogflow\V2\Intent\Message\Image $image
      *           Optional. The image for the card.
-     *     @type \Google\Cloud\Dialogflow\V2\Intent\Message\BasicCard\Button[]|\Google\Protobuf\Internal\RepeatedField $buttons
+     *     @type array<\Google\Cloud\Dialogflow\V2\Intent\Message\BasicCard\Button>|\Google\Protobuf\Internal\RepeatedField $buttons
      *           Optional. The collection of card buttons.
      * }
      */
@@ -198,7 +198,7 @@ class BasicCard extends \Google\Protobuf\Internal\Message
      * Optional. The collection of card buttons.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.Intent.Message.BasicCard.Button buttons = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\Dialogflow\V2\Intent\Message\BasicCard\Button[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\Intent\Message\BasicCard\Button>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setButtons($var)
@@ -211,6 +211,4 @@ class BasicCard extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(BasicCard::class, \Google\Cloud\Dialogflow\V2\Intent_Message_BasicCard::class);
 

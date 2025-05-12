@@ -26,7 +26,7 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.BigQueryTable table = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $table = null;
+    protected $table = null;
     /**
      * Required. Quasi-identifier columns.
      *
@@ -34,12 +34,12 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
      */
     private $quasi_ids;
     /**
-     * Required. The relative frequency column must contain a floating-point number
-     * between 0 and 1 (inclusive). Null values are assumed to be zero.
+     * Required. The relative frequency column must contain a floating-point
+     * number between 0 and 1 (inclusive). Null values are assumed to be zero.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId relative_frequency = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $relative_frequency = null;
+    protected $relative_frequency = null;
 
     /**
      * Constructor.
@@ -49,11 +49,11 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
      *
      *     @type \Google\Cloud\Dlp\V2\BigQueryTable $table
      *           Required. Auxiliary table location.
-     *     @type \Google\Cloud\Dlp\V2\PrivacyMetric\KMapEstimationConfig\AuxiliaryTable\QuasiIdField[]|\Google\Protobuf\Internal\RepeatedField $quasi_ids
+     *     @type array<\Google\Cloud\Dlp\V2\PrivacyMetric\KMapEstimationConfig\AuxiliaryTable\QuasiIdField>|\Google\Protobuf\Internal\RepeatedField $quasi_ids
      *           Required. Quasi-identifier columns.
      *     @type \Google\Cloud\Dlp\V2\FieldId $relative_frequency
-     *           Required. The relative frequency column must contain a floating-point number
-     *           between 0 and 1 (inclusive). Null values are assumed to be zero.
+     *           Required. The relative frequency column must contain a floating-point
+     *           number between 0 and 1 (inclusive). Null values are assumed to be zero.
      * }
      */
     public function __construct($data = NULL) {
@@ -112,7 +112,7 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
      * Required. Quasi-identifier columns.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.PrivacyMetric.KMapEstimationConfig.AuxiliaryTable.QuasiIdField quasi_ids = 1 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\Dlp\V2\PrivacyMetric\KMapEstimationConfig\AuxiliaryTable\QuasiIdField[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\PrivacyMetric\KMapEstimationConfig\AuxiliaryTable\QuasiIdField>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuasiIds($var)
@@ -124,8 +124,8 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The relative frequency column must contain a floating-point number
-     * between 0 and 1 (inclusive). Null values are assumed to be zero.
+     * Required. The relative frequency column must contain a floating-point
+     * number between 0 and 1 (inclusive). Null values are assumed to be zero.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId relative_frequency = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return \Google\Cloud\Dlp\V2\FieldId|null
@@ -146,8 +146,8 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The relative frequency column must contain a floating-point number
-     * between 0 and 1 (inclusive). Null values are assumed to be zero.
+     * Required. The relative frequency column must contain a floating-point
+     * number between 0 and 1 (inclusive). Null values are assumed to be zero.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.FieldId relative_frequency = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param \Google\Cloud\Dlp\V2\FieldId $var
@@ -163,6 +163,4 @@ class AuxiliaryTable extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(AuxiliaryTable::class, \Google\Cloud\Dlp\V2\PrivacyMetric_KMapEstimationConfig_AuxiliaryTable::class);
 

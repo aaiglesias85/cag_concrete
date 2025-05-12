@@ -23,12 +23,18 @@ class SearchCatalogResponse extends \Google\Protobuf\Internal\Message
      */
     private $results;
     /**
+     * The approximate total number of entries matched by the query.
+     *
+     * Generated from protobuf field <code>int32 total_size = 2;</code>
+     */
+    protected $total_size = 0;
+    /**
      * Pagination token that can be used in subsequent calls to retrieve the next
      * page of results.
      *
      * Generated from protobuf field <code>string next_page_token = 3;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * Unreachable locations. Search results don't include data from those
      * locations.
@@ -46,12 +52,14 @@ class SearchCatalogResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\DataCatalog\V1\SearchCatalogResult[]|\Google\Protobuf\Internal\RepeatedField $results
+     *     @type array<\Google\Cloud\DataCatalog\V1\SearchCatalogResult>|\Google\Protobuf\Internal\RepeatedField $results
      *           Search results.
+     *     @type int $total_size
+     *           The approximate total number of entries matched by the query.
      *     @type string $next_page_token
      *           Pagination token that can be used in subsequent calls to retrieve the next
      *           page of results.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $unreachable
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $unreachable
      *           Unreachable locations. Search results don't include data from those
      *           locations.
      *           To get additional information on an error, repeat the search request and
@@ -79,13 +87,39 @@ class SearchCatalogResponse extends \Google\Protobuf\Internal\Message
      * Search results.
      *
      * Generated from protobuf field <code>repeated .google.cloud.datacatalog.v1.SearchCatalogResult results = 1;</code>
-     * @param \Google\Cloud\DataCatalog\V1\SearchCatalogResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DataCatalog\V1\SearchCatalogResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResults($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\DataCatalog\V1\SearchCatalogResult::class);
         $this->results = $arr;
+
+        return $this;
+    }
+
+    /**
+     * The approximate total number of entries matched by the query.
+     *
+     * Generated from protobuf field <code>int32 total_size = 2;</code>
+     * @return int
+     */
+    public function getTotalSize()
+    {
+        return $this->total_size;
+    }
+
+    /**
+     * The approximate total number of entries matched by the query.
+     *
+     * Generated from protobuf field <code>int32 total_size = 2;</code>
+     * @param int $var
+     * @return $this
+     */
+    public function setTotalSize($var)
+    {
+        GPBUtil::checkInt32($var);
+        $this->total_size = $var;
 
         return $this;
     }
@@ -141,7 +175,7 @@ class SearchCatalogResponse extends \Google\Protobuf\Internal\Message
      * `SearchCatalogRequest.scope.restricted_locations` parameter.
      *
      * Generated from protobuf field <code>repeated string unreachable = 6;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setUnreachable($var)

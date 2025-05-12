@@ -102,7 +102,6 @@ class KeySet
         return $this->ranges;
     }
 
-
     /**
      * Add a single KeyRange.
      *
@@ -256,7 +255,7 @@ class KeySet
     }
 
     /**
-     * Create a KeySet from an array created by {@see Google\Cloud\Spanner\KeySet::keySetObject()}.
+     * Create a KeySet from an array created by {@see \Google\Cloud\Spanner\KeySet::keySetObject()}.
      *
      * @param array $keySet An array of KeySet data.
      * @return KeySet

@@ -17,17 +17,19 @@ class BatchComputeResources extends \Google\Protobuf\Internal\Message
 {
     /**
      * Optional. Total number of job executors.
+     * Executor Count should be between 2 and 100. [Default=2]
      *
      * Generated from protobuf field <code>int32 executors_count = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $executors_count = 0;
+    protected $executors_count = 0;
     /**
      * Optional. Max configurable executors.
      * If max_executors_count > executors_count, then auto-scaling is enabled.
+     * Max Executor Count should be between 2 and 1000. [Default=1000]
      *
      * Generated from protobuf field <code>int32 max_executors_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $max_executors_count = 0;
+    protected $max_executors_count = 0;
 
     /**
      * Constructor.
@@ -37,9 +39,11 @@ class BatchComputeResources extends \Google\Protobuf\Internal\Message
      *
      *     @type int $executors_count
      *           Optional. Total number of job executors.
+     *           Executor Count should be between 2 and 100. [Default=2]
      *     @type int $max_executors_count
      *           Optional. Max configurable executors.
      *           If max_executors_count > executors_count, then auto-scaling is enabled.
+     *           Max Executor Count should be between 2 and 1000. [Default=1000]
      * }
      */
     public function __construct($data = NULL) {
@@ -49,6 +53,7 @@ class BatchComputeResources extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. Total number of job executors.
+     * Executor Count should be between 2 and 100. [Default=2]
      *
      * Generated from protobuf field <code>int32 executors_count = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -60,6 +65,7 @@ class BatchComputeResources extends \Google\Protobuf\Internal\Message
 
     /**
      * Optional. Total number of job executors.
+     * Executor Count should be between 2 and 100. [Default=2]
      *
      * Generated from protobuf field <code>int32 executors_count = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var
@@ -76,6 +82,7 @@ class BatchComputeResources extends \Google\Protobuf\Internal\Message
     /**
      * Optional. Max configurable executors.
      * If max_executors_count > executors_count, then auto-scaling is enabled.
+     * Max Executor Count should be between 2 and 1000. [Default=1000]
      *
      * Generated from protobuf field <code>int32 max_executors_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int
@@ -88,6 +95,7 @@ class BatchComputeResources extends \Google\Protobuf\Internal\Message
     /**
      * Optional. Max configurable executors.
      * If max_executors_count > executors_count, then auto-scaling is enabled.
+     * Max Executor Count should be between 2 and 1000. [Default=1000]
      *
      * Generated from protobuf field <code>int32 max_executors_count = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param int $var

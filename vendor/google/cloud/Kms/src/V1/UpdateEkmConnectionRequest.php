@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [KeyManagementService.UpdateEkmConnection][].
+ * Request message for
+ * [EkmService.UpdateEkmConnection][google.cloud.kms.v1.EkmService.UpdateEkmConnection].
  *
  * Generated from protobuf message <code>google.cloud.kms.v1.UpdateEkmConnectionRequest</code>
  */
@@ -21,13 +22,29 @@ class UpdateEkmConnectionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.kms.v1.EkmConnection ekm_connection = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $ekm_connection = null;
+    protected $ekm_connection = null;
     /**
      * Required. List of fields to be updated in this request.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Kms\V1\EkmConnection $ekmConnection Required. [EkmConnection][google.cloud.kms.v1.EkmConnection] with updated
+     *                                                          values.
+     * @param \Google\Protobuf\FieldMask         $updateMask    Required. List of fields to be updated in this request.
+     *
+     * @return \Google\Cloud\Kms\V1\UpdateEkmConnectionRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Kms\V1\EkmConnection $ekmConnection, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setEkmConnection($ekmConnection)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Contexts.UpdateContext][google.cloud.dialogflow.v2.Contexts.UpdateContext].
+ * The request message for
+ * [Contexts.UpdateContext][google.cloud.dialogflow.v2.Contexts.UpdateContext].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.UpdateContextRequest</code>
  */
@@ -20,13 +21,28 @@ class UpdateContextRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Context context = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $context = null;
+    protected $context = null;
     /**
      * Optional. The mask to control which fields get updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Dialogflow\V2\Context $context    Required. The context to update.
+     * @param \Google\Protobuf\FieldMask          $updateMask Optional. The mask to control which fields get updated.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\UpdateContextRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Dialogflow\V2\Context $context, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setContext($context)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

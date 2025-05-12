@@ -19,9 +19,10 @@ class Provenance extends \Google\Protobuf\Internal\Message
     /**
      * The index of the revision that produced this element.
      *
-     * Generated from protobuf field <code>int32 revision = 1;</code>
+     * Generated from protobuf field <code>int32 revision = 1 [deprecated = true];</code>
+     * @deprecated
      */
-    private $revision = 0;
+    protected $revision = 0;
     /**
      * The Id of this operation.  Needs to be unique within the scope of the
      * revision.
@@ -41,7 +42,7 @@ class Provenance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance.OperationType type = 4;</code>
      */
-    private $type = 0;
+    protected $type = 0;
 
     /**
      * Constructor.
@@ -54,7 +55,7 @@ class Provenance extends \Google\Protobuf\Internal\Message
      *     @type int $id
      *           The Id of this operation.  Needs to be unique within the scope of the
      *           revision.
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Provenance\PBParent[]|\Google\Protobuf\Internal\RepeatedField $parents
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Provenance\PBParent>|\Google\Protobuf\Internal\RepeatedField $parents
      *           References to the original elements that are replaced.
      *     @type int $type
      *           The type of provenance operation.
@@ -68,23 +69,27 @@ class Provenance extends \Google\Protobuf\Internal\Message
     /**
      * The index of the revision that produced this element.
      *
-     * Generated from protobuf field <code>int32 revision = 1;</code>
+     * Generated from protobuf field <code>int32 revision = 1 [deprecated = true];</code>
      * @return int
+     * @deprecated
      */
     public function getRevision()
     {
+        @trigger_error('revision is deprecated.', E_USER_DEPRECATED);
         return $this->revision;
     }
 
     /**
      * The index of the revision that produced this element.
      *
-     * Generated from protobuf field <code>int32 revision = 1;</code>
+     * Generated from protobuf field <code>int32 revision = 1 [deprecated = true];</code>
      * @param int $var
      * @return $this
+     * @deprecated
      */
     public function setRevision($var)
     {
+        @trigger_error('revision is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkInt32($var);
         $this->revision = $var;
 
@@ -138,7 +143,7 @@ class Provenance extends \Google\Protobuf\Internal\Message
      * References to the original elements that are replaced.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Provenance.Parent parents = 3;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Provenance\PBParent[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Provenance\PBParent>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setParents($var)

@@ -20,7 +20,21 @@ class GetTriggerRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the trigger to get. Please see
+     *                     {@see EventarcClient::triggerName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Eventarc\V1\GetTriggerRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

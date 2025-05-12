@@ -16,19 +16,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class Compatibility extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. Whether the entity is compatible and can be represented in the metadata
-     * store.
+     * Output only. Whether the entity is compatible and can be represented in
+     * the metadata store.
      *
      * Generated from protobuf field <code>bool compatible = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $compatible = false;
+    protected $compatible = false;
     /**
-     * Output only. Provides additional detail if the entity is incompatible with the
-     * metadata store.
+     * Output only. Provides additional detail if the entity is incompatible
+     * with the metadata store.
      *
      * Generated from protobuf field <code>string reason = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $reason = '';
+    protected $reason = '';
 
     /**
      * Constructor.
@@ -37,11 +37,11 @@ class Compatibility extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type bool $compatible
-     *           Output only. Whether the entity is compatible and can be represented in the metadata
-     *           store.
+     *           Output only. Whether the entity is compatible and can be represented in
+     *           the metadata store.
      *     @type string $reason
-     *           Output only. Provides additional detail if the entity is incompatible with the
-     *           metadata store.
+     *           Output only. Provides additional detail if the entity is incompatible
+     *           with the metadata store.
      * }
      */
     public function __construct($data = NULL) {
@@ -50,8 +50,8 @@ class Compatibility extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Whether the entity is compatible and can be represented in the metadata
-     * store.
+     * Output only. Whether the entity is compatible and can be represented in
+     * the metadata store.
      *
      * Generated from protobuf field <code>bool compatible = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return bool
@@ -62,8 +62,8 @@ class Compatibility extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Whether the entity is compatible and can be represented in the metadata
-     * store.
+     * Output only. Whether the entity is compatible and can be represented in
+     * the metadata store.
      *
      * Generated from protobuf field <code>bool compatible = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param bool $var
@@ -78,8 +78,8 @@ class Compatibility extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Provides additional detail if the entity is incompatible with the
-     * metadata store.
+     * Output only. Provides additional detail if the entity is incompatible
+     * with the metadata store.
      *
      * Generated from protobuf field <code>string reason = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -90,8 +90,8 @@ class Compatibility extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Provides additional detail if the entity is incompatible with the
-     * metadata store.
+     * Output only. Provides additional detail if the entity is incompatible
+     * with the metadata store.
      *
      * Generated from protobuf field <code>string reason = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var

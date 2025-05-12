@@ -21,19 +21,38 @@ class CreateConnectorRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The ID to use for this connector.
      *
      * Generated from protobuf field <code>string connector_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $connector_id = '';
+    protected $connector_id = '';
     /**
      * Required. Resource to create.
      *
      * Generated from protobuf field <code>.google.cloud.vpcaccess.v1.Connector connector = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $connector = null;
+    protected $connector = null;
+
+    /**
+     * @param string                               $parent      Required. The project and location in which the configuration should be created,
+     *                                                          specified in the format `projects/&#42;/locations/*`. Please see
+     *                                                          {@see VpcAccessServiceClient::locationName()} for help formatting this field.
+     * @param string                               $connectorId Required. The ID to use for this connector.
+     * @param \Google\Cloud\VpcAccess\V1\Connector $connector   Required. Resource to create.
+     *
+     * @return \Google\Cloud\VpcAccess\V1\CreateConnectorRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $connectorId, \Google\Cloud\VpcAccess\V1\Connector $connector): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setConnectorId($connectorId)
+            ->setConnector($connector);
+    }
 
     /**
      * Constructor.

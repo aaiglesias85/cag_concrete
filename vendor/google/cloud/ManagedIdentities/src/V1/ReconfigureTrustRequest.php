@@ -22,14 +22,14 @@ class ReconfigureTrustRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The fully-qualified target domain name which will be in trust with current
      * domain.
      *
      * Generated from protobuf field <code>string target_domain_name = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $target_domain_name = '';
+    protected $target_domain_name = '';
     /**
      * Required. The target DNS server IP addresses to resolve the remote domain involved
      * in the trust.
@@ -37,6 +37,27 @@ class ReconfigureTrustRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated string target_dns_ip_addresses = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $target_dns_ip_addresses;
+
+    /**
+     * @param string   $name                 Required. The resource domain name, project name and location using the form:
+     *                                       `projects/{project_id}/locations/global/domains/{domain_name}`
+     *                                       Please see {@see ManagedIdentitiesServiceClient::domainName()} for help formatting this field.
+     * @param string   $targetDomainName     Required. The fully-qualified target domain name which will be in trust with current
+     *                                       domain.
+     * @param string[] $targetDnsIpAddresses Required. The target DNS server IP addresses to resolve the remote domain involved
+     *                                       in the trust.
+     *
+     * @return \Google\Cloud\ManagedIdentities\V1\ReconfigureTrustRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, string $targetDomainName, array $targetDnsIpAddresses): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setTargetDomainName($targetDomainName)
+            ->setTargetDnsIpAddresses($targetDnsIpAddresses);
+    }
 
     /**
      * Constructor.
@@ -50,7 +71,7 @@ class ReconfigureTrustRequest extends \Google\Protobuf\Internal\Message
      *     @type string $target_domain_name
      *           Required. The fully-qualified target domain name which will be in trust with current
      *           domain.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $target_dns_ip_addresses
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $target_dns_ip_addresses
      *           Required. The target DNS server IP addresses to resolve the remote domain involved
      *           in the trust.
      * }
@@ -133,7 +154,7 @@ class ReconfigureTrustRequest extends \Google\Protobuf\Internal\Message
      * in the trust.
      *
      * Generated from protobuf field <code>repeated string target_dns_ip_addresses = 3 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTargetDnsIpAddresses($var)

@@ -9,7 +9,10 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures].
+ * Request message for
+ * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures].
+ * Request message for
+ * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListFeaturesRequest</code>
  */
@@ -17,12 +20,14 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Required. The resource name of the Location to list Features.
-     * Format:
+     * Format for entity_type as parent:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     * Format for feature_group as parent:
+     * `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Lists the Features that match the filter expression. The following
      * filters are supported:
@@ -44,7 +49,7 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 2;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * The maximum number of Features to return. The service may return fewer
      * than this value. If unspecified, at most 1000 Features will be returned.
@@ -53,45 +58,70 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 3;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * A page token, received from a previous
-     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] call.
-     * Provide this to retrieve the subsequent page.
+     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     * call or
+     * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     * call. Provide this to retrieve the subsequent page.
      * When paginating, all other parameters provided to
-     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] must
-     * match the call that provided the page token.
+     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     * or
+     * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     * must match the call that provided the page token.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * A comma-separated list of fields to order by, sorted in ascending order.
      * Use "desc" after a field name for descending.
      * Supported fields:
      *   * `feature_id`
-     *   * `value_type`
+     *   * `value_type` (Not supported for FeatureRegistry Feature)
      *   * `create_time`
      *   * `update_time`
      *
      * Generated from protobuf field <code>string order_by = 5;</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
     /**
      * Mask specifying which fields to read.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask read_mask = 6;</code>
      */
-    private $read_mask = null;
+    protected $read_mask = null;
     /**
-     * If set, return the most recent [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
+     * Only applicable for Vertex AI Feature Store (Legacy).
+     * If set, return the most recent
+     * [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
      * of stats for each Feature in response. Valid value is [0, 10]. If number of
-     * stats exists < [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count], return all
-     * existing stats.
+     * stats exists <
+     * [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count],
+     * return all existing stats.
      *
      * Generated from protobuf field <code>int32 latest_stats_count = 7;</code>
      */
-    private $latest_stats_count = 0;
+    protected $latest_stats_count = 0;
+
+    /**
+     * @param string $parent Required. The resource name of the Location to list Features.
+     *                       Format for entity_type as parent:
+     *                       `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     *                       Format for feature_group as parent:
+     *                       `projects/{project}/locations/{location}/featureGroups/{feature_group}`
+     *                       Please see {@see FeaturestoreServiceClient::entityTypeName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ListFeaturesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -101,8 +131,10 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $parent
      *           Required. The resource name of the Location to list Features.
-     *           Format:
+     *           Format for entity_type as parent:
      *           `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     *           Format for feature_group as parent:
+     *           `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *     @type string $filter
      *           Lists the Features that match the filter expression. The following
      *           filters are supported:
@@ -128,26 +160,33 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
      *           1000.
      *     @type string $page_token
      *           A page token, received from a previous
-     *           [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] call.
-     *           Provide this to retrieve the subsequent page.
+     *           [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     *           call or
+     *           [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     *           call. Provide this to retrieve the subsequent page.
      *           When paginating, all other parameters provided to
-     *           [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] must
-     *           match the call that provided the page token.
+     *           [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     *           or
+     *           [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     *           must match the call that provided the page token.
      *     @type string $order_by
      *           A comma-separated list of fields to order by, sorted in ascending order.
      *           Use "desc" after a field name for descending.
      *           Supported fields:
      *             * `feature_id`
-     *             * `value_type`
+     *             * `value_type` (Not supported for FeatureRegistry Feature)
      *             * `create_time`
      *             * `update_time`
      *     @type \Google\Protobuf\FieldMask $read_mask
      *           Mask specifying which fields to read.
      *     @type int $latest_stats_count
-     *           If set, return the most recent [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
+     *           Only applicable for Vertex AI Feature Store (Legacy).
+     *           If set, return the most recent
+     *           [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
      *           of stats for each Feature in response. Valid value is [0, 10]. If number of
-     *           stats exists < [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count], return all
-     *           existing stats.
+     *           stats exists <
+     *           [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count],
+     *           return all existing stats.
      * }
      */
     public function __construct($data = NULL) {
@@ -157,8 +196,10 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The resource name of the Location to list Features.
-     * Format:
+     * Format for entity_type as parent:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     * Format for feature_group as parent:
+     * `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -170,8 +211,10 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. The resource name of the Location to list Features.
-     * Format:
+     * Format for entity_type as parent:
      * `projects/{project}/locations/{location}/featurestores/{featurestore}/entityTypes/{entity_type}`
+     * Format for feature_group as parent:
+     * `projects/{project}/locations/{location}/featureGroups/{feature_group}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -277,11 +320,15 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * A page token, received from a previous
-     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] call.
-     * Provide this to retrieve the subsequent page.
+     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     * call or
+     * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     * call. Provide this to retrieve the subsequent page.
      * When paginating, all other parameters provided to
-     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] must
-     * match the call that provided the page token.
+     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     * or
+     * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     * must match the call that provided the page token.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      * @return string
@@ -293,11 +340,15 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * A page token, received from a previous
-     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] call.
-     * Provide this to retrieve the subsequent page.
+     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     * call or
+     * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     * call. Provide this to retrieve the subsequent page.
      * When paginating, all other parameters provided to
-     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures] must
-     * match the call that provided the page token.
+     * [FeaturestoreService.ListFeatures][google.cloud.aiplatform.v1.FeaturestoreService.ListFeatures]
+     * or
+     * [FeatureRegistryService.ListFeatures][google.cloud.aiplatform.v1.FeatureRegistryService.ListFeatures]
+     * must match the call that provided the page token.
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      * @param string $var
@@ -316,7 +367,7 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
      * Use "desc" after a field name for descending.
      * Supported fields:
      *   * `feature_id`
-     *   * `value_type`
+     *   * `value_type` (Not supported for FeatureRegistry Feature)
      *   * `create_time`
      *   * `update_time`
      *
@@ -333,7 +384,7 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
      * Use "desc" after a field name for descending.
      * Supported fields:
      *   * `feature_id`
-     *   * `value_type`
+     *   * `value_type` (Not supported for FeatureRegistry Feature)
      *   * `create_time`
      *   * `update_time`
      *
@@ -386,10 +437,13 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * If set, return the most recent [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
+     * Only applicable for Vertex AI Feature Store (Legacy).
+     * If set, return the most recent
+     * [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
      * of stats for each Feature in response. Valid value is [0, 10]. If number of
-     * stats exists < [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count], return all
-     * existing stats.
+     * stats exists <
+     * [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count],
+     * return all existing stats.
      *
      * Generated from protobuf field <code>int32 latest_stats_count = 7;</code>
      * @return int
@@ -400,10 +454,13 @@ class ListFeaturesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * If set, return the most recent [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
+     * Only applicable for Vertex AI Feature Store (Legacy).
+     * If set, return the most recent
+     * [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count]
      * of stats for each Feature in response. Valid value is [0, 10]. If number of
-     * stats exists < [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count], return all
-     * existing stats.
+     * stats exists <
+     * [ListFeaturesRequest.latest_stats_count][google.cloud.aiplatform.v1.ListFeaturesRequest.latest_stats_count],
+     * return all existing stats.
      *
      * Generated from protobuf field <code>int32 latest_stats_count = 7;</code>
      * @param int $var

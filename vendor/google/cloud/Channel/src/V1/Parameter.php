@@ -20,21 +20,21 @@ class Parameter extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Value of the parameter.
      *
      * Generated from protobuf field <code>.google.cloud.channel.v1.Value value = 2;</code>
      */
-    private $value = null;
+    protected $value = null;
     /**
-     * Output only. Specifies whether this parameter is allowed to be changed. For example, for
-     * a Google Workspace Business Starter entitlement in commitment plan,
-     * num_units is editable when entitlement is active.
+     * Output only. Specifies whether this parameter is allowed to be changed. For
+     * example, for a Google Workspace Business Starter entitlement in commitment
+     * plan, num_units is editable when entitlement is active.
      *
      * Generated from protobuf field <code>bool editable = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $editable = false;
+    protected $editable = false;
 
     /**
      * Constructor.
@@ -47,9 +47,9 @@ class Parameter extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Channel\V1\Value $value
      *           Value of the parameter.
      *     @type bool $editable
-     *           Output only. Specifies whether this parameter is allowed to be changed. For example, for
-     *           a Google Workspace Business Starter entitlement in commitment plan,
-     *           num_units is editable when entitlement is active.
+     *           Output only. Specifies whether this parameter is allowed to be changed. For
+     *           example, for a Google Workspace Business Starter entitlement in commitment
+     *           plan, num_units is editable when entitlement is active.
      * }
      */
     public function __construct($data = NULL) {
@@ -120,9 +120,9 @@ class Parameter extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Specifies whether this parameter is allowed to be changed. For example, for
-     * a Google Workspace Business Starter entitlement in commitment plan,
-     * num_units is editable when entitlement is active.
+     * Output only. Specifies whether this parameter is allowed to be changed. For
+     * example, for a Google Workspace Business Starter entitlement in commitment
+     * plan, num_units is editable when entitlement is active.
      *
      * Generated from protobuf field <code>bool editable = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return bool
@@ -133,9 +133,9 @@ class Parameter extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Specifies whether this parameter is allowed to be changed. For example, for
-     * a Google Workspace Business Starter entitlement in commitment plan,
-     * num_units is editable when entitlement is active.
+     * Output only. Specifies whether this parameter is allowed to be changed. For
+     * example, for a Google Workspace Business Starter entitlement in commitment
+     * plan, num_units is editable when entitlement is active.
      *
      * Generated from protobuf field <code>bool editable = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param bool $var

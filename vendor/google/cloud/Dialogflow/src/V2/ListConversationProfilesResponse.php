@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The response message for [ConversationProfiles.ListConversationProfiles][google.cloud.dialogflow.v2.ConversationProfiles.ListConversationProfiles].
+ * The response message for
+ * [ConversationProfiles.ListConversationProfiles][google.cloud.dialogflow.v2.ConversationProfiles.ListConversationProfiles].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListConversationProfilesResponse</code>
  */
@@ -28,7 +29,7 @@ class ListConversationProfilesResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -36,7 +37,7 @@ class ListConversationProfilesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dialogflow\V2\ConversationProfile[]|\Google\Protobuf\Internal\RepeatedField $conversation_profiles
+     *     @type array<\Google\Cloud\Dialogflow\V2\ConversationProfile>|\Google\Protobuf\Internal\RepeatedField $conversation_profiles
      *           The list of project conversation profiles. There is a maximum number
      *           of items returned based on the page_size field in the request.
      *     @type string $next_page_token
@@ -66,7 +67,7 @@ class ListConversationProfilesResponse extends \Google\Protobuf\Internal\Message
      * of items returned based on the page_size field in the request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.ConversationProfile conversation_profiles = 1;</code>
-     * @param \Google\Cloud\Dialogflow\V2\ConversationProfile[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\ConversationProfile>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConversationProfiles($var)

@@ -22,13 +22,29 @@ class UpdateCryptoKeyVersionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.kms.v1.CryptoKeyVersion crypto_key_version = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $crypto_key_version = null;
+    protected $crypto_key_version = null;
     /**
      * Required. List of fields to be updated in this request.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Kms\V1\CryptoKeyVersion $cryptoKeyVersion Required. [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] with
+     *                                                                updated values.
+     * @param \Google\Protobuf\FieldMask            $updateMask       Required. List of fields to be updated in this request.
+     *
+     * @return \Google\Cloud\Kms\V1\UpdateCryptoKeyVersionRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Kms\V1\CryptoKeyVersion $cryptoKeyVersion, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setCryptoKeyVersion($cryptoKeyVersion)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

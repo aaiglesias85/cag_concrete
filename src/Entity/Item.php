@@ -4,189 +4,123 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Item
- *
- * @ORM\Table(name="item")
- * @ORM\Entity(repositoryClass="App\Repository\ItemRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\ItemRepository')]
+#[ORM\Table(name: 'item')]
 class Item
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="item_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $itemId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'item_id', type: 'integer')]
+    private ?int $itemId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=false)
-     */
-    private $description;
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: false)]
+    private ?string $description;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
+    private ?float $price;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="status", type="boolean", nullable=false)
-     */
-    private $status;
+    #[ORM\Column(name: 'status', type: 'boolean', nullable: false)]
+    private ?bool $status;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="yield_calculation", type="string", length=50, nullable=false)
-     */
-    private $yieldCalculation;
+    #[ORM\Column(name: 'yield_calculation', type: 'string', length: 50, nullable: false)]
+    private ?string $yieldCalculation;
 
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
+    private ?\DateTime $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTime $updatedAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Unit')]
+    #[ORM\JoinColumn(name: 'unit_id', referencedColumnName: 'unit_id')]
+    private ?Unit $unit;
 
-    /**
-     * @var Unit
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Unit")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="unit_id", referencedColumnName="unit_id")
-     * })
-     */
-    private $unit;
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Equation')]
+    #[ORM\JoinColumn(name: 'equation_id', referencedColumnName: 'equation_id')]
+    private ?Equation $equation;
 
-    /**
-     * @var Equation
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Equation")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="equation_id", referencedColumnName="equation_id")
-     * })
-     */
-    private $equation;
-
-
-    /**
-     * Get itemId
-     *
-     * @return integer 
-     */
-    public function getItemId()
+    public function getItemId(): ?int
     {
         return $this->itemId;
     }
 
-    /**
-     * Set description
-     *
-     * @param string $description
-     * @return Unit
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
-    
         return $this;
     }
 
-    /**
-     * Get description
-     *
-     * @return string 
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function getStatus()
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus($status)
+    public function setStatus(?bool $status): void
     {
         $this->status = $status;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt(?\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
 
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt($updatedAt)
+    public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
 
-    public function getUnit(): Unit
+    public function getUnit(): ?Unit
     {
         return $this->unit;
     }
 
-    public function setUnit($unit): void
+    public function setUnit(?Unit $unit): void
     {
         $this->unit = $unit;
     }
 
-    public function getYieldCalculation()
+    public function getYieldCalculation(): ?string
     {
         return $this->yieldCalculation;
     }
 
-    public function setYieldCalculation($yieldCalculation)
+    public function setYieldCalculation(?string $yieldCalculation): void
     {
         $this->yieldCalculation = $yieldCalculation;
     }
 
-    /**
-     * @return Equation
-     */
-    public function getEquation()
+    public function getEquation(): ?Equation
     {
         return $this->equation;
     }
 
-    public function setEquation($equation)
+    public function setEquation(?Equation $equation): void
     {
         $this->equation = $equation;
     }

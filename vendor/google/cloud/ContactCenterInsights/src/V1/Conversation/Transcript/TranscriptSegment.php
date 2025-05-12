@@ -20,20 +20,20 @@ class TranscriptSegment extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp message_time = 6;</code>
      */
-    private $message_time = null;
+    protected $message_time = null;
     /**
      * The text of this segment.
      *
      * Generated from protobuf field <code>string text = 1;</code>
      */
-    private $text = '';
+    protected $text = '';
     /**
      * A confidence estimate between 0.0 and 1.0 of the fidelity of this
      * segment. A default value of 0.0 indicates that the value is unset.
      *
      * Generated from protobuf field <code>float confidence = 2;</code>
      */
-    private $confidence = 0.0;
+    protected $confidence = 0.0;
     /**
      * A list of the word-specific information for each word in the segment.
      *
@@ -47,7 +47,7 @@ class TranscriptSegment extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 4;</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * For conversations derived from multi-channel audio, this is the channel
      * number corresponding to the audio from that channel. For
@@ -56,25 +56,25 @@ class TranscriptSegment extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 channel_tag = 5;</code>
      */
-    private $channel_tag = 0;
+    protected $channel_tag = 0;
     /**
      * The participant of this segment.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationParticipant segment_participant = 9;</code>
      */
-    private $segment_participant = null;
+    protected $segment_participant = null;
     /**
      * CCAI metadata relating to the current transcript segment.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.Transcript.TranscriptSegment.DialogflowSegmentMetadata dialogflow_segment_metadata = 10;</code>
      */
-    private $dialogflow_segment_metadata = null;
+    protected $dialogflow_segment_metadata = null;
     /**
      * The sentiment for this transcript segment.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.SentimentData sentiment = 11;</code>
      */
-    private $sentiment = null;
+    protected $sentiment = null;
 
     /**
      * Constructor.
@@ -89,7 +89,7 @@ class TranscriptSegment extends \Google\Protobuf\Internal\Message
      *     @type float $confidence
      *           A confidence estimate between 0.0 and 1.0 of the fidelity of this
      *           segment. A default value of 0.0 indicates that the value is unset.
-     *     @type \Google\Cloud\ContactCenterInsights\V1\Conversation\Transcript\TranscriptSegment\WordInfo[]|\Google\Protobuf\Internal\RepeatedField $words
+     *     @type array<\Google\Cloud\ContactCenterInsights\V1\Conversation\Transcript\TranscriptSegment\WordInfo>|\Google\Protobuf\Internal\RepeatedField $words
      *           A list of the word-specific information for each word in the segment.
      *     @type string $language_code
      *           The language code of this segment as a
@@ -218,7 +218,7 @@ class TranscriptSegment extends \Google\Protobuf\Internal\Message
      * A list of the word-specific information for each word in the segment.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.Conversation.Transcript.TranscriptSegment.WordInfo words = 3;</code>
-     * @param \Google\Cloud\ContactCenterInsights\V1\Conversation\Transcript\TranscriptSegment\WordInfo[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ContactCenterInsights\V1\Conversation\Transcript\TranscriptSegment\WordInfo>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setWords($var)

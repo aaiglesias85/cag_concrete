@@ -16,7 +16,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class WaitRegionOperationRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Name of the Operations resource to return.
+     * Name of the Operations resource to return, or its unique numeric identifier.
      *
      * Generated from protobuf field <code>string operation = 52090215 [(.google.api.field_behavior) = REQUIRED];</code>
      */
@@ -35,13 +35,30 @@ class WaitRegionOperationRequest extends \Google\Protobuf\Internal\Message
     private $region = '';
 
     /**
+     * @param string $project   Project ID for this request.
+     * @param string $region    Name of the region for this request.
+     * @param string $operation Name of the Operations resource to return, or its unique numeric identifier.
+     *
+     * @return \Google\Cloud\Compute\V1\WaitRegionOperationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $project, string $region, string $operation): self
+    {
+        return (new self())
+            ->setProject($project)
+            ->setRegion($region)
+            ->setOperation($operation);
+    }
+
+    /**
      * Constructor.
      *
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
      *     @type string $operation
-     *           Name of the Operations resource to return.
+     *           Name of the Operations resource to return, or its unique numeric identifier.
      *     @type string $project
      *           Project ID for this request.
      *     @type string $region
@@ -54,7 +71,7 @@ class WaitRegionOperationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the Operations resource to return.
+     * Name of the Operations resource to return, or its unique numeric identifier.
      *
      * Generated from protobuf field <code>string operation = 52090215 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -65,7 +82,7 @@ class WaitRegionOperationRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the Operations resource to return.
+     * Name of the Operations resource to return, or its unique numeric identifier.
      *
      * Generated from protobuf field <code>string operation = 52090215 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var

@@ -20,19 +20,19 @@ class ResponseMediaObject extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. Description of media card.
      *
      * Generated from protobuf field <code>string description = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Required. Url where the media is stored.
      *
      * Generated from protobuf field <code>string content_url = 5;</code>
      */
-    private $content_url = '';
+    protected $content_url = '';
     protected $image;
 
     /**
@@ -208,6 +208,4 @@ class ResponseMediaObject extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ResponseMediaObject::class, \Google\Cloud\Dialogflow\V2\Intent_Message_MediaContent_ResponseMediaObject::class);
 

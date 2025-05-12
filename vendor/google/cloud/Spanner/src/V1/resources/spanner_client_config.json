@@ -5,13 +5,16 @@
                 "no_retry_codes": [],
                 "no_retry_1_codes": [],
                 "retry_policy_1_codes": [
-                    "UNAVAILABLE"
+                    "UNAVAILABLE",
+                    "RESOURCE_EXHAUSTED"
                 ],
                 "retry_policy_2_codes": [
-                    "UNAVAILABLE"
+                    "UNAVAILABLE",
+                    "RESOURCE_EXHAUSTED"
                 ],
                 "retry_policy_3_codes": [
-                    "UNAVAILABLE"
+                    "UNAVAILABLE",
+                    "RESOURCE_EXHAUSTED"
                 ]
             },
             "retry_params": {
@@ -66,6 +69,9 @@
                     "timeout_millis": 60000,
                     "retry_codes_name": "retry_policy_2_codes",
                     "retry_params_name": "retry_policy_2_params"
+                },
+                "BatchWrite": {
+                    "timeout_millis": 3600000
                 },
                 "BeginTransaction": {
                     "timeout_millis": 30000,

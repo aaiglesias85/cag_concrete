@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Agents.GetValidationResult][google.cloud.dialogflow.v2.Agents.GetValidationResult].
+ * The request message for
+ * [Agents.GetValidationResult][google.cloud.dialogflow.v2.Agents.GetValidationResult].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.GetValidationResultRequest</code>
  */
@@ -21,7 +22,7 @@ class GetValidationResultRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. The language for which you want a validation result. If not
      * specified, the agent's default language is used. [Many
@@ -31,7 +32,7 @@ class GetValidationResultRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
 
     /**
      * Constructor.

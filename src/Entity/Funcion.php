@@ -4,83 +4,43 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Funcion
- *
- * @ORM\Table(name="function")
- * @ORM\Entity(repositoryClass="App\Repository\FuncionRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\FuncionRepository')]
+#[ORM\Table(name: 'function')]
 class Funcion
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'function_id', type: 'integer')]
+    private ?int $funcionId;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="function_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $funcionId;
+    #[ORM\Column(name: 'url', type: 'string', length: 255, nullable: false)]
+    private ?string $url;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="url", type="string", length=255, nullable=false)
-     */
-    private $url;
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: false)]
+    private ?string $descripcion;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=false)
-     */
-    private $descripcion;
-
-    /**
-     * Get funcionId
-     *
-     * @return integer
-     */
-    public function getFuncionId()
+    public function getFuncionId(): ?int
     {
         return $this->funcionId;
     }
 
-    /**
-     * @return string
-     */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
-    public function setUrl($url)
+    public function setUrl(?string $url): void
     {
         $this->url = $url;
     }
 
-    /**
-     * Set descripcion
-     *
-     * @param string $descripcion
-     * @return Funcion
-     */
-    public function setDescripcion($descripcion)
+    public function setDescripcion(?string $descripcion): self
     {
         $this->descripcion = $descripcion;
-
         return $this;
     }
 
-    /**
-     * Get descripcion
-     *
-     * @return string
-     */
-    public function getDescripcion()
+    public function getDescripcion(): ?string
     {
         return $this->descripcion;
     }

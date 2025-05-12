@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Environments.GetEnvironment][google.cloud.dialogflow.v2.Environments.GetEnvironment].
+ * The request message for
+ * [Environments.GetEnvironment][google.cloud.dialogflow.v2.Environments.GetEnvironment].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.GetEnvironmentRequest</code>
  */
@@ -25,7 +26,7 @@ class GetEnvironmentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
 
     /**
      * Constructor.

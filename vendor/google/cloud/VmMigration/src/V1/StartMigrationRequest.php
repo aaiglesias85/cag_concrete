@@ -20,7 +20,21 @@ class StartMigrationRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string migrating_vm = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $migrating_vm = '';
+    protected $migrating_vm = '';
+
+    /**
+     * @param string $migratingVm Required. The name of the MigratingVm. Please see
+     *                            {@see VmMigrationClient::migratingVmName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\VMMigration\V1\StartMigrationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $migratingVm): self
+    {
+        return (new self())
+            ->setMigratingVm($migratingVm);
+    }
 
     /**
      * Constructor.

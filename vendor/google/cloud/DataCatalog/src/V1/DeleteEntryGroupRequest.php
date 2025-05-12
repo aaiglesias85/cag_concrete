@@ -21,13 +21,27 @@ class DeleteEntryGroupRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. If true, deletes all entries in the entry group.
      *
      * Generated from protobuf field <code>bool force = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $force = false;
+    protected $force = false;
+
+    /**
+     * @param string $name Required. The name of the entry group to delete. Please see
+     *                     {@see DataCatalogClient::entryGroupName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\DeleteEntryGroupRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

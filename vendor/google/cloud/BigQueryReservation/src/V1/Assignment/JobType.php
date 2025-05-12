@@ -39,12 +39,27 @@ class JobType
      * Generated from protobuf enum <code>ML_EXTERNAL = 3;</code>
      */
     const ML_EXTERNAL = 3;
+    /**
+     * Background jobs that BigQuery runs for the customers in the background.
+     *
+     * Generated from protobuf enum <code>BACKGROUND = 4;</code>
+     */
+    const BACKGROUND = 4;
+    /**
+     * Continuous SQL jobs will use this reservation. Reservations with
+     * continuous assignments cannot be mixed with non-continuous assignments.
+     *
+     * Generated from protobuf enum <code>CONTINUOUS = 6;</code>
+     */
+    const CONTINUOUS = 6;
 
     private static $valueToName = [
         self::JOB_TYPE_UNSPECIFIED => 'JOB_TYPE_UNSPECIFIED',
         self::PIPELINE => 'PIPELINE',
         self::QUERY => 'QUERY',
         self::ML_EXTERNAL => 'ML_EXTERNAL',
+        self::BACKGROUND => 'BACKGROUND',
+        self::CONTINUOUS => 'CONTINUOUS',
     ];
 
     public static function name($value)
@@ -68,6 +83,4 @@ class JobType
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(JobType::class, \Google\Cloud\BigQuery\Reservation\V1\Assignment_JobType::class);
 

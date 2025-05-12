@@ -16,24 +16,39 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListVodAdTagDetailsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The VOD session which the ad tag details belong to, in the form of
-     * `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
+     * Required. The VOD session which the ad tag details belong to, in the form
+     * of `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of items to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The next_page_token value returned from a previous List request, if any.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The VOD session which the ad tag details belong to, in the form
+     *                       of `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`. Please see
+     *                       {@see VideoStitcherServiceClient::vodSessionName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Video\Stitcher\V1\ListVodAdTagDetailsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -42,8 +57,8 @@ class ListVodAdTagDetailsRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The VOD session which the ad tag details belong to, in the form of
-     *           `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
+     *           Required. The VOD session which the ad tag details belong to, in the form
+     *           of `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
      *     @type int $page_size
      *           The maximum number of items to return.
      *     @type string $page_token
@@ -56,8 +71,8 @@ class ListVodAdTagDetailsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The VOD session which the ad tag details belong to, in the form of
-     * `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
+     * Required. The VOD session which the ad tag details belong to, in the form
+     * of `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -68,8 +83,8 @@ class ListVodAdTagDetailsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The VOD session which the ad tag details belong to, in the form of
-     * `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
+     * Required. The VOD session which the ad tag details belong to, in the form
+     * of `projects/{project}/locations/{location}/vodSessions/{vod_session_id}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

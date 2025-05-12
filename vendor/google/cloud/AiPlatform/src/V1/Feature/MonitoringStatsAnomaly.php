@@ -9,10 +9,13 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * A list of historical [Snapshot
- * Analysis][FeaturestoreMonitoringConfig.SnapshotAnalysis] or [Import Feature
- * Analysis] [FeaturestoreMonitoringConfig.ImportFeatureAnalysis] stats
- * requested by user, sorted by [FeatureStatsAnomaly.start_time][google.cloud.aiplatform.v1.FeatureStatsAnomaly.start_time] descending.
+ * A list of historical
+ * [SnapshotAnalysis][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.SnapshotAnalysis]
+ * or
+ * [ImportFeaturesAnalysis][google.cloud.aiplatform.v1.FeaturestoreMonitoringConfig.ImportFeaturesAnalysis]
+ * stats requested by user, sorted by
+ * [FeatureStatsAnomaly.start_time][google.cloud.aiplatform.v1.FeatureStatsAnomaly.start_time]
+ * descending.
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.Feature.MonitoringStatsAnomaly</code>
  */
@@ -23,13 +26,13 @@ class MonitoringStatsAnomaly extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Feature.MonitoringStatsAnomaly.Objective objective = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $objective = 0;
+    protected $objective = 0;
     /**
      * Output only. The stats and anomalies generated at specific timestamp.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.FeatureStatsAnomaly feature_stats_anomaly = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $feature_stats_anomaly = null;
+    protected $feature_stats_anomaly = null;
 
     /**
      * Constructor.

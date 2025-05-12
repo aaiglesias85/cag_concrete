@@ -20,7 +20,20 @@ class GetAccessApprovalServiceAccountMessage extends \Google\Protobuf\Internal\M
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Name of the AccessApprovalServiceAccount to retrieve.
+     *
+     * @return \Google\Cloud\AccessApproval\V1\GetAccessApprovalServiceAccountMessage
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

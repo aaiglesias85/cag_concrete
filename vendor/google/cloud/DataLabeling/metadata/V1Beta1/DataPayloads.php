@@ -14,13 +14,11 @@ class DataPayloads
         if (static::$is_initialized == true) {
           return;
         }
-        \GPBMetadata\Google\Api\Annotations::initOnce();
         \GPBMetadata\Google\Protobuf\Duration::initOnce();
-        \GPBMetadata\Google\Protobuf\Timestamp::initOnce();
         $pool->internalAddGeneratedFile(
             '
-–
-5google/cloud/datalabeling/v1beta1/data_payloads.proto!google.cloud.datalabeling.v1beta1google/protobuf/duration.protogoogle/protobuf/timestamp.proto"a
+Ñ
+5google/cloud/datalabeling/v1beta1/data_payloads.proto!google.cloud.datalabeling.v1beta1"a
 ImagePayload
 	mime_type (	
 image_thumbnail (
@@ -39,8 +37,8 @@ signed_uri (	"#
 
 frame_rate (
 
-signed_uri (	Bç
-%com.google.cloud.datalabeling.v1beta1PZMgoogle.golang.org/genproto/googleapis/cloud/datalabeling/v1beta1;datalabelingª!Google.Cloud.DataLabeling.V1Beta1Ê!Google\\Cloud\\DataLabeling\\V1beta1ê$Google::Cloud::DataLabeling::V1beta1bproto3'
+signed_uri (	Bã
+%com.google.cloud.datalabeling.v1beta1PZIcloud.google.com/go/datalabeling/apiv1beta1/datalabelingpb;datalabelingpbª!Google.Cloud.DataLabeling.V1Beta1Ê!Google\\Cloud\\DataLabeling\\V1beta1ê$Google::Cloud::DataLabeling::V1beta1bproto3'
         , true);
 
         static::$is_initialized = true;

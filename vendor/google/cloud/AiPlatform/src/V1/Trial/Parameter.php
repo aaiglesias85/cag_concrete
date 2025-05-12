@@ -17,11 +17,12 @@ class Parameter extends \Google\Protobuf\Internal\Message
 {
     /**
      * Output only. The ID of the parameter. The parameter should be defined in
-     * [StudySpec's Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
+     * [StudySpec's
+     * Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
      *
      * Generated from protobuf field <code>string parameter_id = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $parameter_id = '';
+    protected $parameter_id = '';
     /**
      * Output only. The value of the parameter.
      * `number_value` will be set if a parameter defined in StudySpec is
@@ -31,7 +32,7 @@ class Parameter extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Value value = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $value = null;
+    protected $value = null;
 
     /**
      * Constructor.
@@ -41,7 +42,8 @@ class Parameter extends \Google\Protobuf\Internal\Message
      *
      *     @type string $parameter_id
      *           Output only. The ID of the parameter. The parameter should be defined in
-     *           [StudySpec's Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
+     *           [StudySpec's
+     *           Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
      *     @type \Google\Protobuf\Value $value
      *           Output only. The value of the parameter.
      *           `number_value` will be set if a parameter defined in StudySpec is
@@ -57,7 +59,8 @@ class Parameter extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. The ID of the parameter. The parameter should be defined in
-     * [StudySpec's Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
+     * [StudySpec's
+     * Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
      *
      * Generated from protobuf field <code>string parameter_id = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -69,7 +72,8 @@ class Parameter extends \Google\Protobuf\Internal\Message
 
     /**
      * Output only. The ID of the parameter. The parameter should be defined in
-     * [StudySpec's Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
+     * [StudySpec's
+     * Parameters][google.cloud.aiplatform.v1.StudySpec.parameters].
      *
      * Generated from protobuf field <code>string parameter_id = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var

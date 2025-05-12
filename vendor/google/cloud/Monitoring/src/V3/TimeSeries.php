@@ -24,7 +24,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.Metric metric = 1;</code>
      */
-    private $metric = null;
+    protected $metric = null;
     /**
      * The associated monitored resource.  Custom metrics can use only certain
      * monitored resource types in their time series data. For more information,
@@ -33,7 +33,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.MonitoredResource resource = 2;</code>
      */
-    private $resource = null;
+    protected $resource = null;
     /**
      * Output only. The associated monitored resource metadata. When reading a
      * time series, this field will include metadata labels that are explicitly
@@ -41,7 +41,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.MonitoredResourceMetadata metadata = 7;</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
     /**
      * The metric kind of the time series. When listing time series, this metric
      * kind might be different from the metric kind of the associated metric if
@@ -54,7 +54,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.MetricDescriptor.MetricKind metric_kind = 3;</code>
      */
-    private $metric_kind = 0;
+    protected $metric_kind = 0;
     /**
      * The value type of the time series. When listing time series, this value
      * type might be different from the value type of the associated metric if
@@ -64,7 +64,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.MetricDescriptor.ValueType value_type = 4;</code>
      */
-    private $value_type = 0;
+    protected $value_type = 0;
     /**
      * The data points of this time series. When listing time series, points are
      * returned in reverse time order.
@@ -80,11 +80,21 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
     /**
      * The units in which the metric value is reported. It is only applicable
      * if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The `unit`
-     * defines the representation of the stored metric values.
+     * defines the representation of the stored metric values. This field can only
+     * be changed through CreateTimeSeries when it is empty.
      *
      * Generated from protobuf field <code>string unit = 8;</code>
      */
-    private $unit = '';
+    protected $unit = '';
+    /**
+     * Input only. A detailed description of the time series that will be
+     * associated with the
+     * [google.api.MetricDescriptor][google.api.MetricDescriptor] for the metric.
+     * Once set, this field cannot be changed through CreateTimeSeries.
+     *
+     * Generated from protobuf field <code>string description = 9;</code>
+     */
+    protected $description = '';
 
     /**
      * Constructor.
@@ -119,7 +129,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *           this time series is an alignment or reduction of other time series.
      *           When creating a time series, this field is optional. If present, it must be
      *           the same as the type of the data in the `points` field.
-     *     @type \Google\Cloud\Monitoring\V3\Point[]|\Google\Protobuf\Internal\RepeatedField $points
+     *     @type array<\Google\Cloud\Monitoring\V3\Point>|\Google\Protobuf\Internal\RepeatedField $points
      *           The data points of this time series. When listing time series, points are
      *           returned in reverse time order.
      *           When creating a time series, this field must contain exactly one point and
@@ -130,7 +140,13 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      *     @type string $unit
      *           The units in which the metric value is reported. It is only applicable
      *           if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The `unit`
-     *           defines the representation of the stored metric values.
+     *           defines the representation of the stored metric values. This field can only
+     *           be changed through CreateTimeSeries when it is empty.
+     *     @type string $description
+     *           Input only. A detailed description of the time series that will be
+     *           associated with the
+     *           [google.api.MetricDescriptor][google.api.MetricDescriptor] for the metric.
+     *           Once set, this field cannot be changed through CreateTimeSeries.
      * }
      */
     public function __construct($data = NULL) {
@@ -359,7 +375,7 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
      * must be `BOOL`, `INT64`, `DOUBLE`, or `DISTRIBUTION`.
      *
      * Generated from protobuf field <code>repeated .google.monitoring.v3.Point points = 5;</code>
-     * @param \Google\Cloud\Monitoring\V3\Point[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Monitoring\V3\Point>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPoints($var)
@@ -373,7 +389,8 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
     /**
      * The units in which the metric value is reported. It is only applicable
      * if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The `unit`
-     * defines the representation of the stored metric values.
+     * defines the representation of the stored metric values. This field can only
+     * be changed through CreateTimeSeries when it is empty.
      *
      * Generated from protobuf field <code>string unit = 8;</code>
      * @return string
@@ -386,7 +403,8 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
     /**
      * The units in which the metric value is reported. It is only applicable
      * if the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The `unit`
-     * defines the representation of the stored metric values.
+     * defines the representation of the stored metric values. This field can only
+     * be changed through CreateTimeSeries when it is empty.
      *
      * Generated from protobuf field <code>string unit = 8;</code>
      * @param string $var
@@ -396,6 +414,38 @@ class TimeSeries extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->unit = $var;
+
+        return $this;
+    }
+
+    /**
+     * Input only. A detailed description of the time series that will be
+     * associated with the
+     * [google.api.MetricDescriptor][google.api.MetricDescriptor] for the metric.
+     * Once set, this field cannot be changed through CreateTimeSeries.
+     *
+     * Generated from protobuf field <code>string description = 9;</code>
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Input only. A detailed description of the time series that will be
+     * associated with the
+     * [google.api.MetricDescriptor][google.api.MetricDescriptor] for the metric.
+     * Once set, this field cannot be changed through CreateTimeSeries.
+     *
+     * Generated from protobuf field <code>string description = 9;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDescription($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->description = $var;
 
         return $this;
     }

@@ -21,7 +21,22 @@ class DeleteOccurrenceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name The name of the occurrence in the form of
+     *                     `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`. Please see
+     *                     {@see GrafeasClient::occurrenceName()} for help formatting this field.
+     *
+     * @return \Grafeas\V1\DeleteOccurrenceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

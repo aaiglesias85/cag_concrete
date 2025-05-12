@@ -21,19 +21,20 @@ class ErrorGroupService
         \GPBMetadata\Google\Devtools\Clouderrorreporting\V1Beta1\Common::initOnce();
         $pool->internalAddGeneratedFile(
             '
-ð	
+Û
+
 Egoogle/devtools/clouderrorreporting/v1beta1/error_group_service.proto+google.devtools.clouderrorreporting.v1beta1google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto8google/devtools/clouderrorreporting/v1beta1/common.proto"\\
 GetGroupRequestI
 
 group_name (	B5àAúA/
 -clouderrorreporting.googleapis.com/ErrorGroup"a
 UpdateGroupRequestK
-group (27.google.devtools.clouderrorreporting.v1beta1.ErrorGroupBàA2û
-ErrorGroupServiceÁ
-GetGroup<.google.devtools.clouderrorreporting.v1beta1.GetGroupRequest7.google.devtools.clouderrorreporting.v1beta1.ErrorGroup">‚Óä“+)/v1beta1/{group_name=projects/*/groups/*}ÚA
-group_nameÉ
-UpdateGroup?.google.devtools.clouderrorreporting.v1beta1.UpdateGroupRequest7.google.devtools.clouderrorreporting.v1beta1.ErrorGroup"@‚Óä“2)/v1beta1/{group.name=projects/*/groups/*}:groupÚAgroupVÊA"clouderrorreporting.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformB£
-/com.google.devtools.clouderrorreporting.v1beta1BErrorGroupServiceProtoPZ^google.golang.org/genproto/googleapis/devtools/clouderrorreporting/v1beta1;clouderrorreportingøª#Google.Cloud.ErrorReporting.V1Beta1Ê#Google\\Cloud\\ErrorReporting\\V1beta1ê&Google::Cloud::ErrorReporting::V1beta1bproto3'
+group (27.google.devtools.clouderrorreporting.v1beta1.ErrorGroupBàA2õ
+ErrorGroupServiceú
+GetGroup<.google.devtools.clouderrorreporting.v1beta1.GetGroupRequest7.google.devtools.clouderrorreporting.v1beta1.ErrorGroup"wÚA
+group_name‚Óä“d)/v1beta1/{group_name=projects/*/groups/*}Z75/v1beta1/{group_name=projects/*/locations/*/groups/*}Š
+UpdateGroup?.google.devtools.clouderrorreporting.v1beta1.UpdateGroupRequest7.google.devtools.clouderrorreporting.v1beta1.ErrorGroup"€ÚAgroup‚Óä“r)/v1beta1/{group.name=projects/*/groups/*}:groupZ>5/v1beta1/{group.name=projects/*/locations/*/groups/*}:groupVÊA"clouderrorreporting.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformB”
+/com.google.devtools.clouderrorreporting.v1beta1BErrorGroupServiceProtoPZOcloud.google.com/go/errorreporting/apiv1beta1/errorreportingpb;errorreportingpbøª#Google.Cloud.ErrorReporting.V1Beta1Ê#Google\\Cloud\\ErrorReporting\\V1beta1ê&Google::Cloud::ErrorReporting::V1beta1bproto3'
         , true);
 
         static::$is_initialized = true;

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [ConnectionService.UpdateConnection][google.cloud.bigquery.connection.v1.ConnectionService.UpdateConnection].
+ * The request for
+ * [ConnectionService.UpdateConnection][google.cloud.bigquery.connection.v1.ConnectionService.UpdateConnection].
  *
  * Generated from protobuf message <code>google.cloud.bigquery.connection.v1.UpdateConnectionRequest</code>
  */
@@ -21,19 +22,38 @@ class UpdateConnectionRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Connection containing the updated fields.
      *
      * Generated from protobuf field <code>.google.cloud.bigquery.connection.v1.Connection connection = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $connection = null;
+    protected $connection = null;
     /**
      * Required. Update mask for the connection fields to be updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param string                                          $name       Required. Name of the connection to update, for example:
+     *                                                                    `projects/{project_id}/locations/{location_id}/connections/{connection_id}`
+     *                                                                    Please see {@see ConnectionServiceClient::connectionName()} for help formatting this field.
+     * @param \Google\Cloud\BigQuery\Connection\V1\Connection $connection Required. Connection containing the updated fields.
+     * @param \Google\Protobuf\FieldMask                      $updateMask Required. Update mask for the connection fields to be updated.
+     *
+     * @return \Google\Cloud\BigQuery\Connection\V1\UpdateConnectionRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\BigQuery\Connection\V1\Connection $connection, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setConnection($connection)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

@@ -22,91 +22,112 @@ class Conversation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The source of the audio and transcription for the conversation.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationDataSource data_source = 2;</code>
      */
-    private $data_source = null;
+    protected $data_source = null;
     /**
      * Output only. The time at which the conversation was created.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The most recent time at which the conversation was updated.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp update_time = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $update_time = null;
+    protected $update_time = null;
     /**
      * The time at which the conversation started.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 17;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * A user-specified language code for the conversation.
      *
      * Generated from protobuf field <code>string language_code = 14;</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * An opaque, user-specified string representing the human agent who handled
      * the conversation.
      *
      * Generated from protobuf field <code>string agent_id = 5;</code>
      */
-    private $agent_id = '';
+    protected $agent_id = '';
     /**
-     * A map for the user to specify any custom fields. A maximum of 20 labels per
-     * conversation is allowed, with a maximum of 256 characters per entry.
+     * A map for the user to specify any custom fields. A maximum of 100 labels
+     * per conversation is allowed, with a maximum of 256 characters per entry.
      *
      * Generated from protobuf field <code>map<string, string> labels = 6;</code>
      */
     private $labels;
     /**
+     * Conversation metadata related to quality management.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.QualityMetadata quality_metadata = 24;</code>
+     */
+    protected $quality_metadata = null;
+    /**
+     * Input only. JSON metadata encoded as a string.
+     * This field is primarily used by Insights integrations with various telphony
+     * systems and must be in one of Insight's supported formats.
+     *
+     * Generated from protobuf field <code>string metadata_json = 25 [(.google.api.field_behavior) = INPUT_ONLY];</code>
+     */
+    protected $metadata_json = '';
+    /**
      * Output only. The conversation transcript.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.Transcript transcript = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $transcript = null;
+    protected $transcript = null;
     /**
-     * Immutable. The conversation medium, if unspecified will default to PHONE_CALL.
+     * Immutable. The conversation medium, if unspecified will default to
+     * PHONE_CALL.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.Medium medium = 9 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $medium = 0;
+    protected $medium = 0;
     /**
      * Output only. The duration of the conversation.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $duration = null;
+    protected $duration = null;
     /**
      * Output only. The number of turns in the conversation.
      *
      * Generated from protobuf field <code>int32 turn_count = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $turn_count = 0;
+    protected $turn_count = 0;
     /**
      * Output only. The conversation's latest analysis, if one exists.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Analysis latest_analysis = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $latest_analysis = null;
+    protected $latest_analysis = null;
     /**
-     * Output only. The annotations that were generated during the customer and agent
-     * interaction.
+     * Output only. Latest summary of the conversation.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationSummarizationSuggestionData latest_summary = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    protected $latest_summary = null;
+    /**
+     * Output only. The annotations that were generated during the customer and
+     * agent interaction.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.RuntimeAnnotation runtime_annotations = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
     private $runtime_annotations;
     /**
-     * Output only. All the matched Dialogflow intents in the call. The key corresponds to a
-     * Dialogflow intent, format:
+     * Output only. All the matched Dialogflow intents in the call. The key
+     * corresponds to a Dialogflow intent, format:
      * projects/{project}/agent/{agent}/intents/{intent}
      *
      * Generated from protobuf field <code>map<string, .google.cloud.contactcenterinsights.v1.DialogflowIntent> dialogflow_intents = 18 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -117,7 +138,7 @@ class Conversation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string obfuscated_user_id = 21;</code>
      */
-    private $obfuscated_user_id = '';
+    protected $obfuscated_user_id = '';
     protected $metadata;
     protected $expiration;
 
@@ -153,24 +174,33 @@ class Conversation extends \Google\Protobuf\Internal\Message
      *           An opaque, user-specified string representing the human agent who handled
      *           the conversation.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
-     *           A map for the user to specify any custom fields. A maximum of 20 labels per
-     *           conversation is allowed, with a maximum of 256 characters per entry.
+     *           A map for the user to specify any custom fields. A maximum of 100 labels
+     *           per conversation is allowed, with a maximum of 256 characters per entry.
+     *     @type \Google\Cloud\ContactCenterInsights\V1\Conversation\QualityMetadata $quality_metadata
+     *           Conversation metadata related to quality management.
+     *     @type string $metadata_json
+     *           Input only. JSON metadata encoded as a string.
+     *           This field is primarily used by Insights integrations with various telphony
+     *           systems and must be in one of Insight's supported formats.
      *     @type \Google\Cloud\ContactCenterInsights\V1\Conversation\Transcript $transcript
      *           Output only. The conversation transcript.
      *     @type int $medium
-     *           Immutable. The conversation medium, if unspecified will default to PHONE_CALL.
+     *           Immutable. The conversation medium, if unspecified will default to
+     *           PHONE_CALL.
      *     @type \Google\Protobuf\Duration $duration
      *           Output only. The duration of the conversation.
      *     @type int $turn_count
      *           Output only. The number of turns in the conversation.
      *     @type \Google\Cloud\ContactCenterInsights\V1\Analysis $latest_analysis
      *           Output only. The conversation's latest analysis, if one exists.
-     *     @type \Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation[]|\Google\Protobuf\Internal\RepeatedField $runtime_annotations
-     *           Output only. The annotations that were generated during the customer and agent
-     *           interaction.
+     *     @type \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData $latest_summary
+     *           Output only. Latest summary of the conversation.
+     *     @type array<\Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation>|\Google\Protobuf\Internal\RepeatedField $runtime_annotations
+     *           Output only. The annotations that were generated during the customer and
+     *           agent interaction.
      *     @type array|\Google\Protobuf\Internal\MapField $dialogflow_intents
-     *           Output only. All the matched Dialogflow intents in the call. The key corresponds to a
-     *           Dialogflow intent, format:
+     *           Output only. All the matched Dialogflow intents in the call. The key
+     *           corresponds to a Dialogflow intent, format:
      *           projects/{project}/agent/{agent}/intents/{intent}
      *     @type string $obfuscated_user_id
      *           Obfuscated user ID which the customer sent to us.
@@ -507,8 +537,8 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A map for the user to specify any custom fields. A maximum of 20 labels per
-     * conversation is allowed, with a maximum of 256 characters per entry.
+     * A map for the user to specify any custom fields. A maximum of 100 labels
+     * per conversation is allowed, with a maximum of 256 characters per entry.
      *
      * Generated from protobuf field <code>map<string, string> labels = 6;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -519,8 +549,8 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A map for the user to specify any custom fields. A maximum of 20 labels per
-     * conversation is allowed, with a maximum of 256 characters per entry.
+     * A map for the user to specify any custom fields. A maximum of 100 labels
+     * per conversation is allowed, with a maximum of 256 characters per entry.
      *
      * Generated from protobuf field <code>map<string, string> labels = 6;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -530,6 +560,72 @@ class Conversation extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->labels = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Conversation metadata related to quality management.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.QualityMetadata quality_metadata = 24;</code>
+     * @return \Google\Cloud\ContactCenterInsights\V1\Conversation\QualityMetadata|null
+     */
+    public function getQualityMetadata()
+    {
+        return $this->quality_metadata;
+    }
+
+    public function hasQualityMetadata()
+    {
+        return isset($this->quality_metadata);
+    }
+
+    public function clearQualityMetadata()
+    {
+        unset($this->quality_metadata);
+    }
+
+    /**
+     * Conversation metadata related to quality management.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.QualityMetadata quality_metadata = 24;</code>
+     * @param \Google\Cloud\ContactCenterInsights\V1\Conversation\QualityMetadata $var
+     * @return $this
+     */
+    public function setQualityMetadata($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\Conversation\QualityMetadata::class);
+        $this->quality_metadata = $var;
+
+        return $this;
+    }
+
+    /**
+     * Input only. JSON metadata encoded as a string.
+     * This field is primarily used by Insights integrations with various telphony
+     * systems and must be in one of Insight's supported formats.
+     *
+     * Generated from protobuf field <code>string metadata_json = 25 [(.google.api.field_behavior) = INPUT_ONLY];</code>
+     * @return string
+     */
+    public function getMetadataJson()
+    {
+        return $this->metadata_json;
+    }
+
+    /**
+     * Input only. JSON metadata encoded as a string.
+     * This field is primarily used by Insights integrations with various telphony
+     * systems and must be in one of Insight's supported formats.
+     *
+     * Generated from protobuf field <code>string metadata_json = 25 [(.google.api.field_behavior) = INPUT_ONLY];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setMetadataJson($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->metadata_json = $var;
 
         return $this;
     }
@@ -571,7 +667,8 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. The conversation medium, if unspecified will default to PHONE_CALL.
+     * Immutable. The conversation medium, if unspecified will default to
+     * PHONE_CALL.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.Medium medium = 9 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return int
@@ -582,7 +679,8 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. The conversation medium, if unspecified will default to PHONE_CALL.
+     * Immutable. The conversation medium, if unspecified will default to
+     * PHONE_CALL.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Conversation.Medium medium = 9 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @param int $var
@@ -695,8 +793,44 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The annotations that were generated during the customer and agent
-     * interaction.
+     * Output only. Latest summary of the conversation.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationSummarizationSuggestionData latest_summary = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData|null
+     */
+    public function getLatestSummary()
+    {
+        return $this->latest_summary;
+    }
+
+    public function hasLatestSummary()
+    {
+        return isset($this->latest_summary);
+    }
+
+    public function clearLatestSummary()
+    {
+        unset($this->latest_summary);
+    }
+
+    /**
+     * Output only. Latest summary of the conversation.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationSummarizationSuggestionData latest_summary = 20 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData $var
+     * @return $this
+     */
+    public function setLatestSummary($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\ConversationSummarizationSuggestionData::class);
+        $this->latest_summary = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. The annotations that were generated during the customer and
+     * agent interaction.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.RuntimeAnnotation runtime_annotations = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -707,11 +841,11 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. The annotations that were generated during the customer and agent
-     * interaction.
+     * Output only. The annotations that were generated during the customer and
+     * agent interaction.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.RuntimeAnnotation runtime_annotations = 13 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ContactCenterInsights\V1\RuntimeAnnotation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRuntimeAnnotations($var)
@@ -723,8 +857,8 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. All the matched Dialogflow intents in the call. The key corresponds to a
-     * Dialogflow intent, format:
+     * Output only. All the matched Dialogflow intents in the call. The key
+     * corresponds to a Dialogflow intent, format:
      * projects/{project}/agent/{agent}/intents/{intent}
      *
      * Generated from protobuf field <code>map<string, .google.cloud.contactcenterinsights.v1.DialogflowIntent> dialogflow_intents = 18 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
@@ -736,8 +870,8 @@ class Conversation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. All the matched Dialogflow intents in the call. The key corresponds to a
-     * Dialogflow intent, format:
+     * Output only. All the matched Dialogflow intents in the call. The key
+     * corresponds to a Dialogflow intent, format:
      * projects/{project}/agent/{agent}/intents/{intent}
      *
      * Generated from protobuf field <code>map<string, .google.cloud.contactcenterinsights.v1.DialogflowIntent> dialogflow_intents = 18 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>

@@ -21,14 +21,29 @@ class DeleteJobRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * If set to true, and the job is not found, the request will succeed but no
      * action will be taken on the server.
      *
      * Generated from protobuf field <code>bool allow_missing = 2;</code>
      */
-    private $allow_missing = false;
+    protected $allow_missing = false;
+
+    /**
+     * @param string $name Required. The name of the job to delete.
+     *                     Format: `projects/{project}/locations/{location}/jobs/{job}`
+     *                     Please see {@see TranscoderServiceClient::jobName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Video\Transcoder\V1\DeleteJobRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

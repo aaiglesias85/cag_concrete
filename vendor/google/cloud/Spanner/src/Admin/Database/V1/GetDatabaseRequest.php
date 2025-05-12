@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [GetDatabase][google.spanner.admin.database.v1.DatabaseAdmin.GetDatabase].
+ * The request for
+ * [GetDatabase][google.spanner.admin.database.v1.DatabaseAdmin.GetDatabase].
  *
  * Generated from protobuf message <code>google.spanner.admin.database.v1.GetDatabaseRequest</code>
  */
@@ -22,6 +23,21 @@ class GetDatabaseRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
     private $name = '';
+
+    /**
+     * @param string $name Required. The name of the requested database. Values are of the form
+     *                     `projects/<project>/instances/<instance>/databases/<database>`. Please see
+     *                     {@see DatabaseAdminClient::databaseName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\GetDatabaseRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

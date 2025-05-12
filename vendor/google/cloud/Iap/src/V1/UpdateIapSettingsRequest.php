@@ -22,15 +22,17 @@ class UpdateIapSettingsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.iap.v1.IapSettings iap_settings = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $iap_settings = null;
+    protected $iap_settings = null;
     /**
      * The field mask specifying which IAP settings should be updated.
-     * If omitted, the all of the settings are updated. See
-     * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+     * If omitted, then all of the settings are updated. See
+     * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
+     * Note: All IAP reauth settings must always be set together, using the
+     * field mask: `iapSettings.accessSettings.reauthSettings`.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
 
     /**
      * Constructor.
@@ -44,8 +46,10 @@ class UpdateIapSettingsRequest extends \Google\Protobuf\Internal\Message
      *           resource.
      *     @type \Google\Protobuf\FieldMask $update_mask
      *           The field mask specifying which IAP settings should be updated.
-     *           If omitted, the all of the settings are updated. See
-     *           https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+     *           If omitted, then all of the settings are updated. See
+     *           https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
+     *           Note: All IAP reauth settings must always be set together, using the
+     *           field mask: `iapSettings.accessSettings.reauthSettings`.
      * }
      */
     public function __construct($data = NULL) {
@@ -95,8 +99,10 @@ class UpdateIapSettingsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * The field mask specifying which IAP settings should be updated.
-     * If omitted, the all of the settings are updated. See
-     * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+     * If omitted, then all of the settings are updated. See
+     * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
+     * Note: All IAP reauth settings must always be set together, using the
+     * field mask: `iapSettings.accessSettings.reauthSettings`.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      * @return \Google\Protobuf\FieldMask|null
@@ -118,8 +124,10 @@ class UpdateIapSettingsRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * The field mask specifying which IAP settings should be updated.
-     * If omitted, the all of the settings are updated. See
-     * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+     * If omitted, then all of the settings are updated. See
+     * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.
+     * Note: All IAP reauth settings must always be set together, using the
+     * field mask: `iapSettings.accessSettings.reauthSettings`.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2;</code>
      * @param \Google\Protobuf\FieldMask $var

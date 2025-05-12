@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Participants.ListParticipants][google.cloud.dialogflow.v2.Participants.ListParticipants].
+ * The request message for
+ * [Participants.ListParticipants][google.cloud.dialogflow.v2.Participants.ListParticipants].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListParticipantsRequest</code>
  */
@@ -22,20 +23,36 @@ class ListParticipantsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. The maximum number of items to return in a single page. By
      * default 100 and at most 1000.
      *
      * Generated from protobuf field <code>int32 page_size = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Optional. The next_page_token value returned from a previous list request.
      *
      * Generated from protobuf field <code>string page_token = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The conversation to list all participants from.
+     *                       Format: `projects/<Project ID>/locations/<Location
+     *                       ID>/conversations/<Conversation ID>`. Please see
+     *                       {@see ParticipantsClient::conversationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\ListParticipantsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

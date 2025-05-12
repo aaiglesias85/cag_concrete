@@ -38,7 +38,7 @@ class AddLinesConfigurator extends AbstractConfigurator
         $this->executeConfigure($recipe, $config);
 
         foreach ($this->fileContents as $file => $contents) {
-            $this->write(sprintf('[add-lines] Patching file "%s"', $this->relativize($file)));
+            $this->write(\sprintf('[add-lines] Patching file "%s"', $this->relativize($file)));
             file_put_contents($file, $contents);
         }
     }
@@ -49,7 +49,7 @@ class AddLinesConfigurator extends AbstractConfigurator
         $this->executeUnconfigure($recipe, $config);
 
         foreach ($this->fileContents as $file => $change) {
-            $this->write(sprintf('[add-lines] Reverting file "%s"', $this->relativize($file)));
+            $this->write(\sprintf('[add-lines] Reverting file "%s"', $this->relativize($file)));
             file_put_contents($file, $change);
         }
     }
@@ -81,7 +81,7 @@ class AddLinesConfigurator extends AbstractConfigurator
     {
         foreach ($config as $patch) {
             if (!isset($patch['file'])) {
-                $this->write(sprintf('The "file" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
+                $this->write(\sprintf('The "file" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
 
                 continue;
             }
@@ -91,17 +91,17 @@ class AddLinesConfigurator extends AbstractConfigurator
             }
 
             if (!isset($patch['content'])) {
-                $this->write(sprintf('The "content" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
+                $this->write(\sprintf('The "content" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
 
                 continue;
             }
             $content = $patch['content'];
 
-            $file = $this->path->concatenate([$this->options->get('root-dir'), $patch['file']]);
+            $file = $this->path->concatenate([$this->options->get('root-dir'), $this->options->expandTargetDir($patch['file'])]);
             $warnIfMissing = isset($patch['warn_if_missing']) && $patch['warn_if_missing'];
             if (!is_file($file)) {
                 $this->write([
-                    sprintf('Could not add lines to file <info>%s</info> as it does not exist. Missing lines:', $patch['file']),
+                    \sprintf('Could not add lines to file <info>%s</info> as it does not exist. Missing lines:', $patch['file']),
                     '<comment>"""</comment>',
                     $content,
                     '<comment>"""</comment>',
@@ -112,19 +112,19 @@ class AddLinesConfigurator extends AbstractConfigurator
             }
 
             if (!isset($patch['position'])) {
-                $this->write(sprintf('The "position" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
+                $this->write(\sprintf('The "position" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
 
                 continue;
             }
             $position = $patch['position'];
             if (!\in_array($position, self::VALID_POSITIONS, true)) {
-                $this->write(sprintf('The "position" key must be one of "%s" for the "add-lines" configurator for recipe "%s". Skipping', implode('", "', self::VALID_POSITIONS), $recipe->getName()));
+                $this->write(\sprintf('The "position" key must be one of "%s" for the "add-lines" configurator for recipe "%s". Skipping', implode('", "', self::VALID_POSITIONS), $recipe->getName()));
 
                 continue;
             }
 
             if (self::POSITION_AFTER_TARGET === $position && !isset($patch['target'])) {
-                $this->write(sprintf('The "target" key is required when "position" is "%s" for the "add-lines" configurator for recipe "%s". Skipping', self::POSITION_AFTER_TARGET, $recipe->getName()));
+                $this->write(\sprintf('The "target" key is required when "position" is "%s" for the "add-lines" configurator for recipe "%s". Skipping', self::POSITION_AFTER_TARGET, $recipe->getName()));
 
                 continue;
             }
@@ -139,7 +139,7 @@ class AddLinesConfigurator extends AbstractConfigurator
     {
         foreach ($config as $patch) {
             if (!isset($patch['file'])) {
-                $this->write(sprintf('The "file" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
+                $this->write(\sprintf('The "file" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
 
                 continue;
             }
@@ -147,13 +147,13 @@ class AddLinesConfigurator extends AbstractConfigurator
             // Ignore "requires": the target packages may have just become uninstalled.
             // Checking for a "content" match is enough.
 
-            $file = $this->path->concatenate([$this->options->get('root-dir'), $patch['file']]);
+            $file = $this->path->concatenate([$this->options->get('root-dir'), $this->options->expandTargetDir($patch['file'])]);
             if (!is_file($file)) {
                 continue;
             }
 
             if (!isset($patch['content'])) {
-                $this->write(sprintf('The "content" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
+                $this->write(\sprintf('The "content" key is required for the "add-lines" configurator for recipe "%s". Skipping', $recipe->getName()));
 
                 continue;
             }
@@ -196,7 +196,7 @@ class AddLinesConfigurator extends AbstractConfigurator
 
                 if (!$targetFound) {
                     $this->write([
-                        sprintf('Could not add lines after "%s" as no such string was found in "%s". Missing lines:', $target, $file),
+                        \sprintf('Could not add lines after "%s" as no such string was found in "%s". Missing lines:', $target, $file),
                         '<comment>"""</comment>',
                         $value,
                         '<comment>"""</comment>',
@@ -221,7 +221,7 @@ class AddLinesConfigurator extends AbstractConfigurator
         if (false !== strpos($fileContents, "\n".$value)) {
             $value = "\n".$value;
         } elseif (false !== strpos($fileContents, $value."\n")) {
-            $value = $value."\n";
+            $value .= "\n";
         }
 
         $position = strpos($fileContents, $value);

@@ -16,6 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class RouterNat extends \Google\Protobuf\Internal\Message
 {
     /**
+     * The network tier to use when automatically reserving NAT IP addresses. Must be one of: PREMIUM, STANDARD. If not specified, then the current project-level default tier is used.
+     * Check the AutoNetworkTier enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string auto_network_tier = 269770211;</code>
+     */
+    private $auto_network_tier = null;
+    /**
      * A list of URLs of the IP resources to be drained. These IPs must be valid static external IPs that have been assigned to the NAT. These IPs should be used for updating/patching a NAT only.
      *
      * Generated from protobuf field <code>repeated string drain_nat_ips = 504078535;</code>
@@ -88,7 +95,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      */
     private $rules;
     /**
-     * Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES or ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any other Router.Nat section in any Router for this network in this region.
+     * Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES then there should not be any other Router.Nat section in any Router for this network in this region.
      * Check the SourceSubnetworkIpRangesToNat enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string source_subnetwork_ip_ranges_to_nat = 252213211;</code>
@@ -119,6 +126,13 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      */
     private $tcp_transitory_idle_timeout_sec = null;
     /**
+     * Indicates whether this NAT is used for public or private IP translation. If unspecified, it defaults to PUBLIC.
+     * Check the Type enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string type = 3575610;</code>
+     */
+    private $type = null;
+    /**
      * Timeout (in seconds) for UDP connections. Defaults to 30s if not set.
      *
      * Generated from protobuf field <code>optional int32 udp_idle_timeout_sec = 64919878;</code>
@@ -131,12 +145,15 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $drain_nat_ips
+     *     @type string $auto_network_tier
+     *           The network tier to use when automatically reserving NAT IP addresses. Must be one of: PREMIUM, STANDARD. If not specified, then the current project-level default tier is used.
+     *           Check the AutoNetworkTier enum for the list of possible values.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $drain_nat_ips
      *           A list of URLs of the IP resources to be drained. These IPs must be valid static external IPs that have been assigned to the NAT. These IPs should be used for updating/patching a NAT only.
      *     @type bool $enable_dynamic_port_allocation
      *           Enable Dynamic Port Allocation. If not specified, it is disabled by default. If set to true, - Dynamic Port Allocation will be enabled on this NAT config. - enableEndpointIndependentMapping cannot be set to true. - If minPorts is set, minPortsPerVm must be set to a power of two greater than or equal to 32. If minPortsPerVm is not set, a minimum of 32 ports will be allocated to a VM from this NAT config. 
      *     @type bool $enable_endpoint_independent_mapping
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $endpoint_types
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $endpoint_types
      *           List of NAT-ted endpoint types supported by the Nat Gateway. If the list is empty, then it will be equivalent to include ENDPOINT_TYPE_VM
      *           Check the EndpointTypes enum for the list of possible values.
      *     @type int $icmp_idle_timeout_sec
@@ -152,14 +169,14 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      *     @type string $nat_ip_allocate_option
      *           Specify the NatIpAllocateOption, which can take one of the following values: - MANUAL_ONLY: Uses only Nat IP addresses provided by customers. When there are not enough specified Nat IPs, the Nat service fails for new VMs. - AUTO_ONLY: Nat IPs are allocated by Google Cloud Platform; customers can't specify any Nat IPs. When choosing AUTO_ONLY, then nat_ip should be empty.
      *           Check the NatIpAllocateOption enum for the list of possible values.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $nat_ips
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $nat_ips
      *           A list of URLs of the IP resources used for this Nat service. These IP addresses must be valid static external IP addresses assigned to the project.
-     *     @type \Google\Cloud\Compute\V1\RouterNatRule[]|\Google\Protobuf\Internal\RepeatedField $rules
+     *     @type array<\Google\Cloud\Compute\V1\RouterNatRule>|\Google\Protobuf\Internal\RepeatedField $rules
      *           A list of rules associated with this NAT.
      *     @type string $source_subnetwork_ip_ranges_to_nat
-     *           Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES or ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any other Router.Nat section in any Router for this network in this region.
+     *           Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES then there should not be any other Router.Nat section in any Router for this network in this region.
      *           Check the SourceSubnetworkIpRangesToNat enum for the list of possible values.
-     *     @type \Google\Cloud\Compute\V1\RouterNatSubnetworkToNat[]|\Google\Protobuf\Internal\RepeatedField $subnetworks
+     *     @type array<\Google\Cloud\Compute\V1\RouterNatSubnetworkToNat>|\Google\Protobuf\Internal\RepeatedField $subnetworks
      *           A list of Subnetwork resources whose traffic should be translated by NAT Gateway. It is used only when LIST_OF_SUBNETWORKS is selected for the SubnetworkIpRangeToNatOption above.
      *     @type int $tcp_established_idle_timeout_sec
      *           Timeout (in seconds) for TCP established connections. Defaults to 1200s if not set.
@@ -167,6 +184,9 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      *           Timeout (in seconds) for TCP connections that are in TIME_WAIT state. Defaults to 120s if not set.
      *     @type int $tcp_transitory_idle_timeout_sec
      *           Timeout (in seconds) for TCP transitory connections. Defaults to 30s if not set.
+     *     @type string $type
+     *           Indicates whether this NAT is used for public or private IP translation. If unspecified, it defaults to PUBLIC.
+     *           Check the Type enum for the list of possible values.
      *     @type int $udp_idle_timeout_sec
      *           Timeout (in seconds) for UDP connections. Defaults to 30s if not set.
      * }
@@ -174,6 +194,44 @@ class RouterNat extends \Google\Protobuf\Internal\Message
     public function __construct($data = NULL) {
         \GPBMetadata\Google\Cloud\Compute\V1\Compute::initOnce();
         parent::__construct($data);
+    }
+
+    /**
+     * The network tier to use when automatically reserving NAT IP addresses. Must be one of: PREMIUM, STANDARD. If not specified, then the current project-level default tier is used.
+     * Check the AutoNetworkTier enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string auto_network_tier = 269770211;</code>
+     * @return string
+     */
+    public function getAutoNetworkTier()
+    {
+        return isset($this->auto_network_tier) ? $this->auto_network_tier : '';
+    }
+
+    public function hasAutoNetworkTier()
+    {
+        return isset($this->auto_network_tier);
+    }
+
+    public function clearAutoNetworkTier()
+    {
+        unset($this->auto_network_tier);
+    }
+
+    /**
+     * The network tier to use when automatically reserving NAT IP addresses. Must be one of: PREMIUM, STANDARD. If not specified, then the current project-level default tier is used.
+     * Check the AutoNetworkTier enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string auto_network_tier = 269770211;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAutoNetworkTier($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->auto_network_tier = $var;
+
+        return $this;
     }
 
     /**
@@ -191,7 +249,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      * A list of URLs of the IP resources to be drained. These IPs must be valid static external IPs that have been assigned to the NAT. These IPs should be used for updating/patching a NAT only.
      *
      * Generated from protobuf field <code>repeated string drain_nat_ips = 504078535;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDrainNatIps($var)
@@ -287,7 +345,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      * Check the EndpointTypes enum for the list of possible values.
      *
      * Generated from protobuf field <code>repeated string endpoint_types = 502633807;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEndpointTypes($var)
@@ -531,7 +589,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      * A list of URLs of the IP resources used for this Nat service. These IP addresses must be valid static external IP addresses assigned to the project.
      *
      * Generated from protobuf field <code>repeated string nat_ips = 117635086;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNatIps($var)
@@ -557,7 +615,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      * A list of rules associated with this NAT.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.RouterNatRule rules = 108873975;</code>
-     * @param \Google\Cloud\Compute\V1\RouterNatRule[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\RouterNatRule>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRules($var)
@@ -569,7 +627,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES or ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any other Router.Nat section in any Router for this network in this region.
+     * Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES then there should not be any other Router.Nat section in any Router for this network in this region.
      * Check the SourceSubnetworkIpRangesToNat enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string source_subnetwork_ip_ranges_to_nat = 252213211;</code>
@@ -591,7 +649,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES or ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES, then there should not be any other Router.Nat section in any Router for this network in this region.
+     * Specify the Nat option, which can take one of the following values: - ALL_SUBNETWORKS_ALL_IP_RANGES: All of the IP ranges in every Subnetwork are allowed to Nat. - ALL_SUBNETWORKS_ALL_PRIMARY_IP_RANGES: All of the primary IP ranges in every Subnetwork are allowed to Nat. - LIST_OF_SUBNETWORKS: A list of Subnetworks are allowed to Nat (specified in the field subnetwork below) The default is SUBNETWORK_IP_RANGE_TO_NAT_OPTION_UNSPECIFIED. Note that if this field contains ALL_SUBNETWORKS_ALL_IP_RANGES then there should not be any other Router.Nat section in any Router for this network in this region.
      * Check the SourceSubnetworkIpRangesToNat enum for the list of possible values.
      *
      * Generated from protobuf field <code>optional string source_subnetwork_ip_ranges_to_nat = 252213211;</code>
@@ -621,7 +679,7 @@ class RouterNat extends \Google\Protobuf\Internal\Message
      * A list of Subnetwork resources whose traffic should be translated by NAT Gateway. It is used only when LIST_OF_SUBNETWORKS is selected for the SubnetworkIpRangeToNatOption above.
      *
      * Generated from protobuf field <code>repeated .google.cloud.compute.v1.RouterNatSubnetworkToNat subnetworks = 415853125;</code>
-     * @param \Google\Cloud\Compute\V1\RouterNatSubnetworkToNat[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Compute\V1\RouterNatSubnetworkToNat>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSubnetworks($var)
@@ -736,6 +794,44 @@ class RouterNat extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkInt32($var);
         $this->tcp_transitory_idle_timeout_sec = $var;
+
+        return $this;
+    }
+
+    /**
+     * Indicates whether this NAT is used for public or private IP translation. If unspecified, it defaults to PUBLIC.
+     * Check the Type enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string type = 3575610;</code>
+     * @return string
+     */
+    public function getType()
+    {
+        return isset($this->type) ? $this->type : '';
+    }
+
+    public function hasType()
+    {
+        return isset($this->type);
+    }
+
+    public function clearType()
+    {
+        unset($this->type);
+    }
+
+    /**
+     * Indicates whether this NAT is used for public or private IP translation. If unspecified, it defaults to PUBLIC.
+     * Check the Type enum for the list of possible values.
+     *
+     * Generated from protobuf field <code>optional string type = 3575610;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->type = $var;
 
         return $this;
     }

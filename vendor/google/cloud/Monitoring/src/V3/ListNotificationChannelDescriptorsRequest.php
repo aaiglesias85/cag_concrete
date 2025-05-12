@@ -28,7 +28,7 @@ class ListNotificationChannelDescriptorsRequest extends \Google\Protobuf\Interna
      *
      * Generated from protobuf field <code>string name = 4 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * The maximum number of results to return in a single response. If
      * not set to a positive number, a reasonable value will be chosen by the
@@ -36,7 +36,7 @@ class ListNotificationChannelDescriptorsRequest extends \Google\Protobuf\Interna
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * If non-empty, `page_token` must contain a value returned as the
      * `next_page_token` in a previous response to request the next set
@@ -44,7 +44,30 @@ class ListNotificationChannelDescriptorsRequest extends \Google\Protobuf\Interna
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $name Required. The REST resource name of the parent from which to retrieve
+     *                     the notification channel descriptors. The expected syntax is:
+     *
+     *                     projects/[PROJECT_ID_OR_NUMBER]
+     *
+     *                     Note that this
+     *                     [names](https://cloud.google.com/monitoring/api/v3#project_name) the parent
+     *                     container in which to look for the descriptors; to retrieve a single
+     *                     descriptor by name, use the
+     *                     [GetNotificationChannelDescriptor][google.monitoring.v3.NotificationChannelService.GetNotificationChannelDescriptor]
+     *                     operation, instead.
+     *
+     * @return \Google\Cloud\Monitoring\V3\ListNotificationChannelDescriptorsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

@@ -21,13 +21,30 @@ class WriteUserEventRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. User event to write.
      *
      * Generated from protobuf field <code>.google.cloud.recommendationengine.v1beta1.UserEvent user_event = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $user_event = null;
+    protected $user_event = null;
+
+    /**
+     * @param string                                               $parent    Required. The parent eventStore resource name, such as
+     *                                                                        `projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store`. Please see
+     *                                                                        {@see UserEventServiceClient::eventStoreName()} for help formatting this field.
+     * @param \Google\Cloud\RecommendationEngine\V1beta1\UserEvent $userEvent Required. User event to write.
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\WriteUserEventRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\RecommendationEngine\V1beta1\UserEvent $userEvent): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setUserEvent($userEvent);
+    }
 
     /**
      * Constructor.

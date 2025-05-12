@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Runtime operation information for [DatasetService.ImportData][google.cloud.aiplatform.v1.DatasetService.ImportData].
+ * Runtime operation information for
+ * [DatasetService.ImportData][google.cloud.aiplatform.v1.DatasetService.ImportData].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ImportDataOperationMetadata</code>
  */
@@ -20,7 +21,7 @@ class ImportDataOperationMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.GenericOperationMetadata generic_metadata = 1;</code>
      */
-    private $generic_metadata = null;
+    protected $generic_metadata = null;
 
     /**
      * Constructor.

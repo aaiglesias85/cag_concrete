@@ -21,7 +21,7 @@ class EditAtom extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string key = 1;</code>
      */
-    private $key = '';
+    protected $key = '';
     /**
      * List of `Input.key`s identifying files that should be used in this atom.
      * The listed `inputs` must have the same timeline.
@@ -36,14 +36,14 @@ class EditAtom extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration end_time_offset = 3;</code>
      */
-    private $end_time_offset = null;
+    protected $end_time_offset = null;
     /**
      * Start time in seconds for the atom, relative to the input file timeline.
      * The default is `0s`.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration start_time_offset = 4;</code>
      */
-    private $start_time_offset = null;
+    protected $start_time_offset = null;
 
     /**
      * Constructor.
@@ -54,7 +54,7 @@ class EditAtom extends \Google\Protobuf\Internal\Message
      *     @type string $key
      *           A unique key for this atom. Must be specified when using advanced
      *           mapping.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $inputs
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $inputs
      *           List of `Input.key`s identifying files that should be used in this atom.
      *           The listed `inputs` must have the same timeline.
      *     @type \Google\Protobuf\Duration $end_time_offset
@@ -116,7 +116,7 @@ class EditAtom extends \Google\Protobuf\Internal\Message
      * The listed `inputs` must have the same timeline.
      *
      * Generated from protobuf field <code>repeated string inputs = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInputs($var)

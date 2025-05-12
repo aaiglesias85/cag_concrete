@@ -9,8 +9,11 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Deprecated: Use [Shipment.Load][], [Vehicle.LoadLimit][] and [ShipmentRoute.VehicleLoad][] instead.
+ * Deprecated: Use
+ * [Vehicle.LoadLimit.Interval][google.cloud.optimization.v1.Vehicle.LoadLimit.Interval]
+ * instead.
  *
+ * @deprecated
  * Generated from protobuf message <code>google.cloud.optimization.v1.CapacityQuantity</code>
  */
 class CapacityQuantity extends \Google\Protobuf\Internal\Message
@@ -18,11 +21,11 @@ class CapacityQuantity extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string type = 1;</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
      * Generated from protobuf field <code>int64 value = 2;</code>
      */
-    private $value = 0;
+    protected $value = 0;
 
     /**
      * Constructor.

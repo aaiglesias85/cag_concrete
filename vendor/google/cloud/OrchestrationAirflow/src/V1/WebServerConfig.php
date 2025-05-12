@@ -10,6 +10,8 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * The configuration settings for the Airflow web server App Engine instance.
+ * Supported for Cloud Composer environments in versions
+ * composer-1.*.*-airflow-*.*.*
  *
  * Generated from protobuf message <code>google.cloud.orchestration.airflow.service.v1.WebServerConfig</code>
  */
@@ -25,7 +27,7 @@ class WebServerConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string machine_type = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $machine_type = '';
+    protected $machine_type = '';
 
     /**
      * Constructor.

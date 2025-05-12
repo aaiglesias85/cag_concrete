@@ -23,14 +23,14 @@ class GlobalSiteTag extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Immutable. JavaScript code snippet to be pasted as the first item into the head tag of
-     * every webpage to measure.
+     * Immutable. JavaScript code snippet to be pasted as the first item into the
+     * head tag of every webpage to measure.
      *
      * Generated from protobuf field <code>string snippet = 2 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $snippet = '';
+    protected $snippet = '';
 
     /**
      * Constructor.
@@ -43,8 +43,8 @@ class GlobalSiteTag extends \Google\Protobuf\Internal\Message
      *           Format: properties/{property_id}/dataStreams/{stream_id}/globalSiteTag
      *           Example: "properties/123/dataStreams/456/globalSiteTag"
      *     @type string $snippet
-     *           Immutable. JavaScript code snippet to be pasted as the first item into the head tag of
-     *           every webpage to measure.
+     *           Immutable. JavaScript code snippet to be pasted as the first item into the
+     *           head tag of every webpage to measure.
      * }
      */
     public function __construct($data = NULL) {
@@ -83,8 +83,8 @@ class GlobalSiteTag extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. JavaScript code snippet to be pasted as the first item into the head tag of
-     * every webpage to measure.
+     * Immutable. JavaScript code snippet to be pasted as the first item into the
+     * head tag of every webpage to measure.
      *
      * Generated from protobuf field <code>string snippet = 2 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return string
@@ -95,8 +95,8 @@ class GlobalSiteTag extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. JavaScript code snippet to be pasted as the first item into the head tag of
-     * every webpage to measure.
+     * Immutable. JavaScript code snippet to be pasted as the first item into the
+     * head tag of every webpage to measure.
      *
      * Generated from protobuf field <code>string snippet = 2 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @param string $var

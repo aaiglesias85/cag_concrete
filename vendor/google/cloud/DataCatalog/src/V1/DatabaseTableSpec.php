@@ -21,14 +21,21 @@ class DatabaseTableSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DatabaseTableSpec.TableType type = 1;</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
-     * Fields specific to a Dataplex table and present only in the Dataplex table
-     * entries.
+     * Output only. Fields specific to a Dataplex table and present only in the
+     * Dataplex table entries.
      *
-     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DataplexTableSpec dataplex_table = 2;</code>
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DataplexTableSpec dataplex_table = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $dataplex_table = null;
+    protected $dataplex_table = null;
+    /**
+     * Spec what applies to tables that are actually views.
+     * Not set for "real" tables.
+     *
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DatabaseTableSpec.DatabaseViewSpec database_view_spec = 3;</code>
+     */
+    protected $database_view_spec = null;
 
     /**
      * Constructor.
@@ -39,8 +46,11 @@ class DatabaseTableSpec extends \Google\Protobuf\Internal\Message
      *     @type int $type
      *           Type of this table.
      *     @type \Google\Cloud\DataCatalog\V1\DataplexTableSpec $dataplex_table
-     *           Fields specific to a Dataplex table and present only in the Dataplex table
-     *           entries.
+     *           Output only. Fields specific to a Dataplex table and present only in the
+     *           Dataplex table entries.
+     *     @type \Google\Cloud\DataCatalog\V1\DatabaseTableSpec\DatabaseViewSpec $database_view_spec
+     *           Spec what applies to tables that are actually views.
+     *           Not set for "real" tables.
      * }
      */
     public function __construct($data = NULL) {
@@ -75,10 +85,10 @@ class DatabaseTableSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Fields specific to a Dataplex table and present only in the Dataplex table
-     * entries.
+     * Output only. Fields specific to a Dataplex table and present only in the
+     * Dataplex table entries.
      *
-     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DataplexTableSpec dataplex_table = 2;</code>
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DataplexTableSpec dataplex_table = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Cloud\DataCatalog\V1\DataplexTableSpec|null
      */
     public function getDataplexTable()
@@ -97,10 +107,10 @@ class DatabaseTableSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Fields specific to a Dataplex table and present only in the Dataplex table
-     * entries.
+     * Output only. Fields specific to a Dataplex table and present only in the
+     * Dataplex table entries.
      *
-     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DataplexTableSpec dataplex_table = 2;</code>
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DataplexTableSpec dataplex_table = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Cloud\DataCatalog\V1\DataplexTableSpec $var
      * @return $this
      */
@@ -108,6 +118,44 @@ class DatabaseTableSpec extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\DataCatalog\V1\DataplexTableSpec::class);
         $this->dataplex_table = $var;
+
+        return $this;
+    }
+
+    /**
+     * Spec what applies to tables that are actually views.
+     * Not set for "real" tables.
+     *
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DatabaseTableSpec.DatabaseViewSpec database_view_spec = 3;</code>
+     * @return \Google\Cloud\DataCatalog\V1\DatabaseTableSpec\DatabaseViewSpec|null
+     */
+    public function getDatabaseViewSpec()
+    {
+        return $this->database_view_spec;
+    }
+
+    public function hasDatabaseViewSpec()
+    {
+        return isset($this->database_view_spec);
+    }
+
+    public function clearDatabaseViewSpec()
+    {
+        unset($this->database_view_spec);
+    }
+
+    /**
+     * Spec what applies to tables that are actually views.
+     * Not set for "real" tables.
+     *
+     * Generated from protobuf field <code>.google.cloud.datacatalog.v1.DatabaseTableSpec.DatabaseViewSpec database_view_spec = 3;</code>
+     * @param \Google\Cloud\DataCatalog\V1\DatabaseTableSpec\DatabaseViewSpec $var
+     * @return $this
+     */
+    public function setDatabaseViewSpec($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\DataCatalog\V1\DatabaseTableSpec\DatabaseViewSpec::class);
+        $this->database_view_spec = $var;
 
         return $this;
     }

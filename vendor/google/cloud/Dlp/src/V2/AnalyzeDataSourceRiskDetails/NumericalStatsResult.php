@@ -20,13 +20,13 @@ class NumericalStatsResult extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.Value min_value = 1;</code>
      */
-    private $min_value = null;
+    protected $min_value = null;
     /**
      * Maximum value appearing in the column.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.Value max_value = 2;</code>
      */
-    private $max_value = null;
+    protected $max_value = null;
     /**
      * List of 99 values that partition the set of field values into 100 equal
      * sized buckets.
@@ -45,7 +45,7 @@ class NumericalStatsResult extends \Google\Protobuf\Internal\Message
      *           Minimum value appearing in the column.
      *     @type \Google\Cloud\Dlp\V2\Value $max_value
      *           Maximum value appearing in the column.
-     *     @type \Google\Cloud\Dlp\V2\Value[]|\Google\Protobuf\Internal\RepeatedField $quantile_values
+     *     @type array<\Google\Cloud\Dlp\V2\Value>|\Google\Protobuf\Internal\RepeatedField $quantile_values
      *           List of 99 values that partition the set of field values into 100 equal
      *           sized buckets.
      * }
@@ -144,7 +144,7 @@ class NumericalStatsResult extends \Google\Protobuf\Internal\Message
      * sized buckets.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.Value quantile_values = 4;</code>
-     * @param \Google\Cloud\Dlp\V2\Value[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\Value>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuantileValues($var)
@@ -157,6 +157,4 @@ class NumericalStatsResult extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(NumericalStatsResult::class, \Google\Cloud\Dlp\V2\AnalyzeDataSourceRiskDetails_NumericalStatsResult::class);
 

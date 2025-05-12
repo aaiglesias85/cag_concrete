@@ -22,13 +22,29 @@ class CreateConversationModelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1;</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The conversation model to create.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.ConversationModel conversation_model = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $conversation_model = null;
+    protected $conversation_model = null;
+
+    /**
+     * @param string                                        $parent            The project to create conversation model for. Format:
+     *                                                                         `projects/<Project ID>`
+     * @param \Google\Cloud\Dialogflow\V2\ConversationModel $conversationModel Required. The conversation model to create.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\CreateConversationModelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dialogflow\V2\ConversationModel $conversationModel): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setConversationModel($conversationModel);
+    }
 
     /**
      * Constructor.

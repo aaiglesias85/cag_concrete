@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for listing jobs using [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs].
+ * Request message for listing jobs using
+ * [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs].
  *
  * Generated from protobuf message <code>google.cloud.scheduler.v1.ListJobsRequest</code>
  */
@@ -21,7 +22,7 @@ class ListJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Requested page size.
      * The maximum page size is 500. If unspecified, the page size will
@@ -31,19 +32,33 @@ class ListJobsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 5;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * A token identifying a page of results the server will return. To
      * request the first page results, page_token must be empty. To
      * request the next page of results, page_token must be the value of
-     * [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token] returned from
-     * the previous call to [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs]. It is an error to
-     * switch the value of [filter][google.cloud.scheduler.v1.ListJobsRequest.filter] or
-     * [order_by][google.cloud.scheduler.v1.ListJobsRequest.order_by] while iterating through pages.
+     * [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token]
+     * returned from the previous call to
+     * [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs].
      *
      * Generated from protobuf field <code>string page_token = 6;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The location name. For example:
+     *                       `projects/PROJECT_ID/locations/LOCATION_ID`. Please see
+     *                       {@see CloudSchedulerClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Scheduler\V1\ListJobsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -64,10 +79,9 @@ class ListJobsRequest extends \Google\Protobuf\Internal\Message
      *           A token identifying a page of results the server will return. To
      *           request the first page results, page_token must be empty. To
      *           request the next page of results, page_token must be the value of
-     *           [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token] returned from
-     *           the previous call to [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs]. It is an error to
-     *           switch the value of [filter][google.cloud.scheduler.v1.ListJobsRequest.filter] or
-     *           [order_by][google.cloud.scheduler.v1.ListJobsRequest.order_by] while iterating through pages.
+     *           [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token]
+     *           returned from the previous call to
+     *           [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs].
      * }
      */
     public function __construct($data = NULL) {
@@ -141,10 +155,9 @@ class ListJobsRequest extends \Google\Protobuf\Internal\Message
      * A token identifying a page of results the server will return. To
      * request the first page results, page_token must be empty. To
      * request the next page of results, page_token must be the value of
-     * [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token] returned from
-     * the previous call to [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs]. It is an error to
-     * switch the value of [filter][google.cloud.scheduler.v1.ListJobsRequest.filter] or
-     * [order_by][google.cloud.scheduler.v1.ListJobsRequest.order_by] while iterating through pages.
+     * [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token]
+     * returned from the previous call to
+     * [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs].
      *
      * Generated from protobuf field <code>string page_token = 6;</code>
      * @return string
@@ -158,10 +171,9 @@ class ListJobsRequest extends \Google\Protobuf\Internal\Message
      * A token identifying a page of results the server will return. To
      * request the first page results, page_token must be empty. To
      * request the next page of results, page_token must be the value of
-     * [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token] returned from
-     * the previous call to [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs]. It is an error to
-     * switch the value of [filter][google.cloud.scheduler.v1.ListJobsRequest.filter] or
-     * [order_by][google.cloud.scheduler.v1.ListJobsRequest.order_by] while iterating through pages.
+     * [next_page_token][google.cloud.scheduler.v1.ListJobsResponse.next_page_token]
+     * returned from the previous call to
+     * [ListJobs][google.cloud.scheduler.v1.CloudScheduler.ListJobs].
      *
      * Generated from protobuf field <code>string page_token = 6;</code>
      * @param string $var

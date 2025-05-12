@@ -20,7 +20,7 @@ class Feature extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Fulfillment.Feature.Type type = 1;</code>
      */
-    private $type = 0;
+    protected $type = 0;
 
     /**
      * Constructor.
@@ -65,6 +65,4 @@ class Feature extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Feature::class, \Google\Cloud\Dialogflow\V2\Fulfillment_Feature::class);
 

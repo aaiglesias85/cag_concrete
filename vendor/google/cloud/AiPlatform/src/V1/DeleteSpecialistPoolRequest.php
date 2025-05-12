@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [SpecialistPoolService.DeleteSpecialistPool][google.cloud.aiplatform.v1.SpecialistPoolService.DeleteSpecialistPool].
+ * Request message for
+ * [SpecialistPoolService.DeleteSpecialistPool][google.cloud.aiplatform.v1.SpecialistPoolService.DeleteSpecialistPool].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.DeleteSpecialistPoolRequest</code>
  */
@@ -21,7 +22,7 @@ class DeleteSpecialistPoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * If set to true, any specialist managers in this SpecialistPool will also be
      * deleted. (Otherwise, the request will only work if the SpecialistPool has
@@ -29,7 +30,22 @@ class DeleteSpecialistPoolRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool force = 2;</code>
      */
-    private $force = false;
+    protected $force = false;
+
+    /**
+     * @param string $name Required. The resource name of the SpecialistPool to delete. Format:
+     *                     `projects/{project}/locations/{location}/specialistPools/{specialist_pool}`
+     *                     Please see {@see SpecialistPoolServiceClient::specialistPoolName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\DeleteSpecialistPoolRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

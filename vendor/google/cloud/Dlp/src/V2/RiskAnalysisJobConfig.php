@@ -10,7 +10,8 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * Configuration for a risk analysis job. See
- * https://cloud.google.com/dlp/docs/concepts-risk-analysis to learn more.
+ * https://cloud.google.com/sensitive-data-protection/docs/concepts-risk-analysis
+ * to learn more.
  *
  * Generated from protobuf message <code>google.privacy.dlp.v2.RiskAnalysisJobConfig</code>
  */
@@ -21,13 +22,13 @@ class RiskAnalysisJobConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.PrivacyMetric privacy_metric = 1;</code>
      */
-    private $privacy_metric = null;
+    protected $privacy_metric = null;
     /**
      * Input dataset to compute metrics over.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.BigQueryTable source_table = 2;</code>
      */
-    private $source_table = null;
+    protected $source_table = null;
     /**
      * Actions to execute at the completion of the job. Are executed in the order
      * provided.
@@ -46,7 +47,7 @@ class RiskAnalysisJobConfig extends \Google\Protobuf\Internal\Message
      *           Privacy metric to compute.
      *     @type \Google\Cloud\Dlp\V2\BigQueryTable $source_table
      *           Input dataset to compute metrics over.
-     *     @type \Google\Cloud\Dlp\V2\Action[]|\Google\Protobuf\Internal\RepeatedField $actions
+     *     @type array<\Google\Cloud\Dlp\V2\Action>|\Google\Protobuf\Internal\RepeatedField $actions
      *           Actions to execute at the completion of the job. Are executed in the order
      *           provided.
      * }
@@ -145,7 +146,7 @@ class RiskAnalysisJobConfig extends \Google\Protobuf\Internal\Message
      * provided.
      *
      * Generated from protobuf field <code>repeated .google.privacy.dlp.v2.Action actions = 3;</code>
-     * @param \Google\Cloud\Dlp\V2\Action[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dlp\V2\Action>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setActions($var)

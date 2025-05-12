@@ -16,13 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListTransferConfigsRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The BigQuery project id for which data sources
+     * Required. The BigQuery project id for which transfer configs
      * should be returned: `projects/{project_id}` or
      * `projects/{project_id}/locations/{location_id}`
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * When specified, only configurations of requested data sources are returned.
      *
@@ -38,13 +38,29 @@ class ListTransferConfigsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Page size. The default page size is the maximum value of 1000 results.
      *
      * Generated from protobuf field <code>int32 page_size = 4;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
+
+    /**
+     * @param string $parent Required. The BigQuery project id for which transfer configs
+     *                       should be returned: `projects/{project_id}` or
+     *                       `projects/{project_id}/locations/{location_id}`
+     *                       Please see {@see DataTransferServiceClient::projectName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\BigQuery\DataTransfer\V1\ListTransferConfigsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -53,10 +69,10 @@ class ListTransferConfigsRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The BigQuery project id for which data sources
+     *           Required. The BigQuery project id for which transfer configs
      *           should be returned: `projects/{project_id}` or
      *           `projects/{project_id}/locations/{location_id}`
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $data_source_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $data_source_ids
      *           When specified, only configurations of requested data sources are returned.
      *     @type string $page_token
      *           Pagination token, which can be used to request a specific page
@@ -74,7 +90,7 @@ class ListTransferConfigsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BigQuery project id for which data sources
+     * Required. The BigQuery project id for which transfer configs
      * should be returned: `projects/{project_id}` or
      * `projects/{project_id}/locations/{location_id}`
      *
@@ -87,7 +103,7 @@ class ListTransferConfigsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The BigQuery project id for which data sources
+     * Required. The BigQuery project id for which transfer configs
      * should be returned: `projects/{project_id}` or
      * `projects/{project_id}/locations/{location_id}`
      *
@@ -118,7 +134,7 @@ class ListTransferConfigsRequest extends \Google\Protobuf\Internal\Message
      * When specified, only configurations of requested data sources are returned.
      *
      * Generated from protobuf field <code>repeated string data_source_ids = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDataSourceIds($var)

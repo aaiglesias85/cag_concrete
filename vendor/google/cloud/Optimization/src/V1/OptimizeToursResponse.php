@@ -25,12 +25,13 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
      */
     private $routes;
     /**
-     * Copy of the [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label], if a label was specified in the
-     * request.
+     * Copy of the
+     * [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label],
+     * if a label was specified in the request.
      *
      * Generated from protobuf field <code>string request_label = 3;</code>
      */
-    private $request_label = '';
+    protected $request_label = '';
     /**
      * The list of all shipments skipped.
      *
@@ -40,7 +41,8 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     /**
      * List of all the validation errors that we were able to detect
      * independently. See the "MULTIPLE ERRORS" explanation for the
-     * [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError] message.
+     * [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError]
+     * message.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.OptimizeToursValidationError validation_errors = 5;</code>
      */
@@ -50,12 +52,13 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.OptimizeToursResponse.Metrics metrics = 6;</code>
      */
-    private $metrics = null;
+    protected $metrics = null;
     /**
-     * Deprecated: Use [Metrics.total_cost][] instead.
-     * Total cost of the solution. This takes into account all costs: costs per
-     * per hour and travel hour, fixed vehicle costs, unperformed shipment penalty
-     * costs, global duration cost, etc.
+     * Deprecated: Use
+     * [Metrics.total_cost][google.cloud.optimization.v1.OptimizeToursResponse.Metrics.total_cost]
+     * instead. Total cost of the solution. This takes into account all costs:
+     * costs per per hour and travel hour, fixed vehicle costs, unperformed
+     * shipment penalty costs, global duration cost, etc.
      *
      * Generated from protobuf field <code>double total_cost = 2 [deprecated = true];</code>
      * @deprecated
@@ -68,25 +71,28 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Optimization\V1\ShipmentRoute[]|\Google\Protobuf\Internal\RepeatedField $routes
+     *     @type array<\Google\Cloud\Optimization\V1\ShipmentRoute>|\Google\Protobuf\Internal\RepeatedField $routes
      *           Routes computed for each vehicle; the i-th route corresponds to the i-th
      *           vehicle in the model.
      *     @type string $request_label
-     *           Copy of the [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label], if a label was specified in the
-     *           request.
-     *     @type \Google\Cloud\Optimization\V1\SkippedShipment[]|\Google\Protobuf\Internal\RepeatedField $skipped_shipments
+     *           Copy of the
+     *           [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label],
+     *           if a label was specified in the request.
+     *     @type array<\Google\Cloud\Optimization\V1\SkippedShipment>|\Google\Protobuf\Internal\RepeatedField $skipped_shipments
      *           The list of all shipments skipped.
-     *     @type \Google\Cloud\Optimization\V1\OptimizeToursValidationError[]|\Google\Protobuf\Internal\RepeatedField $validation_errors
+     *     @type array<\Google\Cloud\Optimization\V1\OptimizeToursValidationError>|\Google\Protobuf\Internal\RepeatedField $validation_errors
      *           List of all the validation errors that we were able to detect
      *           independently. See the "MULTIPLE ERRORS" explanation for the
-     *           [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError] message.
+     *           [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError]
+     *           message.
      *     @type \Google\Cloud\Optimization\V1\OptimizeToursResponse\Metrics $metrics
      *           Duration, distance and usage metrics for this solution.
      *     @type float $total_cost
-     *           Deprecated: Use [Metrics.total_cost][] instead.
-     *           Total cost of the solution. This takes into account all costs: costs per
-     *           per hour and travel hour, fixed vehicle costs, unperformed shipment penalty
-     *           costs, global duration cost, etc.
+     *           Deprecated: Use
+     *           [Metrics.total_cost][google.cloud.optimization.v1.OptimizeToursResponse.Metrics.total_cost]
+     *           instead. Total cost of the solution. This takes into account all costs:
+     *           costs per per hour and travel hour, fixed vehicle costs, unperformed
+     *           shipment penalty costs, global duration cost, etc.
      * }
      */
     public function __construct($data = NULL) {
@@ -111,7 +117,7 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
      * vehicle in the model.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.ShipmentRoute routes = 1;</code>
-     * @param \Google\Cloud\Optimization\V1\ShipmentRoute[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\ShipmentRoute>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRoutes($var)
@@ -123,8 +129,9 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Copy of the [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label], if a label was specified in the
-     * request.
+     * Copy of the
+     * [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label],
+     * if a label was specified in the request.
      *
      * Generated from protobuf field <code>string request_label = 3;</code>
      * @return string
@@ -135,8 +142,9 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Copy of the [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label], if a label was specified in the
-     * request.
+     * Copy of the
+     * [OptimizeToursRequest.label][google.cloud.optimization.v1.OptimizeToursRequest.label],
+     * if a label was specified in the request.
      *
      * Generated from protobuf field <code>string request_label = 3;</code>
      * @param string $var
@@ -165,7 +173,7 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
      * The list of all shipments skipped.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.SkippedShipment skipped_shipments = 4;</code>
-     * @param \Google\Cloud\Optimization\V1\SkippedShipment[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\SkippedShipment>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSkippedShipments($var)
@@ -179,7 +187,8 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     /**
      * List of all the validation errors that we were able to detect
      * independently. See the "MULTIPLE ERRORS" explanation for the
-     * [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError] message.
+     * [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError]
+     * message.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.OptimizeToursValidationError validation_errors = 5;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -192,10 +201,11 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     /**
      * List of all the validation errors that we were able to detect
      * independently. See the "MULTIPLE ERRORS" explanation for the
-     * [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError] message.
+     * [OptimizeToursValidationError][google.cloud.optimization.v1.OptimizeToursValidationError]
+     * message.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.OptimizeToursValidationError validation_errors = 5;</code>
-     * @param \Google\Cloud\Optimization\V1\OptimizeToursValidationError[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\OptimizeToursValidationError>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setValidationErrors($var)
@@ -243,10 +253,11 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Metrics.total_cost][] instead.
-     * Total cost of the solution. This takes into account all costs: costs per
-     * per hour and travel hour, fixed vehicle costs, unperformed shipment penalty
-     * costs, global duration cost, etc.
+     * Deprecated: Use
+     * [Metrics.total_cost][google.cloud.optimization.v1.OptimizeToursResponse.Metrics.total_cost]
+     * instead. Total cost of the solution. This takes into account all costs:
+     * costs per per hour and travel hour, fixed vehicle costs, unperformed
+     * shipment penalty costs, global duration cost, etc.
      *
      * Generated from protobuf field <code>double total_cost = 2 [deprecated = true];</code>
      * @return float
@@ -259,10 +270,11 @@ class OptimizeToursResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Metrics.total_cost][] instead.
-     * Total cost of the solution. This takes into account all costs: costs per
-     * per hour and travel hour, fixed vehicle costs, unperformed shipment penalty
-     * costs, global duration cost, etc.
+     * Deprecated: Use
+     * [Metrics.total_cost][google.cloud.optimization.v1.OptimizeToursResponse.Metrics.total_cost]
+     * instead. Total cost of the solution. This takes into account all costs:
+     * costs per per hour and travel hour, fixed vehicle costs, unperformed
+     * shipment penalty costs, global duration cost, etc.
      *
      * Generated from protobuf field <code>double total_cost = 2 [deprecated = true];</code>
      * @param float $var

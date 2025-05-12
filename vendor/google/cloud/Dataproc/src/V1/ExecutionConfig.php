@@ -20,7 +20,7 @@ class ExecutionConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
      * Optional. Tags used for network traffic control.
      *
@@ -32,7 +32,63 @@ class ExecutionConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string kms_key = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $kms_key = '';
+    protected $kms_key = '';
+    /**
+     * Optional. Applies to sessions only. The duration to keep the session alive
+     * while it's idling. Exceeding this threshold causes the session to
+     * terminate. This field cannot be set on a batch workload. Minimum value is
+     * 10 minutes; maximum value is 14 days (see JSON representation of
+     * [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+     * Defaults to 1 hour if not set.
+     * If both `ttl` and `idle_ttl` are specified for an interactive session,
+     * the conditions are treated as `OR` conditions: the workload will be
+     * terminated when it has been idle for `idle_ttl` or when `ttl` has been
+     * exceeded, whichever occurs first.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration idle_ttl = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $idle_ttl = null;
+    /**
+     * Optional. The duration after which the workload will be terminated,
+     * specified as the JSON representation for
+     * [Duration](https://protobuf.dev/programming-guides/proto3/#json).
+     * When the workload exceeds this duration, it will be unconditionally
+     * terminated without waiting for ongoing work to finish. If `ttl` is not
+     * specified for a batch workload, the workload will be allowed to run until
+     * it exits naturally (or run forever without exiting). If `ttl` is not
+     * specified for an interactive session, it defaults to 24 hours. If `ttl` is
+     * not specified for a batch that uses 2.1+ runtime version, it defaults to 4
+     * hours. Minimum value is 10 minutes; maximum value is 14 days. If both `ttl`
+     * and `idle_ttl` are specified (for an interactive session), the conditions
+     * are treated as `OR` conditions: the workload will be terminated when it has
+     * been idle for `idle_ttl` or when `ttl` has been exceeded, whichever occurs
+     * first.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration ttl = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $ttl = null;
+    /**
+     * Optional. A Cloud Storage bucket used to stage workload dependencies,
+     * config files, and store workload output and other ephemeral data, such as
+     * Spark history files. If you do not specify a staging bucket, Cloud Dataproc
+     * will determine a Cloud Storage location according to the region where your
+     * workload is running, and then create and manage project-level, per-location
+     * staging and temporary buckets.
+     * **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+     * a Cloud Storage bucket.**
+     *
+     * Generated from protobuf field <code>string staging_bucket = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $staging_bucket = '';
+    /**
+     * Optional. Authentication configuration used to set the default identity for
+     * the workload execution. The config specifies the type of identity
+     * (service account or user) that will be used by workloads to access
+     * resources on the project(s).
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.AuthenticationConfig authentication_config = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $authentication_config = null;
     protected $network;
 
     /**
@@ -47,10 +103,50 @@ class ExecutionConfig extends \Google\Protobuf\Internal\Message
      *           Optional. Network URI to connect workload to.
      *     @type string $subnetwork_uri
      *           Optional. Subnetwork URI to connect workload to.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $network_tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $network_tags
      *           Optional. Tags used for network traffic control.
      *     @type string $kms_key
      *           Optional. The Cloud KMS key to use for encryption.
+     *     @type \Google\Protobuf\Duration $idle_ttl
+     *           Optional. Applies to sessions only. The duration to keep the session alive
+     *           while it's idling. Exceeding this threshold causes the session to
+     *           terminate. This field cannot be set on a batch workload. Minimum value is
+     *           10 minutes; maximum value is 14 days (see JSON representation of
+     *           [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+     *           Defaults to 1 hour if not set.
+     *           If both `ttl` and `idle_ttl` are specified for an interactive session,
+     *           the conditions are treated as `OR` conditions: the workload will be
+     *           terminated when it has been idle for `idle_ttl` or when `ttl` has been
+     *           exceeded, whichever occurs first.
+     *     @type \Google\Protobuf\Duration $ttl
+     *           Optional. The duration after which the workload will be terminated,
+     *           specified as the JSON representation for
+     *           [Duration](https://protobuf.dev/programming-guides/proto3/#json).
+     *           When the workload exceeds this duration, it will be unconditionally
+     *           terminated without waiting for ongoing work to finish. If `ttl` is not
+     *           specified for a batch workload, the workload will be allowed to run until
+     *           it exits naturally (or run forever without exiting). If `ttl` is not
+     *           specified for an interactive session, it defaults to 24 hours. If `ttl` is
+     *           not specified for a batch that uses 2.1+ runtime version, it defaults to 4
+     *           hours. Minimum value is 10 minutes; maximum value is 14 days. If both `ttl`
+     *           and `idle_ttl` are specified (for an interactive session), the conditions
+     *           are treated as `OR` conditions: the workload will be terminated when it has
+     *           been idle for `idle_ttl` or when `ttl` has been exceeded, whichever occurs
+     *           first.
+     *     @type string $staging_bucket
+     *           Optional. A Cloud Storage bucket used to stage workload dependencies,
+     *           config files, and store workload output and other ephemeral data, such as
+     *           Spark history files. If you do not specify a staging bucket, Cloud Dataproc
+     *           will determine a Cloud Storage location according to the region where your
+     *           workload is running, and then create and manage project-level, per-location
+     *           staging and temporary buckets.
+     *           **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+     *           a Cloud Storage bucket.**
+     *     @type \Google\Cloud\Dataproc\V1\AuthenticationConfig $authentication_config
+     *           Optional. Authentication configuration used to set the default identity for
+     *           the workload execution. The config specifies the type of identity
+     *           (service account or user) that will be used by workloads to access
+     *           resources on the project(s).
      * }
      */
     public function __construct($data = NULL) {
@@ -161,7 +257,7 @@ class ExecutionConfig extends \Google\Protobuf\Internal\Message
      * Optional. Tags used for network traffic control.
      *
      * Generated from protobuf field <code>repeated string network_tags = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNetworkTags($var)
@@ -194,6 +290,204 @@ class ExecutionConfig extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->kms_key = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Applies to sessions only. The duration to keep the session alive
+     * while it's idling. Exceeding this threshold causes the session to
+     * terminate. This field cannot be set on a batch workload. Minimum value is
+     * 10 minutes; maximum value is 14 days (see JSON representation of
+     * [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+     * Defaults to 1 hour if not set.
+     * If both `ttl` and `idle_ttl` are specified for an interactive session,
+     * the conditions are treated as `OR` conditions: the workload will be
+     * terminated when it has been idle for `idle_ttl` or when `ttl` has been
+     * exceeded, whichever occurs first.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration idle_ttl = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Duration|null
+     */
+    public function getIdleTtl()
+    {
+        return $this->idle_ttl;
+    }
+
+    public function hasIdleTtl()
+    {
+        return isset($this->idle_ttl);
+    }
+
+    public function clearIdleTtl()
+    {
+        unset($this->idle_ttl);
+    }
+
+    /**
+     * Optional. Applies to sessions only. The duration to keep the session alive
+     * while it's idling. Exceeding this threshold causes the session to
+     * terminate. This field cannot be set on a batch workload. Minimum value is
+     * 10 minutes; maximum value is 14 days (see JSON representation of
+     * [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+     * Defaults to 1 hour if not set.
+     * If both `ttl` and `idle_ttl` are specified for an interactive session,
+     * the conditions are treated as `OR` conditions: the workload will be
+     * terminated when it has been idle for `idle_ttl` or when `ttl` has been
+     * exceeded, whichever occurs first.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration idle_ttl = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Protobuf\Duration $var
+     * @return $this
+     */
+    public function setIdleTtl($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Duration::class);
+        $this->idle_ttl = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The duration after which the workload will be terminated,
+     * specified as the JSON representation for
+     * [Duration](https://protobuf.dev/programming-guides/proto3/#json).
+     * When the workload exceeds this duration, it will be unconditionally
+     * terminated without waiting for ongoing work to finish. If `ttl` is not
+     * specified for a batch workload, the workload will be allowed to run until
+     * it exits naturally (or run forever without exiting). If `ttl` is not
+     * specified for an interactive session, it defaults to 24 hours. If `ttl` is
+     * not specified for a batch that uses 2.1+ runtime version, it defaults to 4
+     * hours. Minimum value is 10 minutes; maximum value is 14 days. If both `ttl`
+     * and `idle_ttl` are specified (for an interactive session), the conditions
+     * are treated as `OR` conditions: the workload will be terminated when it has
+     * been idle for `idle_ttl` or when `ttl` has been exceeded, whichever occurs
+     * first.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration ttl = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Protobuf\Duration|null
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    public function hasTtl()
+    {
+        return isset($this->ttl);
+    }
+
+    public function clearTtl()
+    {
+        unset($this->ttl);
+    }
+
+    /**
+     * Optional. The duration after which the workload will be terminated,
+     * specified as the JSON representation for
+     * [Duration](https://protobuf.dev/programming-guides/proto3/#json).
+     * When the workload exceeds this duration, it will be unconditionally
+     * terminated without waiting for ongoing work to finish. If `ttl` is not
+     * specified for a batch workload, the workload will be allowed to run until
+     * it exits naturally (or run forever without exiting). If `ttl` is not
+     * specified for an interactive session, it defaults to 24 hours. If `ttl` is
+     * not specified for a batch that uses 2.1+ runtime version, it defaults to 4
+     * hours. Minimum value is 10 minutes; maximum value is 14 days. If both `ttl`
+     * and `idle_ttl` are specified (for an interactive session), the conditions
+     * are treated as `OR` conditions: the workload will be terminated when it has
+     * been idle for `idle_ttl` or when `ttl` has been exceeded, whichever occurs
+     * first.
+     *
+     * Generated from protobuf field <code>.google.protobuf.Duration ttl = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Protobuf\Duration $var
+     * @return $this
+     */
+    public function setTtl($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Protobuf\Duration::class);
+        $this->ttl = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. A Cloud Storage bucket used to stage workload dependencies,
+     * config files, and store workload output and other ephemeral data, such as
+     * Spark history files. If you do not specify a staging bucket, Cloud Dataproc
+     * will determine a Cloud Storage location according to the region where your
+     * workload is running, and then create and manage project-level, per-location
+     * staging and temporary buckets.
+     * **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+     * a Cloud Storage bucket.**
+     *
+     * Generated from protobuf field <code>string staging_bucket = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getStagingBucket()
+    {
+        return $this->staging_bucket;
+    }
+
+    /**
+     * Optional. A Cloud Storage bucket used to stage workload dependencies,
+     * config files, and store workload output and other ephemeral data, such as
+     * Spark history files. If you do not specify a staging bucket, Cloud Dataproc
+     * will determine a Cloud Storage location according to the region where your
+     * workload is running, and then create and manage project-level, per-location
+     * staging and temporary buckets.
+     * **This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+     * a Cloud Storage bucket.**
+     *
+     * Generated from protobuf field <code>string staging_bucket = 10 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setStagingBucket($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->staging_bucket = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Authentication configuration used to set the default identity for
+     * the workload execution. The config specifies the type of identity
+     * (service account or user) that will be used by workloads to access
+     * resources on the project(s).
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.AuthenticationConfig authentication_config = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Dataproc\V1\AuthenticationConfig|null
+     */
+    public function getAuthenticationConfig()
+    {
+        return $this->authentication_config;
+    }
+
+    public function hasAuthenticationConfig()
+    {
+        return isset($this->authentication_config);
+    }
+
+    public function clearAuthenticationConfig()
+    {
+        unset($this->authentication_config);
+    }
+
+    /**
+     * Optional. Authentication configuration used to set the default identity for
+     * the workload execution. The config specifies the type of identity
+     * (service account or user) that will be used by workloads to access
+     * resources on the project(s).
+     *
+     * Generated from protobuf field <code>.google.cloud.dataproc.v1.AuthenticationConfig authentication_config = 11 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Dataproc\V1\AuthenticationConfig $var
+     * @return $this
+     */
+    public function setAuthenticationConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Dataproc\V1\AuthenticationConfig::class);
+        $this->authentication_config = $var;
 
         return $this;
     }

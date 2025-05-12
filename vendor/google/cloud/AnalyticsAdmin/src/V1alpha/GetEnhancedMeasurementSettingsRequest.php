@@ -18,12 +18,29 @@ class GetEnhancedMeasurementSettingsRequest extends \Google\Protobuf\Internal\Me
     /**
      * Required. The name of the settings to lookup.
      * Format:
-     * properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings
-     * Example: "properties/1000/webDataStreams/2000/enhancedMeasurementSettings"
+     * properties/{property}/dataStreams/{data_stream}/enhancedMeasurementSettings
+     * Example: "properties/1000/dataStreams/2000/enhancedMeasurementSettings"
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The name of the settings to lookup.
+     *                     Format:
+     *                     properties/{property}/dataStreams/{data_stream}/enhancedMeasurementSettings
+     *                     Example: "properties/1000/dataStreams/2000/enhancedMeasurementSettings"
+     *                     Please see {@see AnalyticsAdminServiceClient::enhancedMeasurementSettingsName()} for help formatting this field.
+     *
+     * @return \Google\Analytics\Admin\V1alpha\GetEnhancedMeasurementSettingsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.
@@ -34,8 +51,8 @@ class GetEnhancedMeasurementSettingsRequest extends \Google\Protobuf\Internal\Me
      *     @type string $name
      *           Required. The name of the settings to lookup.
      *           Format:
-     *           properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings
-     *           Example: "properties/1000/webDataStreams/2000/enhancedMeasurementSettings"
+     *           properties/{property}/dataStreams/{data_stream}/enhancedMeasurementSettings
+     *           Example: "properties/1000/dataStreams/2000/enhancedMeasurementSettings"
      * }
      */
     public function __construct($data = NULL) {
@@ -46,8 +63,8 @@ class GetEnhancedMeasurementSettingsRequest extends \Google\Protobuf\Internal\Me
     /**
      * Required. The name of the settings to lookup.
      * Format:
-     * properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings
-     * Example: "properties/1000/webDataStreams/2000/enhancedMeasurementSettings"
+     * properties/{property}/dataStreams/{data_stream}/enhancedMeasurementSettings
+     * Example: "properties/1000/dataStreams/2000/enhancedMeasurementSettings"
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -60,8 +77,8 @@ class GetEnhancedMeasurementSettingsRequest extends \Google\Protobuf\Internal\Me
     /**
      * Required. The name of the settings to lookup.
      * Format:
-     * properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings
-     * Example: "properties/1000/webDataStreams/2000/enhancedMeasurementSettings"
+     * properties/{property}/dataStreams/{data_stream}/enhancedMeasurementSettings
+     * Example: "properties/1000/dataStreams/2000/enhancedMeasurementSettings"
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

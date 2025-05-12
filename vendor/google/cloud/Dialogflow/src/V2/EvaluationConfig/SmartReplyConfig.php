@@ -22,16 +22,16 @@ class SmartReplyConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string allowlist_document = 1 [(.google.api.resource_reference) = {</code>
      */
-    private $allowlist_document = '';
+    protected $allowlist_document = '';
     /**
-     * Required. The model to be evaluated can return multiple results with confidence
-     * score on each query. These results will be sorted by the descending order
-     * of the scores and we only keep the first max_result_count results as the
-     * final results to evaluate.
+     * Required. The model to be evaluated can return multiple results with
+     * confidence score on each query. These results will be sorted by the
+     * descending order of the scores and we only keep the first
+     * max_result_count results as the final results to evaluate.
      *
      * Generated from protobuf field <code>int32 max_result_count = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $max_result_count = 0;
+    protected $max_result_count = 0;
 
     /**
      * Constructor.
@@ -44,10 +44,10 @@ class SmartReplyConfig extends \Google\Protobuf\Internal\Message
      *           Format: `projects/<Project ID>/knowledgeBases/<Knowledge Base
      *           ID>/documents/<Document ID>`. Only used for smart reply model.
      *     @type int $max_result_count
-     *           Required. The model to be evaluated can return multiple results with confidence
-     *           score on each query. These results will be sorted by the descending order
-     *           of the scores and we only keep the first max_result_count results as the
-     *           final results to evaluate.
+     *           Required. The model to be evaluated can return multiple results with
+     *           confidence score on each query. These results will be sorted by the
+     *           descending order of the scores and we only keep the first
+     *           max_result_count results as the final results to evaluate.
      * }
      */
     public function __construct($data = NULL) {
@@ -86,10 +86,10 @@ class SmartReplyConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The model to be evaluated can return multiple results with confidence
-     * score on each query. These results will be sorted by the descending order
-     * of the scores and we only keep the first max_result_count results as the
-     * final results to evaluate.
+     * Required. The model to be evaluated can return multiple results with
+     * confidence score on each query. These results will be sorted by the
+     * descending order of the scores and we only keep the first
+     * max_result_count results as the final results to evaluate.
      *
      * Generated from protobuf field <code>int32 max_result_count = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return int
@@ -100,10 +100,10 @@ class SmartReplyConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The model to be evaluated can return multiple results with confidence
-     * score on each query. These results will be sorted by the descending order
-     * of the scores and we only keep the first max_result_count results as the
-     * final results to evaluate.
+     * Required. The model to be evaluated can return multiple results with
+     * confidence score on each query. These results will be sorted by the
+     * descending order of the scores and we only keep the first
+     * max_result_count results as the final results to evaluate.
      *
      * Generated from protobuf field <code>int32 max_result_count = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param int $var
@@ -119,6 +119,4 @@ class SmartReplyConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(SmartReplyConfig::class, \Google\Cloud\Dialogflow\V2\EvaluationConfig_SmartReplyConfig::class);
 

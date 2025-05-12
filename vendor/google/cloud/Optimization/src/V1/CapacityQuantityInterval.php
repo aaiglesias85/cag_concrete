@@ -9,8 +9,11 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Deprecated: Use [Vehicle.LoadLimit.Interval][] instead.
+ * Deprecated: Use
+ * [Vehicle.LoadLimit.Interval][google.cloud.optimization.v1.Vehicle.LoadLimit.Interval]
+ * instead.
  *
+ * @deprecated
  * Generated from protobuf message <code>google.cloud.optimization.v1.CapacityQuantityInterval</code>
  */
 class CapacityQuantityInterval extends \Google\Protobuf\Internal\Message
@@ -18,15 +21,15 @@ class CapacityQuantityInterval extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>string type = 1;</code>
      */
-    private $type = '';
+    protected $type = '';
     /**
      * Generated from protobuf field <code>optional int64 min_value = 2;</code>
      */
-    private $min_value = null;
+    protected $min_value = null;
     /**
      * Generated from protobuf field <code>optional int64 max_value = 3;</code>
      */
-    private $max_value = null;
+    protected $max_value = null;
 
     /**
      * Constructor.

@@ -4,128 +4,84 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * DataTrackingItem
- *
- * @ORM\Table(name="data_tracking_item")
- * @ORM\Entity(repositoryClass="App\Repository\DataTrackingItemRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingItemRepository')]
+#[ORM\Table(name: 'data_tracking_item')]
 class DataTrackingItem
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private ?int $id;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="quantity", type="float", nullable=false)
-     */
-    private $quantity;
+    #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
+    private ?float $quantity;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="float", nullable=false)
-     */
-    private $price;
+    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
+    private ?float $price;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="notes", type="text", nullable=false)
-     */
-    private $notes;
+    #[ORM\Column(name: 'notes', type: 'text', nullable: false)]
+    private ?string $notes;
 
-    /**
-     * @var ProjectItem
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\ProjectItem")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_item_id", referencedColumnName="id")
-     * })
-     */
-    private $projectItem;
+    #[ORM\ManyToOne(targetEntity: ProjectItem::class)]
+    #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id')]
+    private ?ProjectItem $projectItem;
 
+    #[ORM\ManyToOne(targetEntity: DataTracking::class)]
+    #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
+    private ?DataTracking $dataTracking;
 
-    /**
-     * @var DataTracking
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\DataTracking")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="data_tracking_id", referencedColumnName="id")
-     * })
-     */
-    private $dataTracking;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getQuantity()
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
     }
 
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice($price)
+    public function setPrice(?float $price): void
     {
         $this->price = $price;
     }
 
-    /**
-     * @return ProjectItem
-     */
-    public function getProjectItem()
-    {
-        return $this->projectItem;
-    }
-
-    public function setProjectItem($projectItem)
-    {
-        $this->projectItem = $projectItem;
-    }
-
-    /**
-     * @return DataTracking
-     */
-    public function getDataTracking()
-    {
-        return $this->dataTracking;
-    }
-
-    public function setDataTracking($dataTracking)
-    {
-        $this->dataTracking = $dataTracking;
-    }
-
-    public function getNotes()
+    public function getNotes(): ?string
     {
         return $this->notes;
     }
 
-    public function setNotes($notes)
+    public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
+    }
+
+    public function getProjectItem(): ?ProjectItem
+    {
+        return $this->projectItem;
+    }
+
+    public function setProjectItem(?ProjectItem $projectItem): void
+    {
+        $this->projectItem = $projectItem;
+    }
+
+    public function getDataTracking(): ?DataTracking
+    {
+        return $this->dataTracking;
+    }
+
+    public function setDataTracking(?DataTracking $dataTracking): void
+    {
+        $this->dataTracking = $dataTracking;
     }
 }

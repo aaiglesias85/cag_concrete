@@ -22,7 +22,23 @@ class DeletePolicyTagRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. Resource name of the policy tag to delete.
+     *
+     *                     Note: All of its descendant policy tags are also deleted. Please see
+     *                     {@see PolicyTagManagerClient::policyTagName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\DataCatalog\V1\DeletePolicyTagRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

@@ -20,13 +20,29 @@ class CreateAnalysisRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The analysis to create.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.Analysis analysis = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $analysis = null;
+    protected $analysis = null;
+
+    /**
+     * @param string                                          $parent   Required. The parent resource of the analysis. Please see
+     *                                                                  {@see ContactCenterInsightsClient::conversationName()} for help formatting this field.
+     * @param \Google\Cloud\ContactCenterInsights\V1\Analysis $analysis Required. The analysis to create.
+     *
+     * @return \Google\Cloud\ContactCenterInsights\V1\CreateAnalysisRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\ContactCenterInsights\V1\Analysis $analysis): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setAnalysis($analysis);
+    }
 
     /**
      * Constructor.

@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Results of re-identifying a item.
+ * Results of re-identifying an item.
  *
  * Generated from protobuf message <code>google.privacy.dlp.v2.ReidentifyContentResponse</code>
  */
@@ -20,13 +20,13 @@ class ReidentifyContentResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.ContentItem item = 1;</code>
      */
-    private $item = null;
+    protected $item = null;
     /**
      * An overview of the changes that were made to the `item`.
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.TransformationOverview overview = 2;</code>
      */
-    private $overview = null;
+    protected $overview = null;
 
     /**
      * Constructor.

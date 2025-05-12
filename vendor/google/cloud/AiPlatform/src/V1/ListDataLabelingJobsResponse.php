@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [JobService.ListDataLabelingJobs][google.cloud.aiplatform.v1.JobService.ListDataLabelingJobs].
+ * Response message for
+ * [JobService.ListDataLabelingJobs][google.cloud.aiplatform.v1.JobService.ListDataLabelingJobs].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListDataLabelingJobsResponse</code>
  */
@@ -27,7 +28,7 @@ class ListDataLabelingJobsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,7 +36,7 @@ class ListDataLabelingJobsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\DataLabelingJob[]|\Google\Protobuf\Internal\RepeatedField $data_labeling_jobs
+     *     @type array<\Google\Cloud\AIPlatform\V1\DataLabelingJob>|\Google\Protobuf\Internal\RepeatedField $data_labeling_jobs
      *           A list of DataLabelingJobs that matches the specified filter in the
      *           request.
      *     @type string $next_page_token
@@ -64,7 +65,7 @@ class ListDataLabelingJobsResponse extends \Google\Protobuf\Internal\Message
      * request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.DataLabelingJob data_labeling_jobs = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\DataLabelingJob[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\DataLabelingJob>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDataLabelingJobs($var)

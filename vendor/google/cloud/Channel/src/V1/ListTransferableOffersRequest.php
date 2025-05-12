@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers]
+ * Request message for
+ * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers]
  *
  * Generated from protobuf message <code>google.cloud.channel.v1.ListTransferableOffersRequest</code>
  */
@@ -20,7 +21,7 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Requested page size. Server might return fewer results than requested.
      * If unspecified, returns at most 100 offers.
@@ -28,30 +29,41 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * A token for a page of results other than the first page.
      * Obtained using
-     * [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token] of the previous
-     * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers] call.
+     * [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token]
+     * of the previous
+     * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
      * Required. The SKU to look up Offers for.
      *
      * Generated from protobuf field <code>string sku = 6 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $sku = '';
+    protected $sku = '';
     /**
-     * The BCP-47 language code. For example, "en-US". The
+     * Optional. The BCP-47 language code. For example, "en-US". The
      * response will localize in the corresponding language code, if specified.
      * The default value is "en-US".
      *
-     * Generated from protobuf field <code>string language_code = 7;</code>
+     * Generated from protobuf field <code>string language_code = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
+    /**
+     * Optional. The Billing Account to look up Offers for. Format:
+     * accounts/{account_id}/billingAccounts/{billing_account_id}.
+     * This field is only relevant for multi-currency accounts. It should be left
+     * empty for single currency accounts.
+     *
+     * Generated from protobuf field <code>string billing_account = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $billing_account = '';
     protected $transferred_customer_identity;
 
     /**
@@ -74,14 +86,21 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
      *     @type string $page_token
      *           A token for a page of results other than the first page.
      *           Obtained using
-     *           [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token] of the previous
-     *           [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers] call.
+     *           [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token]
+     *           of the previous
+     *           [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers]
+     *           call.
      *     @type string $sku
      *           Required. The SKU to look up Offers for.
      *     @type string $language_code
-     *           The BCP-47 language code. For example, "en-US". The
+     *           Optional. The BCP-47 language code. For example, "en-US". The
      *           response will localize in the corresponding language code, if specified.
      *           The default value is "en-US".
+     *     @type string $billing_account
+     *           Optional. The Billing Account to look up Offers for. Format:
+     *           accounts/{account_id}/billingAccounts/{billing_account_id}.
+     *           This field is only relevant for multi-currency accounts. It should be left
+     *           empty for single currency accounts.
      * }
      */
     public function __construct($data = NULL) {
@@ -212,8 +231,10 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
     /**
      * A token for a page of results other than the first page.
      * Obtained using
-     * [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token] of the previous
-     * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers] call.
+     * [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token]
+     * of the previous
+     * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      * @return string
@@ -226,8 +247,10 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
     /**
      * A token for a page of results other than the first page.
      * Obtained using
-     * [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token] of the previous
-     * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers] call.
+     * [ListTransferableOffersResponse.next_page_token][google.cloud.channel.v1.ListTransferableOffersResponse.next_page_token]
+     * of the previous
+     * [CloudChannelService.ListTransferableOffers][google.cloud.channel.v1.CloudChannelService.ListTransferableOffers]
+     * call.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      * @param string $var
@@ -268,11 +291,11 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The BCP-47 language code. For example, "en-US". The
+     * Optional. The BCP-47 language code. For example, "en-US". The
      * response will localize in the corresponding language code, if specified.
      * The default value is "en-US".
      *
-     * Generated from protobuf field <code>string language_code = 7;</code>
+     * Generated from protobuf field <code>string language_code = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getLanguageCode()
@@ -281,11 +304,11 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The BCP-47 language code. For example, "en-US". The
+     * Optional. The BCP-47 language code. For example, "en-US". The
      * response will localize in the corresponding language code, if specified.
      * The default value is "en-US".
      *
-     * Generated from protobuf field <code>string language_code = 7;</code>
+     * Generated from protobuf field <code>string language_code = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */
@@ -293,6 +316,38 @@ class ListTransferableOffersRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->language_code = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The Billing Account to look up Offers for. Format:
+     * accounts/{account_id}/billingAccounts/{billing_account_id}.
+     * This field is only relevant for multi-currency accounts. It should be left
+     * empty for single currency accounts.
+     *
+     * Generated from protobuf field <code>string billing_account = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getBillingAccount()
+    {
+        return $this->billing_account;
+    }
+
+    /**
+     * Optional. The Billing Account to look up Offers for. Format:
+     * accounts/{account_id}/billingAccounts/{billing_account_id}.
+     * This field is only relevant for multi-currency accounts. It should be left
+     * empty for single currency accounts.
+     *
+     * Generated from protobuf field <code>string billing_account = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setBillingAccount($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->billing_account = $var;
 
         return $this;
     }

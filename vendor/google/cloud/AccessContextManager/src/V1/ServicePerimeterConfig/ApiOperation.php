@@ -27,7 +27,7 @@ class ApiOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_name = 1;</code>
      */
-    private $service_name = '';
+    protected $service_name = '';
     /**
      * API methods or permissions to allow. Method or permission must belong to
      * the service specified by `service_name` field. A single [MethodSelector]
@@ -54,7 +54,7 @@ class ApiOperation extends \Google\Protobuf\Internal\Message
      *           [google.identity.accesscontextmanager.v1.ServicePerimeterConfig.ApiOperation]
      *           with `service_name` field set to `*` will allow all methods AND
      *           permissions for all services.
-     *     @type \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\MethodSelector[]|\Google\Protobuf\Internal\RepeatedField $method_selectors
+     *     @type array<\Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\MethodSelector>|\Google\Protobuf\Internal\RepeatedField $method_selectors
      *           API methods or permissions to allow. Method or permission must belong to
      *           the service specified by `service_name` field. A single [MethodSelector]
      *           [google.identity.accesscontextmanager.v1.ServicePerimeterConfig.MethodSelector]
@@ -130,7 +130,7 @@ class ApiOperation extends \Google\Protobuf\Internal\Message
      * AND permissions for the service specified in `service_name`.
      *
      * Generated from protobuf field <code>repeated .google.identity.accesscontextmanager.v1.ServicePerimeterConfig.MethodSelector method_selectors = 2;</code>
-     * @param \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\MethodSelector[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Identity\AccessContextManager\V1\ServicePerimeterConfig\MethodSelector>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMethodSelectors($var)
@@ -143,6 +143,4 @@ class ApiOperation extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ApiOperation::class, \Google\Identity\AccessContextManager\V1\ServicePerimeterConfig_ApiOperation::class);
 

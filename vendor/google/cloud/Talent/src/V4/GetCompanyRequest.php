@@ -23,7 +23,25 @@ class GetCompanyRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The resource name of the company to be retrieved.
+     *
+     *                     The format is
+     *                     "projects/{project_id}/tenants/{tenant_id}/companies/{company_id}", for
+     *                     example, "projects/api-test-project/tenants/foo/companies/bar". Please see
+     *                     {@see CompanyServiceClient::companyName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Talent\V4\GetCompanyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

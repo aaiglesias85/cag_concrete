@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [ConversationProfiles.UpdateConversationProfile][google.cloud.dialogflow.v2.ConversationProfiles.UpdateConversationProfile].
+ * The request message for
+ * [ConversationProfiles.UpdateConversationProfile][google.cloud.dialogflow.v2.ConversationProfiles.UpdateConversationProfile].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.UpdateConversationProfileRequest</code>
  */
@@ -20,13 +21,28 @@ class UpdateConversationProfileRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.ConversationProfile conversation_profile = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $conversation_profile = null;
+    protected $conversation_profile = null;
     /**
      * Required. The mask to control which fields to update.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\Dialogflow\V2\ConversationProfile $conversationProfile Required. The conversation profile to update.
+     * @param \Google\Protobuf\FieldMask                      $updateMask          Required. The mask to control which fields to update.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\UpdateConversationProfileRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Dialogflow\V2\ConversationProfile $conversationProfile, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setConversationProfile($conversationProfile)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

@@ -22,13 +22,29 @@ class CreateConversationDatasetRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The conversation dataset to create.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.ConversationDataset conversation_dataset = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $conversation_dataset = null;
+    protected $conversation_dataset = null;
+
+    /**
+     * @param string                                          $parent              Required. The project to create conversation dataset for. Format:
+     *                                                                             `projects/<Project ID>/locations/<Location ID>`
+     * @param \Google\Cloud\Dialogflow\V2\ConversationDataset $conversationDataset Required. The conversation dataset to create.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\CreateConversationDatasetRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Dialogflow\V2\ConversationDataset $conversationDataset): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setConversationDataset($conversationDataset);
+    }
 
     /**
      * Constructor.

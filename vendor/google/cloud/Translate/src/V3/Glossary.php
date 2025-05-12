@@ -9,7 +9,7 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Represents a glossary built from user provided data.
+ * Represents a glossary built from user-provided data.
  *
  * Generated from protobuf message <code>google.cloud.translation.v3.Glossary</code>
  */
@@ -21,32 +21,38 @@ class Glossary extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Provides examples to build the glossary from.
      * Total glossary must not exceed 10M Unicode codepoints.
      *
      * Generated from protobuf field <code>.google.cloud.translation.v3.GlossaryInputConfig input_config = 5;</code>
      */
-    private $input_config = null;
+    protected $input_config = null;
     /**
      * Output only. The number of entries defined in the glossary.
      *
      * Generated from protobuf field <code>int32 entry_count = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $entry_count = 0;
+    protected $entry_count = 0;
     /**
      * Output only. When CreateGlossary was called.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp submit_time = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $submit_time = null;
+    protected $submit_time = null;
     /**
      * Output only. When the glossary creation was finished.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
+    /**
+     * Optional. The display name of the glossary.
+     *
+     * Generated from protobuf field <code>string display_name = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $display_name = '';
     protected $languages;
 
     /**
@@ -71,6 +77,8 @@ class Glossary extends \Google\Protobuf\Internal\Message
      *           Output only. When CreateGlossary was called.
      *     @type \Google\Protobuf\Timestamp $end_time
      *           Output only. When the glossary creation was finished.
+     *     @type string $display_name
+     *           Optional. The display name of the glossary.
      * }
      */
     public function __construct($data = NULL) {
@@ -300,6 +308,32 @@ class Glossary extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->end_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The display name of the glossary.
+     *
+     * Generated from protobuf field <code>string display_name = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->display_name;
+    }
+
+    /**
+     * Optional. The display name of the glossary.
+     *
+     * Generated from protobuf field <code>string display_name = 9 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDisplayName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->display_name = $var;
 
         return $this;
     }

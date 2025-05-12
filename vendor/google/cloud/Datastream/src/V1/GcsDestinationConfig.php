@@ -20,20 +20,21 @@ class GcsDestinationConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string path = 1;</code>
      */
-    private $path = '';
+    protected $path = '';
     /**
      * The maximum file size to be saved in the bucket.
      *
      * Generated from protobuf field <code>int32 file_rotation_mb = 2;</code>
      */
-    private $file_rotation_mb = 0;
+    protected $file_rotation_mb = 0;
     /**
      * The maximum duration for which new events are added before a file is
-     * closed and a new file is created.
+     * closed and a new file is created. Values within the range of 15-60 seconds
+     * are allowed.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration file_rotation_interval = 3;</code>
      */
-    private $file_rotation_interval = null;
+    protected $file_rotation_interval = null;
     protected $file_format;
 
     /**
@@ -48,7 +49,8 @@ class GcsDestinationConfig extends \Google\Protobuf\Internal\Message
      *           The maximum file size to be saved in the bucket.
      *     @type \Google\Protobuf\Duration $file_rotation_interval
      *           The maximum duration for which new events are added before a file is
-     *           closed and a new file is created.
+     *           closed and a new file is created. Values within the range of 15-60 seconds
+     *           are allowed.
      *     @type \Google\Cloud\Datastream\V1\AvroFileFormat $avro_file_format
      *           AVRO file format configuration.
      *     @type \Google\Cloud\Datastream\V1\JsonFileFormat $json_file_format
@@ -114,7 +116,8 @@ class GcsDestinationConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * The maximum duration for which new events are added before a file is
-     * closed and a new file is created.
+     * closed and a new file is created. Values within the range of 15-60 seconds
+     * are allowed.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration file_rotation_interval = 3;</code>
      * @return \Google\Protobuf\Duration|null
@@ -136,7 +139,8 @@ class GcsDestinationConfig extends \Google\Protobuf\Internal\Message
 
     /**
      * The maximum duration for which new events are added before a file is
-     * closed and a new file is created.
+     * closed and a new file is created. Values within the range of 15-60 seconds
+     * are allowed.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration file_rotation_interval = 3;</code>
      * @param \Google\Protobuf\Duration $var

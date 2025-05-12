@@ -21,14 +21,15 @@ class ProductService
         \GPBMetadata\Google\Cloud\Retail\V2\Common::initOnce();
         \GPBMetadata\Google\Cloud\Retail\V2\ImportConfig::initOnce();
         \GPBMetadata\Google\Cloud\Retail\V2\Product::initOnce();
+        \GPBMetadata\Google\Cloud\Retail\V2\PurgeConfig::initOnce();
         \GPBMetadata\Google\Longrunning\Operations::initOnce();
         \GPBMetadata\Google\Protobuf\GPBEmpty::initOnce();
         \GPBMetadata\Google\Protobuf\FieldMask::initOnce();
         \GPBMetadata\Google\Protobuf\Timestamp::initOnce();
         $pool->internalAddGeneratedFile(
             '
-ß,
-,google/cloud/retail/v2/product_service.protogoogle.cloud.retail.v2google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto#google/cloud/retail/v2/common.proto*google/cloud/retail/v2/import_config.proto$google/cloud/retail/v2/product.proto#google/longrunning/operations.protogoogle/protobuf/empty.proto google/protobuf/field_mask.protogoogle/protobuf/timestamp.proto"œ
+”/
+,google/cloud/retail/v2/product_service.protogoogle.cloud.retail.v2google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto#google/cloud/retail/v2/common.proto*google/cloud/retail/v2/import_config.proto$google/cloud/retail/v2/product.proto)google/cloud/retail/v2/purge_config.proto#google/longrunning/operations.protogoogle/protobuf/empty.proto google/protobuf/field_mask.protogoogle/protobuf/timestamp.proto"œ
 CreateProductRequest4
 parent (	B$àAúA
 retail.googleapis.com/Branch5
@@ -97,27 +98,29 @@ page_token (	
 remove_time (2.google.protobuf.Timestamp
 allow_missing ("!
 RemoveFulfillmentPlacesMetadata"!
-RemoveFulfillmentPlacesResponse2®
+RemoveFulfillmentPlacesResponse2Â
 ProductServiceÏ
-CreateProduct,.google.cloud.retail.v2.CreateProductRequest.google.cloud.retail.v2.Product"o‚Óä“M"B/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/products:productÚAparent,product,product_id¬
+CreateProduct,.google.cloud.retail.v2.CreateProductRequest.google.cloud.retail.v2.Product"oÚAparent,product,product_id‚Óä“M"B/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/products:product¬
 
-GetProduct).google.cloud.retail.v2.GetProductRequest.google.cloud.retail.v2.Product"R‚Óä“EC/v2/{name=projects/*/locations/*/catalogs/*/branches/*/products/**}ÚAname¾
-ListProducts+.google.cloud.retail.v2.ListProductsRequest,.google.cloud.retail.v2.ListProductsResponse"S‚Óä“DB/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/productsÚAparentÒ
-UpdateProduct,.google.cloud.retail.v2.UpdateProductRequest.google.cloud.retail.v2.Product"r‚Óä“V2K/v2/{product.name=projects/*/locations/*/catalogs/*/branches/*/products/**}:productÚAproduct,update_mask©
-DeleteProduct,.google.cloud.retail.v2.DeleteProductRequest.google.protobuf.Empty"R‚Óä“E*C/v2/{name=projects/*/locations/*/catalogs/*/branches/*/products/**}ÚAnameŽ
-ImportProducts-.google.cloud.retail.v2.ImportProductsRequest.google.longrunning.Operation"­‚Óä“N"I/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/products:import:*ÊAV
--google.cloud.retail.v2.ImportProductsResponse%google.cloud.retail.v2.ImportMetadata´
-SetInventory+.google.cloud.retail.v2.SetInventoryRequest.google.longrunning.Operation"×‚Óä“_"Z/v2/{inventory.name=projects/*/locations/*/catalogs/*/branches/*/products/**}:setInventory:*ÚAinventory,set_maskÊAZ
-+google.cloud.retail.v2.SetInventoryResponse+google.cloud.retail.v2.SetInventoryMetadataÊ
-AddFulfillmentPlaces3.google.cloud.retail.v2.AddFulfillmentPlacesRequest.google.longrunning.Operation"Ý‚Óä“`"[/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:addFulfillmentPlaces:*ÚAproductÊAj
-3google.cloud.retail.v2.AddFulfillmentPlacesResponse3google.cloud.retail.v2.AddFulfillmentPlacesMetadataÙ
-RemoveFulfillmentPlaces6.google.cloud.retail.v2.RemoveFulfillmentPlacesRequest.google.longrunning.Operation"æ‚Óä“c"^/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:removeFulfillmentPlaces:*ÚAproductÊAp
-6google.cloud.retail.v2.RemoveFulfillmentPlacesResponse6google.cloud.retail.v2.RemoveFulfillmentPlacesMetadataÅ
-AddLocalInventories2.google.cloud.retail.v2.AddLocalInventoriesRequest.google.longrunning.Operation"Ú‚Óä“_"Z/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:addLocalInventories:*ÚAproductÊAh
-2google.cloud.retail.v2.AddLocalInventoriesResponse2google.cloud.retail.v2.AddLocalInventoriesMetadataÔ
-RemoveLocalInventories5.google.cloud.retail.v2.RemoveLocalInventoriesRequest.google.longrunning.Operation"ã‚Óä“b"]/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:removeLocalInventories:*ÚAproductÊAn
-5google.cloud.retail.v2.RemoveLocalInventoriesResponse5google.cloud.retail.v2.RemoveLocalInventoriesMetadataIÊAretail.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformBÈ
-com.google.cloud.retail.v2BProductServiceProtoPZ<google.golang.org/genproto/googleapis/cloud/retail/v2;retail¢RETAILªGoogle.Cloud.Retail.V2ÊGoogle\\Cloud\\Retail\\V2êGoogle::Cloud::Retail::V2bproto3'
+GetProduct).google.cloud.retail.v2.GetProductRequest.google.cloud.retail.v2.Product"RÚAname‚Óä“EC/v2/{name=projects/*/locations/*/catalogs/*/branches/*/products/**}¾
+ListProducts+.google.cloud.retail.v2.ListProductsRequest,.google.cloud.retail.v2.ListProductsResponse"SÚAparent‚Óä“DB/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/productsÒ
+UpdateProduct,.google.cloud.retail.v2.UpdateProductRequest.google.cloud.retail.v2.Product"rÚAproduct,update_mask‚Óä“V2K/v2/{product.name=projects/*/locations/*/catalogs/*/branches/*/products/**}:product©
+DeleteProduct,.google.cloud.retail.v2.DeleteProductRequest.google.protobuf.Empty"RÚAname‚Óä“E*C/v2/{name=projects/*/locations/*/catalogs/*/branches/*/products/**}‘
+PurgeProducts,.google.cloud.retail.v2.PurgeProductsRequest.google.longrunning.Operation"²ÊA\\
+,google.cloud.retail.v2.PurgeProductsResponse,google.cloud.retail.v2.PurgeProductsMetadata‚Óä“M"H/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/products:purge:*Ž
+ImportProducts-.google.cloud.retail.v2.ImportProductsRequest.google.longrunning.Operation"­ÊAV
+-google.cloud.retail.v2.ImportProductsResponse%google.cloud.retail.v2.ImportMetadata‚Óä“N"I/v2/{parent=projects/*/locations/*/catalogs/*/branches/*}/products:import:*´
+SetInventory+.google.cloud.retail.v2.SetInventoryRequest.google.longrunning.Operation"×ÊAZ
++google.cloud.retail.v2.SetInventoryResponse+google.cloud.retail.v2.SetInventoryMetadataÚAinventory,set_mask‚Óä“_"Z/v2/{inventory.name=projects/*/locations/*/catalogs/*/branches/*/products/**}:setInventory:*Ê
+AddFulfillmentPlaces3.google.cloud.retail.v2.AddFulfillmentPlacesRequest.google.longrunning.Operation"ÝÊAj
+3google.cloud.retail.v2.AddFulfillmentPlacesResponse3google.cloud.retail.v2.AddFulfillmentPlacesMetadataÚAproduct‚Óä“`"[/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:addFulfillmentPlaces:*Ù
+RemoveFulfillmentPlaces6.google.cloud.retail.v2.RemoveFulfillmentPlacesRequest.google.longrunning.Operation"æÊAp
+6google.cloud.retail.v2.RemoveFulfillmentPlacesResponse6google.cloud.retail.v2.RemoveFulfillmentPlacesMetadataÚAproduct‚Óä“c"^/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:removeFulfillmentPlaces:*Å
+AddLocalInventories2.google.cloud.retail.v2.AddLocalInventoriesRequest.google.longrunning.Operation"ÚÊAh
+2google.cloud.retail.v2.AddLocalInventoriesResponse2google.cloud.retail.v2.AddLocalInventoriesMetadataÚAproduct‚Óä“_"Z/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:addLocalInventories:*Ô
+RemoveLocalInventories5.google.cloud.retail.v2.RemoveLocalInventoriesRequest.google.longrunning.Operation"ãÊAn
+5google.cloud.retail.v2.RemoveLocalInventoriesResponse5google.cloud.retail.v2.RemoveLocalInventoriesMetadataÚAproduct‚Óä“b"]/v2/{product=projects/*/locations/*/catalogs/*/branches/*/products/**}:removeLocalInventories:*IÊAretail.googleapis.comÒA.https://www.googleapis.com/auth/cloud-platformB¾
+com.google.cloud.retail.v2BProductServiceProtoPZ2cloud.google.com/go/retail/apiv2/retailpb;retailpb¢RETAILªGoogle.Cloud.Retail.V2ÊGoogle\\Cloud\\Retail\\V2êGoogle::Cloud::Retail::V2bproto3'
         , true);
 
         static::$is_initialized = true;

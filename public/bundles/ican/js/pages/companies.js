@@ -21,7 +21,8 @@ var Companies = function () {
                 selector: {class: 'm-checkbox--solid m-checkbox--brand'}
             });
         }
-        aoColumns.push({
+        aoColumns.push(
+            {
                 field: "name",
                 title: "Name"
             },
@@ -606,6 +607,7 @@ var Companies = function () {
     }
     var resetWizard = function () {
         activeTab = 1;
+        totalTabs = 2;
         mostrarTab();
         // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
@@ -958,6 +960,11 @@ var Companies = function () {
         var table = $('#lista-projects-table-editable');
 
         var aoColumns = [
+            {
+                field: "projectNumber",
+                title: "C & G Project #",
+                width: 120,
+            },
             {
                 field: "county",
                 title: "County"

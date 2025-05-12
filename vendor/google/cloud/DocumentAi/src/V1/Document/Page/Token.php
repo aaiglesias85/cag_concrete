@@ -21,14 +21,14 @@ class Token extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Layout layout = 1;</code>
      */
-    private $layout = null;
+    protected $layout = null;
     /**
      * Detected break at the end of a
      * [Token][google.cloud.documentai.v1.Document.Page.Token].
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Token.DetectedBreak detected_break = 2;</code>
      */
-    private $detected_break = null;
+    protected $detected_break = null;
     /**
      * A list of detected languages together with confidence.
      *
@@ -36,11 +36,18 @@ class Token extends \Google\Protobuf\Internal\Message
      */
     private $detected_languages;
     /**
-     * The  history of this annotation.
+     * The history of this annotation.
      *
-     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 4;</code>
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 4 [deprecated = true];</code>
+     * @deprecated
      */
-    private $provenance = null;
+    protected $provenance = null;
+    /**
+     * Text style attributes.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Token.StyleInfo style_info = 5;</code>
+     */
+    protected $style_info = null;
 
     /**
      * Constructor.
@@ -54,10 +61,12 @@ class Token extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Token\DetectedBreak $detected_break
      *           Detected break at the end of a
      *           [Token][google.cloud.documentai.v1.Document.Page.Token].
-     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $detected_languages
+     *     @type array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $detected_languages
      *           A list of detected languages together with confidence.
      *     @type \Google\Cloud\DocumentAI\V1\Document\Provenance $provenance
-     *           The  history of this annotation.
+     *           The history of this annotation.
+     *     @type \Google\Cloud\DocumentAI\V1\Document\Page\Token\StyleInfo $style_info
+     *           Text style attributes.
      * }
      */
     public function __construct($data = NULL) {
@@ -156,7 +165,7 @@ class Token extends \Google\Protobuf\Internal\Message
      * A list of detected languages together with confidence.
      *
      * Generated from protobuf field <code>repeated .google.cloud.documentai.v1.Document.Page.DetectedLanguage detected_languages = 3;</code>
-     * @param \Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\DocumentAI\V1\Document\Page\DetectedLanguage>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setDetectedLanguages($var)
@@ -168,37 +177,79 @@ class Token extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The  history of this annotation.
+     * The history of this annotation.
      *
-     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 4;</code>
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 4 [deprecated = true];</code>
      * @return \Google\Cloud\DocumentAI\V1\Document\Provenance|null
+     * @deprecated
      */
     public function getProvenance()
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         return $this->provenance;
     }
 
     public function hasProvenance()
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         return isset($this->provenance);
     }
 
     public function clearProvenance()
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         unset($this->provenance);
     }
 
     /**
-     * The  history of this annotation.
+     * The history of this annotation.
      *
-     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 4;</code>
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Provenance provenance = 4 [deprecated = true];</code>
      * @param \Google\Cloud\DocumentAI\V1\Document\Provenance $var
      * @return $this
+     * @deprecated
      */
     public function setProvenance($var)
     {
+        @trigger_error('provenance is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkMessage($var, \Google\Cloud\DocumentAI\V1\Document\Provenance::class);
         $this->provenance = $var;
+
+        return $this;
+    }
+
+    /**
+     * Text style attributes.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Token.StyleInfo style_info = 5;</code>
+     * @return \Google\Cloud\DocumentAI\V1\Document\Page\Token\StyleInfo|null
+     */
+    public function getStyleInfo()
+    {
+        return $this->style_info;
+    }
+
+    public function hasStyleInfo()
+    {
+        return isset($this->style_info);
+    }
+
+    public function clearStyleInfo()
+    {
+        unset($this->style_info);
+    }
+
+    /**
+     * Text style attributes.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Page.Token.StyleInfo style_info = 5;</code>
+     * @param \Google\Cloud\DocumentAI\V1\Document\Page\Token\StyleInfo $var
+     * @return $this
+     */
+    public function setStyleInfo($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\DocumentAI\V1\Document\Page\Token\StyleInfo::class);
+        $this->style_info = $var;
 
         return $this;
     }

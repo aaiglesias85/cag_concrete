@@ -20,7 +20,7 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue enable_ipv4 = 1;</code>
      */
-    private $enable_ipv4 = null;
+    protected $enable_ipv4 = null;
     /**
      * The resource link for the VPC network from which the Cloud SQL instance is
      * accessible for private IP. For example,
@@ -29,13 +29,24 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string private_network = 2;</code>
      */
-    private $private_network = '';
+    protected $private_network = '';
+    /**
+     * Optional. The name of the allocated IP address range for the private IP
+     * Cloud SQL instance. This name refers to an already allocated IP range
+     * address. If set, the instance IP address will be created in the allocated
+     * range. Note that this IP address range can't be modified after the instance
+     * is created. If you change the VPC when configuring connectivity settings
+     * for the migration job, this field is not relevant.
+     *
+     * Generated from protobuf field <code>string allocated_ip_range = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $allocated_ip_range = '';
     /**
      * Whether SSL connections over IP should be enforced or not.
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue require_ssl = 3;</code>
      */
-    private $require_ssl = null;
+    protected $require_ssl = null;
     /**
      * The list of external networks that are allowed to connect to the instance
      * using the IP. See
@@ -59,9 +70,16 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      *           accessible for private IP. For example,
      *           `projects/myProject/global/networks/default`. This setting can
      *           be updated, but it cannot be removed after it is set.
+     *     @type string $allocated_ip_range
+     *           Optional. The name of the allocated IP address range for the private IP
+     *           Cloud SQL instance. This name refers to an already allocated IP range
+     *           address. If set, the instance IP address will be created in the allocated
+     *           range. Note that this IP address range can't be modified after the instance
+     *           is created. If you change the VPC when configuring connectivity settings
+     *           for the migration job, this field is not relevant.
      *     @type \Google\Protobuf\BoolValue $require_ssl
      *           Whether SSL connections over IP should be enforced or not.
-     *     @type \Google\Cloud\CloudDms\V1\SqlAclEntry[]|\Google\Protobuf\Internal\RepeatedField $authorized_networks
+     *     @type array<\Google\Cloud\CloudDms\V1\SqlAclEntry>|\Google\Protobuf\Internal\RepeatedField $authorized_networks
      *           The list of external networks that are allowed to connect to the instance
      *           using the IP. See
      *           https://en.wikipedia.org/wiki/CIDR_notation#CIDR_notation, also known as
@@ -102,7 +120,7 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.BoolValue enable_ipv4 = 1;</code>
      * @return bool|null
      */
-    public function getEnableIpv4Value()
+    public function getEnableIpv4Unwrapped()
     {
         return $this->readWrapperValue("enable_ipv4");
     }
@@ -131,7 +149,7 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      * @param bool|null $var
      * @return $this
      */
-    public function setEnableIpv4Value($var)
+    public function setEnableIpv4Unwrapped($var)
     {
         $this->writeWrapperValue("enable_ipv4", $var);
         return $this;}
@@ -169,6 +187,42 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
+     * Optional. The name of the allocated IP address range for the private IP
+     * Cloud SQL instance. This name refers to an already allocated IP range
+     * address. If set, the instance IP address will be created in the allocated
+     * range. Note that this IP address range can't be modified after the instance
+     * is created. If you change the VPC when configuring connectivity settings
+     * for the migration job, this field is not relevant.
+     *
+     * Generated from protobuf field <code>string allocated_ip_range = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getAllocatedIpRange()
+    {
+        return $this->allocated_ip_range;
+    }
+
+    /**
+     * Optional. The name of the allocated IP address range for the private IP
+     * Cloud SQL instance. This name refers to an already allocated IP range
+     * address. If set, the instance IP address will be created in the allocated
+     * range. Note that this IP address range can't be modified after the instance
+     * is created. If you change the VPC when configuring connectivity settings
+     * for the migration job, this field is not relevant.
+     *
+     * Generated from protobuf field <code>string allocated_ip_range = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAllocatedIpRange($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->allocated_ip_range = $var;
+
+        return $this;
+    }
+
+    /**
      * Whether SSL connections over IP should be enforced or not.
      *
      * Generated from protobuf field <code>.google.protobuf.BoolValue require_ssl = 3;</code>
@@ -197,7 +251,7 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.BoolValue require_ssl = 3;</code>
      * @return bool|null
      */
-    public function getRequireSslValue()
+    public function getRequireSslUnwrapped()
     {
         return $this->readWrapperValue("require_ssl");
     }
@@ -226,7 +280,7 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      * @param bool|null $var
      * @return $this
      */
-    public function setRequireSslValue($var)
+    public function setRequireSslUnwrapped($var)
     {
         $this->writeWrapperValue("require_ssl", $var);
         return $this;}
@@ -252,7 +306,7 @@ class SqlIpConfig extends \Google\Protobuf\Internal\Message
      * 'slash' notation (e.g. `192.168.100.0/24`).
      *
      * Generated from protobuf field <code>repeated .google.cloud.clouddms.v1.SqlAclEntry authorized_networks = 4;</code>
-     * @param \Google\Cloud\CloudDms\V1\SqlAclEntry[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\CloudDms\V1\SqlAclEntry>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAuthorizedNetworks($var)

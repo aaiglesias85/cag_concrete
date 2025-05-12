@@ -2,152 +2,118 @@
 
 namespace App\Entity;
 
+use App\Repository\CompanyRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Company
- *
- * @ORM\Table(name="company")
- * @ORM\Entity(repositoryClass="App\Repository\CompanyRepository")
- */
+#[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ORM\Table(name: 'company')]
 class Company
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="company_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $companyId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: 'company_id', type: 'integer', nullable: true)]
+    private ?int $companyId = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
+    private ?string $name = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="phone", type="string", length=50, nullable=false)
-     */
-    private $phone;
+    #[ORM\Column(name: 'phone', type: 'string', length: 50, nullable: true)]
+    private ?string $phone = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="address", type="text", nullable=false)
-     */
-    private $address;
+    #[ORM\Column(name: 'address', type: 'text', nullable: true)]
+    private ?string $address = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="contact_name", type="string", length=255, nullable=false)
-     */
-    private $contactName;
+    #[ORM\Column(name: 'contact_name', type: 'string', length: 255, nullable: true)]
+    private ?string $contactName = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="contact_email", type="string", length=255, nullable=false)
-     */
-    private $contactEmail;
+    #[ORM\Column(name: 'contact_email', type: 'string', length: 255, nullable: true)]
+    private ?string $contactEmail = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * Get companyId
-     *
-     * @return integer
-     */
-    public function getCompanyId()
+    public function getCompanyId(): ?int
     {
         return $this->companyId;
     }
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName($name): void
+    public function setName(?string $name): self
     {
         $this->name = $name;
+        return $this;
     }
 
-    public function getPhone()
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
-    public function setPhone($phone): void
+    public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+        return $this;
     }
 
-    public function getContactName()
-    {
-        return $this->contactName;
-    }
-
-    public function setContactName($contactName): void
-    {
-        $this->contactName = $contactName;
-    }
-
-    public function getContactEmail()
-    {
-        return $this->contactEmail;
-    }
-
-    public function setContactEmail($contactEmail): void
-    {
-        $this->contactEmail = $contactEmail;
-    }
-
-    public function getCreatedAt(): \DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): \DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getAddress()
+    public function getAddress(): ?string
     {
         return $this->address;
     }
 
-    public function setAddress($address)
+    public function setAddress(?string $address): self
     {
         $this->address = $address;
+        return $this;
     }
 
+    public function getContactName(): ?string
+    {
+        return $this->contactName;
+    }
+
+    public function setContactName(?string $contactName): self
+    {
+        $this->contactName = $contactName;
+        return $this;
+    }
+
+    public function getContactEmail(): ?string
+    {
+        return $this->contactEmail;
+    }
+
+    public function setContactEmail(?string $contactEmail): self
+    {
+        $this->contactEmail = $contactEmail;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
 }

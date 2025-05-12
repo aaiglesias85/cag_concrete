@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [TensorboardService.ReadTensorboardBlobData][google.cloud.aiplatform.v1.TensorboardService.ReadTensorboardBlobData].
+ * Request message for
+ * [TensorboardService.ReadTensorboardBlobData][google.cloud.aiplatform.v1.TensorboardService.ReadTensorboardBlobData].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ReadTensorboardBlobDataRequest</code>
  */
@@ -18,17 +19,33 @@ class ReadTensorboardBlobDataRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The resource name of the TensorboardTimeSeries to list Blobs.
      * Format:
-     * 'projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}'
+     * `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
      *
      * Generated from protobuf field <code>string time_series = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $time_series = '';
+    protected $time_series = '';
     /**
      * IDs of the blobs to read.
      *
      * Generated from protobuf field <code>repeated string blob_ids = 2;</code>
      */
     private $blob_ids;
+
+    /**
+     * @param string $timeSeries Required. The resource name of the TensorboardTimeSeries to list Blobs.
+     *                           Format:
+     *                           `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
+     *                           Please see {@see TensorboardServiceClient::tensorboardTimeSeriesName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\ReadTensorboardBlobDataRequest
+     *
+     * @experimental
+     */
+    public static function build(string $timeSeries): self
+    {
+        return (new self())
+            ->setTimeSeries($timeSeries);
+    }
 
     /**
      * Constructor.
@@ -39,8 +56,8 @@ class ReadTensorboardBlobDataRequest extends \Google\Protobuf\Internal\Message
      *     @type string $time_series
      *           Required. The resource name of the TensorboardTimeSeries to list Blobs.
      *           Format:
-     *           'projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}'
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $blob_ids
+     *           `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $blob_ids
      *           IDs of the blobs to read.
      * }
      */
@@ -52,7 +69,7 @@ class ReadTensorboardBlobDataRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The resource name of the TensorboardTimeSeries to list Blobs.
      * Format:
-     * 'projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}'
+     * `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
      *
      * Generated from protobuf field <code>string time_series = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -65,7 +82,7 @@ class ReadTensorboardBlobDataRequest extends \Google\Protobuf\Internal\Message
     /**
      * Required. The resource name of the TensorboardTimeSeries to list Blobs.
      * Format:
-     * 'projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}'
+     * `projects/{project}/locations/{location}/tensorboards/{tensorboard}/experiments/{experiment}/runs/{run}/timeSeries/{time_series}`
      *
      * Generated from protobuf field <code>string time_series = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -94,7 +111,7 @@ class ReadTensorboardBlobDataRequest extends \Google\Protobuf\Internal\Message
      * IDs of the blobs to read.
      *
      * Generated from protobuf field <code>repeated string blob_ids = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBlobIds($var)

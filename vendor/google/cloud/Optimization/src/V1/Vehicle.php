@@ -23,7 +23,14 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Vehicle.TravelMode travel_mode = 1;</code>
      */
-    private $travel_mode = 0;
+    protected $travel_mode = 0;
+    /**
+     * Optional. A set of conditions to satisfy that affect the way routes are
+     * calculated for the given vehicle.
+     *
+     * Generated from protobuf field <code>.google.cloud.optimization.v1.RouteModifiers route_modifiers = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $route_modifiers = null;
     /**
      * Geographic location where the vehicle starts before picking up any
      * shipments. If not specified, the vehicle starts at its first pickup.
@@ -32,7 +39,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.type.LatLng start_location = 3;</code>
      */
-    private $start_location = null;
+    protected $start_location = null;
     /**
      * Waypoint representing a geographic location where the vehicle starts before
      * picking up any shipments. If neither `start_waypoint` nor `start_location`
@@ -42,7 +49,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Waypoint start_waypoint = 4;</code>
      */
-    private $start_waypoint = null;
+    protected $start_waypoint = null;
     /**
      * Geographic location where the vehicle ends after it has completed its last
      * `VisitRequest`. If not specified the vehicle's `ShipmentRoute` ends
@@ -52,7 +59,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.type.LatLng end_location = 5;</code>
      */
-    private $end_location = null;
+    protected $end_location = null;
     /**
      * Waypoint representing a geographic location where the vehicle ends after
      * it has completed its last `VisitRequest`. If neither `end_waypoint` nor
@@ -63,7 +70,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Waypoint end_waypoint = 6;</code>
      */
-    private $end_waypoint = null;
+    protected $end_waypoint = null;
     /**
      * Specifies tags attached to the start of the vehicle's route.
      * Empty or duplicate strings are not allowed.
@@ -123,13 +130,13 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>optional double travel_duration_multiple = 11;</code>
      */
-    private $travel_duration_multiple = null;
+    protected $travel_duration_multiple = null;
     /**
      * Unloading policy enforced on the vehicle.
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Vehicle.UnloadingPolicy unloading_policy = 12;</code>
      */
-    private $unloading_policy = 0;
+    protected $unloading_policy = 0;
     /**
      * Capacities of the vehicle (weight, volume, # of pallets for example).
      * The keys in the map are the identifiers of the type of load, consistent
@@ -151,30 +158,32 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>double cost_per_hour = 16;</code>
      */
-    private $cost_per_hour = 0.0;
+    protected $cost_per_hour = 0.0;
     /**
      * Cost per traveled hour of the vehicle route. This cost is applied only to
      * travel time taken by the route (i.e., that reported in
-     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]), and excludes waiting time and visit time.
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]),
+     * and excludes waiting time and visit time.
      *
      * Generated from protobuf field <code>double cost_per_traveled_hour = 17;</code>
      */
-    private $cost_per_traveled_hour = 0.0;
+    protected $cost_per_traveled_hour = 0.0;
     /**
      * Cost per kilometer of the vehicle route. This cost is applied to the
-     * distance reported in the [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] and does not apply
-     * to any distance implicitly traveled from the `arrival_location` to the
-     * `departure_location` of a single `VisitRequest`.
+     * distance reported in the
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * and does not apply to any distance implicitly traveled from the
+     * `arrival_location` to the `departure_location` of a single `VisitRequest`.
      *
      * Generated from protobuf field <code>double cost_per_kilometer = 18;</code>
      */
-    private $cost_per_kilometer = 0.0;
+    protected $cost_per_kilometer = 0.0;
     /**
      * Fixed cost applied if this vehicle is used to handle a shipment.
      *
      * Generated from protobuf field <code>double fixed_cost = 19;</code>
      */
-    private $fixed_cost = 0.0;
+    protected $fixed_cost = 0.0;
     /**
      * This field only applies to vehicles when their route does not serve any
      * shipments. It indicates if the vehicle should be considered as used or not
@@ -189,7 +198,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool used_if_route_is_empty = 20;</code>
      */
-    private $used_if_route_is_empty = false;
+    protected $used_if_route_is_empty = false;
     /**
      * Limit applied to the total duration of the vehicle's route. In a given
      * `OptimizeToursResponse`, the route duration of a vehicle is the
@@ -197,7 +206,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Vehicle.DurationLimit route_duration_limit = 21;</code>
      */
-    private $route_duration_limit = null;
+    protected $route_duration_limit = null;
     /**
      * Limit applied to the travel duration of the vehicle's route. In a given
      * `OptimizeToursResponse`, the route travel duration is the sum of all its
@@ -205,7 +214,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.Vehicle.DurationLimit travel_duration_limit = 22;</code>
      */
-    private $travel_duration_limit = null;
+    protected $travel_duration_limit = null;
     /**
      * Limit applied to the total distance of the vehicle's route. In a given
      * `OptimizeToursResponse`, the route distance is the sum of all its
@@ -213,7 +222,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.DistanceLimit route_distance_limit = 23;</code>
      */
-    private $route_distance_limit = null;
+    protected $route_distance_limit = null;
     /**
      * Specifies a map from visit_types strings to durations. The duration is time
      * in addition to
@@ -233,14 +242,15 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.BreakRule break_rule = 25;</code>
      */
-    private $break_rule = null;
+    protected $break_rule = null;
     /**
      * Specifies a label for this vehicle. This label is reported in the response
-     * as the `vehicle_label` of the corresponding [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
+     * as the `vehicle_label` of the corresponding
+     * [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
      *
      * Generated from protobuf field <code>string label = 27;</code>
      */
-    private $label = '';
+    protected $label = '';
     /**
      * If true, `used_if_route_is_empty` must be false, and this vehicle will
      * remain unused.
@@ -256,11 +266,12 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool ignore = 28;</code>
      */
-    private $ignore = false;
+    protected $ignore = false;
     /**
      * Deprecated: No longer used.
      * Indices in the `break_rule` field in the source
-     * [ShipmentModel][]. They correspond to break rules enforced on the vehicle.
+     * [ShipmentModel][google.cloud.optimization.v1.ShipmentModel]. They
+     * correspond to break rules enforced on the vehicle.
      * As of 2018/03, at most one rule index per vehicle can be specified.
      *
      * Generated from protobuf field <code>repeated int32 break_rule_indices = 29 [deprecated = true];</code>
@@ -268,21 +279,27 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      */
     private $break_rule_indices;
     /**
-     * Deprecated: Use [Vehicle.load_limits][] instead.
+     * Deprecated: Use
+     * [Vehicle.load_limits][google.cloud.optimization.v1.Vehicle.load_limits]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity capacities = 13 [deprecated = true];</code>
      * @deprecated
      */
     private $capacities;
     /**
-     * Deprecated: Use [Vehicle.LoadLimit.start_load_interval][] instead.
+     * Deprecated: Use
+     * [Vehicle.LoadLimit.start_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.start_load_interval]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantityInterval start_load_intervals = 14 [deprecated = true];</code>
      * @deprecated
      */
     private $start_load_intervals;
     /**
-     * Deprecated: Use [Vehicle.LoadLimit.end_load_interval][] instead.
+     * Deprecated: Use
+     * [Vehicle.LoadLimit.end_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.end_load_interval]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantityInterval end_load_intervals = 15 [deprecated = true];</code>
      * @deprecated
@@ -298,6 +315,9 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *     @type int $travel_mode
      *           The travel mode which affects the roads usable by the vehicle and its
      *           speed. See also `travel_duration_multiple`.
+     *     @type \Google\Cloud\Optimization\V1\RouteModifiers $route_modifiers
+     *           Optional. A set of conditions to satisfy that affect the way routes are
+     *           calculated for the given vehicle.
      *     @type \Google\Type\LatLng $start_location
      *           Geographic location where the vehicle starts before picking up any
      *           shipments. If not specified, the vehicle starts at its first pickup.
@@ -322,13 +342,13 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *           when it completes its last `VisitRequest`.
      *           If the shipment model has duration and distance matrices, `end_waypoint`
      *           must not be specified.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $start_tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $start_tags
      *           Specifies tags attached to the start of the vehicle's route.
      *           Empty or duplicate strings are not allowed.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $end_tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $end_tags
      *           Specifies tags attached to the end of the vehicle's route.
      *           Empty or duplicate strings are not allowed.
-     *     @type \Google\Cloud\Optimization\V1\TimeWindow[]|\Google\Protobuf\Internal\RepeatedField $start_time_windows
+     *     @type array<\Google\Cloud\Optimization\V1\TimeWindow>|\Google\Protobuf\Internal\RepeatedField $start_time_windows
      *           Time windows during which the vehicle may depart its start location.
      *           They must be within the global time limits (see
      *           [ShipmentModel.global_*][google.cloud.optimization.v1.ShipmentModel.global_start_time]
@@ -339,7 +359,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *           chronological order.
      *           `cost_per_hour_after_soft_end_time` and `soft_end_time` can only be set if
      *           there is a single time window.
-     *     @type \Google\Cloud\Optimization\V1\TimeWindow[]|\Google\Protobuf\Internal\RepeatedField $end_time_windows
+     *     @type array<\Google\Cloud\Optimization\V1\TimeWindow>|\Google\Protobuf\Internal\RepeatedField $end_time_windows
      *           Time windows during which the vehicle may arrive at its end location.
      *           They must be within the global time limits (see
      *           [ShipmentModel.global_*][google.cloud.optimization.v1.ShipmentModel.global_start_time]
@@ -381,12 +401,14 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *     @type float $cost_per_traveled_hour
      *           Cost per traveled hour of the vehicle route. This cost is applied only to
      *           travel time taken by the route (i.e., that reported in
-     *           [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]), and excludes waiting time and visit time.
+     *           [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]),
+     *           and excludes waiting time and visit time.
      *     @type float $cost_per_kilometer
      *           Cost per kilometer of the vehicle route. This cost is applied to the
-     *           distance reported in the [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] and does not apply
-     *           to any distance implicitly traveled from the `arrival_location` to the
-     *           `departure_location` of a single `VisitRequest`.
+     *           distance reported in the
+     *           [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     *           and does not apply to any distance implicitly traveled from the
+     *           `arrival_location` to the `departure_location` of a single `VisitRequest`.
      *     @type float $fixed_cost
      *           Fixed cost applied if this vehicle is used to handle a shipment.
      *     @type bool $used_if_route_is_empty
@@ -426,7 +448,8 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *           If empty, no breaks will be scheduled for this vehicle.
      *     @type string $label
      *           Specifies a label for this vehicle. This label is reported in the response
-     *           as the `vehicle_label` of the corresponding [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
+     *           as the `vehicle_label` of the corresponding
+     *           [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
      *     @type bool $ignore
      *           If true, `used_if_route_is_empty` must be false, and this vehicle will
      *           remain unused.
@@ -439,17 +462,24 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      *           `RELAX_ALL_AFTER_THRESHOLD`), it is skipped in the response.
      *           If a shipment has a non-empty `allowed_vehicle_indices` field and all of
      *           the allowed vehicles are ignored, it is skipped in the response.
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $break_rule_indices
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $break_rule_indices
      *           Deprecated: No longer used.
      *           Indices in the `break_rule` field in the source
-     *           [ShipmentModel][]. They correspond to break rules enforced on the vehicle.
+     *           [ShipmentModel][google.cloud.optimization.v1.ShipmentModel]. They
+     *           correspond to break rules enforced on the vehicle.
      *           As of 2018/03, at most one rule index per vehicle can be specified.
-     *     @type \Google\Cloud\Optimization\V1\CapacityQuantity[]|\Google\Protobuf\Internal\RepeatedField $capacities
-     *           Deprecated: Use [Vehicle.load_limits][] instead.
-     *     @type \Google\Cloud\Optimization\V1\CapacityQuantityInterval[]|\Google\Protobuf\Internal\RepeatedField $start_load_intervals
-     *           Deprecated: Use [Vehicle.LoadLimit.start_load_interval][] instead.
-     *     @type \Google\Cloud\Optimization\V1\CapacityQuantityInterval[]|\Google\Protobuf\Internal\RepeatedField $end_load_intervals
-     *           Deprecated: Use [Vehicle.LoadLimit.end_load_interval][] instead.
+     *     @type array<\Google\Cloud\Optimization\V1\CapacityQuantity>|\Google\Protobuf\Internal\RepeatedField $capacities
+     *           Deprecated: Use
+     *           [Vehicle.load_limits][google.cloud.optimization.v1.Vehicle.load_limits]
+     *           instead.
+     *     @type array<\Google\Cloud\Optimization\V1\CapacityQuantityInterval>|\Google\Protobuf\Internal\RepeatedField $start_load_intervals
+     *           Deprecated: Use
+     *           [Vehicle.LoadLimit.start_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.start_load_interval]
+     *           instead.
+     *     @type array<\Google\Cloud\Optimization\V1\CapacityQuantityInterval>|\Google\Protobuf\Internal\RepeatedField $end_load_intervals
+     *           Deprecated: Use
+     *           [Vehicle.LoadLimit.end_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.end_load_interval]
+     *           instead.
      * }
      */
     public function __construct($data = NULL) {
@@ -481,6 +511,44 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Google\Cloud\Optimization\V1\Vehicle\TravelMode::class);
         $this->travel_mode = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. A set of conditions to satisfy that affect the way routes are
+     * calculated for the given vehicle.
+     *
+     * Generated from protobuf field <code>.google.cloud.optimization.v1.RouteModifiers route_modifiers = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Optimization\V1\RouteModifiers|null
+     */
+    public function getRouteModifiers()
+    {
+        return $this->route_modifiers;
+    }
+
+    public function hasRouteModifiers()
+    {
+        return isset($this->route_modifiers);
+    }
+
+    public function clearRouteModifiers()
+    {
+        unset($this->route_modifiers);
+    }
+
+    /**
+     * Optional. A set of conditions to satisfy that affect the way routes are
+     * calculated for the given vehicle.
+     *
+     * Generated from protobuf field <code>.google.cloud.optimization.v1.RouteModifiers route_modifiers = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Optimization\V1\RouteModifiers $var
+     * @return $this
+     */
+    public function setRouteModifiers($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Optimization\V1\RouteModifiers::class);
+        $this->route_modifiers = $var;
 
         return $this;
     }
@@ -678,7 +746,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      * Empty or duplicate strings are not allowed.
      *
      * Generated from protobuf field <code>repeated string start_tags = 7;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setStartTags($var)
@@ -706,7 +774,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      * Empty or duplicate strings are not allowed.
      *
      * Generated from protobuf field <code>repeated string end_tags = 8;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEndTags($var)
@@ -750,7 +818,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      * there is a single time window.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.TimeWindow start_time_windows = 9;</code>
-     * @param \Google\Cloud\Optimization\V1\TimeWindow[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\TimeWindow>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setStartTimeWindows($var)
@@ -794,7 +862,7 @@ class Vehicle extends \Google\Protobuf\Internal\Message
      * there is a single time window.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.TimeWindow end_time_windows = 10;</code>
-     * @param \Google\Cloud\Optimization\V1\TimeWindow[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\TimeWindow>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEndTimeWindows($var)
@@ -962,7 +1030,8 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     /**
      * Cost per traveled hour of the vehicle route. This cost is applied only to
      * travel time taken by the route (i.e., that reported in
-     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]), and excludes waiting time and visit time.
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]),
+     * and excludes waiting time and visit time.
      *
      * Generated from protobuf field <code>double cost_per_traveled_hour = 17;</code>
      * @return float
@@ -975,7 +1044,8 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     /**
      * Cost per traveled hour of the vehicle route. This cost is applied only to
      * travel time taken by the route (i.e., that reported in
-     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]), and excludes waiting time and visit time.
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]),
+     * and excludes waiting time and visit time.
      *
      * Generated from protobuf field <code>double cost_per_traveled_hour = 17;</code>
      * @param float $var
@@ -991,9 +1061,10 @@ class Vehicle extends \Google\Protobuf\Internal\Message
 
     /**
      * Cost per kilometer of the vehicle route. This cost is applied to the
-     * distance reported in the [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] and does not apply
-     * to any distance implicitly traveled from the `arrival_location` to the
-     * `departure_location` of a single `VisitRequest`.
+     * distance reported in the
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * and does not apply to any distance implicitly traveled from the
+     * `arrival_location` to the `departure_location` of a single `VisitRequest`.
      *
      * Generated from protobuf field <code>double cost_per_kilometer = 18;</code>
      * @return float
@@ -1005,9 +1076,10 @@ class Vehicle extends \Google\Protobuf\Internal\Message
 
     /**
      * Cost per kilometer of the vehicle route. This cost is applied to the
-     * distance reported in the [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions] and does not apply
-     * to any distance implicitly traveled from the `arrival_location` to the
-     * `departure_location` of a single `VisitRequest`.
+     * distance reported in the
+     * [ShipmentRoute.transitions][google.cloud.optimization.v1.ShipmentRoute.transitions]
+     * and does not apply to any distance implicitly traveled from the
+     * `arrival_location` to the `departure_location` of a single `VisitRequest`.
      *
      * Generated from protobuf field <code>double cost_per_kilometer = 18;</code>
      * @param float $var
@@ -1291,7 +1363,8 @@ class Vehicle extends \Google\Protobuf\Internal\Message
 
     /**
      * Specifies a label for this vehicle. This label is reported in the response
-     * as the `vehicle_label` of the corresponding [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
+     * as the `vehicle_label` of the corresponding
+     * [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
      *
      * Generated from protobuf field <code>string label = 27;</code>
      * @return string
@@ -1303,7 +1376,8 @@ class Vehicle extends \Google\Protobuf\Internal\Message
 
     /**
      * Specifies a label for this vehicle. This label is reported in the response
-     * as the `vehicle_label` of the corresponding [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
+     * as the `vehicle_label` of the corresponding
+     * [ShipmentRoute][google.cloud.optimization.v1.ShipmentRoute].
      *
      * Generated from protobuf field <code>string label = 27;</code>
      * @param string $var
@@ -1366,7 +1440,8 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     /**
      * Deprecated: No longer used.
      * Indices in the `break_rule` field in the source
-     * [ShipmentModel][]. They correspond to break rules enforced on the vehicle.
+     * [ShipmentModel][google.cloud.optimization.v1.ShipmentModel]. They
+     * correspond to break rules enforced on the vehicle.
      * As of 2018/03, at most one rule index per vehicle can be specified.
      *
      * Generated from protobuf field <code>repeated int32 break_rule_indices = 29 [deprecated = true];</code>
@@ -1382,11 +1457,12 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     /**
      * Deprecated: No longer used.
      * Indices in the `break_rule` field in the source
-     * [ShipmentModel][]. They correspond to break rules enforced on the vehicle.
+     * [ShipmentModel][google.cloud.optimization.v1.ShipmentModel]. They
+     * correspond to break rules enforced on the vehicle.
      * As of 2018/03, at most one rule index per vehicle can be specified.
      *
      * Generated from protobuf field <code>repeated int32 break_rule_indices = 29 [deprecated = true];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */
@@ -1400,7 +1476,9 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Vehicle.load_limits][] instead.
+     * Deprecated: Use
+     * [Vehicle.load_limits][google.cloud.optimization.v1.Vehicle.load_limits]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity capacities = 13 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -1413,10 +1491,12 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Vehicle.load_limits][] instead.
+     * Deprecated: Use
+     * [Vehicle.load_limits][google.cloud.optimization.v1.Vehicle.load_limits]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantity capacities = 13 [deprecated = true];</code>
-     * @param \Google\Cloud\Optimization\V1\CapacityQuantity[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\CapacityQuantity>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */
@@ -1430,7 +1510,9 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Vehicle.LoadLimit.start_load_interval][] instead.
+     * Deprecated: Use
+     * [Vehicle.LoadLimit.start_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.start_load_interval]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantityInterval start_load_intervals = 14 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -1443,10 +1525,12 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Vehicle.LoadLimit.start_load_interval][] instead.
+     * Deprecated: Use
+     * [Vehicle.LoadLimit.start_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.start_load_interval]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantityInterval start_load_intervals = 14 [deprecated = true];</code>
-     * @param \Google\Cloud\Optimization\V1\CapacityQuantityInterval[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\CapacityQuantityInterval>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */
@@ -1460,7 +1544,9 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Vehicle.LoadLimit.end_load_interval][] instead.
+     * Deprecated: Use
+     * [Vehicle.LoadLimit.end_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.end_load_interval]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantityInterval end_load_intervals = 15 [deprecated = true];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -1473,10 +1559,12 @@ class Vehicle extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Deprecated: Use [Vehicle.LoadLimit.end_load_interval][] instead.
+     * Deprecated: Use
+     * [Vehicle.LoadLimit.end_load_interval][google.cloud.optimization.v1.Vehicle.LoadLimit.end_load_interval]
+     * instead.
      *
      * Generated from protobuf field <code>repeated .google.cloud.optimization.v1.CapacityQuantityInterval end_load_intervals = 15 [deprecated = true];</code>
-     * @param \Google\Cloud\Optimization\V1\CapacityQuantityInterval[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Optimization\V1\CapacityQuantityInterval>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */

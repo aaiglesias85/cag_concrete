@@ -21,7 +21,22 @@ class DeleteCertificateRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. A name of the certificate to delete. Must be in the format
+     *                     `projects/&#42;/locations/&#42;/certificates/*`. Please see
+     *                     {@see CertificateManagerClient::certificateName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\CertificateManager\V1\DeleteCertificateRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

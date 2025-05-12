@@ -2,29 +2,44 @@
 
 namespace App\Utils;
 
+use App\Entity\ConcreteVendorContact;
+use App\Entity\DataTrackingConcVendor;
+use App\Entity\DataTrackingItem;
+use App\Entity\DataTrackingLabor;
+use App\Entity\DataTrackingMaterial;
+use App\Entity\DataTrackingSubcontract;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
+use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\Unit;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class Base
 {
     private $container;
     private $containerBag;
     public $mailer;
+    public $security;
 
-    public function __construct(ContainerInterface $container, \Swift_Mailer $mailer, ContainerBagInterface $containerBag)
+    public function __construct(ContainerInterface $container,
+                                MailerInterface $mailer,
+                                ContainerBagInterface $containerBag,
+                                Security $security)
     {
         $this->container = $container;
         $this->mailer = $mailer;
         $this->containerBag = $containerBag;
+        $this->security = $security;
     }
 
     //doctrine manager
@@ -38,22 +53,9 @@ class Base
     }
 
     // user
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
-        if (!$this->container->has('security.token_storage')) {
-            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
-        }
-
-        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
-        }
-
-        if (!\is_object($user = $token->getUser())) {
-            // e.g. anonymous authentication
-            return;
-        }
-
-        return $user;
+        return $this->security->getUser();
     }
 
     //Generates a URL from the given parameters.
@@ -160,9 +162,9 @@ class Base
 
         $ruta = $this->generateUrl('home');
         if (substr_count($ruta, 'index.php') > 0) {
-            $ruta = $this->generateUrl('home') . '../';
+            $ruta = $this->generateUrl('home') . '../../';
         } else {
-            $ruta = $this->generateUrl('home');
+            $ruta = $this->generateUrl('home'). '../';;
         }
 
         $direccion_url = "http" . $s . "://" . $_SERVER['HTTP_HOST'] . $ruta;
@@ -191,28 +193,6 @@ class Base
 
         return $ip;
     }
-
-    //Remover puntos del rut
-    public function LimpiarRut($rut)
-    {
-        $patron = "[.]";
-        $rut = mb_eregi_replace($patron, "", $rut);
-        return $rut;
-    }
-
-    //Poner puntos del rut
-    function FormatearRut($rut)
-    {
-        if ($rut != "") {
-            $rut = $this->LimpiarRut($rut);
-            $rutTmp = explode("-", $rut);
-            return number_format($rutTmp[0], 0, "", ".") . '-' . $rutTmp[1];
-        } else {
-            return $rut;
-        }
-
-    }
-
 
     //Cambiar time zone
     function setTimeZone($zone = 'America/Santiago')
@@ -243,30 +223,6 @@ class Base
         $primer_dia_mes = $fecha->format('m/d/Y');
 
         return $primer_dia_mes;
-    }
-
-    //Generar hexadecimal aleatorio
-    function generarCadenaAleatoria()
-    {
-        $codigo = "";
-        //Dos letras
-        $codigo .= substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 6);
-        //Tres numeros
-        $codigo .= "-" . substr(str_shuffle("0123456789"), 0, 6);
-        //Tres numeros
-        //$codigo .= "-".substr(str_shuffle("0123456789"), 0, 6);
-
-        return $codigo;
-    }
-
-    //Generar nombre de paramatero aleatorio
-    function generarParamAleatorio()
-    {
-        $codigo = "";
-        //Dos letras
-        $codigo .= substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
-
-        return $codigo;
     }
 
     //Devuelve la fecha del mensaje en el formato Agosto, 25 H:i
@@ -333,151 +289,6 @@ class Base
 
     }
 
-    //Devuelve la fecha del mensaje en el formato Agosto, 25 H:i
-    public function DevolverFechaFormatoMensajes($fecha)
-    {
-        $mes = $fecha->format('m');
-        switch ($mes) {
-            case "01":
-                $mes = "Ene";
-                break;
-            case "02":
-                $mes = "Feb";
-                break;
-            case "03":
-                $mes = "Mar";
-                break;
-            case "04":
-                $mes = "Abr";
-                break;
-            case "05":
-                $mes = "May";
-                break;
-            case "06":
-                $mes = "Jun";
-                break;
-            case "07":
-                $mes = "Jul";
-                break;
-            case "08":
-                $mes = "Ago";
-                break;
-            case "09":
-                $mes = "Sept";
-                break;
-            case "10":
-                $mes = "Oct";
-                break;
-            case "11":
-                $mes = "Nov";
-                break;
-            case "12":
-                $mes = "Dic";
-                break;
-            default:
-                break;
-        }
-
-        $resultado = $mes . ", " . $fecha->format('j');
-
-        return $resultado;
-    }
-
-    //Devolver mes
-    public function DevolverMes($mes)
-    {
-        $nombre = "";
-        switch ($mes) {
-            case "1":
-                $nombre = "January";
-                break;
-            case "2":
-                $nombre = "February";
-                break;
-            case "3":
-                $nombre = "March";
-                break;
-            case "4":
-                $nombre = "April";
-                break;
-            case "5":
-                $nombre = "May";
-                break;
-            case "6":
-                $nombre = "June";
-                break;
-            case "7":
-                $nombre = "July";
-                break;
-            case "8":
-                $nombre = "August";
-                break;
-            case "9":
-                $nombre = "September";
-                break;
-            case "10":
-                $nombre = "October";
-                break;
-            case "11":
-                $nombre = "November";
-                break;
-            case "12":
-                $nombre = "December";
-                break;
-            default:
-                break;
-        }
-        return $nombre;
-    }
-
-    public function DevolverHora($hora)
-    {
-        $am = ($hora >= 12) ? "pm" : "am";
-        if ($hora > 12) {
-            if ($hora == 13) {
-                $hora = 1;
-            }
-            if ($hora == 14) {
-                $hora = 2;
-            }
-            if ($hora == 15) {
-                $hora = 3;
-            }
-            if ($hora == 16) {
-                $hora = 4;
-            }
-            if ($hora == 17) {
-                $hora = 5;
-            }
-            if ($hora == 18) {
-                $hora = 6;
-            }
-            if ($hora == 19) {
-                $hora = 7;
-            }
-            if ($hora == 20) {
-                $hora = 8;
-            }
-            if ($hora == 21) {
-                $hora = 9;
-            }
-            if ($hora == 22) {
-                $hora = 10;
-            }
-            if ($hora == 23) {
-                $hora = 11;
-            }
-            if ($hora == 24) {
-                $hora = 12;
-            }
-        }
-
-        if ($hora == '00') {
-            $hora = '12';
-        }
-        return $hora . $am;
-    }
-
     /**
      * ListarPermisosDeUsuario: Carga todos los permisos de un perfil
      *
@@ -539,6 +350,8 @@ class Base
             $menuSubcontractor = false;
             $menuReporteSubcontractor = false;
             $menuReporteEmployee = false;
+            $menuConcreteVendor = false;
+            $menuSchedule = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -601,6 +414,12 @@ class Base
                 if ($permiso['funcion_id'] == 20 && $permiso['ver']) {
                     $menuReporteEmployee = true;
                 }
+                if ($permiso['funcion_id'] == 21 && $permiso['ver']) {
+                    $menuConcreteVendor = true;
+                }
+                if ($permiso['funcion_id'] == 22 && $permiso['ver']) {
+                    $menuSchedule = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -623,6 +442,8 @@ class Base
                 'menuSubcontractor' => $menuSubcontractor,
                 'menuReporteSubcontractor' => $menuReporteSubcontractor,
                 'menuReporteEmployee' => $menuReporteEmployee,
+                'menuConcreteVendor' => $menuConcreteVendor,
+                'menuSchedule' => $menuSchedule,
             );
         }
 
@@ -1020,6 +841,103 @@ class Base
         }
 
         return $yield_calculation_name;
+    }
+
+    /**
+     * EliminarInformacionRelacionadaDataTracking
+     * @param $data_tracking_id
+     * @return void
+     */
+    public function EliminarInformacionRelacionadaDataTracking($data_tracking_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // conc vendors
+        $conc_vendors = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->ListarConcVendor($data_tracking_id);
+        foreach ($conc_vendors as $conc_vendor) {
+            $em->remove($conc_vendor);
+        }
+
+        // items
+        $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+            ->ListarItems($data_tracking_id);
+        foreach ($items as $item) {
+            $em->remove($item);
+        }
+
+        // labor
+        $data_tracking_labors = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarLabor($data_tracking_id);
+        foreach ($data_tracking_labors as $data_tracking_labor) {
+            $em->remove($data_tracking_labor);
+        }
+
+        // materials
+        $data_tracking_materials = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
+            ->ListarMaterials($data_tracking_id);
+        foreach ($data_tracking_materials as $data_tracking_material) {
+            $em->remove($data_tracking_material);
+        }
+
+        // data tracking subcontract
+        $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarSubcontracts($data_tracking_id);
+        foreach ($subcontract_items as $subcontract_item) {
+            $em->remove($subcontract_item);
+        }
+    }
+
+    /**
+     * ListarContactsDeProject
+     * @param $project_id
+     * @return array
+     */
+    public function ListarContactsDeProject($project_id)
+    {
+        $contacts = [];
+
+        $project_contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
+            ->ListarContacts($project_id);
+        foreach ($project_contacts as $key => $contact) {
+            $contacts[] = [
+                'contact_id' => $contact->getContactId(),
+                'name' => $contact->getName(),
+                'email' => $contact->getEmail(),
+                'phone' => $contact->getPhone(),
+                'role' => $contact->getRole(),
+                'notes' => $contact->getNotes(),
+                'posicion' => $key
+            ];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * ListarContactsDeConcreteVendor
+     * @param $vendor_id
+     * @return array
+     */
+    public function ListarContactsDeConcreteVendor($vendor_id)
+    {
+        $contacts = [];
+
+        $vendor_contacts = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
+            ->ListarContacts($vendor_id);
+        foreach ($vendor_contacts as $key => $contact) {
+            $contacts[] = [
+                'contact_id' => $contact->getContactId(),
+                'name' => $contact->getName(),
+                'email' => $contact->getEmail(),
+                'phone' => $contact->getPhone(),
+                'role' => $contact->getRole(),
+                'notes' => $contact->getNotes(),
+                'posicion' => $key
+            ];
+        }
+
+        return $contacts;
     }
 
 }

@@ -22,47 +22,55 @@ class Style extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.TextAnchor text_anchor = 1;</code>
      */
-    private $text_anchor = null;
+    protected $text_anchor = null;
     /**
      * Text color.
      *
      * Generated from protobuf field <code>.google.type.Color color = 2;</code>
      */
-    private $color = null;
+    protected $color = null;
     /**
      * Text background color.
      *
      * Generated from protobuf field <code>.google.type.Color background_color = 3;</code>
      */
-    private $background_color = null;
+    protected $background_color = null;
     /**
-     * Font weight. Possible values are normal, bold, bolder, and lighter.
-     * https://www.w3schools.com/cssref/pr_font_weight.asp
+     * [Font weight](https://www.w3schools.com/cssref/pr_font_weight.asp).
+     * Possible values are `normal`, `bold`, `bolder`, and `lighter`.
      *
      * Generated from protobuf field <code>string font_weight = 4;</code>
      */
-    private $font_weight = '';
+    protected $font_weight = '';
     /**
-     * Text style. Possible values are normal, italic, and oblique.
-     * https://www.w3schools.com/cssref/pr_font_font-style.asp
+     * [Text style](https://www.w3schools.com/cssref/pr_font_font-style.asp).
+     * Possible values are `normal`, `italic`, and `oblique`.
      *
      * Generated from protobuf field <code>string text_style = 5;</code>
      */
-    private $text_style = '';
+    protected $text_style = '';
     /**
-     * Text decoration. Follows CSS standard.
-     * <text-decoration-line> <text-decoration-color> <text-decoration-style>
-     * https://www.w3schools.com/cssref/pr_text_text-decoration.asp
+     * [Text
+     * decoration](https://www.w3schools.com/cssref/pr_text_text-decoration.asp).
+     * Follows CSS standard. <text-decoration-line> <text-decoration-color>
+     * <text-decoration-style>
      *
      * Generated from protobuf field <code>string text_decoration = 6;</code>
      */
-    private $text_decoration = '';
+    protected $text_decoration = '';
     /**
      * Font size.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.Document.Style.FontSize font_size = 7;</code>
      */
-    private $font_size = null;
+    protected $font_size = null;
+    /**
+     * Font family such as `Arial`, `Times New Roman`.
+     * https://www.w3schools.com/cssref/pr_font_font-family.asp
+     *
+     * Generated from protobuf field <code>string font_family = 8;</code>
+     */
+    protected $font_family = '';
 
     /**
      * Constructor.
@@ -78,17 +86,21 @@ class Style extends \Google\Protobuf\Internal\Message
      *     @type \Google\Type\Color $background_color
      *           Text background color.
      *     @type string $font_weight
-     *           Font weight. Possible values are normal, bold, bolder, and lighter.
-     *           https://www.w3schools.com/cssref/pr_font_weight.asp
+     *           [Font weight](https://www.w3schools.com/cssref/pr_font_weight.asp).
+     *           Possible values are `normal`, `bold`, `bolder`, and `lighter`.
      *     @type string $text_style
-     *           Text style. Possible values are normal, italic, and oblique.
-     *           https://www.w3schools.com/cssref/pr_font_font-style.asp
+     *           [Text style](https://www.w3schools.com/cssref/pr_font_font-style.asp).
+     *           Possible values are `normal`, `italic`, and `oblique`.
      *     @type string $text_decoration
-     *           Text decoration. Follows CSS standard.
-     *           <text-decoration-line> <text-decoration-color> <text-decoration-style>
-     *           https://www.w3schools.com/cssref/pr_text_text-decoration.asp
+     *           [Text
+     *           decoration](https://www.w3schools.com/cssref/pr_text_text-decoration.asp).
+     *           Follows CSS standard. <text-decoration-line> <text-decoration-color>
+     *           <text-decoration-style>
      *     @type \Google\Cloud\DocumentAI\V1\Document\Style\FontSize $font_size
      *           Font size.
+     *     @type string $font_family
+     *           Font family such as `Arial`, `Times New Roman`.
+     *           https://www.w3schools.com/cssref/pr_font_font-family.asp
      * }
      */
     public function __construct($data = NULL) {
@@ -207,8 +219,8 @@ class Style extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Font weight. Possible values are normal, bold, bolder, and lighter.
-     * https://www.w3schools.com/cssref/pr_font_weight.asp
+     * [Font weight](https://www.w3schools.com/cssref/pr_font_weight.asp).
+     * Possible values are `normal`, `bold`, `bolder`, and `lighter`.
      *
      * Generated from protobuf field <code>string font_weight = 4;</code>
      * @return string
@@ -219,8 +231,8 @@ class Style extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Font weight. Possible values are normal, bold, bolder, and lighter.
-     * https://www.w3schools.com/cssref/pr_font_weight.asp
+     * [Font weight](https://www.w3schools.com/cssref/pr_font_weight.asp).
+     * Possible values are `normal`, `bold`, `bolder`, and `lighter`.
      *
      * Generated from protobuf field <code>string font_weight = 4;</code>
      * @param string $var
@@ -235,8 +247,8 @@ class Style extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Text style. Possible values are normal, italic, and oblique.
-     * https://www.w3schools.com/cssref/pr_font_font-style.asp
+     * [Text style](https://www.w3schools.com/cssref/pr_font_font-style.asp).
+     * Possible values are `normal`, `italic`, and `oblique`.
      *
      * Generated from protobuf field <code>string text_style = 5;</code>
      * @return string
@@ -247,8 +259,8 @@ class Style extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Text style. Possible values are normal, italic, and oblique.
-     * https://www.w3schools.com/cssref/pr_font_font-style.asp
+     * [Text style](https://www.w3schools.com/cssref/pr_font_font-style.asp).
+     * Possible values are `normal`, `italic`, and `oblique`.
      *
      * Generated from protobuf field <code>string text_style = 5;</code>
      * @param string $var
@@ -263,9 +275,10 @@ class Style extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Text decoration. Follows CSS standard.
-     * <text-decoration-line> <text-decoration-color> <text-decoration-style>
-     * https://www.w3schools.com/cssref/pr_text_text-decoration.asp
+     * [Text
+     * decoration](https://www.w3schools.com/cssref/pr_text_text-decoration.asp).
+     * Follows CSS standard. <text-decoration-line> <text-decoration-color>
+     * <text-decoration-style>
      *
      * Generated from protobuf field <code>string text_decoration = 6;</code>
      * @return string
@@ -276,9 +289,10 @@ class Style extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Text decoration. Follows CSS standard.
-     * <text-decoration-line> <text-decoration-color> <text-decoration-style>
-     * https://www.w3schools.com/cssref/pr_text_text-decoration.asp
+     * [Text
+     * decoration](https://www.w3schools.com/cssref/pr_text_text-decoration.asp).
+     * Follows CSS standard. <text-decoration-line> <text-decoration-color>
+     * <text-decoration-style>
      *
      * Generated from protobuf field <code>string text_decoration = 6;</code>
      * @param string $var
@@ -324,6 +338,34 @@ class Style extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\DocumentAI\V1\Document\Style\FontSize::class);
         $this->font_size = $var;
+
+        return $this;
+    }
+
+    /**
+     * Font family such as `Arial`, `Times New Roman`.
+     * https://www.w3schools.com/cssref/pr_font_font-family.asp
+     *
+     * Generated from protobuf field <code>string font_family = 8;</code>
+     * @return string
+     */
+    public function getFontFamily()
+    {
+        return $this->font_family;
+    }
+
+    /**
+     * Font family such as `Arial`, `Times New Roman`.
+     * https://www.w3schools.com/cssref/pr_font_font-family.asp
+     *
+     * Generated from protobuf field <code>string font_family = 8;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setFontFamily($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->font_family = $var;
 
         return $this;
     }

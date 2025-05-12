@@ -21,19 +21,38 @@ class CreateInstanceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The name of the instance to create.
      *
      * Generated from protobuf field <code>string instance_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $instance_id = '';
+    protected $instance_id = '';
     /**
      * An instance resource.
      *
      * Generated from protobuf field <code>.google.cloud.datafusion.v1.Instance instance = 3;</code>
      */
-    private $instance = null;
+    protected $instance = null;
+
+    /**
+     * @param string                               $parent     Required. The instance's project and location in the format
+     *                                                         projects/{project}/locations/{location}. Please see
+     *                                                         {@see DataFusionClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\DataFusion\V1\Instance $instance   An instance resource.
+     * @param string                               $instanceId Required. The name of the instance to create.
+     *
+     * @return \Google\Cloud\DataFusion\V1\CreateInstanceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\DataFusion\V1\Instance $instance, string $instanceId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setInstance($instance)
+            ->setInstanceId($instanceId);
+    }
 
     /**
      * Constructor.

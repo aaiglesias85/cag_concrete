@@ -22,8 +22,8 @@ use Google\Protobuf\Internal\GPBUtil;
  * Each batch of statements is assigned a name which can be used with
  * the [Operations][google.longrunning.Operations] API to monitor
  * progress. See the
- * [operation_id][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.operation_id] field for more
- * details.
+ * [operation_id][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.operation_id]
+ * field for more details.
  *
  * Generated from protobuf message <code>google.spanner.admin.database.v1.UpdateDatabaseDdlRequest</code>
  */
@@ -48,21 +48,58 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
      * [Operation][google.longrunning.Operation].
      * Specifying an explicit operation ID simplifies determining
      * whether the statements were executed in the event that the
-     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] call is replayed,
-     * or the return value is otherwise lost: the [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database] and
-     * `operation_id` fields can be combined to form the
+     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     * call is replayed, or the return value is otherwise lost: the
+     * [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database]
+     * and `operation_id` fields can be combined to form the
      * [name][google.longrunning.Operation.name] of the resulting
-     * [longrunning.Operation][google.longrunning.Operation]: `<database>/operations/<operation_id>`.
+     * [longrunning.Operation][google.longrunning.Operation]:
+     * `<database>/operations/<operation_id>`.
      * `operation_id` should be unique within the database, and must be
      * a valid identifier: `[a-z][a-z0-9_]*`. Note that
      * automatically-generated operation IDs always begin with an
      * underscore. If the named operation already exists,
-     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] returns
-     * `ALREADY_EXISTS`.
+     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     * returns `ALREADY_EXISTS`.
      *
      * Generated from protobuf field <code>string operation_id = 3;</code>
      */
     private $operation_id = '';
+    /**
+     * Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements.
+     * Contains a protobuf-serialized
+     * [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto).
+     * To generate it, [install](https://grpc.io/docs/protoc-installation/) and
+     * run `protoc` with --include_imports and --descriptor_set_out. For example,
+     * to generate for moon/shot/app.proto, run
+     * ```
+     * $protoc  --proto_path=/app_path --proto_path=/lib_path \
+     *          --include_imports \
+     *          --descriptor_set_out=descriptors.data \
+     *          moon/shot/app.proto
+     * ```
+     * For more details, see protobuffer [self
+     * description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).
+     *
+     * Generated from protobuf field <code>bytes proto_descriptors = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $proto_descriptors = '';
+
+    /**
+     * @param string   $database   Required. The database to update. Please see
+     *                             {@see DatabaseAdminClient::databaseName()} for help formatting this field.
+     * @param string[] $statements Required. DDL statements to be applied to the database.
+     *
+     * @return \Google\Cloud\Spanner\Admin\Database\V1\UpdateDatabaseDdlRequest
+     *
+     * @experimental
+     */
+    public static function build(string $database, array $statements): self
+    {
+        return (new self())
+            ->setDatabase($database)
+            ->setStatements($statements);
+    }
 
     /**
      * Constructor.
@@ -72,7 +109,7 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $database
      *           Required. The database to update.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $statements
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $statements
      *           Required. DDL statements to be applied to the database.
      *     @type string $operation_id
      *           If empty, the new update request is assigned an
@@ -81,17 +118,34 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
      *           [Operation][google.longrunning.Operation].
      *           Specifying an explicit operation ID simplifies determining
      *           whether the statements were executed in the event that the
-     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] call is replayed,
-     *           or the return value is otherwise lost: the [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database] and
-     *           `operation_id` fields can be combined to form the
+     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     *           call is replayed, or the return value is otherwise lost: the
+     *           [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database]
+     *           and `operation_id` fields can be combined to form the
      *           [name][google.longrunning.Operation.name] of the resulting
-     *           [longrunning.Operation][google.longrunning.Operation]: `<database>/operations/<operation_id>`.
+     *           [longrunning.Operation][google.longrunning.Operation]:
+     *           `<database>/operations/<operation_id>`.
      *           `operation_id` should be unique within the database, and must be
      *           a valid identifier: `[a-z][a-z0-9_]*`. Note that
      *           automatically-generated operation IDs always begin with an
      *           underscore. If the named operation already exists,
-     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] returns
-     *           `ALREADY_EXISTS`.
+     *           [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     *           returns `ALREADY_EXISTS`.
+     *     @type string $proto_descriptors
+     *           Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements.
+     *           Contains a protobuf-serialized
+     *           [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto).
+     *           To generate it, [install](https://grpc.io/docs/protoc-installation/) and
+     *           run `protoc` with --include_imports and --descriptor_set_out. For example,
+     *           to generate for moon/shot/app.proto, run
+     *           ```
+     *           $protoc  --proto_path=/app_path --proto_path=/lib_path \
+     *                    --include_imports \
+     *                    --descriptor_set_out=descriptors.data \
+     *                    moon/shot/app.proto
+     *           ```
+     *           For more details, see protobuffer [self
+     *           description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).
      * }
      */
     public function __construct($data = NULL) {
@@ -140,7 +194,7 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
      * Required. DDL statements to be applied to the database.
      *
      * Generated from protobuf field <code>repeated string statements = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setStatements($var)
@@ -158,17 +212,19 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
      * [Operation][google.longrunning.Operation].
      * Specifying an explicit operation ID simplifies determining
      * whether the statements were executed in the event that the
-     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] call is replayed,
-     * or the return value is otherwise lost: the [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database] and
-     * `operation_id` fields can be combined to form the
+     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     * call is replayed, or the return value is otherwise lost: the
+     * [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database]
+     * and `operation_id` fields can be combined to form the
      * [name][google.longrunning.Operation.name] of the resulting
-     * [longrunning.Operation][google.longrunning.Operation]: `<database>/operations/<operation_id>`.
+     * [longrunning.Operation][google.longrunning.Operation]:
+     * `<database>/operations/<operation_id>`.
      * `operation_id` should be unique within the database, and must be
      * a valid identifier: `[a-z][a-z0-9_]*`. Note that
      * automatically-generated operation IDs always begin with an
      * underscore. If the named operation already exists,
-     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] returns
-     * `ALREADY_EXISTS`.
+     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     * returns `ALREADY_EXISTS`.
      *
      * Generated from protobuf field <code>string operation_id = 3;</code>
      * @return string
@@ -185,17 +241,19 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
      * [Operation][google.longrunning.Operation].
      * Specifying an explicit operation ID simplifies determining
      * whether the statements were executed in the event that the
-     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] call is replayed,
-     * or the return value is otherwise lost: the [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database] and
-     * `operation_id` fields can be combined to form the
+     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     * call is replayed, or the return value is otherwise lost: the
+     * [database][google.spanner.admin.database.v1.UpdateDatabaseDdlRequest.database]
+     * and `operation_id` fields can be combined to form the
      * [name][google.longrunning.Operation.name] of the resulting
-     * [longrunning.Operation][google.longrunning.Operation]: `<database>/operations/<operation_id>`.
+     * [longrunning.Operation][google.longrunning.Operation]:
+     * `<database>/operations/<operation_id>`.
      * `operation_id` should be unique within the database, and must be
      * a valid identifier: `[a-z][a-z0-9_]*`. Note that
      * automatically-generated operation IDs always begin with an
      * underscore. If the named operation already exists,
-     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl] returns
-     * `ALREADY_EXISTS`.
+     * [UpdateDatabaseDdl][google.spanner.admin.database.v1.DatabaseAdmin.UpdateDatabaseDdl]
+     * returns `ALREADY_EXISTS`.
      *
      * Generated from protobuf field <code>string operation_id = 3;</code>
      * @param string $var
@@ -205,6 +263,58 @@ class UpdateDatabaseDdlRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->operation_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements.
+     * Contains a protobuf-serialized
+     * [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto).
+     * To generate it, [install](https://grpc.io/docs/protoc-installation/) and
+     * run `protoc` with --include_imports and --descriptor_set_out. For example,
+     * to generate for moon/shot/app.proto, run
+     * ```
+     * $protoc  --proto_path=/app_path --proto_path=/lib_path \
+     *          --include_imports \
+     *          --descriptor_set_out=descriptors.data \
+     *          moon/shot/app.proto
+     * ```
+     * For more details, see protobuffer [self
+     * description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).
+     *
+     * Generated from protobuf field <code>bytes proto_descriptors = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getProtoDescriptors()
+    {
+        return $this->proto_descriptors;
+    }
+
+    /**
+     * Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements.
+     * Contains a protobuf-serialized
+     * [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto).
+     * To generate it, [install](https://grpc.io/docs/protoc-installation/) and
+     * run `protoc` with --include_imports and --descriptor_set_out. For example,
+     * to generate for moon/shot/app.proto, run
+     * ```
+     * $protoc  --proto_path=/app_path --proto_path=/lib_path \
+     *          --include_imports \
+     *          --descriptor_set_out=descriptors.data \
+     *          moon/shot/app.proto
+     * ```
+     * For more details, see protobuffer [self
+     * description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).
+     *
+     * Generated from protobuf field <code>bytes proto_descriptors = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setProtoDescriptors($var)
+    {
+        GPBUtil::checkString($var, False);
+        $this->proto_descriptors = $var;
 
         return $this;
     }

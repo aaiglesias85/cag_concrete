@@ -34,15 +34,15 @@ class TemplateParameter extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Paths to all fields that the parameter replaces.
      * A field is allowed to appear in at most one parameter's list of field
      * paths.
-     * A field path is similar in syntax to a [google.protobuf.FieldMask][google.protobuf.FieldMask].
-     * For example, a field path that references the zone field of a workflow
-     * template's cluster selector would be specified as
-     * `placement.clusterSelector.zone`.
+     * A field path is similar in syntax to a
+     * [google.protobuf.FieldMask][google.protobuf.FieldMask]. For example, a
+     * field path that references the zone field of a workflow template's cluster
+     * selector would be specified as `placement.clusterSelector.zone`.
      * Also, field paths can reference fields using the following syntax:
      * * Values in maps can be referenced by key:
      *     * labels['key']
@@ -82,13 +82,13 @@ class TemplateParameter extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Optional. Validation rules to be applied to this parameter's value.
      *
      * Generated from protobuf field <code>.google.cloud.dataproc.v1.ParameterValidation validation = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validation = null;
+    protected $validation = null;
 
     /**
      * Constructor.
@@ -104,14 +104,14 @@ class TemplateParameter extends \Google\Protobuf\Internal\Message
      *           The name must contain only capital letters (A-Z), numbers (0-9), and
      *           underscores (_), and must not start with a number. The maximum length is
      *           40 characters.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $fields
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $fields
      *           Required. Paths to all fields that the parameter replaces.
      *           A field is allowed to appear in at most one parameter's list of field
      *           paths.
-     *           A field path is similar in syntax to a [google.protobuf.FieldMask][google.protobuf.FieldMask].
-     *           For example, a field path that references the zone field of a workflow
-     *           template's cluster selector would be specified as
-     *           `placement.clusterSelector.zone`.
+     *           A field path is similar in syntax to a
+     *           [google.protobuf.FieldMask][google.protobuf.FieldMask]. For example, a
+     *           field path that references the zone field of a workflow template's cluster
+     *           selector would be specified as `placement.clusterSelector.zone`.
      *           Also, field paths can reference fields using the following syntax:
      *           * Values in maps can be referenced by key:
      *               * labels['key']
@@ -195,10 +195,10 @@ class TemplateParameter extends \Google\Protobuf\Internal\Message
      * Required. Paths to all fields that the parameter replaces.
      * A field is allowed to appear in at most one parameter's list of field
      * paths.
-     * A field path is similar in syntax to a [google.protobuf.FieldMask][google.protobuf.FieldMask].
-     * For example, a field path that references the zone field of a workflow
-     * template's cluster selector would be specified as
-     * `placement.clusterSelector.zone`.
+     * A field path is similar in syntax to a
+     * [google.protobuf.FieldMask][google.protobuf.FieldMask]. For example, a
+     * field path that references the zone field of a workflow template's cluster
+     * selector would be specified as `placement.clusterSelector.zone`.
      * Also, field paths can reference fields using the following syntax:
      * * Values in maps can be referenced by key:
      *     * labels['key']
@@ -241,10 +241,10 @@ class TemplateParameter extends \Google\Protobuf\Internal\Message
      * Required. Paths to all fields that the parameter replaces.
      * A field is allowed to appear in at most one parameter's list of field
      * paths.
-     * A field path is similar in syntax to a [google.protobuf.FieldMask][google.protobuf.FieldMask].
-     * For example, a field path that references the zone field of a workflow
-     * template's cluster selector would be specified as
-     * `placement.clusterSelector.zone`.
+     * A field path is similar in syntax to a
+     * [google.protobuf.FieldMask][google.protobuf.FieldMask]. For example, a
+     * field path that references the zone field of a workflow template's cluster
+     * selector would be specified as `placement.clusterSelector.zone`.
      * Also, field paths can reference fields using the following syntax:
      * * Values in maps can be referenced by key:
      *     * labels['key']
@@ -276,7 +276,7 @@ class TemplateParameter extends \Google\Protobuf\Internal\Message
      * - jobs['step-id'].sparkJob.args
      *
      * Generated from protobuf field <code>repeated string fields = 2 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFields($var)

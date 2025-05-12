@@ -21,7 +21,6 @@ use Google\Cloud\Core\ArrayTrait;
 use Google\Cloud\Datastore\Cursor;
 use Google\Cloud\Datastore\DatastoreTrait;
 use Google\Cloud\Datastore\EntityMapper;
-use InvalidArgumentException;
 
 /**
  * Query Google Cloud Datastore using [GQL](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
@@ -31,7 +30,7 @@ use InvalidArgumentException;
  * `$options['allowLiterals']` to `true`. As with any SQL dialect, using
  * parameter binding is highly recommended.
  *
- * Idiomatic usage is via {@see Google\Cloud\Datastore\DatastoreClient::gqlQuery()}.
+ * Idiomatic usage is via {@see \Google\Cloud\Datastore\DatastoreClient::gqlQuery()}.
  *
  *
  * Example:
@@ -149,12 +148,8 @@ class GqlQuery implements QueryInterface
     }
 
     /**
-     * Format the query for use in the API
+     * Format the query for use in the API.
      *
-     * This method is used internally to run queries and is not intended for use
-     * outside the internal library API
-     *
-     * @access private
      * @return array
      */
     public function queryObject()
@@ -181,7 +176,14 @@ class GqlQuery implements QueryInterface
      */
     public function queryKey()
     {
-        return "gqlQuery";
+        return 'gqlQuery';
+    }
+
+    public function aggregation()
+    {
+        $aggregationQuery = new AggregationQuery($this);
+
+        return $aggregationQuery;
     }
 
     /**
@@ -205,11 +207,12 @@ class GqlQuery implements QueryInterface
      */
     public function start($cursor)
     //@codingStandardsIgnoreStart
-    {}
+    {
+    }
     //@codingStandardsIgnoreEnd
 
     /**
-     * Define the json respresentation of the object.
+     * Define the json representation of the object.
      *
      * @access private
      * @return array

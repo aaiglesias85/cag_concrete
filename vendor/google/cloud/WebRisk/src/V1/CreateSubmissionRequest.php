@@ -16,18 +16,35 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreateSubmissionRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The name of the project that is making the submission. This string is in
-     * the format "projects/{project_number}".
+     * Required. The name of the project that is making the submission. This
+     * string is in the format "projects/{project_number}".
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The submission that contains the content of the phishing report.
      *
      * Generated from protobuf field <code>.google.cloud.webrisk.v1.Submission submission = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $submission = null;
+    protected $submission = null;
+
+    /**
+     * @param string                              $parent     Required. The name of the project that is making the submission. This
+     *                                                        string is in the format "projects/{project_number}". Please see
+     *                                                        {@see WebRiskServiceClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\WebRisk\V1\Submission $submission Required. The submission that contains the content of the phishing report.
+     *
+     * @return \Google\Cloud\WebRisk\V1\CreateSubmissionRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\WebRisk\V1\Submission $submission): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setSubmission($submission);
+    }
 
     /**
      * Constructor.
@@ -36,8 +53,8 @@ class CreateSubmissionRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The name of the project that is making the submission. This string is in
-     *           the format "projects/{project_number}".
+     *           Required. The name of the project that is making the submission. This
+     *           string is in the format "projects/{project_number}".
      *     @type \Google\Cloud\WebRisk\V1\Submission $submission
      *           Required. The submission that contains the content of the phishing report.
      * }
@@ -48,8 +65,8 @@ class CreateSubmissionRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of the project that is making the submission. This string is in
-     * the format "projects/{project_number}".
+     * Required. The name of the project that is making the submission. This
+     * string is in the format "projects/{project_number}".
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -60,8 +77,8 @@ class CreateSubmissionRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The name of the project that is making the submission. This string is in
-     * the format "projects/{project_number}".
+     * Required. The name of the project that is making the submission. This
+     * string is in the format "projects/{project_number}".
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var

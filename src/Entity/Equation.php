@@ -4,95 +4,56 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Equation
- *
- * @ORM\Table(name="equation")
- * @ORM\Entity(repositoryClass="App\Repository\EquationRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\EquationRepository')]
+#[ORM\Table(name: 'equation')]
 class Equation
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="equation_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $equationId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'equation_id', type: 'integer')]
+    private ?int $equationId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=false)
-     */
-    private $description;
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: false)]
+    private ?string $description;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="equation", type="string", length=255, nullable=false)
-     */
-    private $equation;
+    #[ORM\Column(name: 'equation', type: 'string', length: 255, nullable: false)]
+    private ?string $equation;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="status", type="boolean", nullable=false)
-     */
-    private $status;
+    #[ORM\Column(name: 'status', type: 'boolean', nullable: false)]
+    private ?bool $status;
 
-
-
-    /**
-     * Get equationId
-     *
-     * @return integer 
-     */
-    public function getEquationId()
+    public function getEquationId(): ?int
     {
         return $this->equationId;
     }
 
-    /**
-     * Set description
-     *
-     * @param string $description
-     * @return Equation
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
-    
         return $this;
     }
 
-    /**
-     * Get description
-     *
-     * @return string 
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function getEquation()
+    public function getEquation(): ?string
     {
         return $this->equation;
     }
 
-    public function setEquation($equation)
+    public function setEquation(?string $equation): void
     {
         $this->equation = $equation;
     }
 
-    public function getStatus()
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus($status)
+    public function setStatus(?bool $status): void
     {
         $this->status = $status;
     }

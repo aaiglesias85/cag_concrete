@@ -22,8 +22,6 @@ class AuditLogConfig extends \Google\Protobuf\Internal\Message
      */
     private $exempted_members;
     /**
-     * This is deprecated and has no effect. Do not use.
-     *
      * Generated from protobuf field <code>optional bool ignore_child_exemptions = 70141850;</code>
      */
     private $ignore_child_exemptions = null;
@@ -41,10 +39,9 @@ class AuditLogConfig extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $exempted_members
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $exempted_members
      *           Specifies the identities that do not cause logging for this type of permission. Follows the same format of Binding.members.
      *     @type bool $ignore_child_exemptions
-     *           This is deprecated and has no effect. Do not use.
      *     @type string $log_type
      *           The log type that this config enables.
      *           Check the LogType enum for the list of possible values.
@@ -70,7 +67,7 @@ class AuditLogConfig extends \Google\Protobuf\Internal\Message
      * Specifies the identities that do not cause logging for this type of permission. Follows the same format of Binding.members.
      *
      * Generated from protobuf field <code>repeated string exempted_members = 232615576;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setExemptedMembers($var)
@@ -82,8 +79,6 @@ class AuditLogConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * This is deprecated and has no effect. Do not use.
-     *
      * Generated from protobuf field <code>optional bool ignore_child_exemptions = 70141850;</code>
      * @return bool
      */
@@ -103,8 +98,6 @@ class AuditLogConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * This is deprecated and has no effect. Do not use.
-     *
      * Generated from protobuf field <code>optional bool ignore_child_exemptions = 70141850;</code>
      * @param bool $var
      * @return $this

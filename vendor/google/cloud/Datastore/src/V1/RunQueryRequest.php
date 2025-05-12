@@ -22,6 +22,14 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
      */
     private $project_id = '';
     /**
+     * The ID of the database against which to make the request.
+     * '(default)' is not allowed; please use empty string '' to refer the default
+     * database.
+     *
+     * Generated from protobuf field <code>string database_id = 9;</code>
+     */
+    private $database_id = '';
+    /**
      * Entities are partitioned into subsets, identified by a partition ID.
      * Queries are scoped to a single partition.
      * This partition ID is normalized with the standard default context
@@ -36,6 +44,22 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.datastore.v1.ReadOptions read_options = 1;</code>
      */
     private $read_options = null;
+    /**
+     * The properties to return.
+     * This field must not be set for a projection query.
+     * See
+     * [LookupRequest.property_mask][google.datastore.v1.LookupRequest.property_mask].
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.PropertyMask property_mask = 10;</code>
+     */
+    private $property_mask = null;
+    /**
+     * Optional. Explain options for the query. If set, additional query
+     * statistics will be returned. If not, only query results will be returned.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.ExplainOptions explain_options = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    private $explain_options = null;
     protected $query_type;
 
     /**
@@ -46,6 +70,10 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Required. The ID of the project against which to make the request.
+     *     @type string $database_id
+     *           The ID of the database against which to make the request.
+     *           '(default)' is not allowed; please use empty string '' to refer the default
+     *           database.
      *     @type \Google\Cloud\Datastore\V1\PartitionId $partition_id
      *           Entities are partitioned into subsets, identified by a partition ID.
      *           Queries are scoped to a single partition.
@@ -56,7 +84,15 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Datastore\V1\Query $query
      *           The query to run.
      *     @type \Google\Cloud\Datastore\V1\GqlQuery $gql_query
-     *           The GQL query to run.
+     *           The GQL query to run. This query must be a non-aggregation query.
+     *     @type \Google\Cloud\Datastore\V1\PropertyMask $property_mask
+     *           The properties to return.
+     *           This field must not be set for a projection query.
+     *           See
+     *           [LookupRequest.property_mask][google.datastore.v1.LookupRequest.property_mask].
+     *     @type \Google\Cloud\Datastore\V1\ExplainOptions $explain_options
+     *           Optional. Explain options for the query. If set, additional query
+     *           statistics will be returned. If not, only query results will be returned.
      * }
      */
     public function __construct($data = NULL) {
@@ -86,6 +122,36 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->project_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * The ID of the database against which to make the request.
+     * '(default)' is not allowed; please use empty string '' to refer the default
+     * database.
+     *
+     * Generated from protobuf field <code>string database_id = 9;</code>
+     * @return string
+     */
+    public function getDatabaseId()
+    {
+        return $this->database_id;
+    }
+
+    /**
+     * The ID of the database against which to make the request.
+     * '(default)' is not allowed; please use empty string '' to refer the default
+     * database.
+     *
+     * Generated from protobuf field <code>string database_id = 9;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDatabaseId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->database_id = $var;
 
         return $this;
     }
@@ -200,7 +266,7 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The GQL query to run.
+     * The GQL query to run. This query must be a non-aggregation query.
      *
      * Generated from protobuf field <code>.google.datastore.v1.GqlQuery gql_query = 7;</code>
      * @return \Google\Cloud\Datastore\V1\GqlQuery|null
@@ -216,7 +282,7 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The GQL query to run.
+     * The GQL query to run. This query must be a non-aggregation query.
      *
      * Generated from protobuf field <code>.google.datastore.v1.GqlQuery gql_query = 7;</code>
      * @param \Google\Cloud\Datastore\V1\GqlQuery $var
@@ -226,6 +292,86 @@ class RunQueryRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\Datastore\V1\GqlQuery::class);
         $this->writeOneof(7, $var);
+
+        return $this;
+    }
+
+    /**
+     * The properties to return.
+     * This field must not be set for a projection query.
+     * See
+     * [LookupRequest.property_mask][google.datastore.v1.LookupRequest.property_mask].
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.PropertyMask property_mask = 10;</code>
+     * @return \Google\Cloud\Datastore\V1\PropertyMask|null
+     */
+    public function getPropertyMask()
+    {
+        return $this->property_mask;
+    }
+
+    public function hasPropertyMask()
+    {
+        return isset($this->property_mask);
+    }
+
+    public function clearPropertyMask()
+    {
+        unset($this->property_mask);
+    }
+
+    /**
+     * The properties to return.
+     * This field must not be set for a projection query.
+     * See
+     * [LookupRequest.property_mask][google.datastore.v1.LookupRequest.property_mask].
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.PropertyMask property_mask = 10;</code>
+     * @param \Google\Cloud\Datastore\V1\PropertyMask $var
+     * @return $this
+     */
+    public function setPropertyMask($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastore\V1\PropertyMask::class);
+        $this->property_mask = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. Explain options for the query. If set, additional query
+     * statistics will be returned. If not, only query results will be returned.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.ExplainOptions explain_options = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return \Google\Cloud\Datastore\V1\ExplainOptions|null
+     */
+    public function getExplainOptions()
+    {
+        return $this->explain_options;
+    }
+
+    public function hasExplainOptions()
+    {
+        return isset($this->explain_options);
+    }
+
+    public function clearExplainOptions()
+    {
+        unset($this->explain_options);
+    }
+
+    /**
+     * Optional. Explain options for the query. If set, additional query
+     * statistics will be returned. If not, only query results will be returned.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.ExplainOptions explain_options = 12 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param \Google\Cloud\Datastore\V1\ExplainOptions $var
+     * @return $this
+     */
+    public function setExplainOptions($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastore\V1\ExplainOptions::class);
+        $this->explain_options = $var;
 
         return $this;
     }

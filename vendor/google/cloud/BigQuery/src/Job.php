@@ -36,6 +36,7 @@ class Job
 
     /**
      * @var ConnectionInterface Represents a connection to BigQuery.
+     * @internal
      */
     private $connection;
 
@@ -56,7 +57,8 @@ class Job
 
     /**
      * @param ConnectionInterface $connection Represents a connection to
-     *        BigQuery.
+     *        BigQuery. This object is created by BigQueryClient,
+     *        and should not be instantiated outside of this client.
      * @param string $id The job's ID.
      * @param string $projectId The project's ID.
      * @param ValueMapper $mapper Maps values between PHP and BigQuery.
@@ -147,9 +149,9 @@ class Job
      * further polling may be necessary in order to access the full query
      * results. Polling for completion can be initiated by iterating on the
      * returned
-     * {@see Google\Cloud\BigQuery\QueryResults}, or by calling either
-     * {@see Google\Cloud\BigQuery\QueryResults::rows()} or
-     * {@see Google\Cloud\BigQuery\QueryResults::waitUntilComplete()}.
+     * {@see QueryResults}, or by calling either
+     * {@see QueryResults::rows()} or
+     * {@see QueryResults::waitUntilComplete()}.
      *
      * Example:
      * ```
@@ -237,8 +239,9 @@ class Job
     }
 
     /**
-     * Checks the job's completeness. Useful in combination with
-     * {@see Google\Cloud\BigQuery\Job::reload()} to poll for job status.
+     * Checks the job's completeness.
+     *
+     * Useful in combination with {@see Job::reload()} to poll for job status.
      *
      * Example:
      * ```

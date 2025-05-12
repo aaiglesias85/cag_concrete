@@ -20,14 +20,14 @@ class Button extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string text = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $text = '';
+    protected $text = '';
     /**
      * Optional. The text to send back to the Dialogflow API or a URI to
      * open.
      *
      * Generated from protobuf field <code>string postback = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $postback = '';
+    protected $postback = '';
 
     /**
      * Constructor.
@@ -103,6 +103,4 @@ class Button extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Button::class, \Google\Cloud\Dialogflow\V2\Intent_Message_Card_Button::class);
 

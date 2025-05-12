@@ -10,7 +10,7 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * Score is a summary of all elements in the data profile.
- * A higher number means more risky.
+ * A higher number means more risk.
  *
  * Generated from protobuf message <code>google.privacy.dlp.v2.DataRiskLevel</code>
  */
@@ -21,7 +21,7 @@ class DataRiskLevel extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.privacy.dlp.v2.DataRiskLevel.DataRiskLevelScore score = 1;</code>
      */
-    private $score = 0;
+    protected $score = 0;
 
     /**
      * Constructor.

@@ -11,7 +11,6 @@ use Google\Protobuf\Internal\GPBUtil;
 /**
  * Sampling Strategy for logging, can be for both training and prediction
  * dataset.
- * Next ID: 2
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.SamplingStrategy</code>
  */
@@ -22,7 +21,7 @@ class SamplingStrategy extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.SamplingStrategy.RandomSampleConfig random_sample_config = 1;</code>
      */
-    private $random_sample_config = null;
+    protected $random_sample_config = null;
 
     /**
      * Constructor.

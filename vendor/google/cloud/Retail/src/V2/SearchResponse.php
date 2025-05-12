@@ -37,15 +37,15 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 total_size = 3;</code>
      */
-    private $total_size = 0;
+    protected $total_size = 0;
     /**
      * Contains the spell corrected query, if found. If the spell correction type
      * is AUTOMATIC, then the search results are based on corrected_query.
-     * Otherwise the original query will be used for search.
+     * Otherwise the original query is used for search.
      *
      * Generated from protobuf field <code>string corrected_query = 4;</code>
      */
-    private $corrected_query = '';
+    protected $corrected_query = '';
     /**
      * A unique search token. This should be included in the
      * [UserEvent][google.cloud.retail.v2.UserEvent] logs resulting from this
@@ -53,7 +53,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string attribution_token = 5;</code>
      */
-    private $attribution_token = '';
+    protected $attribution_token = '';
     /**
      * A token that can be sent as
      * [SearchRequest.page_token][google.cloud.retail.v2.SearchRequest.page_token]
@@ -62,13 +62,13 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 6;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * Query expansion information for the returned results.
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.QueryExpansionInfo query_expansion_info = 7;</code>
      */
-    private $query_expansion_info = null;
+    protected $query_expansion_info = null;
     /**
      * The URI of a customer-defined redirect page. If redirect action is
      * triggered, no search is performed, and only
@@ -78,7 +78,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string redirect_uri = 10;</code>
      */
-    private $redirect_uri = '';
+    protected $redirect_uri = '';
     /**
      * The fully qualified resource name of applied
      * [controls](https://cloud.google.com/retail/docs/serving-control-rules).
@@ -94,6 +94,27 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.SearchRequest.BoostSpec.ConditionBoostSpec invalid_condition_boost_specs = 14;</code>
      */
     private $invalid_condition_boost_specs;
+    /**
+     * Metadata related to A/B testing [Experiment][] associated with this
+     * response. Only exists when an experiment is triggered.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.retail.v2.ExperimentInfo experiment_info = 17;</code>
+     */
+    private $experiment_info;
+    /**
+     * This field specifies all related information that is needed on client
+     * side for UI rendering of conversational retail search.
+     *
+     * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.ConversationalSearchResult conversational_search_result = 18;</code>
+     */
+    protected $conversational_search_result = null;
+    /**
+     * This field specifies all related information for tile navigation that will
+     * be used in client side.
+     *
+     * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.TileNavigationResult tile_navigation_result = 19;</code>
+     */
+    protected $tile_navigation_result = null;
 
     /**
      * Constructor.
@@ -101,9 +122,9 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Retail\V2\SearchResponse\SearchResult[]|\Google\Protobuf\Internal\RepeatedField $results
+     *     @type array<\Google\Cloud\Retail\V2\SearchResponse\SearchResult>|\Google\Protobuf\Internal\RepeatedField $results
      *           A list of matched items. The order represents the ranking.
-     *     @type \Google\Cloud\Retail\V2\SearchResponse\Facet[]|\Google\Protobuf\Internal\RepeatedField $facets
+     *     @type array<\Google\Cloud\Retail\V2\SearchResponse\Facet>|\Google\Protobuf\Internal\RepeatedField $facets
      *           Results of facets requested by user.
      *     @type int $total_size
      *           The estimated total count of matched items irrespective of pagination. The
@@ -114,7 +135,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      *     @type string $corrected_query
      *           Contains the spell corrected query, if found. If the spell correction type
      *           is AUTOMATIC, then the search results are based on corrected_query.
-     *           Otherwise the original query will be used for search.
+     *           Otherwise the original query is used for search.
      *     @type string $attribution_token
      *           A unique search token. This should be included in the
      *           [UserEvent][google.cloud.retail.v2.UserEvent] logs resulting from this
@@ -132,13 +153,22 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      *           [redirect_uri][google.cloud.retail.v2.SearchResponse.redirect_uri] and
      *           [attribution_token][google.cloud.retail.v2.SearchResponse.attribution_token]
      *           are set in the response.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $applied_controls
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $applied_controls
      *           The fully qualified resource name of applied
      *           [controls](https://cloud.google.com/retail/docs/serving-control-rules).
-     *     @type \Google\Cloud\Retail\V2\SearchRequest\BoostSpec\ConditionBoostSpec[]|\Google\Protobuf\Internal\RepeatedField $invalid_condition_boost_specs
+     *     @type array<\Google\Cloud\Retail\V2\SearchRequest\BoostSpec\ConditionBoostSpec>|\Google\Protobuf\Internal\RepeatedField $invalid_condition_boost_specs
      *           The invalid
      *           [SearchRequest.BoostSpec.condition_boost_specs][google.cloud.retail.v2.SearchRequest.BoostSpec.condition_boost_specs]
      *           that are not applied during serving.
+     *     @type array<\Google\Cloud\Retail\V2\ExperimentInfo>|\Google\Protobuf\Internal\RepeatedField $experiment_info
+     *           Metadata related to A/B testing [Experiment][] associated with this
+     *           response. Only exists when an experiment is triggered.
+     *     @type \Google\Cloud\Retail\V2\SearchResponse\ConversationalSearchResult $conversational_search_result
+     *           This field specifies all related information that is needed on client
+     *           side for UI rendering of conversational retail search.
+     *     @type \Google\Cloud\Retail\V2\SearchResponse\TileNavigationResult $tile_navigation_result
+     *           This field specifies all related information for tile navigation that will
+     *           be used in client side.
      * }
      */
     public function __construct($data = NULL) {
@@ -161,7 +191,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      * A list of matched items. The order represents the ranking.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.SearchResponse.SearchResult results = 1;</code>
-     * @param \Google\Cloud\Retail\V2\SearchResponse\SearchResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\SearchResponse\SearchResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setResults($var)
@@ -187,7 +217,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      * Results of facets requested by user.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.SearchResponse.Facet facets = 2;</code>
-     * @param \Google\Cloud\Retail\V2\SearchResponse\Facet[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\SearchResponse\Facet>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFacets($var)
@@ -235,7 +265,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
     /**
      * Contains the spell corrected query, if found. If the spell correction type
      * is AUTOMATIC, then the search results are based on corrected_query.
-     * Otherwise the original query will be used for search.
+     * Otherwise the original query is used for search.
      *
      * Generated from protobuf field <code>string corrected_query = 4;</code>
      * @return string
@@ -248,7 +278,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
     /**
      * Contains the spell corrected query, if found. If the spell correction type
      * is AUTOMATIC, then the search results are based on corrected_query.
-     * Otherwise the original query will be used for search.
+     * Otherwise the original query is used for search.
      *
      * Generated from protobuf field <code>string corrected_query = 4;</code>
      * @param string $var
@@ -411,7 +441,7 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      * [controls](https://cloud.google.com/retail/docs/serving-control-rules).
      *
      * Generated from protobuf field <code>repeated string applied_controls = 12;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAppliedControls($var)
@@ -441,13 +471,117 @@ class SearchResponse extends \Google\Protobuf\Internal\Message
      * that are not applied during serving.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.SearchRequest.BoostSpec.ConditionBoostSpec invalid_condition_boost_specs = 14;</code>
-     * @param \Google\Cloud\Retail\V2\SearchRequest\BoostSpec\ConditionBoostSpec[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\SearchRequest\BoostSpec\ConditionBoostSpec>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setInvalidConditionBoostSpecs($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Retail\V2\SearchRequest\BoostSpec\ConditionBoostSpec::class);
         $this->invalid_condition_boost_specs = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Metadata related to A/B testing [Experiment][] associated with this
+     * response. Only exists when an experiment is triggered.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.retail.v2.ExperimentInfo experiment_info = 17;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getExperimentInfo()
+    {
+        return $this->experiment_info;
+    }
+
+    /**
+     * Metadata related to A/B testing [Experiment][] associated with this
+     * response. Only exists when an experiment is triggered.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.retail.v2.ExperimentInfo experiment_info = 17;</code>
+     * @param array<\Google\Cloud\Retail\V2\ExperimentInfo>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setExperimentInfo($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Retail\V2\ExperimentInfo::class);
+        $this->experiment_info = $arr;
+
+        return $this;
+    }
+
+    /**
+     * This field specifies all related information that is needed on client
+     * side for UI rendering of conversational retail search.
+     *
+     * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.ConversationalSearchResult conversational_search_result = 18;</code>
+     * @return \Google\Cloud\Retail\V2\SearchResponse\ConversationalSearchResult|null
+     */
+    public function getConversationalSearchResult()
+    {
+        return $this->conversational_search_result;
+    }
+
+    public function hasConversationalSearchResult()
+    {
+        return isset($this->conversational_search_result);
+    }
+
+    public function clearConversationalSearchResult()
+    {
+        unset($this->conversational_search_result);
+    }
+
+    /**
+     * This field specifies all related information that is needed on client
+     * side for UI rendering of conversational retail search.
+     *
+     * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.ConversationalSearchResult conversational_search_result = 18;</code>
+     * @param \Google\Cloud\Retail\V2\SearchResponse\ConversationalSearchResult $var
+     * @return $this
+     */
+    public function setConversationalSearchResult($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Retail\V2\SearchResponse\ConversationalSearchResult::class);
+        $this->conversational_search_result = $var;
+
+        return $this;
+    }
+
+    /**
+     * This field specifies all related information for tile navigation that will
+     * be used in client side.
+     *
+     * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.TileNavigationResult tile_navigation_result = 19;</code>
+     * @return \Google\Cloud\Retail\V2\SearchResponse\TileNavigationResult|null
+     */
+    public function getTileNavigationResult()
+    {
+        return $this->tile_navigation_result;
+    }
+
+    public function hasTileNavigationResult()
+    {
+        return isset($this->tile_navigation_result);
+    }
+
+    public function clearTileNavigationResult()
+    {
+        unset($this->tile_navigation_result);
+    }
+
+    /**
+     * This field specifies all related information for tile navigation that will
+     * be used in client side.
+     *
+     * Generated from protobuf field <code>.google.cloud.retail.v2.SearchResponse.TileNavigationResult tile_navigation_result = 19;</code>
+     * @param \Google\Cloud\Retail\V2\SearchResponse\TileNavigationResult $var
+     * @return $this
+     */
+    public function setTileNavigationResult($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Retail\V2\SearchResponse\TileNavigationResult::class);
+        $this->tile_navigation_result = $var;
 
         return $this;
     }

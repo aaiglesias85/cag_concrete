@@ -23,7 +23,16 @@ class ListUptimeCheckConfigsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
+    /**
+     * If provided, this field specifies the criteria that must be met by
+     * uptime checks to be included in the response.
+     * For more details, see [Filtering
+     * syntax](https://cloud.google.com/monitoring/api/v3/sorting-and-filtering#filter_syntax).
+     *
+     * Generated from protobuf field <code>string filter = 2;</code>
+     */
+    protected $filter = '';
     /**
      * The maximum number of results to return in a single response. The server
      * may further constrain the maximum number of results returned in a single
@@ -32,7 +41,7 @@ class ListUptimeCheckConfigsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 3;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * If this field is not empty then it must contain the `nextPageToken` value
      * returned by a previous call to this method.  Using this field causes the
@@ -40,7 +49,24 @@ class ListUptimeCheckConfigsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The
+     *                       [project](https://cloud.google.com/monitoring/api/v3#project_name) whose
+     *                       Uptime check configurations are listed. The format is:
+     *
+     *                       projects/[PROJECT_ID_OR_NUMBER]
+     *
+     * @return \Google\Cloud\Monitoring\V3\ListUptimeCheckConfigsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -53,6 +79,11 @@ class ListUptimeCheckConfigsRequest extends \Google\Protobuf\Internal\Message
      *           [project](https://cloud.google.com/monitoring/api/v3#project_name) whose
      *           Uptime check configurations are listed. The format is:
      *               projects/[PROJECT_ID_OR_NUMBER]
+     *     @type string $filter
+     *           If provided, this field specifies the criteria that must be met by
+     *           uptime checks to be included in the response.
+     *           For more details, see [Filtering
+     *           syntax](https://cloud.google.com/monitoring/api/v3/sorting-and-filtering#filter_syntax).
      *     @type int $page_size
      *           The maximum number of results to return in a single response. The server
      *           may further constrain the maximum number of results returned in a single
@@ -97,6 +128,38 @@ class ListUptimeCheckConfigsRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->parent = $var;
+
+        return $this;
+    }
+
+    /**
+     * If provided, this field specifies the criteria that must be met by
+     * uptime checks to be included in the response.
+     * For more details, see [Filtering
+     * syntax](https://cloud.google.com/monitoring/api/v3/sorting-and-filtering#filter_syntax).
+     *
+     * Generated from protobuf field <code>string filter = 2;</code>
+     * @return string
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+    /**
+     * If provided, this field specifies the criteria that must be met by
+     * uptime checks to be included in the response.
+     * For more details, see [Filtering
+     * syntax](https://cloud.google.com/monitoring/api/v3/sorting-and-filtering#filter_syntax).
+     *
+     * Generated from protobuf field <code>string filter = 2;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setFilter($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->filter = $var;
 
         return $this;
     }

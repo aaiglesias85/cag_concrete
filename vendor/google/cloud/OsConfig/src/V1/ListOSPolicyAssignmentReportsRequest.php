@@ -37,20 +37,20 @@ class ListOSPolicyAssignmentReportsRequest extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The maximum number of results to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * If provided, this field specifies the criteria that must be met by the
      * `OSPolicyAssignmentReport` API resource that is included in the response.
      *
      * Generated from protobuf field <code>string filter = 3;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * A pagination token returned from a previous call to the
      * `ListOSPolicyAssignmentReports` method that indicates where this listing
@@ -58,7 +58,41 @@ class ListOSPolicyAssignmentReportsRequest extends \Google\Protobuf\Internal\Mes
      *
      * Generated from protobuf field <code>string page_token = 4;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The parent resource name.
+     *
+     *                       Format:
+     *                       `projects/{project}/locations/{location}/instances/{instance}/osPolicyAssignments/{assignment}/reports`
+     *
+     *                       For `{project}`, either `project-number` or `project-id` can be provided.
+     *                       For `{instance}`, either `instance-name`, `instance-id`, or `-` can be
+     *                       provided. If '-' is provided, the response will include
+     *                       OSPolicyAssignmentReports for all instances in the project/location.
+     *                       For `{assignment}`, either `assignment-id` or `-` can be provided. If '-'
+     *                       is provided, the response will include OSPolicyAssignmentReports for all
+     *                       OSPolicyAssignments in the project/location.
+     *                       Either {instance} or {assignment} must be `-`.
+     *
+     *                       For example:
+     *                       `projects/{project}/locations/{location}/instances/{instance}/osPolicyAssignments/-/reports`
+     *                       returns all reports for the instance
+     *                       `projects/{project}/locations/{location}/instances/-/osPolicyAssignments/{assignment-id}/reports`
+     *                       returns all the reports for the given assignment across all instances.
+     *                       `projects/{project}/locations/{location}/instances/-/osPolicyAssignments/-/reports`
+     *                       returns all the reports for all assignments across all instances. Please see
+     *                       {@see OsConfigZonalServiceClient::instanceOSPolicyAssignmentName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\OsConfig\V1\ListOSPolicyAssignmentReportsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

@@ -20,19 +20,19 @@ class ExportInsightsDataMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp create_time = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $create_time = null;
+    protected $create_time = null;
     /**
      * Output only. The time the operation finished running.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
     /**
      * The original request for export.
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ExportInsightsDataRequest request = 3;</code>
      */
-    private $request = null;
+    protected $request = null;
     /**
      * Partial errors during export operation that might cause the operation
      * output to be incomplete.
@@ -53,7 +53,7 @@ class ExportInsightsDataMetadata extends \Google\Protobuf\Internal\Message
      *           Output only. The time the operation finished running.
      *     @type \Google\Cloud\ContactCenterInsights\V1\ExportInsightsDataRequest $request
      *           The original request for export.
-     *     @type \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $partial_errors
+     *     @type array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $partial_errors
      *           Partial errors during export operation that might cause the operation
      *           output to be incomplete.
      * }
@@ -188,7 +188,7 @@ class ExportInsightsDataMetadata extends \Google\Protobuf\Internal\Message
      * output to be incomplete.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Status partial_errors = 4;</code>
-     * @param \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPartialErrors($var)

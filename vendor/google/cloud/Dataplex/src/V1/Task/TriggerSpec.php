@@ -20,7 +20,7 @@ class TriggerSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Task.TriggerSpec.Type type = 5 [(.google.api.field_behavior) = REQUIRED, (.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
      * Optional. The first run of the task will be after this time.
      * If not specified, the task will run shortly after being submitted if
@@ -28,7 +28,7 @@ class TriggerSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * Optional. Prevent the task from executing.
      * This does not cancel already running tasks. It is intended to temporarily
@@ -36,14 +36,14 @@ class TriggerSpec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool disabled = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $disabled = false;
+    protected $disabled = false;
     /**
      * Optional. Number of retry attempts before aborting.
      * Set to zero to never attempt to retry a failed task.
      *
      * Generated from protobuf field <code>int32 max_retries = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $max_retries = 0;
+    protected $max_retries = 0;
     protected $trigger;
 
     /**
@@ -66,14 +66,13 @@ class TriggerSpec extends \Google\Protobuf\Internal\Message
      *           Optional. Number of retry attempts before aborting.
      *           Set to zero to never attempt to retry a failed task.
      *     @type string $schedule
-     *           Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for running
-     *           tasks periodically.
-     *           To explicitly set a timezone to the cron tab, apply a prefix in the
-     *           cron tab: "CRON_TZ=${IANA_TIME_ZONE}" or "TZ=${IANA_TIME_ZONE}".
-     *           The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone
-     *           database. For example, "CRON_TZ=America/New_York 1 * * * *", or
-     *           "TZ=America/New_York 1 * * * *".
-     *           This field is required for RECURRING tasks.
+     *           Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for
+     *           running tasks periodically. To explicitly set a timezone to the cron
+     *           tab, apply a prefix in the cron tab: "CRON_TZ=${IANA_TIME_ZONE}" or
+     *           "TZ=${IANA_TIME_ZONE}". The ${IANA_TIME_ZONE} may only be a valid
+     *           string from IANA time zone database. For example,
+     *           `CRON_TZ=America/New_York 1 * * * *`, or `TZ=America/New_York 1 * * *
+     *           *`. This field is required for RECURRING tasks.
      * }
      */
     public function __construct($data = NULL) {
@@ -206,14 +205,13 @@ class TriggerSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for running
-     * tasks periodically.
-     * To explicitly set a timezone to the cron tab, apply a prefix in the
-     * cron tab: "CRON_TZ=${IANA_TIME_ZONE}" or "TZ=${IANA_TIME_ZONE}".
-     * The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone
-     * database. For example, "CRON_TZ=America/New_York 1 * * * *", or
-     * "TZ=America/New_York 1 * * * *".
-     * This field is required for RECURRING tasks.
+     * Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for
+     * running tasks periodically. To explicitly set a timezone to the cron
+     * tab, apply a prefix in the cron tab: "CRON_TZ=${IANA_TIME_ZONE}" or
+     * "TZ=${IANA_TIME_ZONE}". The ${IANA_TIME_ZONE} may only be a valid
+     * string from IANA time zone database. For example,
+     * `CRON_TZ=America/New_York 1 * * * *`, or `TZ=America/New_York 1 * * *
+     * *`. This field is required for RECURRING tasks.
      *
      * Generated from protobuf field <code>string schedule = 100 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
@@ -229,14 +227,13 @@ class TriggerSpec extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for running
-     * tasks periodically.
-     * To explicitly set a timezone to the cron tab, apply a prefix in the
-     * cron tab: "CRON_TZ=${IANA_TIME_ZONE}" or "TZ=${IANA_TIME_ZONE}".
-     * The ${IANA_TIME_ZONE} may only be a valid string from IANA time zone
-     * database. For example, "CRON_TZ=America/New_York 1 * * * *", or
-     * "TZ=America/New_York 1 * * * *".
-     * This field is required for RECURRING tasks.
+     * Optional. Cron schedule (https://en.wikipedia.org/wiki/Cron) for
+     * running tasks periodically. To explicitly set a timezone to the cron
+     * tab, apply a prefix in the cron tab: "CRON_TZ=${IANA_TIME_ZONE}" or
+     * "TZ=${IANA_TIME_ZONE}". The ${IANA_TIME_ZONE} may only be a valid
+     * string from IANA time zone database. For example,
+     * `CRON_TZ=America/New_York 1 * * * *`, or `TZ=America/New_York 1 * * *
+     * *`. This field is required for RECURRING tasks.
      *
      * Generated from protobuf field <code>string schedule = 100 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var

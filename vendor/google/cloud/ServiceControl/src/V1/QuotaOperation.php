@@ -27,7 +27,7 @@ class QuotaOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string operation_id = 1;</code>
      */
-    private $operation_id = '';
+    protected $operation_id = '';
     /**
      * Fully qualified name of the API method for which this quota operation is
      * requested. This name is used for matching quota rules or metric rules and
@@ -40,7 +40,7 @@ class QuotaOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string method_name = 2;</code>
      */
-    private $method_name = '';
+    protected $method_name = '';
     /**
      * Identity of the consumer for whom this quota operation is being performed.
      * This can be in one of the following formats:
@@ -50,7 +50,7 @@ class QuotaOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string consumer_id = 3;</code>
      */
-    private $consumer_id = '';
+    protected $consumer_id = '';
     /**
      * Labels describing the operation.
      *
@@ -77,7 +77,7 @@ class QuotaOperation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.api.servicecontrol.v1.QuotaOperation.QuotaMode quota_mode = 6;</code>
      */
-    private $quota_mode = 0;
+    protected $quota_mode = 0;
 
     /**
      * Constructor.
@@ -111,7 +111,7 @@ class QuotaOperation extends \Google\Protobuf\Internal\Message
      *             api_key:<api_key>.
      *     @type array|\Google\Protobuf\Internal\MapField $labels
      *           Labels describing the operation.
-     *     @type \Google\Cloud\ServiceControl\V1\MetricValueSet[]|\Google\Protobuf\Internal\RepeatedField $quota_metrics
+     *     @type array<\Google\Cloud\ServiceControl\V1\MetricValueSet>|\Google\Protobuf\Internal\RepeatedField $quota_metrics
      *           Represents information about this operation. Each MetricValueSet
      *           corresponds to a metric defined in the service configuration.
      *           The data type used in the MetricValueSet must agree with
@@ -304,7 +304,7 @@ class QuotaOperation extends \Google\Protobuf\Internal\Message
      * This field is mutually exclusive with method_name.
      *
      * Generated from protobuf field <code>repeated .google.api.servicecontrol.v1.MetricValueSet quota_metrics = 5;</code>
-     * @param \Google\Cloud\ServiceControl\V1\MetricValueSet[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ServiceControl\V1\MetricValueSet>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setQuotaMetrics($var)

@@ -9,7 +9,7 @@ use UnexpectedValueException;
 /**
  * These are commonly used subsets of the alphabet that the FFX mode
  * natively supports. In the algorithm, the alphabet is selected using
- * the "radix". Therefore each corresponds to particular radix.
+ * the "radix". Therefore each corresponds to a particular radix.
  *
  * Protobuf type <code>google.privacy.dlp.v2.CryptoReplaceFfxFpeConfig.FfxCommonNativeAlphabet</code>
  */
@@ -75,6 +75,4 @@ class FfxCommonNativeAlphabet
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(FfxCommonNativeAlphabet::class, \Google\Cloud\Dlp\V2\CryptoReplaceFfxFpeConfig_FfxCommonNativeAlphabet::class);
 

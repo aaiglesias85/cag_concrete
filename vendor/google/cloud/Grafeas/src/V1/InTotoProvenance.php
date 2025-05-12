@@ -18,7 +18,7 @@ class InTotoProvenance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.grafeas.v1.BuilderConfig builder_config = 1;</code>
      */
-    private $builder_config = null;
+    protected $builder_config = null;
     /**
      * Identifies the configuration used for the build.
      * When combined with materials, this SHOULD fully describe the build,
@@ -27,11 +27,11 @@ class InTotoProvenance extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.grafeas.v1.Recipe recipe = 2;</code>
      */
-    private $recipe = null;
+    protected $recipe = null;
     /**
      * Generated from protobuf field <code>.grafeas.v1.Metadata metadata = 3;</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
     /**
      * The collection of artifacts that influenced the build including sources,
      * dependencies, build tools, base images, and so on. This is considered to be
@@ -56,7 +56,7 @@ class InTotoProvenance extends \Google\Protobuf\Internal\Message
      *           such that re-running this recipe results in bit-for-bit identical output
      *           (if the build is reproducible).
      *     @type \Grafeas\V1\Metadata $metadata
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $materials
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $materials
      *           The collection of artifacts that influenced the build including sources,
      *           dependencies, build tools, base images, and so on. This is considered to be
      *           incomplete unless metadata.completeness.materials is true. Unset or null is
@@ -199,7 +199,7 @@ class InTotoProvenance extends \Google\Protobuf\Internal\Message
      * equivalent to empty.
      *
      * Generated from protobuf field <code>repeated string materials = 4;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMaterials($var)

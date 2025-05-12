@@ -22,6 +22,14 @@ class LookupRequest extends \Google\Protobuf\Internal\Message
      */
     private $project_id = '';
     /**
+     * The ID of the database against which to make the request.
+     * '(default)' is not allowed; please use empty string '' to refer the default
+     * database.
+     *
+     * Generated from protobuf field <code>string database_id = 9;</code>
+     */
+    private $database_id = '';
+    /**
      * The options for this lookup request.
      *
      * Generated from protobuf field <code>.google.datastore.v1.ReadOptions read_options = 1;</code>
@@ -33,6 +41,32 @@ class LookupRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.datastore.v1.Key keys = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $keys;
+    /**
+     * The properties to return. Defaults to returning all properties.
+     * If this field is set and an entity has a property not referenced in the
+     * mask, it will be absent from [LookupResponse.found.entity.properties][].
+     * The entity's key is always returned.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.PropertyMask property_mask = 5;</code>
+     */
+    private $property_mask = null;
+
+    /**
+     * @param string                                 $projectId   Required. The ID of the project against which to make the request.
+     * @param \Google\Cloud\Datastore\V1\ReadOptions $readOptions The options for this lookup request.
+     * @param \Google\Cloud\Datastore\V1\Key[]       $keys        Required. Keys of entities to look up.
+     *
+     * @return \Google\Cloud\Datastore\V1\LookupRequest
+     *
+     * @experimental
+     */
+    public static function build(string $projectId, \Google\Cloud\Datastore\V1\ReadOptions $readOptions, array $keys): self
+    {
+        return (new self())
+            ->setProjectId($projectId)
+            ->setReadOptions($readOptions)
+            ->setKeys($keys);
+    }
 
     /**
      * Constructor.
@@ -42,10 +76,19 @@ class LookupRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $project_id
      *           Required. The ID of the project against which to make the request.
+     *     @type string $database_id
+     *           The ID of the database against which to make the request.
+     *           '(default)' is not allowed; please use empty string '' to refer the default
+     *           database.
      *     @type \Google\Cloud\Datastore\V1\ReadOptions $read_options
      *           The options for this lookup request.
-     *     @type \Google\Cloud\Datastore\V1\Key[]|\Google\Protobuf\Internal\RepeatedField $keys
+     *     @type array<\Google\Cloud\Datastore\V1\Key>|\Google\Protobuf\Internal\RepeatedField $keys
      *           Required. Keys of entities to look up.
+     *     @type \Google\Cloud\Datastore\V1\PropertyMask $property_mask
+     *           The properties to return. Defaults to returning all properties.
+     *           If this field is set and an entity has a property not referenced in the
+     *           mask, it will be absent from [LookupResponse.found.entity.properties][].
+     *           The entity's key is always returned.
      * }
      */
     public function __construct($data = NULL) {
@@ -75,6 +118,36 @@ class LookupRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->project_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * The ID of the database against which to make the request.
+     * '(default)' is not allowed; please use empty string '' to refer the default
+     * database.
+     *
+     * Generated from protobuf field <code>string database_id = 9;</code>
+     * @return string
+     */
+    public function getDatabaseId()
+    {
+        return $this->database_id;
+    }
+
+    /**
+     * The ID of the database against which to make the request.
+     * '(default)' is not allowed; please use empty string '' to refer the default
+     * database.
+     *
+     * Generated from protobuf field <code>string database_id = 9;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDatabaseId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->database_id = $var;
 
         return $this;
     }
@@ -130,13 +203,55 @@ class LookupRequest extends \Google\Protobuf\Internal\Message
      * Required. Keys of entities to look up.
      *
      * Generated from protobuf field <code>repeated .google.datastore.v1.Key keys = 3 [(.google.api.field_behavior) = REQUIRED];</code>
-     * @param \Google\Cloud\Datastore\V1\Key[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Datastore\V1\Key>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setKeys($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Datastore\V1\Key::class);
         $this->keys = $arr;
+
+        return $this;
+    }
+
+    /**
+     * The properties to return. Defaults to returning all properties.
+     * If this field is set and an entity has a property not referenced in the
+     * mask, it will be absent from [LookupResponse.found.entity.properties][].
+     * The entity's key is always returned.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.PropertyMask property_mask = 5;</code>
+     * @return \Google\Cloud\Datastore\V1\PropertyMask|null
+     */
+    public function getPropertyMask()
+    {
+        return $this->property_mask;
+    }
+
+    public function hasPropertyMask()
+    {
+        return isset($this->property_mask);
+    }
+
+    public function clearPropertyMask()
+    {
+        unset($this->property_mask);
+    }
+
+    /**
+     * The properties to return. Defaults to returning all properties.
+     * If this field is set and an entity has a property not referenced in the
+     * mask, it will be absent from [LookupResponse.found.entity.properties][].
+     * The entity's key is always returned.
+     *
+     * Generated from protobuf field <code>.google.datastore.v1.PropertyMask property_mask = 5;</code>
+     * @param \Google\Cloud\Datastore\V1\PropertyMask $var
+     * @return $this
+     */
+    public function setPropertyMask($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Datastore\V1\PropertyMask::class);
+        $this->property_mask = $var;
 
         return $this;
     }

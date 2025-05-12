@@ -17,30 +17,30 @@ class AnalyzeMoveRequest extends \Google\Protobuf\Internal\Message
 {
     /**
      * Required. Name of the resource to perform the analysis against.
-     * Only GCP Project are supported as of today. Hence, this can only be Project
-     * ID (such as "projects/my-project-id") or a Project Number (such as
-     * "projects/12345").
+     * Only Google Cloud projects are supported as of today. Hence, this can only
+     * be a project ID (such as "projects/my-project-id") or a project number
+     * (such as "projects/12345").
      *
-     * Generated from protobuf field <code>string resource = 1 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string resource = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $resource = '';
+    protected $resource = '';
     /**
-     * Required. Name of the GCP Folder or Organization to reparent the target
-     * resource. The analysis will be performed against hypothetically moving the
-     * resource to this specified desitination parent. This can only be a Folder
-     * number (such as "folders/123") or an Organization number (such as
+     * Required. Name of the Google Cloud folder or organization to reparent the
+     * target resource. The analysis will be performed against hypothetically
+     * moving the resource to this specified desitination parent. This can only be
+     * a folder number (such as "folders/123") or an organization number (such as
      * "organizations/123").
      *
-     * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $destination_parent = '';
+    protected $destination_parent = '';
     /**
      * Analysis view indicating what information should be included in the
      * analysis response. If unspecified, the default view is FULL.
      *
      * Generated from protobuf field <code>.google.cloud.asset.v1.AnalyzeMoveRequest.AnalysisView view = 3;</code>
      */
-    private $view = 0;
+    protected $view = 0;
 
     /**
      * Constructor.
@@ -50,14 +50,14 @@ class AnalyzeMoveRequest extends \Google\Protobuf\Internal\Message
      *
      *     @type string $resource
      *           Required. Name of the resource to perform the analysis against.
-     *           Only GCP Project are supported as of today. Hence, this can only be Project
-     *           ID (such as "projects/my-project-id") or a Project Number (such as
-     *           "projects/12345").
+     *           Only Google Cloud projects are supported as of today. Hence, this can only
+     *           be a project ID (such as "projects/my-project-id") or a project number
+     *           (such as "projects/12345").
      *     @type string $destination_parent
-     *           Required. Name of the GCP Folder or Organization to reparent the target
-     *           resource. The analysis will be performed against hypothetically moving the
-     *           resource to this specified desitination parent. This can only be a Folder
-     *           number (such as "folders/123") or an Organization number (such as
+     *           Required. Name of the Google Cloud folder or organization to reparent the
+     *           target resource. The analysis will be performed against hypothetically
+     *           moving the resource to this specified desitination parent. This can only be
+     *           a folder number (such as "folders/123") or an organization number (such as
      *           "organizations/123").
      *     @type int $view
      *           Analysis view indicating what information should be included in the
@@ -71,11 +71,11 @@ class AnalyzeMoveRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. Name of the resource to perform the analysis against.
-     * Only GCP Project are supported as of today. Hence, this can only be Project
-     * ID (such as "projects/my-project-id") or a Project Number (such as
-     * "projects/12345").
+     * Only Google Cloud projects are supported as of today. Hence, this can only
+     * be a project ID (such as "projects/my-project-id") or a project number
+     * (such as "projects/12345").
      *
-     * Generated from protobuf field <code>string resource = 1 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string resource = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
      */
     public function getResource()
@@ -85,11 +85,11 @@ class AnalyzeMoveRequest extends \Google\Protobuf\Internal\Message
 
     /**
      * Required. Name of the resource to perform the analysis against.
-     * Only GCP Project are supported as of today. Hence, this can only be Project
-     * ID (such as "projects/my-project-id") or a Project Number (such as
-     * "projects/12345").
+     * Only Google Cloud projects are supported as of today. Hence, this can only
+     * be a project ID (such as "projects/my-project-id") or a project number
+     * (such as "projects/12345").
      *
-     * Generated from protobuf field <code>string resource = 1 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string resource = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
      * @return $this
      */
@@ -102,13 +102,13 @@ class AnalyzeMoveRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Name of the GCP Folder or Organization to reparent the target
-     * resource. The analysis will be performed against hypothetically moving the
-     * resource to this specified desitination parent. This can only be a Folder
-     * number (such as "folders/123") or an Organization number (such as
+     * Required. Name of the Google Cloud folder or organization to reparent the
+     * target resource. The analysis will be performed against hypothetically
+     * moving the resource to this specified desitination parent. This can only be
+     * a folder number (such as "folders/123") or an organization number (such as
      * "organizations/123").
      *
-     * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
      */
     public function getDestinationParent()
@@ -117,13 +117,13 @@ class AnalyzeMoveRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Name of the GCP Folder or Organization to reparent the target
-     * resource. The analysis will be performed against hypothetically moving the
-     * resource to this specified desitination parent. This can only be a Folder
-     * number (such as "folders/123") or an Organization number (such as
+     * Required. Name of the Google Cloud folder or organization to reparent the
+     * target resource. The analysis will be performed against hypothetically
+     * moving the resource to this specified desitination parent. This can only be
+     * a folder number (such as "folders/123") or an organization number (such as
      * "organizations/123").
      *
-     * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>string destination_parent = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
      * @return $this
      */

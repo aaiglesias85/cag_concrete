@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [VizierService.SuggestTrials][google.cloud.aiplatform.v1.VizierService.SuggestTrials].
+ * Response message for
+ * [VizierService.SuggestTrials][google.cloud.aiplatform.v1.VizierService.SuggestTrials].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.SuggestTrialsResponse</code>
  */
@@ -26,19 +27,19 @@ class SuggestTrialsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.Study.State study_state = 2;</code>
      */
-    private $study_state = 0;
+    protected $study_state = 0;
     /**
      * The time at which the operation was started.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 3;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * The time at which operation processing completed.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 4;</code>
      */
-    private $end_time = null;
+    protected $end_time = null;
 
     /**
      * Constructor.
@@ -46,7 +47,7 @@ class SuggestTrialsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\Trial[]|\Google\Protobuf\Internal\RepeatedField $trials
+     *     @type array<\Google\Cloud\AIPlatform\V1\Trial>|\Google\Protobuf\Internal\RepeatedField $trials
      *           A list of Trials.
      *     @type int $study_state
      *           The state of the Study.
@@ -76,7 +77,7 @@ class SuggestTrialsResponse extends \Google\Protobuf\Internal\Message
      * A list of Trials.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Trial trials = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\Trial[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Trial>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTrials($var)

@@ -20,7 +20,7 @@ class OpenUriAction extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string uri = 1;</code>
      */
-    private $uri = '';
+    protected $uri = '';
 
     /**
      * Constructor.
@@ -65,6 +65,4 @@ class OpenUriAction extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(OpenUriAction::class, \Google\Cloud\Dialogflow\V2\Intent_Message_BasicCard_Button_OpenUriAction::class);
 

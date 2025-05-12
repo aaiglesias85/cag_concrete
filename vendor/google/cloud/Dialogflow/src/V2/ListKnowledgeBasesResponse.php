@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [KnowledgeBases.ListKnowledgeBases][google.cloud.dialogflow.v2.KnowledgeBases.ListKnowledgeBases].
+ * Response message for
+ * [KnowledgeBases.ListKnowledgeBases][google.cloud.dialogflow.v2.KnowledgeBases.ListKnowledgeBases].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.ListKnowledgeBasesResponse</code>
  */
@@ -27,7 +28,7 @@ class ListKnowledgeBasesResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,7 +36,7 @@ class ListKnowledgeBasesResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Dialogflow\V2\KnowledgeBase[]|\Google\Protobuf\Internal\RepeatedField $knowledge_bases
+     *     @type array<\Google\Cloud\Dialogflow\V2\KnowledgeBase>|\Google\Protobuf\Internal\RepeatedField $knowledge_bases
      *           The list of knowledge bases.
      *     @type string $next_page_token
      *           Token to retrieve the next page of results, or empty if there are no
@@ -62,7 +63,7 @@ class ListKnowledgeBasesResponse extends \Google\Protobuf\Internal\Message
      * The list of knowledge bases.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dialogflow.v2.KnowledgeBase knowledge_bases = 1;</code>
-     * @param \Google\Cloud\Dialogflow\V2\KnowledgeBase[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Dialogflow\V2\KnowledgeBase>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setKnowledgeBases($var)

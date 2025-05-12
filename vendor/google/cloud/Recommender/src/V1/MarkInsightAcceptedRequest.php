@@ -20,10 +20,10 @@ class MarkInsightAcceptedRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * Optional. State properties user wish to include with this state.  Full replace of the
-     * current state_metadata.
+     * Optional. State properties user wish to include with this state.  Full
+     * replace of the current state_metadata.
      *
      * Generated from protobuf field <code>map<string, string> state_metadata = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
@@ -33,7 +33,26 @@ class MarkInsightAcceptedRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string etag = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $etag = '';
+    protected $etag = '';
+
+    /**
+     * @param string $name          Required. Name of the insight. Please see
+     *                              {@see RecommenderClient::insightName()} for help formatting this field.
+     * @param array  $stateMetadata Optional. State properties user wish to include with this state.  Full
+     *                              replace of the current state_metadata.
+     * @param string $etag          Required. Fingerprint of the Insight. Provides optimistic locking.
+     *
+     * @return \Google\Cloud\Recommender\V1\MarkInsightAcceptedRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, array $stateMetadata, string $etag): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setStateMetadata($stateMetadata)
+            ->setEtag($etag);
+    }
 
     /**
      * Constructor.
@@ -44,8 +63,8 @@ class MarkInsightAcceptedRequest extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *           Required. Name of the insight.
      *     @type array|\Google\Protobuf\Internal\MapField $state_metadata
-     *           Optional. State properties user wish to include with this state.  Full replace of the
-     *           current state_metadata.
+     *           Optional. State properties user wish to include with this state.  Full
+     *           replace of the current state_metadata.
      *     @type string $etag
      *           Required. Fingerprint of the Insight. Provides optimistic locking.
      * }
@@ -82,8 +101,8 @@ class MarkInsightAcceptedRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. State properties user wish to include with this state.  Full replace of the
-     * current state_metadata.
+     * Optional. State properties user wish to include with this state.  Full
+     * replace of the current state_metadata.
      *
      * Generated from protobuf field <code>map<string, string> state_metadata = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -94,8 +113,8 @@ class MarkInsightAcceptedRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. State properties user wish to include with this state.  Full replace of the
-     * current state_metadata.
+     * Optional. State properties user wish to include with this state.  Full
+     * replace of the current state_metadata.
      *
      * Generated from protobuf field <code>map<string, string> state_metadata = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param array|\Google\Protobuf\Internal\MapField $var

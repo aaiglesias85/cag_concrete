@@ -29,7 +29,7 @@ class ImportProductsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.ImportErrorsConfig errors_config = 2;</code>
      */
-    private $errors_config = null;
+    protected $errors_config = null;
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ class ImportProductsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $error_samples
+     *     @type array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $error_samples
      *           A sample of errors encountered while processing the request.
      *     @type \Google\Cloud\Retail\V2\ImportErrorsConfig $errors_config
      *           Echoes the destination for the complete errors in the request if set.
@@ -63,7 +63,7 @@ class ImportProductsResponse extends \Google\Protobuf\Internal\Message
      * A sample of errors encountered while processing the request.
      *
      * Generated from protobuf field <code>repeated .google.rpc.Status error_samples = 1;</code>
-     * @param \Google\Rpc\Status[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Rpc\Status>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setErrorSamples($var)

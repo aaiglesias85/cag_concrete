@@ -22,13 +22,30 @@ class ExportInstanceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. Specify data to be exported.
      *
      * Generated from protobuf field <code>.google.cloud.redis.v1.OutputConfig output_config = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $output_config = null;
+    protected $output_config = null;
+
+    /**
+     * @param string                              $name         Required. Redis instance resource name using the form:
+     *                                                          `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+     *                                                          where `location_id` refers to a GCP region.
+     * @param \Google\Cloud\Redis\V1\OutputConfig $outputConfig Required. Specify data to be exported.
+     *
+     * @return \Google\Cloud\Redis\V1\ExportInstanceRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, \Google\Cloud\Redis\V1\OutputConfig $outputConfig): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setOutputConfig($outputConfig);
+    }
 
     /**
      * Constructor.

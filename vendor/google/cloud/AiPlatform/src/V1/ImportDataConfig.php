@@ -27,20 +27,37 @@ class ImportDataConfig extends \Google\Protobuf\Internal\Message
      * considered identical if their content bytes are identical (e.g. image bytes
      * or pdf bytes).
      * These labels will be overridden by Annotation labels specified inside index
-     * file referenced by [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri], e.g. jsonl file.
+     * file referenced by
+     * [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     * e.g. jsonl file.
      *
      * Generated from protobuf field <code>map<string, string> data_item_labels = 2;</code>
      */
     private $data_item_labels;
     /**
-     * Required. Points to a YAML file stored on Google Cloud Storage describing the import
-     * format. Validation will be done against the schema. The schema is defined
-     * as an [OpenAPI 3.0.2 Schema
+     * Labels that will be applied to newly imported Annotations. If two
+     * Annotations are identical, one of them will be deduped. Two Annotations are
+     * considered identical if their
+     * [payload][google.cloud.aiplatform.v1.Annotation.payload],
+     * [payload_schema_uri][google.cloud.aiplatform.v1.Annotation.payload_schema_uri]
+     * and all of their [labels][google.cloud.aiplatform.v1.Annotation.labels] are
+     * the same. These labels will be overridden by Annotation labels specified
+     * inside index file referenced by
+     * [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     * e.g. jsonl file.
+     *
+     * Generated from protobuf field <code>map<string, string> annotation_labels = 3;</code>
+     */
+    private $annotation_labels;
+    /**
+     * Required. Points to a YAML file stored on Google Cloud Storage describing
+     * the import format. Validation will be done against the schema. The schema
+     * is defined as an [OpenAPI 3.0.2 Schema
      * Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      *
      * Generated from protobuf field <code>string import_schema_uri = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $import_schema_uri = '';
+    protected $import_schema_uri = '';
     protected $source;
 
     /**
@@ -62,11 +79,24 @@ class ImportDataConfig extends \Google\Protobuf\Internal\Message
      *           considered identical if their content bytes are identical (e.g. image bytes
      *           or pdf bytes).
      *           These labels will be overridden by Annotation labels specified inside index
-     *           file referenced by [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri], e.g. jsonl file.
+     *           file referenced by
+     *           [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     *           e.g. jsonl file.
+     *     @type array|\Google\Protobuf\Internal\MapField $annotation_labels
+     *           Labels that will be applied to newly imported Annotations. If two
+     *           Annotations are identical, one of them will be deduped. Two Annotations are
+     *           considered identical if their
+     *           [payload][google.cloud.aiplatform.v1.Annotation.payload],
+     *           [payload_schema_uri][google.cloud.aiplatform.v1.Annotation.payload_schema_uri]
+     *           and all of their [labels][google.cloud.aiplatform.v1.Annotation.labels] are
+     *           the same. These labels will be overridden by Annotation labels specified
+     *           inside index file referenced by
+     *           [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     *           e.g. jsonl file.
      *     @type string $import_schema_uri
-     *           Required. Points to a YAML file stored on Google Cloud Storage describing the import
-     *           format. Validation will be done against the schema. The schema is defined
-     *           as an [OpenAPI 3.0.2 Schema
+     *           Required. Points to a YAML file stored on Google Cloud Storage describing
+     *           the import format. Validation will be done against the schema. The schema
+     *           is defined as an [OpenAPI 3.0.2 Schema
      *           Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      * }
      */
@@ -117,7 +147,9 @@ class ImportDataConfig extends \Google\Protobuf\Internal\Message
      * considered identical if their content bytes are identical (e.g. image bytes
      * or pdf bytes).
      * These labels will be overridden by Annotation labels specified inside index
-     * file referenced by [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri], e.g. jsonl file.
+     * file referenced by
+     * [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     * e.g. jsonl file.
      *
      * Generated from protobuf field <code>map<string, string> data_item_labels = 2;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -138,7 +170,9 @@ class ImportDataConfig extends \Google\Protobuf\Internal\Message
      * considered identical if their content bytes are identical (e.g. image bytes
      * or pdf bytes).
      * These labels will be overridden by Annotation labels specified inside index
-     * file referenced by [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri], e.g. jsonl file.
+     * file referenced by
+     * [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     * e.g. jsonl file.
      *
      * Generated from protobuf field <code>map<string, string> data_item_labels = 2;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -153,9 +187,53 @@ class ImportDataConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Points to a YAML file stored on Google Cloud Storage describing the import
-     * format. Validation will be done against the schema. The schema is defined
-     * as an [OpenAPI 3.0.2 Schema
+     * Labels that will be applied to newly imported Annotations. If two
+     * Annotations are identical, one of them will be deduped. Two Annotations are
+     * considered identical if their
+     * [payload][google.cloud.aiplatform.v1.Annotation.payload],
+     * [payload_schema_uri][google.cloud.aiplatform.v1.Annotation.payload_schema_uri]
+     * and all of their [labels][google.cloud.aiplatform.v1.Annotation.labels] are
+     * the same. These labels will be overridden by Annotation labels specified
+     * inside index file referenced by
+     * [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     * e.g. jsonl file.
+     *
+     * Generated from protobuf field <code>map<string, string> annotation_labels = 3;</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getAnnotationLabels()
+    {
+        return $this->annotation_labels;
+    }
+
+    /**
+     * Labels that will be applied to newly imported Annotations. If two
+     * Annotations are identical, one of them will be deduped. Two Annotations are
+     * considered identical if their
+     * [payload][google.cloud.aiplatform.v1.Annotation.payload],
+     * [payload_schema_uri][google.cloud.aiplatform.v1.Annotation.payload_schema_uri]
+     * and all of their [labels][google.cloud.aiplatform.v1.Annotation.labels] are
+     * the same. These labels will be overridden by Annotation labels specified
+     * inside index file referenced by
+     * [import_schema_uri][google.cloud.aiplatform.v1.ImportDataConfig.import_schema_uri],
+     * e.g. jsonl file.
+     *
+     * Generated from protobuf field <code>map<string, string> annotation_labels = 3;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setAnnotationLabels($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->annotation_labels = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Required. Points to a YAML file stored on Google Cloud Storage describing
+     * the import format. Validation will be done against the schema. The schema
+     * is defined as an [OpenAPI 3.0.2 Schema
      * Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      *
      * Generated from protobuf field <code>string import_schema_uri = 4 [(.google.api.field_behavior) = REQUIRED];</code>
@@ -167,9 +245,9 @@ class ImportDataConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. Points to a YAML file stored on Google Cloud Storage describing the import
-     * format. Validation will be done against the schema. The schema is defined
-     * as an [OpenAPI 3.0.2 Schema
+     * Required. Points to a YAML file stored on Google Cloud Storage describing
+     * the import format. Validation will be done against the schema. The schema
+     * is defined as an [OpenAPI 3.0.2 Schema
      * Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#schemaObject).
      *
      * Generated from protobuf field <code>string import_schema_uri = 4 [(.google.api.field_behavior) = REQUIRED];</code>

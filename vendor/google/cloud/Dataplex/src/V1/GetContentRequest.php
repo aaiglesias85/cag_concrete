@@ -21,13 +21,28 @@ class GetContentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Optional. Specify content view to make a partial request.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.GetContentRequest.ContentView view = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $view = 0;
+    protected $view = 0;
+
+    /**
+     * @param string $name Required. The resource name of the content:
+     *                     projects/{project_id}/locations/{location_id}/lakes/{lake_id}/content/{content_id}
+     *                     Please see {@see ContentServiceClient::contentName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Dataplex\V1\GetContentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

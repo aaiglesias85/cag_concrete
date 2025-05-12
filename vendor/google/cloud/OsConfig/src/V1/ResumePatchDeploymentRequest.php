@@ -21,7 +21,22 @@ class ResumePatchDeploymentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The resource name of the patch deployment in the form
+     *                     `projects/&#42;/patchDeployments/*`. Please see
+     *                     {@see OsConfigServiceClient::patchDeploymentName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\OsConfig\V1\ResumePatchDeploymentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

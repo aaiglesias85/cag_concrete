@@ -20,7 +20,7 @@ class OpenApiDocument extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.apigateway.v1.ApiConfig.File document = 1;</code>
      */
-    private $document = null;
+    protected $document = null;
 
     /**
      * Constructor.
@@ -75,6 +75,4 @@ class OpenApiDocument extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(OpenApiDocument::class, \Google\Cloud\ApiGateway\V1\ApiConfig_OpenApiDocument::class);
 

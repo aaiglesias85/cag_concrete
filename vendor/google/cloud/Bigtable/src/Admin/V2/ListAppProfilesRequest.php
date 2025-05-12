@@ -16,15 +16,15 @@ use Google\Protobuf\Internal\GPBUtil;
 class ListAppProfilesRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The unique name of the instance for which a list of app profiles is
-     * requested. Values are of the form
+     * Required. The unique name of the instance for which a list of app profiles
+     * is requested. Values are of the form
      * `projects/{project}/instances/{instance}`.
      * Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
      * e.g., `projects/myproject/instances/-`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Maximum number of results per page.
      * A page_size of zero lets the server choose the number of items to return.
@@ -36,13 +36,31 @@ class ListAppProfilesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 page_size = 3;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The value of `next_page_token` returned by a previous call.
      *
      * Generated from protobuf field <code>string page_token = 2;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. The unique name of the instance for which a list of app profiles
+     *                       is requested. Values are of the form
+     *                       `projects/{project}/instances/{instance}`.
+     *                       Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
+     *                       e.g., `projects/myproject/instances/-`. Please see
+     *                       {@see BigtableInstanceAdminClient::instanceName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\Bigtable\Admin\V2\ListAppProfilesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -51,8 +69,8 @@ class ListAppProfilesRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The unique name of the instance for which a list of app profiles is
-     *           requested. Values are of the form
+     *           Required. The unique name of the instance for which a list of app profiles
+     *           is requested. Values are of the form
      *           `projects/{project}/instances/{instance}`.
      *           Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
      *           e.g., `projects/myproject/instances/-`.
@@ -74,8 +92,8 @@ class ListAppProfilesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The unique name of the instance for which a list of app profiles is
-     * requested. Values are of the form
+     * Required. The unique name of the instance for which a list of app profiles
+     * is requested. Values are of the form
      * `projects/{project}/instances/{instance}`.
      * Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
      * e.g., `projects/myproject/instances/-`.
@@ -89,8 +107,8 @@ class ListAppProfilesRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The unique name of the instance for which a list of app profiles is
-     * requested. Values are of the form
+     * Required. The unique name of the instance for which a list of app profiles
+     * is requested. Values are of the form
      * `projects/{project}/instances/{instance}`.
      * Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
      * e.g., `projects/myproject/instances/-`.

@@ -22,7 +22,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Immutable. [Product][google.cloud.retail.v2.Product] identifier, which is
      * the final component of [name][google.cloud.retail.v2.Product.name]. For
@@ -37,7 +37,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string id = 2 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Immutable. The type of the product. Default to
      * [Catalog.product_level_config.ingestion_product_type][google.cloud.retail.v2.ProductLevelConfig.ingestion_product_type]
@@ -45,7 +45,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.Product.Type type = 3 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $type = 0;
+    protected $type = 0;
     /**
      * Variant group identifier. Must be an
      * [id][google.cloud.retail.v2.Product.id], with the same parent branch with
@@ -65,7 +65,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string primary_product_id = 4;</code>
      */
-    private $primary_product_id = '';
+    protected $primary_product_id = '';
     /**
      * The [id][google.cloud.retail.v2.Product.id] of the collection members when
      * [type][google.cloud.retail.v2.Product.type] is
@@ -73,7 +73,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * Non-existent product ids are allowed.
      * The [type][google.cloud.retail.v2.Product.type] of the members must be
      * either [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] or
-     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise and
+     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise an
      * INVALID_ARGUMENT error is thrown. Should not set it for other types. A
      * maximum of 1000 values are allowed. Otherwise, an INVALID_ARGUMENT error is
      * return.
@@ -99,13 +99,13 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string gtin = 6;</code>
      */
-    private $gtin = '';
+    protected $gtin = '';
     /**
      * Product categories. This field is repeated for supporting one product
      * belonging to several parallel categories. Strongly recommended using the
      * full path for better search / recommendation quality.
      * To represent full path of category, use '>' sign to separate different
-     * hierarchies. If '>' is part of the category name, please replace it with
+     * hierarchies. If '>' is part of the category name, replace it with
      * other character(s).
      * For example, if a shoes product belongs to both
      * ["Shoes & Accessories" -> "Shoes"] and
@@ -119,9 +119,10 @@ class Product extends \Google\Protobuf\Internal\Message
      * [Product][google.cloud.retail.v2.Product] otherwise an INVALID_ARGUMENT
      * error is returned.
      * At most 250 values are allowed per
-     * [Product][google.cloud.retail.v2.Product]. Empty values are not allowed.
-     * Each value must be a UTF-8 encoded string with a length limit of 5,000
-     * characters. Otherwise, an INVALID_ARGUMENT error is returned.
+     * [Product][google.cloud.retail.v2.Product] unless overridden through the
+     * Google Cloud console. Empty values are not allowed. Each value must be a
+     * UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an
+     * INVALID_ARGUMENT error is returned.
      * Corresponding properties: Google Merchant Center property
      * [google_product_category][mc_google_product_category]. Schema.org property
      * [Product.category] (https://schema.org/category).
@@ -141,12 +142,13 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string title = 8 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $title = '';
+    protected $title = '';
     /**
      * The brands of the product.
-     * A maximum of 30 brands are allowed. Each brand must be a UTF-8 encoded
-     * string with a length limit of 1,000 characters. Otherwise, an
-     * INVALID_ARGUMENT error is returned.
+     * A maximum of 30 brands are allowed unless overridden through the Google
+     * Cloud console. Each
+     * brand must be a UTF-8 encoded string with a length limit of 1,000
+     * characters. Otherwise, an INVALID_ARGUMENT error is returned.
      * Corresponding properties: Google Merchant Center property
      * [brand](https://support.google.com/merchants/answer/6324351). Schema.org
      * property [Product.brand](https://schema.org/brand).
@@ -164,7 +166,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string description = 10;</code>
      */
-    private $description = '';
+    protected $description = '';
     /**
      * Language of the title/description and other string attributes. Use language
      * tags defined by [BCP 47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt).
@@ -177,7 +179,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 11;</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * Highly encouraged. Extra product attributes to be included. For example,
      * for products, this could include the store name, vendor, style, color, etc.
@@ -229,38 +231,49 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.PriceInfo price_info = 14;</code>
      */
-    private $price_info = null;
+    protected $price_info = null;
     /**
      * The rating of this product.
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.Rating rating = 15;</code>
      */
-    private $rating = null;
+    protected $rating = null;
     /**
      * The timestamp when this [Product][google.cloud.retail.v2.Product] becomes
      * available for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
+     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search]. Note
+     * that this is only applicable to
+     * [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] and
+     * [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION], and
+     * ignored for [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT].
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp available_time = 18;</code>
      */
-    private $available_time = null;
+    protected $available_time = null;
     /**
      * The online availability of the [Product][google.cloud.retail.v2.Product].
      * Default to
      * [Availability.IN_STOCK][google.cloud.retail.v2.Product.Availability.IN_STOCK].
+     * For primary products with variants set the availability of the primary as
+     * [Availability.OUT_OF_STOCK][google.cloud.retail.v2.Product.Availability.OUT_OF_STOCK]
+     * and set the true availability at the variant level. This way the primary
+     * product will be considered "in stock" as long as it has at least one
+     * variant in stock.
+     * For primary products with no variants set the true availability at the
+     * primary level.
      * Corresponding properties: Google Merchant Center property
      * [availability](https://support.google.com/merchants/answer/6324448).
      * Schema.org property [Offer.availability](https://schema.org/availability).
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.Product.Availability availability = 19;</code>
      */
-    private $availability = 0;
+    protected $availability = 0;
     /**
      * The available quantity of the item.
      *
      * Generated from protobuf field <code>.google.protobuf.Int32Value available_quantity = 20;</code>
      */
-    private $available_quantity = null;
+    protected $available_quantity = null;
     /**
      * Fulfillment information, such as the store IDs for in-store pickup or
      * region IDs for different shipping methods.
@@ -283,7 +296,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string uri = 22;</code>
      */
-    private $uri = '';
+    protected $uri = '';
     /**
      * Product images for the product. We highly recommend putting the main
      * image first.
@@ -301,7 +314,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.Audience audience = 24;</code>
      */
-    private $audience = null;
+    protected $audience = null;
     /**
      * The color of the product.
      * Corresponding properties: Google Merchant Center property
@@ -310,7 +323,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.retail.v2.ColorInfo color_info = 25;</code>
      */
-    private $color_info = null;
+    protected $color_info = null;
     /**
      * The size of the product. To represent different size systems or size types,
      * consider using this format: [[[size_system:]size_type:]size_value].
@@ -391,7 +404,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp publish_time = 33;</code>
      */
-    private $publish_time = null;
+    protected $publish_time = null;
     /**
      * Indicates which fields in the [Product][google.cloud.retail.v2.Product]s
      * are returned in [SearchResponse][google.cloud.retail.v2.SearchResponse].
@@ -432,15 +445,15 @@ class Product extends \Google\Protobuf\Internal\Message
      * following fields are always returned in by default:
      * * [name][google.cloud.retail.v2.Product.name]
      * * [color_info][google.cloud.retail.v2.Product.color_info]
-     * The maximum number of paths is 30. Otherwise, an INVALID_ARGUMENT error is
-     * returned.
      * Note: Returning more fields in
      * [SearchResponse][google.cloud.retail.v2.SearchResponse] can increase
      * response payload size and serving latency.
+     * This field is deprecated. Use the retrievable site-wide control instead.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask retrievable_fields = 30;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask retrievable_fields = 30 [deprecated = true];</code>
+     * @deprecated
      */
-    private $retrievable_fields = null;
+    protected $retrievable_fields = null;
     /**
      * Output only. Product variants grouped together on primary product which
      * share similar product attributes. It's automatically grouped by
@@ -455,6 +468,17 @@ class Product extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.Product variants = 31 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
     private $variants;
+    /**
+     * Output only. A list of local inventories specific to different places.
+     * This field can be managed by
+     * [ProductService.AddLocalInventories][google.cloud.retail.v2.ProductService.AddLocalInventories]
+     * and
+     * [ProductService.RemoveLocalInventories][google.cloud.retail.v2.ProductService.RemoveLocalInventories]
+     * APIs if fine-grained, high-volume updates are necessary.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.retail.v2.LocalInventory local_inventories = 35 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $local_inventories;
     protected $expiration;
 
     /**
@@ -464,16 +488,19 @@ class Product extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type \Google\Protobuf\Timestamp $expire_time
-     *           The timestamp when this product becomes unavailable for
-     *           [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
-     *           If it is set, the [Product][google.cloud.retail.v2.Product] is not
-     *           available for
-     *           [SearchService.Search][google.cloud.retail.v2.SearchService.Search] after
-     *           [expire_time][google.cloud.retail.v2.Product.expire_time]. However, the
-     *           product can still be retrieved by
-     *           [ProductService.GetProduct][google.cloud.retail.v2.ProductService.GetProduct]
-     *           and
-     *           [ProductService.ListProducts][google.cloud.retail.v2.ProductService.ListProducts].
+     *           Note that this field is applied in the following ways:
+     *           * If the [Product][google.cloud.retail.v2.Product] is already expired
+     *           when it is uploaded, this product
+     *             is not indexed for search.
+     *           * If the [Product][google.cloud.retail.v2.Product] is not expired when it
+     *           is uploaded, only the
+     *             [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY]'s and
+     *             [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION]'s
+     *             expireTime is respected, and
+     *             [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT]'s
+     *             expireTime is not used.
+     *           In general, we suggest the users to delete the stale
+     *           products explicitly, instead of using this field to determine staleness.
      *           [expire_time][google.cloud.retail.v2.Product.expire_time] must be later
      *           than [available_time][google.cloud.retail.v2.Product.available_time] and
      *           [publish_time][google.cloud.retail.v2.Product.publish_time], otherwise an
@@ -481,7 +508,13 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Corresponding properties: Google Merchant Center property
      *           [expiration_date](https://support.google.com/merchants/answer/6324499).
      *     @type \Google\Protobuf\Duration $ttl
-     *           Input only. The TTL (time to live) of the product.
+     *           Input only. The TTL (time to live) of the product. Note that this is only
+     *           applicable to [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY]
+     *           and [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION],
+     *           and ignored for
+     *           [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT]. In general,
+     *           we suggest the users to delete the stale products explicitly, instead of
+     *           using this field to determine staleness.
      *           If it is set, it must be a non-negative value, and
      *           [expire_time][google.cloud.retail.v2.Product.expire_time] is set as
      *           current timestamp plus [ttl][google.cloud.retail.v2.Product.ttl]. The
@@ -529,14 +562,14 @@ class Product extends \Google\Protobuf\Internal\Message
      *           [item_group_id](https://support.google.com/merchants/answer/6324507).
      *           Schema.org property
      *           [Product.inProductGroupWithID](https://schema.org/inProductGroupWithID).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $collection_member_ids
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $collection_member_ids
      *           The [id][google.cloud.retail.v2.Product.id] of the collection members when
      *           [type][google.cloud.retail.v2.Product.type] is
      *           [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION].
      *           Non-existent product ids are allowed.
      *           The [type][google.cloud.retail.v2.Product.type] of the members must be
      *           either [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] or
-     *           [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise and
+     *           [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise an
      *           INVALID_ARGUMENT error is thrown. Should not set it for other types. A
      *           maximum of 1000 values are allowed. Otherwise, an INVALID_ARGUMENT error is
      *           return.
@@ -555,12 +588,12 @@ class Product extends \Google\Protobuf\Internal\Message
      *           [Product.gtin13](https://schema.org/gtin13), or
      *           [Product.gtin14](https://schema.org/gtin14).
      *           If the value is not a valid GTIN, an INVALID_ARGUMENT error is returned.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $categories
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $categories
      *           Product categories. This field is repeated for supporting one product
      *           belonging to several parallel categories. Strongly recommended using the
      *           full path for better search / recommendation quality.
      *           To represent full path of category, use '>' sign to separate different
-     *           hierarchies. If '>' is part of the category name, please replace it with
+     *           hierarchies. If '>' is part of the category name, replace it with
      *           other character(s).
      *           For example, if a shoes product belongs to both
      *           ["Shoes & Accessories" -> "Shoes"] and
@@ -574,9 +607,10 @@ class Product extends \Google\Protobuf\Internal\Message
      *           [Product][google.cloud.retail.v2.Product] otherwise an INVALID_ARGUMENT
      *           error is returned.
      *           At most 250 values are allowed per
-     *           [Product][google.cloud.retail.v2.Product]. Empty values are not allowed.
-     *           Each value must be a UTF-8 encoded string with a length limit of 5,000
-     *           characters. Otherwise, an INVALID_ARGUMENT error is returned.
+     *           [Product][google.cloud.retail.v2.Product] unless overridden through the
+     *           Google Cloud console. Empty values are not allowed. Each value must be a
+     *           UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an
+     *           INVALID_ARGUMENT error is returned.
      *           Corresponding properties: Google Merchant Center property
      *           [google_product_category][mc_google_product_category]. Schema.org property
      *           [Product.category] (https://schema.org/category).
@@ -589,11 +623,12 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Corresponding properties: Google Merchant Center property
      *           [title](https://support.google.com/merchants/answer/6324415). Schema.org
      *           property [Product.name](https://schema.org/name).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $brands
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $brands
      *           The brands of the product.
-     *           A maximum of 30 brands are allowed. Each brand must be a UTF-8 encoded
-     *           string with a length limit of 1,000 characters. Otherwise, an
-     *           INVALID_ARGUMENT error is returned.
+     *           A maximum of 30 brands are allowed unless overridden through the Google
+     *           Cloud console. Each
+     *           brand must be a UTF-8 encoded string with a length limit of 1,000
+     *           characters. Otherwise, an INVALID_ARGUMENT error is returned.
      *           Corresponding properties: Google Merchant Center property
      *           [brand](https://support.google.com/merchants/answer/6324351). Schema.org
      *           property [Product.brand](https://schema.org/brand).
@@ -638,7 +673,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *             allowed. Each value must be a non-empty UTF-8 encoded string with a
      *             length limit of 256 characters.
      *           * For number attributes, at most 400 values are allowed.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $tags
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $tags
      *           Custom tags associated with the product.
      *           At most 250 values are allowed per
      *           [Product][google.cloud.retail.v2.Product]. This value must be a UTF-8
@@ -658,17 +693,28 @@ class Product extends \Google\Protobuf\Internal\Message
      *     @type \Google\Protobuf\Timestamp $available_time
      *           The timestamp when this [Product][google.cloud.retail.v2.Product] becomes
      *           available for
-     *           [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
+     *           [SearchService.Search][google.cloud.retail.v2.SearchService.Search]. Note
+     *           that this is only applicable to
+     *           [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] and
+     *           [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION], and
+     *           ignored for [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT].
      *     @type int $availability
      *           The online availability of the [Product][google.cloud.retail.v2.Product].
      *           Default to
      *           [Availability.IN_STOCK][google.cloud.retail.v2.Product.Availability.IN_STOCK].
+     *           For primary products with variants set the availability of the primary as
+     *           [Availability.OUT_OF_STOCK][google.cloud.retail.v2.Product.Availability.OUT_OF_STOCK]
+     *           and set the true availability at the variant level. This way the primary
+     *           product will be considered "in stock" as long as it has at least one
+     *           variant in stock.
+     *           For primary products with no variants set the true availability at the
+     *           primary level.
      *           Corresponding properties: Google Merchant Center property
      *           [availability](https://support.google.com/merchants/answer/6324448).
      *           Schema.org property [Offer.availability](https://schema.org/availability).
      *     @type \Google\Protobuf\Int32Value $available_quantity
      *           The available quantity of the item.
-     *     @type \Google\Cloud\Retail\V2\FulfillmentInfo[]|\Google\Protobuf\Internal\RepeatedField $fulfillment_info
+     *     @type array<\Google\Cloud\Retail\V2\FulfillmentInfo>|\Google\Protobuf\Internal\RepeatedField $fulfillment_info
      *           Fulfillment information, such as the store IDs for in-store pickup or
      *           region IDs for different shipping methods.
      *           All the elements must have distinct
@@ -683,7 +729,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Corresponding properties: Google Merchant Center property
      *           [link](https://support.google.com/merchants/answer/6324416). Schema.org
      *           property [Offer.url](https://schema.org/url).
-     *     @type \Google\Cloud\Retail\V2\Image[]|\Google\Protobuf\Internal\RepeatedField $images
+     *     @type array<\Google\Cloud\Retail\V2\Image>|\Google\Protobuf\Internal\RepeatedField $images
      *           Product images for the product. We highly recommend putting the main
      *           image first.
      *           A maximum of 300 images are allowed.
@@ -698,7 +744,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Corresponding properties: Google Merchant Center property
      *           [color](https://support.google.com/merchants/answer/6324487). Schema.org
      *           property [Product.color](https://schema.org/color).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $sizes
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $sizes
      *           The size of the product. To represent different size systems or size types,
      *           consider using this format: [[[size_system:]size_type:]size_value].
      *           For example, in "US:MENS:M", "US" represents size system; "MENS" represents
@@ -714,7 +760,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *           [size_type](https://support.google.com/merchants/answer/6324497), and
      *           [size_system](https://support.google.com/merchants/answer/6324502).
      *           Schema.org property [Product.size](https://schema.org/size).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $materials
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $materials
      *           The material of the product. For example, "leather", "wooden".
      *           A maximum of 20 values are allowed. Each value must be a UTF-8 encoded
      *           string with a length limit of 200 characters. Otherwise, an
@@ -722,7 +768,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Corresponding properties: Google Merchant Center property
      *           [material](https://support.google.com/merchants/answer/6324410). Schema.org
      *           property [Product.material](https://schema.org/material).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $patterns
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $patterns
      *           The pattern or graphic print of the product. For example, "striped", "polka
      *           dot", "paisley".
      *           A maximum of 20 values are allowed per
@@ -732,7 +778,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Corresponding properties: Google Merchant Center property
      *           [pattern](https://support.google.com/merchants/answer/6324483). Schema.org
      *           property [Product.pattern](https://schema.org/pattern).
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $conditions
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $conditions
      *           The condition of the product. Strongly encouraged to use the standard
      *           values: "new", "refurbished", "used".
      *           A maximum of 1 value is allowed per
@@ -743,7 +789,7 @@ class Product extends \Google\Protobuf\Internal\Message
      *           [condition](https://support.google.com/merchants/answer/6324469).
      *           Schema.org property
      *           [Offer.itemCondition](https://schema.org/itemCondition).
-     *     @type \Google\Cloud\Retail\V2\Promotion[]|\Google\Protobuf\Internal\RepeatedField $promotions
+     *     @type array<\Google\Cloud\Retail\V2\Promotion>|\Google\Protobuf\Internal\RepeatedField $promotions
      *           The promotions applied to the product. A maximum of 10 values are allowed
      *           per [Product][google.cloud.retail.v2.Product]. Only
      *           [Promotion.promotion_id][google.cloud.retail.v2.Promotion.promotion_id]
@@ -795,12 +841,11 @@ class Product extends \Google\Protobuf\Internal\Message
      *           following fields are always returned in by default:
      *           * [name][google.cloud.retail.v2.Product.name]
      *           * [color_info][google.cloud.retail.v2.Product.color_info]
-     *           The maximum number of paths is 30. Otherwise, an INVALID_ARGUMENT error is
-     *           returned.
      *           Note: Returning more fields in
      *           [SearchResponse][google.cloud.retail.v2.SearchResponse] can increase
      *           response payload size and serving latency.
-     *     @type \Google\Cloud\Retail\V2\Product[]|\Google\Protobuf\Internal\RepeatedField $variants
+     *           This field is deprecated. Use the retrievable site-wide control instead.
+     *     @type array<\Google\Cloud\Retail\V2\Product>|\Google\Protobuf\Internal\RepeatedField $variants
      *           Output only. Product variants grouped together on primary product which
      *           share similar product attributes. It's automatically grouped by
      *           [primary_product_id][google.cloud.retail.v2.Product.primary_product_id] for
@@ -810,6 +855,13 @@ class Product extends \Google\Protobuf\Internal\Message
      *           Note: This field is OUTPUT_ONLY for
      *           [ProductService.GetProduct][google.cloud.retail.v2.ProductService.GetProduct].
      *           Do not set this field in API requests.
+     *     @type array<\Google\Cloud\Retail\V2\LocalInventory>|\Google\Protobuf\Internal\RepeatedField $local_inventories
+     *           Output only. A list of local inventories specific to different places.
+     *           This field can be managed by
+     *           [ProductService.AddLocalInventories][google.cloud.retail.v2.ProductService.AddLocalInventories]
+     *           and
+     *           [ProductService.RemoveLocalInventories][google.cloud.retail.v2.ProductService.RemoveLocalInventories]
+     *           APIs if fine-grained, high-volume updates are necessary.
      * }
      */
     public function __construct($data = NULL) {
@@ -818,16 +870,19 @@ class Product extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The timestamp when this product becomes unavailable for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
-     * If it is set, the [Product][google.cloud.retail.v2.Product] is not
-     * available for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search] after
-     * [expire_time][google.cloud.retail.v2.Product.expire_time]. However, the
-     * product can still be retrieved by
-     * [ProductService.GetProduct][google.cloud.retail.v2.ProductService.GetProduct]
-     * and
-     * [ProductService.ListProducts][google.cloud.retail.v2.ProductService.ListProducts].
+     * Note that this field is applied in the following ways:
+     * * If the [Product][google.cloud.retail.v2.Product] is already expired
+     * when it is uploaded, this product
+     *   is not indexed for search.
+     * * If the [Product][google.cloud.retail.v2.Product] is not expired when it
+     * is uploaded, only the
+     *   [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY]'s and
+     *   [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION]'s
+     *   expireTime is respected, and
+     *   [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT]'s
+     *   expireTime is not used.
+     * In general, we suggest the users to delete the stale
+     * products explicitly, instead of using this field to determine staleness.
      * [expire_time][google.cloud.retail.v2.Product.expire_time] must be later
      * than [available_time][google.cloud.retail.v2.Product.available_time] and
      * [publish_time][google.cloud.retail.v2.Product.publish_time], otherwise an
@@ -849,16 +904,19 @@ class Product extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The timestamp when this product becomes unavailable for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
-     * If it is set, the [Product][google.cloud.retail.v2.Product] is not
-     * available for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search] after
-     * [expire_time][google.cloud.retail.v2.Product.expire_time]. However, the
-     * product can still be retrieved by
-     * [ProductService.GetProduct][google.cloud.retail.v2.ProductService.GetProduct]
-     * and
-     * [ProductService.ListProducts][google.cloud.retail.v2.ProductService.ListProducts].
+     * Note that this field is applied in the following ways:
+     * * If the [Product][google.cloud.retail.v2.Product] is already expired
+     * when it is uploaded, this product
+     *   is not indexed for search.
+     * * If the [Product][google.cloud.retail.v2.Product] is not expired when it
+     * is uploaded, only the
+     *   [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY]'s and
+     *   [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION]'s
+     *   expireTime is respected, and
+     *   [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT]'s
+     *   expireTime is not used.
+     * In general, we suggest the users to delete the stale
+     * products explicitly, instead of using this field to determine staleness.
      * [expire_time][google.cloud.retail.v2.Product.expire_time] must be later
      * than [available_time][google.cloud.retail.v2.Product.available_time] and
      * [publish_time][google.cloud.retail.v2.Product.publish_time], otherwise an
@@ -879,7 +937,13 @@ class Product extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Input only. The TTL (time to live) of the product.
+     * Input only. The TTL (time to live) of the product. Note that this is only
+     * applicable to [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY]
+     * and [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION],
+     * and ignored for
+     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT]. In general,
+     * we suggest the users to delete the stale products explicitly, instead of
+     * using this field to determine staleness.
      * If it is set, it must be a non-negative value, and
      * [expire_time][google.cloud.retail.v2.Product.expire_time] is set as
      * current timestamp plus [ttl][google.cloud.retail.v2.Product.ttl]. The
@@ -908,7 +972,13 @@ class Product extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Input only. The TTL (time to live) of the product.
+     * Input only. The TTL (time to live) of the product. Note that this is only
+     * applicable to [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY]
+     * and [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION],
+     * and ignored for
+     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT]. In general,
+     * we suggest the users to delete the stale products explicitly, instead of
+     * using this field to determine staleness.
      * If it is set, it must be a non-negative value, and
      * [expire_time][google.cloud.retail.v2.Product.expire_time] is set as
      * current timestamp plus [ttl][google.cloud.retail.v2.Product.ttl]. The
@@ -1098,7 +1168,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * Non-existent product ids are allowed.
      * The [type][google.cloud.retail.v2.Product.type] of the members must be
      * either [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] or
-     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise and
+     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise an
      * INVALID_ARGUMENT error is thrown. Should not set it for other types. A
      * maximum of 1000 values are allowed. Otherwise, an INVALID_ARGUMENT error is
      * return.
@@ -1118,13 +1188,13 @@ class Product extends \Google\Protobuf\Internal\Message
      * Non-existent product ids are allowed.
      * The [type][google.cloud.retail.v2.Product.type] of the members must be
      * either [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] or
-     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise and
+     * [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT] otherwise an
      * INVALID_ARGUMENT error is thrown. Should not set it for other types. A
      * maximum of 1000 values are allowed. Otherwise, an INVALID_ARGUMENT error is
      * return.
      *
      * Generated from protobuf field <code>repeated string collection_member_ids = 5;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCollectionMemberIds($var)
@@ -1192,7 +1262,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * belonging to several parallel categories. Strongly recommended using the
      * full path for better search / recommendation quality.
      * To represent full path of category, use '>' sign to separate different
-     * hierarchies. If '>' is part of the category name, please replace it with
+     * hierarchies. If '>' is part of the category name, replace it with
      * other character(s).
      * For example, if a shoes product belongs to both
      * ["Shoes & Accessories" -> "Shoes"] and
@@ -1206,9 +1276,10 @@ class Product extends \Google\Protobuf\Internal\Message
      * [Product][google.cloud.retail.v2.Product] otherwise an INVALID_ARGUMENT
      * error is returned.
      * At most 250 values are allowed per
-     * [Product][google.cloud.retail.v2.Product]. Empty values are not allowed.
-     * Each value must be a UTF-8 encoded string with a length limit of 5,000
-     * characters. Otherwise, an INVALID_ARGUMENT error is returned.
+     * [Product][google.cloud.retail.v2.Product] unless overridden through the
+     * Google Cloud console. Empty values are not allowed. Each value must be a
+     * UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an
+     * INVALID_ARGUMENT error is returned.
      * Corresponding properties: Google Merchant Center property
      * [google_product_category][mc_google_product_category]. Schema.org property
      * [Product.category] (https://schema.org/category).
@@ -1228,7 +1299,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * belonging to several parallel categories. Strongly recommended using the
      * full path for better search / recommendation quality.
      * To represent full path of category, use '>' sign to separate different
-     * hierarchies. If '>' is part of the category name, please replace it with
+     * hierarchies. If '>' is part of the category name, replace it with
      * other character(s).
      * For example, if a shoes product belongs to both
      * ["Shoes & Accessories" -> "Shoes"] and
@@ -1242,9 +1313,10 @@ class Product extends \Google\Protobuf\Internal\Message
      * [Product][google.cloud.retail.v2.Product] otherwise an INVALID_ARGUMENT
      * error is returned.
      * At most 250 values are allowed per
-     * [Product][google.cloud.retail.v2.Product]. Empty values are not allowed.
-     * Each value must be a UTF-8 encoded string with a length limit of 5,000
-     * characters. Otherwise, an INVALID_ARGUMENT error is returned.
+     * [Product][google.cloud.retail.v2.Product] unless overridden through the
+     * Google Cloud console. Empty values are not allowed. Each value must be a
+     * UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an
+     * INVALID_ARGUMENT error is returned.
      * Corresponding properties: Google Merchant Center property
      * [google_product_category][mc_google_product_category]. Schema.org property
      * [Product.category] (https://schema.org/category).
@@ -1252,7 +1324,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * https://support.google.com/merchants/answer/6324436
      *
      * Generated from protobuf field <code>repeated string categories = 7;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCategories($var)
@@ -1301,9 +1373,10 @@ class Product extends \Google\Protobuf\Internal\Message
 
     /**
      * The brands of the product.
-     * A maximum of 30 brands are allowed. Each brand must be a UTF-8 encoded
-     * string with a length limit of 1,000 characters. Otherwise, an
-     * INVALID_ARGUMENT error is returned.
+     * A maximum of 30 brands are allowed unless overridden through the Google
+     * Cloud console. Each
+     * brand must be a UTF-8 encoded string with a length limit of 1,000
+     * characters. Otherwise, an INVALID_ARGUMENT error is returned.
      * Corresponding properties: Google Merchant Center property
      * [brand](https://support.google.com/merchants/answer/6324351). Schema.org
      * property [Product.brand](https://schema.org/brand).
@@ -1318,15 +1391,16 @@ class Product extends \Google\Protobuf\Internal\Message
 
     /**
      * The brands of the product.
-     * A maximum of 30 brands are allowed. Each brand must be a UTF-8 encoded
-     * string with a length limit of 1,000 characters. Otherwise, an
-     * INVALID_ARGUMENT error is returned.
+     * A maximum of 30 brands are allowed unless overridden through the Google
+     * Cloud console. Each
+     * brand must be a UTF-8 encoded string with a length limit of 1,000
+     * characters. Otherwise, an INVALID_ARGUMENT error is returned.
      * Corresponding properties: Google Merchant Center property
      * [brand](https://support.google.com/merchants/answer/6324351). Schema.org
      * property [Product.brand](https://schema.org/brand).
      *
      * Generated from protobuf field <code>repeated string brands = 9;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBrands($var)
@@ -1518,7 +1592,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * [custom_label_0–4](https://support.google.com/merchants/answer/6324473).
      *
      * Generated from protobuf field <code>repeated string tags = 13;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTags($var)
@@ -1608,7 +1682,11 @@ class Product extends \Google\Protobuf\Internal\Message
     /**
      * The timestamp when this [Product][google.cloud.retail.v2.Product] becomes
      * available for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
+     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search]. Note
+     * that this is only applicable to
+     * [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] and
+     * [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION], and
+     * ignored for [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT].
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp available_time = 18;</code>
      * @return \Google\Protobuf\Timestamp|null
@@ -1631,7 +1709,11 @@ class Product extends \Google\Protobuf\Internal\Message
     /**
      * The timestamp when this [Product][google.cloud.retail.v2.Product] becomes
      * available for
-     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search].
+     * [SearchService.Search][google.cloud.retail.v2.SearchService.Search]. Note
+     * that this is only applicable to
+     * [Type.PRIMARY][google.cloud.retail.v2.Product.Type.PRIMARY] and
+     * [Type.COLLECTION][google.cloud.retail.v2.Product.Type.COLLECTION], and
+     * ignored for [Type.VARIANT][google.cloud.retail.v2.Product.Type.VARIANT].
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp available_time = 18;</code>
      * @param \Google\Protobuf\Timestamp $var
@@ -1649,6 +1731,13 @@ class Product extends \Google\Protobuf\Internal\Message
      * The online availability of the [Product][google.cloud.retail.v2.Product].
      * Default to
      * [Availability.IN_STOCK][google.cloud.retail.v2.Product.Availability.IN_STOCK].
+     * For primary products with variants set the availability of the primary as
+     * [Availability.OUT_OF_STOCK][google.cloud.retail.v2.Product.Availability.OUT_OF_STOCK]
+     * and set the true availability at the variant level. This way the primary
+     * product will be considered "in stock" as long as it has at least one
+     * variant in stock.
+     * For primary products with no variants set the true availability at the
+     * primary level.
      * Corresponding properties: Google Merchant Center property
      * [availability](https://support.google.com/merchants/answer/6324448).
      * Schema.org property [Offer.availability](https://schema.org/availability).
@@ -1665,6 +1754,13 @@ class Product extends \Google\Protobuf\Internal\Message
      * The online availability of the [Product][google.cloud.retail.v2.Product].
      * Default to
      * [Availability.IN_STOCK][google.cloud.retail.v2.Product.Availability.IN_STOCK].
+     * For primary products with variants set the availability of the primary as
+     * [Availability.OUT_OF_STOCK][google.cloud.retail.v2.Product.Availability.OUT_OF_STOCK]
+     * and set the true availability at the variant level. This way the primary
+     * product will be considered "in stock" as long as it has at least one
+     * variant in stock.
+     * For primary products with no variants set the true availability at the
+     * primary level.
      * Corresponding properties: Google Merchant Center property
      * [availability](https://support.google.com/merchants/answer/6324448).
      * Schema.org property [Offer.availability](https://schema.org/availability).
@@ -1710,7 +1806,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.Int32Value available_quantity = 20;</code>
      * @return int|null
      */
-    public function getAvailableQuantityValue()
+    public function getAvailableQuantityUnwrapped()
     {
         return $this->readWrapperValue("available_quantity");
     }
@@ -1739,7 +1835,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * @param int|null $var
      * @return $this
      */
-    public function setAvailableQuantityValue($var)
+    public function setAvailableQuantityUnwrapped($var)
     {
         $this->writeWrapperValue("available_quantity", $var);
         return $this;}
@@ -1767,7 +1863,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * Otherwise, an INVALID_ARGUMENT error is returned.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.FulfillmentInfo fulfillment_info = 21;</code>
-     * @param \Google\Cloud\Retail\V2\FulfillmentInfo[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\FulfillmentInfo>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setFulfillmentInfo($var)
@@ -1843,7 +1939,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * Schema.org property [Product.image](https://schema.org/image).
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.Image images = 23;</code>
-     * @param \Google\Cloud\Retail\V2\Image[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\Image>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setImages($var)
@@ -1977,7 +2073,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * Schema.org property [Product.size](https://schema.org/size).
      *
      * Generated from protobuf field <code>repeated string sizes = 26;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSizes($var)
@@ -2015,7 +2111,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * property [Product.material](https://schema.org/material).
      *
      * Generated from protobuf field <code>repeated string materials = 27;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMaterials($var)
@@ -2057,7 +2153,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * property [Product.pattern](https://schema.org/pattern).
      *
      * Generated from protobuf field <code>repeated string patterns = 28;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPatterns($var)
@@ -2101,7 +2197,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * [Offer.itemCondition](https://schema.org/itemCondition).
      *
      * Generated from protobuf field <code>repeated string conditions = 29;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setConditions($var)
@@ -2133,7 +2229,7 @@ class Product extends \Google\Protobuf\Internal\Message
      * will be used, other fields will be ignored if set.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.Promotion promotions = 34;</code>
-     * @param \Google\Cloud\Retail\V2\Promotion[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\Promotion>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPromotions($var)
@@ -2230,27 +2326,30 @@ class Product extends \Google\Protobuf\Internal\Message
      * following fields are always returned in by default:
      * * [name][google.cloud.retail.v2.Product.name]
      * * [color_info][google.cloud.retail.v2.Product.color_info]
-     * The maximum number of paths is 30. Otherwise, an INVALID_ARGUMENT error is
-     * returned.
      * Note: Returning more fields in
      * [SearchResponse][google.cloud.retail.v2.SearchResponse] can increase
      * response payload size and serving latency.
+     * This field is deprecated. Use the retrievable site-wide control instead.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask retrievable_fields = 30;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask retrievable_fields = 30 [deprecated = true];</code>
      * @return \Google\Protobuf\FieldMask|null
+     * @deprecated
      */
     public function getRetrievableFields()
     {
+        @trigger_error('retrievable_fields is deprecated.', E_USER_DEPRECATED);
         return $this->retrievable_fields;
     }
 
     public function hasRetrievableFields()
     {
+        @trigger_error('retrievable_fields is deprecated.', E_USER_DEPRECATED);
         return isset($this->retrievable_fields);
     }
 
     public function clearRetrievableFields()
     {
+        @trigger_error('retrievable_fields is deprecated.', E_USER_DEPRECATED);
         unset($this->retrievable_fields);
     }
 
@@ -2294,18 +2393,19 @@ class Product extends \Google\Protobuf\Internal\Message
      * following fields are always returned in by default:
      * * [name][google.cloud.retail.v2.Product.name]
      * * [color_info][google.cloud.retail.v2.Product.color_info]
-     * The maximum number of paths is 30. Otherwise, an INVALID_ARGUMENT error is
-     * returned.
      * Note: Returning more fields in
      * [SearchResponse][google.cloud.retail.v2.SearchResponse] can increase
      * response payload size and serving latency.
+     * This field is deprecated. Use the retrievable site-wide control instead.
      *
-     * Generated from protobuf field <code>.google.protobuf.FieldMask retrievable_fields = 30;</code>
+     * Generated from protobuf field <code>.google.protobuf.FieldMask retrievable_fields = 30 [deprecated = true];</code>
      * @param \Google\Protobuf\FieldMask $var
      * @return $this
+     * @deprecated
      */
     public function setRetrievableFields($var)
     {
+        @trigger_error('retrievable_fields is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkMessage($var, \Google\Protobuf\FieldMask::class);
         $this->retrievable_fields = $var;
 
@@ -2343,13 +2443,49 @@ class Product extends \Google\Protobuf\Internal\Message
      * Do not set this field in API requests.
      *
      * Generated from protobuf field <code>repeated .google.cloud.retail.v2.Product variants = 31 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
-     * @param \Google\Cloud\Retail\V2\Product[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Retail\V2\Product>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setVariants($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Retail\V2\Product::class);
         $this->variants = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Output only. A list of local inventories specific to different places.
+     * This field can be managed by
+     * [ProductService.AddLocalInventories][google.cloud.retail.v2.ProductService.AddLocalInventories]
+     * and
+     * [ProductService.RemoveLocalInventories][google.cloud.retail.v2.ProductService.RemoveLocalInventories]
+     * APIs if fine-grained, high-volume updates are necessary.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.retail.v2.LocalInventory local_inventories = 35 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getLocalInventories()
+    {
+        return $this->local_inventories;
+    }
+
+    /**
+     * Output only. A list of local inventories specific to different places.
+     * This field can be managed by
+     * [ProductService.AddLocalInventories][google.cloud.retail.v2.ProductService.AddLocalInventories]
+     * and
+     * [ProductService.RemoveLocalInventories][google.cloud.retail.v2.ProductService.RemoveLocalInventories]
+     * APIs if fine-grained, high-volume updates are necessary.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.retail.v2.LocalInventory local_inventories = 35 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array<\Google\Cloud\Retail\V2\LocalInventory>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setLocalInventories($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Retail\V2\LocalInventory::class);
+        $this->local_inventories = $arr;
 
         return $this;
     }

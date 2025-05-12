@@ -22,7 +22,21 @@ class DeleteConversationModelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name Required. The conversation model to delete. Format:
+     *                     `projects/<Project ID>/conversationModels/<Conversation Model ID>`
+     *
+     * @return \Google\Cloud\Dialogflow\V2\DeleteConversationModelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

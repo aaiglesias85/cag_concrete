@@ -24,7 +24,7 @@ class TenantService
         \GPBMetadata\Google\Protobuf\FieldMask::initOnce();
         $pool->internalAddGeneratedFile(
             '
-’
+À
 +google/cloud/talent/v4/tenant_service.protogoogle.cloud.talent.v4google/api/client.protogoogle/api/field_behavior.protogoogle/api/resource.proto#google/cloud/talent/v4/common.proto#google/cloud/talent/v4/tenant.protogoogle/protobuf/empty.proto google/protobuf/field_mask.proto"è
 CreateTenantRequestC
 parent (	B3‡A˙A-
@@ -50,12 +50,12 @@ page_token (	
 next_page_token (	:
 metadata (2(.google.cloud.talent.v4.ResponseMetadata2
 TenantServiceú
-CreateTenant+.google.cloud.talent.v4.CreateTenantRequest.google.cloud.talent.v4.Tenant"?Ç”‰ì)"/v4/{parent=projects/*}/tenants:tenant⁄Aparent,tenantÖ
-	GetTenant(.google.cloud.talent.v4.GetTenantRequest.google.cloud.talent.v4.Tenant".Ç”‰ì!/v4/{name=projects/*/tenants/*}⁄Aname®
-UpdateTenant+.google.cloud.talent.v4.UpdateTenantRequest.google.cloud.talent.v4.Tenant"KÇ”‰ì02&/v4/{tenant.name=projects/*/tenants/*}:tenant⁄Atenant,update_maskÉ
-DeleteTenant+.google.cloud.talent.v4.DeleteTenantRequest.google.protobuf.Empty".Ç”‰ì!*/v4/{name=projects/*/tenants/*}⁄Anameò
-ListTenants*.google.cloud.talent.v4.ListTenantsRequest+.google.cloud.talent.v4.ListTenantsResponse"0Ç”‰ì!/v4/{parent=projects/*}/tenants⁄Aparentl Ajobs.googleapis.com“AShttps://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/jobsBv
-com.google.cloud.talent.v4BTenantServiceProtoPZ<google.golang.org/genproto/googleapis/cloud/talent/v4;talent¢CTSbproto3'
+CreateTenant+.google.cloud.talent.v4.CreateTenantRequest.google.cloud.talent.v4.Tenant"?⁄Aparent,tenantÇ”‰ì)"/v4/{parent=projects/*}/tenants:tenantÖ
+	GetTenant(.google.cloud.talent.v4.GetTenantRequest.google.cloud.talent.v4.Tenant".⁄AnameÇ”‰ì!/v4/{name=projects/*/tenants/*}®
+UpdateTenant+.google.cloud.talent.v4.UpdateTenantRequest.google.cloud.talent.v4.Tenant"K⁄Atenant,update_maskÇ”‰ì02&/v4/{tenant.name=projects/*/tenants/*}:tenantÉ
+DeleteTenant+.google.cloud.talent.v4.DeleteTenantRequest.google.protobuf.Empty".⁄AnameÇ”‰ì!*/v4/{name=projects/*/tenants/*}ò
+ListTenants*.google.cloud.talent.v4.ListTenantsRequest+.google.cloud.talent.v4.ListTenantsResponse"0⁄AparentÇ”‰ì!/v4/{parent=projects/*}/tenantsl Ajobs.googleapis.com“AShttps://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/jobsBl
+com.google.cloud.talent.v4BTenantServiceProtoPZ2cloud.google.com/go/talent/apiv4/talentpb;talentpb¢CTSbproto3'
         , true);
 
         static::$is_initialized = true;

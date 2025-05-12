@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [IndexEndpointService.ListIndexEndpoints][google.cloud.aiplatform.v1.IndexEndpointService.ListIndexEndpoints].
+ * Response message for
+ * [IndexEndpointService.ListIndexEndpoints][google.cloud.aiplatform.v1.IndexEndpointService.ListIndexEndpoints].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListIndexEndpointsResponse</code>
  */
@@ -23,11 +24,13 @@ class ListIndexEndpointsResponse extends \Google\Protobuf\Internal\Message
     private $index_endpoints;
     /**
      * A token to retrieve next page of results.
-     * Pass to [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -35,11 +38,13 @@ class ListIndexEndpointsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\IndexEndpoint[]|\Google\Protobuf\Internal\RepeatedField $index_endpoints
+     *     @type array<\Google\Cloud\AIPlatform\V1\IndexEndpoint>|\Google\Protobuf\Internal\RepeatedField $index_endpoints
      *           List of IndexEndpoints in the requested page.
      *     @type string $next_page_token
      *           A token to retrieve next page of results.
-     *           Pass to [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token] to obtain that page.
+     *           Pass to
+     *           [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token]
+     *           to obtain that page.
      * }
      */
     public function __construct($data = NULL) {
@@ -62,7 +67,7 @@ class ListIndexEndpointsResponse extends \Google\Protobuf\Internal\Message
      * List of IndexEndpoints in the requested page.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.IndexEndpoint index_endpoints = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\IndexEndpoint[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\IndexEndpoint>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setIndexEndpoints($var)
@@ -75,7 +80,9 @@ class ListIndexEndpointsResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * A token to retrieve next page of results.
-     * Pass to [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @return string
@@ -87,7 +94,9 @@ class ListIndexEndpointsResponse extends \Google\Protobuf\Internal\Message
 
     /**
      * A token to retrieve next page of results.
-     * Pass to [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token] to obtain that page.
+     * Pass to
+     * [ListIndexEndpointsRequest.page_token][google.cloud.aiplatform.v1.ListIndexEndpointsRequest.page_token]
+     * to obtain that page.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      * @param string $var

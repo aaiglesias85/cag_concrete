@@ -28,14 +28,14 @@ class ListJobsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * Additional information for the API invocation, such as the request
      * tracking id.
      *
      * Generated from protobuf field <code>.google.cloud.talent.v4.ResponseMetadata metadata = 3;</code>
      */
-    private $metadata = null;
+    protected $metadata = null;
 
     /**
      * Constructor.
@@ -43,7 +43,7 @@ class ListJobsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Talent\V4\Job[]|\Google\Protobuf\Internal\RepeatedField $jobs
+     *     @type array<\Google\Cloud\Talent\V4\Job>|\Google\Protobuf\Internal\RepeatedField $jobs
      *           The Jobs for a given company.
      *           The maximum number of items returned is based on the limit field
      *           provided in the request.
@@ -78,7 +78,7 @@ class ListJobsResponse extends \Google\Protobuf\Internal\Message
      * provided in the request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.talent.v4.Job jobs = 1;</code>
-     * @param \Google\Cloud\Talent\V4\Job[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Talent\V4\Job>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setJobs($var)

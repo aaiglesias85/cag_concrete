@@ -21,13 +21,28 @@ class UpdateServiceRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.servicedirectory.v1.Service service = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $service = null;
+    protected $service = null;
     /**
      * Required. List of fields to be updated in this request.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
+
+    /**
+     * @param \Google\Cloud\ServiceDirectory\V1\Service $service    Required. The updated service.
+     * @param \Google\Protobuf\FieldMask                $updateMask Required. List of fields to be updated in this request.
+     *
+     * @return \Google\Cloud\ServiceDirectory\V1\UpdateServiceRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\ServiceDirectory\V1\Service $service, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setService($service)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

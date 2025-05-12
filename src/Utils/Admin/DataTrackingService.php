@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\ConcreteVendor;
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
@@ -42,7 +43,7 @@ class DataTrackingService extends Base
             $project_name = $entity->getDataTracking()->getProject()->getProjectNumber() . " - " . $entity->getDataTracking()->getProject()->getName();
             $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
 
-            $conc_vendor = $entity->getConcVendor();
+            $conc_vendor = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getName() : '';
 
             $em->remove($entity);
             $em->flush();
@@ -363,7 +364,8 @@ class DataTrackingService extends Base
 
             $items[] = [
                 'data_tracking_conc_vendor_id' => $value->getId(),
-                "conc_vendor" => $value->getConcVendor(),
+                "vendor_id" => $value->getConcreteVendor()->getVendorId(),
+                "vendor" => $value->getConcreteVendor()->getName(),
                 "total_conc_used" => $total_conc_used,
                 "conc_price" => $conc_price,
                 "total" => $total,
@@ -542,7 +544,7 @@ class DataTrackingService extends Base
         if ($entity != null) {
 
             // eliminar informacion relacionada
-            $this->EliminarInformacionRelacionada($data_tracking_id);
+            $this->EliminarInformacionRelacionadaDataTracking($data_tracking_id);
 
 
             $project_name = $entity->getProject()->getProjectNumber() . " - " . $entity->getProject()->getName();
@@ -588,7 +590,7 @@ class DataTrackingService extends Base
                     if ($entity != null) {
 
                         // eliminar informacion relacionada
-                        $this->EliminarInformacionRelacionada($data_tracking_id);
+                        $this->EliminarInformacionRelacionadaDataTracking($data_tracking_id);
 
                         $project_name = $entity->getProject()->getProjectNumber() . " - " . $entity->getProject()->getName();
                         $date = $entity->getDate()->format('m/d/Y');
@@ -619,51 +621,6 @@ class DataTrackingService extends Base
         }
 
         return $resultado;
-    }
-
-    /**
-     * EliminarInformacionRelacionada
-     * @param $data_tracking_id
-     * @return void
-     */
-    private function EliminarInformacionRelacionada($data_tracking_id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        // conc vendors
-        $conc_vendors = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-            ->ListarConcVendor($data_tracking_id);
-        foreach ($conc_vendors as $conc_vendor) {
-            $em->remove($conc_vendor);
-        }
-
-        // items
-        $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-            ->ListarItems($data_tracking_id);
-        foreach ($items as $item) {
-            $em->remove($item);
-        }
-
-        // labor
-        $data_tracking_labors = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-            ->ListarLabor($data_tracking_id);
-        foreach ($data_tracking_labors as $data_tracking_labor) {
-            $em->remove($data_tracking_labor);
-        }
-
-        // materials
-        $data_tracking_materials = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
-            ->ListarMaterials($data_tracking_id);
-        foreach ($data_tracking_materials as $data_tracking_material) {
-            $em->remove($data_tracking_material);
-        }
-
-        // data tracking subcontract
-        $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->ListarSubcontracts($data_tracking_id);
-        foreach ($subcontract_items as $subcontract_item) {
-            $em->remove($subcontract_item);
-        }
     }
 
     /**
@@ -859,7 +816,10 @@ class DataTrackingService extends Base
                 $is_new_data_tracking_conc_vendor = true;
             }
 
-            $data_tracking_conc_vendor_entity->setConcVendor($value->conc_vendor);
+            $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                ->find($value->vendor_id);
+            $data_tracking_conc_vendor_entity->setConcreteVendor($concrete_vendor);
+
             $data_tracking_conc_vendor_entity->setTotalConcUsed($value->total_conc_used);
             $data_tracking_conc_vendor_entity->setConcPrice($value->conc_price);
 

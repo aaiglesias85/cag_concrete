@@ -27,33 +27,36 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string service_account = 2;</code>
      */
-    private $service_account = '';
+    protected $service_account = '';
     /**
      * Specifies the upgrade settings for NAP created node pools
      *
      * Generated from protobuf field <code>.google.container.v1.NodePool.UpgradeSettings upgrade_settings = 3;</code>
      */
-    private $upgrade_settings = null;
+    protected $upgrade_settings = null;
     /**
      * Specifies the node management options for NAP created node-pools.
      *
      * Generated from protobuf field <code>.google.container.v1.NodeManagement management = 4;</code>
      */
-    private $management = null;
+    protected $management = null;
     /**
-     * Minimum CPU platform to be used for NAP created node pools.
+     * Deprecated. Minimum CPU platform to be used for NAP created node pools.
      * The instance may be scheduled on the specified or newer CPU platform.
      * Applicable values are the friendly names of CPU platforms, such as
      * minCpuPlatform: Intel Haswell or
      * minCpuPlatform: Intel Sandy Bridge. For more
      * information, read [how to specify min CPU
-     * platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
+     * platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform).
+     * This field is deprecated, min_cpu_platform should be specified using
+     * `cloud.google.com/requested-min-cpu-platform` label selector on the pod.
      * To unset the min cpu platform field pass "automatic"
      * as field value.
      *
-     * Generated from protobuf field <code>string min_cpu_platform = 5;</code>
+     * Generated from protobuf field <code>string min_cpu_platform = 5 [deprecated = true];</code>
+     * @deprecated
      */
-    private $min_cpu_platform = '';
+    protected $min_cpu_platform = '';
     /**
      * Size of the disk attached to each node, specified in GB.
      * The smallest allowed disk size is 10GB.
@@ -61,7 +64,7 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 disk_size_gb = 6;</code>
      */
-    private $disk_size_gb = 0;
+    protected $disk_size_gb = 0;
     /**
      * Type of the disk attached to each node (e.g. 'pd-standard', 'pd-ssd' or
      * 'pd-balanced')
@@ -69,13 +72,13 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string disk_type = 7;</code>
      */
-    private $disk_type = '';
+    protected $disk_type = '';
     /**
      * Shielded Instance options.
      *
      * Generated from protobuf field <code>.google.container.v1.ShieldedInstanceConfig shielded_instance_config = 8;</code>
      */
-    private $shielded_instance_config = null;
+    protected $shielded_instance_config = null;
     /**
      * The Customer Managed Encryption Key used to encrypt the boot disk attached
      * to each node in the node pool. This should be of the form
@@ -86,13 +89,21 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string boot_disk_kms_key = 9;</code>
      */
-    private $boot_disk_kms_key = '';
+    protected $boot_disk_kms_key = '';
     /**
-     * The image type to use for NAP created node.
+     * The image type to use for NAP created node. Please see
+     * https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     * available image types.
      *
      * Generated from protobuf field <code>string image_type = 10;</code>
      */
-    private $image_type = '';
+    protected $image_type = '';
+    /**
+     * Enable or disable Kubelet read only port.
+     *
+     * Generated from protobuf field <code>optional bool insecure_kubelet_readonly_port_enabled = 13;</code>
+     */
+    protected $insecure_kubelet_readonly_port_enabled = null;
 
     /**
      * Constructor.
@@ -100,7 +111,7 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $oauth_scopes
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $oauth_scopes
      *           Scopes that are used by NAP when creating node pools.
      *     @type string $service_account
      *           The Google Cloud Platform Service Account to be used by the node VMs.
@@ -109,13 +120,15 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\Container\V1\NodeManagement $management
      *           Specifies the node management options for NAP created node-pools.
      *     @type string $min_cpu_platform
-     *           Minimum CPU platform to be used for NAP created node pools.
+     *           Deprecated. Minimum CPU platform to be used for NAP created node pools.
      *           The instance may be scheduled on the specified or newer CPU platform.
      *           Applicable values are the friendly names of CPU platforms, such as
      *           minCpuPlatform: Intel Haswell or
      *           minCpuPlatform: Intel Sandy Bridge. For more
      *           information, read [how to specify min CPU
-     *           platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
+     *           platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform).
+     *           This field is deprecated, min_cpu_platform should be specified using
+     *           `cloud.google.com/requested-min-cpu-platform` label selector on the pod.
      *           To unset the min cpu platform field pass "automatic"
      *           as field value.
      *     @type int $disk_size_gb
@@ -136,7 +149,11 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      *           see:
      *           https://cloud.google.com/compute/docs/disks/customer-managed-encryption
      *     @type string $image_type
-     *           The image type to use for NAP created node.
+     *           The image type to use for NAP created node. Please see
+     *           https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     *           available image types.
+     *     @type bool $insecure_kubelet_readonly_port_enabled
+     *           Enable or disable Kubelet read only port.
      * }
      */
     public function __construct($data = NULL) {
@@ -159,7 +176,7 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
      * Scopes that are used by NAP when creating node pools.
      *
      * Generated from protobuf field <code>repeated string oauth_scopes = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOauthScopes($var)
@@ -269,41 +286,49 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Minimum CPU platform to be used for NAP created node pools.
+     * Deprecated. Minimum CPU platform to be used for NAP created node pools.
      * The instance may be scheduled on the specified or newer CPU platform.
      * Applicable values are the friendly names of CPU platforms, such as
      * minCpuPlatform: Intel Haswell or
      * minCpuPlatform: Intel Sandy Bridge. For more
      * information, read [how to specify min CPU
-     * platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
+     * platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform).
+     * This field is deprecated, min_cpu_platform should be specified using
+     * `cloud.google.com/requested-min-cpu-platform` label selector on the pod.
      * To unset the min cpu platform field pass "automatic"
      * as field value.
      *
-     * Generated from protobuf field <code>string min_cpu_platform = 5;</code>
+     * Generated from protobuf field <code>string min_cpu_platform = 5 [deprecated = true];</code>
      * @return string
+     * @deprecated
      */
     public function getMinCpuPlatform()
     {
+        @trigger_error('min_cpu_platform is deprecated.', E_USER_DEPRECATED);
         return $this->min_cpu_platform;
     }
 
     /**
-     * Minimum CPU platform to be used for NAP created node pools.
+     * Deprecated. Minimum CPU platform to be used for NAP created node pools.
      * The instance may be scheduled on the specified or newer CPU platform.
      * Applicable values are the friendly names of CPU platforms, such as
      * minCpuPlatform: Intel Haswell or
      * minCpuPlatform: Intel Sandy Bridge. For more
      * information, read [how to specify min CPU
-     * platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
+     * platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform).
+     * This field is deprecated, min_cpu_platform should be specified using
+     * `cloud.google.com/requested-min-cpu-platform` label selector on the pod.
      * To unset the min cpu platform field pass "automatic"
      * as field value.
      *
-     * Generated from protobuf field <code>string min_cpu_platform = 5;</code>
+     * Generated from protobuf field <code>string min_cpu_platform = 5 [deprecated = true];</code>
      * @param string $var
      * @return $this
+     * @deprecated
      */
     public function setMinCpuPlatform($var)
     {
+        @trigger_error('min_cpu_platform is deprecated.', E_USER_DEPRECATED);
         GPBUtil::checkString($var, True);
         $this->min_cpu_platform = $var;
 
@@ -443,7 +468,9 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The image type to use for NAP created node.
+     * The image type to use for NAP created node. Please see
+     * https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     * available image types.
      *
      * Generated from protobuf field <code>string image_type = 10;</code>
      * @return string
@@ -454,7 +481,9 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The image type to use for NAP created node.
+     * The image type to use for NAP created node. Please see
+     * https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for
+     * available image types.
      *
      * Generated from protobuf field <code>string image_type = 10;</code>
      * @param string $var
@@ -464,6 +493,42 @@ class AutoprovisioningNodePoolDefaults extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->image_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Enable or disable Kubelet read only port.
+     *
+     * Generated from protobuf field <code>optional bool insecure_kubelet_readonly_port_enabled = 13;</code>
+     * @return bool
+     */
+    public function getInsecureKubeletReadonlyPortEnabled()
+    {
+        return isset($this->insecure_kubelet_readonly_port_enabled) ? $this->insecure_kubelet_readonly_port_enabled : false;
+    }
+
+    public function hasInsecureKubeletReadonlyPortEnabled()
+    {
+        return isset($this->insecure_kubelet_readonly_port_enabled);
+    }
+
+    public function clearInsecureKubeletReadonlyPortEnabled()
+    {
+        unset($this->insecure_kubelet_readonly_port_enabled);
+    }
+
+    /**
+     * Enable or disable Kubelet read only port.
+     *
+     * Generated from protobuf field <code>optional bool insecure_kubelet_readonly_port_enabled = 13;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setInsecureKubeletReadonlyPortEnabled($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->insecure_kubelet_readonly_port_enabled = $var;
 
         return $this;
     }

@@ -21,13 +21,30 @@ class BatchCreateNotesRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * The notes to create. Max allowed length is 1000.
      *
      * Generated from protobuf field <code>map<string, .grafeas.v1.Note> notes = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
     private $notes;
+
+    /**
+     * @param string $parent The name of the project in the form of `projects/[PROJECT_ID]`, under which
+     *                       the notes are to be created. Please see
+     *                       {@see GrafeasClient::projectName()} for help formatting this field.
+     * @param array  $notes  The notes to create. Max allowed length is 1000.
+     *
+     * @return \Grafeas\V1\BatchCreateNotesRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, array $notes): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setNotes($notes);
+    }
 
     /**
      * Constructor.

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [JobService.CreateCustomJob][google.cloud.aiplatform.v1.JobService.CreateCustomJob].
+ * Request message for
+ * [JobService.CreateCustomJob][google.cloud.aiplatform.v1.JobService.CreateCustomJob].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.CreateCustomJobRequest</code>
  */
@@ -21,13 +22,30 @@ class CreateCustomJobRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The CustomJob to create.
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.CustomJob custom_job = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $custom_job = null;
+    protected $custom_job = null;
+
+    /**
+     * @param string                                $parent    Required. The resource name of the Location to create the CustomJob in.
+     *                                                         Format: `projects/{project}/locations/{location}`
+     *                                                         Please see {@see JobServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\AIPlatform\V1\CustomJob $customJob Required. The CustomJob to create.
+     *
+     * @return \Google\Cloud\AIPlatform\V1\CreateCustomJobRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\AIPlatform\V1\CustomJob $customJob): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setCustomJob($customJob);
+    }
 
     /**
      * Constructor.

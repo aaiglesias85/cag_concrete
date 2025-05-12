@@ -41,96 +41,207 @@ class ReporteEmployeeService extends Base
      */
     public function ExportarExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
-        //Configurar excel
+        $semanas = $this->ObtenerSemanasReporteExcel($fecha_inicial, $fecha_fin);
+        $employees = $this->ListarEmployeesParaReporteExcel($project_id, $fecha_inicial, $fecha_fin, $employee_id);
+
         Cell::setValueBinder(new AdvancedValueBinder());
+        $styleArray = ['borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN]]];
 
-        $styleArray = array(
-            'borders' => array(
-                'outline' => array(
-                    'borderStyle' => Border::BORDER_THIN
-                ),
-            ),
-        );
-
-        // reader
         $reader = IOFactory::createReader('Xlsx');
-        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'reporte-employee.xlsx');
-        $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
+        $spreadsheet = $reader->load("bundles/ican/excel/reporte-employee.xlsx");
+        $sheet = $spreadsheet->setActiveSheetIndex(0);
 
         $fila = 10;
-        $total = 0;
-        $total_hours = 0;
-        $total_hourly_rate = 0;
+        $diasSemana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-            ->ListarReporteEmployeesParaExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
-        foreach ($lista as $value) {
+        foreach ($semanas as $semana) {
+            $col = 1;
+            $sheet->setCellValue([$col++, $fila], $semana->nombre);
+            $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true, Alignment::HORIZONTAL_LEFT);
 
+            foreach ($diasSemana as $dia) {
+                $sheet->setCellValue([$col++, $fila], $dia);
+                $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true);
+                $sheet->setCellValue([$col++, $fila], '');
+                $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true);
+            }
 
-            $date = $value->getDataTracking()->getDate()->format('m/d/Y');
-            $objWorksheet->setCellValueExplicit('A' . $fila, $date, DataType::TYPE_STRING);
-
-            $employee = $value->getEmployee() ? $value->getEmployee()->getName() : "";
-            $project = $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription();
-            $role = $value->getRole();
-
-            $hours = $value->getHours();
-            $total_hours += $hours;
-
-            $hourly_rate = $value->getHourlyRate();
-            $total_hourly_rate += $hourly_rate;
-
-            $subtotal = $hours * $hourly_rate;
-            $total+=$subtotal;
-
-            $objWorksheet
-                ->setCellValue('B' . $fila, $employee)
-                ->setCellValue('C' . $fila, $project)
-                ->setCellValue('D' . $fila, $role)
-                ->setCellValue('E' . $fila, $hours)
-                ->setCellValue('F' . $fila, $hourly_rate)
-                ->setCellValue('G' . $fila, $subtotal);
-
-            $objWorksheet->getStyle('A' . $fila . ':A' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('B' . $fila . ':B' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('C' . $fila . ':C' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('D' . $fila . ':D' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
+            // Agregar columna final para total por empleado
+            $sheet->setCellValue([$col, $fila], 'Total');
+            $this->estilizarCelda($sheet, [$col, $fila], $styleArray, true);
 
             $fila++;
 
+            $sumaPorColumna = [];
+            $totalGeneral = 0;
+
+            foreach ($employees as $employee) {
+                $col = 1;
+                $sheet->setCellValue([$col++, $fila], $employee['name']);
+                $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true, Alignment::HORIZONTAL_LEFT);
+
+                $totalEmpleado = 0;
+
+                foreach ($semana->dias as $index => $dia) {
+                    $repo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
+
+                    $proyectos = array_map(
+                        function ($v) {
+                            return $v->getDataTracking()->getProject()->getProjectNumber();
+                        },
+                        $repo->ListarReporteEmployeesParaExcel($search, $employee['employee_id'], $project_id, $dia, $dia)
+                    );
+
+                    $sheet->setCellValue([$col++, $fila], implode(', ', $proyectos));
+                    $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray);
+
+                    $horas = $repo->TotalHours('', $employee['employee_id'], $project_id, $dia, $dia);
+                    $sheet->setCellValue([$col++, $fila], $horas);
+                    $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray);
+
+                    $totalEmpleado += $horas;
+                    $sumaPorColumna[$index] = ($sumaPorColumna[$index] ?? 0) + $horas;
+                    $totalGeneral += $horas;
+                }
+
+                // Total por empleado
+                $sheet->setCellValue([$col, $fila], $totalEmpleado);
+                $this->estilizarCelda($sheet, [$col, $fila], $styleArray, true);
+
+                $fila++;
+            }
+
+            // Agregar fila de total por columna
+            $col = 2;
+            $sheet->setCellValue([1, $fila], 'Total');
+            $this->estilizarCelda($sheet, [1, $fila], $styleArray, true);
+
+            foreach ($sumaPorColumna as $totalDia) {
+                $col++; // saltar columna de proyectos
+                $sheet->setCellValue([$col++, $fila], $totalDia);
+                $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true);
+            }
+
+            // Total general al final
+            $sheet->setCellValue([$col, $fila], $totalGeneral);
+            $this->estilizarCelda($sheet, [$col, $fila], $styleArray, true);
+
+            // Aplicar bordes a toda la fila de totales
+            $ultimaColumna = $col;
+            $rangoFilaTotal = 'A' . $fila . ':' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($ultimaColumna) . $fila;
+            $sheet->getStyle($rangoFilaTotal)->applyFromArray($styleArray);
+
+            $fila += 5; // espacio entre semanas
         }
 
-        // total
-        $fila++;
-        $objWorksheet
-            ->setCellValue('D' . $fila, "Total")
-            ->setCellValue('E' . $fila, $total_hours)
-            ->setCellValue('F' . $fila, $total_hourly_rate)
-            ->setCellValue('G' . $fila, $total);
-
-        $objWorksheet->getStyle('D' . $fila . ':D' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
-
-
-        //Salvar excel
         $fichero = "reporte-employee.xlsx";
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save("uploads/excel/" . $fichero);
 
-        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
-        $objWriter->save("uploads" . DIRECTORY_SEPARATOR . "excel" . DIRECTORY_SEPARATOR . $fichero);
-        $objPHPExcel->disconnectWorksheets();
-        unset($objPHPExcel);
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
 
-        $ruta = $this->ObtenerURL();
-        $dir = 'uploads/excel/' . $fichero;
-        $url = $ruta . $dir;
-
-        return $url;
+        return $this->ObtenerURL() . 'uploads/excel/' . $fichero;
     }
+
+    private function estilizarCelda($sheet, $coord, $styleArray, $bold = false, $align = Alignment::HORIZONTAL_CENTER)
+    {
+        $sheet->getStyle($coord)->applyFromArray($styleArray);
+        $sheet->getStyle($coord)->getAlignment()->setHorizontal($align);
+        if ($bold) {
+            $sheet->getStyle($coord)->getFont()->setBold(true);
+        }
+    }
+
+
+
+    /**
+     * ListarEmployeesParaReporteExcel
+     * @param $project_id
+     * @param $fecha_inicial
+     * @param $fecha_fin
+     * @return array
+     */
+    public function ListarEmployeesParaReporteExcel($project_id, $fecha_inicial, $fecha_fin, $employee_id)
+    {
+        $employees = [];
+
+        $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarEmployeesDeProject($project_id, $fecha_inicial, $fecha_fin, $employee_id);
+        foreach ($lista as $value) {
+
+            if ($value->getEmployee()) {
+                $employees[] = [
+                    'employee_id' => $value->getEmployee()->getEmployeeId(),
+                    'name' => $value->getEmployee()->getName(),
+                ];
+            }
+
+        }
+
+        return $employees;
+    }
+
+    /***
+     * ObtenerSemanasReporteExcel
+     * @param string|null $fechaInicio
+     * @param string|null $fechaFin
+     * @return array
+     */
+    public function ObtenerSemanasReporteExcel(?string $fechaInicio, ?string $fechaFin, string $formato = 'm/d/Y'): array
+    {
+        $hoy = new \DateTime();
+
+        if (empty($fechaInicio) && empty($fechaFin)) {
+            // Semana actual
+            $inicio = (clone $hoy)->modify('monday this week');
+            $fin = (clone $hoy)->modify('saturday this week');
+        } elseif (empty($fechaInicio)) {
+            $fin = \DateTime::createFromFormat($formato, $fechaFin) ?: $hoy;
+            $inicio = (clone $fin)->modify('monday this week');
+        } elseif (empty($fechaFin)) {
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio) ?: (clone $hoy)->modify('monday this week');
+            $fin = clone $hoy;
+        } else {
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio);
+            $fin = \DateTime::createFromFormat($formato, $fechaFin);
+        }
+
+        if (!$inicio || !$fin) {
+            return [];
+        }
+
+        // Asegurar que las fechas estén en el orden correcto
+        if ($inicio > $fin) {
+            [$inicio, $fin] = [$fin, $inicio];
+        }
+
+        $semanas = [];
+
+        $inicioSemana = (clone $inicio)->modify('monday this week');
+        $finSemana = (clone $inicioSemana)->modify('saturday this week');
+
+        while ($inicioSemana <= $fin) {
+            $dias = [];
+            for ($i = 0; $i < 6; $i++) {
+                $dia = (clone $inicioSemana)->modify("+$i days");
+                $dias[] = $dia->format($formato);
+            }
+
+            $nombre = $dias[0] . ' to ' . end($dias);
+
+            $semanas[] = (object)[
+                'nombre' => $nombre,
+                'dias' => $dias
+            ];
+
+            $inicioSemana->modify('+1 week');
+            $finSemana->modify('+1 week');
+        }
+
+        return $semanas;
+    }
+
 
     /**
      * ListarReporteEmployees: Listar los reporte employees
@@ -142,7 +253,7 @@ class ReporteEmployeeService extends Base
      * @author Marcel
      */
     public function ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                                                $employee_id, $project_id, $fecha_inicial, $fecha_fin)
+                                           $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
         $arreglo_resultado = array();
 

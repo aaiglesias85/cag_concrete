@@ -9,32 +9,57 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for review document method.
+ * Request message for the
+ * [ReviewDocument][google.cloud.documentai.v1.DocumentProcessorService.ReviewDocument]
+ * method.
  *
  * Generated from protobuf message <code>google.cloud.documentai.v1.ReviewDocumentRequest</code>
  */
 class ReviewDocumentRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The resource name of the HumanReviewConfig that the document will be
-     * reviewed with.
+     * Required. The resource name of the
+     * [HumanReviewConfig][google.cloud.documentai.v1.HumanReviewConfig] that the
+     * document will be reviewed with.
      *
      * Generated from protobuf field <code>string human_review_config = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $human_review_config = '';
+    protected $human_review_config = '';
     /**
      * Whether the validation should be performed on the ad-hoc review request.
      *
      * Generated from protobuf field <code>bool enable_schema_validation = 3;</code>
      */
-    private $enable_schema_validation = false;
+    protected $enable_schema_validation = false;
     /**
      * The priority of the human review task.
      *
      * Generated from protobuf field <code>.google.cloud.documentai.v1.ReviewDocumentRequest.Priority priority = 5;</code>
      */
-    private $priority = 0;
+    protected $priority = 0;
+    /**
+     * The document schema of the human review task.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.DocumentSchema document_schema = 6;</code>
+     */
+    protected $document_schema = null;
     protected $source;
+
+    /**
+     * @param string $humanReviewConfig Required. The resource name of the
+     *                                  [HumanReviewConfig][google.cloud.documentai.v1.HumanReviewConfig] that the
+     *                                  document will be reviewed with. Please see
+     *                                  {@see DocumentProcessorServiceClient::humanReviewConfigName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\DocumentAI\V1\ReviewDocumentRequest
+     *
+     * @experimental
+     */
+    public static function build(string $humanReviewConfig): self
+    {
+        return (new self())
+            ->setHumanReviewConfig($humanReviewConfig);
+    }
 
     /**
      * Constructor.
@@ -45,12 +70,15 @@ class ReviewDocumentRequest extends \Google\Protobuf\Internal\Message
      *     @type \Google\Cloud\DocumentAI\V1\Document $inline_document
      *           An inline document proto.
      *     @type string $human_review_config
-     *           Required. The resource name of the HumanReviewConfig that the document will be
-     *           reviewed with.
+     *           Required. The resource name of the
+     *           [HumanReviewConfig][google.cloud.documentai.v1.HumanReviewConfig] that the
+     *           document will be reviewed with.
      *     @type bool $enable_schema_validation
      *           Whether the validation should be performed on the ad-hoc review request.
      *     @type int $priority
      *           The priority of the human review task.
+     *     @type \Google\Cloud\DocumentAI\V1\DocumentSchema $document_schema
+     *           The document schema of the human review task.
      * }
      */
     public function __construct($data = NULL) {
@@ -90,8 +118,9 @@ class ReviewDocumentRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the HumanReviewConfig that the document will be
-     * reviewed with.
+     * Required. The resource name of the
+     * [HumanReviewConfig][google.cloud.documentai.v1.HumanReviewConfig] that the
+     * document will be reviewed with.
      *
      * Generated from protobuf field <code>string human_review_config = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -102,8 +131,9 @@ class ReviewDocumentRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The resource name of the HumanReviewConfig that the document will be
-     * reviewed with.
+     * Required. The resource name of the
+     * [HumanReviewConfig][google.cloud.documentai.v1.HumanReviewConfig] that the
+     * document will be reviewed with.
      *
      * Generated from protobuf field <code>string human_review_config = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -165,6 +195,42 @@ class ReviewDocumentRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkEnum($var, \Google\Cloud\DocumentAI\V1\ReviewDocumentRequest\Priority::class);
         $this->priority = $var;
+
+        return $this;
+    }
+
+    /**
+     * The document schema of the human review task.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.DocumentSchema document_schema = 6;</code>
+     * @return \Google\Cloud\DocumentAI\V1\DocumentSchema|null
+     */
+    public function getDocumentSchema()
+    {
+        return $this->document_schema;
+    }
+
+    public function hasDocumentSchema()
+    {
+        return isset($this->document_schema);
+    }
+
+    public function clearDocumentSchema()
+    {
+        unset($this->document_schema);
+    }
+
+    /**
+     * The document schema of the human review task.
+     *
+     * Generated from protobuf field <code>.google.cloud.documentai.v1.DocumentSchema document_schema = 6;</code>
+     * @param \Google\Cloud\DocumentAI\V1\DocumentSchema $var
+     * @return $this
+     */
+    public function setDocumentSchema($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\DocumentAI\V1\DocumentSchema::class);
+        $this->document_schema = $var;
 
         return $this;
     }

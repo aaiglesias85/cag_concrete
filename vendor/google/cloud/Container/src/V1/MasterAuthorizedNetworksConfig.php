@@ -23,7 +23,7 @@ class MasterAuthorizedNetworksConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enabled = 1;</code>
      */
-    private $enabled = false;
+    protected $enabled = false;
     /**
      * cidr_blocks define up to 50 external networks that could access
      * Kubernetes master through HTTPS.
@@ -31,6 +31,18 @@ class MasterAuthorizedNetworksConfig extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .google.container.v1.MasterAuthorizedNetworksConfig.CidrBlock cidr_blocks = 2;</code>
      */
     private $cidr_blocks;
+    /**
+     * Whether master is accessbile via Google Compute Engine Public IP addresses.
+     *
+     * Generated from protobuf field <code>optional bool gcp_public_cidrs_access_enabled = 3;</code>
+     */
+    protected $gcp_public_cidrs_access_enabled = null;
+    /**
+     * Whether master authorized networks is enforced on private endpoint or not.
+     *
+     * Generated from protobuf field <code>optional bool private_endpoint_enforcement_enabled = 5;</code>
+     */
+    protected $private_endpoint_enforcement_enabled = null;
 
     /**
      * Constructor.
@@ -40,9 +52,13 @@ class MasterAuthorizedNetworksConfig extends \Google\Protobuf\Internal\Message
      *
      *     @type bool $enabled
      *           Whether or not master authorized networks is enabled.
-     *     @type \Google\Cloud\Container\V1\MasterAuthorizedNetworksConfig\CidrBlock[]|\Google\Protobuf\Internal\RepeatedField $cidr_blocks
+     *     @type array<\Google\Cloud\Container\V1\MasterAuthorizedNetworksConfig\CidrBlock>|\Google\Protobuf\Internal\RepeatedField $cidr_blocks
      *           cidr_blocks define up to 50 external networks that could access
      *           Kubernetes master through HTTPS.
+     *     @type bool $gcp_public_cidrs_access_enabled
+     *           Whether master is accessbile via Google Compute Engine Public IP addresses.
+     *     @type bool $private_endpoint_enforcement_enabled
+     *           Whether master authorized networks is enforced on private endpoint or not.
      * }
      */
     public function __construct($data = NULL) {
@@ -93,13 +109,85 @@ class MasterAuthorizedNetworksConfig extends \Google\Protobuf\Internal\Message
      * Kubernetes master through HTTPS.
      *
      * Generated from protobuf field <code>repeated .google.container.v1.MasterAuthorizedNetworksConfig.CidrBlock cidr_blocks = 2;</code>
-     * @param \Google\Cloud\Container\V1\MasterAuthorizedNetworksConfig\CidrBlock[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Container\V1\MasterAuthorizedNetworksConfig\CidrBlock>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCidrBlocks($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Container\V1\MasterAuthorizedNetworksConfig\CidrBlock::class);
         $this->cidr_blocks = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Whether master is accessbile via Google Compute Engine Public IP addresses.
+     *
+     * Generated from protobuf field <code>optional bool gcp_public_cidrs_access_enabled = 3;</code>
+     * @return bool
+     */
+    public function getGcpPublicCidrsAccessEnabled()
+    {
+        return isset($this->gcp_public_cidrs_access_enabled) ? $this->gcp_public_cidrs_access_enabled : false;
+    }
+
+    public function hasGcpPublicCidrsAccessEnabled()
+    {
+        return isset($this->gcp_public_cidrs_access_enabled);
+    }
+
+    public function clearGcpPublicCidrsAccessEnabled()
+    {
+        unset($this->gcp_public_cidrs_access_enabled);
+    }
+
+    /**
+     * Whether master is accessbile via Google Compute Engine Public IP addresses.
+     *
+     * Generated from protobuf field <code>optional bool gcp_public_cidrs_access_enabled = 3;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setGcpPublicCidrsAccessEnabled($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->gcp_public_cidrs_access_enabled = $var;
+
+        return $this;
+    }
+
+    /**
+     * Whether master authorized networks is enforced on private endpoint or not.
+     *
+     * Generated from protobuf field <code>optional bool private_endpoint_enforcement_enabled = 5;</code>
+     * @return bool
+     */
+    public function getPrivateEndpointEnforcementEnabled()
+    {
+        return isset($this->private_endpoint_enforcement_enabled) ? $this->private_endpoint_enforcement_enabled : false;
+    }
+
+    public function hasPrivateEndpointEnforcementEnabled()
+    {
+        return isset($this->private_endpoint_enforcement_enabled);
+    }
+
+    public function clearPrivateEndpointEnforcementEnabled()
+    {
+        unset($this->private_endpoint_enforcement_enabled);
+    }
+
+    /**
+     * Whether master authorized networks is enforced on private endpoint or not.
+     *
+     * Generated from protobuf field <code>optional bool private_endpoint_enforcement_enabled = 5;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setPrivateEndpointEnforcementEnabled($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->private_endpoint_enforcement_enabled = $var;
 
         return $this;
     }

@@ -26,7 +26,7 @@ class Exec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.osconfig.v1.OSPolicy.Resource.ExecResource.Exec.Interpreter interpreter = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $interpreter = 0;
+    protected $interpreter = 0;
     /**
      * Only recorded for enforce Exec.
      * Path to an output file (that is created by this Exec) whose
@@ -37,7 +37,7 @@ class Exec extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string output_file_path = 5;</code>
      */
-    private $output_file_path = '';
+    protected $output_file_path = '';
     protected $source;
 
     /**
@@ -51,7 +51,7 @@ class Exec extends \Google\Protobuf\Internal\Message
      *     @type string $script
      *           An inline script.
      *           The size of the script is limited to 1024 characters.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $args
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $args
      *           Optional arguments to pass to the source during execution.
      *     @type int $interpreter
      *           Required. The script interpreter to use.
@@ -148,7 +148,7 @@ class Exec extends \Google\Protobuf\Internal\Message
      * Optional arguments to pass to the source during execution.
      *
      * Generated from protobuf field <code>repeated string args = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setArgs($var)

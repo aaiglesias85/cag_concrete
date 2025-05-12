@@ -23,7 +23,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * A list of email addresses to which notifications relating to approval
      * requests should be sent. Notifications relating to a resource will be sent
@@ -57,7 +57,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enrolled_ancestor = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $enrolled_ancestor = false;
+    protected $enrolled_ancestor = false;
     /**
      * The asymmetric crypto key version to use for signing approval requests.
      * Empty active_key_version indicates that a Google-managed key should be used
@@ -66,7 +66,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string active_key_version = 6;</code>
      */
-    private $active_key_version = '';
+    protected $active_key_version = '';
     /**
      * Output only. This field is read only (not settable via UpdateAccessApprovalSettings
      * method). If the field is true, that indicates that an ancestor of this
@@ -75,7 +75,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool ancestor_has_active_key_version = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $ancestor_has_active_key_version = false;
+    protected $ancestor_has_active_key_version = false;
     /**
      * Output only. This field is read only (not settable via UpdateAccessApprovalSettings
      * method). If the field is true, that indicates that there is some
@@ -87,7 +87,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool invalid_key_version = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $invalid_key_version = false;
+    protected $invalid_key_version = false;
 
     /**
      * Constructor.
@@ -100,12 +100,12 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      *             * "projects/{project}/accessApprovalSettings"
      *             * "folders/{folder}/accessApprovalSettings"
      *             * "organizations/{organization}/accessApprovalSettings"
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $notification_emails
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $notification_emails
      *           A list of email addresses to which notifications relating to approval
      *           requests should be sent. Notifications relating to a resource will be sent
      *           to all emails in the settings of ancestor resources of that resource. A
      *           maximum of 50 email addresses are allowed.
-     *     @type \Google\Cloud\AccessApproval\V1\EnrolledService[]|\Google\Protobuf\Internal\RepeatedField $enrolled_services
+     *     @type array<\Google\Cloud\AccessApproval\V1\EnrolledService>|\Google\Protobuf\Internal\RepeatedField $enrolled_services
      *           A list of Google Cloud Services for which the given resource has Access
      *           Approval enrolled. Access requests for the resource given by name against
      *           any of these services contained here will be required to have explicit
@@ -200,7 +200,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      * maximum of 50 email addresses are allowed.
      *
      * Generated from protobuf field <code>repeated string notification_emails = 2;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setNotificationEmails($var)
@@ -244,7 +244,7 @@ class AccessApprovalSettings extends \Google\Protobuf\Internal\Message
      * services is expanded.
      *
      * Generated from protobuf field <code>repeated .google.cloud.accessapproval.v1.EnrolledService enrolled_services = 3;</code>
-     * @param \Google\Cloud\AccessApproval\V1\EnrolledService[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AccessApproval\V1\EnrolledService>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setEnrolledServices($var)

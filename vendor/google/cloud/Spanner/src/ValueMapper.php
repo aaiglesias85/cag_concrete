@@ -20,8 +20,10 @@ namespace Google\Cloud\Spanner;
 use Google\Cloud\Core\ArrayTrait;
 use Google\Cloud\Core\Int64;
 use Google\Cloud\Core\TimeTrait;
-use Google\Cloud\Spanner\V1\TypeCode;
 use Google\Cloud\Spanner\V1\TypeAnnotationCode;
+use Google\Cloud\Spanner\V1\TypeCode;
+use Google\Protobuf\Internal\DescriptorPool;
+use Google\Protobuf\Internal\Message;
 
 /**
  * Manage value mappings between Google Cloud PHP and Cloud Spanner
@@ -33,6 +35,7 @@ class ValueMapper
 
     const TYPE_BOOL = TypeCode::BOOL;
     const TYPE_INT64 = TypeCode::INT64;
+    const TYPE_FLOAT32 = TypeCode::FLOAT32;
     const TYPE_FLOAT64 = TypeCode::FLOAT64;
     const TYPE_TIMESTAMP = TypeCode::TIMESTAMP;
     const TYPE_DATE = TypeCode::DATE;
@@ -42,10 +45,14 @@ class ValueMapper
     const TYPE_STRUCT = TypeCode::STRUCT;
     const TYPE_NUMERIC = TypeCode::NUMERIC;
     const TYPE_JSON = TypeCode::JSON;
+    const TYPE_PROTO = TypeCode::PROTO;
     const TYPE_PG_NUMERIC = 'pgNumeric';
+    const TYPE_PG_JSONB = 'pgJsonb';
+    const TYPE_PG_OID = 'pgOid';
 
     /**
      * @var array
+     * @internal
      */
     public static $allowedTypes = [
         self::TYPE_BOOL,
@@ -60,6 +67,10 @@ class ValueMapper
         self::TYPE_NUMERIC,
         self::TYPE_JSON,
         self::TYPE_PG_NUMERIC,
+        self::TYPE_PG_JSONB,
+        self::TYPE_PG_OID,
+        self::TYPE_FLOAT32,
+        self::TYPE_PROTO,
     ];
 
     /*
@@ -73,6 +84,8 @@ class ValueMapper
      */
     private static $typeToClassMap = [
         self::TYPE_PG_NUMERIC => PgNumeric::class,
+        self::TYPE_PG_JSONB => PgJsonb::class,
+        self::TYPE_PG_OID => PgOid::class,
     ];
 
     /*
@@ -83,6 +96,8 @@ class ValueMapper
      */
     private static $typeCodes = [
         self::TYPE_PG_NUMERIC => self::TYPE_NUMERIC,
+        self::TYPE_PG_JSONB => self::TYPE_JSON,
+        self::TYPE_PG_OID => self::TYPE_INT64,
     ];
 
     /*
@@ -93,6 +108,8 @@ class ValueMapper
      */
     private static $typeAnnotations = [
         self::TYPE_PG_NUMERIC => TypeAnnotationCode::PG_NUMERIC,
+        self::TYPE_PG_JSONB => TypeAnnotationCode::PG_JSONB,
+        self::TYPE_PG_OID => TypeAnnotationCode::PG_OID,
     ];
 
     /**
@@ -129,9 +146,7 @@ class ValueMapper
                 ));
             }
 
-            $type = isset($types[$key])
-                ? $types[$key]
-                : null;
+            $type = $types[$key] ?? null;
 
             if (!$type && is_array($value) && !$this->isAssoc($value)) {
                 $type = new ArrayType(null);
@@ -139,11 +154,11 @@ class ValueMapper
 
             $definition = null;
             if ($type) {
-                list ($type, $definition) = $this->resolveTypeDefinition($type, $key);
+                list($type, $definition) = $this->resolveTypeDefinition($type, $key);
             }
 
             $paramDefinition = $this->paramType($value, $type, $definition);
-            list ($parameters[$key], $paramTypes[$key]) = $paramDefinition;
+            list($parameters[$key], $paramTypes[$key]) = $paramDefinition;
         }
 
         return [
@@ -274,9 +289,13 @@ class ValueMapper
 
         switch ($type['code']) {
             case self::TYPE_INT64:
-                $value = $this->returnInt64AsObject
-                    ? new Int64($value)
-                    : (int) $value;
+                if (isset($type['typeAnnotation']) && $type['typeAnnotation'] === TypeAnnotationCode::PG_OID) {
+                    $value = new PgOid($value);
+                } else {
+                    $value = $this->returnInt64AsObject
+                        ? new Int64($value)
+                        : (int) $value;
+                }
                 break;
 
             case self::TYPE_TIMESTAMP:
@@ -302,9 +321,7 @@ class ValueMapper
                 break;
 
             case self::TYPE_STRUCT:
-                $fields = isset($type['structType']['fields'])
-                    ? $type['structType']['fields']
-                    : [];
+                $fields = $type['structType']['fields'] ?? [];
 
                 $value = $this->decodeValues($fields, $value, Result::RETURN_ASSOCIATIVE);
                 break;
@@ -317,6 +334,13 @@ class ValueMapper
                 }
                 break;
 
+            case self::TYPE_JSON:
+                if (isset($type['typeAnnotation']) && $type['typeAnnotation'] === TypeAnnotationCode::PG_JSONB) {
+                    $value = new PgJsonb($value);
+                }
+                break;
+
+            case self::TYPE_FLOAT32:
             case self::TYPE_FLOAT64:
                 // NaN, Infinite and -Infinite are possible FLOAT64 values,
                 // but when the gRPC response is decoded, they are represented
@@ -339,12 +363,16 @@ class ValueMapper
 
                         default:
                             throw new \RuntimeException(sprintf(
-                                'Unexpected string value %s encountered in FLOAT64 field.',
-                                $value
+                                'Unexpected string value %s encountered in %s field.',
+                                $value,
+                                TypeCode::name($type['code'])
                             ));
                     }
                 }
 
+                break;
+            case self::TYPE_PROTO:
+                $value = new Proto($value, $type['protoTypeFqn']);
                 break;
         }
 
@@ -425,14 +453,14 @@ class ValueMapper
                 break;
 
             case 'object':
-                list ($type, $value) = $this->objectParam($value);
+                list($type, $value) = $this->objectParam($value);
                 break;
 
             case 'array':
                 if ($givenType === Database::TYPE_STRUCT) {
                     if (!($definition instanceof StructType)) {
                         throw new \InvalidArgumentException(
-                            'Struct parameter types must be declared explicitly, and must '.
+                            'Struct parameter types must be declared explicitly, and must ' .
                             'be an instance of Google\Cloud\Spanner\StructType.'
                         );
                     }
@@ -441,7 +469,7 @@ class ValueMapper
                         $value = (array) $value;
                     }
 
-                    list ($value, $type) = $this->structParam($value, $definition);
+                    list($value, $type) = $this->structParam($value, $definition);
                 } else {
                     if (!($definition instanceof ArrayType)) {
                         throw new \InvalidArgumentException(
@@ -449,7 +477,7 @@ class ValueMapper
                         );
                     }
 
-                    list ($value, $type) = $this->arrayParam($value, $definition, $allowMixedArrayType);
+                    list($value, $type) = $this->arrayParam($value, $definition, $allowMixedArrayType);
                 }
 
                 break;
@@ -476,7 +504,7 @@ class ValueMapper
      *
      * @param StructValue|array|null $value The struct value.
      * @param StructType $type The struct type.
-     * @return [array, array] An array containing the value and type.
+     * @return array{0: array, 1: array} An array containing the value and type.
      */
     private function structParam($value, StructType $type)
     {
@@ -543,9 +571,7 @@ class ValueMapper
 
             // Get the value which corresponds to the current type.
             $index = $names[$fieldName];
-            $paramValue = isset($values[$fieldName][$index])
-                ? $values[$fieldName][$index]
-                : null;
+            $paramValue = $values[$fieldName][$index] ?? null;
 
             // If the value didn't exist in the values structure, set it to null.
             // The $typeIndex will give us a hook to order fields properly.
@@ -619,7 +645,7 @@ class ValueMapper
      * @param bool $allowMixedArrayType [optional] If true, array values may be of mixed type.
      *        This is useful when reading against complex keys containing multiple
      *        elements of differing types.
-     * @return [array, array] An array containing the value and type.
+     * @return array{0: array, 1: array} An array containing the value and type.
      */
     private function arrayParam($value, ArrayType $arrayObj, $allowMixedArrayType = false)
     {
@@ -633,6 +659,7 @@ class ValueMapper
 
         // counts the diff data types used inside the array
         $uniqueTypes = [];
+        $protoTypeFqn = null;
         $res = null;
         if ($value !== null) {
             $res = [];
@@ -663,6 +690,10 @@ class ValueMapper
                         $inferredType['typeAnnotation'] = $type[1]['typeAnnotation'];
                     }
 
+                    if (isset($type[1]['protoTypeFqn'])) {
+                        $protoTypeFqn = $type[1]['protoTypeFqn'];
+                    }
+
                     $inferredTypes[] = $inferredType;
                 }
             }
@@ -671,7 +702,6 @@ class ValueMapper
         if (!$allowMixedArrayType && count($uniqueTypes) > 1) {
             throw new \InvalidArgumentException('Array values may not be of mixed type');
         }
-
 
         // get typeCode either from the array type or the first element's inferred type
         $typeCode = self::isCustomType($arrayObj->type())
@@ -690,7 +720,7 @@ class ValueMapper
         if (is_null($typeCode) && count($inferredTypes) > 0 && isset($inferredTypes[0]['code'])) {
             $typeCode = $inferredTypes[0]['code'];
         }
-        
+
         if (is_null($typeAnnotationCode) && count($inferredTypes) > 0 && isset($inferredTypes[0]['typeAnnotation'])) {
             $typeAnnotationCode = $inferredTypes[0]['typeAnnotation'];
         }
@@ -704,6 +734,9 @@ class ValueMapper
             $typeObject = $nestedDef[1];
         } else {
             $typeObject = $this->typeObject($typeCode, $typeAnnotationCode);
+            if ($protoTypeFqn) {
+                $typeObject['protoTypeFqn'] = $protoTypeFqn;
+            }
         }
 
         $type = $this->typeObject(
@@ -720,7 +753,7 @@ class ValueMapper
      * Handle query parameter mappings for various types of objects.
      *
      * @param mixed $value The parameter value.
-     * @return [array, array] An array containing the value and type.
+     * @return array{0: array, 1: array} An array containing the value and type.
      */
     private function objectParam($value)
     {
@@ -735,16 +768,33 @@ class ValueMapper
                           ? $value->typeAnnotation()
                           : null;
 
-            return [
-                $this->typeObject($value->type(), $typeAnnotation),
-                $value->formatAsString()
-            ];
+            $typeObject = $this->typeObject($value->type(), $typeAnnotation);
+
+            if ($value instanceof Proto) {
+                $typeObject['protoTypeFqn'] = $value->getProtoTypeFqn();
+            }
+
+            return [$typeObject, $value->formatAsString()];
         }
 
         if ($value instanceof Int64) {
             return [
                 $this->typeObject(self::TYPE_INT64),
                 $value->get()
+            ];
+        }
+
+        if ($value instanceof Message) {
+            $fullName = DescriptorPool::getGeneratedPool()
+                ->getDescriptorByClassName(get_class($value))
+                ->getFullName();
+            $typeObject = [
+                'code' => self::TYPE_PROTO,
+                'protoTypeFqn' => $fullName,
+            ];
+            return [
+                $typeObject,
+                base64_encode($value->serializetoString())
             ];
         }
 
@@ -764,7 +814,7 @@ class ValueMapper
      *        the structure of an array or struct type.
      * @param string $nestedDefinitionType [optional] Either `arrayElementType`
      *        or `structType`.
-     * @return array
+     * @return array{0: array, 1: array}
      */
     private function typeObject(
         $type,

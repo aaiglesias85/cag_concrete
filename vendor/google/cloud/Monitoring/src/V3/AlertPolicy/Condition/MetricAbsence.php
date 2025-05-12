@@ -20,7 +20,8 @@ use Google\Protobuf\Internal\GPBUtil;
 class MetricAbsence extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. A [filter](https://cloud.google.com/monitoring/api/v3/filters) that
+     * Required. A
+     * [filter](https://cloud.google.com/monitoring/api/v3/filters) that
      * identifies which time series should be compared with the threshold.
      * The filter is similar to the one that is specified in the
      * [`ListTimeSeries`
@@ -32,7 +33,7 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string filter = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Specifies the alignment of data points in individual time series as
      * well as how to combine the retrieved time series together (such as
@@ -59,7 +60,7 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 2;</code>
      */
-    private $duration = null;
+    protected $duration = null;
     /**
      * The number/percent of time series for which the comparison must hold
      * in order for the condition to trigger. If unspecified, then the
@@ -68,7 +69,7 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.monitoring.v3.AlertPolicy.Condition.Trigger trigger = 3;</code>
      */
-    private $trigger = null;
+    protected $trigger = null;
 
     /**
      * Constructor.
@@ -77,7 +78,8 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $filter
-     *           Required. A [filter](https://cloud.google.com/monitoring/api/v3/filters) that
+     *           Required. A
+     *           [filter](https://cloud.google.com/monitoring/api/v3/filters) that
      *           identifies which time series should be compared with the threshold.
      *           The filter is similar to the one that is specified in the
      *           [`ListTimeSeries`
@@ -86,7 +88,7 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
      *           processed). The filter must specify the metric type and the resource
      *           type. Optionally, it can specify resource labels and metric labels.
      *           This field must not exceed 2048 Unicode characters in length.
-     *     @type \Google\Cloud\Monitoring\V3\Aggregation[]|\Google\Protobuf\Internal\RepeatedField $aggregations
+     *     @type array<\Google\Cloud\Monitoring\V3\Aggregation>|\Google\Protobuf\Internal\RepeatedField $aggregations
      *           Specifies the alignment of data points in individual time series as
      *           well as how to combine the retrieved time series together (such as
      *           when aggregating multiple streams on each resource to a single
@@ -118,7 +120,8 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. A [filter](https://cloud.google.com/monitoring/api/v3/filters) that
+     * Required. A
+     * [filter](https://cloud.google.com/monitoring/api/v3/filters) that
      * identifies which time series should be compared with the threshold.
      * The filter is similar to the one that is specified in the
      * [`ListTimeSeries`
@@ -137,7 +140,8 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. A [filter](https://cloud.google.com/monitoring/api/v3/filters) that
+     * Required. A
+     * [filter](https://cloud.google.com/monitoring/api/v3/filters) that
      * identifies which time series should be compared with the threshold.
      * The filter is similar to the one that is specified in the
      * [`ListTimeSeries`
@@ -192,7 +196,7 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
      * field.
      *
      * Generated from protobuf field <code>repeated .google.monitoring.v3.Aggregation aggregations = 5;</code>
-     * @param \Google\Cloud\Monitoring\V3\Aggregation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Monitoring\V3\Aggregation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAggregations($var)
@@ -295,6 +299,4 @@ class MetricAbsence extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(MetricAbsence::class, \Google\Cloud\Monitoring\V3\AlertPolicy_Condition_MetricAbsence::class);
 

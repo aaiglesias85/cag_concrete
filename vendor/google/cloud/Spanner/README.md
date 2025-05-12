@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-spanner/v/stable)](https://packagist.org/packages/google/cloud-spanner) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-spanner.svg)](https://packagist.org/packages/google/cloud-spanner)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-spanner/latest)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-spanner/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -17,16 +17,10 @@ schemas, SQL (ANSI 2011 with extensions), and automatic, synchronous replication
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-spanner
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component requires the gRPC extension. Please see our [gRPC installation guide](https://cloud.google.com/php/grpc)
@@ -77,7 +71,12 @@ use Google\Auth\Cache\SysVCacheItemPool;
 $authCache = new SysVCacheItemPool();
 $sessionCache = new SysVCacheItemPool([
     // Use a different project identifier for ftok than the default
-    'proj' => 'B'
+    'proj' => 'B',
+    // We highly recommend using 250kb as it should safely contain the default
+    // 500 maximum sessions the pool can handle. Please modify this value
+    // accordingly depending on the number of maximum sessions you would like
+    // for the pool to handle.
+    'memsize' => 250000
 ]);
 
 $spanner = new SpannerClient([
@@ -104,6 +103,11 @@ $sessionPool->warmup();
 ```
 
 By using a cache implementation like `SysVCacheItemPool`, you can share the cached sessions among multiple processes, so that for example, you can warmup the session upon the server startup, then all the other PHP processes will benefit from the warmed up sessions.
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

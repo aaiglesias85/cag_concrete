@@ -34,6 +34,12 @@ class CallAnalysisMetadata extends \Google\Protobuf\Internal\Message
      */
     private $sentiments;
     /**
+     * Overall conversation-level silence during the call.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationLevelSilence silence = 11;</code>
+     */
+    protected $silence = null;
+    /**
      * All the matched intents in the call.
      *
      * Generated from protobuf field <code>map<string, .google.cloud.contactcenterinsights.v1.Intent> intents = 6;</code>
@@ -50,7 +56,13 @@ class CallAnalysisMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.IssueModelResult issue_model_result = 8;</code>
      */
-    private $issue_model_result = null;
+    protected $issue_model_result = null;
+    /**
+     * Results of scoring QaScorecards.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.QaScorecardResult qa_scorecard_results = 10;</code>
+     */
+    private $qa_scorecard_results;
 
     /**
      * Constructor.
@@ -58,18 +70,22 @@ class CallAnalysisMetadata extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\ContactCenterInsights\V1\CallAnnotation[]|\Google\Protobuf\Internal\RepeatedField $annotations
+     *     @type array<\Google\Cloud\ContactCenterInsights\V1\CallAnnotation>|\Google\Protobuf\Internal\RepeatedField $annotations
      *           A list of call annotations that apply to this call.
      *     @type array|\Google\Protobuf\Internal\MapField $entities
      *           All the entities in the call.
-     *     @type \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSentiment[]|\Google\Protobuf\Internal\RepeatedField $sentiments
+     *     @type array<\Google\Cloud\ContactCenterInsights\V1\ConversationLevelSentiment>|\Google\Protobuf\Internal\RepeatedField $sentiments
      *           Overall conversation-level sentiment for each channel of the call.
+     *     @type \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSilence $silence
+     *           Overall conversation-level silence during the call.
      *     @type array|\Google\Protobuf\Internal\MapField $intents
      *           All the matched intents in the call.
      *     @type array|\Google\Protobuf\Internal\MapField $phrase_matchers
      *           All the matched phrase matchers in the call.
      *     @type \Google\Cloud\ContactCenterInsights\V1\IssueModelResult $issue_model_result
      *           Overall conversation-level issue modeling result.
+     *     @type array<\Google\Cloud\ContactCenterInsights\V1\QaScorecardResult>|\Google\Protobuf\Internal\RepeatedField $qa_scorecard_results
+     *           Results of scoring QaScorecards.
      * }
      */
     public function __construct($data = NULL) {
@@ -92,7 +108,7 @@ class CallAnalysisMetadata extends \Google\Protobuf\Internal\Message
      * A list of call annotations that apply to this call.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.CallAnnotation annotations = 2;</code>
-     * @param \Google\Cloud\ContactCenterInsights\V1\CallAnnotation[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ContactCenterInsights\V1\CallAnnotation>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAnnotations($var)
@@ -144,13 +160,49 @@ class CallAnalysisMetadata extends \Google\Protobuf\Internal\Message
      * Overall conversation-level sentiment for each channel of the call.
      *
      * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.ConversationLevelSentiment sentiments = 4;</code>
-     * @param \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSentiment[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ContactCenterInsights\V1\ConversationLevelSentiment>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSentiments($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSentiment::class);
         $this->sentiments = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Overall conversation-level silence during the call.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationLevelSilence silence = 11;</code>
+     * @return \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSilence|null
+     */
+    public function getSilence()
+    {
+        return $this->silence;
+    }
+
+    public function hasSilence()
+    {
+        return isset($this->silence);
+    }
+
+    public function clearSilence()
+    {
+        unset($this->silence);
+    }
+
+    /**
+     * Overall conversation-level silence during the call.
+     *
+     * Generated from protobuf field <code>.google.cloud.contactcenterinsights.v1.ConversationLevelSilence silence = 11;</code>
+     * @param \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSilence $var
+     * @return $this
+     */
+    public function setSilence($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\ConversationLevelSilence::class);
+        $this->silence = $var;
 
         return $this;
     }
@@ -239,6 +291,32 @@ class CallAnalysisMetadata extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Google\Cloud\ContactCenterInsights\V1\IssueModelResult::class);
         $this->issue_model_result = $var;
+
+        return $this;
+    }
+
+    /**
+     * Results of scoring QaScorecards.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.QaScorecardResult qa_scorecard_results = 10;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getQaScorecardResults()
+    {
+        return $this->qa_scorecard_results;
+    }
+
+    /**
+     * Results of scoring QaScorecards.
+     *
+     * Generated from protobuf field <code>repeated .google.cloud.contactcenterinsights.v1.QaScorecardResult qa_scorecard_results = 10;</code>
+     * @param array<\Google\Cloud\ContactCenterInsights\V1\QaScorecardResult>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setQaScorecardResults($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\ContactCenterInsights\V1\QaScorecardResult::class);
+        $this->qa_scorecard_results = $arr;
 
         return $this;
     }

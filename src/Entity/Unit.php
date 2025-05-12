@@ -4,78 +4,43 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Unit
- *
- * @ORM\Table(name="unit")
- * @ORM\Entity(repositoryClass="App\Repository\UnitRepository")
- */
+#[ORM\Table(name: "unit")]
+#[ORM\Entity(repositoryClass: "App\Repository\UnitRepository")]
 class Unit
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="unit_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $unitId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "unit_id", type: "integer", nullable: true)]
+    private ?int $unitId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=false)
-     */
-    private $description;
+    #[ORM\Column(name: "description", type: "string", length: 255, nullable: true)]
+    private ?string $description;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="status", type="boolean", nullable=false)
-     */
-    private $status;
+    #[ORM\Column(name: "status", type: "boolean", nullable: true)]
+    private ?bool $status;
 
-
-
-    /**
-     * Get unitId
-     *
-     * @return integer 
-     */
-    public function getUnitId()
+    public function getUnitId(): ?int
     {
         return $this->unitId;
     }
 
-    /**
-     * Set description
-     *
-     * @param string $description
-     * @return Unit
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
-    
         return $this;
     }
 
-    /**
-     * Get description
-     *
-     * @return string 
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function getStatus()
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus($status)
+    public function setStatus(?bool $status): void
     {
         $this->status = $status;
     }

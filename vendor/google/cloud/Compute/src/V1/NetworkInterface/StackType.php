@@ -7,7 +7,7 @@ namespace Google\Cloud\Compute\V1\NetworkInterface;
 use UnexpectedValueException;
 
 /**
- * The stack type for this network interface to identify whether the IPv6 feature is enabled or not. If not specified, IPV4_ONLY will be used. This field can be both set at instance creation and update network interface operations.
+ * The stack type for this network interface. To assign only IPv4 addresses, use IPV4_ONLY. To assign both IPv4 and IPv6 addresses, use IPV4_IPV6. If not specified, IPV4_ONLY is used. This field can be both set at instance creation and update network interface operations.
  *
  * Protobuf type <code>google.cloud.compute.v1.NetworkInterface.StackType</code>
  */
@@ -26,11 +26,17 @@ class StackType
      */
     const IPV4_IPV6 = 22197249;
     /**
-     * The network interface will be assigned IPv4 address.
+     * The network interface will only be assigned IPv4 addresses.
      *
      * Generated from protobuf enum <code>IPV4_ONLY = 22373798;</code>
      */
     const IPV4_ONLY = 22373798;
+    /**
+     * The network interface will only be assigned IPv6 addresses.
+     *
+     * Generated from protobuf enum <code>IPV6_ONLY = 79632100;</code>
+     */
+    const IPV6_ONLY = 79632100;
     /**
      * Generated from protobuf enum <code>UNSPECIFIED_STACK_TYPE = 298084569;</code>
      */
@@ -40,6 +46,7 @@ class StackType
         self::UNDEFINED_STACK_TYPE => 'UNDEFINED_STACK_TYPE',
         self::IPV4_IPV6 => 'IPV4_IPV6',
         self::IPV4_ONLY => 'IPV4_ONLY',
+        self::IPV6_ONLY => 'IPV6_ONLY',
         self::UNSPECIFIED_STACK_TYPE => 'UNSPECIFIED_STACK_TYPE',
     ];
 

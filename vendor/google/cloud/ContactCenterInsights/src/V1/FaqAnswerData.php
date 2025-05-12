@@ -20,7 +20,7 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string answer = 1;</code>
      */
-    private $answer = '';
+    protected $answer = '';
     /**
      * The system's confidence score that this answer is a good match for this
      * conversation, ranging from 0.0 (completely uncertain) to 1.0 (completely
@@ -28,13 +28,13 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>float confidence_score = 2;</code>
      */
-    private $confidence_score = 0.0;
+    protected $confidence_score = 0.0;
     /**
      * The corresponding FAQ question.
      *
      * Generated from protobuf field <code>string question = 3;</code>
      */
-    private $question = '';
+    protected $question = '';
     /**
      * Map that contains metadata about the FAQ answer and the document that
      * it originates from.
@@ -43,13 +43,13 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
      */
     private $metadata;
     /**
-     * Name of the query record.
+     * The name of the answer record.
      * Format:
-     * projects/{project}/locations/{location}/queryRecords/{query_record}.
+     * projects/{project}/locations/{location}/answerRecords/{answer_record}
      *
      * Generated from protobuf field <code>string query_record = 5;</code>
      */
-    private $query_record = '';
+    protected $query_record = '';
     /**
      * The knowledge document that this answer was extracted from.
      * Format:
@@ -57,7 +57,7 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string source = 6;</code>
      */
-    private $source = '';
+    protected $source = '';
 
     /**
      * Constructor.
@@ -77,9 +77,9 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
      *           Map that contains metadata about the FAQ answer and the document that
      *           it originates from.
      *     @type string $query_record
-     *           Name of the query record.
+     *           The name of the answer record.
      *           Format:
-     *           projects/{project}/locations/{location}/queryRecords/{query_record}.
+     *           projects/{project}/locations/{location}/answerRecords/{answer_record}
      *     @type string $source
      *           The knowledge document that this answer was extracted from.
      *           Format:
@@ -202,9 +202,9 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the query record.
+     * The name of the answer record.
      * Format:
-     * projects/{project}/locations/{location}/queryRecords/{query_record}.
+     * projects/{project}/locations/{location}/answerRecords/{answer_record}
      *
      * Generated from protobuf field <code>string query_record = 5;</code>
      * @return string
@@ -215,9 +215,9 @@ class FaqAnswerData extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the query record.
+     * The name of the answer record.
      * Format:
-     * projects/{project}/locations/{location}/queryRecords/{query_record}.
+     * projects/{project}/locations/{location}/answerRecords/{answer_record}
      *
      * Generated from protobuf field <code>string query_record = 5;</code>
      * @param string $var

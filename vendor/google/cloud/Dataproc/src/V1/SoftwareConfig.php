@@ -18,7 +18,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
     /**
      * Optional. The version of software inside the cluster. It must be one of the
      * supported [Dataproc
-     * Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_dataproc_versions),
+     * Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported-dataproc-image-versions),
      * such as "1.2" (including a subminor version, such as "1.2.29"), or the
      * ["preview"
      * version](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions).
@@ -26,7 +26,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string image_version = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $image_version = '';
+    protected $image_version = '';
     /**
      * Optional. The properties to set on daemon config files.
      * Property keys are specified in `prefix:property` format, for example
@@ -63,7 +63,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
      *     @type string $image_version
      *           Optional. The version of software inside the cluster. It must be one of the
      *           supported [Dataproc
-     *           Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_dataproc_versions),
+     *           Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported-dataproc-image-versions),
      *           such as "1.2" (including a subminor version, such as "1.2.29"), or the
      *           ["preview"
      *           version](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions).
@@ -84,7 +84,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
      *           * yarn:   `yarn-site.xml`
      *           For more information, see [Cluster
      *           properties](https://cloud.google.com/dataproc/docs/concepts/cluster-properties).
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $optional_components
+     *     @type array<int>|\Google\Protobuf\Internal\RepeatedField $optional_components
      *           Optional. The set of components to activate on the cluster.
      * }
      */
@@ -96,7 +96,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
     /**
      * Optional. The version of software inside the cluster. It must be one of the
      * supported [Dataproc
-     * Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_dataproc_versions),
+     * Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported-dataproc-image-versions),
      * such as "1.2" (including a subminor version, such as "1.2.29"), or the
      * ["preview"
      * version](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions).
@@ -113,7 +113,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
     /**
      * Optional. The version of software inside the cluster. It must be one of the
      * supported [Dataproc
-     * Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported_dataproc_versions),
+     * Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported-dataproc-image-versions),
      * such as "1.2" (including a subminor version, such as "1.2.29"), or the
      * ["preview"
      * version](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions).
@@ -200,7 +200,7 @@ class SoftwareConfig extends \Google\Protobuf\Internal\Message
      * Optional. The set of components to activate on the cluster.
      *
      * Generated from protobuf field <code>repeated .google.cloud.dataproc.v1.Component optional_components = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<int>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setOptionalComponents($var)

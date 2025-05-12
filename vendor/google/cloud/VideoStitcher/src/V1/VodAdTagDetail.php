@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Information related to the details for one ad tag.
+ * Information related to the details for one ad tag. This resource is only
+ * available for VOD sessions that do not implement Google Ad Manager ad
+ * insertion.
  *
  * Generated from protobuf message <code>google.cloud.video.stitcher.v1.VodAdTagDetail</code>
  */
@@ -21,7 +23,7 @@ class VodAdTagDetail extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * A list of ad requests for one ad tag.
      *
@@ -38,7 +40,7 @@ class VodAdTagDetail extends \Google\Protobuf\Internal\Message
      *     @type string $name
      *           The name of the ad tag detail for the specified VOD session, in the form of
      *           `projects/{project}/locations/{location}/vodSessions/{vod_session_id}/vodAdTagDetails/{id}`.
-     *     @type \Google\Cloud\Video\Stitcher\V1\AdRequest[]|\Google\Protobuf\Internal\RepeatedField $ad_requests
+     *     @type array<\Google\Cloud\Video\Stitcher\V1\AdRequest>|\Google\Protobuf\Internal\RepeatedField $ad_requests
      *           A list of ad requests for one ad tag.
      * }
      */
@@ -90,7 +92,7 @@ class VodAdTagDetail extends \Google\Protobuf\Internal\Message
      * A list of ad requests for one ad tag.
      *
      * Generated from protobuf field <code>repeated .google.cloud.video.stitcher.v1.AdRequest ad_requests = 2;</code>
-     * @param \Google\Cloud\Video\Stitcher\V1\AdRequest[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Video\Stitcher\V1\AdRequest>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setAdRequests($var)

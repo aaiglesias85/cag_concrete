@@ -9,10 +9,12 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Deprecated: Use [ShipmentRoute.Transition.delay_duration][] instead.
- * Time interval spent on the route resulting from a
+ * Deprecated: Use
+ * [ShipmentRoute.Transition.delay_duration][google.cloud.optimization.v1.ShipmentRoute.Transition.delay_duration]
+ * instead. Time interval spent on the route resulting from a
  * [TransitionAttributes.delay][google.cloud.optimization.v1.TransitionAttributes.delay].
  *
+ * @deprecated
  * Generated from protobuf message <code>google.cloud.optimization.v1.ShipmentRoute.Delay</code>
  */
 class Delay extends \Google\Protobuf\Internal\Message
@@ -22,13 +24,13 @@ class Delay extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 1;</code>
      */
-    private $start_time = null;
+    protected $start_time = null;
     /**
      * Duration of the delay.
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 2;</code>
      */
-    private $duration = null;
+    protected $duration = null;
 
     /**
      * Constructor.

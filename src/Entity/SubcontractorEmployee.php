@@ -4,102 +4,70 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * SubcontractorEmployee
- *
- * @ORM\Table(name="subcontractor_employee")
- * @ORM\Entity(repositoryClass="App\Repository\SubcontractorEmployeeRepository")
- */
+#[ORM\Table(name: "subcontractor_employee")]
+#[ORM\Entity(repositoryClass: "App\Repository\SubcontractorEmployeeRepository")]
 class SubcontractorEmployee
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="subcontractor_employee_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $employeeId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: "subcontractor_employee_id", type: "integer", nullable: false)]
+    private ?int $employeeId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     */
-    private $name;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    private ?string $name;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="hourly_rate", type="float", nullable=false)
-     */
-    private $hourlyRate;
+    #[ORM\Column(name: "hourly_rate", type: "float", nullable: true)]
+    private ?float $hourlyRate;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="position", type="string", length=255, nullable=false)
-     */
-    private $position;
+    #[ORM\Column(name: "position", type: "string", length: 255, nullable: true)]
+    private ?string $position;
 
-    /**
-     * @var Subcontractor
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Subcontractor")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="subcontractor_id", referencedColumnName="subcontractor_id")
-     * })
-     */
-    private $subcontractor;
+    #[ORM\ManyToOne(targetEntity: "App\Entity\Subcontractor")]
+    #[ORM\JoinColumn(name: "subcontractor_id", referencedColumnName: "subcontractor_id", nullable: true)]
+    private ?Subcontractor $subcontractor;
 
-    /**
-     * Get employeeId
-     *
-     * @return integer
-     */
-    public function getEmployeeId()
+    public function getEmployeeId(): ?int
     {
         return $this->employeeId;
     }
 
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    public function getHourlyRate()
+    public function getName(): ?string
     {
-        return $this->hourlyRate;
+        return $this->name;
     }
 
-    public function setHourlyRate($hourlyRate)
+    public function setHourlyRate(?float $hourlyRate): void
     {
         $this->hourlyRate = $hourlyRate;
     }
 
-    public function getPosition()
+    public function getHourlyRate(): ?float
     {
-        return $this->position;
+        return $this->hourlyRate;
     }
 
-    public function setPosition($position)
+    public function setPosition(?string $position): void
     {
         $this->position = $position;
     }
 
-    public function getSubcontractor()
+    public function getPosition(): ?string
     {
-        return $this->subcontractor;
+        return $this->position;
     }
 
-    public function setSubcontractor($subcontractor)
+    public function setSubcontractor(?Subcontractor $subcontractor): void
     {
         $this->subcontractor = $subcontractor;
     }
 
+    public function getSubcontractor(): ?Subcontractor
+    {
+        return $this->subcontractor;
+    }
 }

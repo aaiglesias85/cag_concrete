@@ -29,7 +29,6 @@ namespace Google\Cloud\ErrorReporting\V1beta1\Gapic;
 use Google\ApiCore\ApiException;
 use Google\ApiCore\CredentialsWrapper;
 use Google\ApiCore\GapicClientTrait;
-
 use Google\ApiCore\PathTemplate;
 use Google\ApiCore\RequestParamsHeaderDescriptor;
 use Google\ApiCore\RetrySettings;
@@ -62,34 +61,33 @@ use Google\Cloud\ErrorReporting\V1beta1\UpdateGroupRequest;
  * contained within formatted names that are returned by the API.
  *
  * @experimental
+ *
+ * @deprecated Please use the new service client {@see \Google\Cloud\ErrorReporting\V1beta1\Client\ErrorGroupServiceClient}.
  */
 class ErrorGroupServiceGapicClient
 {
     use GapicClientTrait;
 
-    /**
-     * The name of the service.
-     */
+    /** The name of the service. */
     const SERVICE_NAME = 'google.devtools.clouderrorreporting.v1beta1.ErrorGroupService';
 
     /**
      * The default address of the service.
+     *
+     * @deprecated SERVICE_ADDRESS_TEMPLATE should be used instead.
      */
     const SERVICE_ADDRESS = 'clouderrorreporting.googleapis.com';
 
-    /**
-     * The default port of the service.
-     */
+    /** The address template of the service. */
+    private const SERVICE_ADDRESS_TEMPLATE = 'clouderrorreporting.UNIVERSE_DOMAIN';
+
+    /** The default port of the service. */
     const DEFAULT_SERVICE_PORT = 443;
 
-    /**
-     * The name of the code generator, to be included in the agent header.
-     */
+    /** The name of the code generator, to be included in the agent header. */
     const CODEGEN_NAME = 'gapic';
 
-    /**
-     * The default scopes required by the service.
-     */
+    /** The default scopes required by the service. */
     public static $serviceScopes = [
         'https://www.googleapis.com/auth/cloud-platform',
     ];
@@ -205,9 +203,6 @@ class ErrorGroupServiceGapicClient
      * @param array $options {
      *     Optional. Options for configuring the service API wrapper.
      *
-     *     @type string $serviceAddress
-     *           **Deprecated**. This option will be removed in a future major release. Please
-     *           utilize the `$apiEndpoint` option instead.
      *     @type string $apiEndpoint
      *           The address of the API remote host. May optionally include the port, formatted
      *           as "<uri>:<port>". Default 'clouderrorreporting.googleapis.com:443'.
@@ -237,7 +232,7 @@ class ErrorGroupServiceGapicClient
      *           *Advanced usage*: Additionally, it is possible to pass in an already
      *           instantiated {@see \Google\ApiCore\Transport\TransportInterface} object. Note
      *           that when this object is provided, any settings in $transportConfig, and any
-     *           $serviceAddress setting, will be ignored.
+     *           $apiEndpoint setting, will be ignored.
      *     @type array $transportConfig
      *           Configuration options that will be used to construct the transport. Options for
      *           each supported transport type should be passed in a key for that transport. For
@@ -278,20 +273,32 @@ class ErrorGroupServiceGapicClient
      * }
      * ```
      *
-     * @param string $groupName    Required. The group resource name. Written as
-     *                             `projects/{projectID}/groups/{group_name}`. Call
-     *                             [`groupStats.list`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/projects.groupStats/list)
+     * @param string $groupName    Required. The group resource name. Written as either
+     *                             `projects/{projectID}/groups/{group_id}` or
+     *                             `projects/{projectID}/locations/{location}/groups/{group_id}`. Call
+     *                             [groupStats.list]
+     *                             [google.devtools.clouderrorreporting.v1beta1.ErrorStatsService.ListGroupStats]
      *                             to return a list of groups belonging to this project.
      *
-     *                             Example: `projects/my-project-123/groups/my-group`
+     *                             Examples: `projects/my-project-123/groups/my-group`,
+     *                             `projects/my-project-123/locations/global/groups/my-group`
+     *
+     *                             In the group resource name, the `group_id` is a unique identifier for a
+     *                             particular error group. The identifier is derived from key parts of the
+     *                             error-log content and is treated as Service Data. For information about
+     *                             how Service Data is handled, see [Google Cloud Privacy
+     *                             Notice](https://cloud.google.com/terms/cloud-privacy-notice).
+     *
+     *                             For a list of supported locations, see [Supported
+     *                             Regions](https://cloud.google.com/logging/docs/region-support). `global` is
+     *                             the default when unspecified.
      * @param array  $optionalArgs {
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\ErrorReporting\V1beta1\ErrorGroup
@@ -331,10 +338,9 @@ class ErrorGroupServiceGapicClient
      *     Optional.
      *
      *     @type RetrySettings|array $retrySettings
-     *           Retry settings to use for this call. Can be a
-     *           {@see Google\ApiCore\RetrySettings} object, or an associative array of retry
-     *           settings parameters. See the documentation on
-     *           {@see Google\ApiCore\RetrySettings} for example usage.
+     *           Retry settings to use for this call. Can be a {@see RetrySettings} object, or an
+     *           associative array of retry settings parameters. See the documentation on
+     *           {@see RetrySettings} for example usage.
      * }
      *
      * @return \Google\Cloud\ErrorReporting\V1beta1\ErrorGroup

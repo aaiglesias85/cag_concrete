@@ -3,208 +3,145 @@
 namespace App\Repository;
 
 use App\Entity\Usuario;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class UsuarioRepository extends EntityRepository
+class UsuarioRepository extends ServiceEntityRepository
 {
-
-    /**
-     * ListarOrdenados: Lista los usuarios
-     *
-     *
-     * @return Usuario[]
-     */
-    public function ListarOrdenados()
+    public function __construct(ManagerRegistry $registry)
     {
-        $consulta = $this->createQueryBuilder('u')
-            ->andWhere('u.habilitado = 1');
-
-        $consulta->orderBy('u.nombre', 'ASC');
-
-        return $consulta->getQuery()->getResult();
+        parent::__construct($registry, Usuario::class);
     }
 
     /**
-     * AutenticarLogin: Chequear el login
-     * @param string $email Email
-     * @param string $pass Pass
-     * @return Usuario
+     * Listar los usuarios habilitados ordenados por nombre
+     *
+     * @return Usuario[]
      */
-    public function AutenticarLogin($email, $pass)
+    public function ListarOrdenados(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.habilitado = 1')
+            ->orderBy('u.nombre', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Autenticar el login con email y contraseña
+     *
+     * @param string $email
+     * @param string $pass
+     * @return Usuario|null
+     */
+    public function AutenticarLogin(string $email, string $pass): ?Usuario
     {
         $email = strtolower($email);
-        $consulta = $this->createQueryBuilder('u')
+
+        return $this->createQueryBuilder('u')
             ->where('u.email = :email AND u.password = :pass')
             ->setParameter('email', $email)
             ->setParameter('pass', $pass)
-            ->getQuery();
-
-        $usuario = $consulta->getOneOrNullResult();
-        return $usuario;
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
-     * BuscarUsuarioPorEmail: Devuelve el usuario al que le corresponde el email
-     * @param string $email Email
+     * Buscar usuario por email
      *
-     * @return Usuario
+     * @param string $email
+     * @return Usuario|null
      */
-    public function BuscarUsuarioPorEmail($email)
+    public function BuscarUsuarioPorEmail(string $email): ?Usuario
     {
-        $criteria = array('email' => $email);
-        return $this->findOneBy($criteria);
+        return $this->findOneBy(['email' => $email]);
     }
 
     /**
-     * ListarUsuarios: Lista los usuarios
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * Listar usuarios con filtros de búsqueda, paginación y ordenación
      *
+     * @param int $start
+     * @param int $limit
+     * @param string|null $sSearch
+     * @param string $iSortCol_0
+     * @param string $sSortDir_0
+     * @param string|null $perfil_id
      * @return Usuario[]
      */
-    public function ListarUsuarios($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $perfil_id = "")
-    {
-        $consulta = $this->createQueryBuilder('u')
+    public function ListarUsuarios(
+        int $start,
+        int $limit,
+        ?string $sSearch = null,
+        string $iSortCol_0 = 'nombre',
+        string $sSortDir_0 = 'ASC',
+        ?string $perfil_id = null
+    ): array {
+        $qb = $this->createQueryBuilder('u')
             ->leftJoin('u.rol', 'r');
 
-
-        if ($sSearch != "") {
-            $consulta->andWhere('u.email LIKE :email OR u.nombre LIKE :nombre OR u.apellidos LIKE :apellidos')
-                ->setParameter('email', "%{$sSearch}%")
-                ->setParameter('nombre', "%{$sSearch}%")
-                ->setParameter('apellidos', "%{$sSearch}%");
+        // Filtro de búsqueda
+        if ($sSearch) {
+            $qb->andWhere('u.email LIKE :search OR u.nombre LIKE :search OR u.apellidos LIKE :search')
+                ->setParameter('search', "%$sSearch%");
         }
 
-
-        if ($perfil_id != '') {
-            $consulta->andWhere('r.rolId = :perfil_id')
+        // Filtro por perfil
+        if ($perfil_id) {
+            $qb->andWhere('r.rolId = :perfil_id')
                 ->setParameter('perfil_id', $perfil_id);
         }
 
-        switch ($iSortCol_0) {
-            case "perfil":
-                $consulta->orderBy("r.nombre", $sSortDir_0);
-                break;
-            default:
-                $consulta->orderBy("u.$iSortCol_0", $sSortDir_0);
-                break;
-        }
+        // Ordenación
+        $qb->orderBy($iSortCol_0 === 'perfil' ? 'r.nombre' : "u.$iSortCol_0", $sSortDir_0);
 
-        if ($limit > 0) {
-            $consulta->setMaxResults($limit);
-        }
+        // Paginación
+        $qb->setFirstResult($start)
+            ->setMaxResults($limit);
 
-        return $consulta->setFirstResult($start)
-            ->getQuery()->getResult();
-
+        return $qb->getQuery()->getResult();
     }
 
     /**
-     * TotalUsuarios: Total de usuarios de la BD
-     * @param string $sSearch Para buscar
+     * Obtener el total de usuarios con filtros de búsqueda
      *
-     * @author Marcel
+     * @param string|null $sSearch
+     * @param string|null $perfil_id
+     * @return int
      */
-    public function TotalUsuarios($sSearch, $perfil_id = "")
+    public function TotalUsuarios(?string $sSearch = null, ?string $perfil_id = null): int
     {
-        $em = $this->getEntityManager();
-        $consulta = 'SELECT COUNT(u.usuarioId) FROM App\Entity\Usuario u ';
-        $join = ' LEFT JOIN u.rol r ';
-        $where = '';
+        $qb = $this->createQueryBuilder('u')
+            ->select('COUNT(u.usuarioId)')
+            ->leftJoin('u.rol', 'r');
 
-        if ($sSearch != "") {
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1)
-                $where .= ' WHERE (u.email LIKE :email OR u.nombre LIKE :nombre OR u.apellidos LIKE :apellidos) ';
-            else
-                $where .= ' AND (u.email LIKE :email OR u.nombre LIKE :nombre OR u.apellidos LIKE :apellidos) ';
+        // Filtro de búsqueda
+        if ($sSearch) {
+            $qb->andWhere('u.email LIKE :search OR u.nombre LIKE :search OR u.apellidos LIKE :search')
+                ->setParameter('search', "%$sSearch%");
         }
 
-        if ($perfil_id != "") {
-
-            $esta_query = explode("WHERE", $where);
-            if (count($esta_query) == 1) {
-                $where .= ' WHERE (r.rolId = :perfil_id) ';
-            } else {
-                $where .= ' AND (r.rolId = :perfil_id) ';
-            }
+        // Filtro por perfil
+        if ($perfil_id) {
+            $qb->andWhere('r.rolId = :perfil_id')
+                ->setParameter('perfil_id', $perfil_id);
         }
 
-        $consulta .= $join;
-        $consulta .= $where;
-        $query = $em->createQuery($consulta);
-        //Adicionar parametros        
-        //$sSearch        
-        $esta_query_nombre = substr_count($consulta, ':nombre');
-        if ($esta_query_nombre == 1)
-            $query->setParameter('nombre', "%{$sSearch}%");
-
-        $esta_query_email = substr_count($consulta, ':email');
-        if ($esta_query_email == 1)
-            $query->setParameter('email', "%{$sSearch}%");
-
-        $esta_query_apellidos = substr_count($consulta, ':apellidos');
-        if ($esta_query_apellidos == 1)
-            $query->setParameter('apellidos', "%{$sSearch}%");
-
-        $esta_query_perfil_id = substr_count($consulta, ':perfil_id');
-        if ($esta_query_perfil_id == 1) {
-            $query->setParameter('perfil_id', $perfil_id);
-        }
-
-        return $query->getSingleScalarResult();
-    }
-
-
-    /**
-     * ListarUsuariosNoRol: Carga todos los usuarios que no son del rol de la BD
-     * @param int $rol_id Id del rol
-     *
-     * @author Marcel
-     */
-    public function ListarUsuariosNoRol($rol_id)
-    {
-        $consulta = $this->createQueryBuilder('u')
-            ->leftJoin('u.rol', 'r')
-            ->where('r.rolId <> :rol_id')
-            ->setParameter('rol_id', $rol_id);
-
-        return $consulta->getQuery()->getResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarUsuariosRol: Carga todos los usuarios del rol de la BD
-     * @param int $rol_id Id del rol
+     * Listar usuarios que tienen un rol específico
      *
-     * @author Marcel
+     * @param int $rol_id
+     * @return Usuario[]
      */
-    public function ListarUsuariosRol($rol_id)
+    public function ListarUsuariosRol(int $rol_id): array
     {
-        $consulta = $this->createQueryBuilder('u')
+        return $this->createQueryBuilder('u')
             ->leftJoin('u.rol', 'r')
             ->where('r.rolId = :rol_id')
-            ->setParameter('rol_id', $rol_id);
-
-        return $consulta->getQuery()->getResult();
+            ->setParameter('rol_id', $rol_id)
+            ->getQuery()
+            ->getResult();
     }
-
-    /**
-     * ListarUsuariosRolActivos: Carga todos los usuarios del rol activos de la BD
-     * @param int $rol_id Id del rol
-     *
-     * @author Marcel
-     */
-    public function ListarUsuariosRolActivos($rol_id)
-    {
-        $consulta = $this->createQueryBuilder('u')
-            ->leftJoin('u.rol', 'r')
-            ->where('u.habilitado = 1 and r.rolId = :rol_id')
-            ->setParameter('rol_id', $rol_id);
-
-        $consulta->orderBy('u.usuarioId', 'ASC');
-
-        return $consulta->getQuery()->getResult();
-    }
-
 }

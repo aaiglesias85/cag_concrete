@@ -26,20 +26,20 @@ class ListFindingsResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp read_time = 2;</code>
      */
-    private $read_time = null;
+    protected $read_time = null;
     /**
      * Token to retrieve the next page of results, or empty if there are no more
      * results.
      *
      * Generated from protobuf field <code>string next_page_token = 3;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
     /**
      * The total number of findings matching the query.
      *
      * Generated from protobuf field <code>int32 total_size = 4;</code>
      */
-    private $total_size = 0;
+    protected $total_size = 0;
 
     /**
      * Constructor.
@@ -47,7 +47,7 @@ class ListFindingsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\SecurityCenter\V1\ListFindingsResponse\ListFindingsResult[]|\Google\Protobuf\Internal\RepeatedField $list_findings_results
+     *     @type array<\Google\Cloud\SecurityCenter\V1\ListFindingsResponse\ListFindingsResult>|\Google\Protobuf\Internal\RepeatedField $list_findings_results
      *           Findings matching the list request.
      *     @type \Google\Protobuf\Timestamp $read_time
      *           Time used for executing the list request.
@@ -78,7 +78,7 @@ class ListFindingsResponse extends \Google\Protobuf\Internal\Message
      * Findings matching the list request.
      *
      * Generated from protobuf field <code>repeated .google.cloud.securitycenter.v1.ListFindingsResponse.ListFindingsResult list_findings_results = 1;</code>
-     * @param \Google\Cloud\SecurityCenter\V1\ListFindingsResponse\ListFindingsResult[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\SecurityCenter\V1\ListFindingsResponse\ListFindingsResult>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setListFindingsResults($var)

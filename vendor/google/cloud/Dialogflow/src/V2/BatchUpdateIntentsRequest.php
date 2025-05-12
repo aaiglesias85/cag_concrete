@@ -19,7 +19,7 @@ class BatchUpdateIntentsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Optional. The language used to access language-specific data.
      * If not specified, the agent's default language is used.
@@ -29,20 +29,56 @@ class BatchUpdateIntentsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string language_code = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $language_code = '';
+    protected $language_code = '';
     /**
      * Optional. The mask to control which fields get updated.
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Optional. The resource view to apply to the returned intent.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.IntentView intent_view = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $intent_view = 0;
+    protected $intent_view = 0;
     protected $intent_batch;
+
+    /**
+     * @param string $parent         Required. The name of the agent to update or create intents in.
+     *                               Format: `projects/<Project ID>/agent`. Please see
+     *                               {@see IntentsClient::agentName()} for help formatting this field.
+     * @param string $intentBatchUri The URI to a Google Cloud Storage file containing intents to update or
+     *                               create. The file format can either be a serialized proto (of IntentBatch
+     *                               type) or JSON object. Note: The URI must start with "gs://".
+     *
+     * @return \Google\Cloud\Dialogflow\V2\BatchUpdateIntentsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, string $intentBatchUri): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setIntentBatchUri($intentBatchUri);
+    }
+
+    /**
+     * @param string                                  $parent            Required. The name of the agent to update or create intents in.
+     *                                                                   Format: `projects/<Project ID>/agent`. Please see
+     *                                                                   {@see IntentsClient::agentName()} for help formatting this field.
+     * @param \Google\Cloud\Dialogflow\V2\IntentBatch $intentBatchInline The collection of intents to update or create.
+     *
+     * @return \Google\Cloud\Dialogflow\V2\BatchUpdateIntentsRequest
+     *
+     * @experimental
+     */
+    public static function buildFromParentIntentBatchInline(string $parent, \Google\Cloud\Dialogflow\V2\IntentBatch $intentBatchInline): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setIntentBatchInline($intentBatchInline);
+    }
 
     /**
      * Constructor.

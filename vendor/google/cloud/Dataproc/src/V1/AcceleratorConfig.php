@@ -21,26 +21,26 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      * Full URL, partial URI, or short name of the accelerator type resource to
      * expose to this instance. See
      * [Compute Engine
-     * AcceleratorTypes](https://cloud.google.com/compute/docs/reference/beta/acceleratorTypes).
+     * AcceleratorTypes](https://cloud.google.com/compute/docs/reference/v1/acceleratorTypes).
      * Examples:
-     * * `https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     * * `projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     * * `nvidia-tesla-k80`
+     * * `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     * * `projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     * * `nvidia-tesla-t4`
      * **Auto Zone Exception**: If you are using the Dataproc
      * [Auto Zone
      * Placement](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement)
      * feature, you must use the short name of the accelerator type
-     * resource, for example, `nvidia-tesla-k80`.
+     * resource, for example, `nvidia-tesla-t4`.
      *
      * Generated from protobuf field <code>string accelerator_type_uri = 1;</code>
      */
-    private $accelerator_type_uri = '';
+    protected $accelerator_type_uri = '';
     /**
      * The number of the accelerator cards of this type exposed to this instance.
      *
      * Generated from protobuf field <code>int32 accelerator_count = 2;</code>
      */
-    private $accelerator_count = 0;
+    protected $accelerator_count = 0;
 
     /**
      * Constructor.
@@ -52,16 +52,16 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      *           Full URL, partial URI, or short name of the accelerator type resource to
      *           expose to this instance. See
      *           [Compute Engine
-     *           AcceleratorTypes](https://cloud.google.com/compute/docs/reference/beta/acceleratorTypes).
+     *           AcceleratorTypes](https://cloud.google.com/compute/docs/reference/v1/acceleratorTypes).
      *           Examples:
-     *           * `https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     *           * `projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     *           * `nvidia-tesla-k80`
+     *           * `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     *           * `projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     *           * `nvidia-tesla-t4`
      *           **Auto Zone Exception**: If you are using the Dataproc
      *           [Auto Zone
      *           Placement](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement)
      *           feature, you must use the short name of the accelerator type
-     *           resource, for example, `nvidia-tesla-k80`.
+     *           resource, for example, `nvidia-tesla-t4`.
      *     @type int $accelerator_count
      *           The number of the accelerator cards of this type exposed to this instance.
      * }
@@ -75,16 +75,16 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      * Full URL, partial URI, or short name of the accelerator type resource to
      * expose to this instance. See
      * [Compute Engine
-     * AcceleratorTypes](https://cloud.google.com/compute/docs/reference/beta/acceleratorTypes).
+     * AcceleratorTypes](https://cloud.google.com/compute/docs/reference/v1/acceleratorTypes).
      * Examples:
-     * * `https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     * * `projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     * * `nvidia-tesla-k80`
+     * * `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     * * `projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     * * `nvidia-tesla-t4`
      * **Auto Zone Exception**: If you are using the Dataproc
      * [Auto Zone
      * Placement](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement)
      * feature, you must use the short name of the accelerator type
-     * resource, for example, `nvidia-tesla-k80`.
+     * resource, for example, `nvidia-tesla-t4`.
      *
      * Generated from protobuf field <code>string accelerator_type_uri = 1;</code>
      * @return string
@@ -98,16 +98,16 @@ class AcceleratorConfig extends \Google\Protobuf\Internal\Message
      * Full URL, partial URI, or short name of the accelerator type resource to
      * expose to this instance. See
      * [Compute Engine
-     * AcceleratorTypes](https://cloud.google.com/compute/docs/reference/beta/acceleratorTypes).
+     * AcceleratorTypes](https://cloud.google.com/compute/docs/reference/v1/acceleratorTypes).
      * Examples:
-     * * `https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     * * `projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80`
-     * * `nvidia-tesla-k80`
+     * * `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     * * `projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+     * * `nvidia-tesla-t4`
      * **Auto Zone Exception**: If you are using the Dataproc
      * [Auto Zone
      * Placement](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement)
      * feature, you must use the short name of the accelerator type
-     * resource, for example, `nvidia-tesla-k80`.
+     * resource, for example, `nvidia-tesla-t4`.
      *
      * Generated from protobuf field <code>string accelerator_type_uri = 1;</code>
      * @param string $var

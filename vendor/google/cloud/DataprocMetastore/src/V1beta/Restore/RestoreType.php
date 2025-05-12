@@ -7,7 +7,7 @@ namespace Google\Cloud\Metastore\V1beta\Restore;
 use UnexpectedValueException;
 
 /**
- * The type of restore.
+ * The type of restore. If unspecified, defaults to `METADATA_ONLY`.
  *
  * Protobuf type <code>google.cloud.metastore.v1beta.Restore.RestoreType</code>
  */
@@ -59,6 +59,4 @@ class RestoreType
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(RestoreType::class, \Google\Cloud\Metastore\V1beta\Restore_RestoreType::class);
 

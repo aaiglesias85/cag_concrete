@@ -20,26 +20,44 @@ class CreateChannelRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The channel to create.
      *
      * Generated from protobuf field <code>.google.cloud.eventarc.v1.Channel channel = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $channel = null;
+    protected $channel = null;
     /**
      * Required. The user-provided ID to be assigned to the channel.
      *
      * Generated from protobuf field <code>string channel_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $channel_id = '';
+    protected $channel_id = '';
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+
+    /**
+     * @param string                            $parent    Required. The parent collection in which to add this channel. Please see
+     *                                                     {@see EventarcClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Eventarc\V1\Channel $channel   Required. The channel to create.
+     * @param string                            $channelId Required. The user-provided ID to be assigned to the channel.
+     *
+     * @return \Google\Cloud\Eventarc\V1\CreateChannelRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Eventarc\V1\Channel $channel, string $channelId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setChannel($channel)
+            ->setChannelId($channelId);
+    }
 
     /**
      * Constructor.
@@ -54,7 +72,7 @@ class CreateChannelRequest extends \Google\Protobuf\Internal\Message
      *     @type string $channel_id
      *           Required. The user-provided ID to be assigned to the channel.
      *     @type bool $validate_only
-     *           Required. If set, validate the request and preview the review, but do not
+     *           Optional. If set, validate the request and preview the review, but do not
      *           post it.
      * }
      */
@@ -152,10 +170,10 @@ class CreateChannelRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return bool
      */
     public function getValidateOnly()
@@ -164,10 +182,10 @@ class CreateChannelRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. If set, validate the request and preview the review, but do not
+     * Optional. If set, validate the request and preview the review, but do not
      * post it.
      *
-     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = REQUIRED];</code>
+     * Generated from protobuf field <code>bool validate_only = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param bool $var
      * @return $this
      */

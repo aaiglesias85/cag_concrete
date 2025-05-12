@@ -30,11 +30,12 @@ class AnalyzeSyntaxResponse extends \Google\Protobuf\Internal\Message
     /**
      * The language of the text, which will be the same as the language specified
      * in the request or, if not specified, the automatically-detected language.
-     * See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     * See [Document.language][google.cloud.language.v1.Document.language] field
+     * for more details.
      *
      * Generated from protobuf field <code>string language = 3;</code>
      */
-    private $language = '';
+    protected $language = '';
 
     /**
      * Constructor.
@@ -42,14 +43,15 @@ class AnalyzeSyntaxResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Language\V1\Sentence[]|\Google\Protobuf\Internal\RepeatedField $sentences
+     *     @type array<\Google\Cloud\Language\V1\Sentence>|\Google\Protobuf\Internal\RepeatedField $sentences
      *           Sentences in the input document.
-     *     @type \Google\Cloud\Language\V1\Token[]|\Google\Protobuf\Internal\RepeatedField $tokens
+     *     @type array<\Google\Cloud\Language\V1\Token>|\Google\Protobuf\Internal\RepeatedField $tokens
      *           Tokens, along with their syntactic information, in the input document.
      *     @type string $language
      *           The language of the text, which will be the same as the language specified
      *           in the request or, if not specified, the automatically-detected language.
-     *           See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     *           See [Document.language][google.cloud.language.v1.Document.language] field
+     *           for more details.
      * }
      */
     public function __construct($data = NULL) {
@@ -72,7 +74,7 @@ class AnalyzeSyntaxResponse extends \Google\Protobuf\Internal\Message
      * Sentences in the input document.
      *
      * Generated from protobuf field <code>repeated .google.cloud.language.v1.Sentence sentences = 1;</code>
-     * @param \Google\Cloud\Language\V1\Sentence[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Language\V1\Sentence>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setSentences($var)
@@ -98,7 +100,7 @@ class AnalyzeSyntaxResponse extends \Google\Protobuf\Internal\Message
      * Tokens, along with their syntactic information, in the input document.
      *
      * Generated from protobuf field <code>repeated .google.cloud.language.v1.Token tokens = 2;</code>
-     * @param \Google\Cloud\Language\V1\Token[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Language\V1\Token>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTokens($var)
@@ -112,7 +114,8 @@ class AnalyzeSyntaxResponse extends \Google\Protobuf\Internal\Message
     /**
      * The language of the text, which will be the same as the language specified
      * in the request or, if not specified, the automatically-detected language.
-     * See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     * See [Document.language][google.cloud.language.v1.Document.language] field
+     * for more details.
      *
      * Generated from protobuf field <code>string language = 3;</code>
      * @return string
@@ -125,7 +128,8 @@ class AnalyzeSyntaxResponse extends \Google\Protobuf\Internal\Message
     /**
      * The language of the text, which will be the same as the language specified
      * in the request or, if not specified, the automatically-detected language.
-     * See [Document.language][google.cloud.language.v1.Document.language] field for more details.
+     * See [Document.language][google.cloud.language.v1.Document.language] field
+     * for more details.
      *
      * Generated from protobuf field <code>string language = 3;</code>
      * @param string $var

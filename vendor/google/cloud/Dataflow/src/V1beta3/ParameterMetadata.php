@@ -20,25 +20,25 @@ class ParameterMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The label to display for the parameter.
      *
      * Generated from protobuf field <code>string label = 2;</code>
      */
-    private $label = '';
+    protected $label = '';
     /**
      * Required. The help text to display for the parameter.
      *
      * Generated from protobuf field <code>string help_text = 3;</code>
      */
-    private $help_text = '';
+    protected $help_text = '';
     /**
      * Optional. Whether the parameter is optional. Defaults to false.
      *
      * Generated from protobuf field <code>bool is_optional = 4;</code>
      */
-    private $is_optional = false;
+    protected $is_optional = false;
     /**
      * Optional. Regexes that the parameter must match.
      *
@@ -51,7 +51,7 @@ class ParameterMetadata extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.dataflow.v1beta3.ParameterType param_type = 6;</code>
      */
-    private $param_type = 0;
+    protected $param_type = 0;
     /**
      * Optional. Additional metadata for describing this parameter.
      *
@@ -73,7 +73,7 @@ class ParameterMetadata extends \Google\Protobuf\Internal\Message
      *           Required. The help text to display for the parameter.
      *     @type bool $is_optional
      *           Optional. Whether the parameter is optional. Defaults to false.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $regexes
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $regexes
      *           Optional. Regexes that the parameter must match.
      *     @type int $param_type
      *           Optional. The type of the parameter.
@@ -206,7 +206,7 @@ class ParameterMetadata extends \Google\Protobuf\Internal\Message
      * Optional. Regexes that the parameter must match.
      *
      * Generated from protobuf field <code>repeated string regexes = 5;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setRegexes($var)

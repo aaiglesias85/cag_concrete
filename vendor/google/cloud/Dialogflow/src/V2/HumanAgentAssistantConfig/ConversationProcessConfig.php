@@ -21,7 +21,7 @@ class ConversationProcessConfig extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int32 recent_sentences_count = 2;</code>
      */
-    private $recent_sentences_count = 0;
+    protected $recent_sentences_count = 0;
 
     /**
      * Constructor.
@@ -69,6 +69,4 @@ class ConversationProcessConfig extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(ConversationProcessConfig::class, \Google\Cloud\Dialogflow\V2\HumanAgentAssistantConfig_ConversationProcessConfig::class);
 

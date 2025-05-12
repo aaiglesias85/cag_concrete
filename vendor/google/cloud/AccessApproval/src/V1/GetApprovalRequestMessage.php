@@ -22,7 +22,22 @@ class GetApprovalRequestMessage extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
+
+    /**
+     * @param string $name The name of the approval request to retrieve.
+     *                     Format:
+     *                     "{projects|folders|organizations}/{id}/approvalRequests/{approval_request}"
+     *
+     * @return \Google\Cloud\AccessApproval\V1\GetApprovalRequestMessage
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

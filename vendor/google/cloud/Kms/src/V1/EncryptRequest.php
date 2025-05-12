@@ -26,12 +26,14 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. The data to encrypt. Must be no larger than 64KiB.
      * The maximum size depends on the key version's
      * [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the
+     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     * [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     * [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys, the
      * plaintext must be no larger than 64KiB. For
      * [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      * the plaintext and additional_authenticated_data fields must be no larger
@@ -39,22 +41,24 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes plaintext = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $plaintext = '';
+    protected $plaintext = '';
     /**
      * Optional. Optional data that, if specified, must also be provided during
      * decryption through
      * [DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data].
      * The maximum size depends on the key version's
      * [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the AAD
-     * must be no larger than 64KiB. For
+     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     * [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     * [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys the
+     * AAD must be no larger than 64KiB. For
      * [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      * the plaintext and additional_authenticated_data fields must be no larger
      * than 8KiB.
      *
      * Generated from protobuf field <code>bytes additional_authenticated_data = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $additional_authenticated_data = '';
+    protected $additional_authenticated_data = '';
     /**
      * Optional. An optional CRC32C checksum of the
      * [EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext].
@@ -78,7 +82,7 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Int64Value plaintext_crc32c = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $plaintext_crc32c = null;
+    protected $plaintext_crc32c = null;
     /**
      * Optional. An optional CRC32C checksum of the
      * [EncryptRequest.additional_authenticated_data][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data].
@@ -102,7 +106,38 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Int64Value additional_authenticated_data_crc32c = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $additional_authenticated_data_crc32c = null;
+    protected $additional_authenticated_data_crc32c = null;
+
+    /**
+     * @param string $name      Required. The resource name of the
+     *                          [CryptoKey][google.cloud.kms.v1.CryptoKey] or
+     *                          [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+     *                          encryption.
+     *
+     *                          If a [CryptoKey][google.cloud.kms.v1.CryptoKey] is specified, the server
+     *                          will use its [primary version][google.cloud.kms.v1.CryptoKey.primary].
+     * @param string $plaintext Required. The data to encrypt. Must be no larger than 64KiB.
+     *
+     *                          The maximum size depends on the key version's
+     *                          [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
+     *                          For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     *                          [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     *                          [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys, the
+     *                          plaintext must be no larger than 64KiB. For
+     *                          [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
+     *                          the plaintext and additional_authenticated_data fields must be no larger
+     *                          than 8KiB.
+     *
+     * @return \Google\Cloud\Kms\V1\EncryptRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, string $plaintext): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setPlaintext($plaintext);
+    }
 
     /**
      * Constructor.
@@ -121,7 +156,9 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      *           Required. The data to encrypt. Must be no larger than 64KiB.
      *           The maximum size depends on the key version's
      *           [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     *           For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the
+     *           For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     *           [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     *           [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys, the
      *           plaintext must be no larger than 64KiB. For
      *           [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      *           the plaintext and additional_authenticated_data fields must be no larger
@@ -132,8 +169,10 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      *           [DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data].
      *           The maximum size depends on the key version's
      *           [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     *           For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the AAD
-     *           must be no larger than 64KiB. For
+     *           For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     *           [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     *           [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys the
+     *           AAD must be no larger than 64KiB. For
      *           [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      *           the plaintext and additional_authenticated_data fields must be no larger
      *           than 8KiB.
@@ -224,7 +263,9 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * Required. The data to encrypt. Must be no larger than 64KiB.
      * The maximum size depends on the key version's
      * [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the
+     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     * [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     * [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys, the
      * plaintext must be no larger than 64KiB. For
      * [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      * the plaintext and additional_authenticated_data fields must be no larger
@@ -242,7 +283,9 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * Required. The data to encrypt. Must be no larger than 64KiB.
      * The maximum size depends on the key version's
      * [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the
+     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     * [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     * [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys, the
      * plaintext must be no larger than 64KiB. For
      * [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      * the plaintext and additional_authenticated_data fields must be no larger
@@ -266,8 +309,10 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * [DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data].
      * The maximum size depends on the key version's
      * [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the AAD
-     * must be no larger than 64KiB. For
+     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     * [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     * [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys the
+     * AAD must be no larger than 64KiB. For
      * [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      * the plaintext and additional_authenticated_data fields must be no larger
      * than 8KiB.
@@ -286,8 +331,10 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * [DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data].
      * The maximum size depends on the key version's
      * [protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
-     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the AAD
-     * must be no larger than 64KiB. For
+     * For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+     * [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+     * [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys the
+     * AAD must be no larger than 64KiB. For
      * [HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
      * the plaintext and additional_authenticated_data fields must be no larger
      * than 8KiB.
@@ -369,7 +416,7 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.Int64Value plaintext_crc32c = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int|string|null
      */
-    public function getPlaintextCrc32CValue()
+    public function getPlaintextCrc32CUnwrapped()
     {
         return $this->readWrapperValue("plaintext_crc32c");
     }
@@ -434,7 +481,7 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * @param int|string|null $var
      * @return $this
      */
-    public function setPlaintextCrc32CValue($var)
+    public function setPlaintextCrc32CUnwrapped($var)
     {
         $this->writeWrapperValue("plaintext_crc32c", $var);
         return $this;}
@@ -504,7 +551,7 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.google.protobuf.Int64Value additional_authenticated_data_crc32c = 8 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return int|string|null
      */
-    public function getAdditionalAuthenticatedDataCrc32CValue()
+    public function getAdditionalAuthenticatedDataCrc32CUnwrapped()
     {
         return $this->readWrapperValue("additional_authenticated_data_crc32c");
     }
@@ -569,7 +616,7 @@ class EncryptRequest extends \Google\Protobuf\Internal\Message
      * @param int|string|null $var
      * @return $this
      */
-    public function setAdditionalAuthenticatedDataCrc32CValue($var)
+    public function setAdditionalAuthenticatedDataCrc32CUnwrapped($var)
     {
         $this->writeWrapperValue("additional_authenticated_data_crc32c", $var);
         return $this;}

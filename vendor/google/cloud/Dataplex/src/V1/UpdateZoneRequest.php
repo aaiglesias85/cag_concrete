@@ -20,21 +20,37 @@ class UpdateZoneRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.FieldMask update_mask = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $update_mask = null;
+    protected $update_mask = null;
     /**
      * Required. Update description.
      * Only fields specified in `update_mask` are updated.
      *
      * Generated from protobuf field <code>.google.cloud.dataplex.v1.Zone zone = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $zone = null;
+    protected $zone = null;
     /**
      * Optional. Only validate the request, but do not perform mutations.
      * The default is false.
      *
      * Generated from protobuf field <code>bool validate_only = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $validate_only = false;
+    protected $validate_only = false;
+
+    /**
+     * @param \Google\Cloud\Dataplex\V1\Zone $zone       Required. Update description.
+     *                                                   Only fields specified in `update_mask` are updated.
+     * @param \Google\Protobuf\FieldMask     $updateMask Required. Mask of fields to update.
+     *
+     * @return \Google\Cloud\Dataplex\V1\UpdateZoneRequest
+     *
+     * @experimental
+     */
+    public static function build(\Google\Cloud\Dataplex\V1\Zone $zone, \Google\Protobuf\FieldMask $updateMask): self
+    {
+        return (new self())
+            ->setZone($zone)
+            ->setUpdateMask($updateMask);
+    }
 
     /**
      * Constructor.

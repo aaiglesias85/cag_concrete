@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [TensorboardService.ReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1.TensorboardService.ReadTensorboardTimeSeriesData].
+ * Response message for
+ * [TensorboardService.ReadTensorboardTimeSeriesData][google.cloud.aiplatform.v1.TensorboardService.ReadTensorboardTimeSeriesData].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ReadTensorboardTimeSeriesDataResponse</code>
  */
@@ -20,7 +21,7 @@ class ReadTensorboardTimeSeriesDataResponse extends \Google\Protobuf\Internal\Me
      *
      * Generated from protobuf field <code>.google.cloud.aiplatform.v1.TimeSeriesData time_series_data = 1;</code>
      */
-    private $time_series_data = null;
+    protected $time_series_data = null;
 
     /**
      * Constructor.

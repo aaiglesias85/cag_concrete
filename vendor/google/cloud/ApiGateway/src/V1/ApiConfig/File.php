@@ -21,13 +21,13 @@ class File extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string path = 1;</code>
      */
-    private $path = '';
+    protected $path = '';
     /**
      * The bytes that constitute the file.
      *
      * Generated from protobuf field <code>bytes contents = 2;</code>
      */
-    private $contents = '';
+    protected $contents = '';
 
     /**
      * Constructor.
@@ -103,6 +103,4 @@ class File extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(File::class, \Google\Cloud\ApiGateway\V1\ApiConfig_File::class);
 

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request message for [CloudChannelService.ChangeOffer][google.cloud.channel.v1.CloudChannelService.ChangeOffer].
+ * Request message for
+ * [CloudChannelService.ChangeOffer][google.cloud.channel.v1.CloudChannelService.ChangeOffer].
  *
  * Generated from protobuf message <code>google.cloud.channel.v1.ChangeOfferRequest</code>
  */
@@ -22,17 +23,19 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Required. New Offer.
      * Format: accounts/{account_id}/offers/{offer_id}.
      *
      * Generated from protobuf field <code>string offer = 2 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $offer = '';
+    protected $offer = '';
     /**
-     * Optional. Parameters needed to purchase the Offer. To view the available Parameters
-     * refer to the [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions] from the desired offer.
+     * Optional. Parameters needed to purchase the Offer. To view the available
+     * Parameters refer to the
+     * [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions]
+     * from the desired offer.
      *
      * Generated from protobuf field <code>repeated .google.cloud.channel.v1.Parameter parameters = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
@@ -42,10 +45,11 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string purchase_order_id = 5 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $purchase_order_id = '';
+    protected $purchase_order_id = '';
     /**
-     * Optional. You can specify an optional unique request ID, and if you need to retry
-     * your request, the server will know to ignore the request if it's complete.
+     * Optional. You can specify an optional unique request ID, and if you need to
+     * retry your request, the server will know to ignore the request if it's
+     * complete.
      * For example, you make an initial request and the request times out. If you
      * make the request again with the same request ID, the server can check if
      * it received the original operation with the same request ID. If it did, it
@@ -56,7 +60,16 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string request_id = 6 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+    /**
+     * Optional. The billing account resource name that is used to pay for this
+     * entitlement when setting up billing on a trial subscription.
+     * This field is only relevant for multi-currency accounts. It should be
+     * left empty for single currency accounts.
+     *
+     * Generated from protobuf field <code>string billing_account = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
+     */
+    protected $billing_account = '';
 
     /**
      * Constructor.
@@ -71,14 +84,17 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
      *     @type string $offer
      *           Required. New Offer.
      *           Format: accounts/{account_id}/offers/{offer_id}.
-     *     @type \Google\Cloud\Channel\V1\Parameter[]|\Google\Protobuf\Internal\RepeatedField $parameters
-     *           Optional. Parameters needed to purchase the Offer. To view the available Parameters
-     *           refer to the [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions] from the desired offer.
+     *     @type array<\Google\Cloud\Channel\V1\Parameter>|\Google\Protobuf\Internal\RepeatedField $parameters
+     *           Optional. Parameters needed to purchase the Offer. To view the available
+     *           Parameters refer to the
+     *           [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions]
+     *           from the desired offer.
      *     @type string $purchase_order_id
      *           Optional. Purchase order id provided by the reseller.
      *     @type string $request_id
-     *           Optional. You can specify an optional unique request ID, and if you need to retry
-     *           your request, the server will know to ignore the request if it's complete.
+     *           Optional. You can specify an optional unique request ID, and if you need to
+     *           retry your request, the server will know to ignore the request if it's
+     *           complete.
      *           For example, you make an initial request and the request times out. If you
      *           make the request again with the same request ID, the server can check if
      *           it received the original operation with the same request ID. If it did, it
@@ -86,6 +102,11 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
      *           The request ID must be a valid [UUID](https://tools.ietf.org/html/rfc4122)
      *           with the exception that zero UUID is not supported
      *           (`00000000-0000-0000-0000-000000000000`).
+     *     @type string $billing_account
+     *           Optional. The billing account resource name that is used to pay for this
+     *           entitlement when setting up billing on a trial subscription.
+     *           This field is only relevant for multi-currency accounts. It should be
+     *           left empty for single currency accounts.
      * }
      */
     public function __construct($data = NULL) {
@@ -152,8 +173,10 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Parameters needed to purchase the Offer. To view the available Parameters
-     * refer to the [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions] from the desired offer.
+     * Optional. Parameters needed to purchase the Offer. To view the available
+     * Parameters refer to the
+     * [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions]
+     * from the desired offer.
      *
      * Generated from protobuf field <code>repeated .google.cloud.channel.v1.Parameter parameters = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -164,11 +187,13 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. Parameters needed to purchase the Offer. To view the available Parameters
-     * refer to the [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions] from the desired offer.
+     * Optional. Parameters needed to purchase the Offer. To view the available
+     * Parameters refer to the
+     * [Offer.parameter_definitions][google.cloud.channel.v1.Offer.parameter_definitions]
+     * from the desired offer.
      *
      * Generated from protobuf field <code>repeated .google.cloud.channel.v1.Parameter parameters = 3 [(.google.api.field_behavior) = OPTIONAL];</code>
-     * @param \Google\Cloud\Channel\V1\Parameter[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Channel\V1\Parameter>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setParameters($var)
@@ -206,8 +231,9 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. You can specify an optional unique request ID, and if you need to retry
-     * your request, the server will know to ignore the request if it's complete.
+     * Optional. You can specify an optional unique request ID, and if you need to
+     * retry your request, the server will know to ignore the request if it's
+     * complete.
      * For example, you make an initial request and the request times out. If you
      * make the request again with the same request ID, the server can check if
      * it received the original operation with the same request ID. If it did, it
@@ -225,8 +251,9 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Optional. You can specify an optional unique request ID, and if you need to retry
-     * your request, the server will know to ignore the request if it's complete.
+     * Optional. You can specify an optional unique request ID, and if you need to
+     * retry your request, the server will know to ignore the request if it's
+     * complete.
      * For example, you make an initial request and the request times out. If you
      * make the request again with the same request ID, the server can check if
      * it received the original operation with the same request ID. If it did, it
@@ -243,6 +270,38 @@ class ChangeOfferRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->request_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Optional. The billing account resource name that is used to pay for this
+     * entitlement when setting up billing on a trial subscription.
+     * This field is only relevant for multi-currency accounts. It should be
+     * left empty for single currency accounts.
+     *
+     * Generated from protobuf field <code>string billing_account = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @return string
+     */
+    public function getBillingAccount()
+    {
+        return $this->billing_account;
+    }
+
+    /**
+     * Optional. The billing account resource name that is used to pay for this
+     * entitlement when setting up billing on a trial subscription.
+     * This field is only relevant for multi-currency accounts. It should be
+     * left empty for single currency accounts.
+     *
+     * Generated from protobuf field <code>string billing_account = 7 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setBillingAccount($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->billing_account = $var;
 
         return $this;
     }

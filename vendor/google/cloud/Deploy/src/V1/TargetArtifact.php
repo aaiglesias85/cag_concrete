@@ -16,17 +16,25 @@ use Google\Protobuf\Internal\GPBUtil;
 class TargetArtifact extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Output only. File path of the resolved Skaffold configuration relative to the URI.
+     * Output only. File path of the resolved Skaffold configuration for the
+     * stable phase, relative to the URI.
      *
      * Generated from protobuf field <code>string skaffold_config_path = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $skaffold_config_path = '';
+    protected $skaffold_config_path = '';
     /**
-     * Output only. File path of the rendered manifest relative to the URI.
+     * Output only. File path of the rendered manifest relative to the URI for the
+     * stable phase.
      *
      * Generated from protobuf field <code>string manifest_path = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $manifest_path = '';
+    protected $manifest_path = '';
+    /**
+     * Output only. Map from the phase ID to the phase artifacts for the `Target`.
+     *
+     * Generated from protobuf field <code>map<string, .google.cloud.deploy.v1.TargetArtifact.PhaseArtifact> phase_artifacts = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     */
+    private $phase_artifacts;
     protected $uri;
 
     /**
@@ -40,9 +48,13 @@ class TargetArtifact extends \Google\Protobuf\Internal\Message
      *           deployment configuration used by Skaffold during a rollout, and all
      *           paths are relative to this location.
      *     @type string $skaffold_config_path
-     *           Output only. File path of the resolved Skaffold configuration relative to the URI.
+     *           Output only. File path of the resolved Skaffold configuration for the
+     *           stable phase, relative to the URI.
      *     @type string $manifest_path
-     *           Output only. File path of the rendered manifest relative to the URI.
+     *           Output only. File path of the rendered manifest relative to the URI for the
+     *           stable phase.
+     *     @type array|\Google\Protobuf\Internal\MapField $phase_artifacts
+     *           Output only. Map from the phase ID to the phase artifacts for the `Target`.
      * }
      */
     public function __construct($data = NULL) {
@@ -86,7 +98,8 @@ class TargetArtifact extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. File path of the resolved Skaffold configuration relative to the URI.
+     * Output only. File path of the resolved Skaffold configuration for the
+     * stable phase, relative to the URI.
      *
      * Generated from protobuf field <code>string skaffold_config_path = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -97,7 +110,8 @@ class TargetArtifact extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. File path of the resolved Skaffold configuration relative to the URI.
+     * Output only. File path of the resolved Skaffold configuration for the
+     * stable phase, relative to the URI.
      *
      * Generated from protobuf field <code>string skaffold_config_path = 2 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -112,7 +126,8 @@ class TargetArtifact extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. File path of the rendered manifest relative to the URI.
+     * Output only. File path of the rendered manifest relative to the URI for the
+     * stable phase.
      *
      * Generated from protobuf field <code>string manifest_path = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
@@ -123,7 +138,8 @@ class TargetArtifact extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. File path of the rendered manifest relative to the URI.
+     * Output only. File path of the rendered manifest relative to the URI for the
+     * stable phase.
      *
      * Generated from protobuf field <code>string manifest_path = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
@@ -133,6 +149,32 @@ class TargetArtifact extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->manifest_path = $var;
+
+        return $this;
+    }
+
+    /**
+     * Output only. Map from the phase ID to the phase artifacts for the `Target`.
+     *
+     * Generated from protobuf field <code>map<string, .google.cloud.deploy.v1.TargetArtifact.PhaseArtifact> phase_artifacts = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getPhaseArtifacts()
+    {
+        return $this->phase_artifacts;
+    }
+
+    /**
+     * Output only. Map from the phase ID to the phase artifacts for the `Target`.
+     *
+     * Generated from protobuf field <code>map<string, .google.cloud.deploy.v1.TargetArtifact.PhaseArtifact> phase_artifacts = 5 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
+     * @return $this
+     */
+    public function setPhaseArtifacts($var)
+    {
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Google\Cloud\Deploy\V1\TargetArtifact\PhaseArtifact::class);
+        $this->phase_artifacts = $arr;
 
         return $this;
     }

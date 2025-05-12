@@ -20,25 +20,27 @@ class Image extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bytes content = 1;</code>
      */
-    private $content = '';
+    protected $content = '';
     /**
-     * Encoding mime type for the image.
+     * Encoding [media type (MIME
+     * type)](https://www.iana.org/assignments/media-types/media-types.xhtml)
+     * for the image.
      *
      * Generated from protobuf field <code>string mime_type = 2;</code>
      */
-    private $mime_type = '';
+    protected $mime_type = '';
     /**
      * Width of the image in pixels.
      *
      * Generated from protobuf field <code>int32 width = 3;</code>
      */
-    private $width = 0;
+    protected $width = 0;
     /**
      * Height of the image in pixels.
      *
      * Generated from protobuf field <code>int32 height = 4;</code>
      */
-    private $height = 0;
+    protected $height = 0;
 
     /**
      * Constructor.
@@ -49,7 +51,9 @@ class Image extends \Google\Protobuf\Internal\Message
      *     @type string $content
      *           Raw byte content of the image.
      *     @type string $mime_type
-     *           Encoding mime type for the image.
+     *           Encoding [media type (MIME
+     *           type)](https://www.iana.org/assignments/media-types/media-types.xhtml)
+     *           for the image.
      *     @type int $width
      *           Width of the image in pixels.
      *     @type int $height
@@ -88,7 +92,9 @@ class Image extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Encoding mime type for the image.
+     * Encoding [media type (MIME
+     * type)](https://www.iana.org/assignments/media-types/media-types.xhtml)
+     * for the image.
      *
      * Generated from protobuf field <code>string mime_type = 2;</code>
      * @return string
@@ -99,7 +105,9 @@ class Image extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Encoding mime type for the image.
+     * Encoding [media type (MIME
+     * type)](https://www.iana.org/assignments/media-types/media-types.xhtml)
+     * for the image.
      *
      * Generated from protobuf field <code>string mime_type = 2;</code>
      * @param string $var

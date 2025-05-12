@@ -22,7 +22,7 @@ class PredictionApikeyRegistryService
         \GPBMetadata\Google\Cloud\Recommendationengine\V1Beta1\RecommendationengineResources::initOnce();
         $pool->internalAddGeneratedFile(
             '
-â
+ç
 Rgoogle/cloud/recommendationengine/v1beta1/prediction_apikey_registry_service.proto)google.cloud.recommendationengine.v1beta1google/api/field_behavior.protogoogle/api/resource.protogoogle/protobuf/empty.protogoogle/api/client.protoNgoogle/cloud/recommendationengine/v1beta1/recommendationengine_resources.proto"/
 PredictionApiKeyRegistration
 api_key (	"Í
@@ -43,10 +43,10 @@ page_token (	B‡A"∑
 name (	BH‡A˙AB
 @recommendationengine.googleapis.com/PredictionApiKeyRegistration2ó
 PredictionApiKeyRegistryŸ
-"CreatePredictionApiKeyRegistrationT.google.cloud.recommendationengine.v1beta1.CreatePredictionApiKeyRegistrationRequestG.google.cloud.recommendationengine.v1beta1.PredictionApiKeyRegistration"ìÇ”‰ìd"_/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/predictionApiKeyRegistrations:*⁄A&parent,prediction_api_key_registration¿
-!ListPredictionApiKeyRegistrationsS.google.cloud.recommendationengine.v1beta1.ListPredictionApiKeyRegistrationsRequestT.google.cloud.recommendationengine.v1beta1.ListPredictionApiKeyRegistrationsResponse"pÇ”‰ìa_/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/predictionApiKeyRegistrations⁄AparentÇ
-"DeletePredictionApiKeyRegistrationT.google.cloud.recommendationengine.v1beta1.DeletePredictionApiKeyRegistrationRequest.google.protobuf.Empty"nÇ”‰ìa*_/v1beta1/{name=projects/*/locations/*/catalogs/*/eventStores/*/predictionApiKeyRegistrations/*}⁄AnameW A#recommendationengine.googleapis.com“A.https://www.googleapis.com/auth/cloud-platformBü
--com.google.cloud.recommendationengine.v1beta1PZ]google.golang.org/genproto/googleapis/cloud/recommendationengine/v1beta1;recommendationengine¢RECAI™)Google.Cloud.RecommendationEngine.V1Beta1 )Google\\Cloud\\RecommendationEngine\\V1beta1Í,Google::Cloud::RecommendationEngine::V1beta1bproto3'
+"CreatePredictionApiKeyRegistrationT.google.cloud.recommendationengine.v1beta1.CreatePredictionApiKeyRegistrationRequestG.google.cloud.recommendationengine.v1beta1.PredictionApiKeyRegistration"ì⁄A&parent,prediction_api_key_registrationÇ”‰ìd"_/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/predictionApiKeyRegistrations:*¿
+!ListPredictionApiKeyRegistrationsS.google.cloud.recommendationengine.v1beta1.ListPredictionApiKeyRegistrationsRequestT.google.cloud.recommendationengine.v1beta1.ListPredictionApiKeyRegistrationsResponse"p⁄AparentÇ”‰ìa_/v1beta1/{parent=projects/*/locations/*/catalogs/*/eventStores/*}/predictionApiKeyRegistrationsÇ
+"DeletePredictionApiKeyRegistrationT.google.cloud.recommendationengine.v1beta1.DeletePredictionApiKeyRegistrationRequest.google.protobuf.Empty"n⁄AnameÇ”‰ìa*_/v1beta1/{name=projects/*/locations/*/catalogs/*/eventStores/*/predictionApiKeyRegistrations/*}W A#recommendationengine.googleapis.com“A.https://www.googleapis.com/auth/cloud-platformB£
+-com.google.cloud.recommendationengine.v1beta1PZacloud.google.com/go/recommendationengine/apiv1beta1/recommendationenginepb;recommendationenginepb¢RECAI™)Google.Cloud.RecommendationEngine.V1Beta1 )Google\\Cloud\\RecommendationEngine\\V1beta1Í,Google::Cloud::RecommendationEngine::V1beta1bproto3'
         , true);
 
         static::$is_initialized = true;

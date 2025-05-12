@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Response message for [MetadataService.ListContexts][google.cloud.aiplatform.v1.MetadataService.ListContexts].
+ * Response message for
+ * [MetadataService.ListContexts][google.cloud.aiplatform.v1.MetadataService.ListContexts].
  *
  * Generated from protobuf message <code>google.cloud.aiplatform.v1.ListContextsResponse</code>
  */
@@ -22,13 +23,14 @@ class ListContextsResponse extends \Google\Protobuf\Internal\Message
      */
     private $contexts;
     /**
-     * A token, which can be sent as [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
+     * A token, which can be sent as
+     * [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
      * to retrieve the next page.
      * If this field is not populated, there are no subsequent pages.
      *
      * Generated from protobuf field <code>string next_page_token = 2;</code>
      */
-    private $next_page_token = '';
+    protected $next_page_token = '';
 
     /**
      * Constructor.
@@ -36,10 +38,11 @@ class ListContextsResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\AIPlatform\V1\Context[]|\Google\Protobuf\Internal\RepeatedField $contexts
+     *     @type array<\Google\Cloud\AIPlatform\V1\Context>|\Google\Protobuf\Internal\RepeatedField $contexts
      *           The Contexts retrieved from the MetadataStore.
      *     @type string $next_page_token
-     *           A token, which can be sent as [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
+     *           A token, which can be sent as
+     *           [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
      *           to retrieve the next page.
      *           If this field is not populated, there are no subsequent pages.
      * }
@@ -64,7 +67,7 @@ class ListContextsResponse extends \Google\Protobuf\Internal\Message
      * The Contexts retrieved from the MetadataStore.
      *
      * Generated from protobuf field <code>repeated .google.cloud.aiplatform.v1.Context contexts = 1;</code>
-     * @param \Google\Cloud\AIPlatform\V1\Context[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\AIPlatform\V1\Context>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setContexts($var)
@@ -76,7 +79,8 @@ class ListContextsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A token, which can be sent as [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
+     * A token, which can be sent as
+     * [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
      * to retrieve the next page.
      * If this field is not populated, there are no subsequent pages.
      *
@@ -89,7 +93,8 @@ class ListContextsResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A token, which can be sent as [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
+     * A token, which can be sent as
+     * [ListContextsRequest.page_token][google.cloud.aiplatform.v1.ListContextsRequest.page_token]
      * to retrieve the next page.
      * If this field is not populated, there are no subsequent pages.
      *

@@ -23,7 +23,7 @@ class Table extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string name = 1;</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
      * Output only. Map from cluster ID to per-cluster table state.
      * If it could not be determined whether or not the table has data in a
@@ -36,27 +36,103 @@ class Table extends \Google\Protobuf\Internal\Message
     private $cluster_states;
     /**
      * The column families configured for this table, mapped by column family ID.
-     * Views: `SCHEMA_VIEW`, `FULL`
+     * Views: `SCHEMA_VIEW`, `STATS_VIEW`, `FULL`
      *
      * Generated from protobuf field <code>map<string, .google.bigtable.admin.v2.ColumnFamily> column_families = 3;</code>
      */
     private $column_families;
     /**
-     * Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored in this
-     * table. Timestamps not matching the granularity will be rejected.
-     * If unspecified at creation time, the value will be set to `MILLIS`.
-     * Views: `SCHEMA_VIEW`, `FULL`.
+     * Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored
+     * in this table. Timestamps not matching the granularity will be rejected. If
+     * unspecified at creation time, the value will be set to `MILLIS`. Views:
+     * `SCHEMA_VIEW`, `FULL`.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.Table.TimestampGranularity granularity = 4 [(.google.api.field_behavior) = IMMUTABLE];</code>
      */
-    private $granularity = 0;
+    protected $granularity = 0;
     /**
-     * Output only. If this table was restored from another data source (e.g. a backup), this
-     * field will be populated with information about the restore.
+     * Output only. If this table was restored from another data source (e.g. a
+     * backup), this field will be populated with information about the restore.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.RestoreInfo restore_info = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $restore_info = null;
+    protected $restore_info = null;
+    /**
+     * If specified, enable the change stream on this table.
+     * Otherwise, the change stream is disabled and the change stream is not
+     * retained.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.ChangeStreamConfig change_stream_config = 8;</code>
+     */
+    protected $change_stream_config = null;
+    /**
+     * Set to true to make the table protected against data loss. i.e. deleting
+     * the following resources through Admin APIs are prohibited:
+     * * The table.
+     * * The column families in the table.
+     * * The instance containing the table.
+     * Note one can still delete the data stored in the table through Data APIs.
+     *
+     * Generated from protobuf field <code>bool deletion_protection = 9;</code>
+     */
+    protected $deletion_protection = false;
+    /**
+     * The row key schema for this table. The schema is used to decode the raw row
+     * key bytes into a structured format. The order of field declarations in this
+     * schema is important, as it reflects how the raw row key bytes are
+     * structured. Currently, this only affects how the key is read via a
+     * GoogleSQL query from the ExecuteQuery API.
+     * For a SQL query, the _key column is still read as raw bytes. But queries
+     * can reference the key fields by name, which will be decoded from _key using
+     * provided type and encoding. Queries that reference key fields will fail if
+     * they encounter an invalid row key.
+     * For example, if _key = "some_id#2024-04-30#\x00\x13\x00\xf3" with the
+     * following schema:
+     * {
+     *   fields {
+     *     field_name: "id"
+     *     type { string { encoding: utf8_bytes {} } }
+     *   }
+     *   fields {
+     *     field_name: "date"
+     *     type { string { encoding: utf8_bytes {} } }
+     *   }
+     *   fields {
+     *     field_name: "product_code"
+     *     type { int64 { encoding: big_endian_bytes {} } }
+     *   }
+     *   encoding { delimited_bytes { delimiter: "#" } }
+     * }
+     * The decoded key parts would be:
+     *   id = "some_id", date = "2024-04-30", product_code = 1245427
+     * The query "SELECT _key, product_code FROM table" will return two columns:
+     * /------------------------------------------------------\
+     * |              _key                     | product_code |
+     * | --------------------------------------|--------------|
+     * | "some_id#2024-04-30#\x00\x13\x00\xf3" |   1245427    |
+     * \------------------------------------------------------/
+     * The schema has the following invariants:
+     * (1) The decoded field values are order-preserved. For read, the field
+     * values will be decoded in sorted mode from the raw bytes.
+     * (2) Every field in the schema must specify a non-empty name.
+     * (3) Every field must specify a type with an associated encoding. The type
+     * is limited to scalar types only: Array, Map, Aggregate, and Struct are not
+     * allowed.
+     * (4) The field names must not collide with existing column family
+     * names and reserved keywords "_key" and "_timestamp".
+     * The following update operations are allowed for row_key_schema:
+     * - Update from an empty schema to a new schema.
+     * - Remove the existing schema. This operation requires setting the
+     *   `ignore_warnings` flag to `true`, since it might be a backward
+     *   incompatible change. Without the flag, the update request will fail with
+     *   an INVALID_ARGUMENT error.
+     * Any other row key schema update operation (e.g. update existing schema
+     * columns names or types) is currently unsupported.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.Type.Struct row_key_schema = 15;</code>
+     */
+    protected $row_key_schema = null;
+    protected $automated_backup_config;
 
     /**
      * Constructor.
@@ -76,15 +152,81 @@ class Table extends \Google\Protobuf\Internal\Message
      *           Views: `REPLICATION_VIEW`, `ENCRYPTION_VIEW`, `FULL`
      *     @type array|\Google\Protobuf\Internal\MapField $column_families
      *           The column families configured for this table, mapped by column family ID.
-     *           Views: `SCHEMA_VIEW`, `FULL`
+     *           Views: `SCHEMA_VIEW`, `STATS_VIEW`, `FULL`
      *     @type int $granularity
-     *           Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored in this
-     *           table. Timestamps not matching the granularity will be rejected.
-     *           If unspecified at creation time, the value will be set to `MILLIS`.
-     *           Views: `SCHEMA_VIEW`, `FULL`.
+     *           Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored
+     *           in this table. Timestamps not matching the granularity will be rejected. If
+     *           unspecified at creation time, the value will be set to `MILLIS`. Views:
+     *           `SCHEMA_VIEW`, `FULL`.
      *     @type \Google\Cloud\Bigtable\Admin\V2\RestoreInfo $restore_info
-     *           Output only. If this table was restored from another data source (e.g. a backup), this
-     *           field will be populated with information about the restore.
+     *           Output only. If this table was restored from another data source (e.g. a
+     *           backup), this field will be populated with information about the restore.
+     *     @type \Google\Cloud\Bigtable\Admin\V2\ChangeStreamConfig $change_stream_config
+     *           If specified, enable the change stream on this table.
+     *           Otherwise, the change stream is disabled and the change stream is not
+     *           retained.
+     *     @type bool $deletion_protection
+     *           Set to true to make the table protected against data loss. i.e. deleting
+     *           the following resources through Admin APIs are prohibited:
+     *           * The table.
+     *           * The column families in the table.
+     *           * The instance containing the table.
+     *           Note one can still delete the data stored in the table through Data APIs.
+     *     @type \Google\Cloud\Bigtable\Admin\V2\Table\AutomatedBackupPolicy $automated_backup_policy
+     *           If specified, automated backups are enabled for this table.
+     *           Otherwise, automated backups are disabled.
+     *     @type \Google\Cloud\Bigtable\Admin\V2\Type\Struct $row_key_schema
+     *           The row key schema for this table. The schema is used to decode the raw row
+     *           key bytes into a structured format. The order of field declarations in this
+     *           schema is important, as it reflects how the raw row key bytes are
+     *           structured. Currently, this only affects how the key is read via a
+     *           GoogleSQL query from the ExecuteQuery API.
+     *           For a SQL query, the _key column is still read as raw bytes. But queries
+     *           can reference the key fields by name, which will be decoded from _key using
+     *           provided type and encoding. Queries that reference key fields will fail if
+     *           they encounter an invalid row key.
+     *           For example, if _key = "some_id#2024-04-30#\x00\x13\x00\xf3" with the
+     *           following schema:
+     *           {
+     *             fields {
+     *               field_name: "id"
+     *               type { string { encoding: utf8_bytes {} } }
+     *             }
+     *             fields {
+     *               field_name: "date"
+     *               type { string { encoding: utf8_bytes {} } }
+     *             }
+     *             fields {
+     *               field_name: "product_code"
+     *               type { int64 { encoding: big_endian_bytes {} } }
+     *             }
+     *             encoding { delimited_bytes { delimiter: "#" } }
+     *           }
+     *           The decoded key parts would be:
+     *             id = "some_id", date = "2024-04-30", product_code = 1245427
+     *           The query "SELECT _key, product_code FROM table" will return two columns:
+     *           /------------------------------------------------------\
+     *           |              _key                     | product_code |
+     *           | --------------------------------------|--------------|
+     *           | "some_id#2024-04-30#\x00\x13\x00\xf3" |   1245427    |
+     *           \------------------------------------------------------/
+     *           The schema has the following invariants:
+     *           (1) The decoded field values are order-preserved. For read, the field
+     *           values will be decoded in sorted mode from the raw bytes.
+     *           (2) Every field in the schema must specify a non-empty name.
+     *           (3) Every field must specify a type with an associated encoding. The type
+     *           is limited to scalar types only: Array, Map, Aggregate, and Struct are not
+     *           allowed.
+     *           (4) The field names must not collide with existing column family
+     *           names and reserved keywords "_key" and "_timestamp".
+     *           The following update operations are allowed for row_key_schema:
+     *           - Update from an empty schema to a new schema.
+     *           - Remove the existing schema. This operation requires setting the
+     *             `ignore_warnings` flag to `true`, since it might be a backward
+     *             incompatible change. Without the flag, the update request will fail with
+     *             an INVALID_ARGUMENT error.
+     *           Any other row key schema update operation (e.g. update existing schema
+     *           columns names or types) is currently unsupported.
      * }
      */
     public function __construct($data = NULL) {
@@ -158,7 +300,7 @@ class Table extends \Google\Protobuf\Internal\Message
 
     /**
      * The column families configured for this table, mapped by column family ID.
-     * Views: `SCHEMA_VIEW`, `FULL`
+     * Views: `SCHEMA_VIEW`, `STATS_VIEW`, `FULL`
      *
      * Generated from protobuf field <code>map<string, .google.bigtable.admin.v2.ColumnFamily> column_families = 3;</code>
      * @return \Google\Protobuf\Internal\MapField
@@ -170,7 +312,7 @@ class Table extends \Google\Protobuf\Internal\Message
 
     /**
      * The column families configured for this table, mapped by column family ID.
-     * Views: `SCHEMA_VIEW`, `FULL`
+     * Views: `SCHEMA_VIEW`, `STATS_VIEW`, `FULL`
      *
      * Generated from protobuf field <code>map<string, .google.bigtable.admin.v2.ColumnFamily> column_families = 3;</code>
      * @param array|\Google\Protobuf\Internal\MapField $var
@@ -185,10 +327,10 @@ class Table extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored in this
-     * table. Timestamps not matching the granularity will be rejected.
-     * If unspecified at creation time, the value will be set to `MILLIS`.
-     * Views: `SCHEMA_VIEW`, `FULL`.
+     * Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored
+     * in this table. Timestamps not matching the granularity will be rejected. If
+     * unspecified at creation time, the value will be set to `MILLIS`. Views:
+     * `SCHEMA_VIEW`, `FULL`.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.Table.TimestampGranularity granularity = 4 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @return int
@@ -199,10 +341,10 @@ class Table extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored in this
-     * table. Timestamps not matching the granularity will be rejected.
-     * If unspecified at creation time, the value will be set to `MILLIS`.
-     * Views: `SCHEMA_VIEW`, `FULL`.
+     * Immutable. The granularity (i.e. `MILLIS`) at which timestamps are stored
+     * in this table. Timestamps not matching the granularity will be rejected. If
+     * unspecified at creation time, the value will be set to `MILLIS`. Views:
+     * `SCHEMA_VIEW`, `FULL`.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.Table.TimestampGranularity granularity = 4 [(.google.api.field_behavior) = IMMUTABLE];</code>
      * @param int $var
@@ -217,8 +359,8 @@ class Table extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. If this table was restored from another data source (e.g. a backup), this
-     * field will be populated with information about the restore.
+     * Output only. If this table was restored from another data source (e.g. a
+     * backup), this field will be populated with information about the restore.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.RestoreInfo restore_info = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Cloud\Bigtable\Admin\V2\RestoreInfo|null
@@ -239,8 +381,8 @@ class Table extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. If this table was restored from another data source (e.g. a backup), this
-     * field will be populated with information about the restore.
+     * Output only. If this table was restored from another data source (e.g. a
+     * backup), this field will be populated with information about the restore.
      *
      * Generated from protobuf field <code>.google.bigtable.admin.v2.RestoreInfo restore_info = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Cloud\Bigtable\Admin\V2\RestoreInfo $var
@@ -252,6 +394,259 @@ class Table extends \Google\Protobuf\Internal\Message
         $this->restore_info = $var;
 
         return $this;
+    }
+
+    /**
+     * If specified, enable the change stream on this table.
+     * Otherwise, the change stream is disabled and the change stream is not
+     * retained.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.ChangeStreamConfig change_stream_config = 8;</code>
+     * @return \Google\Cloud\Bigtable\Admin\V2\ChangeStreamConfig|null
+     */
+    public function getChangeStreamConfig()
+    {
+        return $this->change_stream_config;
+    }
+
+    public function hasChangeStreamConfig()
+    {
+        return isset($this->change_stream_config);
+    }
+
+    public function clearChangeStreamConfig()
+    {
+        unset($this->change_stream_config);
+    }
+
+    /**
+     * If specified, enable the change stream on this table.
+     * Otherwise, the change stream is disabled and the change stream is not
+     * retained.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.ChangeStreamConfig change_stream_config = 8;</code>
+     * @param \Google\Cloud\Bigtable\Admin\V2\ChangeStreamConfig $var
+     * @return $this
+     */
+    public function setChangeStreamConfig($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Bigtable\Admin\V2\ChangeStreamConfig::class);
+        $this->change_stream_config = $var;
+
+        return $this;
+    }
+
+    /**
+     * Set to true to make the table protected against data loss. i.e. deleting
+     * the following resources through Admin APIs are prohibited:
+     * * The table.
+     * * The column families in the table.
+     * * The instance containing the table.
+     * Note one can still delete the data stored in the table through Data APIs.
+     *
+     * Generated from protobuf field <code>bool deletion_protection = 9;</code>
+     * @return bool
+     */
+    public function getDeletionProtection()
+    {
+        return $this->deletion_protection;
+    }
+
+    /**
+     * Set to true to make the table protected against data loss. i.e. deleting
+     * the following resources through Admin APIs are prohibited:
+     * * The table.
+     * * The column families in the table.
+     * * The instance containing the table.
+     * Note one can still delete the data stored in the table through Data APIs.
+     *
+     * Generated from protobuf field <code>bool deletion_protection = 9;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setDeletionProtection($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->deletion_protection = $var;
+
+        return $this;
+    }
+
+    /**
+     * If specified, automated backups are enabled for this table.
+     * Otherwise, automated backups are disabled.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.Table.AutomatedBackupPolicy automated_backup_policy = 13;</code>
+     * @return \Google\Cloud\Bigtable\Admin\V2\Table\AutomatedBackupPolicy|null
+     */
+    public function getAutomatedBackupPolicy()
+    {
+        return $this->readOneof(13);
+    }
+
+    public function hasAutomatedBackupPolicy()
+    {
+        return $this->hasOneof(13);
+    }
+
+    /**
+     * If specified, automated backups are enabled for this table.
+     * Otherwise, automated backups are disabled.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.Table.AutomatedBackupPolicy automated_backup_policy = 13;</code>
+     * @param \Google\Cloud\Bigtable\Admin\V2\Table\AutomatedBackupPolicy $var
+     * @return $this
+     */
+    public function setAutomatedBackupPolicy($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Bigtable\Admin\V2\Table\AutomatedBackupPolicy::class);
+        $this->writeOneof(13, $var);
+
+        return $this;
+    }
+
+    /**
+     * The row key schema for this table. The schema is used to decode the raw row
+     * key bytes into a structured format. The order of field declarations in this
+     * schema is important, as it reflects how the raw row key bytes are
+     * structured. Currently, this only affects how the key is read via a
+     * GoogleSQL query from the ExecuteQuery API.
+     * For a SQL query, the _key column is still read as raw bytes. But queries
+     * can reference the key fields by name, which will be decoded from _key using
+     * provided type and encoding. Queries that reference key fields will fail if
+     * they encounter an invalid row key.
+     * For example, if _key = "some_id#2024-04-30#\x00\x13\x00\xf3" with the
+     * following schema:
+     * {
+     *   fields {
+     *     field_name: "id"
+     *     type { string { encoding: utf8_bytes {} } }
+     *   }
+     *   fields {
+     *     field_name: "date"
+     *     type { string { encoding: utf8_bytes {} } }
+     *   }
+     *   fields {
+     *     field_name: "product_code"
+     *     type { int64 { encoding: big_endian_bytes {} } }
+     *   }
+     *   encoding { delimited_bytes { delimiter: "#" } }
+     * }
+     * The decoded key parts would be:
+     *   id = "some_id", date = "2024-04-30", product_code = 1245427
+     * The query "SELECT _key, product_code FROM table" will return two columns:
+     * /------------------------------------------------------\
+     * |              _key                     | product_code |
+     * | --------------------------------------|--------------|
+     * | "some_id#2024-04-30#\x00\x13\x00\xf3" |   1245427    |
+     * \------------------------------------------------------/
+     * The schema has the following invariants:
+     * (1) The decoded field values are order-preserved. For read, the field
+     * values will be decoded in sorted mode from the raw bytes.
+     * (2) Every field in the schema must specify a non-empty name.
+     * (3) Every field must specify a type with an associated encoding. The type
+     * is limited to scalar types only: Array, Map, Aggregate, and Struct are not
+     * allowed.
+     * (4) The field names must not collide with existing column family
+     * names and reserved keywords "_key" and "_timestamp".
+     * The following update operations are allowed for row_key_schema:
+     * - Update from an empty schema to a new schema.
+     * - Remove the existing schema. This operation requires setting the
+     *   `ignore_warnings` flag to `true`, since it might be a backward
+     *   incompatible change. Without the flag, the update request will fail with
+     *   an INVALID_ARGUMENT error.
+     * Any other row key schema update operation (e.g. update existing schema
+     * columns names or types) is currently unsupported.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.Type.Struct row_key_schema = 15;</code>
+     * @return \Google\Cloud\Bigtable\Admin\V2\Type\Struct|null
+     */
+    public function getRowKeySchema()
+    {
+        return $this->row_key_schema;
+    }
+
+    public function hasRowKeySchema()
+    {
+        return isset($this->row_key_schema);
+    }
+
+    public function clearRowKeySchema()
+    {
+        unset($this->row_key_schema);
+    }
+
+    /**
+     * The row key schema for this table. The schema is used to decode the raw row
+     * key bytes into a structured format. The order of field declarations in this
+     * schema is important, as it reflects how the raw row key bytes are
+     * structured. Currently, this only affects how the key is read via a
+     * GoogleSQL query from the ExecuteQuery API.
+     * For a SQL query, the _key column is still read as raw bytes. But queries
+     * can reference the key fields by name, which will be decoded from _key using
+     * provided type and encoding. Queries that reference key fields will fail if
+     * they encounter an invalid row key.
+     * For example, if _key = "some_id#2024-04-30#\x00\x13\x00\xf3" with the
+     * following schema:
+     * {
+     *   fields {
+     *     field_name: "id"
+     *     type { string { encoding: utf8_bytes {} } }
+     *   }
+     *   fields {
+     *     field_name: "date"
+     *     type { string { encoding: utf8_bytes {} } }
+     *   }
+     *   fields {
+     *     field_name: "product_code"
+     *     type { int64 { encoding: big_endian_bytes {} } }
+     *   }
+     *   encoding { delimited_bytes { delimiter: "#" } }
+     * }
+     * The decoded key parts would be:
+     *   id = "some_id", date = "2024-04-30", product_code = 1245427
+     * The query "SELECT _key, product_code FROM table" will return two columns:
+     * /------------------------------------------------------\
+     * |              _key                     | product_code |
+     * | --------------------------------------|--------------|
+     * | "some_id#2024-04-30#\x00\x13\x00\xf3" |   1245427    |
+     * \------------------------------------------------------/
+     * The schema has the following invariants:
+     * (1) The decoded field values are order-preserved. For read, the field
+     * values will be decoded in sorted mode from the raw bytes.
+     * (2) Every field in the schema must specify a non-empty name.
+     * (3) Every field must specify a type with an associated encoding. The type
+     * is limited to scalar types only: Array, Map, Aggregate, and Struct are not
+     * allowed.
+     * (4) The field names must not collide with existing column family
+     * names and reserved keywords "_key" and "_timestamp".
+     * The following update operations are allowed for row_key_schema:
+     * - Update from an empty schema to a new schema.
+     * - Remove the existing schema. This operation requires setting the
+     *   `ignore_warnings` flag to `true`, since it might be a backward
+     *   incompatible change. Without the flag, the update request will fail with
+     *   an INVALID_ARGUMENT error.
+     * Any other row key schema update operation (e.g. update existing schema
+     * columns names or types) is currently unsupported.
+     *
+     * Generated from protobuf field <code>.google.bigtable.admin.v2.Type.Struct row_key_schema = 15;</code>
+     * @param \Google\Cloud\Bigtable\Admin\V2\Type\Struct $var
+     * @return $this
+     */
+    public function setRowKeySchema($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\Bigtable\Admin\V2\Type\Struct::class);
+        $this->row_key_schema = $var;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAutomatedBackupConfig()
+    {
+        return $this->whichOneof("automated_backup_config");
     }
 
 }

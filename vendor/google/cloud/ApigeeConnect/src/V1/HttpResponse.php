@@ -20,25 +20,25 @@ class HttpResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string id = 1;</code>
      */
-    private $id = '';
+    protected $id = '';
     /**
      * Status of http response, e.g. "200 OK".
      *
      * Generated from protobuf field <code>string status = 2;</code>
      */
-    private $status = '';
+    protected $status = '';
     /**
      * Status code of http response, e.g. 200.
      *
      * Generated from protobuf field <code>int32 status_code = 3;</code>
      */
-    private $status_code = 0;
+    protected $status_code = 0;
     /**
      * The HTTP 1.1 response body.
      *
      * Generated from protobuf field <code>bytes body = 4;</code>
      */
-    private $body = '';
+    protected $body = '';
     /**
      * The HTTP response headers.
      *
@@ -53,7 +53,7 @@ class HttpResponse extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>int64 content_length = 6;</code>
      */
-    private $content_length = 0;
+    protected $content_length = 0;
 
     /**
      * Constructor.
@@ -69,7 +69,7 @@ class HttpResponse extends \Google\Protobuf\Internal\Message
      *           Status code of http response, e.g. 200.
      *     @type string $body
      *           The HTTP 1.1 response body.
-     *     @type \Google\Cloud\ApigeeConnect\V1\Header[]|\Google\Protobuf\Internal\RepeatedField $headers
+     *     @type array<\Google\Cloud\ApigeeConnect\V1\Header>|\Google\Protobuf\Internal\RepeatedField $headers
      *           The HTTP response headers.
      *     @type int|string $content_length
      *           Content length records the length of the associated content. The
@@ -202,7 +202,7 @@ class HttpResponse extends \Google\Protobuf\Internal\Message
      * The HTTP response headers.
      *
      * Generated from protobuf field <code>repeated .google.cloud.apigeeconnect.v1.Header headers = 5;</code>
-     * @param \Google\Cloud\ApigeeConnect\V1\Header[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\ApigeeConnect\V1\Header>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setHeaders($var)

@@ -17,17 +17,17 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The parent, which owns this collection of migration jobs.
+     * Required. The parent which owns this collection of migration jobs.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The ID of the instance to create.
      *
      * Generated from protobuf field <code>string migration_job_id = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $migration_job_id = '';
+    protected $migration_job_id = '';
     /**
      * Required. Represents a [migration
      * job](https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.migrationJobs)
@@ -35,17 +35,37 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.clouddms.v1.MigrationJob migration_job = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $migration_job = null;
+    protected $migration_job = null;
     /**
-     * A unique id used to identify the request. If the server receives two
-     * requests with the same id, then the second request will be ignored.
+     * Optional. A unique ID used to identify the request. If the server receives
+     * two requests with the same ID, then the second request is ignored.
      * It is recommended to always set this value to a UUID.
-     * The id must contain only letters (a-z, A-Z), numbers (0-9), underscores
+     * The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores
      * (_), and hyphens (-). The maximum length is 40 characters.
      *
-     * Generated from protobuf field <code>string request_id = 4;</code>
+     * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $request_id = '';
+    protected $request_id = '';
+
+    /**
+     * @param string                                 $parent         Required. The parent which owns this collection of migration jobs. Please see
+     *                                                               {@see DataMigrationServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\CloudDms\V1\MigrationJob $migrationJob   Required. Represents a [migration
+     *                                                               job](https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.migrationJobs)
+     *                                                               object.
+     * @param string                                 $migrationJobId Required. The ID of the instance to create.
+     *
+     * @return \Google\Cloud\CloudDms\V1\CreateMigrationJobRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\CloudDms\V1\MigrationJob $migrationJob, string $migrationJobId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setMigrationJob($migrationJob)
+            ->setMigrationJobId($migrationJobId);
+    }
 
     /**
      * Constructor.
@@ -54,7 +74,7 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The parent, which owns this collection of migration jobs.
+     *           Required. The parent which owns this collection of migration jobs.
      *     @type string $migration_job_id
      *           Required. The ID of the instance to create.
      *     @type \Google\Cloud\CloudDms\V1\MigrationJob $migration_job
@@ -62,10 +82,10 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
      *           job](https://cloud.google.com/database-migration/docs/reference/rest/v1/projects.locations.migrationJobs)
      *           object.
      *     @type string $request_id
-     *           A unique id used to identify the request. If the server receives two
-     *           requests with the same id, then the second request will be ignored.
+     *           Optional. A unique ID used to identify the request. If the server receives
+     *           two requests with the same ID, then the second request is ignored.
      *           It is recommended to always set this value to a UUID.
-     *           The id must contain only letters (a-z, A-Z), numbers (0-9), underscores
+     *           The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores
      *           (_), and hyphens (-). The maximum length is 40 characters.
      * }
      */
@@ -75,7 +95,7 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent, which owns this collection of migration jobs.
+     * Required. The parent which owns this collection of migration jobs.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -86,7 +106,7 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The parent, which owns this collection of migration jobs.
+     * Required. The parent which owns this collection of migration jobs.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -167,13 +187,13 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A unique id used to identify the request. If the server receives two
-     * requests with the same id, then the second request will be ignored.
+     * Optional. A unique ID used to identify the request. If the server receives
+     * two requests with the same ID, then the second request is ignored.
      * It is recommended to always set this value to a UUID.
-     * The id must contain only letters (a-z, A-Z), numbers (0-9), underscores
+     * The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores
      * (_), and hyphens (-). The maximum length is 40 characters.
      *
-     * Generated from protobuf field <code>string request_id = 4;</code>
+     * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return string
      */
     public function getRequestId()
@@ -182,13 +202,13 @@ class CreateMigrationJobRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * A unique id used to identify the request. If the server receives two
-     * requests with the same id, then the second request will be ignored.
+     * Optional. A unique ID used to identify the request. If the server receives
+     * two requests with the same ID, then the second request is ignored.
      * It is recommended to always set this value to a UUID.
-     * The id must contain only letters (a-z, A-Z), numbers (0-9), underscores
+     * The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores
      * (_), and hyphens (-). The maximum length is 40 characters.
      *
-     * Generated from protobuf field <code>string request_id = 4;</code>
+     * Generated from protobuf field <code>string request_id = 4 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param string $var
      * @return $this
      */

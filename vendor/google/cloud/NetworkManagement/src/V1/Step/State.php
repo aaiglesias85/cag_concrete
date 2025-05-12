@@ -35,6 +35,13 @@ class State
      */
     const START_FROM_INTERNET = 2;
     /**
+     * Initial state: packet originating from a Google service.
+     * The google_service information is populated.
+     *
+     * Generated from protobuf enum <code>START_FROM_GOOGLE_SERVICE = 27;</code>
+     */
+    const START_FROM_GOOGLE_SERVICE = 27;
+    /**
      * Initial state: packet originating from a VPC or on-premises network
      * with internal source IP.
      * If the source is a VPC network visible to the user, a NetworkInfo
@@ -57,6 +64,64 @@ class State
      * Generated from protobuf enum <code>START_FROM_CLOUD_SQL_INSTANCE = 22;</code>
      */
     const START_FROM_CLOUD_SQL_INSTANCE = 22;
+    /**
+     * Initial state: packet originating from a Redis instance.
+     * A RedisInstanceInfo is populated with starting instance information.
+     *
+     * Generated from protobuf enum <code>START_FROM_REDIS_INSTANCE = 32;</code>
+     */
+    const START_FROM_REDIS_INSTANCE = 32;
+    /**
+     * Initial state: packet originating from a Redis Cluster.
+     * A RedisClusterInfo is populated with starting Cluster information.
+     *
+     * Generated from protobuf enum <code>START_FROM_REDIS_CLUSTER = 33;</code>
+     */
+    const START_FROM_REDIS_CLUSTER = 33;
+    /**
+     * Initial state: packet originating from a Cloud Function.
+     * A CloudFunctionInfo is populated with starting function information.
+     *
+     * Generated from protobuf enum <code>START_FROM_CLOUD_FUNCTION = 23;</code>
+     */
+    const START_FROM_CLOUD_FUNCTION = 23;
+    /**
+     * Initial state: packet originating from an App Engine service version.
+     * An AppEngineVersionInfo is populated with starting version information.
+     *
+     * Generated from protobuf enum <code>START_FROM_APP_ENGINE_VERSION = 25;</code>
+     */
+    const START_FROM_APP_ENGINE_VERSION = 25;
+    /**
+     * Initial state: packet originating from a Cloud Run revision.
+     * A CloudRunRevisionInfo is populated with starting revision information.
+     *
+     * Generated from protobuf enum <code>START_FROM_CLOUD_RUN_REVISION = 26;</code>
+     */
+    const START_FROM_CLOUD_RUN_REVISION = 26;
+    /**
+     * Initial state: packet originating from a Storage Bucket. Used only for
+     * return traces.
+     * The storage_bucket information is populated.
+     *
+     * Generated from protobuf enum <code>START_FROM_STORAGE_BUCKET = 29;</code>
+     */
+    const START_FROM_STORAGE_BUCKET = 29;
+    /**
+     * Initial state: packet originating from a published service that uses
+     * Private Service Connect. Used only for return traces.
+     *
+     * Generated from protobuf enum <code>START_FROM_PSC_PUBLISHED_SERVICE = 30;</code>
+     */
+    const START_FROM_PSC_PUBLISHED_SERVICE = 30;
+    /**
+     * Initial state: packet originating from a serverless network endpoint
+     * group backend. Used only for return traces.
+     * The serverless_neg information is populated.
+     *
+     * Generated from protobuf enum <code>START_FROM_SERVERLESS_NEG = 31;</code>
+     */
+    const START_FROM_SERVERLESS_NEG = 31;
     /**
      * Config checking state: verify ingress firewall rule.
      *
@@ -82,6 +147,12 @@ class State
      */
     const APPLY_FORWARDING_RULE = 7;
     /**
+     * Config checking state: verify load balancer backend configuration.
+     *
+     * Generated from protobuf enum <code>ANALYZE_LOAD_BALANCER_BACKEND = 28;</code>
+     */
+    const ANALYZE_LOAD_BALANCER_BACKEND = 28;
+    /**
      * Config checking state: packet sent or received under foreign IP
      * address and allowed.
      *
@@ -97,13 +168,13 @@ class State
     /**
      * Forwarding state: arriving at a Compute Engine internal load balancer.
      *
-     * Generated from protobuf enum <code>ARRIVE_AT_INTERNAL_LOAD_BALANCER = 10;</code>
+     * Generated from protobuf enum <code>ARRIVE_AT_INTERNAL_LOAD_BALANCER = 10 [deprecated = true];</code>
      */
     const ARRIVE_AT_INTERNAL_LOAD_BALANCER = 10;
     /**
      * Forwarding state: arriving at a Compute Engine external load balancer.
      *
-     * Generated from protobuf enum <code>ARRIVE_AT_EXTERNAL_LOAD_BALANCER = 11;</code>
+     * Generated from protobuf enum <code>ARRIVE_AT_EXTERNAL_LOAD_BALANCER = 11 [deprecated = true];</code>
      */
     const ARRIVE_AT_EXTERNAL_LOAD_BALANCER = 11;
     /**
@@ -118,6 +189,12 @@ class State
      * Generated from protobuf enum <code>ARRIVE_AT_VPN_TUNNEL = 13;</code>
      */
     const ARRIVE_AT_VPN_TUNNEL = 13;
+    /**
+     * Forwarding state: arriving at a VPC connector.
+     *
+     * Generated from protobuf enum <code>ARRIVE_AT_VPC_CONNECTOR = 24;</code>
+     */
+    const ARRIVE_AT_VPC_CONNECTOR = 24;
     /**
      * Transition state: packet header translated.
      *
@@ -168,19 +245,30 @@ class State
         self::STATE_UNSPECIFIED => 'STATE_UNSPECIFIED',
         self::START_FROM_INSTANCE => 'START_FROM_INSTANCE',
         self::START_FROM_INTERNET => 'START_FROM_INTERNET',
+        self::START_FROM_GOOGLE_SERVICE => 'START_FROM_GOOGLE_SERVICE',
         self::START_FROM_PRIVATE_NETWORK => 'START_FROM_PRIVATE_NETWORK',
         self::START_FROM_GKE_MASTER => 'START_FROM_GKE_MASTER',
         self::START_FROM_CLOUD_SQL_INSTANCE => 'START_FROM_CLOUD_SQL_INSTANCE',
+        self::START_FROM_REDIS_INSTANCE => 'START_FROM_REDIS_INSTANCE',
+        self::START_FROM_REDIS_CLUSTER => 'START_FROM_REDIS_CLUSTER',
+        self::START_FROM_CLOUD_FUNCTION => 'START_FROM_CLOUD_FUNCTION',
+        self::START_FROM_APP_ENGINE_VERSION => 'START_FROM_APP_ENGINE_VERSION',
+        self::START_FROM_CLOUD_RUN_REVISION => 'START_FROM_CLOUD_RUN_REVISION',
+        self::START_FROM_STORAGE_BUCKET => 'START_FROM_STORAGE_BUCKET',
+        self::START_FROM_PSC_PUBLISHED_SERVICE => 'START_FROM_PSC_PUBLISHED_SERVICE',
+        self::START_FROM_SERVERLESS_NEG => 'START_FROM_SERVERLESS_NEG',
         self::APPLY_INGRESS_FIREWALL_RULE => 'APPLY_INGRESS_FIREWALL_RULE',
         self::APPLY_EGRESS_FIREWALL_RULE => 'APPLY_EGRESS_FIREWALL_RULE',
         self::APPLY_ROUTE => 'APPLY_ROUTE',
         self::APPLY_FORWARDING_RULE => 'APPLY_FORWARDING_RULE',
+        self::ANALYZE_LOAD_BALANCER_BACKEND => 'ANALYZE_LOAD_BALANCER_BACKEND',
         self::SPOOFING_APPROVED => 'SPOOFING_APPROVED',
         self::ARRIVE_AT_INSTANCE => 'ARRIVE_AT_INSTANCE',
         self::ARRIVE_AT_INTERNAL_LOAD_BALANCER => 'ARRIVE_AT_INTERNAL_LOAD_BALANCER',
         self::ARRIVE_AT_EXTERNAL_LOAD_BALANCER => 'ARRIVE_AT_EXTERNAL_LOAD_BALANCER',
         self::ARRIVE_AT_VPN_GATEWAY => 'ARRIVE_AT_VPN_GATEWAY',
         self::ARRIVE_AT_VPN_TUNNEL => 'ARRIVE_AT_VPN_TUNNEL',
+        self::ARRIVE_AT_VPC_CONNECTOR => 'ARRIVE_AT_VPC_CONNECTOR',
         self::NAT => 'NAT',
         self::PROXY_CONNECTION => 'PROXY_CONNECTION',
         self::DELIVER => 'DELIVER',
@@ -211,6 +299,4 @@ class State
     }
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(State::class, \Google\Cloud\NetworkManagement\V1\Step_State::class);
 

@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Environments.CreateEnvironment][google.cloud.dialogflow.v2.Environments.CreateEnvironment].
+ * The request message for
+ * [Environments.CreateEnvironment][google.cloud.dialogflow.v2.Environments.CreateEnvironment].
  *
  * Generated from protobuf message <code>google.cloud.dialogflow.v2.CreateEnvironmentRequest</code>
  */
@@ -23,19 +24,19 @@ class CreateEnvironmentRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The environment to create.
      *
      * Generated from protobuf field <code>.google.cloud.dialogflow.v2.Environment environment = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $environment = null;
+    protected $environment = null;
     /**
      * Required. The unique id of the new environment.
      *
      * Generated from protobuf field <code>string environment_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $environment_id = '';
+    protected $environment_id = '';
 
     /**
      * Constructor.

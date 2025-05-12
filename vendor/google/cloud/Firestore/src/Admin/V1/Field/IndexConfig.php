@@ -30,8 +30,8 @@ class IndexConfig extends \Google\Protobuf\Internal\Message
      */
     private $uses_ancestor_config = false;
     /**
-     * Output only. Specifies the resource name of the `Field` from which this field's
-     * index configuration is set (when `uses_ancestor_config` is true),
+     * Output only. Specifies the resource name of the `Field` from which this
+     * field's index configuration is set (when `uses_ancestor_config` is true),
      * or from which it *would* be set if this field had no index configuration
      * (when `uses_ancestor_config` is false).
      *
@@ -55,15 +55,15 @@ class IndexConfig extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Google\Cloud\Firestore\Admin\V1\Index[]|\Google\Protobuf\Internal\RepeatedField $indexes
+     *     @type array<\Google\Cloud\Firestore\Admin\V1\Index>|\Google\Protobuf\Internal\RepeatedField $indexes
      *           The indexes supported for this field.
      *     @type bool $uses_ancestor_config
      *           Output only. When true, the `Field`'s index configuration is set from the
      *           configuration specified by the `ancestor_field`.
      *           When false, the `Field`'s index configuration is defined explicitly.
      *     @type string $ancestor_field
-     *           Output only. Specifies the resource name of the `Field` from which this field's
-     *           index configuration is set (when `uses_ancestor_config` is true),
+     *           Output only. Specifies the resource name of the `Field` from which this
+     *           field's index configuration is set (when `uses_ancestor_config` is true),
      *           or from which it *would* be set if this field had no index configuration
      *           (when `uses_ancestor_config` is false).
      *     @type bool $reverting
@@ -94,7 +94,7 @@ class IndexConfig extends \Google\Protobuf\Internal\Message
      * The indexes supported for this field.
      *
      * Generated from protobuf field <code>repeated .google.firestore.admin.v1.Index indexes = 1;</code>
-     * @param \Google\Cloud\Firestore\Admin\V1\Index[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Firestore\Admin\V1\Index>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setIndexes($var)
@@ -136,8 +136,8 @@ class IndexConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Specifies the resource name of the `Field` from which this field's
-     * index configuration is set (when `uses_ancestor_config` is true),
+     * Output only. Specifies the resource name of the `Field` from which this
+     * field's index configuration is set (when `uses_ancestor_config` is true),
      * or from which it *would* be set if this field had no index configuration
      * (when `uses_ancestor_config` is false).
      *
@@ -150,8 +150,8 @@ class IndexConfig extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. Specifies the resource name of the `Field` from which this field's
-     * index configuration is set (when `uses_ancestor_config` is true),
+     * Output only. Specifies the resource name of the `Field` from which this
+     * field's index configuration is set (when `uses_ancestor_config` is true),
      * or from which it *would* be set if this field had no index configuration
      * (when `uses_ancestor_config` is false).
      *

@@ -17,38 +17,38 @@ use Google\Protobuf\Internal\GPBUtil;
 class Operation extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The server-assigned ID for the operation.
+     * Output only. The server-assigned ID for the operation.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $name = '';
+    protected $name = '';
     /**
-     * The name of the Google Compute Engine
+     * Output only. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/zones#available) in which the
      * operation is taking place. This field is deprecated, use location instead.
      *
-     * Generated from protobuf field <code>string zone = 2 [deprecated = true];</code>
+     * Generated from protobuf field <code>string zone = 2 [deprecated = true, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @deprecated
      */
     protected $zone = '';
     /**
-     * The operation type.
+     * Output only. The operation type.
      *
-     * Generated from protobuf field <code>.google.container.v1.Operation.Type operation_type = 3;</code>
+     * Generated from protobuf field <code>.google.container.v1.Operation.Type operation_type = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $operation_type = 0;
+    protected $operation_type = 0;
     /**
-     * The current status of the operation.
+     * Output only. The current status of the operation.
      *
-     * Generated from protobuf field <code>.google.container.v1.Operation.Status status = 4;</code>
+     * Generated from protobuf field <code>.google.container.v1.Operation.Status status = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $status = 0;
+    protected $status = 0;
     /**
-     * Detailed operation progress, if available.
+     * Output only. Detailed operation progress, if available.
      *
-     * Generated from protobuf field <code>string detail = 8;</code>
+     * Generated from protobuf field <code>string detail = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $detail = '';
+    protected $detail = '';
     /**
      * Output only. If an error has occurred, a textual description of the error.
      * Deprecated. Use the field error instead.
@@ -58,47 +58,58 @@ class Operation extends \Google\Protobuf\Internal\Message
      */
     protected $status_message = '';
     /**
-     * Server-defined URL for the resource.
+     * Output only. Server-defined URI for the operation. Example:
+     * `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
      *
-     * Generated from protobuf field <code>string self_link = 6;</code>
+     * Generated from protobuf field <code>string self_link = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $self_link = '';
+    protected $self_link = '';
     /**
-     * Server-defined URL for the target of the operation.
+     * Output only. Server-defined URI for the target of the operation. The format
+     * of this is a URI to the resource being modified (such as a cluster, node
+     * pool, or node). For node pool repairs, there may be multiple nodes being
+     * repaired, but only one will be the target.
+     * Examples:
+     * -
+     * ##
+     * `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster`
+     * ##
+     * `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np`
+     * `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
      *
-     * Generated from protobuf field <code>string target_link = 7;</code>
+     * Generated from protobuf field <code>string target_link = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $target_link = '';
+    protected $target_link = '';
     /**
-     * [Output only] The name of the Google Compute Engine
+     * Output only. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      * or
      * [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      * in which the cluster resides.
      *
-     * Generated from protobuf field <code>string location = 9;</code>
+     * Generated from protobuf field <code>string location = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $location = '';
+    protected $location = '';
     /**
-     * [Output only] The time the operation started, in
+     * Output only. The time the operation started, in
      * [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *
-     * Generated from protobuf field <code>string start_time = 10;</code>
+     * Generated from protobuf field <code>string start_time = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $start_time = '';
+    protected $start_time = '';
     /**
-     * [Output only] The time the operation completed, in
+     * Output only. The time the operation completed, in
      * [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *
-     * Generated from protobuf field <code>string end_time = 11;</code>
+     * Generated from protobuf field <code>string end_time = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $end_time = '';
+    protected $end_time = '';
     /**
-     * Output only. [Output only] Progress information for an operation.
+     * Output only. Progress information for an operation.
      *
      * Generated from protobuf field <code>.google.container.v1.OperationProgress progress = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      */
-    private $progress = null;
+    protected $progress = null;
     /**
      * Which conditions caused the current cluster state.
      * Deprecated. Use field error instead.
@@ -120,7 +131,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.rpc.Status error = 15;</code>
      */
-    private $error = null;
+    protected $error = null;
 
     /**
      * Constructor.
@@ -129,42 +140,53 @@ class Operation extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           The server-assigned ID for the operation.
+     *           Output only. The server-assigned ID for the operation.
      *     @type string $zone
-     *           The name of the Google Compute Engine
+     *           Output only. The name of the Google Compute Engine
      *           [zone](https://cloud.google.com/compute/docs/zones#available) in which the
      *           operation is taking place. This field is deprecated, use location instead.
      *     @type int $operation_type
-     *           The operation type.
+     *           Output only. The operation type.
      *     @type int $status
-     *           The current status of the operation.
+     *           Output only. The current status of the operation.
      *     @type string $detail
-     *           Detailed operation progress, if available.
+     *           Output only. Detailed operation progress, if available.
      *     @type string $status_message
      *           Output only. If an error has occurred, a textual description of the error.
      *           Deprecated. Use the field error instead.
      *     @type string $self_link
-     *           Server-defined URL for the resource.
+     *           Output only. Server-defined URI for the operation. Example:
+     *           `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
      *     @type string $target_link
-     *           Server-defined URL for the target of the operation.
+     *           Output only. Server-defined URI for the target of the operation. The format
+     *           of this is a URI to the resource being modified (such as a cluster, node
+     *           pool, or node). For node pool repairs, there may be multiple nodes being
+     *           repaired, but only one will be the target.
+     *           Examples:
+     *           -
+     *           ##
+     *           `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster`
+     *           ##
+     *           `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np`
+     *           `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
      *     @type string $location
-     *           [Output only] The name of the Google Compute Engine
+     *           Output only. The name of the Google Compute Engine
      *           [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      *           or
      *           [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      *           in which the cluster resides.
      *     @type string $start_time
-     *           [Output only] The time the operation started, in
+     *           Output only. The time the operation started, in
      *           [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *     @type string $end_time
-     *           [Output only] The time the operation completed, in
+     *           Output only. The time the operation completed, in
      *           [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *     @type \Google\Cloud\Container\V1\OperationProgress $progress
-     *           Output only. [Output only] Progress information for an operation.
-     *     @type \Google\Cloud\Container\V1\StatusCondition[]|\Google\Protobuf\Internal\RepeatedField $cluster_conditions
+     *           Output only. Progress information for an operation.
+     *     @type array<\Google\Cloud\Container\V1\StatusCondition>|\Google\Protobuf\Internal\RepeatedField $cluster_conditions
      *           Which conditions caused the current cluster state.
      *           Deprecated. Use field error instead.
-     *     @type \Google\Cloud\Container\V1\StatusCondition[]|\Google\Protobuf\Internal\RepeatedField $nodepool_conditions
+     *     @type array<\Google\Cloud\Container\V1\StatusCondition>|\Google\Protobuf\Internal\RepeatedField $nodepool_conditions
      *           Which conditions caused the current node pool state.
      *           Deprecated. Use field error instead.
      *     @type \Google\Rpc\Status $error
@@ -177,9 +199,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The server-assigned ID for the operation.
+     * Output only. The server-assigned ID for the operation.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getName()
@@ -188,9 +210,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The server-assigned ID for the operation.
+     * Output only. The server-assigned ID for the operation.
      *
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 1 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -203,11 +225,11 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name of the Google Compute Engine
+     * Output only. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/zones#available) in which the
      * operation is taking place. This field is deprecated, use location instead.
      *
-     * Generated from protobuf field <code>string zone = 2 [deprecated = true];</code>
+     * Generated from protobuf field <code>string zone = 2 [deprecated = true, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      * @deprecated
      */
@@ -218,11 +240,11 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The name of the Google Compute Engine
+     * Output only. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/zones#available) in which the
      * operation is taking place. This field is deprecated, use location instead.
      *
-     * Generated from protobuf field <code>string zone = 2 [deprecated = true];</code>
+     * Generated from protobuf field <code>string zone = 2 [deprecated = true, (.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      * @deprecated
@@ -237,9 +259,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The operation type.
+     * Output only. The operation type.
      *
-     * Generated from protobuf field <code>.google.container.v1.Operation.Type operation_type = 3;</code>
+     * Generated from protobuf field <code>.google.container.v1.Operation.Type operation_type = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return int
      */
     public function getOperationType()
@@ -248,9 +270,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The operation type.
+     * Output only. The operation type.
      *
-     * Generated from protobuf field <code>.google.container.v1.Operation.Type operation_type = 3;</code>
+     * Generated from protobuf field <code>.google.container.v1.Operation.Type operation_type = 3 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param int $var
      * @return $this
      */
@@ -263,9 +285,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The current status of the operation.
+     * Output only. The current status of the operation.
      *
-     * Generated from protobuf field <code>.google.container.v1.Operation.Status status = 4;</code>
+     * Generated from protobuf field <code>.google.container.v1.Operation.Status status = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return int
      */
     public function getStatus()
@@ -274,9 +296,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The current status of the operation.
+     * Output only. The current status of the operation.
      *
-     * Generated from protobuf field <code>.google.container.v1.Operation.Status status = 4;</code>
+     * Generated from protobuf field <code>.google.container.v1.Operation.Status status = 4 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param int $var
      * @return $this
      */
@@ -289,9 +311,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Detailed operation progress, if available.
+     * Output only. Detailed operation progress, if available.
      *
-     * Generated from protobuf field <code>string detail = 8;</code>
+     * Generated from protobuf field <code>string detail = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getDetail()
@@ -300,9 +322,9 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Detailed operation progress, if available.
+     * Output only. Detailed operation progress, if available.
      *
-     * Generated from protobuf field <code>string detail = 8;</code>
+     * Generated from protobuf field <code>string detail = 8 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -347,9 +369,10 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Server-defined URL for the resource.
+     * Output only. Server-defined URI for the operation. Example:
+     * `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
      *
-     * Generated from protobuf field <code>string self_link = 6;</code>
+     * Generated from protobuf field <code>string self_link = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getSelfLink()
@@ -358,9 +381,10 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Server-defined URL for the resource.
+     * Output only. Server-defined URI for the operation. Example:
+     * `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
      *
-     * Generated from protobuf field <code>string self_link = 6;</code>
+     * Generated from protobuf field <code>string self_link = 6 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -373,9 +397,19 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Server-defined URL for the target of the operation.
+     * Output only. Server-defined URI for the target of the operation. The format
+     * of this is a URI to the resource being modified (such as a cluster, node
+     * pool, or node). For node pool repairs, there may be multiple nodes being
+     * repaired, but only one will be the target.
+     * Examples:
+     * -
+     * ##
+     * `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster`
+     * ##
+     * `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np`
+     * `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
      *
-     * Generated from protobuf field <code>string target_link = 7;</code>
+     * Generated from protobuf field <code>string target_link = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getTargetLink()
@@ -384,9 +418,19 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Server-defined URL for the target of the operation.
+     * Output only. Server-defined URI for the target of the operation. The format
+     * of this is a URI to the resource being modified (such as a cluster, node
+     * pool, or node). For node pool repairs, there may be multiple nodes being
+     * repaired, but only one will be the target.
+     * Examples:
+     * -
+     * ##
+     * `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster`
+     * ##
+     * `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np`
+     * `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
      *
-     * Generated from protobuf field <code>string target_link = 7;</code>
+     * Generated from protobuf field <code>string target_link = 7 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -399,13 +443,13 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output only] The name of the Google Compute Engine
+     * Output only. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      * or
      * [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      * in which the cluster resides.
      *
-     * Generated from protobuf field <code>string location = 9;</code>
+     * Generated from protobuf field <code>string location = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getLocation()
@@ -414,13 +458,13 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output only] The name of the Google Compute Engine
+     * Output only. The name of the Google Compute Engine
      * [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      * or
      * [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available)
      * in which the cluster resides.
      *
-     * Generated from protobuf field <code>string location = 9;</code>
+     * Generated from protobuf field <code>string location = 9 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -433,10 +477,10 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output only] The time the operation started, in
+     * Output only. The time the operation started, in
      * [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *
-     * Generated from protobuf field <code>string start_time = 10;</code>
+     * Generated from protobuf field <code>string start_time = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getStartTime()
@@ -445,10 +489,10 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output only] The time the operation started, in
+     * Output only. The time the operation started, in
      * [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *
-     * Generated from protobuf field <code>string start_time = 10;</code>
+     * Generated from protobuf field <code>string start_time = 10 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -461,10 +505,10 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output only] The time the operation completed, in
+     * Output only. The time the operation completed, in
      * [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *
-     * Generated from protobuf field <code>string end_time = 11;</code>
+     * Generated from protobuf field <code>string end_time = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return string
      */
     public function getEndTime()
@@ -473,10 +517,10 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * [Output only] The time the operation completed, in
+     * Output only. The time the operation completed, in
      * [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
      *
-     * Generated from protobuf field <code>string end_time = 11;</code>
+     * Generated from protobuf field <code>string end_time = 11 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param string $var
      * @return $this
      */
@@ -489,7 +533,7 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. [Output only] Progress information for an operation.
+     * Output only. Progress information for an operation.
      *
      * Generated from protobuf field <code>.google.container.v1.OperationProgress progress = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @return \Google\Cloud\Container\V1\OperationProgress|null
@@ -510,7 +554,7 @@ class Operation extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Output only. [Output only] Progress information for an operation.
+     * Output only. Progress information for an operation.
      *
      * Generated from protobuf field <code>.google.container.v1.OperationProgress progress = 12 [(.google.api.field_behavior) = OUTPUT_ONLY];</code>
      * @param \Google\Cloud\Container\V1\OperationProgress $var
@@ -543,7 +587,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      * Deprecated. Use field error instead.
      *
      * Generated from protobuf field <code>repeated .google.container.v1.StatusCondition cluster_conditions = 13 [deprecated = true];</code>
-     * @param \Google\Cloud\Container\V1\StatusCondition[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Container\V1\StatusCondition>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */
@@ -575,7 +619,7 @@ class Operation extends \Google\Protobuf\Internal\Message
      * Deprecated. Use field error instead.
      *
      * Generated from protobuf field <code>repeated .google.container.v1.StatusCondition nodepool_conditions = 14 [deprecated = true];</code>
-     * @param \Google\Cloud\Container\V1\StatusCondition[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\Container\V1\StatusCondition>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      * @deprecated
      */

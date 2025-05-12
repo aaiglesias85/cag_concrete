@@ -20,13 +20,13 @@ class Diagnostic extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string location = 1;</code>
      */
-    private $location = '';
+    protected $location = '';
     /**
      * The diagnostic message.
      *
      * Generated from protobuf field <code>string message = 2;</code>
      */
-    private $message = '';
+    protected $message = '';
 
     /**
      * Constructor.
@@ -99,6 +99,4 @@ class Diagnostic extends \Google\Protobuf\Internal\Message
 
 }
 
-// Adding a class alias for backwards compatibility with the previous class name.
-class_alias(Diagnostic::class, \Google\Cloud\ApiGateway\V1\OperationMetadata_Diagnostic::class);
 

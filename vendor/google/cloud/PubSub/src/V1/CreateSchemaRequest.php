@@ -34,12 +34,39 @@ class CreateSchemaRequest extends \Google\Protobuf\Internal\Message
     /**
      * The ID to use for the schema, which will become the final component of
      * the schema's resource name.
-     * See https://cloud.google.com/pubsub/docs/admin#resource_names for resource
-     * name constraints.
+     * See https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names for
+     * resource name constraints.
      *
      * Generated from protobuf field <code>string schema_id = 3;</code>
      */
     private $schema_id = '';
+
+    /**
+     * @param string                         $parent   Required. The name of the project in which to create the schema.
+     *                                                 Format is `projects/{project-id}`. Please see
+     *                                                 {@see SchemaServiceClient::projectName()} for help formatting this field.
+     * @param \Google\Cloud\PubSub\V1\Schema $schema   Required. The schema object to create.
+     *
+     *                                                 This schema's `name` parameter is ignored. The schema object returned
+     *                                                 by CreateSchema will have a `name` made using the given `parent` and
+     *                                                 `schema_id`.
+     * @param string                         $schemaId The ID to use for the schema, which will become the final component of
+     *                                                 the schema's resource name.
+     *
+     *                                                 See https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names for
+     *                                                 resource name constraints.
+     *
+     * @return \Google\Cloud\PubSub\V1\CreateSchemaRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\PubSub\V1\Schema $schema, string $schemaId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setSchema($schema)
+            ->setSchemaId($schemaId);
+    }
 
     /**
      * Constructor.
@@ -58,8 +85,8 @@ class CreateSchemaRequest extends \Google\Protobuf\Internal\Message
      *     @type string $schema_id
      *           The ID to use for the schema, which will become the final component of
      *           the schema's resource name.
-     *           See https://cloud.google.com/pubsub/docs/admin#resource_names for resource
-     *           name constraints.
+     *           See https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names for
+     *           resource name constraints.
      * }
      */
     public function __construct($data = NULL) {
@@ -140,8 +167,8 @@ class CreateSchemaRequest extends \Google\Protobuf\Internal\Message
     /**
      * The ID to use for the schema, which will become the final component of
      * the schema's resource name.
-     * See https://cloud.google.com/pubsub/docs/admin#resource_names for resource
-     * name constraints.
+     * See https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names for
+     * resource name constraints.
      *
      * Generated from protobuf field <code>string schema_id = 3;</code>
      * @return string
@@ -154,8 +181,8 @@ class CreateSchemaRequest extends \Google\Protobuf\Internal\Message
     /**
      * The ID to use for the schema, which will become the final component of
      * the schema's resource name.
-     * See https://cloud.google.com/pubsub/docs/admin#resource_names for resource
-     * name constraints.
+     * See https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names for
+     * resource name constraints.
      *
      * Generated from protobuf field <code>string schema_id = 3;</code>
      * @param string $var

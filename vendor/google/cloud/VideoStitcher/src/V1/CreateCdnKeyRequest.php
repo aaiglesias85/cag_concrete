@@ -16,28 +16,52 @@ use Google\Protobuf\Internal\GPBUtil;
 class CreateCdnKeyRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Required. The project in which the CDN key should be created, in the form of
-     * `projects/{project_number}/locations/{location}`.
+     * Required. The project in which the CDN key should be created, in the form
+     * of `projects/{project_number}/locations/{location}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The CDN key resource to create.
      *
      * Generated from protobuf field <code>.google.cloud.video.stitcher.v1.CdnKey cdn_key = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $cdn_key = null;
+    protected $cdn_key = null;
     /**
-     * Required. The ID to use for the CDN key, which will become the final component of
-     * the CDN key's resource name.
+     * Required. The ID to use for the CDN key, which will become the final
+     * component of the CDN key's resource name.
      * This value should conform to RFC-1034, which restricts to
      * lower-case letters, numbers, and hyphen, with the first character a
      * letter, the last a letter or a number, and a 63 character maximum.
      *
      * Generated from protobuf field <code>string cdn_key_id = 3 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $cdn_key_id = '';
+    protected $cdn_key_id = '';
+
+    /**
+     * @param string                                 $parent   Required. The project in which the CDN key should be created, in the form
+     *                                                         of `projects/{project_number}/locations/{location}`. Please see
+     *                                                         {@see VideoStitcherServiceClient::locationName()} for help formatting this field.
+     * @param \Google\Cloud\Video\Stitcher\V1\CdnKey $cdnKey   Required. The CDN key resource to create.
+     * @param string                                 $cdnKeyId Required. The ID to use for the CDN key, which will become the final
+     *                                                         component of the CDN key's resource name.
+     *
+     *                                                         This value should conform to RFC-1034, which restricts to
+     *                                                         lower-case letters, numbers, and hyphen, with the first character a
+     *                                                         letter, the last a letter or a number, and a 63 character maximum.
+     *
+     * @return \Google\Cloud\Video\Stitcher\V1\CreateCdnKeyRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\Video\Stitcher\V1\CdnKey $cdnKey, string $cdnKeyId): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setCdnKey($cdnKey)
+            ->setCdnKeyId($cdnKeyId);
+    }
 
     /**
      * Constructor.
@@ -46,13 +70,13 @@ class CreateCdnKeyRequest extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $parent
-     *           Required. The project in which the CDN key should be created, in the form of
-     *           `projects/{project_number}/locations/{location}`.
+     *           Required. The project in which the CDN key should be created, in the form
+     *           of `projects/{project_number}/locations/{location}`.
      *     @type \Google\Cloud\Video\Stitcher\V1\CdnKey $cdn_key
      *           Required. The CDN key resource to create.
      *     @type string $cdn_key_id
-     *           Required. The ID to use for the CDN key, which will become the final component of
-     *           the CDN key's resource name.
+     *           Required. The ID to use for the CDN key, which will become the final
+     *           component of the CDN key's resource name.
      *           This value should conform to RFC-1034, which restricts to
      *           lower-case letters, numbers, and hyphen, with the first character a
      *           letter, the last a letter or a number, and a 63 character maximum.
@@ -64,8 +88,8 @@ class CreateCdnKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The project in which the CDN key should be created, in the form of
-     * `projects/{project_number}/locations/{location}`.
+     * Required. The project in which the CDN key should be created, in the form
+     * of `projects/{project_number}/locations/{location}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @return string
@@ -76,8 +100,8 @@ class CreateCdnKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The project in which the CDN key should be created, in the form of
-     * `projects/{project_number}/locations/{location}`.
+     * Required. The project in which the CDN key should be created, in the form
+     * of `projects/{project_number}/locations/{location}`.
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      * @param string $var
@@ -128,8 +152,8 @@ class CreateCdnKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the CDN key, which will become the final component of
-     * the CDN key's resource name.
+     * Required. The ID to use for the CDN key, which will become the final
+     * component of the CDN key's resource name.
      * This value should conform to RFC-1034, which restricts to
      * lower-case letters, numbers, and hyphen, with the first character a
      * letter, the last a letter or a number, and a 63 character maximum.
@@ -143,8 +167,8 @@ class CreateCdnKeyRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The ID to use for the CDN key, which will become the final component of
-     * the CDN key's resource name.
+     * Required. The ID to use for the CDN key, which will become the final
+     * component of the CDN key's resource name.
      * This value should conform to RFC-1034, which restricts to
      * lower-case letters, numbers, and hyphen, with the first character a
      * letter, the last a letter or a number, and a 63 character maximum.

@@ -9,10 +9,11 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Deprecated: Use [ShipmentRoute.transitions][] instead.
- * Travel between each visit, along the route: from the
- * vehicle's `start_location` to the first visit's `arrival_location`, then
- * from the first visit's `departure_location` to the second visit's
+ * Deprecated: Use
+ * [ShipmentRoute.Transition][google.cloud.optimization.v1.ShipmentRoute.Transition]
+ * instead. Travel between each visit along the route: from the vehicle's
+ * `start_location` to the first visit's `arrival_location`, then from the
+ * first visit's `departure_location` to the second visit's
  * `arrival_location`, and so on until the vehicle's `end_location`. This
  * accounts only for the actual travel between visits, not counting the
  * waiting time, the time spent performing a visit, nor the distance covered
@@ -21,6 +22,7 @@ use Google\Protobuf\Internal\GPBUtil;
  * If the vehicle does not have a start_ and/or end_location, the
  * corresponding travel metrics are 0 and/or empty.
  *
+ * @deprecated
  * Generated from protobuf message <code>google.cloud.optimization.v1.ShipmentRoute.TravelStep</code>
  */
 class TravelStep extends \Google\Protobuf\Internal\Message
@@ -30,13 +32,13 @@ class TravelStep extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration duration = 1;</code>
      */
-    private $duration = null;
+    protected $duration = null;
     /**
      * Distance traveled during the step.
      *
      * Generated from protobuf field <code>double distance_meters = 2;</code>
      */
-    private $distance_meters = 0.0;
+    protected $distance_meters = 0.0;
     /**
      * When traffic is requested via
      * [OptimizeToursRequest.consider_road_traffic][google.cloud.optimization.v1.OptimizeToursRequest.consider_road_traffic],
@@ -46,7 +48,7 @@ class TravelStep extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool traffic_info_unavailable = 3;</code>
      */
-    private $traffic_info_unavailable = false;
+    protected $traffic_info_unavailable = false;
     /**
      * The encoded polyline representation of the route followed during the
      * step.
@@ -56,7 +58,7 @@ class TravelStep extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.optimization.v1.ShipmentRoute.EncodedPolyline route_polyline = 4;</code>
      */
-    private $route_polyline = null;
+    protected $route_polyline = null;
 
     /**
      * Constructor.

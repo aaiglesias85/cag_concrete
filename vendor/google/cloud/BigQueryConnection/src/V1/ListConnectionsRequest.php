@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request for [ConnectionService.ListConnections][google.cloud.bigquery.connection.v1.ConnectionService.ListConnections].
+ * The request for
+ * [ConnectionService.ListConnections][google.cloud.bigquery.connection.v1.ConnectionService.ListConnections].
  *
  * Generated from protobuf message <code>google.cloud.bigquery.connection.v1.ListConnectionsRequest</code>
  */
@@ -21,19 +22,34 @@ class ListConnectionsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. Page size.
      *
      * Generated from protobuf field <code>int32 page_size = 4 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * Page token.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
+
+    /**
+     * @param string $parent Required. Parent resource name.
+     *                       Must be in the form: `projects/{project_id}/locations/{location_id}`
+     *                       Please see {@see ConnectionServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\BigQuery\Connection\V1\ListConnectionsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.

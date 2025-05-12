@@ -28,7 +28,7 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * documentation](https://cloud.google.com/speech-to-text/quotas) for usage
      * limits.
      *
-     * Generated from protobuf field <code>repeated string phrases = 1;</code>
+     * Generated from protobuf field <code>repeated string phrases = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
     private $phrases;
     /**
@@ -40,9 +40,9 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * Dialogflow recommends that you use boosts in the range (0, 20] and that you
      * find a value that fits your use case with binary search.
      *
-     * Generated from protobuf field <code>float boost = 2;</code>
+     * Generated from protobuf field <code>float boost = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      */
-    private $boost = 0.0;
+    protected $boost = 0.0;
 
     /**
      * Constructor.
@@ -50,7 +50,7 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $phrases
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $phrases
      *           Optional. A list of strings containing words and phrases that the speech
      *           recognizer should recognize with higher likelihood.
      *           This list can be used to:
@@ -88,7 +88,7 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * documentation](https://cloud.google.com/speech-to-text/quotas) for usage
      * limits.
      *
-     * Generated from protobuf field <code>repeated string phrases = 1;</code>
+     * Generated from protobuf field <code>repeated string phrases = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getPhrases()
@@ -108,8 +108,8 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * documentation](https://cloud.google.com/speech-to-text/quotas) for usage
      * limits.
      *
-     * Generated from protobuf field <code>repeated string phrases = 1;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated string phrases = 1 [(.google.api.field_behavior) = OPTIONAL];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPhrases($var)
@@ -129,7 +129,7 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * Dialogflow recommends that you use boosts in the range (0, 20] and that you
      * find a value that fits your use case with binary search.
      *
-     * Generated from protobuf field <code>float boost = 2;</code>
+     * Generated from protobuf field <code>float boost = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @return float
      */
     public function getBoost()
@@ -146,7 +146,7 @@ class SpeechContext extends \Google\Protobuf\Internal\Message
      * Dialogflow recommends that you use boosts in the range (0, 20] and that you
      * find a value that fits your use case with binary search.
      *
-     * Generated from protobuf field <code>float boost = 2;</code>
+     * Generated from protobuf field <code>float boost = 2 [(.google.api.field_behavior) = OPTIONAL];</code>
      * @param float $var
      * @return $this
      */

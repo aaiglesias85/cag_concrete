@@ -9,7 +9,9 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Request for [HubService.ListHubs][google.cloud.networkconnectivity.v1.HubService.ListHubs] method.
+ * Request for
+ * [HubService.ListHubs][google.cloud.networkconnectivity.v1.HubService.ListHubs]
+ * method.
  *
  * Generated from protobuf message <code>google.cloud.networkconnectivity.v1.ListHubsRequest</code>
  */
@@ -20,31 +22,45 @@ class ListHubsRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
-     * The maximum number of results per page that should be returned.
+     * The maximum number of results per page to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      */
-    private $page_size = 0;
+    protected $page_size = 0;
     /**
      * The page token.
      *
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
-    private $page_token = '';
+    protected $page_token = '';
     /**
-     * An expression that filters the results listed in the response.
+     * An expression that filters the list of results.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      */
-    private $filter = '';
+    protected $filter = '';
     /**
      * Sort the results by a certain order.
      *
      * Generated from protobuf field <code>string order_by = 5;</code>
      */
-    private $order_by = '';
+    protected $order_by = '';
+
+    /**
+     * @param string $parent Required. The parent resource's name. Please see
+     *                       {@see HubServiceClient::locationName()} for help formatting this field.
+     *
+     * @return \Google\Cloud\NetworkConnectivity\V1\ListHubsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent): self
+    {
+        return (new self())
+            ->setParent($parent);
+    }
 
     /**
      * Constructor.
@@ -55,11 +71,11 @@ class ListHubsRequest extends \Google\Protobuf\Internal\Message
      *     @type string $parent
      *           Required. The parent resource's name.
      *     @type int $page_size
-     *           The maximum number of results per page that should be returned.
+     *           The maximum number of results per page to return.
      *     @type string $page_token
      *           The page token.
      *     @type string $filter
-     *           An expression that filters the results listed in the response.
+     *           An expression that filters the list of results.
      *     @type string $order_by
      *           Sort the results by a certain order.
      * }
@@ -96,7 +112,7 @@ class ListHubsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The maximum number of results per page that should be returned.
+     * The maximum number of results per page to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      * @return int
@@ -107,7 +123,7 @@ class ListHubsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The maximum number of results per page that should be returned.
+     * The maximum number of results per page to return.
      *
      * Generated from protobuf field <code>int32 page_size = 2;</code>
      * @param int $var
@@ -148,7 +164,7 @@ class ListHubsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * An expression that filters the results listed in the response.
+     * An expression that filters the list of results.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      * @return string
@@ -159,7 +175,7 @@ class ListHubsRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * An expression that filters the results listed in the response.
+     * An expression that filters the list of results.
      *
      * Generated from protobuf field <code>string filter = 4;</code>
      * @param string $var

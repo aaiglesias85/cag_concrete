@@ -21,13 +21,30 @@ class CreateCatalogItemRequest extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string parent = 1 [(.google.api.field_behavior) = REQUIRED, (.google.api.resource_reference) = {</code>
      */
-    private $parent = '';
+    protected $parent = '';
     /**
      * Required. The catalog item to create.
      *
      * Generated from protobuf field <code>.google.cloud.recommendationengine.v1beta1.CatalogItem catalog_item = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $catalog_item = null;
+    protected $catalog_item = null;
+
+    /**
+     * @param string                                                 $parent      Required. The parent catalog resource name, such as
+     *                                                                            `projects/&#42;/locations/global/catalogs/default_catalog`. Please see
+     *                                                                            {@see CatalogServiceClient::catalogName()} for help formatting this field.
+     * @param \Google\Cloud\RecommendationEngine\V1beta1\CatalogItem $catalogItem Required. The catalog item to create.
+     *
+     * @return \Google\Cloud\RecommendationEngine\V1beta1\CreateCatalogItemRequest
+     *
+     * @experimental
+     */
+    public static function build(string $parent, \Google\Cloud\RecommendationEngine\V1beta1\CatalogItem $catalogItem): self
+    {
+        return (new self())
+            ->setParent($parent)
+            ->setCatalogItem($catalogItem);
+    }
 
     /**
      * Constructor.

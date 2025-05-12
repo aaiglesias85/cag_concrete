@@ -23,11 +23,11 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string container_name = 1;</code>
      */
-    private $container_name = '';
+    protected $container_name = '';
     /**
-     * Required. The URI to pull the container image from. Note that all images referenced
-     * by actions in the pipeline are pulled before the first action runs. If
-     * multiple actions reference the same image, it is only pulled once,
+     * Required. The URI to pull the container image from. Note that all images
+     * referenced by actions in the pipeline are pulled before the first action
+     * runs. If multiple actions reference the same image, it is only pulled once,
      * ensuring that the same image is used for all actions in a single pipeline.
      * The image URI can be either a complete host and image specification (e.g.,
      * quay.io/biocontainers/samtools), a library and image name (e.g.,
@@ -36,11 +36,12 @@ class Action extends \Google\Protobuf\Internal\Message
      * If the specified image is not public, the service account specified for
      * the Virtual Machine must have access to pull the images from GCR, or
      * appropriate credentials must be specified in the
-     * [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials] field.
+     * [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials]
+     * field.
      *
      * Generated from protobuf field <code>string image_uri = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      */
-    private $image_uri = '';
+    protected $image_uri = '';
     /**
      * If specified, overrides the `CMD` specified in the container. If the
      * container also has an `ENTRYPOINT` the values are used as entrypoint
@@ -55,10 +56,11 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>string entrypoint = 4;</code>
      */
-    private $entrypoint = '';
+    protected $entrypoint = '';
     /**
      * The environment to pass into the container. This environment is merged
-     * with values specified in the [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     * with values specified in the
+     * [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
      * message, overwriting any duplicate values.
      * In addition to the values passed here, a few other values are
      * automatically injected into the environment. These cannot be hidden or
@@ -75,13 +77,26 @@ class Action extends \Google\Protobuf\Internal\Message
      */
     private $environment;
     /**
+     * The encrypted environment to pass into the container. This environment is
+     * merged with values specified in the
+     * [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     * message, overwriting any duplicate values.
+     * The secret must decrypt to a JSON-encoded dictionary where key-value pairs
+     * serve as environment variable names and their values. The decoded
+     * environment variables can overwrite the values specified by the
+     * `environment` field.
+     *
+     * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.Secret encrypted_environment = 21;</code>
+     */
+    protected $encrypted_environment = null;
+    /**
      * An optional identifier for a PID namespace to run the action inside.
      * Multiple actions should use the same string to share a namespace.  If
      * unspecified, a separate isolated namespace is used.
      *
      * Generated from protobuf field <code>string pid_namespace = 6;</code>
      */
-    private $pid_namespace = '';
+    protected $pid_namespace = '';
     /**
      * A map of containers to host port mappings for this container. If the
      * container already specifies exposed ports, use the
@@ -131,7 +146,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.Secret credentials = 11;</code>
      */
-    private $credentials = null;
+    protected $credentials = null;
     /**
      * The maximum amount of time to give the action to complete. If the action
      * fails to complete before the timeout, it will be terminated and the exit
@@ -140,14 +155,14 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Duration timeout = 12;</code>
      */
-    private $timeout = null;
+    protected $timeout = null;
     /**
      * Normally, a non-zero exit status causes the pipeline to fail. This flag
      * allows execution of other actions to continue instead.
      *
      * Generated from protobuf field <code>bool ignore_exit_status = 13;</code>
      */
-    private $ignore_exit_status = false;
+    protected $ignore_exit_status = false;
     /**
      * This flag allows an action to continue running in the background while
      * executing subsequent actions. This is useful to provide services to
@@ -155,7 +170,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool run_in_background = 14;</code>
      */
-    private $run_in_background = false;
+    protected $run_in_background = false;
     /**
      * By default, after an action fails, no further actions are run. This flag
      * indicates that this action must be run even if the pipeline has already
@@ -165,7 +180,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool always_run = 15;</code>
      */
-    private $always_run = false;
+    protected $always_run = false;
     /**
      * Enable access to the FUSE device for this action. Filesystems can then
      * be mounted into disks shared with other actions. The other actions do
@@ -176,7 +191,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool enable_fuse = 16;</code>
      */
-    private $enable_fuse = false;
+    protected $enable_fuse = false;
     /**
      * Exposes all ports specified by `EXPOSE` statements in the container. To
      * discover the host side port numbers, consult the `ACTION_STARTED` event
@@ -184,7 +199,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool publish_exposed_ports = 17;</code>
      */
-    private $publish_exposed_ports = false;
+    protected $publish_exposed_ports = false;
     /**
      * All container images are typically downloaded before any actions are
      * executed. This helps prevent typos in URIs or issues like lack of disk
@@ -194,7 +209,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool disable_image_prefetch = 18;</code>
      */
-    private $disable_image_prefetch = false;
+    protected $disable_image_prefetch = false;
     /**
      * A small portion of the container's standard error stream is typically
      * captured and returned inside the `ContainerStoppedEvent`. Setting this
@@ -202,13 +217,13 @@ class Action extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>bool disable_standard_error_capture = 19;</code>
      */
-    private $disable_standard_error_capture = false;
+    protected $disable_standard_error_capture = false;
     /**
      * Prevents the container from accessing the external network.
      *
      * Generated from protobuf field <code>bool block_external_network = 20;</code>
      */
-    private $block_external_network = false;
+    protected $block_external_network = false;
 
     /**
      * Constructor.
@@ -222,9 +237,9 @@ class Action extends \Google\Protobuf\Internal\Message
      *           must contain only upper and lowercase alphanumeric characters and hyphens
      *           and cannot start with a hyphen.
      *     @type string $image_uri
-     *           Required. The URI to pull the container image from. Note that all images referenced
-     *           by actions in the pipeline are pulled before the first action runs. If
-     *           multiple actions reference the same image, it is only pulled once,
+     *           Required. The URI to pull the container image from. Note that all images
+     *           referenced by actions in the pipeline are pulled before the first action
+     *           runs. If multiple actions reference the same image, it is only pulled once,
      *           ensuring that the same image is used for all actions in a single pipeline.
      *           The image URI can be either a complete host and image specification (e.g.,
      *           quay.io/biocontainers/samtools), a library and image name (e.g.,
@@ -233,8 +248,9 @@ class Action extends \Google\Protobuf\Internal\Message
      *           If the specified image is not public, the service account specified for
      *           the Virtual Machine must have access to pull the images from GCR, or
      *           appropriate credentials must be specified in the
-     *           [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials] field.
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $commands
+     *           [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials]
+     *           field.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $commands
      *           If specified, overrides the `CMD` specified in the container. If the
      *           container also has an `ENTRYPOINT` the values are used as entrypoint
      *           arguments. Otherwise, they are used as a command and arguments to run
@@ -243,7 +259,8 @@ class Action extends \Google\Protobuf\Internal\Message
      *           If specified, overrides the `ENTRYPOINT` specified in the container.
      *     @type array|\Google\Protobuf\Internal\MapField $environment
      *           The environment to pass into the container. This environment is merged
-     *           with values specified in the [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     *           with values specified in the
+     *           [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
      *           message, overwriting any duplicate values.
      *           In addition to the values passed here, a few other values are
      *           automatically injected into the environment. These cannot be hidden or
@@ -255,6 +272,15 @@ class Action extends \Google\Protobuf\Internal\Message
      *           `GOOGLE_LAST_EXIT_STATUS` will be set to the exit status of the last
      *           non-background action that executed. This can be used by workflow engine
      *           authors to determine whether an individual action has succeeded or failed.
+     *     @type \Google\Cloud\LifeSciences\V2beta\Secret $encrypted_environment
+     *           The encrypted environment to pass into the container. This environment is
+     *           merged with values specified in the
+     *           [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     *           message, overwriting any duplicate values.
+     *           The secret must decrypt to a JSON-encoded dictionary where key-value pairs
+     *           serve as environment variable names and their values. The decoded
+     *           environment variables can overwrite the values specified by the
+     *           `environment` field.
      *     @type string $pid_namespace
      *           An optional identifier for a PID namespace to run the action inside.
      *           Multiple actions should use the same string to share a namespace.  If
@@ -266,7 +292,7 @@ class Action extends \Google\Protobuf\Internal\Message
      *           The host port number must be less than 65536. If it is zero, an unused
      *           random port is assigned. To determine the resulting port number, consult
      *           the `ContainerStartedEvent` in the operation metadata.
-     *     @type \Google\Cloud\LifeSciences\V2beta\Mount[]|\Google\Protobuf\Internal\RepeatedField $mounts
+     *     @type array<\Google\Cloud\LifeSciences\V2beta\Mount>|\Google\Protobuf\Internal\RepeatedField $mounts
      *           A list of mounts to make available to the action.
      *           In addition to the values specified here, every action has a special
      *           virtual disk mounted under `/google` that contains log files and other
@@ -374,9 +400,9 @@ class Action extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The URI to pull the container image from. Note that all images referenced
-     * by actions in the pipeline are pulled before the first action runs. If
-     * multiple actions reference the same image, it is only pulled once,
+     * Required. The URI to pull the container image from. Note that all images
+     * referenced by actions in the pipeline are pulled before the first action
+     * runs. If multiple actions reference the same image, it is only pulled once,
      * ensuring that the same image is used for all actions in a single pipeline.
      * The image URI can be either a complete host and image specification (e.g.,
      * quay.io/biocontainers/samtools), a library and image name (e.g.,
@@ -385,7 +411,8 @@ class Action extends \Google\Protobuf\Internal\Message
      * If the specified image is not public, the service account specified for
      * the Virtual Machine must have access to pull the images from GCR, or
      * appropriate credentials must be specified in the
-     * [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials] field.
+     * [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials]
+     * field.
      *
      * Generated from protobuf field <code>string image_uri = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @return string
@@ -396,9 +423,9 @@ class Action extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Required. The URI to pull the container image from. Note that all images referenced
-     * by actions in the pipeline are pulled before the first action runs. If
-     * multiple actions reference the same image, it is only pulled once,
+     * Required. The URI to pull the container image from. Note that all images
+     * referenced by actions in the pipeline are pulled before the first action
+     * runs. If multiple actions reference the same image, it is only pulled once,
      * ensuring that the same image is used for all actions in a single pipeline.
      * The image URI can be either a complete host and image specification (e.g.,
      * quay.io/biocontainers/samtools), a library and image name (e.g.,
@@ -407,7 +434,8 @@ class Action extends \Google\Protobuf\Internal\Message
      * If the specified image is not public, the service account specified for
      * the Virtual Machine must have access to pull the images from GCR, or
      * appropriate credentials must be specified in the
-     * [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials] field.
+     * [google.cloud.lifesciences.v2beta.Action.credentials][google.cloud.lifesciences.v2beta.Action.credentials]
+     * field.
      *
      * Generated from protobuf field <code>string image_uri = 2 [(.google.api.field_behavior) = REQUIRED];</code>
      * @param string $var
@@ -442,7 +470,7 @@ class Action extends \Google\Protobuf\Internal\Message
      * inside the container.
      *
      * Generated from protobuf field <code>repeated string commands = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setCommands($var)
@@ -481,7 +509,8 @@ class Action extends \Google\Protobuf\Internal\Message
 
     /**
      * The environment to pass into the container. This environment is merged
-     * with values specified in the [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     * with values specified in the
+     * [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
      * message, overwriting any duplicate values.
      * In addition to the values passed here, a few other values are
      * automatically injected into the environment. These cannot be hidden or
@@ -504,7 +533,8 @@ class Action extends \Google\Protobuf\Internal\Message
 
     /**
      * The environment to pass into the container. This environment is merged
-     * with values specified in the [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     * with values specified in the
+     * [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
      * message, overwriting any duplicate values.
      * In addition to the values passed here, a few other values are
      * automatically injected into the environment. These cannot be hidden or
@@ -525,6 +555,56 @@ class Action extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->environment = $arr;
+
+        return $this;
+    }
+
+    /**
+     * The encrypted environment to pass into the container. This environment is
+     * merged with values specified in the
+     * [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     * message, overwriting any duplicate values.
+     * The secret must decrypt to a JSON-encoded dictionary where key-value pairs
+     * serve as environment variable names and their values. The decoded
+     * environment variables can overwrite the values specified by the
+     * `environment` field.
+     *
+     * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.Secret encrypted_environment = 21;</code>
+     * @return \Google\Cloud\LifeSciences\V2beta\Secret|null
+     */
+    public function getEncryptedEnvironment()
+    {
+        return $this->encrypted_environment;
+    }
+
+    public function hasEncryptedEnvironment()
+    {
+        return isset($this->encrypted_environment);
+    }
+
+    public function clearEncryptedEnvironment()
+    {
+        unset($this->encrypted_environment);
+    }
+
+    /**
+     * The encrypted environment to pass into the container. This environment is
+     * merged with values specified in the
+     * [google.cloud.lifesciences.v2beta.Pipeline][google.cloud.lifesciences.v2beta.Pipeline]
+     * message, overwriting any duplicate values.
+     * The secret must decrypt to a JSON-encoded dictionary where key-value pairs
+     * serve as environment variable names and their values. The decoded
+     * environment variables can overwrite the values specified by the
+     * `environment` field.
+     *
+     * Generated from protobuf field <code>.google.cloud.lifesciences.v2beta.Secret encrypted_environment = 21;</code>
+     * @param \Google\Cloud\LifeSciences\V2beta\Secret $var
+     * @return $this
+     */
+    public function setEncryptedEnvironment($var)
+    {
+        GPBUtil::checkMessage($var, \Google\Cloud\LifeSciences\V2beta\Secret::class);
+        $this->encrypted_environment = $var;
 
         return $this;
     }
@@ -638,7 +718,7 @@ class Action extends \Google\Protobuf\Internal\Message
      * </ul>
      *
      * Generated from protobuf field <code>repeated .google.cloud.lifesciences.v2beta.Mount mounts = 9;</code>
-     * @param \Google\Cloud\LifeSciences\V2beta\Mount[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @param array<\Google\Cloud\LifeSciences\V2beta\Mount>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setMounts($var)

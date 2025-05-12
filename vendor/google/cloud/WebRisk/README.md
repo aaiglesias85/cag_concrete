@@ -4,7 +4,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/google/cloud-web-risk/v/stable)](https://packagist.org/packages/google/cloud-web-risk) [![Packagist](https://img.shields.io/packagist/dm/google/cloud-web-risk.svg)](https://packagist.org/packages/google/cloud-web-risk)
 
-* [API documentation](http://googleapis.github.io/google-cloud-php/#/docs/cloud-web-risk/latest/webrisk/readme)
+* [API documentation](https://cloud.google.com/php/docs/reference/cloud-web-risk/latest)
 
 **NOTE:** This repository is part of [Google Cloud PHP](https://github.com/googleapis/google-cloud-php). Any
 support requests, bug reports, or development contributions should be directed to
@@ -14,16 +14,10 @@ that project.
 
 Install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-web-risk
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 This component supports both REST over HTTP/1.1 and gRPC. In order to take advantage of the benefits offered by gRPC (such as streaming methods)
@@ -56,6 +50,11 @@ if ($threats) {
     }
 }
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 
