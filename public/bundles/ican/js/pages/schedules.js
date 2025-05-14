@@ -111,7 +111,7 @@ var Schedules = function () {
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            hiddenDays: [0], // 0 = domingo
+            // hiddenDays: [0], // 0 = domingo
             height: 800,
             contentHeight: 780,
             aspectRatio: 3,  // see: https://fullcalendar.io/docs/aspectRatio

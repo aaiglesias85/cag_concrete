@@ -320,9 +320,11 @@ class ScheduleService extends Base
         $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
         foreach ($periodo as $dia) {
 
+            /*
             if ($dia->format('w') === '0') {
                 continue; // Saltar domingos
             }
+            */
 
             $day = \DateTime::createFromFormat('Y-m-d H:i', $dia->format('Y-m-d') . ' ' . $hour);
 
