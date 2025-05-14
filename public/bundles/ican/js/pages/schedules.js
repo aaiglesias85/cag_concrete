@@ -6,7 +6,7 @@ var Schedules = function () {
     // calendario
     var calendar = null;
     var schedules = [];
-    var mostrar_calendario = false;
+    var mostrar_calendario = true;
     var initAccionesCalendario = function () {
 
         $(document).off('click', "#btn-calendario");
@@ -1187,6 +1187,9 @@ var Schedules = function () {
             initAccionChange();
 
             initAccionesCalendario();
+
+            // listar calendario
+            listarCalendario();
         }
 
     };
