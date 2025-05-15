@@ -281,7 +281,8 @@ class ScheduleRepository extends EntityRepository
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy("s.day", 'ASC');
+        $consulta->orderBy("s.day", 'ASC')
+            ->addOrderBy("p.projectNumber", 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
