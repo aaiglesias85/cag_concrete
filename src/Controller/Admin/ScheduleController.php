@@ -130,14 +130,14 @@ class ScheduleController extends AbstractController
         $vendor_id = $request->get('vendor_id');
         $concrete_vendor_contacts_id = $request->get('concrete_vendor_contacts_id');
 
-        $hour = $request->get('hour');
+        $hours = $request->get('hour');
         $quantity = $request->get('quantity');
         $notes = $request->get('notes');
 
         try {
 
             $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
-                $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes);
+                $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes);
 
             if ($resultado['success']) {
 

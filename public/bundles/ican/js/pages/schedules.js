@@ -162,14 +162,26 @@ var Schedules = function () {
 
                     } else if (element.hasClass('fc-time-grid-event')) {
 
-                        element.find('.fc-title').append('<div class="fc-description">' + content + '</div>');
+                        element.data('content', content);
+                        element.data('placement', 'top');
+
+                        element.popover({trigger: 'hover', html: true});
+
+                        /*element.find('.fc-title').append('<div class="fc-description">' + content + '</div>');
                         element.css({
                             height: '150px',
                             overflow: 'auto'
                         });
 
+                         */
+
                     } else if (element.find('.fc-list-item-title').lenght !== 0) {
-                        element.find('.fc-list-item-title').append('<div class="fc-description">' + content + '</div>');
+                        // element.find('.fc-list-item-title').append('<div class="fc-description">' + content + '</div>');
+
+                        element.data('content', content);
+                        element.data('placement', 'top');
+
+                        element.popover({trigger: 'hover', html: true});
                     }
                 }
             }
@@ -391,11 +403,25 @@ var Schedules = function () {
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
 
+        $('#schedule-form textarea').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+
         $('#project').val('');
         $('#project').trigger('change');
 
         $('#concrete-vendor').val('');
         $('#concrete-vendor').trigger('change');
+
+        $('#hour').attr('multiple', '');
+        $('#hour').select2();
+
+        $('#hour').val([]);
+        $('#hour').trigger('change');
 
         // reset
         $('#contact-project option').each(function (e) {
@@ -500,47 +526,199 @@ var Schedules = function () {
 
             event_change = false;
 
-            var project_id = $('#project').val();
-            var hour = $('#hour').val();
-
-            if ($('#schedule-form').valid() && project_id !== '' && hour !== '' && isValidFechas()) {
-
-                var schedule_id = $('#schedule_id').val();
-                if (schedule_id === '') {
-                    SalvarSchedule();
-                } else {
-                    ActualizarSchedule();
-                }
-
+            var schedule_id = $('#schedule_id').val();
+            if (schedule_id === '') {
+                SalvarSchedule();
             } else {
-                if (project_id === "") {
-                    var $element = $('#select-project .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-                if (hour === "") {
-                    var $element = $('#select-hour .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
+                ActualizarSchedule();
             }
         };
     }
 
+    var SalvarSchedule = function () {
+
+        var project_id = $('#project').val();
+        var hour = $('#hour').val();
+
+        if ($('#schedule-form').valid() && project_id !== '' && hour.length > 0 && isValidFechas()) {
+
+            var project_contact_id = $('#contact-project').val();
+            var date_start = $('#date-start').val();
+            var date_stop = $('#date-stop').val();
+
+            var description = $('#description').val();
+            var location = $('#location').val();
+
+            var vendor_id = $('#concrete-vendor').val();
+            var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
+            concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
+
+
+            var quantity = $('#quantity').val();
+            var notes = $('#notes').val();
+
+            MyApp.block('#form-schedule');
+
+            $.ajax({
+                type: "POST",
+                url: "schedule/salvar",
+                dataType: "json",
+                data: {
+                    'project_id': project_id,
+                    'project_contact_id': project_contact_id,
+                    'description': description,
+                    'location': location,
+                    'date_start': date_start,
+                    'date_stop': date_stop,
+                    'latitud': latitud,
+                    'longitud': longitud,
+                    'vendor_id': vendor_id,
+                    'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
+                    'hour': hour,
+                    'quantity': quantity,
+                    'notes': notes,
+
+                },
+                success: function (response) {
+                    mApp.unblock('#form-schedule');
+                    if (response.success) {
+
+                        toastr.success(response.message, "Success");
+
+                        cerrarForms();
+
+                        btnClickFiltrar();
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                },
+                failure: function (response) {
+                    mApp.unblock('#form-schedule');
+
+                    toastr.error(response.error, "");
+                }
+            });
+
+        } else {
+            if (project_id === "") {
+                var $element = $('#select-project .select2');
+                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                    .data("title", "This field is required")
+                    .addClass("has-error")
+                    .tooltip({
+                        placement: 'bottom'
+                    }); // Create a new tooltip based on the error messsage we just set in the title
+
+                $element.closest('.form-group')
+                    .removeClass('has-success').addClass('has-error');
+            }
+            if (hour.length === 0) {
+                var $element = $('#select-hour .select2');
+                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                    .data("title", "This field is required")
+                    .addClass("has-error")
+                    .tooltip({
+                        placement: 'bottom'
+                    }); // Create a new tooltip based on the error messsage we just set in the title
+
+                $element.closest('.form-group')
+                    .removeClass('has-success').addClass('has-error');
+            }
+        }
+    }
+    var ActualizarSchedule = function () {
+
+        var project_id = $('#project').val();
+        var hour = $('#hour').val();
+
+        if ($('#schedule-form').valid() && project_id !== '' && hour !== '' && isValidFechas()) {
+
+            var schedule_id = $('#schedule_id').val();
+            var project_contact_id = $('#contact-project').val();
+            var day = $('#day').val();
+
+            var description = $('#description').val();
+            var location = $('#location').val();
+
+            var vendor_id = $('#concrete-vendor').val();
+            var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
+            concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
+
+            var quantity = $('#quantity').val();
+            var notes = $('#notes').val();
+
+            MyApp.block('#form-schedule');
+
+            $.ajax({
+                type: "POST",
+                url: "schedule/actualizar",
+                dataType: "json",
+                data: {
+                    'schedule_id': schedule_id,
+                    'project_id': project_id,
+                    'project_contact_id': project_contact_id,
+                    'description': description,
+                    'location': location,
+                    'day': day,
+                    'latitud': latitud,
+                    'longitud': longitud,
+                    'vendor_id': vendor_id,
+                    'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
+                    'hour': hour,
+                    'quantity': quantity,
+                    'notes': notes,
+
+                },
+                success: function (response) {
+                    mApp.unblock('#form-schedule');
+                    if (response.success) {
+
+                        toastr.success(response.message, "Success");
+
+                        cerrarForms();
+
+                        btnClickFiltrar();
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                },
+                failure: function (response) {
+                    mApp.unblock('#form-schedule');
+
+                    toastr.error(response.error, "");
+                }
+            });
+
+        } else {
+            if (project_id === "") {
+                var $element = $('#select-project .select2');
+                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                    .data("title", "This field is required")
+                    .addClass("has-error")
+                    .tooltip({
+                        placement: 'bottom'
+                    }); // Create a new tooltip based on the error messsage we just set in the title
+
+                $element.closest('.form-group')
+                    .removeClass('has-success').addClass('has-error');
+            }
+            if (hour === "") {
+                var $element = $('#select-hour .select2');
+                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                    .data("title", "This field is required")
+                    .addClass("has-error")
+                    .tooltip({
+                        placement: 'bottom'
+                    }); // Create a new tooltip based on the error messsage we just set in the title
+
+                $element.closest('.form-group')
+                    .removeClass('has-success').addClass('has-error');
+            }
+        }
+
+    }
     var isValidFechas = function () {
         var valid = true;
 
@@ -599,129 +777,6 @@ var Schedules = function () {
         }
 
         return valid;
-    }
-
-    var SalvarSchedule = function () {
-
-        var project_id = $('#project').val();
-        var project_contact_id = $('#contact-project').val();
-        var date_start = $('#date-start').val();
-        var date_stop = $('#date-stop').val();
-
-        var description = $('#description').val();
-        var location = $('#location').val();
-
-        var vendor_id = $('#concrete-vendor').val();
-        var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
-        concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
-
-        var hour = $('#hour').val();
-        var quantity = $('#quantity').val();
-        var notes = $('#notes').val();
-
-        MyApp.block('#form-schedule');
-
-        $.ajax({
-            type: "POST",
-            url: "schedule/salvar",
-            dataType: "json",
-            data: {
-                'project_id': project_id,
-                'project_contact_id': project_contact_id,
-                'description': description,
-                'location': location,
-                'date_start': date_start,
-                'date_stop': date_stop,
-                'latitud': latitud,
-                'longitud': longitud,
-                'vendor_id': vendor_id,
-                'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
-                'hour': hour,
-                'quantity': quantity,
-                'notes': notes,
-
-            },
-            success: function (response) {
-                mApp.unblock('#form-schedule');
-                if (response.success) {
-
-                    toastr.success(response.message, "Success");
-
-                    cerrarForms();
-
-                    btnClickFiltrar();
-
-                } else {
-                    toastr.error(response.error, "");
-                }
-            },
-            failure: function (response) {
-                mApp.unblock('#form-schedule');
-
-                toastr.error(response.error, "");
-            }
-        });
-    }
-    var ActualizarSchedule = function () {
-
-        var schedule_id = $('#schedule_id').val();
-        var project_id = $('#project').val();
-        var project_contact_id = $('#contact-project').val();
-        var day = $('#day').val();
-
-        var description = $('#description').val();
-        var location = $('#location').val();
-
-        var vendor_id = $('#concrete-vendor').val();
-        var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
-        concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
-
-        var hour = $('#hour').val();
-        var quantity = $('#quantity').val();
-        var notes = $('#notes').val();
-
-        MyApp.block('#form-schedule');
-
-        $.ajax({
-            type: "POST",
-            url: "schedule/actualizar",
-            dataType: "json",
-            data: {
-                'schedule_id': schedule_id,
-                'project_id': project_id,
-                'project_contact_id': project_contact_id,
-                'description': description,
-                'location': location,
-                'day': day,
-                'latitud': latitud,
-                'longitud': longitud,
-                'vendor_id': vendor_id,
-                'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
-                'hour': hour,
-                'quantity': quantity,
-                'notes': notes,
-
-            },
-            success: function (response) {
-                mApp.unblock('#form-schedule');
-                if (response.success) {
-
-                    toastr.success(response.message, "Success");
-
-                    cerrarForms();
-
-                    btnClickFiltrar();
-
-                } else {
-                    toastr.error(response.error, "");
-                }
-            },
-            failure: function (response) {
-                mApp.unblock('#form-schedule');
-
-                toastr.error(response.error, "");
-            }
-        });
     }
 
     //Cerrar form
@@ -840,6 +895,9 @@ var Schedules = function () {
                     $('#day').val(response.schedule.day);
                     $('#div-day').removeClass('m--hide');
                     $('.date-new').addClass('m--hide');
+
+                    $('#hour').removeAttr('multiple');
+                    $('#hour').select2();
 
                     $('#hour').val(response.schedule.hour);
                     $('#hour').trigger('change');
@@ -985,6 +1043,10 @@ var Schedules = function () {
         initPortlets();
 
         $('.m-select2').select2();
+
+        $('#hour').select2({
+            placeholder: 'Select',
+        });
 
         $('#contact-concrete-vendor').select2({
             placeholder: 'Select contacts',

@@ -341,8 +341,7 @@
                                         Hour
                                         <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="hour" name="hour">
-                                        <option value="">Select</option>
+                                    <select class="form-control m-select2 event-change" id="hour" name="hour" multiple="">
                                         {% for h in 0..23 %}
                                             {% for m in [0, 15, 30, 45] %}
                                                 {% set hour = "%02d:%02d"|format(h, m) %}

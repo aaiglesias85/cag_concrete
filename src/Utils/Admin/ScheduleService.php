@@ -300,69 +300,72 @@ class ScheduleService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarSchedule($project_id, $project_contact_id, $date_start, $date_stop, $description, $location, $latitud, $longitud,
-                                   $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes)
+    public function SalvarSchedule($project_id, $project_contact_id, $date_start_param, $date_stop_param, $description, $location, $latitud, $longitud,
+                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes)
     {
         $em = $this->getDoctrine()->getManager();
 
-        // validar
-        $validar_fecha_error = $this->ValidarFechasYHora($date_start, $date_stop, $hour);
-        if ($validar_fecha_error) {
-            $resultado['success'] = false;
-            $resultado['error'] = $validar_fecha_error;
-            return $resultado;
-        }
+        foreach ($hours as $hour) {
 
-        $date_start = \DateTime::createFromFormat('m/d/Y', $date_start);
-        $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop);
-
-        $intervalo = new \DateInterval('P1D');
-        $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
-        foreach ($periodo as $dia) {
-
-            /*
-            if ($dia->format('w') === '0') {
-                continue; // Saltar domingos
-            }
-            */
-
-            $day = \DateTime::createFromFormat('Y-m-d H:i', $dia->format('Y-m-d') . ' ' . $hour);
-
-            $entity = new Schedule();
-
-            $entity->setDescription($description);
-            $entity->setLocation($location);
-            $entity->setLatitud($latitud);
-            $entity->setLongitud($longitud);
-
-            $entity->setDay($day);
-            $entity->setQuantity($quantity);
-            $entity->setNotes($notes);
-
-            if ($project_id != '') {
-                $project = $this->getDoctrine()->getRepository(Project::class)
-                    ->find($project_id);
-                $entity->setProject($project);
-            }
-            if ($project_contact_id != '') {
-                $project_contact = $this->getDoctrine()->getRepository(ProjectContact::class)
-                    ->find($project_contact_id);
-                $entity->setContactProject($project_contact);
+            // validar
+            $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
+            if ($validar_fecha_error) {
+                $resultado['success'] = false;
+                $resultado['error'] = $validar_fecha_error;
+                return $resultado;
             }
 
-            if ($vendor_id != '') {
-                $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
-                    ->find($vendor_id);
-                $entity->setConcreteVendor($concrete_vendor);
+            $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
+            $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
+
+            $intervalo = new \DateInterval('P1D');
+            $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
+            foreach ($periodo as $dia) {
+
+                /*
+                if ($dia->format('w') === '0') {
+                    continue; // Saltar domingos
+                }
+                */
+
+                $day = \DateTime::createFromFormat('Y-m-d H:i', $dia->format('Y-m-d') . ' ' . $hour);
+
+                $entity = new Schedule();
+
+                $entity->setDescription($description);
+                $entity->setLocation($location);
+                $entity->setLatitud($latitud);
+                $entity->setLongitud($longitud);
+
+                $entity->setDay($day);
+                $entity->setQuantity($quantity);
+                $entity->setNotes($notes);
+
+                if ($project_id != '') {
+                    $project = $this->getDoctrine()->getRepository(Project::class)
+                        ->find($project_id);
+                    $entity->setProject($project);
+                }
+                if ($project_contact_id != '') {
+                    $project_contact = $this->getDoctrine()->getRepository(ProjectContact::class)
+                        ->find($project_contact_id);
+                    $entity->setContactProject($project_contact);
+                }
+
+                if ($vendor_id != '') {
+                    $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                        ->find($vendor_id);
+                    $entity->setConcreteVendor($concrete_vendor);
+                }
+
+                if (empty($lista)) {
+                    $em->persist($entity);
+                }
+
+                // salvar contactos
+                $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
+
             }
-
-            if (empty($lista)) {
-                $em->persist($entity);
-            }
-
-            // salvar contactos
-            $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
-
         }
 
         $em->flush();
