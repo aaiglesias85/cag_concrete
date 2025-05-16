@@ -20,42 +20,71 @@ class ScheduleService extends Base
      */
     public function ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $arreglo_resultado = [];
 
         $lista = $this->getDoctrine()->getRepository(Schedule::class)
             ->ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
 
+        // Arreglo temporal para ordenar por título y agrupar por día
+        $datos = [];
+
         foreach ($lista as $value) {
-            $schedule_id = $value->getScheduleId();
+            $day = $value->getDay()->format('Y-m-d'); // Solo la fecha
+            $title = $value->getProject()->getProjectNumber();
 
-            $day = $value->getDay();
-            $project = $value->getProject()->getProjectNumber();
+            $datos[] = [
+                'value' => $value,
+                'day' => $day,
+                'title' => $title,
+            ];
+        }
 
-            $className = "fc-event-primary";
+        // Ordenar alfabéticamente por título
+        usort($datos, function ($a, $b) {
+            return strcmp($a['title'], $b['title']);
+        });
 
-            $arreglo_resultado[$cont] = array(
-                "id" => $schedule_id,
-                "title" => $project,
-                'start' => $day->format('Y-m-d H:i'),
-                'end' => $day->format('Y-m-d H:i'),
-                'className' => $className,
-                "location" => $value->getLocation(),
-                "description" => $value->getDescription(),
-                "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
-                "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
-                "day" => $value->getDay()->format('m/d/Y'),
-                "hour" => $value->getDay()->format('H:i'),
-                "quantity" => $value->getQuantity(),
-                "notes" => $value->getNotes(),
-            );
+        // Agrupar por día y asignar horas a start/end desde las 08:00 con saltos de 30 minutos
+        $porFecha = [];
+        foreach ($datos as $item) {
+            $porFecha[$item['day']][] = $item['value'];
+        }
 
+        $cont = 0;
 
-            $cont++;
+        foreach ($porFecha as $fecha => $items) {
+            $horaActual = \DateTime::createFromFormat('Y-m-d H:i', $fecha . ' 00:00');
+
+            foreach ($items as $value) {
+                $schedule_id = $value->getScheduleId();
+                $title = $value->getProject()->getProjectNumber();
+
+                $dayOriginal = $value->getDay(); // Fecha original con hora de la DB
+
+                $arreglo_resultado[$cont] = [
+                    "id" => $schedule_id,
+                    "title" => $title,
+                    'start' => $horaActual->format('Y-m-d H:i'), // hora artificial para mostrar en calendario
+                    'end' => $horaActual->format('Y-m-d H:i'),
+                    'className' => "fc-event-primary",
+                    "location" => $value->getLocation(),
+                    "description" => $value->getDescription(),
+                    "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
+                    "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
+                    "day" => $dayOriginal->format('m/d/Y'), // original de la DB
+                    "hour" => $dayOriginal->format('H:i'),  // original de la DB
+                    "quantity" => $value->getQuantity(),
+                    "notes" => $value->getNotes(),
+                ];
+
+                $horaActual->modify('+90 minutes'); // incremento de 90 min
+                $cont++;
+            }
         }
 
         return $arreglo_resultado;
     }
+
 
     /**
      * CargarDatosSchedule: Carga los datos de un schedule
