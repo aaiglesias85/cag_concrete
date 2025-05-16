@@ -32,11 +32,55 @@ class InspectorService extends Base
             $arreglo_resultado['phone'] = $entity->getPhone();
             $arreglo_resultado['status'] = $entity->getStatus();
 
+            // projects
+            $projects = $this->ListarProjects($inspector_id);
+            $arreglo_resultado['projects'] = $projects;
+
             $resultado['success'] = true;
             $resultado['inspector'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarProjects
+     * @param $inspector_id
+     * @return array
+     */
+    public function ListarProjects($inspector_id)
+    {
+        $projects = [];
+
+        $inspector_projects = $this->getDoctrine()->getRepository(DataTracking::class)
+            ->ListarProjectsDeInspector($inspector_id);
+
+        foreach ($inspector_projects as $key => $inspector_project) {
+            $value = $inspector_project->getProject();
+            $project_id = $value->getProjectId();
+
+            // listar ultima nota del proyecto
+            $nota = $this->ListarUltimaNotaDeProject($project_id);
+
+            $projects[] = [
+                "id" => $project_id,
+                "project_id" => $project_id,
+                "projectNumber" => $value->getProjectNumber(),
+                "number" => $value->getProjectNumber(),
+                "name" => $value->getName(),
+                "description" => $value->getDescription(),
+                "company" => $value->getCompany()->getName(),
+                "county" => $value->getCounty(),
+                "status" => $value->getStatus(),
+                "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
+                "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',
+                "dueDate" => $value->getDueDate() != '' ? $value->getDueDate()->format('m/d/Y') : '',
+                'nota' => $nota,
+                'posicion' => $key
+            ];
+        }
+
+        return $projects;
     }
 
     /**

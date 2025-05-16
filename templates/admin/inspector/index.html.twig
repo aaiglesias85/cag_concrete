@@ -118,80 +118,143 @@
                     </ul>
                 </div>
             </div>
-            <form class="m-form" id="inspector-form" action="#"
-                  enctype="multipart/form-data" method="post">
 
-                <input type="hidden" id="inspector_id" name="inspector_id"/>
+            <div class="m-portlet__body">
 
-                <div class="m-portlet__body">
-                    <div class="m-form__section m-form__section--first">
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
-                                <span class="ic-step-number">1</span>
-                                Name
-                                <span class="ic-small italic">(required)</span>
-                            </label>
+                <ul class="nav nav-tabs nav-item-hide" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active wizard-tab" data-item="1"
+                           data-toggle="tab" href="#tab-content-general" id="tab-general">
+                            General
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="2"
+                           data-toggle="tab" href="#tab-content-projects" id="tab-projects">
+                            Projects
+                        </a>
+                    </li>
+                </ul>
 
-                            <input type="text" class="form-control form-control-text event-change"
-                                   id="name" name="name"/>
-                        </div>
+                <div class="tab-content">
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <div class="row">
-                                <div class="col-md-5">
+                    <div class="tab-pane active" id="tab-content-general" role="tabpanel">
+                        <form class="m-form" id="inspector-form" action="#" enctype="multipart/form-data" method="post">
+
+                            <input type="hidden" id="inspector_id" name="inspector_id"/>
+
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group ic-form-group">
                                     <label>
-                                        <span class="ic-step-number">2</span>
-                                        Email
-                                        <span class="ic-small italic">(optional)</span>
+                                        <span class="ic-step-number">1</span>
+                                        Name
+                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text">@</span>
-                                        </div>
-                                        <input type="text" class="form-control event-change" id="email" name="email">
-                                    </div>
+
+                                    <input type="text" class="form-control form-control-text event-change"
+                                           id="name" name="name"/>
                                 </div>
-                                <div class="col-md-5">
-                                    <label>
-                                        Phone
-                                    </label>
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend">
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Email
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend"><span class="input-group-text">@</span>
+                                                </div>
+                                                <input type="text" class="form-control event-change" id="email" name="email">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label>
+                                                Phone
+                                            </label>
+                                            <div class="input-group m-input-group">
+                                                <div class="input-group-prepend">
                                         <span class="input-group-text"><i
                                                     class="flaticon-support"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control event-change" id="phone" name="phone">
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control event-change" id="phone" name="phone">
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label><span class="ic-step-number">3</span>Status</label>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="m-form__group form-group">
+                                                <div class="m-radio-inline">
+                                                    <label class="m-radio">
+                                                        <input type="radio" name="radioestado" id="estadoactivo"
+                                                               class="event-change" checked>
+                                                        Active
+                                                        <span></span>
+                                                    </label>
+                                                    <label class="m-radio">
+                                                        <input type="radio" name="radioestado" id="estadoinactivo"
+                                                               class="event-change">
+                                                        Inactive
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label><span class="ic-step-number">3</span>Status</label>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="m-form__group form-group">
-                                        <div class="m-radio-inline">
-                                            <label class="m-radio">
-                                                <input type="radio" name="radioestado" id="estadoactivo"
-                                                       class="event-change" checked>
-                                                Active
-                                                <span></span>
-                                            </label>
-                                            <label class="m-radio">
-                                                <input type="radio" name="radioestado" id="estadoinactivo"
-                                                       class="event-change">
-                                                Inactive
-                                                <span></span>
-                                            </label>
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-projects" role="tabpanel">
+                        <div class="row" id="lista-projects">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right mb-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-projects-table-editable"></div>
+                                <!--end: Datatable -->
                             </div>
                         </div>
                     </div>
-                    <div class="m-form__actions">
+                </div>
+
+                <div class="m-form">
+                    <div class="m-form__actions text-center">
+                        <button id="btn-wizard-anterior"
+                                class="btn btn-info m--hide" type="button">
+                            Back
+                        </button>
+
+                        <button id="btn-wizard-siguiente"
+                                class="btn btn-primary m--hide" type="button">
+                            Next
+                        </button>
                         {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-salvar-inspector" class="btn btn-success" type="button">
+                            <button id="btn-wizard-finalizar" class="btn btn-success" type="button">
                                 Save
                             </button>
                         {% endif %}
@@ -200,7 +263,8 @@
                         </button>
                     </div>
                 </div>
-            </form>
+            </div>
+
         </div>
 
     </div>
