@@ -154,6 +154,7 @@ var Companies = function () {
 
     //Validacion
     var initForm = function () {
+
         //Validacion
         $("#company-form").validate({
             rules: {
@@ -161,7 +162,7 @@ var Companies = function () {
                     required: true
                 },
                 contactemail: {
-                    email: true
+                    optionalEmail: true // Usamos la validación personalizada en lugar de email:true
                 }
             },
             showErrors: function (errorMap, errorList) {
@@ -761,7 +762,7 @@ var Companies = function () {
                 },*/
                 email: {
                     // required: true,
-                    email: true
+                    optionalEmail: true
                 },
                 /*phone: {
                     required: true

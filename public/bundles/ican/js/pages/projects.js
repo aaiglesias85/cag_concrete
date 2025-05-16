@@ -2236,7 +2236,7 @@ var Projects = function () {
                 },*/
                 email: {
                     // required: true,
-                    email: true
+                    optionalEmail: true
                 },
                 /*phone: {
                     required: true

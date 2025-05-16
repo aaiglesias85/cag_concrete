@@ -181,7 +181,7 @@ var Subcontractors = function () {
                     required: true
                 },
                 contactemail: {
-                    email: true
+                    optionalEmail: true
                 }
             },
             showErrors: function (errorMap, errorList) {

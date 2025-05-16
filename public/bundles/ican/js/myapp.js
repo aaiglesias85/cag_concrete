@@ -215,6 +215,15 @@ var MyApp = function () {
             "La fecha inicial no puede ser anterior ni posterior a 60 días"
         );
 
+        $.validator.addMethod("optionalEmail", function(value, element) {
+            // Si el campo está vacío, es válido (no obligatorio)
+            if (value === "") {
+                return true;
+            }
+            // Si tiene contenido, validamos que sea un email correcto
+            return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value);
+        }, "Por favor, ingrese un correo válido.");
+
         $(document).on('keypress', ".just-number", function (e) {
             var keynum = window.event ? window.event.keyCode : e.which;
 
