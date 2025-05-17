@@ -4,6 +4,19 @@
 
 {% block stylesheetspecific %}
     <link href="{{ asset('bundles/ican/plugins/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet">
+    <style>
+
+        .fc-slats tr,
+        .fc-slats td {
+            border: none !important;
+            background: none !important;
+        }
+
+
+        .fc-slats .fc-time {
+            display: none !important;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
