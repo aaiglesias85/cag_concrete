@@ -91,6 +91,7 @@ class EmployeeService extends Base
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['hourly_rate'] = $entity->getHourlyRate();
             $arreglo_resultado['position'] = $entity->getPosition();
+            $arreglo_resultado['color'] = $entity->getColor();
 
             $resultado['success'] = true;
             $resultado['employee'] = $arreglo_resultado;
@@ -204,7 +205,7 @@ class EmployeeService extends Base
      * @param int $employee_id Id
      * @author Marcel
      */
-    public function ActualizarEmployee($employee_id, $name, $hourly_rate, $position)
+    public function ActualizarEmployee($employee_id, $name, $hourly_rate, $position, $color)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -224,6 +225,7 @@ class EmployeeService extends Base
             $entity->setName($name);
             $entity->setHourlyRate($hourly_rate);
             $entity->setPosition($position);
+            $entity->setColor($color);
 
             $em->flush();
 
@@ -245,7 +247,7 @@ class EmployeeService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarEmployee($name, $hourly_rate, $position)
+    public function SalvarEmployee($name, $hourly_rate, $position, $color)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -263,6 +265,7 @@ class EmployeeService extends Base
         $entity->setName($name);
         $entity->setHourlyRate($hourly_rate);
         $entity->setPosition($position);
+        $entity->setColor($color);
 
         $em->persist($entity);
 

@@ -134,6 +134,8 @@ var Employees = function () {
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
 
+        $('#color').minicolors('value', '#34bfa3');
+
         event_change = false;
     };
 
@@ -217,6 +219,7 @@ var Employees = function () {
                 var name = $('#name').val();
                 var hourly_rate = $('#hourly_rate').val();
                 var position = $('#position').val();
+                var color = $('#color').val();
 
                 MyApp.block('#form-employee');
 
@@ -228,7 +231,8 @@ var Employees = function () {
                         'employee_id': employee_id,
                         'name': name,
                         'hourly_rate': hourly_rate,
-                        'position': position
+                        'position': position,
+                        'color': color
                     },
                     success: function (response) {
                         mApp.unblock('#form-employee');
@@ -325,6 +329,7 @@ var Employees = function () {
                         $('#name').val(response.employee.name);
                         $('#hourly_rate').val(response.employee.hourly_rate);
                         $('#position').val(response.employee.position);
+                        $('#color').minicolors('value', response.employee.color);
 
                         event_change = false;
 
@@ -464,6 +469,20 @@ var Employees = function () {
     var initWidgets = function () {
 
         initPortlets();
+
+        $('#color').minicolors({
+            control: 'hue',
+            format: "hex",
+            defaultValue: '#34bfa3',
+            inline: false,
+            letterCase: 'uppercase',
+            opacity: false,
+            position: 'bottom left',
+            change: function (hex, opacity) {
+                if (!hex) return;
+            },
+            theme: 'bootstrap'
+        });
     }
 
     var initPortlets = function () {

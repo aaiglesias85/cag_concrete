@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 04-05-2025 a las 01:03:39
+-- Tiempo de generación: 17-05-2025 a las 01:09:06
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -159,7 +159,7 @@ CREATE TABLE `concrete_vendor` (
 INSERT INTO `concrete_vendor` (`vendor_id`, `name`, `address`, `phone`, `contact_name`, `contact_email`) VALUES
 (1, 'ARGOS', '', '', '', ''),
 (2, 'ERNST', '', '', '', ''),
-(3, 'ARG', '', '', NULL, NULL),
+(3, 'ARG', 'Paso el roble 50', '(353)453-4543', NULL, 'cyborgmnk@gmail.com'),
 (4, 'WDC', '', '', '', ''),
 (5, 'USA', '', '', '', ''),
 (6, 'PLATINUM', '', '', '', ''),
@@ -2184,7 +2184,7 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_t
 (1025, 6.00, 35.00, 'Laborer', 285, 8, NULL),
 (1026, 6.00, 0.00, 'Lead', 285, 42, NULL),
 (1027, 6.00, 35.00, 'Laborer', 285, 36, NULL),
-(1028, 6.00, 35.00, 'Laborer', 285, 74, NULL),
+(1028, 6.00, 35.00, 'Subcontractor', 285, 74, NULL),
 (1029, 10.00, 0.00, 'Lead', 286, 6, NULL),
 (1030, 10.00, 35.00, 'Laborer', 286, 21, NULL),
 (1031, 10.00, 35.00, 'Laborer', 286, 22, NULL),
@@ -2194,7 +2194,7 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_t
 (1035, 12.00, 35.00, 'Laborer', 287, 8, NULL),
 (1036, 12.00, 35.00, 'Laborer', 287, 9, NULL),
 (1037, 12.00, 0.00, 'Lead', 287, 37, NULL),
-(1038, 12.00, 35.00, 'Laborer', 287, 74, NULL),
+(1038, 12.00, 35.00, 'Subcontractor', 287, 74, NULL),
 (1039, 11.00, 35.00, 'Laborer', 288, 15, NULL),
 (1040, 11.00, 35.00, 'Laborer', 288, 5, NULL),
 (1041, 11.00, 35.00, 'Laborer', 288, 30, NULL),
@@ -2210,7 +2210,7 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_t
 (1051, 12.00, 35.00, 'Laborer', 291, 9, NULL),
 (1052, 12.00, 0.00, 'Lead', 291, 37, NULL),
 (1053, 12.00, 0.00, 'Lead', 291, 42, NULL),
-(1054, 12.00, 35.00, 'Laborer', 291, 74, NULL),
+(1054, 12.00, 35.00, 'Subcontractor', 291, 74, NULL),
 (1055, 15.00, 35.00, 'Laborer', 292, 28, NULL),
 (1056, 15.00, 35.00, 'Laborer', 292, 20, NULL),
 (1057, 15.00, 35.00, 'Laborer', 292, 26, NULL),
@@ -2238,12 +2238,12 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_t
 (1079, 9.00, 35.00, 'Laborer', 298, 14, NULL),
 (1080, 9.00, 0.00, 'Lead', 298, 38, NULL),
 (1081, 9.00, 35.00, 'Laborer', 298, 24, NULL),
-(1082, 9.00, 35.00, 'Laborer', 298, 74, NULL),
+(1082, 9.00, 35.00, 'Subcontractor', 298, 74, NULL),
 (1083, 10.50, 35.00, 'Laborer', 299, 7, NULL),
 (1084, 10.50, 0.00, 'Lead', 299, 37, NULL),
 (1085, 10.50, 35.00, 'Laborer', 299, 12, NULL),
 (1086, 10.50, 0.00, 'Lead', 299, 42, NULL),
-(1087, 10.50, 35.00, 'Laborer', 299, 74, NULL),
+(1087, 10.50, 35.00, 'Subcontractor', 299, 74, NULL),
 (1088, 8.00, 0.00, 'Subcontractor', 296, 67, NULL),
 (1089, 12.00, 35.00, 'Laborer', 300, 5, NULL),
 (1090, 12.00, 35.00, 'Laborer', 300, 15, NULL),
@@ -2497,26 +2497,26 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_t
 (1344, 12.00, 35.00, 'Laborer', 356, 1, NULL),
 (1345, 12.00, 35.00, 'Laborer', 356, 7, NULL),
 (1346, 12.00, 0.00, 'Lead', 356, 42, NULL),
-(1347, 12.00, 35.00, 'Laborer', 356, 74, NULL),
+(1347, 12.00, 35.00, 'Subcontractor', 356, 74, NULL),
 (1348, 12.00, 35.00, 'Laborer', 357, 1, NULL),
 (1349, 12.00, 35.00, 'Laborer', 357, 7, NULL),
-(1350, 12.00, 35.00, 'Laborer', 357, 74, NULL),
+(1350, 12.00, 35.00, 'Subcontractor', 357, 74, NULL),
 (1351, 12.00, 0.00, 'Lead', 357, 42, NULL),
 (1352, 11.00, 35.00, 'Laborer', 358, 1, NULL),
 (1353, 11.00, 35.00, 'Laborer', 358, 7, NULL),
-(1354, 11.00, 35.00, 'Laborer', 358, 74, NULL),
+(1354, 11.00, 35.00, 'Subcontractor', 358, 74, NULL),
 (1355, 11.00, 0.00, 'Lead', 358, 42, NULL),
 (1356, 10.00, 35.00, 'Laborer', 359, 1, NULL),
 (1357, 10.00, 35.00, 'Laborer', 359, 7, NULL),
-(1358, 10.00, 35.00, 'Laborer', 359, 74, NULL),
+(1358, 10.00, 35.00, 'Subcontractor', 359, 74, NULL),
 (1359, 10.00, 0.00, 'Lead', 359, 42, NULL),
 (1360, 11.00, 35.00, 'Laborer', 360, 1, NULL),
 (1361, 11.00, 0.00, 'Lead', 360, 42, NULL),
-(1362, 11.00, 35.00, 'Laborer', 360, 74, NULL),
+(1362, 11.00, 35.00, 'Subcontractor', 360, 74, NULL),
 (1363, 12.00, 35.00, 'Laborer', 361, 7, NULL),
 (1364, 12.00, 35.00, 'Laborer', 361, 13, NULL),
 (1365, 12.00, 0.00, 'Lead', 361, 42, NULL),
-(1366, 12.00, 35.00, 'Laborer', 361, 74, NULL),
+(1366, 12.00, 35.00, 'Subcontractor', 361, 74, NULL),
 (1367, 12.00, 35.00, 'Laborer', 361, 5, NULL),
 (1368, 12.00, 35.00, 'Laborer', 361, 8, NULL),
 (1369, 12.00, 35.00, 'Laborer', 361, 9, NULL),
@@ -2816,90 +2816,91 @@ CREATE TABLE `employee` (
   `employee_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `hourly_rate` float(8,2) DEFAULT NULL,
-  `position` varchar(255) DEFAULT NULL
+  `position` varchar(255) DEFAULT NULL,
+  `color` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`) VALUES
-(1, 'Andres Mendoza', 20.00, 'Laborer'),
-(2, 'Angel Orona', 20.00, 'Laborer'),
-(3, 'Camilo Romero', 20.00, 'Laborer'),
-(4, 'Carlos Arroyo', 25.00, 'Lead'),
-(5, 'Carlos Jose Loasiga', 20.00, 'Laborer'),
-(6, 'Cruz Cortez', 25.00, 'Lead'),
-(7, 'David Sendejas (Jose Perez)', 20.00, 'Laborer'),
-(8, 'Dennis Alvarez', 20.00, 'Laborer'),
-(9, 'Eliud Pazos', 20.00, 'Laborer'),
-(10, 'Emilio Romero', 20.00, 'Laborer'),
-(11, 'Fernando Arredondo', 20.00, 'Laborer'),
-(12, 'Francisco Narciso', 20.00, 'Laborer'),
-(13, 'Gadiel Urias Mendoza', 20.00, 'Laborer'),
-(14, 'Geoffrey Fabio Restrepo', 20.00, 'Laborer'),
-(15, 'Gerardo Alvarado', 20.00, 'Laborer'),
-(16, 'Hector Camarillo', 20.00, 'Laborer'),
-(17, 'Helmer Osciel Cruz', 20.00, 'Laborer'),
-(18, 'Homero Mares', 20.00, 'Laborer'),
-(19, 'Jesus Martinez Galvez', 20.00, 'Laborer'),
-(20, 'Jordan Vicuna Hernandez', 20.00, 'Laborer'),
-(21, 'Jose Camarillo', 20.00, 'Laborer'),
-(22, 'Jose Manuel Martinez', 20.00, 'Laborer'),
-(23, 'Juan Cazares', 20.00, 'Laborer'),
-(24, 'Juan Trejo', 20.00, 'Laborer'),
-(25, 'Kevin Garcia', 20.00, 'Laborer'),
-(26, 'Luis G.Cordova', 20.00, 'Laborer'),
-(27, 'Miguel Garcia', 20.00, 'Laborer'),
-(28, 'Noel Josias Mendoza', 20.00, 'Laborer'),
-(29, 'Orlais Lores-Mayeta', 20.00, 'Laborer'),
-(30, 'Oscar Alvarado', 20.00, 'Laborer'),
-(31, 'Pedro Garcia', 20.00, 'Laborer'),
-(32, 'Raul Cazares', 20.00, 'Laborer'),
-(33, 'Roberto Alvarado', 20.00, 'Laborer'),
-(34, 'Ruben Murillo', 20.00, 'Laborer'),
-(35, '\"Tate\" Vincente Bly', 20.00, 'Laborer'),
-(36, 'Wilbert Rutilio', 20.00, 'Laborer'),
-(37, 'Francisco Gutierrez', 25.00, 'Lead'),
-(38, 'Jose Duarte', 25.00, 'Lead'),
-(39, 'Julian Bautista', 25.00, 'Lead'),
-(40, 'Miguel Murillo', 25.00, 'Lead'),
-(41, 'Victor Cordova', 25.00, 'Lead'),
-(42, 'Victor Soriano', 25.00, 'Lead'),
-(43, 'Victor Suarez', 25.00, 'Lead'),
-(44, 'Juan Avalos', 20.00, 'Laborer'),
-(45, 'Juan Manuel Sanchez Garcia', 20.00, 'Laborer'),
-(46, 'Jesus Avalos', 20.00, 'Laborer'),
-(47, 'Alfredo Chegue', 20.00, 'Laborer'),
-(48, 'Victorino Luna', 25.00, 'Subcontractor'),
-(49, 'Abram Sanchez', 25.00, 'Subcontractor'),
-(50, 'Armando Bautista', 25.00, 'Subcontractor'),
-(51, 'Sergio Rodriguez', 25.00, 'Subcontractor'),
-(52, 'Osvaldo Rosales', 25.00, 'Subcontractor'),
-(53, 'Jose Luis Rosales', 25.00, 'Subcontractor'),
-(54, 'Saul Olguin', 25.00, 'Subcontractor'),
-(55, 'Isael Olguin', 25.00, 'Subcontractor'),
-(56, 'Luis Oliver', 25.00, 'Subcontractor'),
-(57, 'Christopher Sandoval', 25.00, 'Subcontractor'),
-(58, 'Victor Garcia', 25.00, 'Subcontractor'),
-(59, 'Daniel Diaz', 25.00, 'Subcontractor'),
-(60, 'Lucas Hernandez', 25.00, 'Subcontractor'),
-(61, 'Edmundo Martinez', 25.00, 'Subcontractor'),
-(62, 'Luis Fernando Rosales', 25.00, 'Subcontractor'),
-(63, 'Guillermo Cuevas', 25.00, 'Subcontractor'),
-(64, 'Gerardo Yacxi', 25.00, 'Subcontractor'),
-(65, 'Saul Cano', 25.00, 'Subcontractor'),
-(66, 'Silvano Escorza', 25.00, 'Subcontractor'),
-(67, 'Test test', 25.00, 'Subcontractor'),
-(68, 'Francisco Duran', 25.00, 'Subcontractor'),
-(69, 'Francisco Camarillo', 25.00, 'Subcontractor'),
-(70, 'Arcadio Duran', 25.00, 'Subcontractor'),
-(71, 'Octavio Perez', 25.00, 'Subcontractor'),
-(72, 'Ilse Sanchez', 25.00, 'Subcontractor'),
-(73, 'Jose Covarrubias', 20.00, 'Laborer'),
-(74, 'Brayan Moya', 20.00, 'Laborer'),
-(75, 'Mauricio Lopez', 25.00, 'Subcontractor'),
-(76, 'Armando Bautista-Laborer', 20.00, 'Laborer');
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`) VALUES
+(1, 'Andres Mendoza', 20.00, 'Laborer', NULL),
+(2, 'Angel Orona', 20.00, 'Laborer', NULL),
+(3, 'Camilo Romero', 20.00, 'Laborer', NULL),
+(4, 'Carlos Arroyo', 25.00, 'Lead', NULL),
+(5, 'Carlos Jose Loasiga', 20.00, 'Laborer', NULL),
+(6, 'Cruz Cortez', 25.00, 'Lead', NULL),
+(7, 'David Sendejas (Jose Perez)', 20.00, 'Laborer', NULL),
+(8, 'Dennis Alvarez', 20.00, 'Laborer', NULL),
+(9, 'Eliud Pazos', 20.00, 'Laborer', NULL),
+(10, 'Emilio Romero', 20.00, 'Laborer', NULL),
+(11, 'Fernando Arredondo', 20.00, 'Laborer', NULL),
+(12, 'Francisco Narciso', 20.00, 'Laborer', NULL),
+(13, 'Gadiel Urias Mendoza', 20.00, 'Laborer', NULL),
+(14, 'Geoffrey Fabio Restrepo', 20.00, 'Laborer', NULL),
+(15, 'Gerardo Alvarado', 20.00, 'Laborer', NULL),
+(16, 'Hector Camarillo', 20.00, 'Laborer', NULL),
+(17, 'Helmer Osciel Cruz', 20.00, 'Laborer', NULL),
+(18, 'Homero Mares', 20.00, 'Laborer', NULL),
+(19, 'Jesus Martinez Galvez', 20.00, 'Laborer', NULL),
+(20, 'Jordan Vicuna Hernandez', 20.00, 'Laborer', NULL),
+(21, 'Jose Camarillo', 20.00, 'Laborer', NULL),
+(22, 'Jose Manuel Martinez', 20.00, 'Laborer', NULL),
+(23, 'Juan Cazares', 20.00, 'Laborer', NULL),
+(24, 'Juan Trejo', 20.00, 'Laborer', NULL),
+(25, 'Kevin Garcia', 20.00, 'Laborer', NULL),
+(26, 'Luis G.Cordova', 20.00, 'Laborer', NULL),
+(27, 'Miguel Garcia', 20.00, 'Laborer', NULL),
+(28, 'Noel Josias Mendoza', 20.00, 'Laborer', NULL),
+(29, 'Orlais Lores-Mayeta', 20.00, 'Laborer', NULL),
+(30, 'Oscar Alvarado', 20.00, 'Laborer', NULL),
+(31, 'Pedro Garcia', 20.00, 'Laborer', NULL),
+(32, 'Raul Cazares', 20.00, 'Laborer', NULL),
+(33, 'Roberto Alvarado', 20.00, 'Laborer', NULL),
+(34, 'Ruben Murillo', 20.00, 'Laborer', NULL),
+(35, '\"Tate\" Vincente Bly', 20.00, 'Laborer', NULL),
+(36, 'Wilbert Rutilio', 20.00, 'Laborer', NULL),
+(37, 'Francisco Gutierrez', 25.00, 'Lead', NULL),
+(38, 'Jose Duarte', 25.00, 'Lead', NULL),
+(39, 'Julian Bautista', 25.00, 'Lead', NULL),
+(40, 'Miguel Murillo', 25.00, 'Lead', NULL),
+(41, 'Victor Cordova', 25.00, 'Lead', NULL),
+(42, 'Victor Soriano', 25.00, 'Lead', NULL),
+(43, 'Victor Suarez', 25.00, 'Lead', NULL),
+(44, 'Juan Avalos', 20.00, 'Laborer', NULL),
+(45, 'Juan Manuel Sanchez Garcia', 20.00, 'Laborer', NULL),
+(46, 'Jesus Avalos', 20.00, 'Laborer', NULL),
+(47, 'Alfredo Chegue', 20.00, 'Laborer', NULL),
+(48, 'Victorino Luna', 25.00, 'Subcontractor', NULL),
+(49, 'Abram Sanchez', 25.00, 'Subcontractor', NULL),
+(50, 'Armando Bautista', 25.00, 'Subcontractor', NULL),
+(51, 'Sergio Rodriguez', 25.00, 'Subcontractor', NULL),
+(52, 'Osvaldo Rosales', 25.00, 'Subcontractor', NULL),
+(53, 'Jose Luis Rosales', 25.00, 'Subcontractor', NULL),
+(54, 'Saul Olguin', 25.00, 'Subcontractor', NULL),
+(55, 'Isael Olguin', 25.00, 'Subcontractor', NULL),
+(56, 'Luis Oliver', 25.00, 'Subcontractor', NULL),
+(57, 'Christopher Sandoval', 25.00, 'Subcontractor', NULL),
+(58, 'Victor Garcia', 25.00, 'Subcontractor', NULL),
+(59, 'Daniel Diaz', 25.00, 'Subcontractor', NULL),
+(60, 'Lucas Hernandez', 25.00, 'Subcontractor', NULL),
+(61, 'Edmundo Martinez', 25.00, 'Subcontractor', NULL),
+(62, 'Luis Fernando Rosales', 25.00, 'Subcontractor', NULL),
+(63, 'Guillermo Cuevas', 25.00, 'Subcontractor', NULL),
+(64, 'Gerardo Yacxi', 25.00, 'Subcontractor', NULL),
+(65, 'Saul Cano', 25.00, 'Subcontractor', NULL),
+(66, 'Silvano Escorza', 25.00, 'Subcontractor', NULL),
+(67, 'Test test', 25.00, 'Subcontractor', NULL),
+(68, 'Francisco Duran', 25.00, 'Subcontractor', NULL),
+(69, 'Francisco Camarillo', 25.00, 'Subcontractor', NULL),
+(70, 'Arcadio Duran', 25.00, 'Subcontractor', NULL),
+(71, 'Octavio Perez', 25.00, 'Subcontractor', NULL),
+(72, 'Ilse Sanchez', 25.00, 'Subcontractor', NULL),
+(73, 'Jose Covarrubias', 20.00, 'Laborer', NULL),
+(74, 'Brayan Moya', 20.00, 'Laborer', NULL),
+(75, 'Mauricio Lopez', 25.00, 'Subcontractor', NULL),
+(76, 'Armando Bautista-Laborer', 20.00, 'Laborer', NULL);
 
 -- --------------------------------------------------------
 
@@ -4067,7 +4068,73 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3270, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-03 20:51:03', 1),
 (3271, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-03 20:51:25', 1),
 (3272, 'Update', 'Schedule', 'The schedule is modified: Prueba', '::1', '2025-05-04 01:03:10', 1),
-(3273, 'Update', 'Schedule', 'The schedule is modified: Prueba', '::1', '2025-05-04 01:03:28', 1);
+(3273, 'Update', 'Schedule', 'The schedule is modified: Prueba', '::1', '2025-05-04 01:03:28', 1),
+(3274, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-04 16:26:34', 1),
+(3275, 'Add', 'Schedule', 'The schedule is added: prueba de una semana, Start date: 05/04/2025 Stop date: 05/11/2025', '::1', '2025-05-04 18:30:11', 1),
+(3276, 'Update', 'Schedule', 'The schedule is modified: prueba de una semana', '::1', '2025-05-04 18:43:59', 1),
+(3277, 'Update', 'Schedule', 'The schedule is modified: prueba de una semana', '::1', '2025-05-04 18:44:07', 1),
+(3278, 'Add', 'Schedule', 'The schedule is added: update, Start date: 05/04/2025 Stop date: 05/06/2025', '::1', '2025-05-04 18:57:45', 1),
+(3279, 'Update', 'Schedule', 'The schedule is modified: update', '::1', '2025-05-04 18:58:06', 1),
+(3280, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: ARG', '::1', '2025-05-07 01:04:14', 1),
+(3281, 'Add', 'Schedule', 'The schedule is added: Prueba domingo, Start date: 05/11/2025 Stop date: 05/18/2025', '::1', '2025-05-14 23:38:11', 1),
+(3282, 'Update', 'Schedule', 'The schedule is modified: update', '::1', '2025-05-15 02:03:57', 1),
+(3283, 'Add', 'Schedule', 'The schedule is added: Prueba varias horas, Start date: 05/18/2025 Stop date: 05/25/2025', '::1', '2025-05-15 02:09:52', 1),
+(3284, 'Add', 'Schedule', 'The schedule is added: prueba, Start date: 05/11/2025 Stop date: 05/18/2025', '::1', '2025-05-15 02:20:21', 1),
+(3285, 'Add', 'Schedule', 'The schedule is added: test, Start date: 05/04/2025 Stop date: 05/11/2025', '::1', '2025-05-15 02:21:21', 1),
+(3286, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-05-15 02:23:04', 1),
+(3287, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:45:59', 1),
+(3288, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3289, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3290, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3291, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3292, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3293, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3294, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3295, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3296, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3297, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3298, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3299, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3300, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3301, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3302, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3303, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3304, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3305, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3306, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3307, 'Delete', 'Schedule', 'The schedule is deleted: Prueba varias horas', '::1', '2025-05-16 00:46:00', 1),
+(3308, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3309, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3310, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3311, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3312, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3313, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3314, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3315, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3316, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3317, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3318, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3319, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3320, 'Delete', 'Schedule', 'The schedule is deleted: prueba', '::1', '2025-05-16 00:46:00', 1),
+(3321, 'Delete', 'Schedule', 'The schedule is deleted: Prueba domingo', '::1', '2025-05-16 00:46:00', 1),
+(3322, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3323, 'Delete', 'Schedule', 'The schedule is deleted: prueba de una semana', '::1', '2025-05-16 00:46:00', 1),
+(3324, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3325, 'Delete', 'Schedule', 'The schedule is deleted: prueba de una semana', '::1', '2025-05-16 00:46:00', 1),
+(3326, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3327, 'Delete', 'Schedule', 'The schedule is deleted: prueba de una semana', '::1', '2025-05-16 00:46:00', 1),
+(3328, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3329, 'Delete', 'Schedule', 'The schedule is deleted: prueba de una semana', '::1', '2025-05-16 00:46:00', 1),
+(3330, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3331, 'Delete', 'Schedule', 'The schedule is deleted: prueba de una semana', '::1', '2025-05-16 00:46:00', 1),
+(3332, 'Delete', 'Schedule', 'The schedule is deleted: update', '::1', '2025-05-16 00:46:00', 1),
+(3333, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3334, 'Delete', 'Schedule', 'The schedule is deleted: test', '::1', '2025-05-16 00:46:00', 1),
+(3335, 'Add', 'Schedule', 'The schedule is added: Prueba, Start date: 05/11/2025 Stop date: 05/18/2025', '::1', '2025-05-16 00:47:41', 1),
+(3336, 'Add', 'Schedule', 'The schedule is added: test, Start date: 05/11/2025 Stop date: 05/18/2025', '::1', '2025-05-16 00:48:10', 1),
+(3337, 'Update', 'Employee', 'The employee is modified: Brayan Moya', '::1', '2025-05-17 00:39:51', 1),
+(3338, 'Update', 'Employee', 'The employee is modified: Brayan Moya', '::1', '2025-05-17 00:40:59', 1),
+(3339, 'Update', 'Employee', 'The employee is modified: Brayan Moya', '::1', '2025-05-17 00:41:29', 1);
 
 -- --------------------------------------------------------
 
@@ -6980,8 +7047,9 @@ CREATE TABLE `schedule` (
   `location` varchar(255) DEFAULT NULL,
   `latitud` varchar(50) DEFAULT NULL,
   `longitud` varchar(50) DEFAULT NULL,
-  `date_start` date DEFAULT NULL,
-  `date_stop` date DEFAULT NULL,
+  `day` datetime DEFAULT NULL,
+  `quantity` decimal(18,6) DEFAULT NULL,
+  `notes` text,
   `project_id` int(11) DEFAULT NULL,
   `project_contact_id` int(11) DEFAULT NULL,
   `vendor_id` int(11) DEFAULT NULL
@@ -6991,8 +7059,21 @@ CREATE TABLE `schedule` (
 -- Volcado de datos para la tabla `schedule`
 --
 
-INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `date_start`, `date_stop`, `project_id`, `project_contact_id`, `vendor_id`) VALUES
-(2, 'Prueba', '1600 Amphitheatre Parkway, Mountain View, CA', '37.4216443', '-122.080638', '2025-05-03', '2025-05-31', 263, NULL, 3);
+INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `day`, `quantity`, `notes`, `project_id`, `project_contact_id`, `vendor_id`) VALUES
+(49, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-11 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(50, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-12 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(51, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-13 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(52, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-14 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(53, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-15 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(54, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-16 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(55, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-17 10:00:00', 10.000000, 'test', 256, NULL, 3),
+(56, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-11 10:00:00', 10.000000, 'test', 257, NULL, 20),
+(57, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-12 10:00:00', 10.000000, 'test', 257, NULL, 20),
+(58, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-13 10:00:00', 10.000000, 'test', 257, NULL, 20),
+(59, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-14 10:00:00', 10.000000, 'test', 257, NULL, 20),
+(60, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-15 10:00:00', 10.000000, 'test', 257, NULL, 20),
+(61, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-16 10:00:00', 10.000000, 'test', 257, NULL, 20),
+(62, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-17 10:00:00', 10.000000, 'test', 257, NULL, 20);
 
 -- --------------------------------------------------------
 
@@ -7011,7 +7092,20 @@ CREATE TABLE `schedule_concrete_vendor_contact` (
 --
 
 INSERT INTO `schedule_concrete_vendor_contact` (`id`, `schedule_id`, `contact_id`) VALUES
-(3, 2, 2);
+(9, 49, 3),
+(10, 49, 2),
+(11, 50, 3),
+(12, 50, 2),
+(13, 51, 3),
+(14, 51, 2),
+(15, 52, 3),
+(16, 52, 2),
+(17, 53, 3),
+(18, 53, 2),
+(19, 54, 3),
+(20, 54, 2),
+(21, 55, 3),
+(22, 55, 2);
 
 -- --------------------------------------------------------
 
@@ -7396,7 +7490,7 @@ ALTER TABLE `schedule`
   ADD PRIMARY KEY (`schedule_id`),
   ADD KEY `Refscheduleprojectid` (`project_id`),
   ADD KEY `Refscheduleprojectcontactid` (`project_contact_id`),
-  ADD KEY `vendor_id` (`vendor_id`);
+  ADD KEY `Refscheduleconcvendorid` (`vendor_id`);
 
 --
 -- Indices de la tabla `schedule_concrete_vendor_contact`
@@ -7491,7 +7585,7 @@ ALTER TABLE `data_tracking`
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=233;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_item`
@@ -7563,7 +7657,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3274;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3340;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -7623,13 +7717,13 @@ ALTER TABLE `rol_permission`
 -- AUTO_INCREMENT de la tabla `schedule`
 --
 ALTER TABLE `schedule`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule_concrete_vendor_contact`
 --
 ALTER TABLE `schedule_concrete_vendor_contact`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`

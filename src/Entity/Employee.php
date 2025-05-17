@@ -22,6 +22,9 @@ class Employee
     #[ORM\Column(name: 'position', type: 'string', length: 255, nullable: false)]
     private ?string $position;
 
+    #[ORM\Column(name: 'color', type: 'string', length: 50, nullable: false)]
+    private ?string $color;
+
     public function getEmployeeId(): ?int
     {
         return $this->employeeId;
@@ -55,5 +58,15 @@ class Employee
     public function setPosition(?string $position): void
     {
         $this->position = $position;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): void
+    {
+        $this->color = $color;
     }
 }

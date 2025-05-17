@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 04-05-2025 a las 01:03:52
+-- Tiempo de generación: 17-05-2025 a las 01:08:55
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -311,19 +311,20 @@ CREATE TABLE `employee` (
   `employee_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `hourly_rate` float(8,2) DEFAULT NULL,
-  `position` varchar(255) DEFAULT NULL
+  `position` varchar(255) DEFAULT NULL,
+  `color` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`) VALUES
-(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente'),
-(2, 'Andres Iglesias', 70.00, 'Developer'),
-(3, 'Geydis Marquez', 5.00, 'Jefe'),
-(4, 'Luis Miguel', 2.00, 'RRHH'),
-(5, 'Brian Marcel', 2.00, 'Ayudante');
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`) VALUES
+(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', NULL),
+(2, 'Andres Iglesias', 70.00, 'Developer', NULL),
+(3, 'Geydis Marquez', 5.00, 'Jefe', NULL),
+(4, 'Luis Miguel', 2.00, 'RRHH', NULL),
+(5, 'Brian Marcel', 2.00, 'Ayudante', NULL);
 
 -- --------------------------------------------------------
 
@@ -1235,8 +1236,9 @@ CREATE TABLE `schedule` (
   `location` varchar(255) DEFAULT NULL,
   `latitud` varchar(50) DEFAULT NULL,
   `longitud` varchar(50) DEFAULT NULL,
-  `date_start` date DEFAULT NULL,
-  `date_stop` date DEFAULT NULL,
+  `day` datetime DEFAULT NULL,
+  `quantity` decimal(18,6) DEFAULT NULL,
+  `notes` text,
   `project_id` int(11) DEFAULT NULL,
   `project_contact_id` int(11) DEFAULT NULL,
   `vendor_id` int(11) DEFAULT NULL
@@ -1607,7 +1609,7 @@ ALTER TABLE `schedule`
   ADD PRIMARY KEY (`schedule_id`),
   ADD KEY `Refscheduleprojectid` (`project_id`),
   ADD KEY `Refscheduleprojectcontactid` (`project_contact_id`),
-  ADD KEY `vendor_id` (`vendor_id`);
+  ADD KEY `Refscheduleconcvendorid` (`vendor_id`);
 
 --
 -- Indices de la tabla `schedule_concrete_vendor_contact`

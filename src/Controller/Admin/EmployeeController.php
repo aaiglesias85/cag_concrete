@@ -102,13 +102,14 @@ class EmployeeController extends AbstractController
         $name = $request->get('name');
         $hourly_rate = $request->get('hourly_rate');
         $position = $request->get('position');
+        $color = $request->get('color');
 
         try {
 
             if ($employee_id == "") {
-                $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $position);
+                $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $position, $color);
             } else {
-                $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $position);
+                $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $position, $color);
             }
 
             if ($resultado['success']) {

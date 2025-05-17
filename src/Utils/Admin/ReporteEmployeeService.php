@@ -6,10 +6,12 @@ use App\Entity\DataTrackingLabor;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ReporteEmployeeService extends Base
 {
@@ -54,6 +56,14 @@ class ReporteEmployeeService extends Base
         $fila = 10;
         $diasSemana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+        // Separar empleados por rol
+        $empleadosNormales = array_filter($employees, fn($e) => $e['role'] !== 'Subcontractor');
+        $subcontractors = array_filter($employees, fn($e) => $e['role'] === 'Subcontractor');
+        $empleadosOrdenados = array_merge($empleadosNormales, [['separator' => true]], $subcontractors);
+
+        // Color verde oscuro para subcontractors
+        $subcontractorColorHex = '007744'; // Verde oscuro reutilizable
+
         foreach ($semanas as $semana) {
             $col = 1;
             $sheet->setCellValue([$col++, $fila], $semana->nombre);
@@ -66,19 +76,42 @@ class ReporteEmployeeService extends Base
                 $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true);
             }
 
-            // Agregar columna final para total por empleado
             $sheet->setCellValue([$col, $fila], 'Total');
             $this->estilizarCelda($sheet, [$col, $fila], $styleArray, true);
-
             $fila++;
 
             $sumaPorColumna = [];
             $totalGeneral = 0;
 
-            foreach ($employees as $employee) {
+            foreach ($empleadosOrdenados as $employee) {
+                if (isset($employee['separator']) && $employee['separator']) {
+                    $fila++; // fila vacía entre normales y subcontractors
+                    continue;
+                }
+
                 $col = 1;
+
+                $employeeColor = $employee['color'] ?: null;
+                $isSubcontractor = $employee['role'] === 'Subcontractor';
+
+                // Aplicar color definido por empleado o verde oscuro si es subcontractor
+                $fillColor = null;
+                if ($employeeColor) {
+                    $fillColor = ltrim($employeeColor, '#');
+                } elseif ($isSubcontractor) {
+                    $fillColor = $subcontractorColorHex;
+                }
+
+                $customStyle = $styleArray;
+                if ($fillColor) {
+                    $customStyle['fill'] = [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => $fillColor],
+                    ];
+                }
+
                 $sheet->setCellValue([$col++, $fila], $employee['name']);
-                $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true, Alignment::HORIZONTAL_LEFT);
+                $this->estilizarCelda($sheet, [$col - 1, $fila], $customStyle, true, Alignment::HORIZONTAL_LEFT);
 
                 $totalEmpleado = 0;
 
@@ -93,25 +126,26 @@ class ReporteEmployeeService extends Base
                     );
 
                     $sheet->setCellValue([$col++, $fila], implode(', ', $proyectos));
-                    $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray);
+                    $this->estilizarCelda($sheet, [$col - 1, $fila], $customStyle);
 
                     $horas = $repo->TotalHours('', $employee['employee_id'], $project_id, $dia, $dia);
                     $sheet->setCellValue([$col++, $fila], $horas);
-                    $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray);
+                    $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray); // sin color para horas
 
                     $totalEmpleado += $horas;
                     $sumaPorColumna[$index] = ($sumaPorColumna[$index] ?? 0) + $horas;
                     $totalGeneral += $horas;
                 }
 
-                // Total por empleado
                 $sheet->setCellValue([$col, $fila], $totalEmpleado);
-                $this->estilizarCelda($sheet, [$col, $fila], $styleArray, true);
+                $this->estilizarCelda($sheet, [$col, $fila], $customStyle, true);
 
                 $fila++;
             }
 
-            // Agregar fila de total por columna
+            // Fila vacía antes del total
+            $fila++;
+
             $col = 2;
             $sheet->setCellValue([1, $fila], 'Total');
             $this->estilizarCelda($sheet, [1, $fila], $styleArray, true);
@@ -122,11 +156,9 @@ class ReporteEmployeeService extends Base
                 $this->estilizarCelda($sheet, [$col - 1, $fila], $styleArray, true);
             }
 
-            // Total general al final
             $sheet->setCellValue([$col, $fila], $totalGeneral);
             $this->estilizarCelda($sheet, [$col, $fila], $styleArray, true);
 
-            // Aplicar bordes a toda la fila de totales
             $ultimaColumna = $col;
             $rangoFilaTotal = 'A' . $fila . ':' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($ultimaColumna) . $fila;
             $sheet->getStyle($rangoFilaTotal)->applyFromArray($styleArray);
@@ -153,8 +185,6 @@ class ReporteEmployeeService extends Base
         }
     }
 
-
-
     /**
      * ListarEmployeesParaReporteExcel
      * @param $project_id
@@ -165,22 +195,62 @@ class ReporteEmployeeService extends Base
     public function ListarEmployeesParaReporteExcel($project_id, $fecha_inicial, $fecha_fin, $employee_id)
     {
         $employees = [];
-
         $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
             ->ListarEmployeesDeProject($project_id, $fecha_inicial, $fecha_fin, $employee_id);
-        foreach ($lista as $value) {
 
-            if ($value->getEmployee()) {
-                $employees[] = [
-                    'employee_id' => $value->getEmployee()->getEmployeeId(),
-                    'name' => $value->getEmployee()->getName(),
-                ];
+        // Agrupar por datatracking_id
+        $grupos = [];
+
+        foreach ($lista as $value) {
+            if (!$value->getEmployee()) {
+                continue;
             }
 
+            $datatrackingId = $value->getDatatracking()->getId();
+            $employee = $value->getEmployee();
+            $role = $value->getRole();
+            $color = $employee->getColor() ?: "";
+
+            $grupos[$datatrackingId][] = [
+                'datatracking_id' => $datatrackingId,
+                'employee_id' => $employee->getEmployeeId(),
+                'name' => $employee->getName(),
+                'role' => $role,
+                'color' => $color,
+            ];
+        }
+
+        // Ajustar colores de los laborers si no tienen color asignado
+        foreach ($grupos as $grupo) {
+            // Buscar el color del Lead
+            $colorLead = '';
+            foreach ($grupo as $entry) {
+                if (strtolower($entry['role']) === 'lead' && !empty($entry['color'])) {
+                    $colorLead = $entry['color'];
+                    break;
+                }
+            }
+
+            // Asignar color del Lead a los Laborer solo si no tienen color
+            foreach ($grupo as &$entry) {
+                if (
+                    strtolower($entry['role']) === 'laborer' &&
+                    empty($entry['color']) &&
+                    !empty($colorLead)
+                ) {
+                    $entry['color'] = $colorLead;
+                }
+            }
+
+            // Agregar al arreglo final
+            foreach ($grupo as $value) {
+                $employees[] = $value;
+            }
         }
 
         return $employees;
     }
+
 
     /***
      * ObtenerSemanasReporteExcel
