@@ -32,7 +32,7 @@ class ProjectItem
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Equation")]
     #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
-    private ?Equation $equation;
+    private ?Equation $equation = null;
 
     public function getId(): ?int
     {
