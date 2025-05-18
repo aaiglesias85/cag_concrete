@@ -1,0 +1,1 @@
+ALTER TABLE `data_tracking_labor` ADD `color` VARCHAR(50) NULL AFTER `role`;

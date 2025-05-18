@@ -809,6 +809,20 @@ var DataTracking = function () {
 
         $("[data-switch=true]").bootstrapSwitch();
 
+        $('#labor-color').minicolors({
+            control: 'hue',
+            format: "hex",
+            defaultValue: '#34bfa3',
+            inline: false,
+            letterCase: 'uppercase',
+            opacity: false,
+            position: 'bottom left',
+            change: function (hex, opacity) {
+                if (!hex) return;
+            },
+            theme: 'bootstrap'
+        });
+
         initSelectProject();
 
         // change
@@ -2003,6 +2017,7 @@ var DataTracking = function () {
 
                 var hours = $('#hours').val();
                 var role = $('#labor-role').val();
+                var color = $('#labor-color').val();
 
                 var hourly_rate = $('#employee option[value="' + employee_id + '"]').attr("data-rate");
                 if (employee_id === '') {
@@ -2024,6 +2039,7 @@ var DataTracking = function () {
                         hourly_rate: hourly_rate,
                         total: total,
                         role: role,
+                        color: color,
                         posicion: labor.length
                     });
 
@@ -2039,6 +2055,7 @@ var DataTracking = function () {
                         labor[posicion].hourly_rate = hourly_rate;
                         labor[posicion].total = total;
                         labor[posicion].role = role;
+                        labor[posicion].color = color;
                     }
                 }
 
@@ -2109,6 +2126,7 @@ var DataTracking = function () {
 
                 $('#hours').val(labor[posicion].hours);
                 $('#labor-role').val(labor[posicion].role);
+                $('#labor-color').minicolors('value', labor[posicion].color);
 
                 // open modal
                 $('#modal-data-tracking-labor').modal('show');
@@ -2379,6 +2397,8 @@ var DataTracking = function () {
 
         $('#employee-type-owner').prop('checked', true);
         $('#employee-type-subcontractor').prop('checked', false);
+
+        $('#labor-color').minicolors('value', '#34bfa3');
 
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");

@@ -443,6 +443,7 @@ class DataTrackingService extends Base
                 "subcontractor" => $subcontractor,
                 "employee" => $employee_name,
                 "role" => $value->getRole(),
+                "color" => $value->getColor(),
                 "hours" => $hours,
                 "hourly_rate" => $hourly_rate,
                 "total" => $total,
@@ -901,6 +902,7 @@ class DataTrackingService extends Base
             $data_tracking_labor_entity->setHourlyRate($value->hourly_rate);
             $data_tracking_labor_entity->setHours($value->hours);
             $data_tracking_labor_entity->setRole($value->role);
+            $data_tracking_labor_entity->setColor($value->color);
 
             if ($value->employee_id != '') {
                 $employee_entity = $this->getDoctrine()->getRepository(Employee::class)

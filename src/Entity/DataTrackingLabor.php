@@ -22,6 +22,9 @@ class DataTrackingLabor
     #[ORM\Column(name: 'role', type: 'string', length: 255, nullable: false)]
     private ?string $role;
 
+    #[ORM\Column(name: 'color', type: 'string', length: 50, nullable: false)]
+    private ?string $color;
+
     #[ORM\ManyToOne(targetEntity: Employee::class)]
     #[ORM\JoinColumn(name: 'employee_id', referencedColumnName: 'employee_id')]
     private ?Employee $employee;
@@ -67,6 +70,16 @@ class DataTrackingLabor
     public function setRole(?string $role): void
     {
         $this->role = $role;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): void
+    {
+        $this->color = $color;
     }
 
     public function getEmployee(): ?Employee

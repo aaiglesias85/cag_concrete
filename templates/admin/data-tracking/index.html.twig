@@ -3,11 +3,13 @@
 {% block subtitle %} - Data Tracking{% endblock %}
 
 {% block stylesheetspecific %}
-<style>
-    .m-datatable.m-datatable--default>.m-datatable__table>.m-datatable__body .m-datatable__row.row-pending>.m-datatable__cell {
-        background: #FFB38C;
-    }
-</style>
+    <link href="{{ asset('bundles/ican/plugins/jquery-minicolors/jquery.minicolors.css') }}" rel="stylesheet">
+    
+    <style>
+        .m-datatable.m-datatable--default > .m-datatable__table > .m-datatable__body .m-datatable__row.row-pending > .m-datatable__cell {
+            background: #FFB38C;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -50,17 +52,17 @@
                             Data Tracking
                         </h3>
                     </div>
-                      <div class="col-md-1">
-                           
-                                    <a href="#" id="btn-reset-filters"
-                                       class="btn"
-                                       aria-label="Reset filters">
+                    <div class="col-md-1">
+
+                        <a href="#" id="btn-reset-filters"
+                           class="btn"
+                           aria-label="Reset filters">
                                         <span>
                                             <i class="la la-refresh"></i>
                                             <span>Reset filters</span>
                                         </span>
-                                    </a>
-                                    
+                        </a>
+
                     </div>
                 </div>
                 <div class="m-portlet__head-tools">
@@ -853,7 +855,8 @@
                                                     {% if permiso.agregar or permiso.editar %}
                                                         <div class="col-md-2">
                                                             <div class="btn-group">
-                                                                <button id="btn-agregar-subcontract" class="btn btn-success"
+                                                                <button id="btn-agregar-subcontract"
+                                                                        class="btn btn-success"
                                                                         style="margin-bottom: 20px; margin-top: 10px;">
                                                                     New <i class="la la-plus"></i>
                                                                 </button>
@@ -919,7 +922,8 @@
                 </div>
                 <div class="modal-body">
 
-                    <div class="m-alert m-alert--icon m-alert--outline alert alert-danger alert-dismissible fade show" role="alert">
+                    <div class="m-alert m-alert--icon m-alert--outline alert alert-danger alert-dismissible fade show"
+                         role="alert">
                         <div class="m-alert__icon">
                             <i class="la la-warning"></i>
                         </div>
@@ -935,7 +939,8 @@
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btn-save-data-tracking-confirm">Yes
+                    <button type="button" class="btn btn-success" data-dismiss="modal"
+                            id="btn-save-data-tracking-confirm">Yes
                     </button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
                 </div>
@@ -1100,7 +1105,8 @@
                                     <div class="input-group m-input-group">
                                         <div class="input-group-prepend"><span class="input-group-text">$</span>
                                         </div>
-                                        <input type="text" class="form-control event-change form-control-number" id="price-subcontract" name="price">
+                                        <input type="text" class="form-control event-change form-control-number"
+                                               id="price-subcontract" name="price">
                                     </div>
                                 </div>
                             </div>
@@ -1155,12 +1161,14 @@
                                     <div class="m-form__group form-group">
                                         <div class="m-radio-inline">
                                             <label class="m-radio">
-                                                <input type="radio" name="employeetype" id="employee-type-owner" checked>
+                                                <input type="radio" name="employeetype" id="employee-type-owner"
+                                                       checked>
                                                 Owner
                                                 <span></span>
                                             </label>
                                             <label class="m-radio">
-                                                <input type="radio" name="employeetype" id="employee-type-subcontractor" >
+                                                <input type="radio" name="employeetype"
+                                                       id="employee-type-subcontractor">
                                                 Subcontractor
                                                 <span></span>
                                             </label>
@@ -1227,7 +1235,8 @@
                                             </select>
                                         </div>
                                         <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                            <a href="javascript:;" title="Add employee" id="btn-add-employee-subcontractor"
+                                            <a href="javascript:;" title="Add employee"
+                                               id="btn-add-employee-subcontractor"
                                                class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
                                                 <i class="la la-plus"></i>
                                             </a>
@@ -1255,7 +1264,20 @@
                                 Position/Role
                                 <span class="ic-small italic">(optional)</span>
                             </label>
-                            <input type="text" class="form-control" id="labor-role" name="role" />
+                            <input type="text" class="form-control" id="labor-role" name="role"/>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Color
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="labor-color" name="color"/>
+                                </div>
+                            </div>
+
                         </div>
 
                     </form>
@@ -1888,7 +1910,8 @@
                                                                         id="basic-addon1">Total $:</span>
                                                             </div>
                                                             <input type="text" class="form-control m-input"
-                                                                   id="monto_total_conc_vendor-detalle" value="" disabled>
+                                                                   id="monto_total_conc_vendor-detalle" value=""
+                                                                   disabled>
                                                         </div>
                                                     </div>
 
@@ -1931,7 +1954,8 @@
                                                                         id="basic-addon1">Total $:</span>
                                                             </div>
                                                             <input type="text" class="form-control m-input"
-                                                                   id="monto_total_subcontract-detalle" value="" disabled>
+                                                                   id="monto_total_subcontract-detalle" value=""
+                                                                   disabled>
                                                         </div>
                                                     </div>
 
@@ -1975,6 +1999,8 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
+
+    <script src="{{ asset('bundles/ican/plugins/jquery-minicolors/jquery.minicolors.min.js') }}"></script>
 
     <!-- init components -->
     <script>

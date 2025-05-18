@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 17-05-2025 a las 01:08:55
+-- Tiempo de generación: 18-05-2025 a las 14:38:26
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -227,6 +227,7 @@ CREATE TABLE `data_tracking_labor` (
   `hours` decimal(18,2) DEFAULT NULL,
   `hourly_rate` decimal(18,2) DEFAULT NULL,
   `role` varchar(255) DEFAULT NULL,
+  `color` varchar(50) DEFAULT NULL,
   `data_tracking_id` int(11) NOT NULL,
   `employee_id` int(11) DEFAULT NULL,
   `subcontractor_employee_id` int(11) DEFAULT NULL
@@ -236,14 +237,14 @@ CREATE TABLE `data_tracking_labor` (
 -- Volcado de datos para la tabla `data_tracking_labor`
 --
 
-INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `data_tracking_id`, `employee_id`, `subcontractor_employee_id`) VALUES
-(1, 1.00, 56.00, 'Jefe', 4, 1, NULL),
-(3, 5.00, 70.00, 'Jefe', 3, 2, NULL),
-(4, 10.00, 56.00, 'Constructor', 3, 1, NULL),
-(5, 4.00, 70.00, 'Asistent', 4, 2, NULL),
-(6, 2.00, 2.00, 'RRHH', 4, 4, NULL),
-(7, 2.00, 2.00, 'Ayudante', 4, 5, NULL),
-(8, 5.00, 70.00, 'Developer', 5, 2, NULL);
+INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `color`, `data_tracking_id`, `employee_id`, `subcontractor_employee_id`) VALUES
+(1, 1.00, 56.00, 'Jefe', NULL, 4, 1, NULL),
+(3, 5.00, 70.00, 'Jefe', NULL, 3, 2, NULL),
+(4, 10.00, 56.00, 'Constructor', NULL, 3, 1, NULL),
+(5, 4.00, 70.00, 'Asistent', NULL, 4, 2, NULL),
+(6, 2.00, 2.00, 'RRHH', NULL, 4, 4, NULL),
+(7, 2.00, 2.00, 'Ayudante', NULL, 4, 5, NULL),
+(8, 5.00, 70.00, 'Developer', NULL, 5, 2, NULL);
 
 -- --------------------------------------------------------
 

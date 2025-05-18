@@ -209,7 +209,9 @@ class ReporteEmployeeService extends Base
             $datatrackingId = $value->getDatatracking()->getId();
             $employee = $value->getEmployee();
             $role = $value->getRole();
-            $color = $employee->getColor() ?: "";
+
+            $color = $value->getColor() ?: "";
+            $color = $color === "" ? $employee->getColor() ?: $color : $color;
 
             $grupos[$datatrackingId][] = [
                 'datatracking_id' => $datatrackingId,
