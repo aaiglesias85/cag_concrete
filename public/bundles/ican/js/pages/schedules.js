@@ -461,9 +461,11 @@ var Schedules = function () {
                 location: {
                     required: true
                 },
-                quantity: {
+                /*quantity: {
                     required: true
                 },
+
+                 */
             },
             showErrors: function (errorMap, errorList) {
                 // Clean up any tooltips for valid elements
