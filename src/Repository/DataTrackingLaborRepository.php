@@ -48,19 +48,19 @@ class DataTrackingLaborRepository extends EntityRepository
     }
 
     /**
-     * ListarDataTrackingsDeEmployeeEmployee: Lista el data tracking de employee employee
+     * ListarDataTrackingsDeEmployeeSubcontractor: Lista el data tracking de employee employee
      *
      * @return DataTrackingLabor[]
      */
-    public function ListarDataTrackingsDeEmployeeEmployee($employee_employee_id)
+    public function ListarDataTrackingsDeEmployeeSubcontractor($employee_subcontractor_id)
     {
         $qb = $this->createQueryBuilder('d_t_l')
-            ->leftJoin('d_t_l.employeeEmployee', 's_e')
+            ->leftJoin('d_t_l.employeeSubcontractor', 's_e')
             ->orderBy('d_t_l.id', 'ASC');
 
-        if (!empty($employee_employee_id)) {
-            $qb->andWhere('s_e.employeeId = :employee_employee_id')
-                ->setParameter('employee_employee_id', $employee_employee_id);
+        if (!empty($employee_subcontractor_id)) {
+            $qb->andWhere('s_e.employeeId = :employee_subcontractor_id')
+                ->setParameter('employee_subcontractor_id', $employee_subcontractor_id);
         }
 
         return $qb->getQuery()->getResult();
