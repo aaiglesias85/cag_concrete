@@ -144,7 +144,7 @@ var Schedules = function () {
                 if (info.event.extendedProps && info.event.extendedProps.description) {
 
                     var content = `
-                        <b>Hour:</b> ${info.event.extendedProps.hour} <br>
+                        <b>Hour:</b> ${info.event.extendedProps.hour !== "" ? info.event.extendedProps.hour : 'All day'} <br>
                         <b>Location:</b>${info.event.extendedProps.location} <br>
                         <b>Description:</b>${info.event.extendedProps.description} <br>
                         <b>Conc. Vendor:</b>${info.event.extendedProps.concreteVendor} <br>
@@ -417,6 +417,14 @@ var Schedules = function () {
         $('#concrete-vendor').val('');
         $('#concrete-vendor').trigger('change');
 
+        $('#highpriority').prop('checked', false);
+
+
+        // reset
+        $('#hour').each(function (e) {
+            if ($(this).val() === "")
+                $(this).remove();
+        });
         $('#hour').attr('multiple', '');
         $('#hour').select2();
 
@@ -447,6 +455,7 @@ var Schedules = function () {
 
         $('.date-new').removeClass('m--hide');
         $('#div-day').removeClass('m--hide').addClass('m--hide');
+        $('#btn-clonar').removeClass('m--hide').addClass('m--hide');
 
     };
 
@@ -542,7 +551,7 @@ var Schedules = function () {
         var project_id = $('#project').val();
         var hour = $('#hour').val();
 
-        if ($('#schedule-form').valid() && project_id !== '' && hour.length > 0 && isValidFechas()) {
+        if ($('#schedule-form').valid() && project_id !== '' && isValidFechas()) {
 
             var project_contact_id = $('#contact-project').val();
             var date_start = $('#date-start').val();
@@ -558,6 +567,7 @@ var Schedules = function () {
 
             var quantity = $('#quantity').val();
             var notes = $('#notes').val();
+            var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
 
             MyApp.block('#form-schedule');
 
@@ -579,6 +589,7 @@ var Schedules = function () {
                     'hour': hour,
                     'quantity': quantity,
                     'notes': notes,
+                    'highpriority': highpriority,
 
                 },
                 success: function (response) {
@@ -615,18 +626,6 @@ var Schedules = function () {
                 $element.closest('.form-group')
                     .removeClass('has-success').addClass('has-error');
             }
-            if (hour.length === 0) {
-                var $element = $('#select-hour .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
-            }
         }
     }
     var ActualizarSchedule = function () {
@@ -634,7 +633,7 @@ var Schedules = function () {
         var project_id = $('#project').val();
         var hour = $('#hour').val();
 
-        if ($('#schedule-form').valid() && project_id !== '' && hour !== '' && isValidFechas()) {
+        if ($('#schedule-form').valid() && project_id !== '' && isValidFechas()) {
 
             var schedule_id = $('#schedule_id').val();
             var project_contact_id = $('#contact-project').val();
@@ -649,6 +648,7 @@ var Schedules = function () {
 
             var quantity = $('#quantity').val();
             var notes = $('#notes').val();
+            var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
 
             MyApp.block('#form-schedule');
 
@@ -670,6 +670,7 @@ var Schedules = function () {
                     'hour': hour,
                     'quantity': quantity,
                     'notes': notes,
+                    'highpriority': highpriority,
 
                 },
                 success: function (response) {
@@ -696,18 +697,6 @@ var Schedules = function () {
         } else {
             if (project_id === "") {
                 var $element = $('#select-project .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
-            }
-            if (hour === "") {
-                var $element = $('#select-hour .select2');
                 $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                     .data("title", "This field is required")
                     .addClass("has-error")
@@ -899,6 +888,7 @@ var Schedules = function () {
                     $('.date-new').addClass('m--hide');
 
                     $('#hour').removeAttr('multiple');
+                    $('#hour').prepend(new Option('Select', '', false, false));
                     $('#hour').select2();
 
                     $('#hour').val(response.schedule.hour);
@@ -906,6 +896,10 @@ var Schedules = function () {
 
                     $('#quantity').val(response.schedule.quantity);
                     $('#notes').val(response.schedule.notes);
+
+                    $('#highpriority').prop('checked', response.schedule.highpriority);
+
+                    $('#btn-clonar').removeClass('m--hide');
 
                 } else {
                     toastr.error(response.error, "");
@@ -1231,6 +1225,132 @@ var Schedules = function () {
         });
     }
 
+    // clonar
+    var initAccionClonar = function () {
+        // validacion
+        initFormClonar();
+
+        $(document).off('click', "#schedule-table-editable a.clonar");
+        $(document).on('click', "#schedule-table-editable a.clonar", function (e) {
+            e.preventDefault();
+            resetFormsClonar();
+
+            var schedule_id = $(this).data('id');
+            $('#schedule_id').val(schedule_id);
+
+            $('#modal-clonar-schedule').modal('show');
+        });
+
+        $(document).off('click', "#btn-clonar");
+        $(document).on('click', "#btn-clonar", function (e) {
+
+            resetFormsClonar();
+
+            $('#modal-clonar-schedule').modal('show');
+        });
+
+        $(document).off('click', "#btn-clonar-schedule");
+        $(document).on('click', "#btn-clonar-schedule", function (e) {
+
+            var schedule_id = $('#schedule_id').val();
+
+            if ($('#clonar-schedule-form').valid()) {
+
+                var date_start = $('#date-start-clonar').val();
+                var date_stop = $('#date-stop-clonar').val();
+
+                MyApp.block('.modal-content');
+
+                $.ajax({
+                    type: "POST",
+                    url: "schedule/clonar",
+                    dataType: "json",
+                    data: {
+                        'schedule_id': schedule_id,
+                        'date_start': date_start,
+                        'date_stop': date_stop,
+                    },
+                    success: function (response) {
+                        mApp.unblock('.modal-content');
+                        if (response.success) {
+
+                            toastr.success(response.message, "Success");
+
+                            cerrarFormsConfirmated();
+                            resetFormsClonar();
+                            $('#modal-clonar-schedule').modal('hide');
+
+                            btnClickFiltrar();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    },
+                    failure: function (response) {
+                        mApp.unblock('.modal-content');
+
+                        toastr.error(response.error, "");
+                    }
+                });
+
+            }
+        });
+
+
+        function initFormClonar() {
+            $("#clonar-schedule-form").validate({
+                rules: {
+                    datestart: {
+                        required: true
+                    },
+                    datestop: {
+                        required: true
+                    },
+                },
+                showErrors: function (errorMap, errorList) {
+                    // Clean up any tooltips for valid elements
+                    $.each(this.validElements(), function (index, element) {
+                        var $element = $(element);
+
+                        $element.data("title", "") // Clear the title - there is no error associated anymore
+                            .removeClass("has-error")
+                            .tooltip("dispose");
+
+                        $element
+                            .closest('.form-group')
+                            .removeClass('has-error').addClass('success');
+                    });
+
+                    // Create new tooltips for invalid elements
+                    $.each(errorList, function (index, error) {
+                        var $element = $(error.element);
+
+                        $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                            .data("title", error.message)
+                            .addClass("has-error")
+                            .tooltip({
+                                placement: 'bottom'
+                            }); // Create a new tooltip based on the error messsage we just set in the title
+
+                        $element.closest('.form-group')
+                            .removeClass('has-success').addClass('has-error');
+
+                    });
+                }
+            });
+
+        };
+        function resetFormsClonar() {
+            $('#clonar-schedule-form input').each(function (e) {
+                $element = $(this);
+                $element.val('');
+
+                $element.data("title", "").removeClass("has-error").tooltip("dispose");
+                $element.closest('.form-group').removeClass('has-error').addClass('success');
+            });
+        };
+    };
+
 
     return {
         //main function to initiate the module
@@ -1244,6 +1364,7 @@ var Schedules = function () {
             initAccionSalvar();
             initAccionCerrar();
             initAccionEditar();
+            initAccionClonar();
             initAccionEliminar();
             initAccionFiltrar();
             initAccionResetFiltrar();

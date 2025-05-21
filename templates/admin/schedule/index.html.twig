@@ -310,7 +310,8 @@
                                     <div class="input-group m-input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i
                                                         class="flaticon-location"></i></span></div>
-                                        <input type="text" class="form-control event-change" id="location" name="location">
+                                        <input type="text" class="form-control event-change" id="location"
+                                               name="location">
 
                                     </div>
                                 </div>
@@ -352,9 +353,10 @@
                                 <div class="col-md-3" id="select-hour">
                                     <label>
                                         Hour
-                                        <span class="ic-small italic">(required)</span>
+                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="hour" name="hour" multiple="">
+                                    <select class="form-control m-select2 event-change" id="hour" name="hour"
+                                            multiple="">
                                         {% for h in 0..23 %}
                                             {% for m in [0, 15, 30, 45] %}
                                                 {% set hour = "%02d:%02d"|format(h, m) %}
@@ -370,12 +372,23 @@
                                     </label>
                                     <input type="text" class="form-control" id="quantity" name="quantity">
                                 </div>
-                                <div class="col-md-7">
+                                <div class="col-md-2">
+                                    <label></label>
+                                    <div>
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" id="highpriority" name="highpriority">
+                                            High Priority
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
                                     <label>
                                         Notes
                                         <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <textarea class="form-control form-control-text" rows="3" id="notes" name="notes"> </textarea>
+                                    <textarea class="form-control form-control-text" rows="3" id="notes"
+                                              name="notes"> </textarea>
                                 </div>
 
                             </div>
@@ -388,6 +401,10 @@
                             <button id="btn-salvar-schedule" class="btn btn-success" type="button">
                                 Save
                             </button>
+
+                            <button id="btn-clonar" class="btn btn-warning m--hide" type="button">
+                                Clone Schedule
+                            </button>
                         {% endif %}
                         <button class="btn btn-danger cerrar-form-schedule" type="button">
                             Cancel
@@ -398,6 +415,70 @@
 
         </div>
 
+    </div>
+
+    <!-- modal clonar -->
+    <div class="modal fade" id="modal-clonar-schedule" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Clone Schedule
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="clonar-schedule-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <div class="form-group m-form__group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>
+                                        Start Date
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class='input-group date'>
+                                        <input type='text' class="form-control m-input date-picker event-change"
+                                               placeholder="Date Start" autocomplete="off"
+                                               id="date-start-clonar" name="datestart"/>
+                                        <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="la la-calendar glyphicon-th"></i>
+                                                    </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>
+                                        Stop Date
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <div class='input-group date'>
+                                        <input type='text' class="form-control m-input date-picker event-change"
+                                               placeholder="Date Stop" autocomplete="off"
+                                               id="date-stop-clonar" name="datestop"/>
+                                        <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="la la-calendar glyphicon-th"></i>
+                                                    </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-clonar-schedule">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 

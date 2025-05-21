@@ -61,20 +61,27 @@ class ScheduleService extends Base
 
                 $dayOriginal = $value->getDay(); // Fecha original con hora de la DB
 
+                $class = "m-fc-event--brand";
+                $highpriority = $value->getHighpriority();
+                if ($highpriority) {
+                    $class = "m-fc-event--danger m-fc-event--solid-danger";
+                }
+
                 $arreglo_resultado[$cont] = [
                     "id" => $schedule_id,
                     "title" => $title,
                     'start' => $horaActual->format('Y-m-d H:i'), // hora artificial para mostrar en calendario
                     'end' => $horaActual->format('Y-m-d H:i'),
-                    'className' => "fc-event-primary",
+                    'className' => $class,
                     "location" => $value->getLocation(),
                     "description" => $value->getDescription(),
                     "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
                     "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
                     "day" => $dayOriginal->format('m/d/Y'), // original de la DB
-                    "hour" => $dayOriginal->format('H:i'),  // original de la DB
+                    "hour" => $value->getHour() != null ? $value->getHour() : "",
                     "quantity" => $value->getQuantity(),
                     "notes" => $value->getNotes(),
+                    "highpriority" => $highpriority,
                 ];
 
                 $horaActual->modify('+90 minutes'); // incremento de 90 min
@@ -113,9 +120,10 @@ class ScheduleService extends Base
             $arreglo_resultado['longitud'] = $entity->getLongitud();
 
             $arreglo_resultado['day'] = $entity->getDay()->format('m/d/Y');
-            $arreglo_resultado['hour'] = $entity->getDay()->format('H:i');
+            $arreglo_resultado['hour'] = $entity->getHour() != null ? $entity->getHour() : "";
             $arreglo_resultado['quantity'] = $entity->getQuantity();
             $arreglo_resultado['notes'] = $entity->getNotes();
+            $arreglo_resultado['highpriority'] = $entity->getHighpriority();
 
             $vendor_id = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId() : '';
             $arreglo_resultado['vendor_id'] = $vendor_id;
@@ -260,12 +268,82 @@ class ScheduleService extends Base
     }
 
     /**
+     * ClonarSchedule: Clonar los datos del schedule en la BD
+     * @param int $schedule_id Id
+     * @author Marcel
+     */
+    public function ClonarSchedule($schedule_id, $date_start_param, $date_stop_param)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(Schedule::class)
+            ->find($schedule_id);
+        /** @var Schedule $entity */
+        if ($entity != null) {
+
+            $project_id = $entity->getProject()->getProjectId();
+            $project_contact_id = $entity->getContactProject() ? $entity->getContactProject()->getContactId() : "";
+            $hour = $entity->getHour() !== null ? $entity->getHour() : "";
+            $description = $entity->getDescription();
+            $location = $entity->getLocation();
+            $latitud = $entity->getLatitud();
+            $longitud = $entity->getLongitud();
+            $vendor_id = $entity->getConcreteVendor()->getVendorId();
+            $quantity = $entity->getQuantity();
+            $notes = $entity->getNotes();
+            $highpriority = $entity->getHighpriority();
+
+            $concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
+            $concrete_vendor_contacts_id = implode(",",$concrete_vendor_contacts_id);
+
+            // validar
+            $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
+            if ($validar_fecha_error) {
+                $resultado['success'] = false;
+                $resultado['error'] = $validar_fecha_error;
+                return $resultado;
+            }
+
+            $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
+            $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
+
+            $intervalo = new \DateInterval('P1D');
+            $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
+            foreach ($periodo as $dia) {
+
+                /*
+                if ($dia->format('w') === '0') {
+                    continue; // Saltar domingos
+                }
+                */
+
+                $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
+                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority);
+
+            }
+
+
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Add";
+            $log_categoria = "Schedule";
+            $log_descripcion = "The schedule is added: $description, Start date: " . $date_start->format('m/d/Y') . " Stop date: " . $date_stop->format('m/d/Y');
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+
+            return $resultado;
+        }
+    }
+
+    /**
      * ActualizarSchedule: Actuializa los datos del rol en la BD
      * @param int $schedule_id Id
      * @author Marcel
      */
     public function ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
-                                       $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes)
+                                       $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -281,11 +359,14 @@ class ScheduleService extends Base
 
             $entity->setQuantity($quantity);
             $entity->setNotes($notes);
+            $entity->setHighpriority($highpriority);
 
-            if ($day != '' && $hour != '') {
-                $day = \DateTime::createFromFormat('m/d/Y H:i', $day . " " . $hour);
+            if ($day != '') {
+                $day = \DateTime::createFromFormat('m/d/Y', $day);
                 $entity->setDay($day);
             }
+
+            $entity->setHour($hour);
 
             if ($project_id != '') {
                 $project = $this->getDoctrine()->getRepository(Project::class)
@@ -330,11 +411,12 @@ class ScheduleService extends Base
      * @author Marcel
      */
     public function SalvarSchedule($project_id, $project_contact_id, $date_start_param, $date_stop_param, $description, $location, $latitud, $longitud,
-                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes)
+                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes, $highpriority)
     {
         $em = $this->getDoctrine()->getManager();
 
-        foreach ($hours as $hour) {
+        if (empty($hours)) {
+            $hour = "";
 
             // validar
             $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
@@ -357,45 +439,42 @@ class ScheduleService extends Base
                 }
                 */
 
-                $day = \DateTime::createFromFormat('Y-m-d H:i', $dia->format('Y-m-d') . ' ' . $hour);
-
-                $entity = new Schedule();
-
-                $entity->setDescription($description);
-                $entity->setLocation($location);
-                $entity->setLatitud($latitud);
-                $entity->setLongitud($longitud);
-
-                $entity->setDay($day);
-                $entity->setQuantity($quantity);
-                $entity->setNotes($notes);
-
-                if ($project_id != '') {
-                    $project = $this->getDoctrine()->getRepository(Project::class)
-                        ->find($project_id);
-                    $entity->setProject($project);
-                }
-                if ($project_contact_id != '') {
-                    $project_contact = $this->getDoctrine()->getRepository(ProjectContact::class)
-                        ->find($project_contact_id);
-                    $entity->setContactProject($project_contact);
-                }
-
-                if ($vendor_id != '') {
-                    $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
-                        ->find($vendor_id);
-                    $entity->setConcreteVendor($concrete_vendor);
-                }
-
-                if (empty($lista)) {
-                    $em->persist($entity);
-                }
-
-                // salvar contactos
-                $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
+                $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
+                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority);
 
             }
+
+        } else {
+            foreach ($hours as $hour) {
+
+                // validar
+                $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
+                if ($validar_fecha_error) {
+                    $resultado['success'] = false;
+                    $resultado['error'] = $validar_fecha_error;
+                    return $resultado;
+                }
+
+                $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
+                $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
+
+                $intervalo = new \DateInterval('P1D');
+                $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
+                foreach ($periodo as $dia) {
+
+                    /*
+                    if ($dia->format('w') === '0') {
+                        continue; // Saltar domingos
+                    }
+                    */
+
+                    $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
+                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority);
+
+                }
+            }
         }
+
 
         $em->flush();
 
@@ -408,6 +487,49 @@ class ScheduleService extends Base
         $resultado['success'] = true;
 
         return $resultado;
+    }
+
+    private function Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
+                            $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = new Schedule();
+
+        $entity->setDescription($description);
+        $entity->setLocation($location);
+        $entity->setLatitud($latitud);
+        $entity->setLongitud($longitud);
+
+        $entity->setDay($dia);
+        $entity->setHour($hour);
+        $entity->setQuantity($quantity);
+        $entity->setNotes($notes);
+        $entity->setHighpriority($highpriority);
+
+        if ($project_id != '') {
+            $project = $this->getDoctrine()->getRepository(Project::class)
+                ->find($project_id);
+            $entity->setProject($project);
+        }
+        if ($project_contact_id != '') {
+            $project_contact = $this->getDoctrine()->getRepository(ProjectContact::class)
+                ->find($project_contact_id);
+            $entity->setContactProject($project_contact);
+        }
+
+        if ($vendor_id != '') {
+            $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                ->find($vendor_id);
+            $entity->setConcreteVendor($concrete_vendor);
+        }
+
+        if (empty($lista)) {
+            $em->persist($entity);
+        }
+
+        // salvar contactos
+        $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
     }
 
 
@@ -429,14 +551,17 @@ class ScheduleService extends Base
             return 'The start date cannot be greater than the end date.';
         }
 
-        if (!preg_match('/^\d{2}:\d{2}$/', $hora)) {
-            return 'Invalid time. Use H:i format (e.g., 2:30 PM).';
+        if ($hora !== "") {
+            if (!preg_match('/^\d{2}:\d{2}$/', $hora)) {
+                return 'Invalid time. Use H:i format (e.g., 2:30 PM).';
+            }
+
+            [$horaPart, $minutoPart] = explode(':', $hora);
+            if ((int)$horaPart > 23 || (int)$minutoPart > 59) {
+                return 'Time out of range.';
+            }
         }
 
-        [$horaPart, $minutoPart] = explode(':', $hora);
-        if ((int)$horaPart > 23 || (int)$minutoPart > 59) {
-            return 'Time out of range.';
-        }
 
         return null;
     }
@@ -503,9 +628,10 @@ class ScheduleService extends Base
                 "description" => $value->getDescription(),
                 "location" => $value->getLocation(),
                 "day" => $value->getDay()->format('m/d/Y'),
-                "hour" => $value->getDay()->format('H:i'),
+                "hour" => $value->getHour() != null ? $value->getHour() : "",
                 "quantity" => $value->getQuantity(),
                 "notes" => $value->getNotes(),
+                "highpriority" => $value->getHighpriority(),
                 "acciones" => $acciones
             );
 
@@ -542,6 +668,7 @@ class ScheduleService extends Base
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
+                $acciones .= '<a href="javascript:;" class="clonar m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="Clone record" data-id="' . $id . '"> <i class="la la-copy"></i> </a> ';
             } else {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
             }

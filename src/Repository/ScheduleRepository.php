@@ -171,9 +171,6 @@ class ScheduleRepository extends EntityRepository
             case "concreteVendor":
                 $consulta->orderBy("c_v.name", $sSortDir_0);
                 break;
-            case "hour":
-                $consulta->orderBy("s.day", $sSortDir_0);
-                break;
             default:
                 $consulta->orderBy("s.$iSortCol_0", $sSortDir_0);
                 break;

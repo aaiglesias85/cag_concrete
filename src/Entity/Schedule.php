@@ -29,11 +29,17 @@ class Schedule
     #[ORM\Column(name: 'day', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $day;
 
+    #[ORM\Column(name: 'hour', type: 'string', length: 50)]
+    private ?string $hour;
+
     #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
     private ?float $quantity;
 
     #[ORM\Column(name: 'notes', type: 'text', nullable: true)]
     private ?string $notes;
+
+    #[ORM\Column(name: "highpriority", type: "boolean", nullable: true)]
+    private ?bool $highpriority;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
     #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
@@ -150,5 +156,25 @@ class Schedule
     public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
+    }
+
+    public function getHour(): ?string
+    {
+        return $this->hour;
+    }
+
+    public function setHour(?string $hour): void
+    {
+        $this->hour = $hour;
+    }
+
+    public function getHighpriority(): ?bool
+    {
+        return $this->highpriority;
+    }
+
+    public function setHighpriority(?bool $highpriority): void
+    {
+        $this->highpriority = $highpriority;
     }
 }

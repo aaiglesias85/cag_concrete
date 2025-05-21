@@ -131,13 +131,15 @@ class ScheduleController extends AbstractController
         $concrete_vendor_contacts_id = $request->get('concrete_vendor_contacts_id');
 
         $hours = $request->get('hour');
-        $quantity = $request->get('quantity');
+        $quantity = (float) $request->get('quantity');
         $notes = $request->get('notes');
+        $highpriority = $request->get('highpriority');
 
         try {
 
             $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
-                $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes);
+                $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id,
+                $hours, $quantity, $notes, $highpriority);
 
             if ($resultado['success']) {
 
@@ -180,13 +182,50 @@ class ScheduleController extends AbstractController
 
         $day = $request->get('day');
         $hour = $request->get('hour');
-        $quantity = $request->get('quantity');
+        $quantity = (float) $request->get('quantity');
         $notes = $request->get('notes');
+        $highpriority = $request->get('highpriority');
 
         try {
 
             $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
-                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes);
+                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority);
+
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+                return $this->json($resultadoJson);
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+
+                return $this->json($resultadoJson);
+            }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * clonar Acción para clonar schedules en la BD
+     *
+     */
+    public function clonar(Request $request)
+    {
+
+        $schedule_id = $request->get('schedule_id');
+
+        $date_start = $request->get('date_start');
+        $date_stop = $request->get('date_stop');
+
+        try {
+
+            $resultado = $this->scheduleService->ClonarSchedule($schedule_id, $date_start, $date_stop);
 
             if ($resultado['success']) {
 
