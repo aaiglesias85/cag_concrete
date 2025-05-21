@@ -50,7 +50,7 @@ class ReporteEmployeeService extends Base
         $styleArray = ['borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN]]];
 
         $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load("bundles/ican/excel/reporte-employee.xlsx");
+        $spreadsheet = $reader->load("bundles/ican/excel/report-employee.xlsx");
         $sheet = $spreadsheet->setActiveSheetIndex(0);
 
         $fila = 10;
@@ -166,7 +166,7 @@ class ReporteEmployeeService extends Base
             $fila += 5; // espacio entre semanas
         }
 
-        $fichero = "reporte-employee.xlsx";
+        $fichero = "report-employee.xlsx";
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save("uploads/excel/" . $fichero);
 

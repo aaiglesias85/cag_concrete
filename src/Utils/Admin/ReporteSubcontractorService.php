@@ -55,7 +55,7 @@ class ReporteSubcontractorService extends Base
 
         // reader
         $reader = IOFactory::createReader('Xlsx');
-        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'reporte-subcontractor.xlsx');
+        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'report-subcontractor.xlsx');
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
         $fila = 10;
@@ -121,7 +121,7 @@ class ReporteSubcontractorService extends Base
         $objWorksheet->getStyle('H' . $fila . ':H' . $fila)->applyFromArray($styleArray);
 
         //Salvar excel
-        $fichero = "reporte-subcontractor.xlsx";
+        $fichero = "report-subcontractor.xlsx";
 
         $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
         $objWriter->save("uploads" . DIRECTORY_SEPARATOR . "excel" . DIRECTORY_SEPARATOR . $fichero);
