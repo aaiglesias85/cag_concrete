@@ -471,5 +471,4 @@ class DataTrackingLaborRepository extends EntityRepository
         return $consulta->getQuery()->getResult();
     }
 
-
 }

@@ -125,6 +125,21 @@ class ReporteEmployeeService extends Base
                         $repo->ListarReporteEmployeesParaExcel($search, $employee['employee_id'], $project_id, $dia, $dia)
                     );
 
+                    // buscar el color del dia
+                    $labores = $repo->ListarEmployeesDeProject($project_id, $dia, $dia, $employee['employee_id']);
+                    if (!empty($labores) && $labores[0]->getColor() != "") {
+                        $colorDia = ltrim($labores[0]->getColor(), '#');
+                        $customStyle['fill'] = [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => $colorDia],
+                        ];
+                    } else {
+                        $customStyle['fill'] = [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => $fillColor],
+                        ];
+                    }
+
                     $sheet->setCellValue([$col++, $fila], implode(', ', $proyectos));
                     $this->estilizarCelda($sheet, [$col - 1, $fila], $customStyle);
 
@@ -209,9 +224,7 @@ class ReporteEmployeeService extends Base
             $datatrackingId = $value->getDatatracking()->getId();
             $employee = $value->getEmployee();
             $role = $value->getRole();
-
-            $color = $value->getColor() ?: "";
-            $color = $color === "" ? $employee->getColor() ?: $color : $color;
+            $color = $employee->getColor();
 
             $grupos[$datatrackingId][] = [
                 'datatracking_id' => $datatrackingId,
