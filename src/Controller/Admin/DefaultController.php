@@ -224,4 +224,9 @@ class DefaultController extends AbstractController
             'advertisement' => !empty($advertisements) ? $advertisements[0] : null,
         ));
     }
+
+    public function renderModalConcreteVendor()
+    {
+        return $this->render('admin/block/modal-concrete-vendor.html.twig', array());
+    }
 }

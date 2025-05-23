@@ -3110,6 +3110,27 @@ var DataTracking = function () {
 
         });
 
+        // add conc vendor
+        $(document).off('click', "#btn-add-conc-vendor");
+        $(document).on('click', "#btn-add-conc-vendor", function (e) {
+
+            ModalConcreteVendor.mostrarModal();
+
+        });
+
+        $('#modal-concrete-vendor').on('hidden.bs.modal', function () {
+            var concrete_vendor = ModalConcreteVendor.getVendor();
+            if (concrete_vendor != null) {
+                //add conc vendor to select
+                $('#concrete-vendor').append(new Option(concrete_vendor.name, concrete_vendor.vendor_id, false, false));
+
+                $('#concrete-vendor').select2();
+
+                $('#concrete-vendor').val(concrete_vendor.vendor_id);
+                $('#concrete-vendor').trigger('change');
+            }
+        });
+
         function EliminarConcVendor(posicion) {
             if (conc_vendors[posicion]) {
 

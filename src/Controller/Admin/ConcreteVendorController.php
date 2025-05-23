@@ -120,6 +120,7 @@ class ConcreteVendorController extends AbstractController
             if ($resultado['success']) {
 
                 $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['vendor_id'] = $resultado['vendor_id'];
                 $resultadoJson['message'] = "The operation was successful";
 
                 return $this->json($resultadoJson);

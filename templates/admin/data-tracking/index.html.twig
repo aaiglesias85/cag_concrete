@@ -1417,16 +1417,24 @@
                                         Conc Vendor
                                         <span class="ic-small italic">(required)</span>
                                     </label>
-
-                                    <select class="form-control m-select2" id="concrete-vendor">
-                                        <option value="">Select</option>
-                                        {% for item in concrete_vendors %}
-                                            <option value="{{ item.vendorId }}">
-                                                {{ item.name }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <select class="form-control m-select2" id="concrete-vendor">
+                                                <option value="">Select</option>
+                                                {% for item in concrete_vendors %}
+                                                    <option value="{{ item.vendorId }}">
+                                                        {{ item.name }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3" style="padding-top: 3px; padding-left: 0px;">
+                                            <a href="javascript:;" title="Add Conc Vendor" id="btn-add-conc-vendor"
+                                               class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                                <i class="la la-plus"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1995,6 +2003,7 @@
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalItemProject')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployee')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEmployeeSubcontractor')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalConcreteVendor')) }}
 
 {% endblock %}
 
@@ -2009,6 +2018,7 @@
             ModalItemProject.init();
             ModalEmployee.init();
             ModalEmployeeSubcontractor.init();
+            ModalConcreteVendor.init();
         });
     </script>
 

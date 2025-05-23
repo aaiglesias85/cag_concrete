@@ -319,6 +319,7 @@ class ConcreteVendorService extends Base
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
+            $resultado['vendor_id'] = $entity->getVendorId();
 
             return $resultado;
         }
@@ -364,6 +365,7 @@ class ConcreteVendorService extends Base
         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
         $resultado['success'] = true;
+        $resultado['vendor_id'] = $entity->getVendorId();
 
         return $resultado;
     }
