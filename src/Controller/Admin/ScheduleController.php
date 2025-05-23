@@ -219,13 +219,14 @@ class ScheduleController extends AbstractController
     {
 
         $schedule_id = $request->get('schedule_id');
+        $highpriority = $request->get('highpriority');
 
         $date_start = $request->get('date_start');
         $date_stop = $request->get('date_stop');
 
         try {
 
-            $resultado = $this->scheduleService->ClonarSchedule($schedule_id, $date_start, $date_stop);
+            $resultado = $this->scheduleService->ClonarSchedule($schedule_id, $highpriority, $date_start, $date_stop);
 
             if ($resultado['success']) {
 

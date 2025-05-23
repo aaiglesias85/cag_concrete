@@ -272,7 +272,7 @@ class ScheduleService extends Base
      * @param int $schedule_id Id
      * @author Marcel
      */
-    public function ClonarSchedule($schedule_id, $date_start_param, $date_stop_param)
+    public function ClonarSchedule($schedule_id, $highpriority, $date_start_param, $date_stop_param)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -288,13 +288,12 @@ class ScheduleService extends Base
             $location = $entity->getLocation();
             $latitud = $entity->getLatitud();
             $longitud = $entity->getLongitud();
-            $vendor_id = $entity->getConcreteVendor()->getVendorId();
+            $vendor_id = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
             $quantity = $entity->getQuantity();
             $notes = $entity->getNotes();
-            $highpriority = $entity->getHighpriority();
 
             $concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
-            $concrete_vendor_contacts_id = implode(",",$concrete_vendor_contacts_id);
+            $concrete_vendor_contacts_id = implode(",", $concrete_vendor_contacts_id);
 
             // validar
             $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
@@ -618,7 +617,8 @@ class ScheduleService extends Base
         foreach ($lista as $value) {
             $schedule_id = $value->getScheduleId();
 
-            $acciones = $this->ListarAcciones($schedule_id);
+            $highpriority = $value->getHighpriority() ? 1 : 0;
+            $acciones = $this->ListarAcciones($schedule_id, $highpriority);
 
             $arreglo_resultado[$cont] = array(
                 "id" => $schedule_id,
@@ -658,7 +658,7 @@ class ScheduleService extends Base
      *
      * @author Marcel
      */
-    public function ListarAcciones($id)
+    public function ListarAcciones($id, $highpriority)
     {
         $usuario = $this->getUser();
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 22);
@@ -668,7 +668,7 @@ class ScheduleService extends Base
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-                $acciones .= '<a href="javascript:;" class="clonar m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="Clone record" data-id="' . $id . '"> <i class="la la-copy"></i> </a> ';
+                $acciones .= '<a href="javascript:;" class="clonar m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="Clone record" data-id="' . $id . '" data-highpriority="' . $highpriority . '"> <i class="la la-copy"></i> </a> ';
             } else {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
             }

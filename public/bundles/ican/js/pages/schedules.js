@@ -1238,6 +1238,9 @@ var Schedules = function () {
             var schedule_id = $(this).data('id');
             $('#schedule_id').val(schedule_id);
 
+            var highpriority = $(this).data('highpriority') === '1' ? true : false;
+            $('#highpriority-clonar').prop('checked', highpriority);
+
             $('#modal-clonar-schedule').modal('show');
         });
 
@@ -1245,6 +1248,9 @@ var Schedules = function () {
         $(document).on('click', "#btn-clonar", function (e) {
 
             resetFormsClonar();
+
+            var highpriority = $('#highpriority').prop('checked');
+            $('#highpriority-clonar').prop('checked', highpriority);
 
             $('#modal-clonar-schedule').modal('show');
         });
@@ -1258,6 +1264,7 @@ var Schedules = function () {
 
                 var date_start = $('#date-start-clonar').val();
                 var date_stop = $('#date-stop-clonar').val();
+                var highpriority = $('#highpriority-clonar').prop('checked') ? 1 : 0;
 
                 MyApp.block('.modal-content');
 
@@ -1269,6 +1276,7 @@ var Schedules = function () {
                         'schedule_id': schedule_id,
                         'date_start': date_start,
                         'date_stop': date_stop,
+                        'highpriority': highpriority
                     },
                     success: function (response) {
                         mApp.unblock('.modal-content');
@@ -1348,6 +1356,8 @@ var Schedules = function () {
                 $element.data("title", "").removeClass("has-error").tooltip("dispose");
                 $element.closest('.form-group').removeClass('has-error').addClass('success');
             });
+
+            $('#highpriority-clonar').prop('checked', false);
         };
     };
 
