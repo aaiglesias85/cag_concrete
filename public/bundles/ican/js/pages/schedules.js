@@ -464,13 +464,13 @@ var Schedules = function () {
         //Validacion
         $("#schedule-form").validate({
             rules: {
-                descripcion: {
+                /*descripcion: {
                     required: true
                 },
                 location: {
                     required: true
                 },
-                /*quantity: {
+                quantity: {
                     required: true
                 },
 
