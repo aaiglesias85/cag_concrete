@@ -4,14 +4,232 @@ namespace App\Utils\Admin;
 
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
+use App\Entity\Employee;
 use App\Entity\Project;
 use App\Entity\ProjectContact;
 use App\Entity\Schedule;
 use App\Entity\ScheduleConcreteVendorContact;
 use App\Utils\Base;
+use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ScheduleService extends Base
 {
+
+    /**
+     * ExportarExcel: Exporta a excel el invoice
+     *
+     *
+     * @author Marcel
+     */
+    public function ExportarExcel($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin)
+    {
+        $semanas = $this->ObtenerSemanasReporteExcelSchedule($fecha_inicial, $fecha_fin);
+        $employees = $this->ListarEmployeesLeads();
+
+        Cell::setValueBinder(new AdvancedValueBinder());
+        $styleArray = ['borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN]]];
+
+        $reader = IOFactory::createReader('Xlsx');
+        $spreadsheet = $reader->load("bundles/ican/excel/schedule.xlsx");
+        $sheet = $spreadsheet->setActiveSheetIndex(0);
+
+        $fila = 10;
+        $diasSemana = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        $columnas = range('A', 'K'); // Aumentado para acomodar 7 días + columnas fijas
+
+        $nombres = array_map(fn($e) => strtoupper($e['name']), $employees);
+        $textoCrewLeads = 'CREW LEADS: ' . implode(', ', $nombres);
+
+        foreach ($semanas as $semana) {
+            $textoSemana = 'WEEK OF ' . strtoupper(date('F j, Y', strtotime($semana->dias[0])));
+            $mergeSemana = "{$columnas[0]}{$fila}:{$columnas[10]}{$fila}";
+            $sheet->mergeCells($mergeSemana);
+            $sheet->setCellValue("{$columnas[0]}{$fila}", $textoSemana);
+            $this->estilizarCelda($sheet, $mergeSemana, $styleArray, bold: true);
+
+            $fila++;
+            $mergeCrew = "{$columnas[0]}{$fila}:{$columnas[10]}{$fila}";
+            $sheet->mergeCells($mergeCrew);
+            $sheet->setCellValue("{$columnas[0]}{$fila}", $textoCrewLeads);
+            $this->estilizarCelda($sheet, $mergeCrew, $styleArray, bold: true);
+
+            $fila++;
+            $customStyle = $styleArray;
+
+            $encabezados = ['PROJECT', 'WORK', 'CONCRETE'];
+            foreach ($semana->dias as $dia) {
+                $fecha = \DateTime::createFromFormat('m/d/Y', $dia);
+                $encabezados[] = strtoupper($fecha->format('l')) . ' ' . $fecha->format('m/d');
+            }
+            $encabezados[] = 'NOTES';
+
+            foreach ($encabezados as $i => $texto) {
+                if (!isset($columnas[$i])) break;
+                $col = $columnas[$i];
+                $coord = "{$col}{$fila}";
+
+                if ($i >= 3 && $i <= 9) {
+                    $customStyle['fill'] = [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'F9A825'],
+                    ];
+                    $customStyle['font'] = ['color' => ['rgb' => '000000']];
+                } else {
+                    $customStyle['fill'] = [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => '000000'],
+                    ];
+                    $customStyle['font'] = ['color' => ['rgb' => 'FFFFFF']];
+                }
+
+                $sheet->setCellValueExplicit($coord, strtoupper($texto), DataType::TYPE_STRING);
+                $this->estilizarCelda($sheet, $coord, $customStyle, bold: true, align: Alignment::HORIZONTAL_LEFT);
+            }
+
+            $fila++;
+
+            $repo = $this->getDoctrine()->getRepository(Schedule::class);
+            $agregado = [];
+
+            foreach ($semana->dias as $dia) {
+
+                $schedules = $repo->ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $dia, $dia);
+                $diaFecha = \DateTime::createFromFormat('m/d/Y', $dia);
+                $diaNombre = $diaFecha->format('l');
+                $indexDia = array_search($diaNombre, $diasSemana);
+
+                foreach ($schedules as $schedule) {
+                    $project = $schedule->getProject();
+                    $vendor = $schedule->getConcreteVendor();
+                    $clave = $project->getProjectId() . '|' . $schedule->getDescription() . '|' . $vendor->getVendorId();
+
+                    if (!isset($agregado[$clave])) {
+                        $agregado[$clave] = [
+                            'project' => $project->getProjectNumber() . ' - ' . $project->getDescription(),
+                            'work' => $schedule->getDescription(),
+                            'vendor' => $vendor->getName(),
+                            'dias' => array_fill(0, 7, ''), // DOMINGO a sábado
+                            'notes' => $schedule->getNotes(),
+                        ];
+                    }
+
+                    if ($indexDia !== false) {
+                        $hora = $schedule->getHour();
+                        $ampm = '';
+                        if ($hora != '') {
+                            $ampm = \DateTime::createFromFormat('H:i', $hora)->format('g:i a');
+                        }
+
+                        $cantidad = $schedule->getQuantity();
+                        $linea1 = 'NEED CREW';
+                        $linea2 = $ampm !== "" ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
+                        $agregado[$clave]['dias'][$indexDia] = $linea1 . "\n" . $linea2;
+                    }
+                }
+            }
+
+            foreach ($agregado as $datos) {
+                $filaDatos = array_merge(
+                    [$datos['project'], $datos['work'], $datos['vendor']],
+                    $datos['dias'],
+                    [$datos['notes']]
+                );
+
+                foreach ($filaDatos as $i => $valor) {
+                    if (!isset($columnas[$i])) continue;
+                    $coord = "{$columnas[$i]}{$fila}";
+                    $sheet->setCellValueExplicit($coord, $valor, DataType::TYPE_STRING);
+                    $this->estilizarCelda($sheet, $coord, $styleArray, bold: false, align: Alignment::HORIZONTAL_LEFT, wrapText: true);
+                }
+                $fila++;
+            }
+
+            $fila += 2;
+        }
+
+        $fichero = "schedule.xlsx";
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save("uploads/excel/" . $fichero);
+
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+
+        return $this->ObtenerURL() . 'uploads/excel/' . $fichero;
+    }
+
+    private function ObtenerSemanasReporteExcelSchedule(?string $fechaInicio, ?string $fechaFin, string $formato = 'm/d/Y'): array
+    {
+        $hoy = new \DateTime();
+
+        if (empty($fechaInicio) && empty($fechaFin)) {
+            $inicio = (clone $hoy)->modify('sunday this week');
+            $fin = (clone $hoy)->modify('saturday this week');
+        } elseif (empty($fechaInicio)) {
+            $fin = \DateTime::createFromFormat($formato, $fechaFin) ?: $hoy;
+            $inicio = (clone $fin)->modify('sunday this week');
+        } elseif (empty($fechaFin)) {
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio) ?: (clone $hoy)->modify('sunday this week');
+            $fin = clone $hoy;
+        } else {
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio);
+            $fin = \DateTime::createFromFormat($formato, $fechaFin);
+        }
+
+        if (!$inicio || !$fin) {
+            return [];
+        }
+
+        if ($inicio > $fin) {
+            [$inicio, $fin] = [$fin, $inicio];
+        }
+
+        $semanas = [];
+        $inicioSemana = (clone $inicio)->modify('sunday this week');
+
+        while ($inicioSemana <= $fin) {
+            $dias = [];
+            for ($i = 0; $i < 7; $i++) { // 7 días: domingo a sábado
+                $dia = (clone $inicioSemana)->modify("+$i days");
+                $dias[] = $dia->format($formato);
+            }
+
+            $nombre = $dias[0] . ' to ' . end($dias);
+
+            $semanas[] = (object)[
+                'nombre' => $nombre,
+                'dias' => $dias
+            ];
+
+            $inicioSemana->modify('+1 week');
+        }
+
+        return $semanas;
+    }
+
+    private function ListarEmployeesLeads()
+    {
+        $employees = [];
+
+        $lista = $this->getDoctrine()->getRepository(Employee::class)->ListarLeads();
+
+        foreach ($lista as $employee) {
+
+            $employees[] = [
+                'employee_id' => $employee->getEmployeeId(),
+                'name' => $employee->getName(),
+                'role' => $employee->getPosition(),
+                'color' => $employee->getColor(),
+            ];
+        }
+
+        return $employees;
+    }
 
     /**
      * ListarSchedulesParaCalendario: Listar los schedules para el calendario

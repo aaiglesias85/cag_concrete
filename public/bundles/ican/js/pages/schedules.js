@@ -92,14 +92,14 @@ var Schedules = function () {
 
         // default date
         var todayDate = moment().startOf('day');
+        var TODAY = todayDate.format('YYYY-MM-DD');
 
         // poner fecha del filtro inicial si lo selecciono, esto para que el calendario empiece ahi
         var fechaInicial = $('#fechaInicial').val();
         if (fechaInicial !== "") {
             todayDate = MyApp.convertirStringAFecha(fechaInicial, 'Y-m-d');
+            TODAY = todayDate.format('Y-m-d');
         }
-
-        var TODAY = todayDate.format('YYYY-MM-DD');
 
         var calendarEl = document.getElementById('calendario');
         calendar = new FullCalendar.Calendar(calendarEl, {
@@ -1361,6 +1361,48 @@ var Schedules = function () {
         };
     };
 
+    var initAccionExportar = function () {
+
+        $(document).off('click', "#btn-exportar");
+        $(document).on('click', "#btn-exportar", function (e) {
+            e.preventDefault();
+
+            var search = $('#lista-schedule .m_form_search').val();
+            var project_id = $('#filtro-project').val();
+            var vendor_id = $('#filtro-concrete-vendor').val();
+            var fecha_inicial = $('#fechaInicial').val();
+            var fecha_fin = $('#fechaFin').val();
+
+            MyApp.block('#lista-schedule');
+
+            $.ajax({
+                type: "POST",
+                url: "schedule/exportarExcel",
+                dataType: "json",
+                data: {
+                    'search': search,
+                    'project_id': project_id,
+                    'vendor_id': vendor_id,
+                    'fecha_inicial': fecha_inicial,
+                    'fecha_fin': fecha_fin
+                },
+                success: function (response) {
+                    mApp.unblock('#lista-schedule');
+                    if (response.success) {
+                        document.location = response.url;
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                },
+                failure: function (response) {
+                    mApp.unblock('#lista-schedule');
+
+                    toastr.error(response.error, "");
+                }
+            });
+        });
+    };
+
 
     return {
         //main function to initiate the module
@@ -1382,6 +1424,8 @@ var Schedules = function () {
             initAccionChange();
 
             initAccionesCalendario();
+
+            initAccionExportar();
 
             // listar calendario
             listarCalendario();

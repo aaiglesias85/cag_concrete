@@ -33,3 +33,7 @@ cargarDatosScheduleAdmin:
 listarScheduleParaCalendarioAdmin:
   path: /schedule/listarParaCalendario
   defaults: { _controller: App\Controller\Admin\ScheduleController::listarParaCalendario, _format: json }
+
+exportarExcelScheduleAdmin:
+  path:  /schedule/exportarExcel
+  defaults: { _controller: App\Controller\Admin\ScheduleController::exportarExcel, _format: json }

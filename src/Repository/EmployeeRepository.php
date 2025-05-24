@@ -21,6 +21,20 @@ class EmployeeRepository extends EntityRepository
     }
 
     /**
+     * ListarLeads: Lista los employees que son Lead
+     *
+     * @return Employee[]
+     */
+    public function ListarLeads(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where("e.position = 'Lead'")
+            ->orderBy('e.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * ListarEmployees: Lista los employees con filtros y ordenación.
      *
      * @param int $start El inicio de la paginación

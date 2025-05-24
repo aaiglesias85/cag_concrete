@@ -17,6 +17,7 @@ use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\Unit;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -938,6 +939,82 @@ class Base
         }
 
         return $contacts;
+    }
+
+    /***
+     * ObtenerSemanasReporteExcel
+     * @param string|null $fechaInicio
+     * @param string|null $fechaFin
+     * @return array
+     */
+    public function ObtenerSemanasReporteExcel(?string $fechaInicio, ?string $fechaFin, string $formato = 'm/d/Y'): array
+    {
+        $hoy = new \DateTime();
+
+        if (empty($fechaInicio) && empty($fechaFin)) {
+            // Semana actual
+            $inicio = (clone $hoy)->modify('monday this week');
+            $fin = (clone $hoy)->modify('saturday this week');
+        } elseif (empty($fechaInicio)) {
+            $fin = \DateTime::createFromFormat($formato, $fechaFin) ?: $hoy;
+            $inicio = (clone $fin)->modify('monday this week');
+        } elseif (empty($fechaFin)) {
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio) ?: (clone $hoy)->modify('monday this week');
+            $fin = clone $hoy;
+        } else {
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio);
+            $fin = \DateTime::createFromFormat($formato, $fechaFin);
+        }
+
+        if (!$inicio || !$fin) {
+            return [];
+        }
+
+        // Asegurar que las fechas estén en el orden correcto
+        if ($inicio > $fin) {
+            [$inicio, $fin] = [$fin, $inicio];
+        }
+
+        $semanas = [];
+
+        $inicioSemana = (clone $inicio)->modify('monday this week');
+        $finSemana = (clone $inicioSemana)->modify('saturday this week');
+
+        while ($inicioSemana <= $fin) {
+            $dias = [];
+            for ($i = 0; $i < 6; $i++) {
+                $dia = (clone $inicioSemana)->modify("+$i days");
+                $dias[] = $dia->format($formato);
+            }
+
+            $nombre = $dias[0] . ' to ' . end($dias);
+
+            $semanas[] = (object)[
+                'nombre' => $nombre,
+                'dias' => $dias
+            ];
+
+            $inicioSemana->modify('+1 week');
+            $finSemana->modify('+1 week');
+        }
+
+        return $semanas;
+    }
+
+    public function estilizarCelda($sheet, $coord, $styleArray, $bold = false, $align = Alignment::HORIZONTAL_CENTER, $wrapText = false)
+    {
+        $sheet->getStyle($coord)->applyFromArray($styleArray);
+        $sheet->getStyle($coord)->getAlignment()->setHorizontal($align);
+        $sheet->getStyle($coord)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+        if ($wrapText) {
+            $sheet->getStyle($coord)->getAlignment()->setWrapText(true);
+            $sheet->getRowDimension((int)filter_var($coord, FILTER_SANITIZE_NUMBER_INT))->setRowHeight(-1); // auto height
+        }
+
+        if ($bold) {
+            $sheet->getStyle($coord)->getFont()->setBold(true);
+        }
     }
 
 }

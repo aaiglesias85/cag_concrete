@@ -361,4 +361,33 @@ class ScheduleController extends AbstractController
             return $this->json($resultadoJson);
         }
     }
+
+    /**
+     * exportarExcel Acción para la exportacion en excel
+     *
+     */
+    public function exportarExcel(Request $request)
+    {
+
+        $search = $request->get('search');
+        $project_id = $request->get('project_id');
+        $vendor_id = $request->get('vendor_id');
+        $fecha_inicial = $request->get('fecha_inicial');
+        $fecha_fin = $request->get('fecha_fin');
+
+        try {
+            $url = $this->scheduleService->ExportarExcel($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['url'] = $url;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

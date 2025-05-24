@@ -191,15 +191,6 @@ class ReporteEmployeeService extends Base
         return $this->ObtenerURL() . 'uploads/excel/' . $fichero;
     }
 
-    private function estilizarCelda($sheet, $coord, $styleArray, $bold = false, $align = Alignment::HORIZONTAL_CENTER)
-    {
-        $sheet->getStyle($coord)->applyFromArray($styleArray);
-        $sheet->getStyle($coord)->getAlignment()->setHorizontal($align);
-        if ($bold) {
-            $sheet->getStyle($coord)->getFont()->setBold(true);
-        }
-    }
-
     /**
      * ListarEmployeesParaReporteExcel
      * @param $project_id
@@ -264,67 +255,6 @@ class ReporteEmployeeService extends Base
         }
 
         return $employees;
-    }
-
-
-    /***
-     * ObtenerSemanasReporteExcel
-     * @param string|null $fechaInicio
-     * @param string|null $fechaFin
-     * @return array
-     */
-    public function ObtenerSemanasReporteExcel(?string $fechaInicio, ?string $fechaFin, string $formato = 'm/d/Y'): array
-    {
-        $hoy = new \DateTime();
-
-        if (empty($fechaInicio) && empty($fechaFin)) {
-            // Semana actual
-            $inicio = (clone $hoy)->modify('monday this week');
-            $fin = (clone $hoy)->modify('saturday this week');
-        } elseif (empty($fechaInicio)) {
-            $fin = \DateTime::createFromFormat($formato, $fechaFin) ?: $hoy;
-            $inicio = (clone $fin)->modify('monday this week');
-        } elseif (empty($fechaFin)) {
-            $inicio = \DateTime::createFromFormat($formato, $fechaInicio) ?: (clone $hoy)->modify('monday this week');
-            $fin = clone $hoy;
-        } else {
-            $inicio = \DateTime::createFromFormat($formato, $fechaInicio);
-            $fin = \DateTime::createFromFormat($formato, $fechaFin);
-        }
-
-        if (!$inicio || !$fin) {
-            return [];
-        }
-
-        // Asegurar que las fechas estén en el orden correcto
-        if ($inicio > $fin) {
-            [$inicio, $fin] = [$fin, $inicio];
-        }
-
-        $semanas = [];
-
-        $inicioSemana = (clone $inicio)->modify('monday this week');
-        $finSemana = (clone $inicioSemana)->modify('saturday this week');
-
-        while ($inicioSemana <= $fin) {
-            $dias = [];
-            for ($i = 0; $i < 6; $i++) {
-                $dia = (clone $inicioSemana)->modify("+$i days");
-                $dias[] = $dia->format($formato);
-            }
-
-            $nombre = $dias[0] . ' to ' . end($dias);
-
-            $semanas[] = (object)[
-                'nombre' => $nombre,
-                'dias' => $dias
-            ];
-
-            $inicioSemana->modify('+1 week');
-            $finSemana->modify('+1 week');
-        }
-
-        return $semanas;
     }
 
 
