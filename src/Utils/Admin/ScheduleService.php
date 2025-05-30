@@ -98,7 +98,6 @@ class ScheduleService extends Base
             $agregado = [];
 
             foreach ($semana->dias as $dia) {
-
                 $schedules = $repo->ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $dia, $dia);
                 $diaFecha = \DateTime::createFromFormat('m/d/Y', $dia);
                 $diaNombre = $diaFecha->format('l');
@@ -107,13 +106,17 @@ class ScheduleService extends Base
                 foreach ($schedules as $schedule) {
                     $project = $schedule->getProject();
                     $vendor = $schedule->getConcreteVendor();
-                    $clave = $project->getProjectId() . '|' . $schedule->getDescription() . '|' . $vendor->getVendorId();
+
+                    $vendorId = $vendor?->getVendorId() ?? '0';
+                    $vendorName = $vendor?->getName() ?? '';
+
+                    $clave = $project->getProjectId() . '|' . $schedule->getDescription() . '|' . $vendorId;
 
                     if (!isset($agregado[$clave])) {
                         $agregado[$clave] = [
                             'project' => $project->getProjectNumber() . ' - ' . $project->getDescription(),
                             'work' => $schedule->getDescription(),
-                            'vendor' => $vendor->getName(),
+                            'vendor' => $vendorName,
                             'dias' => array_fill(0, 7, ''), // DOMINGO a sábado
                             'notes' => $schedule->getNotes(),
                         ];
@@ -123,7 +126,7 @@ class ScheduleService extends Base
                         $hora = $schedule->getHour();
                         $ampm = '';
                         if ($hora != '') {
-                            $ampm = \DateTime::createFromFormat('H:i', $hora)->format('g:i a');
+                            $ampm = \DateTime::createFromFormat('H:i', $hora)?->format('g:i a');
                         }
 
                         $cantidad = $schedule->getQuantity();
