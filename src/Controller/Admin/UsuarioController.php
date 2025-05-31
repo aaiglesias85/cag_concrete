@@ -425,7 +425,9 @@ class UsuarioController extends AbstractController
 
         try {
 
-            $lista = $this->usuarioService->ListarOrdenados();
+            $search = $request->get('search');
+
+            $lista = $this->usuarioService->ListarOrdenados($search);
 
             $resultadoJson['success'] = true;
             $resultadoJson['usuarios'] = $lista;

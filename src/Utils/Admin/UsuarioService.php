@@ -21,16 +21,18 @@ class UsuarioService extends Base
      * ListarOrdenados
      * @return array
      */
-    public function ListarOrdenados()
+    public function ListarOrdenados($search = "")
     {
         $usuarios = [];
 
         $lista = $this->getDoctrine()->getRepository(Usuario::class)
-            ->ListarOrdenados();
+            ->ListarOrdenados($search);
         foreach ($lista as $value) {
             $usuarios[] = [
                 'usuario_id' => $value->getUsuarioId(),
-                'nombre' => $value->getNombreCompleto()
+                'nombre' => $value->getNombreCompleto(),
+                'email' => $value->getEmail(),
+
             ];
         }
 

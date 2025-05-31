@@ -6,6 +6,7 @@
 parameters:
   locale: 'en'
   mailer_sender_address: '%env(MAILER_SENDER_ADDRESS)%'
+  mailer_from_name: '%env(MAILER_FROM_NAME)%'
   google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
   recaptcha_publick_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
   recaptcha_private_key: '%env(GOOGLE_RECAPTCHA_SECRET)%'

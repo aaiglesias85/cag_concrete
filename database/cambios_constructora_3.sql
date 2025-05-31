@@ -1,1 +1,0 @@
-ALTER TABLE `employee` ADD `color` VARCHAR(50) NULL AFTER `position`;

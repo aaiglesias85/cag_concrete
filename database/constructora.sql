@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 18-05-2025 a las 14:38:26
+-- Tiempo de generación: 31-05-2025 a las 15:04:04
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -385,7 +385,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (19, 'reporte_subcontractor', 'Subcontractors'),
 (20, 'reporte_employee', 'Employees'),
 (21, 'conc_vendor', 'Concrete Vendors'),
-(22, 'schedule', 'Schedule Document');
+(22, 'schedule', 'Schedule Document'),
+(23, 'reminder', 'Reminders');
 
 -- --------------------------------------------------------
 
@@ -1162,6 +1163,31 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `reminder`
+--
+
+CREATE TABLE `reminder` (
+  `reminder_id` int(11) NOT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body` text,
+  `day` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `reminder_recipient`
+--
+
+CREATE TABLE `reminder_recipient` (
+  `id` int(11) NOT NULL,
+  `reminder_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `rol`
 --
 
@@ -1223,7 +1249,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (31, 1, 1, 1, 1, 1, 19),
 (32, 1, 1, 1, 1, 1, 20),
 (33, 1, 1, 1, 1, 1, 21),
-(34, 1, 1, 1, 1, 1, 22);
+(34, 1, 1, 1, 1, 1, 22),
+(35, 1, 1, 1, 1, 1, 23);
 
 -- --------------------------------------------------------
 
@@ -1394,7 +1421,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (23, 1, 1, 1, 1, 1, 19),
 (24, 1, 1, 1, 1, 1, 20),
 (25, 1, 1, 1, 1, 1, 21),
-(26, 1, 1, 1, 1, 1, 22);
+(26, 1, 1, 1, 1, 1, 22),
+(27, 1, 1, 1, 1, 1, 23);
 
 --
 -- Índices para tablas volcadas
@@ -1590,6 +1618,20 @@ ALTER TABLE `project_notes`
   ADD KEY `Ref6678` (`project_id`);
 
 --
+-- Indices de la tabla `reminder`
+--
+ALTER TABLE `reminder`
+  ADD PRIMARY KEY (`reminder_id`);
+
+--
+-- Indices de la tabla `reminder_recipient`
+--
+ALTER TABLE `reminder_recipient`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refreminderrecipient1` (`reminder_id`),
+  ADD KEY `Refreminderrecipient2` (`user_id`);
+
+--
 -- Indices de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -1747,7 +1789,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -1822,6 +1864,18 @@ ALTER TABLE `project_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
+-- AUTO_INCREMENT de la tabla `reminder`
+--
+ALTER TABLE `reminder`
+  MODIFY `reminder_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `reminder_recipient`
+--
+ALTER TABLE `reminder_recipient`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -1831,7 +1885,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -1879,7 +1933,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Restricciones para tablas volcadas
@@ -2007,6 +2061,13 @@ ALTER TABLE `project_item`
 --
 ALTER TABLE `project_notes`
   ADD CONSTRAINT `Refproject78` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `reminder_recipient`
+--
+ALTER TABLE `reminder_recipient`
+  ADD CONSTRAINT `Refreminderrecipient1` FOREIGN KEY (`reminder_id`) REFERENCES `reminder` (`reminder_id`),
+  ADD CONSTRAINT `Refreminderrecipient2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Filtros para la tabla `rol_permission`

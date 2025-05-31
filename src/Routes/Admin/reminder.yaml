@@ -1,0 +1,23 @@
+reminder:
+  path: /reminder
+  defaults: { _controller: App\Controller\Admin\ReminderController::index }
+
+listarReminderAdmin:
+  path: /reminder/listar
+  defaults: { _controller: App\Controller\Admin\ReminderController::listar, _format: json }
+
+salvarReminderAdmin:
+  path: /reminder/salvar
+  defaults: { _controller: App\Controller\Admin\ReminderController::salvar, _format: json }
+
+eliminarReminderAdmin:
+  path: /reminder/eliminar
+  defaults: { _controller: App\Controller\Admin\ReminderController::eliminar, _format: json }
+
+eliminarRemindersAdmin:
+  path: /reminder/eliminarReminders
+  defaults: { _controller: App\Controller\Admin\ReminderController::eliminarReminders, _format: json }
+
+cargarDatosReminderAdmin:
+  path: /reminder/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ReminderController::cargarDatos, _format: json }

@@ -12,9 +12,63 @@ use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
+use App\Entity\Reminder;
+use App\Entity\ReminderRecipient;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Address;
 
 class ScriptService extends Base
 {
+
+    /**
+     * CronReminders
+     */
+    public function CronReminders()
+    {
+
+        //Enviar email
+        $direccion_url = $this->ObtenerURL();
+        $direccion_from = $this->getParameter('mailer_sender_address');
+        $from_name = $this->getParameter('mailer_from_name');
+
+        $fecha_actual = $this->ObtenerFechaActual('m/d/Y');
+
+        // listar reminders
+        $reminders = $this->getDoctrine()->getRepository(Reminder::class)
+            ->ListarRemindersRangoFecha($fecha_actual, $fecha_actual, 1);
+        foreach ($reminders as $reminder) {
+            $reminder_id = $reminder->getReminderId();
+
+
+            $asunto = $reminder->getSubject();
+            $contenido = $reminder->getBody();
+
+            // construir email
+            $mensaje = (new TemplatedEmail())
+                ->from(new Address($direccion_from, $from_name));
+
+            // to
+            $reminder_usuarios = $this->getDoctrine()->getRepository(ReminderRecipient::class)
+                ->ListarUsuariosDeReminder($reminder_id);
+            foreach ($reminder_usuarios as $reminder_usuario){
+                $mensaje->addTo(new Address($reminder_usuario->getUser()->getEmail(), $reminder_usuario->getUser()->getNombreCompleto()));
+            }
+
+            // resto mensaje
+            $mensaje
+                ->subject($asunto)
+                ->htmlTemplate('mailing/mail.html.twig')
+                ->context([
+                    'direccion_url' => $direccion_url,
+                    'asunto' => $asunto,
+                    'contenido' => $contenido,
+                ]);
+
+            $this->mailer->send($mensaje);
+
+        }
+
+    }
 
     /**
      * DefinirConcreteVendorDataTracking

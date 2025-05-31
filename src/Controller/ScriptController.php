@@ -52,4 +52,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function cronreminders()
+    {
+        $this->scriptService->CronReminders();
+
+        return new Response('OK', 200);
+    }
 }

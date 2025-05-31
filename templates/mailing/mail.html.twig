@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ asunto }}</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800');
+
+        body {
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+            color: #000;
+            margin: 0;
+            font-weight: 300;
+            font-size: 15px;
+        }
+
+        .container {
+            width: 600px;
+            margin: auto;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .centrado {
+            margin: auto;
+            float: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .header img {
+            width: 180px;
+        }
+
+        a {
+            color: #2C3691;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: #111;
+        }
+
+        p a {
+            color: #2C3691;
+            font-weight: bold;
+        }
+
+        .cabecera {
+            color: #fff;
+            padding: 8px;
+            border-bottom: 1px solid #2C3691;
+        }
+
+        h1 {
+            color: #000;
+            text-transform: uppercase;
+            font-size: 18px;
+            margin-top: 15px;
+            line-height: 2rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 15px;
+            margin: 10px 0 5px 0;
+            text-align: left !important;
+        }
+
+        p {
+            text-align: left !important;
+        }
+
+        ul {
+            text-align: left !important;
+            padding-left: 20px;
+            line-height: 1.4em;
+        }
+
+        li {
+            text-align: left !important;
+        }
+
+        .footer {
+            border-top: 1px solid #2C3691;
+            margin-top: 1em;
+            padding-top: 1em;
+        }
+
+        .footer h1 {
+            color: #2C3691;
+            font-size: 14px;
+            text-transform: none;
+        }
+
+        .footer p {
+            text-align: center !important;
+        }
+
+        .info-footer {
+            margin-top: 10px;
+        }
+
+        .info-footer p {
+            text-align: center !important;
+            font-size: 12px;
+            padding-top: 0.5em;
+        }
+
+        .info-footer p.small {
+            font-size: 11px !important;
+        }
+
+        table {
+            border: 1px solid #2C3691;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 13px;
+            line-height: 18px;
+            font-weight: 300;
+            border-spacing: 0;
+            margin: auto;
+            width: 85%;
+        }
+
+        td, th {
+            padding: 6px 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- cabecera -->
+<div class="header container centrado">
+    <div class="row">
+        <div class="text-center cabecera">
+            <img src="{{ direccion_url }}/bundles/ican/img/logo.jpg" style="width: 180px;"/>
+        </div>
+    </div>
+</div>
+
+<!-- contenido -->
+<div class="titulos">
+    <div class="container">
+        <div class="row">
+            <div class="centrado text-center">
+
+                <h3>Estimado/a:</h3>
+
+                <p>
+                    {{ contenido |raw }}
+                </p>
+
+                <br><br>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container info-footer">
+    <div class="row">
+        <p class="small">* Este mensaje se ha generado automáticamente, por favor no responder.</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer container centrado">
+    <div class="row">
+        <div class="text-center">
+            <p style="display:inline;vertical-align:top;font-size:14px;line-height:1.42857">
+                {{ "now"|date("Y") }} © Concrete Construction
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

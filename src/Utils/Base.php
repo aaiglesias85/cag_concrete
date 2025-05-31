@@ -15,6 +15,7 @@ use App\Entity\PermisoUsuario;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
+use App\Entity\ReminderRecipient;
 use App\Entity\Unit;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -353,6 +354,7 @@ class Base
             $menuReporteEmployee = false;
             $menuConcreteVendor = false;
             $menuSchedule = false;
+            $menuReminder = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -421,6 +423,9 @@ class Base
                 if ($permiso['funcion_id'] == 22 && $permiso['ver']) {
                     $menuSchedule = true;
                 }
+                if ($permiso['funcion_id'] == 23 && $permiso['ver']) {
+                    $menuReminder = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -445,6 +450,7 @@ class Base
                 'menuReporteEmployee' => $menuReporteEmployee,
                 'menuConcreteVendor' => $menuConcreteVendor,
                 'menuSchedule' => $menuSchedule,
+                'menuReminder' => $menuReminder,
             );
         }
 
@@ -555,6 +561,13 @@ class Base
             ->ListarNotificationsDeUsuario($usuario_id);
         foreach ($notificaciones as $notificacion) {
             $em->remove($notificacion);
+        }
+
+        // reminders
+        $reminders = $this->getDoctrine()->getRepository(ReminderRecipient::class)
+            ->ListarRemindersDeUsuario($usuario_id);
+        foreach ($reminders as $reminder) {
+            $em->remove($reminder);
         }
     }
 

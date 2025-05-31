@@ -229,4 +229,9 @@ class DefaultController extends AbstractController
     {
         return $this->render('admin/block/modal-concrete-vendor.html.twig', array());
     }
+
+    public function renderModalReminder()
+    {
+        return $this->render('admin/block/modal-reminder.html.twig', array());
+    }
 }

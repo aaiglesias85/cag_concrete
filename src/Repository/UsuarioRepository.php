@@ -18,11 +18,19 @@ class UsuarioRepository extends ServiceEntityRepository
      *
      * @return Usuario[]
      */
-    public function ListarOrdenados(): array
+    public function ListarOrdenados($search = ""): array
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.habilitado = 1')
-            ->orderBy('u.nombre', 'ASC')
+        $qb = $this->createQueryBuilder('u');
+
+        // Filtro de búsqueda
+        if ($search) {
+            $qb->andWhere('u.email LIKE :search OR u.nombre LIKE :search OR u.apellidos LIKE :search')
+                ->setParameter('search', "%$search%");
+        }
+
+        $qb->andWhere('u.habilitado = 1');
+
+        return $qb->orderBy('u.nombre', 'ASC')
             ->getQuery()
             ->getResult();
     }

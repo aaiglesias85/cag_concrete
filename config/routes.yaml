@@ -30,14 +30,24 @@ denegado:
   path:  /denegado
   defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
 
+#test
+testemail:
+  path: /test-email
+  defaults: { _controller: App\Controller\DefaultController::testemail, _format: json }
+
+#crons
+crondefinirnotificacionesduedate:
+  path:  /definir-notificaciones-duedate
+  defaults: { _controller: App\Controller\ScriptController::definirnotificacionesduedate }
+
+cronreminders:
+  path:  /cron-reminders
+  defaults: { _controller: App\Controller\ScriptController::cronreminders }
+
 #scripts
 definirpendingdatatracking:
   path:  /definir-pending-datatracking
   defaults: { _controller: App\Controller\ScriptController::definirpendingdatatracking }
-
-definirnotificacionesduedate:
-  path:  /definir-notificaciones-duedate
-  defaults: { _controller: App\Controller\ScriptController::definirnotificacionesduedate }
 
 definiryieldcalculationitem:
   path:  /definir-yield-calculation-item

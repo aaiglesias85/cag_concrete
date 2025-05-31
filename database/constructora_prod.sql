@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 18-05-2025 a las 14:38:34
+-- Tiempo de generación: 31-05-2025 a las 15:03:57
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -460,7 +460,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (246, '2025-02-04', '', 'PAULA', NULL, NULL, 'VICTOR(27): POURED CLASS B WIDEN, SW', NULL, NULL, NULL, 0.00, 5.00, 286.00, 0.00, 0.00, 0, '2025-02-12 10:30:50', '2025-02-24 21:19:40', 256, NULL, 1),
 (247, '2025-02-05', '', 'PAULA', NULL, NULL, 'JULIAN(22): POURED SW, RAMPS', NULL, NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-02-12 10:32:37', '2025-02-24 21:20:14', 256, NULL, 1),
 (248, '2025-02-06', '', 'PAULA', NULL, NULL, 'JULIAN(12): POURED C&G, SW, RAMPS', NULL, NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-02-12 10:34:12', '2025-02-24 21:21:48', 256, NULL, 1),
-(249, '2025-02-03', '', '', NULL, NULL, 'JULIAN(18.5): POURED DITCH PAVING', NULL, NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 0, '2025-02-12 10:36:49', '2025-02-19 17:06:46', 259, NULL, NULL),
+(249, '2025-02-03', '', '', NULL, NULL, 'JULIAN(18.5): POURED DITCH PAVING', NULL, NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 0, '2025-02-12 10:36:49', '2025-05-23 17:11:44', 259, NULL, NULL),
 (255, '2025-02-05', '', '', NULL, NULL, 'GERARDO: PREPWORK', '', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 0, '2025-02-12 10:50:48', NULL, 257, NULL, NULL),
 (256, '2025-02-05', '', 'PAULA', NULL, NULL, 'VICTOR(18): POURED DITCH PAVING', NULL, NULL, NULL, 0.00, 5.00, 286.00, 0.00, 0.00, 0, '2025-02-12 10:52:37', '2025-02-24 21:25:36', 63, 12, 1),
 (257, '2025-02-06', '', '', NULL, NULL, 'VICTOR(13): POURED RAMPS TYPE A, 2 SPILLWAYS', NULL, NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 0, '2025-02-12 10:57:58', '2025-02-19 17:04:22', 228, NULL, NULL),
@@ -564,7 +564,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (358, '2025-02-26', '', '', NULL, NULL, 'VICTOR S(15): POURED C&G, HC', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 21:52:46', NULL, 69, NULL, NULL),
 (359, '2025-02-27', '', '', NULL, NULL, 'VICTORO S(18): POURED SW', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 21:53:49', NULL, 69, NULL, NULL),
 (360, '2025-02-28', '', '', NULL, NULL, 'VICTOR S(18): POURED SW', NULL, NULL, NULL, 0.00, 3.00, 0.00, 0.00, 0.00, 1, '2025-03-03 21:54:41', NULL, 69, NULL, NULL),
-(361, '2025-03-01', '', '', NULL, NULL, 'VICTOR S & FRANCISCO(101.5): POURED DW 8IN', NULL, NULL, NULL, 0.00, 10.00, 286.00, 0.00, 0.00, 0, '2025-03-03 21:56:21', '2025-05-03 17:07:15', 69, NULL, 1),
+(361, '2025-03-01', '', '', NULL, NULL, 'VICTOR S & FRANCISCO(101.5): POURED DW 8IN', NULL, NULL, NULL, 0.00, 10.00, 286.00, 0.00, 0.00, 0, '2025-03-03 21:56:21', '2025-05-23 17:04:48', 69, NULL, 1),
 (362, '2025-02-24', '', '', NULL, NULL, 'VICTORINO(9): POURED SW', NULL, NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 1, '2025-03-03 21:58:49', NULL, 256, NULL, NULL),
 (363, '2025-02-25', '', '', NULL, NULL, 'VICTORINO(18): POURED DW, SW', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:01:25', NULL, 256, NULL, NULL),
 (364, '2025-02-26', '', '', NULL, NULL, 'ANGEL(16): POURED DW, SW, RAMP', NULL, NULL, NULL, 0.00, 3.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:13:03', NULL, 256, NULL, NULL),
@@ -2034,7 +2034,7 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `color`
 (843, 9.00, 35.00, 'Laborer', NULL, 248, 13, NULL),
 (844, 9.00, 0.00, 'Lead', NULL, 248, 39, NULL),
 (845, 9.00, 35.00, 'Laborer', NULL, 248, 29, NULL),
-(846, 12.50, 35.00, 'Laborer', NULL, 249, 1, NULL),
+(846, 12.50, 20.00, 'Laborer', '#BF3173', 249, 1, NULL),
 (847, 12.50, 35.00, 'Laborer', NULL, 249, 2, NULL),
 (848, 12.50, 35.00, 'Laborer', NULL, 249, 13, NULL),
 (849, 12.50, 35.00, 'Laborer', NULL, 249, 14, NULL),
@@ -2995,7 +2995,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (19, 'reporte_subcontractor', 'Subcontractors'),
 (20, 'reporte_employee', 'Employees'),
 (21, 'conc_vendor', 'Concrete Vendors'),
-(22, 'schedule', 'Schedule Document');
+(22, 'schedule', 'Schedule Document'),
+(23, 'reminder', 'Reminders');
 
 -- --------------------------------------------------------
 
@@ -4146,7 +4147,19 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3347, 'Update', 'Employee', 'The employee is modified: Victor Soriano', '::1', '2025-05-17 01:26:20', 1),
 (3348, 'Update', 'Employee', 'The employee is modified: Victor Suarez', '::1', '2025-05-17 01:26:31', 1),
 (3349, 'Delete', 'Item', 'The item is deleted: Test333', '::1', '2025-05-17 02:02:17', 1),
-(3350, 'Delete', 'Item', 'The item is deleted: Test', '::1', '2025-05-17 02:02:17', 1);
+(3350, 'Delete', 'Item', 'The item is deleted: Test', '::1', '2025-05-17 02:02:17', 1),
+(3351, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-05-21 20:05:06', 1),
+(3352, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-05-21 20:14:36', 1),
+(3353, 'Add', 'Schedule', 'The schedule is added: Test, Start date: 05/18/2025 Stop date: 06/01/2025', '::1', '2025-05-21 20:16:19', 1),
+(3354, 'Add', 'Schedule', 'The schedule is added: Test, Start date: 05/18/2025 Stop date: 06/01/2025', '::1', '2025-05-21 20:17:03', 1),
+(3355, 'Add', 'Schedule', 'The schedule is added: test, Start date: 06/01/2025 Stop date: 06/08/2025', '::1', '2025-05-21 20:53:31', 1),
+(3356, 'Add', 'Schedule', 'The schedule is added: Prueba, Start date: 06/01/2025 Stop date: 06/08/2025', '::1', '2025-05-21 20:56:02', 1),
+(3357, 'Add', 'Schedule', 'The schedule is added: Test, Start date: 06/15/2025 Stop date: 06/22/2025', '::1', '2025-05-21 20:56:48', 1),
+(3358, 'Add', 'Schedule', 'The schedule is added: test, Start date: 07/01/2025 Stop date: 07/06/2025', '::1', '2025-05-23 16:40:28', 1),
+(3359, 'Add', 'Concrete Vendor', 'The concrete vendor is added: Test docker', '::1', '2025-05-23 17:04:38', 1),
+(3360, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-23 17:04:48', 1),
+(3361, 'Delete', 'Concrete Vendor', 'The concrete vendor is deleted: Test docker', '::1', '2025-05-23 17:04:59', 1),
+(3362, 'Update', 'Data Tracking', 'The data tracking is modified, Project: SAV57000 - , Date: 02/03/2025', '::1', '2025-05-23 17:11:44', 1);
 
 -- --------------------------------------------------------
 
@@ -6912,6 +6925,31 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `reminder`
+--
+
+CREATE TABLE `reminder` (
+  `reminder_id` int(11) NOT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body` text,
+  `day` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `reminder_recipient`
+--
+
+CREATE TABLE `reminder_recipient` (
+  `id` int(11) NOT NULL,
+  `reminder_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `rol`
 --
 
@@ -7045,7 +7083,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (172, 1, 1, 1, 1, 4, 15),
 (173, 1, 1, 1, 1, 4, 16),
 (174, 1, 1, 1, 1, 1, 21),
-(175, 1, 1, 1, 1, 1, 22);
+(175, 1, 1, 1, 1, 1, 22),
+(176, 1, 1, 1, 1, 1, 23);
 
 -- --------------------------------------------------------
 
@@ -7059,9 +7098,11 @@ CREATE TABLE `schedule` (
   `location` varchar(255) DEFAULT NULL,
   `latitud` varchar(50) DEFAULT NULL,
   `longitud` varchar(50) DEFAULT NULL,
-  `day` datetime DEFAULT NULL,
+  `day` date DEFAULT NULL,
+  `hour` varchar(50) DEFAULT NULL,
   `quantity` decimal(18,6) DEFAULT NULL,
   `notes` text,
+  `highpriority` tinyint(1) DEFAULT NULL,
   `project_id` int(11) DEFAULT NULL,
   `project_contact_id` int(11) DEFAULT NULL,
   `vendor_id` int(11) DEFAULT NULL
@@ -7071,21 +7112,75 @@ CREATE TABLE `schedule` (
 -- Volcado de datos para la tabla `schedule`
 --
 
-INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `day`, `quantity`, `notes`, `project_id`, `project_contact_id`, `vendor_id`) VALUES
-(49, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-11 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(50, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-12 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(51, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-13 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(52, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-14 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(53, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-15 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(54, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-16 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(55, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-17 10:00:00', 10.000000, 'test', 256, NULL, 3),
-(56, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-11 10:00:00', 10.000000, 'test', 257, NULL, 20),
-(57, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-12 10:00:00', 10.000000, 'test', 257, NULL, 20),
-(58, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-13 10:00:00', 10.000000, 'test', 257, NULL, 20),
-(59, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-14 10:00:00', 10.000000, 'test', 257, NULL, 20),
-(60, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-15 10:00:00', 10.000000, 'test', 257, NULL, 20),
-(61, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-16 10:00:00', 10.000000, 'test', 257, NULL, 20),
-(62, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-17 10:00:00', 10.000000, 'test', 257, NULL, 20);
+INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `day`, `hour`, `quantity`, `notes`, `highpriority`, `project_id`, `project_contact_id`, `vendor_id`) VALUES
+(49, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-11', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(50, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-12', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(51, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-13', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(52, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-14', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(53, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-15', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(54, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-16', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(55, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-17', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
+(56, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-11', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(57, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-12', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
+(58, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-13', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
+(59, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-14', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
+(60, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-15', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
+(61, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-16', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
+(62, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-17', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
+(63, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-18', '', 0.000000, '', 1, 287, NULL, 11),
+(64, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-19', '', 0.000000, '', 1, 287, NULL, 11),
+(65, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-20', '', 0.000000, '', 1, 287, NULL, 11),
+(66, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-21', '', 0.000000, '', 1, 287, NULL, 11),
+(67, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-22', '', 0.000000, '', 1, 287, NULL, 11),
+(68, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-23', '', 0.000000, '', 1, 287, NULL, 11),
+(69, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-24', '', 0.000000, '', 1, 287, NULL, 11),
+(70, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-25', '', 0.000000, '', 1, 287, NULL, 11),
+(71, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-26', '', 0.000000, '', 1, 287, NULL, 11),
+(72, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-27', '', 0.000000, '', 1, 287, NULL, 11),
+(73, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-28', '', 0.000000, '', 1, 287, NULL, 11),
+(74, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-29', '', 0.000000, '', 1, 287, NULL, 11),
+(75, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-30', '', 0.000000, '', 1, 287, NULL, 11),
+(76, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-31', '', 0.000000, '', 1, 287, NULL, 11),
+(77, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-18', '', 0.000000, '', 0, 292, NULL, 2),
+(78, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-19', '', 0.000000, '', 0, 292, NULL, 2),
+(79, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-20', '', 0.000000, '', 0, 292, NULL, 2),
+(80, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-21', '', 0.000000, '', 0, 292, NULL, 2),
+(81, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-22', '', 0.000000, '', 0, 292, NULL, 2),
+(82, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-23', '', 0.000000, '', 0, 292, NULL, 2),
+(83, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-24', '', 0.000000, '', 0, 292, NULL, 2),
+(84, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-25', '', 0.000000, '', 0, 292, NULL, 2),
+(85, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-26', '', 0.000000, '', 0, 292, NULL, 2),
+(86, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-27', '', 0.000000, '', 0, 292, NULL, 2),
+(87, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-28', '', 0.000000, '', 0, 292, NULL, 2),
+(88, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-29', '', 0.000000, '', 0, 292, NULL, 2),
+(89, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-30', '', 0.000000, '', 0, 292, NULL, 2),
+(90, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-31', '', 0.000000, '', 0, 292, NULL, 2),
+(91, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-01', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(92, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-02', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(93, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-03', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(94, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-04', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(95, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-05', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(96, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-06', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(97, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-07', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
+(98, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-01', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(99, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-02', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(100, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-03', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(101, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-04', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(102, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-05', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(103, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-06', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(104, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-07', '', 10.000000, 'test', NULL, 256, NULL, 3),
+(105, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-15', '', 0.000000, '', 0, 292, NULL, 2),
+(106, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-16', '', 0.000000, '', 0, 292, NULL, 2),
+(107, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-17', '', 0.000000, '', 0, 292, NULL, 2),
+(108, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-18', '', 0.000000, '', 0, 292, NULL, 2),
+(109, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-19', '', 0.000000, '', 0, 292, NULL, 2),
+(110, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-20', '', 0.000000, '', 0, 292, NULL, 2),
+(111, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-21', '', 0.000000, '', 0, 292, NULL, 2),
+(112, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-01', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
+(113, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-02', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
+(114, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-03', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
+(115, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-04', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
+(116, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-05', '10:30', 10.000000, 'test', 0, 257, NULL, 20);
 
 -- --------------------------------------------------------
 
@@ -7117,7 +7212,21 @@ INSERT INTO `schedule_concrete_vendor_contact` (`id`, `schedule_id`, `contact_id
 (19, 54, 3),
 (20, 54, 2),
 (21, 55, 3),
-(22, 55, 2);
+(22, 55, 2),
+(23, 98, 3),
+(24, 98, 2),
+(25, 99, 3),
+(26, 99, 2),
+(27, 100, 3),
+(28, 100, 2),
+(29, 101, 3),
+(30, 101, 2),
+(31, 102, 3),
+(32, 102, 2),
+(33, 103, 3),
+(34, 103, 2),
+(35, 104, 3),
+(36, 104, 2);
 
 -- --------------------------------------------------------
 
@@ -7289,7 +7398,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (791, 1, 1, 1, 1, 1, 19),
 (792, 1, 1, 1, 1, 1, 20),
 (793, 1, 1, 1, 1, 1, 21),
-(794, 1, 1, 1, 1, 1, 22);
+(794, 1, 1, 1, 1, 1, 22),
+(795, 1, 1, 1, 1, 1, 23);
 
 --
 -- Índices para tablas volcadas
@@ -7482,6 +7592,20 @@ ALTER TABLE `project_notes`
   ADD KEY `Ref6678` (`project_id`);
 
 --
+-- Indices de la tabla `reminder`
+--
+ALTER TABLE `reminder`
+  ADD PRIMARY KEY (`reminder_id`);
+
+--
+-- Indices de la tabla `reminder_recipient`
+--
+ALTER TABLE `reminder_recipient`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refreminderrecipient1` (`reminder_id`),
+  ADD KEY `Refreminderrecipient2` (`user_id`);
+
+--
 -- Indices de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -7639,7 +7763,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -7669,7 +7793,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3351;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3363;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -7714,6 +7838,18 @@ ALTER TABLE `project_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=673;
 
 --
+-- AUTO_INCREMENT de la tabla `reminder`
+--
+ALTER TABLE `reminder`
+  MODIFY `reminder_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `reminder_recipient`
+--
+ALTER TABLE `reminder_recipient`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
@@ -7723,19 +7859,19 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
 --
 ALTER TABLE `schedule`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule_concrete_vendor_contact`
 --
 ALTER TABLE `schedule_concrete_vendor_contact`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -7771,7 +7907,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=795;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=796;
 
 --
 -- Restricciones para tablas volcadas
@@ -7886,6 +8022,13 @@ ALTER TABLE `project_item`
 --
 ALTER TABLE `project_notes`
   ADD CONSTRAINT `Refproject78` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `reminder_recipient`
+--
+ALTER TABLE `reminder_recipient`
+  ADD CONSTRAINT `Refreminderrecipient1` FOREIGN KEY (`reminder_id`) REFERENCES `reminder` (`reminder_id`),
+  ADD CONSTRAINT `Refreminderrecipient2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Filtros para la tabla `rol_permission`

@@ -92,6 +92,9 @@
     <!-- modal advertisement -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalAdvertisement')) }}
 
+    <!-- modal reminder -->
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalReminder')) }}
+
     {% include 'admin/block/modals.html.twig' %}
 
 {% endblock %}
@@ -154,6 +157,13 @@
     <script>
         jQuery(document).ready(function () {
             ModalAdvertisement.init();
+        });
+    </script>
+
+    <!-- modal reminder -->
+    <script>
+        jQuery(document).ready(function () {
+            ModalReminder.init();
         });
     </script>
 

@@ -13,14 +13,21 @@
                     <div class="m-stack__item m-stack__item--middle m-brand__tools">
 
                         <!-- BEGIN: Responsive Aside Left Menu Toggler -->
-                        <a href="javascript:;" id="m_aside_left_offcanvas_toggle"
-                           class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
+                        <a href="javascript:;" id="m_aside_left_offcanvas_toggle" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
                             <span></span>
                         </a>
+
                         <!-- END -->
+
+                        <!-- BEGIN: Responsive Header Menu Toggler -->
+                        <a id="m_aside_header_menu_mobile_toggle" href="javascript:;" class="m-brand__icon m-brand__toggler m--visible-tablet-and-mobile-inline-block">
+                            <span></span>
+                        </a>
+
+                        <!-- END -->
+
                         <!-- BEGIN: Topbar Toggler -->
-                        <a id="m_aside_header_topbar_mobile_toggle" href="javascript:;"
-                           class="m-brand__icon m--visible-tablet-and-mobile-inline-block">
+                        <a id="m_aside_header_topbar_mobile_toggle" href="javascript:;" class="m-brand__icon m--visible-tablet-and-mobile-inline-block">
                             <i class="flaticon-more"></i>
                         </a>
 
@@ -32,18 +39,32 @@
             <!-- END: Brand -->
             <div class="m-stack__item m-stack__item--fluid m-header-head" id="m_header_nav">
 
+                <!-- BEGIN: Horizontal Menu -->
+                <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-light " id="m_aside_header_menu_mobile_close_btn"><i class="la la-close"></i></button>
+                <div id="m_header_menu" class="m-header-menu m-aside-header-menu-mobile m-aside-header-menu-mobile--offcanvas  m-header-menu--skin-light m-header-menu--submenu-skin-light m-aside-header-menu-mobile--skin-light m-aside-header-menu-mobile--submenu-skin-light ">
+                    <ul class="m-menu__nav">
+                        <li class="m-menu__item">
+                            <a href="javascript:;" class="m-menu__link " title="Add Reminder" id="btn-header-add-reminder">
+                                <i class="m-menu__link-icon flaticon-email"></i>
+                                <span class="m-menu__link-title"> <span class="m-menu__link-wrap">
+                                <span class="m-menu__link-text">Add Reminder</span> </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- END: Horizontal Menu -->
+
                 <!-- BEGIN: Topbar -->
                 <div id="m_header_topbar" class="m-topbar  m-stack m-stack--ver m-stack--general">
-
                     <div class="m-stack__item m-topbar__nav-wrapper">
                         <ul class="m-topbar__nav m-nav m-nav--inline">
-
                             <li class="m-nav__item m-topbar__notifications m-dropdown m-dropdown--large m-dropdown--arrow m-dropdown--align-right m-dropdown--mobile-full-width"
                                 m-dropdown-toggle="click" m-dropdown-persistent="1">
                                 <a href="javascript:;" class="m-nav__link m-dropdown__toggle" id="m_topbar_notification_icon">
 
                                     {% if notificaciones_sin_leer > 0 %}
-                                    <span class="m-nav__link-badge m-badge m-badge--dot m-badge--dot-small m-badge--danger"></span>
+                                        <span class="m-nav__link-badge m-badge m-badge--dot m-badge--dot-small m-badge--danger"></span>
                                     {% endif %}
 
                                     <span class="m-nav__link-icon {% if notificaciones_sin_leer > 0 %}bg-notificacioness-nuevas{% endif %}">
@@ -70,9 +91,9 @@
                                                         <a class="nav-link m-tabs__link" data-toggle="tab" href="#topbar_notifications_logs" role="tab">Logs</a>
                                                     </li>
                                                     {% if advertisements | length > 0 %}
-                                                    <li class="nav-item m-tabs__item">
-                                                        <a class="nav-link m-tabs__link" data-toggle="tab" href="#topbar_advertisments" role="tab">Advertisements</a>
-                                                    </li>
+                                                        <li class="nav-item m-tabs__item">
+                                                            <a class="nav-link m-tabs__link" data-toggle="tab" href="#topbar_advertisments" role="tab">Advertisements</a>
+                                                        </li>
                                                     {% endif %}
                                                 </ul>
                                                 <div class="tab-content">
@@ -99,7 +120,7 @@
                                                                                         </a>
                                                                                         <span class="m-list-timeline__time">{{ item.fecha }}</span>
                                                                                     </div>
-                                                                                    {% else %}
+                                                                                {% else %}
                                                                                     <div class="m-list-timeline__item {{ item.class }}">
                                                                                         <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
                                                                                         <a class="m-list-timeline__text"
@@ -119,34 +140,34 @@
                                                     <div class="tab-pane" id="topbar_notifications_logs" role="tabpanel">
                                                         <div class="m-dropdown__scrollable m-scrollable" data-scrollable="true" data-height="300" data-mobile-height="200">
                                                             {% if logs | length == 0 %}
-                                                            <div class="m-stack m-stack--ver m-stack--general" style="min-height: 180px;">
-                                                                <div class="m-stack__item m-stack__item--center m-stack__item--middle">
-                                                                    <span class="">All caught up!<br>No new logs.</span>
-                                                                </div>
-                                                            </div>
-                                                            {% endif %}
-                                                            {% if logs | length > 0 %}
-                                                            <div class="m-list-timeline">
-                                                                <div class="m-list-timeline__group">
-                                                                    <div class="m-list-timeline__items">
-                                                                        {% for item in logs %}
-                                                                            <div class="m-list-timeline__item">
-                                                                                <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
-                                                                                <a class="m-list-timeline__text"
-                                                                                   href="{{ url('log') }}">
-                                                                                    <b>{{ item.usuario }}</b><br>{{ item.descripcion }}
-                                                                                    <span class="m-badge {{item.class}} m-badge--wide">
-                                                                            {{item.operacion}}
-                                                                        </span>
-                                                                                </a>
-                                                                                <span class="m-list-timeline__time">
-                                                                        {{ item.fecha }}
-                                                                    </span>
-                                                                            </div>
-                                                                        {% endfor %}
+                                                                <div class="m-stack m-stack--ver m-stack--general" style="min-height: 180px;">
+                                                                    <div class="m-stack__item m-stack__item--center m-stack__item--middle">
+                                                                        <span class="">All caught up!<br>No new logs.</span>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            {% endif %}
+                                                            {% if logs | length > 0 %}
+                                                                <div class="m-list-timeline">
+                                                                    <div class="m-list-timeline__group">
+                                                                        <div class="m-list-timeline__items">
+                                                                            {% for item in logs %}
+                                                                                <div class="m-list-timeline__item">
+                                                                                    <span class="m-list-timeline__badge m-list-timeline__badge--state-success"></span>
+                                                                                    <a class="m-list-timeline__text"
+                                                                                       href="{{ url('log') }}">
+                                                                                        <b>{{ item.usuario }}</b><br>{{ item.descripcion }}
+                                                                                        <span class="m-badge {{item.class}} m-badge--wide">
+                                                                            {{item.operacion}}
+                                                                        </span>
+                                                                                    </a>
+                                                                                    <span class="m-list-timeline__time">
+                                                                        {{ item.fecha }}
+                                                                    </span>
+                                                                                </div>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             {% endif %}
                                                         </div>
                                                     </div>
@@ -181,7 +202,6 @@
                                     </div>
                                 </div>
                             </li>
-
                             <li class="m-nav__item m-topbar__user-profile  m-dropdown m-dropdown--medium m-dropdown--arrow  m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light"
                                 m-dropdown-toggle="click">
                                 <a href="javascript:;" class="m-nav__link m-dropdown__toggle">
@@ -231,12 +251,7 @@
                                                             <span class="m-nav__link-text">Logs</span>
                                                         </a>
                                                     </li>
-                                                    <li class="m-nav__item">
-                                                        <a href="#" target="_blank" class="m-nav__link">
-                                                            <i class="m-nav__link-icon flaticon-lifebuoy"></i>
-                                                            <span class="m-nav__link-text">New Task/Bugs/Fixes</span>
-                                                        </a>
-                                                    </li>
+
                                                     <li class="m-nav__separator m-nav__separator--fit">
                                                     </li>
                                                     <li class="m-nav__item">
