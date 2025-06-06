@@ -95,10 +95,15 @@ class DefaultService extends Base
         $total_proyectos_completed = $this->getDoctrine()->getRepository(Project::class)
             ->TotalProjects('', '', '', 2, $from, $to);
 
+        // total de proyectos Canceled
+        $total_proyectos_canceled = $this->getDoctrine()->getRepository(Project::class)
+            ->TotalProjects('', '', '', 3, $from, $to);
+
         return [
             'total_proyectos_activos' => $total_proyectos_activos,
             'total_proyectos_inactivos' => $total_proyectos_inactivos,
-            'total_proyectos_completed' => $total_proyectos_completed
+            'total_proyectos_completed' => $total_proyectos_completed,
+            'total_proyectos_canceled' => $total_proyectos_canceled,
         ];
     }
 

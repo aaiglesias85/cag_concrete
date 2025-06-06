@@ -108,6 +108,7 @@
                             <option value="1">In Progress</option>
                             <option value="0">Not Started</option>
                             <option value="2">Completed</option>
+                            <option value="3">Canceled</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -463,6 +464,12 @@
                                                     <input type="radio" name="radioestado" id="estadocompleted"
                                                            class="event-change project-estado" value="2">
                                                     Completed
+                                                    <span></span>
+                                                </label>
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestado" id="estadocanceled"
+                                                           class="event-change project-estado" value="3">
+                                                    Canceled
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -1037,6 +1044,13 @@
                                                            id="estadocompleted-detalle"
                                                            class="event-change project-estado-detalle" value="2">
                                                     Completed
+                                                    <span></span>
+                                                </label>
+                                                <label class="m-radio">
+                                                    <input type="radio" name="radioestadodetalle"
+                                                           id="estadocanceled-detalle"
+                                                           class="event-change project-estado-detalle" value="3">
+                                                    Canceled
                                                     <span></span>
                                                 </label>
                                             </div>

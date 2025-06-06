@@ -71,6 +71,7 @@
                             <option value="">Status</option>
                             <option value="1">In Progress</option>
                             <option value="2">Completed</option>
+                            <option value="3">Canceled</option>
                         </select>
                     </div>
 
@@ -153,15 +154,18 @@
                                         <h3 class="m-widget1__title">Projects</h3>
                                         <span class="m-widget1__desc">In Progress</span><br>
                                         <span class="m-widget1__desc">Not Started</span><br>
-                                        <span class="m-widget1__desc">Completed</span>
+                                        <span class="m-widget1__desc">Completed</span><br>
+                                        <span class="m-widget1__desc">Canceled</span>
                                     </div>
                                     <div class="col m--align-right">
                                         </br>
                                         <span class="m-widget1__number m--font-info">{{ stats.total_proyectos_activos }}</span>
                                         </br>
-                                        <span class="m-widget1__number m--font-danger">{{ stats.total_proyectos_inactivos }}</span>
+                                        <span class="m-widget1__number m--font-warning">{{ stats.total_proyectos_inactivos }}</span>
                                         </br>
                                         <span class="m-widget1__number m--font-success">{{ stats.total_proyectos_completed }}</span>
+                                        </br>
+                                        <span class="m-widget1__number m--font-danger">{{ stats.total_proyectos_canceled }}</span>
                                     </div>
                                 </div>
                             </div>

@@ -13,6 +13,7 @@ var ProjectsDetalle = function () {
         $('#estadoactivo-detalle').val(1);
         $('#estadoinactivo-detalle').val(0);
         $('#estadocompleted-detalle').val(2);
+        $('#estadocanceled-detalle').val(3);
         $('#estadoactivo-detalle').prop('checked', true);
 
         $('#federal_fun-detalle').prop('checked', false);

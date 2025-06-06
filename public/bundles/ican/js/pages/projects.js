@@ -28,6 +28,22 @@ var Projects = function () {
                 width: 120,
             },
             {
+                field: "status",
+                title: "Status",
+                responsive: {visible: 'lg'},
+                width: 100,
+                // callback function support for column rendering
+                template: function (row) {
+                    var status = {
+                        1: {'title': 'In Progress', 'class': ' m-badge--info'},
+                        0: {'title': 'Not Started', 'class': ' m-badge--warning'},
+                        2: {'title': 'Completed', 'class': ' m-badge--success'},
+                        3: {'title': 'Canceled', 'class': ' m-badge--danger'},
+                    };
+                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
+                }
+            },
+            {
                 field: "county",
                 title: "County"
             },
@@ -47,21 +63,6 @@ var Projects = function () {
             {
                 field: "company",
                 title: "Company"
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 100,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'In Progress', 'class': ' m-badge--info'},
-                        0: {'title': 'Not Started', 'class': ' m-badge--danger'},
-                        2: {'title': 'Completed', 'class': ' m-badge--success'},
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
-                }
             },
             {
                 field: "nota",
@@ -238,6 +239,7 @@ var Projects = function () {
         $('#estadoactivo').val(1);
         $('#estadoinactivo').val(0);
         $('#estadocompleted').val(2);
+        $('#estadocanceled').val(3);
         $('#estadoactivo').prop('checked', true);
 
         $('#federal_funding').prop('checked', false);
