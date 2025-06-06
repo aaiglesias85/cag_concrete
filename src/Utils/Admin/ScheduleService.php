@@ -30,6 +30,8 @@ class ScheduleService extends Base
     public function ExportarExcel($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin)
     {
         $semanas = $this->ObtenerSemanasReporteExcelSchedule($fecha_inicial, $fecha_fin);
+        $this->writelog(var_export($search, true));
+
         $employees = $this->ListarEmployeesLeads();
 
         Cell::setValueBinder(new AdvancedValueBinder());
@@ -193,7 +195,7 @@ class ScheduleService extends Base
         }
 
         $semanas = [];
-        $inicioSemana = (clone $inicio)->modify('sunday this week');
+        $inicioSemana = (clone $inicio)->modify('-' . $inicio->format('w') . ' days');
 
         while ($inicioSemana <= $fin) {
             $dias = [];
