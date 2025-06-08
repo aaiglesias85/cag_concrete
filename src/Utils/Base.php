@@ -355,6 +355,11 @@ class Base
             $menuConcreteVendor = false;
             $menuSchedule = false;
             $menuReminder = false;
+            $menuProjectStage = false;
+            $menuProjectType = false;
+            $menuProposalType = false;
+            $menuPlanStatus = false;
+            $menuDistrict = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -426,6 +431,21 @@ class Base
                 if ($permiso['funcion_id'] == 23 && $permiso['ver']) {
                     $menuReminder = true;
                 }
+                if ($permiso['funcion_id'] == 24 && $permiso['ver']) {
+                    $menuProjectStage = true;
+                }
+                if ($permiso['funcion_id'] == 25 && $permiso['ver']) {
+                    $menuProjectType = true;
+                }
+                if ($permiso['funcion_id'] == 26 && $permiso['ver']) {
+                    $menuProposalType = true;
+                }
+                if ($permiso['funcion_id'] == 27 && $permiso['ver']) {
+                    $menuPlanStatus = true;
+                }
+                if ($permiso['funcion_id'] == 28 && $permiso['ver']) {
+                    $menuDistrict = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -451,6 +471,11 @@ class Base
                 'menuConcreteVendor' => $menuConcreteVendor,
                 'menuSchedule' => $menuSchedule,
                 'menuReminder' => $menuReminder,
+                'menuProjectStage' => $menuProjectStage,
+                'menuProjectType' => $menuProjectType,
+                'menuProposalType' => $menuProposalType,
+                'menuPlanStatus' => $menuPlanStatus,
+                'menuDistrict' => $menuDistrict,
             );
         }
 

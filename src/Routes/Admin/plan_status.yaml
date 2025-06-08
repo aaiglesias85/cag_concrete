@@ -1,0 +1,23 @@
+plan_status:
+  path: /plan-status
+  defaults: { _controller: App\Controller\Admin\PlanStatusController::index }
+
+listarPlanStatusAdmin:
+  path: /plan-status/listar
+  defaults: { _controller: App\Controller\Admin\PlanStatusController::listar, _format: json }
+
+salvarPlanStatusAdmin:
+  path: /plan-status/salvar
+  defaults: { _controller: App\Controller\Admin\PlanStatusController::salvar, _format: json }
+
+eliminarPlanStatusAdmin:
+  path: /plan-status/eliminar
+  defaults: { _controller: App\Controller\Admin\PlanStatusController::eliminar, _format: json }
+
+eliminarPlanStatussAdmin:
+  path: /plan-status/eliminarStatuss
+  defaults: { _controller: App\Controller\Admin\PlanStatusController::eliminarStatuss, _format: json }
+
+cargarDatosPlanStatusAdmin:
+  path: /plan-status/cargarDatos
+  defaults: { _controller: App\Controller\Admin\PlanStatusController::cargarDatos, _format: json }

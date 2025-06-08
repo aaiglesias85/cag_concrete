@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 31-05-2025 a las 15:03:57
+-- Tiempo de generación: 08-06-2025 a las 18:30:51
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -2810,6 +2810,18 @@ INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `da
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `district`
+--
+
+CREATE TABLE `district` (
+  `district_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `employee`
 --
 
@@ -2996,7 +3008,12 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (20, 'reporte_employee', 'Employees'),
 (21, 'conc_vendor', 'Concrete Vendors'),
 (22, 'schedule', 'Schedule Document'),
-(23, 'reminder', 'Reminders');
+(23, 'reminder', 'Reminders'),
+(24, 'project_stage', 'Project Stages'),
+(25, 'project_type', 'Project Type'),
+(26, 'proposal_type', 'Proposal Type'),
+(27, 'plan_status', 'Plan Status'),
+(28, 'district', 'District');
 
 -- --------------------------------------------------------
 
@@ -4159,7 +4176,19 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3359, 'Add', 'Concrete Vendor', 'The concrete vendor is added: Test docker', '::1', '2025-05-23 17:04:38', 1),
 (3360, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05055 - , Date: 03/01/2025', '::1', '2025-05-23 17:04:48', 1),
 (3361, 'Delete', 'Concrete Vendor', 'The concrete vendor is deleted: Test docker', '::1', '2025-05-23 17:04:59', 1),
-(3362, 'Update', 'Data Tracking', 'The data tracking is modified, Project: SAV57000 - , Date: 02/03/2025', '::1', '2025-05-23 17:11:44', 1);
+(3362, 'Update', 'Data Tracking', 'The data tracking is modified, Project: SAV57000 - , Date: 02/03/2025', '::1', '2025-05-23 17:11:44', 1),
+(3363, 'Add', 'User', 'The user is added: Marcel Curbelo Carmona', '::1', '2025-05-31 16:44:32', 1),
+(3364, 'Add', 'User', 'The user is added: Andres Iglesias', '::1', '2025-05-31 16:45:22', 1),
+(3365, 'Add', 'Reminder', 'The reminder is added: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 16:50:11', 1),
+(3366, 'Update', 'Reminder', 'The reminder is modified: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 16:51:56', 1),
+(3367, 'Update', 'Reminder', 'The reminder is modified: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 16:52:11', 1),
+(3368, 'Update', 'Reminder', 'The reminder is modified: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 16:52:56', 1),
+(3369, 'Update', 'Reminder', 'The reminder is modified: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 16:56:48', 1),
+(3370, 'Add', 'Reminder', 'The reminder is added: Test 2, Date: 06/01/2025', '::1', '2025-05-31 20:21:23', 1),
+(3371, 'Add', 'Reminder', 'The reminder is added: Test 3, Date: 06/02/2025', '::1', '2025-05-31 20:25:56', 1),
+(3372, 'Update', 'Reminder', 'The reminder is modified: Test 2, Date: 06/01/2025', '::1', '2025-05-31 20:26:10', 1),
+(3373, 'Update', 'Reminder', 'The reminder is modified: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 20:26:17', 1),
+(3374, 'Update', 'Project', 'The project is modified: MMIP PROJECT', '::1', '2025-06-06 22:44:03', 1);
 
 -- --------------------------------------------------------
 
@@ -4257,6 +4286,18 @@ CREATE TABLE `overhead_price` (
 
 INSERT INTO `overhead_price` (`overhead_id`, `name`, `price`) VALUES
 (1, '2025 Q1', 286.00);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `plan_status`
+--
+
+CREATE TABLE `plan_status` (
+  `status_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -4542,7 +4583,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (255, 'M006468', 'CWM04110', 'B1CBA2402829-0', NULL, 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', 7, NULL),
 (256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', NULL, 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', NULL, '', 1, NULL, NULL, '2025-02-10 20:26:00', '2025-04-16 01:22:09', 5, NULL),
 (257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', 7, NULL),
-(259, '0012757 & 0012758', 'SAV57000', '', NULL, 'I-16 & I-95 MMIP PROJECT', NULL, 'GDOT', 'SMC-056-S', 1435095.12, 1, 'CHATHAM', 0, '', 0, '2020-10-02', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-02-11 21:19:30', '2025-02-11 21:29:25', 47, NULL),
+(259, '0012757 & 0012758', 'SAV57000', '', 'MMIP PROJECT', 'I-16 & I-95 MMIP PROJECT', NULL, 'GDOT', 'SMC-056-S', 1435095.12, 1, 'CHATHAM', 0, '', 0, '2020-10-02', '2025-10-31', NULL, '', 3, NULL, NULL, '2025-02-11 21:19:30', '2025-06-06 22:44:03', 47, NULL),
 (260, '24112201', 'PC25032', 'B1CBA2402749-0', NULL, 'SR 15 ', NULL, 'GDOT', '1886', 6050.00, 1, 'GREENE', 0, '', 1, '2025-01-31', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-02-13 14:10:07', '2025-02-13 14:11:03', 12, NULL),
 (261, '0015759', 'EDG45000', 'B3CBA1901689-1', NULL, 'LAURENS ', NULL, 'GDOT', '0015759', 208017.00, 1, 'LAURENS', 0, '', 0, '2019-01-05', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-02-13 15:03:16', '2025-02-13 15:06:53', 34, NULL),
 (262, 'CSBRG-0007-00(050)', 'GAB', 'B3CBA1601188-0', NULL, 'PULASKI', NULL, 'GDOT', 'CSBRG-0007-00(050)', 23160.00, 1, 'PULASKI', 0, '', 0, '2016-07-20', '2017-07-20', NULL, '', 2, NULL, NULL, '2025-02-13 15:39:03', '2025-02-13 15:49:40', 48, NULL),
@@ -6920,7 +6961,47 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (669, 'Change contract amount, old value: 0', '2025-03-03', 301),
 (670, 'Change name, old value: ', '2025-04-16', 256),
 (671, 'Change name, old value: ', '2025-04-16', 161),
-(672, 'Change name, old value: ', '2025-04-19', 257);
+(672, 'Change name, old value: ', '2025-04-19', 257),
+(673, 'Change name, old value: ', '2025-06-06', 259),
+(674, 'Change status, old value: In Progress', '2025-06-06', 259),
+(675, 'Change contract amount, old value: 1435095.12', '2025-06-06', 259);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_stage`
+--
+
+CREATE TABLE `project_stage` (
+  `stage_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `color` varchar(50) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_type`
+--
+
+CREATE TABLE `project_type` (
+  `type_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `proposal_type`
+--
+
+CREATE TABLE `proposal_type` (
+  `type_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -6932,8 +7013,18 @@ CREATE TABLE `reminder` (
   `reminder_id` int(11) NOT NULL,
   `subject` varchar(255) DEFAULT NULL,
   `body` text,
-  `day` date DEFAULT NULL
+  `day` date DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `reminder`
+--
+
+INSERT INTO `reminder` (`reminder_id`, `subject`, `body`, `day`, `status`) VALUES
+(1, 'Test Reminder', '<b>Prueba de notificacion</b>', '2025-05-31', 1),
+(2, 'Test 2', 'Prueba 2', '2025-06-01', 1),
+(3, 'Test 3', 'prueba 3', '2025-06-02', 1);
 
 -- --------------------------------------------------------
 
@@ -6946,6 +7037,15 @@ CREATE TABLE `reminder_recipient` (
   `reminder_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `reminder_recipient`
+--
+
+INSERT INTO `reminder_recipient` (`id`, `reminder_id`, `user_id`) VALUES
+(13, 3, 2),
+(14, 2, 2),
+(15, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -7084,7 +7184,12 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (173, 1, 1, 1, 1, 4, 16),
 (174, 1, 1, 1, 1, 1, 21),
 (175, 1, 1, 1, 1, 1, 22),
-(176, 1, 1, 1, 1, 1, 23);
+(176, 1, 1, 1, 1, 1, 23),
+(177, 1, 1, 1, 1, 1, 24),
+(178, 1, 1, 1, 1, 1, 25),
+(179, 1, 1, 1, 1, 1, 26),
+(180, 1, 1, 1, 1, 1, 27),
+(181, 1, 1, 1, 1, 1, 28);
 
 -- --------------------------------------------------------
 
@@ -7354,7 +7459,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `phone`, `created_at`, `updated_at`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, '', '2024-04-12 09:24:44', '2025-04-19 02:05:26', 1);
+(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, '', '2024-04-12 09:24:44', '2025-04-19 02:05:26', 1),
+(2, 'Marcel', 'Curbelo Carmona', 'cyborgmnk@gmail.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, '(994)356-4654', '2025-05-31 16:44:32', NULL, 3),
+(3, 'Andres', 'Iglesias', 'aaiglesias85@gmail.com', '$2y$12$226igY3UNO0.lFU9EboVz.Y2bW.VC0lwjeYYsgh/J6FSgq88fAbki', 1, '(345)465-4654', '2025-05-31 16:45:22', NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -7399,7 +7506,38 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (792, 1, 1, 1, 1, 1, 20),
 (793, 1, 1, 1, 1, 1, 21),
 (794, 1, 1, 1, 1, 1, 22),
-(795, 1, 1, 1, 1, 1, 23);
+(795, 1, 1, 1, 1, 1, 23),
+(796, 1, 1, 1, 1, 2, 1),
+(797, 1, 0, 0, 0, 2, 3),
+(798, 1, 0, 0, 0, 2, 4),
+(799, 0, 1, 0, 0, 2, 6),
+(800, 1, 1, 0, 0, 2, 7),
+(801, 1, 0, 0, 0, 2, 8),
+(802, 1, 0, 0, 0, 2, 9),
+(803, 1, 1, 1, 1, 2, 10),
+(804, 1, 1, 1, 1, 2, 11),
+(805, 1, 1, 1, 1, 2, 12),
+(806, 0, 1, 0, 0, 2, 13),
+(807, 1, 1, 0, 0, 2, 15),
+(808, 1, 0, 0, 0, 2, 16),
+(809, 1, 1, 1, 1, 3, 1),
+(810, 1, 0, 0, 0, 3, 3),
+(811, 1, 0, 0, 0, 3, 4),
+(812, 1, 0, 0, 0, 3, 5),
+(813, 1, 0, 0, 0, 3, 6),
+(814, 1, 0, 0, 0, 3, 7),
+(815, 1, 0, 0, 0, 3, 8),
+(816, 1, 0, 0, 0, 3, 9),
+(817, 1, 0, 0, 0, 3, 10),
+(818, 1, 0, 0, 0, 3, 11),
+(819, 1, 1, 1, 1, 3, 12),
+(820, 1, 0, 0, 0, 3, 13),
+(821, 1, 0, 0, 0, 3, 15),
+(822, 1, 1, 1, 1, 1, 24),
+(823, 1, 1, 1, 1, 1, 25),
+(824, 1, 1, 1, 1, 1, 26),
+(825, 1, 1, 1, 1, 1, 27),
+(826, 1, 1, 1, 1, 1, 28);
 
 --
 -- Índices para tablas volcadas
@@ -7490,6 +7628,12 @@ ALTER TABLE `data_tracking_subcontract`
   ADD KEY `subcontractor_id` (`subcontractor_id`);
 
 --
+-- Indices de la tabla `district`
+--
+ALTER TABLE `district`
+  ADD PRIMARY KEY (`district_id`);
+
+--
 -- Indices de la tabla `employee`
 --
 ALTER TABLE `employee`
@@ -7561,6 +7705,12 @@ ALTER TABLE `overhead_price`
   ADD PRIMARY KEY (`overhead_id`);
 
 --
+-- Indices de la tabla `plan_status`
+--
+ALTER TABLE `plan_status`
+  ADD PRIMARY KEY (`status_id`);
+
+--
 -- Indices de la tabla `project`
 --
 ALTER TABLE `project`
@@ -7590,6 +7740,24 @@ ALTER TABLE `project_item`
 ALTER TABLE `project_notes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Ref6678` (`project_id`);
+
+--
+-- Indices de la tabla `project_stage`
+--
+ALTER TABLE `project_stage`
+  ADD PRIMARY KEY (`stage_id`);
+
+--
+-- Indices de la tabla `project_type`
+--
+ALTER TABLE `project_type`
+  ADD PRIMARY KEY (`type_id`);
+
+--
+-- Indices de la tabla `proposal_type`
+--
+ALTER TABLE `proposal_type`
+  ADD PRIMARY KEY (`type_id`);
 
 --
 -- Indices de la tabla `reminder`
@@ -7748,6 +7916,12 @@ ALTER TABLE `data_tracking_subcontract`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
+-- AUTO_INCREMENT de la tabla `district`
+--
+ALTER TABLE `district`
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `employee`
 --
 ALTER TABLE `employee`
@@ -7763,7 +7937,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -7793,7 +7967,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3363;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3375;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -7812,6 +7986,12 @@ ALTER TABLE `notification`
 --
 ALTER TABLE `overhead_price`
   MODIFY `overhead_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `plan_status`
+--
+ALTER TABLE `plan_status`
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `project`
@@ -7835,19 +8015,37 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=673;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=676;
+
+--
+-- AUTO_INCREMENT de la tabla `project_stage`
+--
+ALTER TABLE `project_stage`
+  MODIFY `stage_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `project_type`
+--
+ALTER TABLE `project_type`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `proposal_type`
+--
+ALTER TABLE `proposal_type`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `reminder_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `reminder_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `reminder_recipient`
 --
 ALTER TABLE `reminder_recipient`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -7859,7 +8057,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -7901,13 +8099,13 @@ ALTER TABLE `unit`
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=796;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=827;
 
 --
 -- Restricciones para tablas volcadas

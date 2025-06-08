@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 31-05-2025 a las 15:04:04
+-- Tiempo de generación: 08-06-2025 a las 18:30:42
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -305,6 +305,18 @@ INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `da
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `district`
+--
+
+CREATE TABLE `district` (
+  `district_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `employee`
 --
 
@@ -386,7 +398,12 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (20, 'reporte_employee', 'Employees'),
 (21, 'conc_vendor', 'Concrete Vendors'),
 (22, 'schedule', 'Schedule Document'),
-(23, 'reminder', 'Reminders');
+(23, 'reminder', 'Reminders'),
+(24, 'project_stage', 'Project Stages'),
+(25, 'project_type', 'Project Type'),
+(26, 'proposal_type', 'Proposal Type'),
+(27, 'plan_status', 'Plan Status'),
+(28, 'district', 'District');
 
 -- --------------------------------------------------------
 
@@ -1005,6 +1022,18 @@ INSERT INTO `overhead_price` (`overhead_id`, `name`, `price`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `plan_status`
+--
+
+CREATE TABLE `plan_status` (
+  `status_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `project`
 --
 
@@ -1163,6 +1192,43 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `project_stage`
+--
+
+CREATE TABLE `project_stage` (
+  `stage_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `color` varchar(50) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_type`
+--
+
+CREATE TABLE `project_type` (
+  `type_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `proposal_type`
+--
+
+CREATE TABLE `proposal_type` (
+  `type_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `reminder`
 --
 
@@ -1170,7 +1236,8 @@ CREATE TABLE `reminder` (
   `reminder_id` int(11) NOT NULL,
   `subject` varchar(255) DEFAULT NULL,
   `body` text,
-  `day` date DEFAULT NULL
+  `day` date DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -1250,7 +1317,12 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (32, 1, 1, 1, 1, 1, 20),
 (33, 1, 1, 1, 1, 1, 21),
 (34, 1, 1, 1, 1, 1, 22),
-(35, 1, 1, 1, 1, 1, 23);
+(35, 1, 1, 1, 1, 1, 23),
+(36, 1, 1, 1, 1, 1, 24),
+(37, 1, 1, 1, 1, 1, 25),
+(38, 1, 1, 1, 1, 1, 26),
+(39, 1, 1, 1, 1, 1, 27),
+(40, 1, 1, 1, 1, 1, 28);
 
 -- --------------------------------------------------------
 
@@ -1422,7 +1494,12 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (24, 1, 1, 1, 1, 1, 20),
 (25, 1, 1, 1, 1, 1, 21),
 (26, 1, 1, 1, 1, 1, 22),
-(27, 1, 1, 1, 1, 1, 23);
+(27, 1, 1, 1, 1, 1, 23),
+(28, 1, 1, 1, 1, 1, 24),
+(29, 1, 1, 1, 1, 1, 25),
+(30, 1, 1, 1, 1, 1, 26),
+(31, 1, 1, 1, 1, 1, 27),
+(32, 1, 1, 1, 1, 1, 28);
 
 --
 -- Índices para tablas volcadas
@@ -1513,6 +1590,12 @@ ALTER TABLE `data_tracking_subcontract`
   ADD KEY `subcontractor_id` (`subcontractor_id`);
 
 --
+-- Indices de la tabla `district`
+--
+ALTER TABLE `district`
+  ADD PRIMARY KEY (`district_id`);
+
+--
 -- Indices de la tabla `employee`
 --
 ALTER TABLE `employee`
@@ -1587,6 +1670,12 @@ ALTER TABLE `overhead_price`
   ADD PRIMARY KEY (`overhead_id`);
 
 --
+-- Indices de la tabla `plan_status`
+--
+ALTER TABLE `plan_status`
+  ADD PRIMARY KEY (`status_id`);
+
+--
 -- Indices de la tabla `project`
 --
 ALTER TABLE `project`
@@ -1616,6 +1705,24 @@ ALTER TABLE `project_item`
 ALTER TABLE `project_notes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Ref6678` (`project_id`);
+
+--
+-- Indices de la tabla `project_stage`
+--
+ALTER TABLE `project_stage`
+  ADD PRIMARY KEY (`stage_id`);
+
+--
+-- Indices de la tabla `project_type`
+--
+ALTER TABLE `project_type`
+  ADD PRIMARY KEY (`type_id`);
+
+--
+-- Indices de la tabla `proposal_type`
+--
+ALTER TABLE `proposal_type`
+  ADD PRIMARY KEY (`type_id`);
 
 --
 -- Indices de la tabla `reminder`
@@ -1774,6 +1881,12 @@ ALTER TABLE `data_tracking_subcontract`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
+-- AUTO_INCREMENT de la tabla `district`
+--
+ALTER TABLE `district`
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `employee`
 --
 ALTER TABLE `employee`
@@ -1789,7 +1902,7 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -1840,6 +1953,12 @@ ALTER TABLE `overhead_price`
   MODIFY `overhead_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT de la tabla `plan_status`
+--
+ALTER TABLE `plan_status`
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project`
 --
 ALTER TABLE `project`
@@ -1864,6 +1983,24 @@ ALTER TABLE `project_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
+-- AUTO_INCREMENT de la tabla `project_stage`
+--
+ALTER TABLE `project_stage`
+  MODIFY `stage_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `project_type`
+--
+ALTER TABLE `project_type`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `proposal_type`
+--
+ALTER TABLE `proposal_type`
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `reminder`
 --
 ALTER TABLE `reminder`
@@ -1885,7 +2022,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -1933,7 +2070,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- Restricciones para tablas volcadas

@@ -1,0 +1,23 @@
+project_type:
+  path: /project-type
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::index }
+
+listarProjectTypeAdmin:
+  path: /project-type/listar
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::listar, _format: json }
+
+salvarProjectTypeAdmin:
+  path: /project-type/salvar
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::salvar, _format: json }
+
+eliminarProjectTypeAdmin:
+  path: /project-type/eliminar
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::eliminar, _format: json }
+
+eliminarProjectTypesAdmin:
+  path: /project-type/eliminarTypes
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::eliminarTypes, _format: json }
+
+cargarDatosProjectTypeAdmin:
+  path: /project-type/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::cargarDatos, _format: json }

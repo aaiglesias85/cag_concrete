@@ -1,0 +1,23 @@
+project_stage:
+  path: /project-stage
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::index }
+
+listarProjectStageAdmin:
+  path: /project-stage/listar
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::listar, _format: json }
+
+salvarProjectStageAdmin:
+  path: /project-stage/salvar
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::salvar, _format: json }
+
+eliminarProjectStageAdmin:
+  path: /project-stage/eliminar
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::eliminar, _format: json }
+
+eliminarProjectStagesAdmin:
+  path: /project-stage/eliminarStages
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::eliminarStages, _format: json }
+
+cargarDatosProjectStageAdmin:
+  path: /project-stage/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::cargarDatos, _format: json }

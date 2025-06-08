@@ -1,0 +1,23 @@
+proposal_type:
+  path: /proposal-type
+  defaults: { _controller: App\Controller\Admin\ProposalTypeController::index }
+
+listarProposalTypeAdmin:
+  path: /proposal-type/listar
+  defaults: { _controller: App\Controller\Admin\ProposalTypeController::listar, _format: json }
+
+salvarProposalTypeAdmin:
+  path: /proposal-type/salvar
+  defaults: { _controller: App\Controller\Admin\ProposalTypeController::salvar, _format: json }
+
+eliminarProposalTypeAdmin:
+  path: /proposal-type/eliminar
+  defaults: { _controller: App\Controller\Admin\ProposalTypeController::eliminar, _format: json }
+
+eliminarProposalTypesAdmin:
+  path: /proposal-type/eliminarTypes
+  defaults: { _controller: App\Controller\Admin\ProposalTypeController::eliminarTypes, _format: json }
+
+cargarDatosProposalTypeAdmin:
+  path: /proposal-type/cargarDatos
+  defaults: { _controller: App\Controller\Admin\ProposalTypeController::cargarDatos, _format: json }
