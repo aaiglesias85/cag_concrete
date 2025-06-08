@@ -28,15 +28,16 @@
             {% endif %}
 
             <!-- menu projects -->
-            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
-                    m-menu-submenu-toggle="click">
+            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor or
+                menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict %}
+
+                <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true" m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
                         <i class="m-menu__link-icon flaticon-suitcase"></i>
                         <span class="m-menu__link-text">Projects</span>
                         <i class="m-menu__ver-arrow la la-angle-right"></i>
                     </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
+                    <div class="m-menu__submenu m-menu__submenu--up" style="top: 0px;">
                         <span class="m-menu__arrow"></span>
                         <ul class="m-menu__subnav">
                             <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
@@ -76,6 +77,72 @@
                                         <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                         <span class="m-menu__link-text">Concrete Vendors</span>
                                     </a>
+                                </li>
+                            {% endif %}
+
+                            <!-- menu estimates -->
+                            {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict %}
+
+                                <li class="m-menu__item  m-menu__item--parent" aria-haspopup="true">
+                                    <span class="m-menu__link"><span class="m-menu__link-text">Estimates</span></span>
+                                </li>
+
+                                <li class="m-menu__item m-menu__item--submenu" m-menu-submenu-toggle="hover"
+                                    m-menu-link-redirect="1" aria-haspopup="true">
+                                    <a href="javascript:;" class="m-menu__link m-menu__toggle">
+                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                        <span class="m-menu__link-text">Libraries</span><i
+                                                class="m-menu__hor-arrow la la-angle-right"></i><i
+                                                class="m-menu__ver-arrow la la-angle-right"></i></a>
+                                    <div class="m-menu__submenu m-menu__submenu--classic m-menu__submenu--right"><span
+                                                class="m-menu__arrow "></span>
+                                        <ul class="m-menu__subnav">
+                                            {% if menu.menuProjectStage %}
+                                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                                    <a href="{{ url('project_stage') }}" class="m-menu__link ">
+                                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                        <span class="m-menu__link-text">Project Stages</span>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+
+                                            {% if menu.menuProjectType %}
+                                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                                    <a href="{{ url('project_type') }}" class="m-menu__link ">
+                                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                        <span class="m-menu__link-text">Project Types</span>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+
+                                            {% if menu.menuProposalType %}
+                                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                                    <a href="{{ url('proposal_type') }}" class="m-menu__link ">
+                                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                        <span class="m-menu__link-text">Proposal Types</span>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+
+                                            {% if menu.menuPlanStatus %}
+                                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                                    <a href="{{ url('plan_status') }}" class="m-menu__link ">
+                                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                        <span class="m-menu__link-text">Plan Status</span>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+
+                                            {% if menu.menuDistrict %}
+                                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
+                                                    <a href="{{ url('district') }}" class="m-menu__link ">
+                                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                        <span class="m-menu__link-text">Districts</span>
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
                                 </li>
                             {% endif %}
 
@@ -138,9 +205,7 @@
 
             <!-- menu libraries -->
             {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or
-                menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement or menu.menuReminder or
-                menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict
-            %}
+                menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement or menu.menuReminder %}
                 <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true"
                     m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Libraries">
@@ -232,51 +297,6 @@
                                     <a href="{{ url('reminder') }}" class="m-menu__link ">
                                         <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                         <span class="m-menu__link-text">Reminders</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuProjectStage %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('project_stage') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Project Stages</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuProjectType %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('project_type') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Project Types</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuProposalType %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('proposal_type') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Proposal Types</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuPlanStatus %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('plan_status') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Plan Status</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuDistrict %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('district') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Districts</span>
                                     </a>
                                 </li>
                             {% endif %}
