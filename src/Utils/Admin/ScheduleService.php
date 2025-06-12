@@ -42,13 +42,26 @@ class ScheduleService extends Base
         $sheet = $spreadsheet->setActiveSheetIndex(0);
 
         $fila = 10;
-        $diasSemana = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        $columnas = range('A', 'K'); // Aumentado para acomodar 7 días + columnas fijas
+        $diasSemana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $columnas = range('A', 'K'); // A-K para 11 columnas
 
         $nombres = array_map(fn($e) => strtoupper($e['name']), $employees);
         $textoCrewLeads = 'CREW LEADS: ' . implode(', ', $nombres);
 
         foreach ($semanas as $semana) {
+            // Reordenar semana para comenzar en lunes
+            $diasOrdenados = [];
+            foreach ($diasSemana as $diaNombre) {
+                foreach ($semana->dias as $dia) {
+                    $fecha = \DateTime::createFromFormat('m/d/Y', $dia);
+                    if ($fecha && $fecha->format('l') === $diaNombre) {
+                        $diasOrdenados[] = $dia;
+                        break;
+                    }
+                }
+            }
+            $semana->dias = $diasOrdenados;
+
             $textoSemana = 'WEEK OF ' . strtoupper(date('F j, Y', strtotime($semana->dias[0])));
             $mergeSemana = "{$columnas[0]}{$fila}:{$columnas[10]}{$fila}";
             $sheet->mergeCells($mergeSemana);
@@ -119,7 +132,7 @@ class ScheduleService extends Base
                             'project' => $project->getProjectNumber() . ' - ' . $project->getDescription(),
                             'work' => $schedule->getDescription(),
                             'vendor' => $vendorName,
-                            'dias' => array_fill(0, 7, ''), // DOMINGO a sábado
+                            'dias' => array_fill(0, 7, ''), // LUNES a domingo
                             'notes' => $schedule->getNotes(),
                         ];
                     }
@@ -173,13 +186,13 @@ class ScheduleService extends Base
         $hoy = new \DateTime();
 
         if (empty($fechaInicio) && empty($fechaFin)) {
-            $inicio = (clone $hoy)->modify('sunday this week');
-            $fin = (clone $hoy)->modify('saturday this week');
+            $inicio = (clone $hoy)->modify('monday this week');
+            $fin = (clone $hoy)->modify('sunday this week');
         } elseif (empty($fechaInicio)) {
             $fin = \DateTime::createFromFormat($formato, $fechaFin) ?: $hoy;
-            $inicio = (clone $fin)->modify('sunday this week');
+            $inicio = (clone $fin)->modify('monday this week');
         } elseif (empty($fechaFin)) {
-            $inicio = \DateTime::createFromFormat($formato, $fechaInicio) ?: (clone $hoy)->modify('sunday this week');
+            $inicio = \DateTime::createFromFormat($formato, $fechaInicio) ?: (clone $hoy)->modify('monday this week');
             $fin = clone $hoy;
         } else {
             $inicio = \DateTime::createFromFormat($formato, $fechaInicio);
@@ -195,11 +208,11 @@ class ScheduleService extends Base
         }
 
         $semanas = [];
-        $inicioSemana = (clone $inicio)->modify('-' . $inicio->format('w') . ' days');
+        $inicioSemana = (clone $inicio)->modify('monday this week');
 
         while ($inicioSemana <= $fin) {
             $dias = [];
-            for ($i = 0; $i < 7; $i++) { // 7 días: domingo a sábado
+            for ($i = 0; $i < 7; $i++) { // Lunes a domingo
                 $dia = (clone $inicioSemana)->modify("+$i days");
                 $dias[] = $dia->format($formato);
             }
@@ -216,6 +229,7 @@ class ScheduleService extends Base
 
         return $semanas;
     }
+
 
     private function ListarEmployeesLeads()
     {
