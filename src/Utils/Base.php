@@ -8,6 +8,7 @@ use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingMaterial;
 use App\Entity\DataTrackingSubcontract;
+use App\Entity\EstimateEstimator;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
@@ -593,6 +594,13 @@ class Base
             ->ListarRemindersDeUsuario($usuario_id);
         foreach ($reminders as $reminder) {
             $em->remove($reminder);
+        }
+
+        // estimates
+        $estimates = $this->getDoctrine()->getRepository(EstimateEstimator::class)
+            ->ListarEstimatesDeUsuario($usuario_id);
+        foreach ($estimates as $estimate) {
+            $em->remove($estimate);
         }
     }
 

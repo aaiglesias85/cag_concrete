@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\Company;
 use App\Entity\CompanyContact;
+use App\Entity\Estimate;
 use App\Entity\Project;
 use App\Utils\Base;
 
@@ -23,6 +24,13 @@ class CompanyService extends Base
             ->find($contact_id);
         /**@var CompanyContact $entity */
         if ($entity != null) {
+
+            // estimates
+            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                ->ListarEstimatesDeContact($contact_id);
+            foreach ($estimates as $estimate) {
+                $estimate->setContact(NULL);
+            }
 
             $contact_name = $entity->getName();
 
@@ -168,12 +176,8 @@ class CompanyService extends Base
                 return $resultado;
             }
 
-            // contacts
-            $contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
-                ->ListarContacts($company_id);
-            foreach ($contacts as $contact) {
-                $em->remove($contact);
-            }
+            // eliminar info
+            $this->EliminarInformacionDeCompany($company_id);
 
             $company_descripcion = $entity->getName();
 
@@ -221,12 +225,9 @@ class CompanyService extends Base
                         $projects = $this->getDoctrine()->getRepository(Project::class)
                             ->ListarProjectsDeCompany($company_id);
                         if (count($projects) == 0) {
-                            // contacts
-                            $contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
-                                ->ListarContacts($company_id);
-                            foreach ($contacts as $contact) {
-                                $em->remove($contact);
-                            }
+
+                            // eliminar info
+                            $this->EliminarInformacionDeCompany($company_id);
 
                             $company_descripcion = $entity->getName();
 
@@ -257,6 +258,38 @@ class CompanyService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * EliminarInformacionDeCompany
+     * @param $company_id
+     * @return void
+     */
+    public function EliminarInformacionDeCompany($company_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // contacts
+        $contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
+            ->ListarContacts($company_id);
+        foreach ($contacts as $contact) {
+
+            // estimates
+            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                ->ListarEstimatesDeContact($contact->getContactId());
+            foreach ($estimates as $estimate) {
+                $estimate->setContact(NULL);
+            }
+
+            $em->remove($contact);
+        }
+
+        // estimates
+        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+            ->ListarEstimatesDeCompany($company_id);
+        foreach ($estimates as $estimate) {
+            $estimate->setCompany(NULL);
+        }
     }
 
     /**

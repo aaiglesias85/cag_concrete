@@ -1,0 +1,230 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\Estimate;
+use App\Entity\EstimateProjectType;
+use Doctrine\ORM\EntityRepository;
+
+class EstimateProjectTypeRepository extends EntityRepository
+{
+
+    /**
+     * ListarTypesDeEstimate: Lista los types de un estimate
+     *
+     * @return EstimateProjectType[]
+     */
+    public function ListarTypesDeEstimate($estimate_id)
+    {
+        $consulta = $this->createQueryBuilder('e_p_t')
+            ->leftJoin('e_p_t.estimate', 'e')
+            ->leftJoin('e_p_t.type', 'p_t');
+
+        if ($estimate_id != '') {
+            $consulta->andWhere('e.estimateId = :estimate_id')
+                ->setParameter('estimate_id', $estimate_id);
+        }
+
+        $consulta->orderBy('p_t.description', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
+     * ListarEstimatesDeType: Lista los estimates de un type
+     *
+     * @return EstimateProjectType[]
+     */
+    public function ListarEstimatesDeType($type_id)
+    {
+        $consulta = $this->createQueryBuilder('e_p_t')
+            ->leftJoin('e_p_t.estimate', 'e')
+            ->leftJoin('e_p_t.type', 'p_t');
+
+        if ($type_id != '') {
+            $consulta->andWhere('p_t.typeId = :type_id')
+                ->setParameter('type_id', $type_id);
+        }
+
+        $consulta->orderBy('e.name', "DESC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+
+    /**
+     * ListarEstimates: Lista los estimates
+     * @param int $start Inicio
+     * @param int $limit Limite
+     * @param string $sSearch Para buscar
+     *
+     * @return EstimateProjectType[]
+     */
+    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id = '', $stage_id = '', $proposal_type_id = '',
+                                    $status_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
+    {
+        $consulta = $this->createQueryBuilder('e_p_t')
+            ->leftJoin('e_p_t.estimate', 'e')
+            ->leftJoin('e_p_t.type', 't')
+            ->leftJoin('e.company', 'c')
+            ->leftJoin('e.contact', 'c_c')
+            ->leftJoin('e.proposalType', 'p_t')
+            ->leftJoin('e.status', 'p_s')
+            ->leftJoin('p.district', 'd')
+            ->leftJoin('e.stage', 'p_s');
+
+        if ($sSearch != "") {
+            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR e.county LIKE :search OR e.priority LIKE :search OR
+            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
+            p_t.description LIKE :search OR p_s.description LIKE :search OR d.description LIKE :search OR p_s.description LIKE :search OR
+            t.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($stage_id != '') {
+            $consulta->andWhere('p_s.stageId = :stage_id')
+                ->setParameter('stage_id', $stage_id);
+        }
+
+        if ($proposal_type_id != '') {
+            $consulta->andWhere('p_t.typeId = :proposal_type_id')
+                ->setParameter('proposal_type_id', $proposal_type_id);
+        }
+
+        if ($status_id != '') {
+            $consulta->andWhere('p_s.statusId = :status_id')
+                ->setParameter('status_id', $status_id);
+        }
+
+        if ($district_id != '') {
+            $consulta->andWhere('d.districtId = :district_id')
+                ->setParameter('district_id', $district_id);
+        }
+
+        if ($company_id != '') {
+            $consulta->andWhere('c.companyId = :company_id')
+                ->setParameter('company_id', $company_id);
+        }
+
+        if ($project_type_id != '') {
+            $consulta->andWhere('t.typeId = :project_type_id')
+                ->setParameter('project_type_id', $project_type_id);
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+
+            $consulta->andWhere('e.bidDeadlineDate >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
+
+            $consulta->andWhere('e.bidDeadlineDate <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        switch ($iSortCol_0) {
+            case 'type':
+                $consulta->orderBy("t.description", $sSortDir_0);
+                break;
+            case 'estimator':
+                $consulta->orderBy("e.name", $sSortDir_0);
+                break;
+            default:
+                $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
+                break;
+        }
+
+        $consulta->groupBy('e.estimateId');
+
+
+        if ($limit > 0) {
+            $consulta->setMaxResults($limit);
+        }
+
+        return $consulta->setFirstResult($start)
+            ->getQuery()->getResult();
+    }
+
+    /**
+     * TotalEstimates: Total de estimates de la BD
+     * @param string $sSearch Para buscar
+     *
+     * @return int
+     */
+    public function TotalEstimates($sSearch, $company_id = '', $stage_id = '', $proposal_type_id = '',
+                                   $status_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
+    {
+
+        $consulta = $this->createQueryBuilder('e_p_t')
+            ->select('COUNT(DISTINCT e.estimateId)') // Contar estimates únicos
+            ->leftJoin('e_p_t.estimate', 'e')
+            ->leftJoin('e_p_t.type', 't')
+            ->leftJoin('e.company', 'c')
+            ->leftJoin('e.contact', 'c_c')
+            ->leftJoin('e.proposalType', 'p_t')
+            ->leftJoin('e.status', 'p_s')
+            ->leftJoin('p.district', 'd')
+            ->leftJoin('e.stage', 'p_s');
+
+        if ($sSearch != "") {
+            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR e.county LIKE :search OR e.priority LIKE :search OR
+            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
+            p_t.description LIKE :search OR p_s.description LIKE :search OR d.description LIKE :search OR p_s.description LIKE :search OR
+            t.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($stage_id != '') {
+            $consulta->andWhere('p_s.stageId = :stage_id')
+                ->setParameter('stage_id', $stage_id);
+        }
+
+        if ($proposal_type_id != '') {
+            $consulta->andWhere('p_t.typeId = :proposal_type_id')
+                ->setParameter('proposal_type_id', $proposal_type_id);
+        }
+
+        if ($status_id != '') {
+            $consulta->andWhere('p_s.statusId = :status_id')
+                ->setParameter('status_id', $status_id);
+        }
+
+        if ($district_id != '') {
+            $consulta->andWhere('d.districtId = :district_id')
+                ->setParameter('district_id', $district_id);
+        }
+
+        if ($company_id != '') {
+            $consulta->andWhere('c.companyId = :company_id')
+                ->setParameter('company_id', $company_id);
+        }
+
+        if ($project_type_id != '') {
+            $consulta->andWhere('t.typeId = :project_type_id')
+                ->setParameter('project_type_id', $project_type_id);
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+
+            $consulta->andWhere('e.bidDeadlineDate >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
+
+            $consulta->andWhere('e.bidDeadlineDate <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        return (int)$consulta->getQuery()->getSingleScalarResult();
+    }
+}

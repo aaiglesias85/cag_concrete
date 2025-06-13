@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-06-2025 a las 18:30:42
+-- Tiempo de generación: 12-06-2025 a las 23:25:03
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -362,6 +362,56 @@ INSERT INTO `equation` (`equation_id`, `description`, `equation`, `status`) VALU
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `estimate`
+--
+
+CREATE TABLE `estimate` (
+  `estimate_id` int(11) NOT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `bid_deadline_date` date DEFAULT NULL,
+  `bid_deadline_hour` varchar(50) DEFAULT NULL,
+  `county` varchar(255) DEFAULT NULL,
+  `priority` varchar(50) DEFAULT NULL,
+  `bid_no` varchar(50) DEFAULT NULL,
+  `work_hour` varchar(50) DEFAULT NULL,
+  `phone` text,
+  `email` text,
+  `project_stage_id` int(11) DEFAULT NULL,
+  `proposal_type_id` int(11) DEFAULT NULL,
+  `status_id` int(11) DEFAULT NULL,
+  `district_id` int(11) DEFAULT NULL,
+  `company_id` int(11) DEFAULT NULL,
+  `contact_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_estimator`
+--
+
+CREATE TABLE `estimate_estimator` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_project_type`
+--
+
+CREATE TABLE `estimate_project_type` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `type_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `function`
 --
 
@@ -403,7 +453,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (25, 'project_type', 'Project Type'),
 (26, 'proposal_type', 'Proposal Type'),
 (27, 'plan_status', 'Plan Status'),
-(28, 'district', 'District');
+(28, 'district', 'District'),
+(29, 'estimate', 'Estimates');
 
 -- --------------------------------------------------------
 
@@ -1322,7 +1373,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (37, 1, 1, 1, 1, 1, 25),
 (38, 1, 1, 1, 1, 1, 26),
 (39, 1, 1, 1, 1, 1, 27),
-(40, 1, 1, 1, 1, 1, 28);
+(40, 1, 1, 1, 1, 1, 28),
+(41, 1, 1, 1, 1, 1, 29);
 
 -- --------------------------------------------------------
 
@@ -1499,7 +1551,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (29, 1, 1, 1, 1, 1, 25),
 (30, 1, 1, 1, 1, 1, 26),
 (31, 1, 1, 1, 1, 1, 27),
-(32, 1, 1, 1, 1, 1, 28);
+(32, 1, 1, 1, 1, 1, 28),
+(33, 1, 1, 1, 1, 1, 29);
 
 --
 -- Índices para tablas volcadas
@@ -1606,6 +1659,34 @@ ALTER TABLE `employee`
 --
 ALTER TABLE `equation`
   ADD PRIMARY KEY (`equation_id`);
+
+--
+-- Indices de la tabla `estimate`
+--
+ALTER TABLE `estimate`
+  ADD PRIMARY KEY (`estimate_id`),
+  ADD KEY `Refestimate1` (`project_stage_id`),
+  ADD KEY `Refestimate2` (`proposal_type_id`),
+  ADD KEY `Refestimate3` (`status_id`),
+  ADD KEY `Refestimate4` (`district_id`),
+  ADD KEY `Refestimate5` (`company_id`),
+  ADD KEY `Refestimate6` (`contact_id`);
+
+--
+-- Indices de la tabla `estimate_estimator`
+--
+ALTER TABLE `estimate_estimator`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_estimator1` (`estimate_id`),
+  ADD KEY `Refestimate_estimator2` (`user_id`);
+
+--
+-- Indices de la tabla `estimate_project_type`
+--
+ALTER TABLE `estimate_project_type`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_project_type1` (`estimate_id`),
+  ADD KEY `Refestimate_project_type2` (`type_id`);
 
 --
 -- Indices de la tabla `function`
@@ -1899,10 +1980,28 @@ ALTER TABLE `equation`
   MODIFY `equation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate`
+--
+ALTER TABLE `estimate`
+  MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_estimator`
+--
+ALTER TABLE `estimate_estimator`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_project_type`
+--
+ALTER TABLE `estimate_project_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -2022,7 +2121,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2070,7 +2169,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- Restricciones para tablas volcadas
@@ -2133,6 +2232,31 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
+
+--
+-- Filtros para la tabla `estimate`
+--
+ALTER TABLE `estimate`
+  ADD CONSTRAINT `Refestimate1` FOREIGN KEY (`project_stage_id`) REFERENCES `project_stage` (`stage_id`),
+  ADD CONSTRAINT `Refestimate2` FOREIGN KEY (`proposal_type_id`) REFERENCES `proposal_type` (`type_id`),
+  ADD CONSTRAINT `Refestimate3` FOREIGN KEY (`status_id`) REFERENCES `plan_status` (`status_id`),
+  ADD CONSTRAINT `Refestimate4` FOREIGN KEY (`district_id`) REFERENCES `district` (`district_id`),
+  ADD CONSTRAINT `Refestimate5` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
+  ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
+
+--
+-- Filtros para la tabla `estimate_estimator`
+--
+ALTER TABLE `estimate_estimator`
+  ADD CONSTRAINT `Refestimate_estimator1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_estimator2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `estimate_project_type`
+--
+ALTER TABLE `estimate_project_type`
+  ADD CONSTRAINT `Refestimate_project_type1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_project_type2` FOREIGN KEY (`type_id`) REFERENCES `project_type` (`type_id`);
 
 --
 -- Filtros para la tabla `invoice`

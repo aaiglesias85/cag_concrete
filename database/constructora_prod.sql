@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-06-2025 a las 18:30:51
+-- Tiempo de generación: 12-06-2025 a las 23:25:13
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -2819,6 +2819,17 @@ CREATE TABLE `district` (
   `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `district`
+--
+
+INSERT INTO `district` (`district_id`, `description`, `status`) VALUES
+(1, 'District 1', 1),
+(2, 'District 2', 1),
+(3, 'District 3', 1),
+(4, 'District 4', 1),
+(5, 'District 5', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -2972,6 +2983,56 @@ INSERT INTO `equation` (`equation_id`, `description`, `equation`, `status`) VALU
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `estimate`
+--
+
+CREATE TABLE `estimate` (
+  `estimate_id` int(11) NOT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `bid_deadline_date` date DEFAULT NULL,
+  `bid_deadline_hour` varchar(50) DEFAULT NULL,
+  `county` varchar(255) DEFAULT NULL,
+  `priority` varchar(50) DEFAULT NULL,
+  `bid_no` varchar(50) DEFAULT NULL,
+  `work_hour` varchar(50) DEFAULT NULL,
+  `phone` text,
+  `email` text,
+  `project_stage_id` int(11) DEFAULT NULL,
+  `proposal_type_id` int(11) DEFAULT NULL,
+  `status_id` int(11) DEFAULT NULL,
+  `district_id` int(11) DEFAULT NULL,
+  `company_id` int(11) DEFAULT NULL,
+  `contact_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_estimator`
+--
+
+CREATE TABLE `estimate_estimator` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_project_type`
+--
+
+CREATE TABLE `estimate_project_type` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `type_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `function`
 --
 
@@ -3013,7 +3074,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (25, 'project_type', 'Project Type'),
 (26, 'proposal_type', 'Proposal Type'),
 (27, 'plan_status', 'Plan Status'),
-(28, 'district', 'District');
+(28, 'district', 'District'),
+(29, 'estimate', 'Estimates');
 
 -- --------------------------------------------------------
 
@@ -4188,7 +4250,40 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3371, 'Add', 'Reminder', 'The reminder is added: Test 3, Date: 06/02/2025', '::1', '2025-05-31 20:25:56', 1),
 (3372, 'Update', 'Reminder', 'The reminder is modified: Test 2, Date: 06/01/2025', '::1', '2025-05-31 20:26:10', 1),
 (3373, 'Update', 'Reminder', 'The reminder is modified: Test Reminder, Date: 05/31/2025', '::1', '2025-05-31 20:26:17', 1),
-(3374, 'Update', 'Project', 'The project is modified: MMIP PROJECT', '::1', '2025-06-06 22:44:03', 1);
+(3374, 'Update', 'Project', 'The project is modified: MMIP PROJECT', '::1', '2025-06-06 22:44:03', 1),
+(3375, 'Add', 'Project Stage', 'The project stage is added: Undecided', '::1', '2025-06-08 19:57:33', 1),
+(3376, 'Add', 'Project Stage', 'The project stage is added: Accepted', '::1', '2025-06-08 19:58:01', 1),
+(3377, 'Add', 'Project Stage', 'The project stage is added: Material Quotes', '::1', '2025-06-08 19:59:50', 1),
+(3378, 'Add', 'Project Stage', 'The project stage is added: Estimating', '::1', '2025-06-08 20:00:29', 1),
+(3379, 'Add', 'Project Stage', 'The project stage is added: Curtis Review', '::1', '2025-06-08 20:01:09', 1),
+(3380, 'Add', 'Project Type', 'The project type is added: Quick Response', '::1', '2025-06-08 20:24:17', 1),
+(3381, 'Add', 'Project Type', 'The project type is added: Traffic Signal', '::1', '2025-06-08 20:24:31', 1),
+(3382, 'Add', 'Project Type', 'The project type is added: Turnkey', '::1', '2025-06-08 20:24:46', 1),
+(3383, 'Add', 'Project Type', 'The project type is added: Roundabout', '::1', '2025-06-08 20:25:03', 1),
+(3384, 'Add', 'Project Type', 'The project type is added: Bridge & Approaches', '::1', '2025-06-08 20:25:35', 1),
+(3385, 'Update', 'Project Type', 'The project type is modified: Bridge & Approaches', '::1', '2025-06-08 20:25:39', 1),
+(3386, 'Add', 'Project Type', 'The project type is added: test', '::1', '2025-06-08 20:25:45', 1),
+(3387, 'Delete', 'Project Type', 'The project type is deleted: test', '::1', '2025-06-08 20:25:48', 1),
+(3388, 'Add', 'Proposal Type', 'The proposal type is added: Bid', '::1', '2025-06-08 20:48:41', 1),
+(3389, 'Add', 'Proposal Type', 'The proposal type is added: Letting', '::1', '2025-06-08 20:48:50', 1),
+(3390, 'Add', 'Proposal Type', 'The proposal type is added: Add-On', '::1', '2025-06-08 20:48:59', 1),
+(3391, 'Add', 'Proposal Type', 'The proposal type is added: Re-Bid', '::1', '2025-06-08 20:49:07', 1),
+(3392, 'Add', 'Proposal Type', 'The proposal type is added: Prime', '::1', '2025-06-08 20:49:40', 1),
+(3393, 'Add', 'Proposal Type', 'The proposal type is added: Quick Response', '::1', '2025-06-08 20:49:50', 1),
+(3394, 'Add', 'Plan Status', 'The plan status is added: Downloaded', '::1', '2025-06-08 21:01:48', 1),
+(3395, 'Add', 'Plan Status', 'The plan status is added: New Addenda', '::1', '2025-06-08 21:02:54', 1),
+(3396, 'Add', 'Plan Status', 'The plan status is added: No Plans', '::1', '2025-06-08 21:03:01', 1),
+(3397, 'Add', 'Plan Status', 'The plan status is added: Log Only', '::1', '2025-06-08 21:03:09', 1),
+(3398, 'Update', 'Plan Status', 'The plan status is modified: Downloaded', '::1', '2025-06-08 21:04:51', 1),
+(3399, 'Update', 'Plan Status', 'The plan status is modified: Downloaded', '::1', '2025-06-08 21:04:54', 1),
+(3400, 'Add', 'District', 'The district is added: District 1', '::1', '2025-06-08 21:21:04', 1),
+(3401, 'Add', 'District', 'The district is added: District 2', '::1', '2025-06-08 21:23:15', 1),
+(3402, 'Add', 'District', 'The district is added: District 3', '::1', '2025-06-08 21:23:19', 1),
+(3403, 'Add', 'District', 'The district is added: District 4', '::1', '2025-06-08 21:23:23', 1),
+(3404, 'Add', 'District', 'The district is added: District 5', '::1', '2025-06-08 21:23:38', 1),
+(3405, 'Update', 'District', 'The district is modified: District 1', '::1', '2025-06-08 21:24:06', 1),
+(3406, 'Update', 'District', 'The district is modified: District 5', '::1', '2025-06-08 21:24:08', 1),
+(3407, 'Update', 'District', 'The district is modified: District 5', '::1', '2025-06-08 21:24:12', 1);
 
 -- --------------------------------------------------------
 
@@ -4298,6 +4393,16 @@ CREATE TABLE `plan_status` (
   `description` varchar(255) DEFAULT NULL,
   `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `plan_status`
+--
+
+INSERT INTO `plan_status` (`status_id`, `description`, `status`) VALUES
+(1, 'Downloaded', 1),
+(2, 'New Addenda', 1),
+(3, 'No Plans', 1),
+(4, 'Log Only', 1);
 
 -- --------------------------------------------------------
 
@@ -6979,6 +7084,17 @@ CREATE TABLE `project_stage` (
   `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `project_stage`
+--
+
+INSERT INTO `project_stage` (`stage_id`, `description`, `color`, `status`) VALUES
+(1, 'Undecided', '#ADB5CA', 1),
+(2, 'Accepted', '#34BFA3', 1),
+(3, 'Material Quotes', '#9816F4', 1),
+(4, 'Estimating', '#0EEB2B', 1),
+(5, 'Curtis Review', '#FFB822', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -6991,6 +7107,17 @@ CREATE TABLE `project_type` (
   `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `project_type`
+--
+
+INSERT INTO `project_type` (`type_id`, `description`, `status`) VALUES
+(1, 'Quick Response', 1),
+(2, 'Traffic Signal', 1),
+(3, 'Turnkey', 1),
+(4, 'Roundabout', 1),
+(5, 'Bridge & Approaches', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -7002,6 +7129,18 @@ CREATE TABLE `proposal_type` (
   `description` varchar(255) DEFAULT NULL,
   `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `proposal_type`
+--
+
+INSERT INTO `proposal_type` (`type_id`, `description`, `status`) VALUES
+(1, 'Bid', 1),
+(2, 'Letting', 1),
+(3, 'Add-On', 1),
+(4, 'Re-Bid', 1),
+(5, 'Prime', 1),
+(6, 'Quick Response', 1);
 
 -- --------------------------------------------------------
 
@@ -7189,7 +7328,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (178, 1, 1, 1, 1, 1, 25),
 (179, 1, 1, 1, 1, 1, 26),
 (180, 1, 1, 1, 1, 1, 27),
-(181, 1, 1, 1, 1, 1, 28);
+(181, 1, 1, 1, 1, 1, 28),
+(182, 1, 1, 1, 1, 1, 29);
 
 -- --------------------------------------------------------
 
@@ -7537,7 +7677,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (823, 1, 1, 1, 1, 1, 25),
 (824, 1, 1, 1, 1, 1, 26),
 (825, 1, 1, 1, 1, 1, 27),
-(826, 1, 1, 1, 1, 1, 28);
+(826, 1, 1, 1, 1, 1, 28),
+(827, 1, 1, 1, 1, 1, 29);
 
 --
 -- Índices para tablas volcadas
@@ -7644,6 +7785,34 @@ ALTER TABLE `employee`
 --
 ALTER TABLE `equation`
   ADD PRIMARY KEY (`equation_id`);
+
+--
+-- Indices de la tabla `estimate`
+--
+ALTER TABLE `estimate`
+  ADD PRIMARY KEY (`estimate_id`),
+  ADD KEY `Refestimate1` (`project_stage_id`),
+  ADD KEY `Refestimate2` (`proposal_type_id`),
+  ADD KEY `Refestimate3` (`status_id`),
+  ADD KEY `Refestimate4` (`district_id`),
+  ADD KEY `Refestimate5` (`company_id`),
+  ADD KEY `Refestimate6` (`contact_id`);
+
+--
+-- Indices de la tabla `estimate_estimator`
+--
+ALTER TABLE `estimate_estimator`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_estimator1` (`estimate_id`),
+  ADD KEY `Refestimate_estimator2` (`user_id`);
+
+--
+-- Indices de la tabla `estimate_project_type`
+--
+ALTER TABLE `estimate_project_type`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_project_type1` (`estimate_id`),
+  ADD KEY `Refestimate_project_type2` (`type_id`);
 
 --
 -- Indices de la tabla `function`
@@ -7919,7 +8088,7 @@ ALTER TABLE `data_tracking_subcontract`
 -- AUTO_INCREMENT de la tabla `district`
 --
 ALTER TABLE `district`
-  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `employee`
@@ -7934,10 +8103,28 @@ ALTER TABLE `equation`
   MODIFY `equation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate`
+--
+ALTER TABLE `estimate`
+  MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_estimator`
+--
+ALTER TABLE `estimate_estimator`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_project_type`
+--
+ALTER TABLE `estimate_project_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -7967,7 +8154,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3375;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3408;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -7991,7 +8178,7 @@ ALTER TABLE `overhead_price`
 -- AUTO_INCREMENT de la tabla `plan_status`
 --
 ALTER TABLE `plan_status`
-  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `project`
@@ -8021,19 +8208,19 @@ ALTER TABLE `project_notes`
 -- AUTO_INCREMENT de la tabla `project_stage`
 --
 ALTER TABLE `project_stage`
-  MODIFY `stage_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `stage_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `project_type`
 --
 ALTER TABLE `project_type`
-  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `proposal_type`
 --
 ALTER TABLE `proposal_type`
-  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `reminder`
@@ -8057,7 +8244,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -8105,7 +8292,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=827;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=828;
 
 --
 -- Restricciones para tablas volcadas
@@ -8168,6 +8355,31 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
+
+--
+-- Filtros para la tabla `estimate`
+--
+ALTER TABLE `estimate`
+  ADD CONSTRAINT `Refestimate1` FOREIGN KEY (`project_stage_id`) REFERENCES `project_stage` (`stage_id`),
+  ADD CONSTRAINT `Refestimate2` FOREIGN KEY (`proposal_type_id`) REFERENCES `proposal_type` (`type_id`),
+  ADD CONSTRAINT `Refestimate3` FOREIGN KEY (`status_id`) REFERENCES `plan_status` (`status_id`),
+  ADD CONSTRAINT `Refestimate4` FOREIGN KEY (`district_id`) REFERENCES `district` (`district_id`),
+  ADD CONSTRAINT `Refestimate5` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
+  ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
+
+--
+-- Filtros para la tabla `estimate_estimator`
+--
+ALTER TABLE `estimate_estimator`
+  ADD CONSTRAINT `Refestimate_estimator1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_estimator2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `estimate_project_type`
+--
+ALTER TABLE `estimate_project_type`
+  ADD CONSTRAINT `Refestimate_project_type1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_project_type2` FOREIGN KEY (`type_id`) REFERENCES `project_type` (`type_id`);
 
 --
 -- Filtros para la tabla `item`

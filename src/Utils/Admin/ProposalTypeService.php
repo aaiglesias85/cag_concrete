@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\Estimate;
 use App\Entity\ProposalType;
 use App\Utils\Base;
 
@@ -48,6 +49,15 @@ class ProposalTypeService extends Base
         /**@var ProposalType $entity */
         if ($entity != null) {
 
+            // estimates
+            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                ->ListarEstimatesDeProposalType($type_id);
+            if (count($estimates) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The proposal type could not be deleted, because it is related to a project estimate";
+                return $resultado;
+            }
+
             $type_descripcion = $entity->getDescription();
 
 
@@ -90,16 +100,21 @@ class ProposalTypeService extends Base
                     /** @var ProposalType $entity */
                     if ($entity != null) {
 
-                        $type_descripcion = $entity->getDescription();
+                        // estimates
+                        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                            ->ListarEstimatesDeProposalType($type_id);
+                        if (count($estimates) == 0) {
+                            $type_descripcion = $entity->getDescription();
 
-                        $em->remove($entity);
-                        $cant_eliminada++;
+                            $em->remove($entity);
+                            $cant_eliminada++;
 
-                        //Salvar log
-                        $log_operacion = "Delete";
-                        $log_categoria = "Proposal Type";
-                        $log_descripcion = "The proposal type is deleted: $type_descripcion";
-                        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                            //Salvar log
+                            $log_operacion = "Delete";
+                            $log_categoria = "Proposal Type";
+                            $log_descripcion = "The proposal type is deleted: $type_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
 
                     }
                 }
@@ -109,11 +124,11 @@ class ProposalTypeService extends Base
 
         if ($cant_eliminada == 0) {
             $resultado['success'] = false;
-            $resultado['error'] = "The proposal types could not be deleted, because they are associated with a invoice";
+            $resultado['error'] = "The proposal types could not be deleted, because they are associated with a project estimate";
         } else {
             $resultado['success'] = true;
 
-            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected types because they are associated with a invoice";
+            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected types because they are associated with a project estimate";
             $resultado['message'] = $mensaje;
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\Estimate;
 use App\Entity\ProjectStage;
 use App\Utils\Base;
 
@@ -49,6 +50,15 @@ class ProjectStageService extends Base
         /**@var ProjectStage $entity */
         if ($entity != null) {
 
+            // estimates
+            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                ->ListarEstimatesDeStage($stage_id);
+            if (count($estimates) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The project stage could not be deleted, because it is related to a project estimate";
+                return $resultado;
+            }
+
             $stage_descripcion = $entity->getDescription();
 
 
@@ -91,16 +101,21 @@ class ProjectStageService extends Base
                     /** @var ProjectStage $entity */
                     if ($entity != null) {
 
-                        $stage_descripcion = $entity->getDescription();
+                        // estimates
+                        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                            ->ListarEstimatesDeStage($stage_id);
+                        if (count($estimates) == 0) {
+                            $stage_descripcion = $entity->getDescription();
 
-                        $em->remove($entity);
-                        $cant_eliminada++;
+                            $em->remove($entity);
+                            $cant_eliminada++;
 
-                        //Salvar log
-                        $log_operacion = "Delete";
-                        $log_categoria = "Project Stage";
-                        $log_descripcion = "The project stage is deleted: $stage_descripcion";
-                        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                            //Salvar log
+                            $log_operacion = "Delete";
+                            $log_categoria = "Project Stage";
+                            $log_descripcion = "The project stage is deleted: $stage_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
 
                     }
                 }
@@ -110,11 +125,11 @@ class ProjectStageService extends Base
 
         if ($cant_eliminada == 0) {
             $resultado['success'] = false;
-            $resultado['error'] = "The project stages could not be deleted, because they are associated with a invoice";
+            $resultado['error'] = "The project stages could not be deleted, because they are associated with a project estimates";
         } else {
             $resultado['success'] = true;
 
-            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected stages because they are associated with a invoice";
+            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected stages because they are associated with a project estimates";
             $resultado['message'] = $mensaje;
         }
 

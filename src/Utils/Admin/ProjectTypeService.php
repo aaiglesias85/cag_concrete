@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\EstimateProjectType;
 use App\Entity\ProjectType;
 use App\Utils\Base;
 
@@ -48,6 +49,9 @@ class ProjectTypeService extends Base
         /**@var ProjectType $entity */
         if ($entity != null) {
 
+            // eliminar info
+            $this->EliminarInformacionDeType($type_id);
+
             $type_descripcion = $entity->getDescription();
 
 
@@ -90,6 +94,9 @@ class ProjectTypeService extends Base
                     /** @var ProjectType $entity */
                     if ($entity != null) {
 
+                        // eliminar info
+                        $this->EliminarInformacionDeType($type_id);
+
                         $type_descripcion = $entity->getDescription();
 
                         $em->remove($entity);
@@ -118,6 +125,23 @@ class ProjectTypeService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * EliminarInformacionDeType
+     * @param $type_id
+     * @return void
+     */
+    public function EliminarInformacionDeType($type_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // estimates
+        $estimates = $this->getDoctrine()->getRepository(EstimateProjectType::class)
+            ->ListarEstimatesDeType($type_id);
+        foreach ($estimates as $estimate) {
+            $em->remove($estimate);
+        }
     }
 
     /**

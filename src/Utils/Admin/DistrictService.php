@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\District;
+use App\Entity\Estimate;
 use App\Utils\Base;
 
 class DistrictService extends Base
@@ -47,6 +48,15 @@ class DistrictService extends Base
             ->find($district_id);
         /**@var District $entity */
         if ($entity != null) {
+
+            // estimates
+            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                ->ListarEstimatesDeDistrict($district_id);
+            if (count($estimates) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The district could not be deleted, because it is related to a project estimate";
+                return $resultado;
+            }
             
             $district_descripcion = $entity->getDescription();
 
@@ -89,17 +99,22 @@ class DistrictService extends Base
                         ->find($district_id);
                     /** @var District $entity */
                     if ($entity != null) {
-                        
-                        $district_descripcion = $entity->getDescription();
 
-                        $em->remove($entity);
-                        $cant_eliminada++;
+                        // estimates
+                        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+                            ->ListarEstimatesDeDistrict($district_id);
+                        if (count($estimates) == 0) {
+                            $district_descripcion = $entity->getDescription();
 
-                        //Salvar log
-                        $log_operacion = "Delete";
-                        $log_categoria = "District";
-                        $log_descripcion = "The district is deleted: $district_descripcion";
-                        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                            $em->remove($entity);
+                            $cant_eliminada++;
+
+                            //Salvar log
+                            $log_operacion = "Delete";
+                            $log_categoria = "District";
+                            $log_descripcion = "The district is deleted: $district_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
 
                     }
                 }
@@ -109,11 +124,11 @@ class DistrictService extends Base
 
         if ($cant_eliminada == 0) {
             $resultado['success'] = false;
-            $resultado['error'] = "The districts could not be deleted, because they are associated with a invoice";
+            $resultado['error'] = "The districts could not be deleted, because they are associated with a project estimates";
         } else {
             $resultado['success'] = true;
 
-            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected districts because they are associated with a invoice";
+            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected districts because they are associated with a project estimates";
             $resultado['message'] = $mensaje;
         }
 
