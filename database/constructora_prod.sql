@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 12-06-2025 a las 23:25:13
+-- Tiempo de generación: 14-06-2025 a las 21:33:06
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -135,7 +135,8 @@ INSERT INTO `company_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `
 (5, 'Alejandro Gomez', '', '', 'Adminstrator', 'Contact for Job GGC78001', 40),
 (6, 'BRANDON ORAVETZ', '', '', '', '', 41),
 (7, 'Emily Wallace', '', '', 'Business Manager', '', 41),
-(8, 'Joana Garcia', '', '', 'TESTING TESTER TESTED', 'TEST TEST TEST', 46);
+(8, 'Joana Garcia', '', '', 'TESTING TESTER TESTED', 'TEST TEST TEST', 46),
+(9, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '', '', ' ', 14);
 
 -- --------------------------------------------------------
 
@@ -2990,21 +2991,59 @@ CREATE TABLE `estimate` (
   `estimate_id` int(11) NOT NULL,
   `project_id` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
-  `bid_deadline_date` date DEFAULT NULL,
-  `bid_deadline_hour` varchar(50) DEFAULT NULL,
+  `bid_deadline` datetime DEFAULT NULL,
   `county` varchar(255) DEFAULT NULL,
   `priority` varchar(50) DEFAULT NULL,
   `bid_no` varchar(50) DEFAULT NULL,
   `work_hour` varchar(50) DEFAULT NULL,
   `phone` text,
   `email` text,
+  `job_walk` datetime DEFAULT NULL,
+  `rfi_due_date` datetime DEFAULT NULL,
+  `project_start` datetime DEFAULT NULL,
+  `project_end` datetime DEFAULT NULL,
+  `submitted_date` datetime DEFAULT NULL,
+  `awarded_date` datetime DEFAULT NULL,
+  `lost_date` datetime DEFAULT NULL,
+  `location` text,
+  `sector` varchar(50) DEFAULT NULL,
   `project_stage_id` int(11) DEFAULT NULL,
   `proposal_type_id` int(11) DEFAULT NULL,
   `status_id` int(11) DEFAULT NULL,
   `district_id` int(11) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
-  `contact_id` int(11) DEFAULT NULL
+  `contact_id` int(11) DEFAULT NULL,
+  `plan_downloading_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate`
+--
+
+INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
+(2, '546546', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 3, 1, 1, 24, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_bid_deadline`
+--
+
+CREATE TABLE `estimate_bid_deadline` (
+  `id` int(11) NOT NULL,
+  `bid_deadline` datetime DEFAULT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `company_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate_bid_deadline`
+--
+
+INSERT INTO `estimate_bid_deadline` (`id`, `bid_deadline`, `estimate_id`, `company_id`) VALUES
+(1, '2025-06-14 17:00:00', 2, 16),
+(2, '2025-06-18 17:05:00', 2, 24),
+(3, '2025-06-26 17:10:00', 2, 44);
 
 -- --------------------------------------------------------
 
@@ -3018,6 +3057,13 @@ CREATE TABLE `estimate_estimator` (
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `estimate_estimator`
+--
+
+INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
+(9, 2, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -3029,6 +3075,14 @@ CREATE TABLE `estimate_project_type` (
   `estimate_id` int(11) DEFAULT NULL,
   `type_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate_project_type`
+--
+
+INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
+(17, 2, 1),
+(18, 2, 4);
 
 -- --------------------------------------------------------
 
@@ -3075,7 +3129,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (26, 'proposal_type', 'Proposal Type'),
 (27, 'plan_status', 'Plan Status'),
 (28, 'district', 'District'),
-(29, 'estimate', 'Estimates');
+(29, 'estimate', 'Estimates'),
+(30, 'plan_downloading', 'Plans Downloading');
 
 -- --------------------------------------------------------
 
@@ -4283,7 +4338,19 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3404, 'Add', 'District', 'The district is added: District 5', '::1', '2025-06-08 21:23:38', 1),
 (3405, 'Update', 'District', 'The district is modified: District 1', '::1', '2025-06-08 21:24:06', 1),
 (3406, 'Update', 'District', 'The district is modified: District 5', '::1', '2025-06-08 21:24:08', 1),
-(3407, 'Update', 'District', 'The district is modified: District 5', '::1', '2025-06-08 21:24:12', 1);
+(3407, 'Update', 'District', 'The district is modified: District 5', '::1', '2025-06-08 21:24:12', 1),
+(3408, 'Add', 'Company Contact', 'The company contact is added: Marcel Curbelo Carmona', '::1', '2025-06-14 17:53:30', 1),
+(3409, 'Add', 'Project Estimate', 'The project estimate is added: Test Bid', '::1', '2025-06-14 18:15:03', 1),
+(3410, 'Update', 'Estimate', 'The estimate is modified: Test Bid', '::1', '2025-06-14 18:49:23', 1),
+(3411, 'Update', 'Estimate', 'The estimate is modified: Test Bid', '::1', '2025-06-14 19:08:09', 1),
+(3412, 'Update', 'Estimate', 'The estimate is modified: Test Bid', '::1', '2025-06-14 19:25:46', 1),
+(3413, 'Delete', 'Estimate', 'The estimate is deleted: Test Bid', '::1', '2025-06-14 19:34:47', 1),
+(3414, 'Add', 'Project Estimate', 'The project estimate is added: Test bid deadline', '::1', '2025-06-14 20:10:30', 1),
+(3415, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-14 20:12:20', 1),
+(3416, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-14 20:12:25', 1),
+(3417, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-14 21:08:43', 1),
+(3418, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-14 21:10:22', 1),
+(3419, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-14 21:10:54', 1);
 
 -- --------------------------------------------------------
 
@@ -4381,6 +4448,30 @@ CREATE TABLE `overhead_price` (
 
 INSERT INTO `overhead_price` (`overhead_id`, `name`, `price`) VALUES
 (1, '2025 Q1', 286.00);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `plan_downloading`
+--
+
+CREATE TABLE `plan_downloading` (
+  `plan_downloading_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `plan_downloading`
+--
+
+INSERT INTO `plan_downloading` (`plan_downloading_id`, `description`, `status`) VALUES
+(1, 'In Progress', 1),
+(2, 'Done', 1),
+(3, 'Done - Requested Scopes Not Found', 1),
+(4, 'No Plans Available', 1),
+(5, 'Invalid Platform Credentials', 1),
+(6, 'Limit Reached', 1);
 
 -- --------------------------------------------------------
 
@@ -7329,7 +7420,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (179, 1, 1, 1, 1, 1, 26),
 (180, 1, 1, 1, 1, 1, 27),
 (181, 1, 1, 1, 1, 1, 28),
-(182, 1, 1, 1, 1, 1, 29);
+(182, 1, 1, 1, 1, 1, 29),
+(183, 1, 1, 1, 1, 1, 30);
 
 -- --------------------------------------------------------
 
@@ -7678,7 +7770,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (824, 1, 1, 1, 1, 1, 26),
 (825, 1, 1, 1, 1, 1, 27),
 (826, 1, 1, 1, 1, 1, 28),
-(827, 1, 1, 1, 1, 1, 29);
+(827, 1, 1, 1, 1, 1, 29),
+(828, 1, 1, 1, 1, 1, 30);
 
 --
 -- Índices para tablas volcadas
@@ -7796,7 +7889,16 @@ ALTER TABLE `estimate`
   ADD KEY `Refestimate3` (`status_id`),
   ADD KEY `Refestimate4` (`district_id`),
   ADD KEY `Refestimate5` (`company_id`),
-  ADD KEY `Refestimate6` (`contact_id`);
+  ADD KEY `Refestimate6` (`contact_id`),
+  ADD KEY `plan_downloading_id` (`plan_downloading_id`);
+
+--
+-- Indices de la tabla `estimate_bid_deadline`
+--
+ALTER TABLE `estimate_bid_deadline`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_bid_dealine1` (`estimate_id`),
+  ADD KEY `Refestimate_bid_dealine2` (`company_id`);
 
 --
 -- Indices de la tabla `estimate_estimator`
@@ -7872,6 +7974,12 @@ ALTER TABLE `notification`
 --
 ALTER TABLE `overhead_price`
   ADD PRIMARY KEY (`overhead_id`);
+
+--
+-- Indices de la tabla `plan_downloading`
+--
+ALTER TABLE `plan_downloading`
+  ADD PRIMARY KEY (`plan_downloading_id`);
 
 --
 -- Indices de la tabla `plan_status`
@@ -8034,7 +8142,7 @@ ALTER TABLE `company`
 -- AUTO_INCREMENT de la tabla `company_contact`
 --
 ALTER TABLE `company_contact`
-  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `concrete_vendor`
@@ -8106,25 +8214,31 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `estimate`
 --
 ALTER TABLE `estimate`
-  MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_bid_deadline`
+--
+ALTER TABLE `estimate_bid_deadline`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -8154,7 +8268,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3408;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3420;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8173,6 +8287,12 @@ ALTER TABLE `notification`
 --
 ALTER TABLE `overhead_price`
   MODIFY `overhead_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `plan_downloading`
+--
+ALTER TABLE `plan_downloading`
+  MODIFY `plan_downloading_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `plan_status`
@@ -8244,7 +8364,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=184;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -8292,7 +8412,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=828;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=829;
 
 --
 -- Restricciones para tablas volcadas
@@ -8365,7 +8485,15 @@ ALTER TABLE `estimate`
   ADD CONSTRAINT `Refestimate3` FOREIGN KEY (`status_id`) REFERENCES `plan_status` (`status_id`),
   ADD CONSTRAINT `Refestimate4` FOREIGN KEY (`district_id`) REFERENCES `district` (`district_id`),
   ADD CONSTRAINT `Refestimate5` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
-  ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
+  ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`),
+  ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`);
+
+--
+-- Filtros para la tabla `estimate_bid_deadline`
+--
+ALTER TABLE `estimate_bid_deadline`
+  ADD CONSTRAINT `Refestimate_bid_dealine1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_bid_dealine2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`);
 
 --
 -- Filtros para la tabla `estimate_estimator`

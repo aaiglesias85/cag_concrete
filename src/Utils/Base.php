@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\Entity\CompanyContact;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
@@ -361,6 +362,8 @@ class Base
             $menuProposalType = false;
             $menuPlanStatus = false;
             $menuDistrict = false;
+            $menuEstimate = false;
+            $menuPlanDownloading = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -447,6 +450,12 @@ class Base
                 if ($permiso['funcion_id'] == 28 && $permiso['ver']) {
                     $menuDistrict = true;
                 }
+                if ($permiso['funcion_id'] == 29 && $permiso['ver']) {
+                    $menuEstimate = true;
+                }
+                if ($permiso['funcion_id'] == 30 && $permiso['ver']) {
+                    $menuPlanDownloading = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -477,6 +486,8 @@ class Base
                 'menuProposalType' => $menuProposalType,
                 'menuPlanStatus' => $menuPlanStatus,
                 'menuDistrict' => $menuDistrict,
+                'menuEstimate' => $menuEstimate,
+                'menuPlanDownloading' => $menuPlanDownloading,
             );
         }
 
@@ -1061,6 +1072,32 @@ class Base
         if ($bold) {
             $sheet->getStyle($coord)->getFont()->setBold(true);
         }
+    }
+
+    /**
+     * ListarContactsDeCompany
+     * @param $company_id
+     * @return array
+     */
+    public function ListarContactsDeCompany($company_id)
+    {
+        $contacts = [];
+
+        $company_contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
+            ->ListarContacts($company_id);
+        foreach ($company_contacts as $key => $contact) {
+            $contacts[] = [
+                'contact_id' => $contact->getContactId(),
+                'name' => $contact->getName(),
+                'email' => $contact->getEmail(),
+                'phone' => $contact->getPhone(),
+                'role' => $contact->getRole(),
+                'notes' => $contact->getNotes(),
+                'posicion' => $key
+            ];
+        }
+
+        return $contacts;
     }
 
 }

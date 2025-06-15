@@ -129,6 +129,26 @@ class EstimateRepository extends EntityRepository
     }
 
     /**
+     * ListarEstimatesDePlanDownloading: Lista los estimates de un plan downloading
+     *
+     * @return Estimate[]
+     */
+    public function ListarEstimatesDePlanDownloading($plan_downloading_id)
+    {
+        $consulta = $this->createQueryBuilder('e')
+            ->leftJoin('e.planDownloading', 'p_d');
+
+        if ($plan_downloading_id != '') {
+            $consulta->andWhere('p_d.planDownloadingId = :plan_downloading_id')
+                ->setParameter('plan_downloading_id', $plan_downloading_id);
+        }
+
+        $consulta->orderBy('e.name', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarEstimates: Lista los estimates
      * @param int $start Inicio
      * @param int $limit Limite
@@ -143,19 +163,19 @@ class EstimateRepository extends EntityRepository
             ->leftJoin('e.company', 'c')
             ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'p_t')
-            ->leftJoin('e.status', 'p_s')
-            ->leftJoin('p.district', 'd')
-            ->leftJoin('e.stage', 'p_s');
+            ->leftJoin('e.status', 'pl_s')
+            ->leftJoin('e.district', 'd')
+            ->leftJoin('e.stage', 'pr_s');
 
         if ($sSearch != "") {
             $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR e.county LIKE :search OR e.priority LIKE :search OR
             e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
-            p_t.description LIKE :search OR p_s.description LIKE :search OR d.description LIKE :search OR p_s.description LIKE :search')
+            p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
         if ($stage_id != '') {
-            $consulta->andWhere('p_s.stageId = :stage_id')
+            $consulta->andWhere('pr_s.stageId = :stage_id')
                 ->setParameter('stage_id', $stage_id);
         }
 
@@ -165,7 +185,7 @@ class EstimateRepository extends EntityRepository
         }
 
         if ($status_id != '') {
-            $consulta->andWhere('p_s.statusId = :status_id')
+            $consulta->andWhere('pl_s.statusId = :status_id')
                 ->setParameter('status_id', $status_id);
         }
 
@@ -180,25 +200,32 @@ class EstimateRepository extends EntityRepository
         }
 
         if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('e.bidDeadlineDate >= :fecha_inicial')
+            $consulta->andWhere('e.bidDeadline >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('e.bidDeadlineDate <= :fecha_final')
+            $consulta->andWhere('e.bidDeadline <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        if ($iSortCol_0 !== 'type' && $iSortCol_0 !== 'estimator') {
-            $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
-        } else {
-            $consulta->orderBy("e.name", $sSortDir_0);
+        switch ($iSortCol_0) {
+            case 'company':
+                $consulta->orderBy("c.name", $sSortDir_0);
+                break;
+            case 'type':
+            case 'estimator':
+                $consulta->orderBy("e.name", $sSortDir_0);
+                break;
+            default:
+                $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
+                break;
         }
 
 
@@ -217,26 +244,26 @@ class EstimateRepository extends EntityRepository
      * @return int
      */
     public function TotalEstimates($sSearch, $company_id = '', $stage_id = '', $proposal_type_id = '',
-                                             $status_id = '', $district_id = '', $fecha_inicial = '', $fecha_fin = '')
+                                   $status_id = '', $district_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('e')
             ->select('COUNT(e.estimateId)')
             ->leftJoin('e.company', 'c')
             ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'p_t')
-            ->leftJoin('e.status', 'p_s')
-            ->leftJoin('p.district', 'd')
-            ->leftJoin('e.stage', 'p_s');
+            ->leftJoin('e.status', 'pl_s')
+            ->leftJoin('e.district', 'd')
+            ->leftJoin('e.stage', 'pr_s');
 
         if ($sSearch != "") {
             $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR e.county LIKE :search OR e.priority LIKE :search OR
             e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
-            p_t.description LIKE :search OR p_s.description LIKE :search OR d.description LIKE :search OR p_s.description LIKE :search')
+            p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
         if ($stage_id != '') {
-            $consulta->andWhere('p_s.stageId = :stage_id')
+            $consulta->andWhere('pr_s.stageId = :stage_id')
                 ->setParameter('stage_id', $stage_id);
         }
 
@@ -246,7 +273,7 @@ class EstimateRepository extends EntityRepository
         }
 
         if ($status_id != '') {
-            $consulta->andWhere('p_s.statusId = :status_id')
+            $consulta->andWhere('pl_s.statusId = :status_id')
                 ->setParameter('status_id', $status_id);
         }
 
@@ -261,18 +288,18 @@ class EstimateRepository extends EntityRepository
         }
 
         if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('e.bidDeadlineDate >= :fecha_inicial')
+            $consulta->andWhere('e.bidDeadline >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
 
-            $consulta->andWhere('e.bidDeadlineDate <= :fecha_final')
+            $consulta->andWhere('e.bidDeadline <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 

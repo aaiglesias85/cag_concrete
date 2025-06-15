@@ -26,4 +26,6 @@ class CompanyContactRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
 }

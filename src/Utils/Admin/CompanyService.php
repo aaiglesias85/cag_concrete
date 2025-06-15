@@ -5,11 +5,64 @@ namespace App\Utils\Admin;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\Estimate;
+use App\Entity\EstimateBidDeadline;
 use App\Entity\Project;
 use App\Utils\Base;
 
 class CompanyService extends Base
 {
+
+    /**
+     * SalvarContact: Guarda los datos de un contact en la BD
+     * @param string $name Nombre
+     * @author Marcel
+     */
+    public function SalvarContact($company_id, $name, $phone, $email, $role, $notes)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //Verificar name
+        $contact = $this->getDoctrine()->getRepository(CompanyContact::class)
+            ->findOneBy(['name' => $name, 'company' => $company_id]);
+        if ($contact != null) {
+            $resultado['success'] = false;
+            $resultado['error'] = "The contact name is in use, please try entering another one.";
+            return $resultado;
+        }
+
+        $company_entity = $this->getDoctrine()->getRepository(Company::class)
+            ->find($company_id);
+        if ($company_entity) {
+            $entity = new CompanyContact();
+
+            $entity->setName($name);
+            $entity->setEmail($email);
+            $entity->setPhone($phone);
+            $entity->setRole($role);
+            $entity->setNotes($notes);
+
+            $entity->setCompany($company_entity);
+
+            $em->persist($entity);
+
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Add";
+            $log_categoria = "Company Contact";
+            $log_descripcion = "The company contact is added: $name";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['contact_id'] = $entity->getContactId();
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+
+        return $resultado;
+    }
 
     /**
      * EliminarContact: Elimina un contact en la BD
@@ -76,7 +129,7 @@ class CompanyService extends Base
             $arreglo_resultado['contactEmail'] = $entity->getContactEmail();
 
             // contacts
-            $contacts = $this->ListarContacts($company_id);
+            $contacts = $this->ListarContactsDeCompany($company_id);
             $arreglo_resultado['contacts'] = $contacts;
 
             // projects
@@ -125,32 +178,6 @@ class CompanyService extends Base
         }
 
         return $projects;
-    }
-
-    /**
-     * ListarContacts
-     * @param $company_id
-     * @return array
-     */
-    public function ListarContacts($company_id)
-    {
-        $contacts = [];
-
-        $company_contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
-            ->ListarContacts($company_id);
-        foreach ($company_contacts as $key => $contact) {
-            $contacts[] = [
-                'contact_id' => $contact->getContactId(),
-                'name' => $contact->getName(),
-                'email' => $contact->getEmail(),
-                'phone' => $contact->getPhone(),
-                'role' => $contact->getRole(),
-                'notes' => $contact->getNotes(),
-                'posicion' => $key
-            ];
-        }
-
-        return $contacts;
     }
 
     /**
@@ -290,6 +317,13 @@ class CompanyService extends Base
         foreach ($estimates as $estimate) {
             $estimate->setCompany(NULL);
         }
+
+        // bid deadline estimates
+        $bid_deadline_estimates = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+            ->ListarBidDeadlineEstimatesDeCompany($company_id);
+        foreach ($bid_deadline_estimates as $bid_deadline_estimate) {
+            $em->remove($bid_deadline_estimate);
+        }
     }
 
     /**
@@ -334,6 +368,7 @@ class CompanyService extends Base
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
+            $resultado['company_id'] = $entity->getCompanyId();
 
             return $resultado;
         }
@@ -381,6 +416,7 @@ class CompanyService extends Base
         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
         $resultado['success'] = true;
+        $resultado['company_id'] = $entity->getCompanyId();
 
         return $resultado;
     }

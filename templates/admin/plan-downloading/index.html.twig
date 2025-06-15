@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block subtitle %} - Proposal Types{% endblock %}
+{% block subtitle %} - Plans Downloading{% endblock %}
 
 {% block stylesheetspecific %}
 
@@ -12,7 +12,7 @@
         <div class="d-flex align-items-center">
             <div class="mr-auto">
                 <h3 class="m-subheader__title m-subheader__title--separator">
-                    Proposal Types
+                    Plans Downloading
                 </h3>
                 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
                     <li class="m-nav__item m-nav__item--home">
@@ -23,13 +23,13 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Proposal Types</span>
+                            <span class="m-nav__link-text">Plans Downloading</span>
                         </a>
                     </li>
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Manage the proposal types</span>
+                            <span class="m-nav__link-text">Manage the plans downloading</span>
                         </a>
                     </li>
                 </ul>
@@ -39,12 +39,12 @@
     <!-- END: Subheader -->
 
     <div class="m-content">
-        <div id="lista-proposal-type" class="m-portlet m-portlet--mobile" m-portlet="true">
+        <div id="lista-plan-downloading" class="m-portlet m-portlet--mobile" m-portlet="true">
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
-                            Proposal Types
+                            Plans Downloading
                         </h3>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                     <ul class="m-portlet__nav">
                         {% if permiso.agregar %}
                             <li class="m-portlet__nav-item">
-                                <a id="btn-nuevo-proposal-type"
+                                <a id="btn-nuevo-plan-downloading"
                                    class="btn btn-success btn-icon"
                                    href="javascript:;">
                                     <span>
@@ -64,7 +64,7 @@
                         {% endif %}
                         {% if permiso.eliminar %}
                             <li class="m-portlet__nav-item">
-                                <a id="btn-eliminar-proposal-type"
+                                <a id="btn-eliminar-plan-downloading"
                                    class="btn btn-danger btn-icon"
                                    href="javascript:;">
                                     <span>
@@ -100,17 +100,17 @@
                 <!--end: Search Form -->
 
                 <!--begin: Datatable -->
-                <div class="m_datatable" id="proposal-type-table-editable"></div>
+                <div class="m_datatable" id="plan-downloading-table-editable"></div>
                 <!--end: Datatable -->
             </div>
         </div>
 
-        <div id="form-proposal-type" class="m-portlet m--hide">
+        <div id="form-plan-downloading" class="m-portlet m--hide">
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text" id="form-proposal-type-title">
-                            Do you want to create a new proposal type? Follow the next steps:
+                        <h3 class="m-portlet__head-text" id="form-plan-downloading-title">
+                            Do you want to create a new plan downloading? Follow the next steps:
                         </h3>
                     </div>
                 </div>
@@ -118,16 +118,16 @@
                     <ul class="m-portlet__nav">
                         <li class="m-portlet__nav-item">
                             <a href="javascript:;"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-proposal-type"><i
+                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-plan-downloading"><i
                                         class="la la-close"></i></a>
                         </li>
                     </ul>
                 </div>
             </div>
-            <form class="m-form" id="proposal-type-form" action="#"
+            <form class="m-form" id="plan-downloading-form" action="#"
                   enctype="multipart/form-data" method="post">
 
-                <input type="hidden" id="type_id" name="type_id"/>
+                <input type="hidden" id="plan_downloading_id" name="plan_downloading_id"/>
 
                 <div class="m-portlet__body">
                     <div class="m-form__section m-form__section--first">
@@ -170,11 +170,11 @@
                     </div>
                     <div class="m-form__actions">
                         {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-salvar-proposal-type" class="btn btn-success" type="button">
+                            <button id="btn-salvar-plan-downloading" class="btn btn-success" type="button">
                                 Save
                             </button>
                         {% endif %}
-                        <button class="btn btn-danger cerrar-form-proposal-type" type="button">
+                        <button class="btn btn-danger cerrar-form-plan-downloading" type="button">
                             Cancel
                         </button>
                     </div>
@@ -188,7 +188,7 @@
 
 {% block javascriptsspecific %}
     
-    <script src="{{ asset('bundles/ican/js/pages/proposal-types.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('bundles/ican/js/pages/plan-downloading.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {
@@ -198,7 +198,7 @@
         };
 
         jQuery(document).ready(function () {
-            ProposalTypes.init();
+            PlanDownloading.init();
         });
     </script>
 {% endblock %}

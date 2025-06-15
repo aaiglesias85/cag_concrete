@@ -19,11 +19,8 @@ class Estimate
     #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: 'bid_deadline_date', type: 'date', nullable: false)]
-    private ?\DateTimeInterface $bidDeadlineDate;
-
-    #[ORM\Column(name: "bid_deadline_hour", type: "string", length: 50, nullable: true)]
-    private ?string $bidDeadlineHour;
+    #[ORM\Column(name: 'bid_deadline', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $bidDeadline;
 
     #[ORM\Column(name: "county", type: "string", length: 255, nullable: true)]
     private ?string $county;
@@ -42,6 +39,33 @@ class Estimate
 
     #[ORM\Column(name: "email", type: "text", nullable: true)]
     private ?string $email;
+
+    #[ORM\Column(name: 'job_walk', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $jobWalk;
+
+    #[ORM\Column(name: 'rfi_due_date', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $rfiDueDate;
+
+    #[ORM\Column(name: 'project_start', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $projectStart;
+
+    #[ORM\Column(name: 'project_end', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $projectEnd;
+
+    #[ORM\Column(name: 'submitted_date', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $submittedDate;
+
+    #[ORM\Column(name: 'awarded_date', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $awardedDate;
+
+    #[ORM\Column(name: 'lost_date', type: 'datetime', nullable: false)]
+    private ?\DateTimeInterface $lostDate;
+
+    #[ORM\Column(name: "location", type: "text", nullable: true)]
+    private ?string $location;
+
+    #[ORM\Column(name: "sector", type: "string", length: 50, nullable: true)]
+    private ?string $sector;
 
     #[ORM\ManyToOne(targetEntity: ProjectStage::class)]
     #[ORM\JoinColumn(name: 'project_stage_id', referencedColumnName: 'stage_id')]
@@ -66,6 +90,10 @@ class Estimate
     #[ORM\ManyToOne(targetEntity: CompanyContact::class)]
     #[ORM\JoinColumn(name: 'contact_id', referencedColumnName: 'contact_id')]
     private ?CompanyContact $contact = null;
+
+    #[ORM\ManyToOne(targetEntity: PlanDownloading::class)]
+    #[ORM\JoinColumn(name: 'plan_downloading_id', referencedColumnName: 'plan_downloading_id')]
+    private ?PlanDownloading $planDownloading = null;
 
 
     public function getEstimateId(): ?int
@@ -103,24 +131,14 @@ class Estimate
         $this->projectId = $projectId;
     }
 
-    public function getBidDeadlineDate(): ?\DateTimeInterface
+    public function getBidDeadline(): ?\DateTimeInterface
     {
-        return $this->bidDeadlineDate;
+        return $this->bidDeadline;
     }
 
-    public function setBidDeadlineDate(?\DateTimeInterface $bidDeadlineDate): void
+    public function setBidDeadline(?\DateTimeInterface $bidDeadline): void
     {
-        $this->bidDeadlineDate = $bidDeadlineDate;
-    }
-
-    public function getBidDeadlineHour(): ?string
-    {
-        return $this->bidDeadlineHour;
-    }
-
-    public function setBidDeadlineHour(?string $bidDeadlineHour): void
-    {
-        $this->bidDeadlineHour = $bidDeadlineHour;
+        $this->bidDeadline = $bidDeadline;
     }
 
     public function getCounty(): ?string
@@ -231,5 +249,105 @@ class Estimate
     public function setContact(?CompanyContact $contact): void
     {
         $this->contact = $contact;
+    }
+
+    public function getPlanDownloading(): ?PlanDownloading
+    {
+        return $this->planDownloading;
+    }
+
+    public function setPlanDownloading(?PlanDownloading $planDownloading): void
+    {
+        $this->planDownloading = $planDownloading;
+    }
+
+    public function getJobWalk(): ?\DateTimeInterface
+    {
+        return $this->jobWalk;
+    }
+
+    public function setJobWalk(?\DateTimeInterface $jobWalk): void
+    {
+        $this->jobWalk = $jobWalk;
+    }
+
+    public function getRfiDueDate(): ?\DateTimeInterface
+    {
+        return $this->rfiDueDate;
+    }
+
+    public function setRfiDueDate(?\DateTimeInterface $rfiDueDate): void
+    {
+        $this->rfiDueDate = $rfiDueDate;
+    }
+
+    public function getProjectStart(): ?\DateTimeInterface
+    {
+        return $this->projectStart;
+    }
+
+    public function setProjectStart(?\DateTimeInterface $projectStart): void
+    {
+        $this->projectStart = $projectStart;
+    }
+
+    public function getProjectEnd(): ?\DateTimeInterface
+    {
+        return $this->projectEnd;
+    }
+
+    public function setProjectEnd(?\DateTimeInterface $projectEnd): void
+    {
+        $this->projectEnd = $projectEnd;
+    }
+
+    public function getSubmittedDate(): ?\DateTimeInterface
+    {
+        return $this->submittedDate;
+    }
+
+    public function setSubmittedDate(?\DateTimeInterface $submittedDate): void
+    {
+        $this->submittedDate = $submittedDate;
+    }
+
+    public function getAwardedDate(): ?\DateTimeInterface
+    {
+        return $this->awardedDate;
+    }
+
+    public function setAwardedDate(?\DateTimeInterface $awardedDate): void
+    {
+        $this->awardedDate = $awardedDate;
+    }
+
+    public function getLostDate(): ?\DateTimeInterface
+    {
+        return $this->lostDate;
+    }
+
+    public function setLostDate(?\DateTimeInterface $lostDate): void
+    {
+        $this->lostDate = $lostDate;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?string $location): void
+    {
+        $this->location = $location;
+    }
+
+    public function getSector(): ?string
+    {
+        return $this->sector;
+    }
+
+    public function setSector(?string $sector): void
+    {
+        $this->sector = $sector;
     }
 }

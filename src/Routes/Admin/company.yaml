@@ -25,3 +25,11 @@ cargarDatosCompanyAdmin:
 eliminarContactCompanyAdmin:
   path:  /company/eliminarContact
   defaults: { _controller: App\Controller\Admin\CompanyController::eliminarContact, _format: json }
+
+salvarContactCompanyAdmin:
+  path:  /company/salvarContact
+  defaults: { _controller: App\Controller\Admin\CompanyController::salvarContact, _format: json }
+
+listarContactsCompanyAdmin:
+  path:  /company/listarContacts
+  defaults: { _controller: App\Controller\Admin\CompanyController::listarContacts, _format: json }

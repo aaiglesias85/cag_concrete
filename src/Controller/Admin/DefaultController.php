@@ -234,4 +234,14 @@ class DefaultController extends AbstractController
     {
         return $this->render('admin/block/modal-reminder.html.twig', array());
     }
+
+    public function renderModalCompany()
+    {
+        return $this->render('admin/block/modal-company.html.twig', array());
+    }
+
+    public function renderModalContactCompany()
+    {
+        return $this->render('admin/block/modal-contact-company.html.twig', array());
+    }
 }

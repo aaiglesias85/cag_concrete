@@ -1,0 +1,23 @@
+plan_downloading:
+  path: /plan-downloading
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::index }
+
+listarPlanDownloadingAdmin:
+  path: /plan-downloading/listar
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::listar, _format: json }
+
+salvarPlanDownloadingAdmin:
+  path: /plan-downloading/salvar
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::salvar, _format: json }
+
+eliminarPlanDownloadingAdmin:
+  path: /plan-downloading/eliminar
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::eliminar, _format: json }
+
+eliminarPlanDownloadingsAdmin:
+  path: /plan-downloading/eliminarPlans
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::eliminarPlans, _format: json }
+
+cargarDatosPlanDownloadingAdmin:
+  path: /plan-downloading/cargarDatos
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::cargarDatos, _format: json }

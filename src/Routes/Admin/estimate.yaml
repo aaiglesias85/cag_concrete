@@ -1,0 +1,31 @@
+estimate:
+  path: /estimate
+  defaults: { _controller: App\Controller\Admin\EstimateController::index }
+
+listarEstimateAdmin:
+  path: /estimate/listar
+  defaults: { _controller: App\Controller\Admin\EstimateController::listar, _format: json }
+
+salvarEstimateAdmin:
+  path: /estimate/salvar
+  defaults: { _controller: App\Controller\Admin\EstimateController::salvar, _format: json }
+
+eliminarEstimateAdmin:
+  path: /estimate/eliminar
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminar, _format: json }
+
+eliminarEstimatesAdmin:
+  path: /estimate/eliminarEstimates
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarEstimates, _format: json }
+
+cargarDatosEstimateAdmin:
+  path: /estimate/cargarDatos
+  defaults: { _controller: App\Controller\Admin\EstimateController::cargarDatos, _format: json }
+
+cambiarStageEstimateAdmin:
+  path: /estimate/cambiarStage
+  defaults: { _controller: App\Controller\Admin\EstimateController::cambiarStage, _format: json }
+
+eliminarBidDeadlineStageEstimateAdmin:
+  path: /estimate/eliminarBidDeadline
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarBidDeadline, _format: json }
