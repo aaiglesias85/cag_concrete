@@ -29,6 +29,7 @@ var Estimates = function () {
             {
                 field: "company",
                 title: "Companies",
+                width: 200,
             },
             {
                 field: "bidDeadline",
@@ -38,7 +39,10 @@ var Estimates = function () {
             {
                 field: "estimators",
                 title: "Estimators",
-                width: 150,
+                width: 200,
+                template: function (row) {
+                    return `<div class="d-flex" style="gap: 5px;">${row.estimators}</div>`;
+                }
             },
             {
                 field: "stage",
@@ -102,6 +106,19 @@ var Estimates = function () {
         oTable
             .on('m-datatable--on-ajax-done', function () {
                 mApp.unblock('#estimate-table-editable');
+
+                // init pop over
+                setTimeout(function () {
+
+                    // Volver a inicializar popovers
+                    $('.popover-company').popover({
+                        trigger: 'hover',
+                        html: true,
+                        placement: 'top',
+                        container: 'body' // muy importante si están dentro de scrolls/tablas
+                    });
+
+                }, 500);
             })
             .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
                 mApp.unblock('#estimate-table-editable');

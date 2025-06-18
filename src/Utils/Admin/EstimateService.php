@@ -730,6 +730,9 @@ class EstimateService extends Base
 
             $bidDeadline = $value->getBidDeadline() ? $value->getBidDeadline()->format('m/d/Y H:i') : "Not set";
 
+            // companies
+            $companies = $this->ListarCompaniesParaListado($value);
+
             // estimators
             $estimators = $this->ListarEstimatorsParaListado($estimate_id);
 
@@ -739,7 +742,7 @@ class EstimateService extends Base
             $arreglo_resultado[$cont] = array(
                 "id" => $estimate_id,
                 "name" => $value->getName(),
-                "company" => $value->getCompany() ? $value->getCompany()->getName() : "",
+                "company" => $companies,
                 "bidDeadline" => $bidDeadline,
                 "estimators" => $estimators,
                 "stage" => $stage,
@@ -752,6 +755,64 @@ class EstimateService extends Base
 
         return $arreglo_resultado;
     }
+
+    // listar los companies para el listado
+    private function ListarCompaniesParaListado(Estimate $estimate)
+    {
+        $companies = [];
+
+        if ($estimate->getCompany()) {
+            $companies[] = $estimate->getCompany()->getName();
+        }
+
+        $lista = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+            ->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
+
+        foreach ($lista as $value) {
+            $nombre = $value->getCompany()->getName();
+            if (!in_array($nombre, $companies)) {
+                $companies[] = $nombre;
+            }
+        }
+
+        if (count($companies) === 0) {
+            return '';
+        }
+
+        $primerNombre = htmlspecialchars($companies[0], ENT_QUOTES, 'UTF-8');
+        $html = '<div class="d-inline-flex align-items-center" style="gap: 8px;">';
+
+        $restantes = array_slice($companies, 1);
+
+        // Estilo base para los badges
+        $estiloBase = 'padding: 4px 10px; font-size: 12px;';
+
+        // Si hay más de una empresa, agregar borde izquierdo rojo al primer badge
+        $estiloPrincipal = $estiloBase;
+        if (count($restantes) > 0) {
+            $estiloPrincipal .= ' border-left: 3px solid red;';
+        }
+
+        // Badge principal
+        $html .= '<span class="badge badge-info" style="' . $estiloPrincipal . '">' . $primerNombre . '</span>';
+
+        if (count($restantes) > 0) {
+            // Badges del popover
+            $contenidoPopover = implode('', array_map(function ($c) use ($estiloBase) {
+                $c = htmlspecialchars($c, ENT_QUOTES, 'UTF-8');
+                return '<div class="mb-1"><span class="badge badge-info" style="' . $estiloBase . '">' . $c . '</span></div>';
+            }, $restantes));
+
+            $dataContent = htmlspecialchars($contenidoPopover, ENT_QUOTES, 'UTF-8');
+
+            $html .= '<span class="badge badge-info popover-company" data-toggle="popover" data-html="true" data-content="' . $dataContent . '" style="' . $estiloBase . '">+' . count($restantes) . '</span>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
+    }
+
 
     // devolver stage stages
     private function DevolverStageParaListado($estimate_id, ?ProjectStage $stage)
@@ -832,7 +893,8 @@ class EstimateService extends Base
                     font-size: 14px;
                     font-family: Arial, sans-serif;
                     text-transform: uppercase;
-                ">
+                    cursor: pointer;
+                " title="{$nombreCompleto}">
                     {$iniciales}
                 </div>
                 HTML;
