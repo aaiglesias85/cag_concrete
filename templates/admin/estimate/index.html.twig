@@ -251,6 +251,12 @@
                             Bid Details
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="3"
+                           data-toggle="tab" href="#tab-content-project-information" id="tab-project-information">
+                            Project Information
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="tab-content">
@@ -517,7 +523,7 @@
                                         <span class="ic-small italic">(optional)</span>
                                     </label>
                                     <div>
-                                        <a href="javascript:;" id="btn-agregar-bid-deadline" class="btn btn-success btn-sm mb-3">
+                                        <a href="javascript:;" class="btn btn-success btn-sm mb-3 btn-agregar-bid-deadline">
                                             <i class="la la-plus"></i> Add deadline
                                         </a>
                                     </div>
@@ -699,6 +705,44 @@
                             </div>
 
                         </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-project-information" role="tabpanel">
+                        <div class="row" id="lista-project-information">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+                                                    {% if permiso.agregar or permiso.editar %}
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-success btn-agregar-bid-deadline" style="margin-bottom: 20px; margin-top: 10px;">
+                                                                <i class="la la-plus"></i>  Manage companies
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="project-information-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
                     </div>
                 </div>
 

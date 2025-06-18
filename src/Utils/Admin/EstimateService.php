@@ -179,6 +179,8 @@ class EstimateService extends Base
             $bid_deadlines[] = [
                 'id' => $estimate_bid_deadline->getId(),
                 'bidDeadline' => $estimate_bid_deadline->getBidDeadline()->format('m/d/Y H:i'),
+                'tag'=> $estimate_bid_deadline->getTag() ?? '',
+                'address' => $estimate_bid_deadline->getAddress() ?? '',
                 'company_id' => $estimate_bid_deadline->getCompany()->getCompanyId(),
                 'company' => $estimate_bid_deadline->getCompany()->getName(),
                 "posicion" => $key
@@ -524,6 +526,9 @@ class EstimateService extends Base
                     $bid_deadline_entity->setBidDeadline($bidDeadline);
                 }
 
+                $bid_deadline_entity->setTag($value->tag);
+                $bid_deadline_entity->setAddress($value->address);
+
                 if ($value->company_id != '') {
                     $company = $this->getDoctrine()->getRepository(Company::class)
                         ->find($value->company_id);
@@ -785,7 +790,7 @@ class EstimateService extends Base
         $restantes = array_slice($companies, 1);
 
         // Estilo base para los badges
-        $estiloBase = 'padding: 4px 10px; font-size: 12px;';
+        $estiloBase = 'padding: 3px 9px; font-size: 11px;';
 
         // Si hay más de una empresa, agregar borde izquierdo rojo al primer badge
         $estiloPrincipal = $estiloBase;

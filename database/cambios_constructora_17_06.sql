@@ -1,0 +1,1 @@
+ALTER TABLE `estimate_bid_deadline` ADD `tag` VARCHAR(50) NULL AFTER `bid_deadline`, ADD `address` TEXT NULL AFTER `tag`;

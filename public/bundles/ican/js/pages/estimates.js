@@ -646,6 +646,7 @@ var Estimates = function () {
                     // bid deadlines
                     bid_deadlines = response.estimate.bid_deadlines;
                     actualizarTableListaBidDeadLines();
+                    actualizarTableListaProjectInformation();
 
 
                     // habilitar tab
@@ -1095,6 +1096,9 @@ var Estimates = function () {
                 case 2:
                     actualizarTableListaBidDeadLines();
                     break;
+                case 3:
+                    actualizarTableListaProjectInformation();
+                    break;
             }
 
         });
@@ -1137,6 +1141,10 @@ var Estimates = function () {
                 case 2:
                     $('#tab-bid-details').tab('show');
                     actualizarTableListaBidDeadLines();
+                    break;
+                case 3:
+                    $('#tab-project-information').tab('show');
+                    actualizarTableListaProjectInformation();
                     break;
             }
         }, 0);
@@ -1401,8 +1409,8 @@ var Estimates = function () {
     };
     var initAccionesBidDeadLines = function () {
 
-        $(document).off('click', "#btn-agregar-bid-deadline");
-        $(document).on('click', "#btn-agregar-bid-deadline", function (e) {
+        $(document).off('click', ".btn-agregar-bid-deadline");
+        $(document).on('click', ".btn-agregar-bid-deadline", function (e) {
             // reset
             resetFormBidDeadLines();
 
@@ -1429,6 +1437,8 @@ var Estimates = function () {
                         bidDeadline: bidDeadline,
                         company_id: company_id,
                         company: company,
+                        tag: '',
+                        address: '',
                         posicion: bid_deadlines.length
                     });
 
@@ -1443,6 +1453,7 @@ var Estimates = function () {
 
                 //actualizar lista
                 actualizarTableListaBidDeadLines();
+                actualizarTableListaProjectInformation();
 
                 // reset
                 resetFormBidDeadLines();
@@ -1492,41 +1503,45 @@ var Estimates = function () {
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
-            if (bid_deadlines[posicion]) {
+            eliminarBidDeadline(posicion, '#bid-deadline-table-editable');
+        });
 
-                if (bid_deadlines[posicion].id != '') {
-                    MyApp.block('#bid-deadline-table-editable');
+    };
+    var eliminarBidDeadline = function (posicion, block_element) {
+        if (bid_deadlines[posicion]) {
 
-                    $.ajax({
-                        type: "POST",
-                        url: "estimate/eliminarBidDeadline",
-                        dataType: "json",
-                        data: {
-                            'id': bid_deadlines[posicion].id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#bid-deadline-table-editable');
-                            if (response.success) {
+            if (bid_deadlines[posicion].id != '') {
+                MyApp.block(block_element);
 
-                                toastr.success(response.message, "");
+                $.ajax({
+                    type: "POST",
+                    url: "estimate/eliminarBidDeadline",
+                    dataType: "json",
+                    data: {
+                        'id': bid_deadlines[posicion].id
+                    },
+                    success: function (response) {
+                        mApp.unblock(block_element);
+                        if (response.success) {
 
-                                deleteBidDeadline(posicion);
+                            toastr.success(response.message, "");
 
-                            } else {
-                                toastr.error(response.error, "");
-                            }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#bid-deadline-table-editable');
+                            deleteBidDeadline(posicion);
 
+                        } else {
                             toastr.error(response.error, "");
                         }
-                    });
-                } else {
-                    deleteBidDeadline(posicion);
-                }
+                    },
+                    failure: function (response) {
+                        mApp.unblock(block_element);
+
+                        toastr.error(response.error, "");
+                    }
+                });
+            } else {
+                deleteBidDeadline(posicion);
             }
-        });
+        }
 
         function deleteBidDeadline(posicion) {
             //Eliminar
@@ -1537,9 +1552,9 @@ var Estimates = function () {
             }
             //actualizar lista
             actualizarTableListaBidDeadLines();
+            actualizarTableListaProjectInformation();
         }
-
-    };
+    }
     var resetFormBidDeadLines = function () {
         $('#bid-deadline-form input').each(function (e) {
             $element = $(this);
@@ -1556,6 +1571,170 @@ var Estimates = function () {
         $element.removeClass('has-error').tooltip("dispose");
 
         nEditingRowBidDeadlines = null;
+    };
+    
+    // project information
+    var oTableListaProjectInformation;
+    var initTableListaProjectInformation = function () {
+        MyApp.block('#project-information-table-editable');
+
+        var table = $('#project-information-table-editable');
+
+        const tagOptions = [
+            { text: "" },
+            { text: "No Tag" },
+            { text: "High Priority" },
+            { text: "Medium Priority" },
+            { text: "Low Priority" },
+            { text: "Don't Bid" },
+        ];
+
+        var aoColumns = [
+            {
+                field: "company",
+                title: "Company"
+            },
+            {
+                field: "tag",
+                title: "Tag",
+                width: 150,
+                template: function (row) {
+                    const current = row.tag ?? '';
+                    const optionsHtml = tagOptions.map(option => {
+                        const selected = option.text === current ? 'selected' : '';
+                        return `<option value="${option.text}" ${selected}>${option.text}</option>`;
+                    }).join('');
+
+                    return `<select class="form-control m-select2 project-information-tag" data-posicion="${row.posicion}" style="width: 150px;">${optionsHtml}</select>`;
+                }
+            },
+            {
+                field: "address",
+                title: "Address",
+                width: 500,
+                template: function (row) {
+                    return `<input type="text" class="form-control project-information-address" value="${row.address}" data-posicion="${row.posicion}" />`;
+                }
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete company"><i class="la la-trash"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableListaProjectInformation = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: bid_deadlines,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-project-information .m_form_search'),
+            },
+        });
+
+        //Events
+        oTableListaProjectInformation
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#project-information-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#project-information-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#project-information-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#project-information-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#project-information-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+        // init select
+        setTimeout(function () {
+            $('.project-information-tag').select2();
+        }, 1000);
+
+    };
+    var actualizarTableListaProjectInformation = function () {
+        if(oTableListaProjectInformation){
+            oTableListaProjectInformation.destroy();
+        }
+
+        initTableListaProjectInformation();
+    }
+
+    var initAccionesProjectInformation = function () {
+
+
+        $(document).off('change', ".project-information-address");
+        $(document).on('change', ".project-information-address", function () {
+            var posicion = $(this).data('posicion');
+            if (bid_deadlines[posicion]) {
+                bid_deadlines[posicion].address = $(this).val();
+            }
+        });
+
+        $(document).off('change', ".project-information-tag");
+        $(document).on('change', ".project-information-tag", function () {
+            var posicion = $(this).data('posicion');
+            if (bid_deadlines[posicion]) {
+                bid_deadlines[posicion].tag = $(this).val();
+            }
+        });
+
+        $(document).off('click', "#project-information-table-editable a.delete");
+        $(document).on('click', "#project-information-table-editable a.delete", function (e) {
+
+            e.preventDefault();
+            var posicion = $(this).data('posicion');
+            eliminarBidDeadline(posicion, '#project-information-table-editable');
+        });
+
     };
 
 
@@ -1582,6 +1761,9 @@ var Estimates = function () {
             // bid deadlines
             initFormBidDeadLines();
             initAccionesBidDeadLines();
+
+            // project information
+            initAccionesProjectInformation();
 
             initAccionChange();
         }

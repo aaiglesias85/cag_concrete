@@ -16,6 +16,12 @@ class EstimateBidDeadline
     #[ORM\Column(name: 'bid_deadline', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $bidDeadline;
 
+    #[ORM\Column(name: "tag", type: "string", length: 50, nullable: true)]
+    private ?string $tag;
+
+    #[ORM\Column(name: "address", type: "text", nullable: true)]
+    private ?string $address;
+
     #[ORM\ManyToOne(targetEntity: "App\Entity\Estimate")]
     #[ORM\JoinColumn(name: "estimate_id", referencedColumnName: "estimate_id", nullable: true)]
     private ?Estimate $estimate;
@@ -57,5 +63,25 @@ class EstimateBidDeadline
     public function setCompany(?Company $company): void
     {
         $this->company = $company;
+    }
+
+    public function getTag(): ?string
+    {
+        return $this->tag;
+    }
+
+    public function setTag(?string $tag): void
+    {
+        $this->tag = $tag;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): void
+    {
+        $this->address = $address;
     }
 }
