@@ -257,6 +257,12 @@
                             Project Information
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="4"
+                           data-toggle="tab" href="#tab-content-bid-information" id="tab-bid-information">
+                            Bid Information
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="tab-content">
@@ -743,6 +749,43 @@
                                 <!--end: Datatable -->
                             </div>
                         </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-bid-information" role="tabpanel">
+                        <form class="m-form" id="bid-information-form" action="#" enctype="multipart/form-data"
+                              method="post">
+
+                            <div class="m-form__section m-form__section--first">
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label>
+                                        <span class="ic-step-number">1</span>
+                                        Description
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <textarea class="form-control" id="bidDescription" name="biddescription" rows="3"></textarea>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label>
+                                        <span class="ic-step-number">2</span>
+                                        Instructions
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <textarea class="form-control" id="bidInstructions" name="bidinstructions" rows="3"></textarea>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label>
+                                        <span class="ic-step-number">3</span>
+                                        Plan Links
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <textarea class="form-control" id="planLink" name="planlink" rows="3"></textarea>
+                                </div>
+
+                            </div>
+
+                        </form>
                     </div>
                 </div>
 

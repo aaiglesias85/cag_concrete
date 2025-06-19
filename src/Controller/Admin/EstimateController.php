@@ -179,6 +179,10 @@ class EstimateController extends AbstractController
         $location = $request->get('location');
         $sector = $request->get('sector');
 
+        $bidDescription = $request->get('bidDescription');
+        $bidInstructions = $request->get('bidInstructions');
+        $planLink = $request->get('planLink');
+
         $stage_id = $request->get('stage_id');
         $proposal_type_id = $request->get('proposal_type_id');
         $status_id = $request->get('status_id');
@@ -207,7 +211,7 @@ class EstimateController extends AbstractController
                 $resultado = $this->estimateService->ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county, $priority,
                     $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                     $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id);
+                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink);
             }
 
             if ($resultado['success']) {

@@ -133,6 +133,9 @@ class EstimateService extends Base
             $arreglo_resultado['lostDate'] = $entity->getLostDate() ? $entity->getLostDate()->format('m/d/Y H:i') : "";
             $arreglo_resultado['location'] = $entity->getLocation();
             $arreglo_resultado['sector'] = $entity->getSector();
+            $arreglo_resultado['bidDescription'] = $entity->getBidDescription();
+            $arreglo_resultado['bidInstructions'] = $entity->getBidInstructions();
+            $arreglo_resultado['planLink'] = $entity->getPlanLink();
 
 
             $arreglo_resultado['stage_id'] = $entity->getStage() != null ? $entity->getStage()->getStageId() : '';
@@ -346,7 +349,7 @@ class EstimateService extends Base
     public function ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county, $priority,
                                        $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                                        $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                                                                          $awardedDate, $lostDate, $location, $sector, $plan_downloading_id)
+                                       $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -374,6 +377,10 @@ class EstimateService extends Base
             $entity->setEmail($email);
             $entity->setLocation($location);
             $entity->setSector($sector);
+
+            $entity->setBidDescription($bidDescription);
+            $entity->setBidInstructions($bidInstructions);
+            $entity->setPlanLink($planLink);
 
             $entity->setBidDeadline(NULL);
             if ($bidDeadline != '') {

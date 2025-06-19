@@ -244,6 +244,27 @@ var Estimates = function () {
             $element.data("title", "").removeClass("has-error").tooltip("dispose");
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
+        $('#estimate-bid-details-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+        $('#bid-information-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+        $('#bid-information-form textarea').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
 
         $('#estimator').val([]);
         $('#estimator').trigger('change');
@@ -437,6 +458,9 @@ var Estimates = function () {
         var location = $('#location').val();
         var sector = $('#sector').val();
         var plan_downloading_id = $('#plan-downloading').val();
+        var bidDescription = $('#bidDescription').val();
+        var bidInstructions = $('#bidInstructions').val();
+        var planLink = $('#planLink').val();
 
         MyApp.block('#form-estimate');
 
@@ -472,6 +496,9 @@ var Estimates = function () {
                 'lostDate': lostDate,
                 'location': location,
                 'sector': sector,
+                'bidDescription': bidDescription,
+                'bidInstructions': bidInstructions,
+                'planLink': planLink,
                 'plan_downloading_id': plan_downloading_id,
                 'bid_deadlines': JSON.stringify(bid_deadlines)
             },
@@ -643,6 +670,10 @@ var Estimates = function () {
                     $('#plan-downloading').val(response.estimate.plan_downloading_id);
                     $('#plan-downloading').trigger('change');
 
+                    $('#bidDescription').val(response.estimate.bidDescription);
+                    $('#bidInstructions').val(response.estimate.bidInstructions);
+                    $('#planLink').val(response.estimate.planLink);
+
                     // bid deadlines
                     bid_deadlines = response.estimate.bid_deadlines;
                     actualizarTableListaBidDeadLines();
@@ -650,7 +681,7 @@ var Estimates = function () {
 
 
                     // habilitar tab
-                    totalTabs = 2;
+                    totalTabs = 4;
                     $('#btn-wizard-siguiente').removeClass('m--hide');
                     $('.nav-item-hide').removeClass('m--hide');
 
@@ -1145,6 +1176,9 @@ var Estimates = function () {
                 case 3:
                     $('#tab-project-information').tab('show');
                     actualizarTableListaProjectInformation();
+                    break;
+                case 4:
+                    $('#tab-bid-information').tab('show');
                     break;
             }
         }, 0);

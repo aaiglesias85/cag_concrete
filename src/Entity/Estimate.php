@@ -40,6 +40,15 @@ class Estimate
     #[ORM\Column(name: "email", type: "text", nullable: true)]
     private ?string $email;
 
+    #[ORM\Column(name: "bid_description", type: "text", nullable: true)]
+    private ?string $bidDescription;
+
+    #[ORM\Column(name: "bid_instructions", type: "text", nullable: true)]
+    private ?string $bidInstructions;
+
+    #[ORM\Column(name: "plan_link", type: "text", nullable: true)]
+    private ?string $planLink;
+
     #[ORM\Column(name: 'job_walk', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $jobWalk;
 
@@ -349,5 +358,35 @@ class Estimate
     public function setSector(?string $sector): void
     {
         $this->sector = $sector;
+    }
+
+    public function getBidDescription(): ?string
+    {
+        return $this->bidDescription;
+    }
+
+    public function setBidDescription(?string $bidDescription): void
+    {
+        $this->bidDescription = $bidDescription;
+    }
+
+    public function getBidInstructions(): ?string
+    {
+        return $this->bidInstructions;
+    }
+
+    public function setBidInstructions(?string $bidInstructions): void
+    {
+        $this->bidInstructions = $bidInstructions;
+    }
+
+    public function getPlanLink(): ?string
+    {
+        return $this->planLink;
+    }
+
+    public function setPlanLink(?string $planLink): void
+    {
+        $this->planLink = $planLink;
     }
 }
