@@ -19,6 +19,7 @@ use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\ReminderRecipient;
 use App\Entity\Unit;
+use App\Entity\UserQbwcToken;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -35,10 +36,10 @@ class Base
     public $mailer;
     public $security;
 
-    public function __construct(ContainerInterface $container,
-                                MailerInterface $mailer,
+    public function __construct(ContainerInterface    $container,
+                                MailerInterface       $mailer,
                                 ContainerBagInterface $containerBag,
-                                Security $security)
+                                Security              $security)
     {
         $this->container = $container;
         $this->mailer = $mailer;
@@ -168,7 +169,7 @@ class Base
         if (substr_count($ruta, 'index.php') > 0) {
             $ruta = $this->generateUrl('home') . '../../';
         } else {
-            $ruta = $this->generateUrl('home'). '../';;
+            $ruta = $this->generateUrl('home') . '../';;
         }
 
         $direccion_url = "http" . $s . "://" . $_SERVER['HTTP_HOST'] . $ruta;
@@ -612,6 +613,13 @@ class Base
             ->ListarEstimatesDeUsuario($usuario_id);
         foreach ($estimates as $estimate) {
             $em->remove($estimate);
+        }
+
+        // qbwc tokens
+        $qbwc_tokens = $this->getDoctrine()->getRepository(UserQbwcToken::class)
+            ->ListarTokensDeUsuario($usuario_id);
+        foreach ($qbwc_tokens as $qbwc_token) {
+            $em->remove($qbwc_token);
         }
     }
 

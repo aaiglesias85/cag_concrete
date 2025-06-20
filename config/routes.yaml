@@ -60,3 +60,9 @@ definirsubcontractordatatrackingprojectitem:
 definirconcretevendordatatracking:
   path:  /definir-concrete-vendor-datatracking
   defaults: { _controller: App\Controller\ScriptController::definirconcretevendordatatracking }
+
+
+#qbwc
+qbwc:
+  path: /qbwc
+  defaults: { _controller: App\Controller\QbwcController::qbwc, _format: json }

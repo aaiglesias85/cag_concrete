@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-06-2025 a las 01:31:49
+-- Tiempo de generación: 20-06-2025 a las 20:11:13
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -1509,6 +1509,21 @@ CREATE TABLE `subcontractor_notes` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `sync_queue_qbwc`
+--
+
+CREATE TABLE `sync_queue_qbwc` (
+  `id` int(11) NOT NULL,
+  `tipo` varchar(50) DEFAULT NULL,
+  `entidad_id` int(11) DEFAULT NULL,
+  `estado` varchar(50) DEFAULT NULL,
+  `intentos` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `unit`
 --
 
@@ -1607,6 +1622,18 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (32, 1, 1, 1, 1, 1, 28),
 (33, 1, 1, 1, 1, 1, 29),
 (34, 1, 1, 1, 1, 1, 30);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_qbwc_token`
+--
+
+CREATE TABLE `user_qbwc_token` (
+  `id` int(11) NOT NULL,
+  `token` text,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Índices para tablas volcadas
@@ -1940,6 +1967,12 @@ ALTER TABLE `subcontractor_notes`
   ADD KEY `Ref63453` (`subcontractor_id`);
 
 --
+-- Indices de la tabla `sync_queue_qbwc`
+--
+ALTER TABLE `sync_queue_qbwc`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -1959,6 +1992,13 @@ ALTER TABLE `user_permission`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Ref133` (`user_id`),
   ADD KEY `Ref194` (`function_id`);
+
+--
+-- Indices de la tabla `user_qbwc_token`
+--
+ALTER TABLE `user_qbwc_token`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refuser_qbwc_token1` (`user_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -2235,6 +2275,12 @@ ALTER TABLE `subcontractor_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
+--
+ALTER TABLE `sync_queue_qbwc`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -2251,6 +2297,12 @@ ALTER TABLE `user`
 --
 ALTER TABLE `user_permission`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT de la tabla `user_qbwc_token`
+--
+ALTER TABLE `user_qbwc_token`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -2465,6 +2517,12 @@ ALTER TABLE `user`
 ALTER TABLE `user_permission`
   ADD CONSTRAINT `Reffunction4` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refuser3` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `user_qbwc_token`
+--
+ALTER TABLE `user_qbwc_token`
+  ADD CONSTRAINT `Refuser_qbwc_token1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

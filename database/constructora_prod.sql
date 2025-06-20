@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-06-2025 a las 01:32:46
+-- Tiempo de generación: 20-06-2025 a las 20:11:26
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3024,7 +3024,7 @@ CREATE TABLE `estimate` (
 --
 
 INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `bid_description`, `bid_instructions`, `plan_link`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
-(2, '546546', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', NULL, NULL, NULL, 1, 3, 1, 1, 24, NULL, 1),
+(2, '546546', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
 (3, '345435', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 1, 2, 1, 22, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -3070,9 +3070,9 @@ CREATE TABLE `estimate_estimator` (
 
 INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
 (16, 3, 2),
-(29, 2, 1),
-(30, 2, 3),
-(31, 2, 2);
+(32, 2, 1),
+(33, 2, 3),
+(34, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -3093,8 +3093,8 @@ CREATE TABLE `estimate_project_type` (
 INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (27, 3, 2),
 (28, 3, 3),
-(37, 2, 1),
-(38, 2, 4);
+(39, 2, 1),
+(40, 2, 4);
 
 -- --------------------------------------------------------
 
@@ -4375,7 +4375,8 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3429, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-18 03:26:19', 1),
 (3430, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-18 03:26:55', 1),
 (3431, 'Delete', 'Bid Deadline Estimate', 'The bid deadline estimate is deleted: Test bid deadline Bid Deadline: 30/06/2025 23:25', '::1', '2025-06-18 03:27:04', 1),
-(3432, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-18 03:27:28', 1);
+(3432, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-18 03:27:28', 1),
+(3433, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-19 01:50:15', 1);
 
 -- --------------------------------------------------------
 
@@ -7663,6 +7664,21 @@ INSERT INTO `subcontractor_notes` (`id`, `notes`, `date`, `subcontractor_id`) VA
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `sync_queue_qbwc`
+--
+
+CREATE TABLE `sync_queue_qbwc` (
+  `id` int(11) NOT NULL,
+  `tipo` varchar(50) DEFAULT NULL,
+  `entidad_id` int(11) DEFAULT NULL,
+  `estado` varchar(50) DEFAULT NULL,
+  `intentos` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `unit`
 --
 
@@ -7797,6 +7813,18 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (826, 1, 1, 1, 1, 1, 28),
 (827, 1, 1, 1, 1, 1, 29),
 (828, 1, 1, 1, 1, 1, 30);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_qbwc_token`
+--
+
+CREATE TABLE `user_qbwc_token` (
+  `id` int(11) NOT NULL,
+  `token` text,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Índices para tablas volcadas
@@ -8127,6 +8155,12 @@ ALTER TABLE `subcontractor_notes`
   ADD KEY `Ref63453` (`subcontractor_id`);
 
 --
+-- Indices de la tabla `sync_queue_qbwc`
+--
+ALTER TABLE `sync_queue_qbwc`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -8146,6 +8180,13 @@ ALTER TABLE `user_permission`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Ref133` (`user_id`),
   ADD KEY `Ref194` (`function_id`);
+
+--
+-- Indices de la tabla `user_qbwc_token`
+--
+ALTER TABLE `user_qbwc_token`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refuser_qbwc_token1` (`user_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -8251,13 +8292,13 @@ ALTER TABLE `estimate_bid_deadline`
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `function`
@@ -8293,7 +8334,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3433;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3434;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8422,6 +8463,12 @@ ALTER TABLE `subcontractor_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
+--
+ALTER TABLE `sync_queue_qbwc`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -8438,6 +8485,12 @@ ALTER TABLE `user`
 --
 ALTER TABLE `user_permission`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=829;
+
+--
+-- AUTO_INCREMENT de la tabla `user_qbwc_token`
+--
+ALTER TABLE `user_qbwc_token`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -8639,6 +8692,12 @@ ALTER TABLE `user`
 ALTER TABLE `user_permission`
   ADD CONSTRAINT `Reffunction4` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refuser3` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `user_qbwc_token`
+--
+ALTER TABLE `user_qbwc_token`
+  ADD CONSTRAINT `Refuser_qbwc_token1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
