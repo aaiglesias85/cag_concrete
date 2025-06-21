@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 20-06-2025 a las 20:11:26
+-- Tiempo de generación: 21-06-2025 a las 16:45:40
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3095,6 +3095,22 @@ INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (28, 3, 3),
 (39, 2, 1),
 (40, 2, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_quote`
+--
+
+CREATE TABLE `estimate_quote` (
+  `id` int(11) NOT NULL,
+  `quantity` decimal(18,6) DEFAULT NULL,
+  `price` decimal(18,6) DEFAULT NULL,
+  `yield_calculation` varchar(50) DEFAULT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `item_id` int(11) DEFAULT NULL,
+  `equation_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -7970,6 +7986,15 @@ ALTER TABLE `estimate_project_type`
   ADD KEY `Refestimate_project_type2` (`type_id`);
 
 --
+-- Indices de la tabla `estimate_quote`
+--
+ALTER TABLE `estimate_quote`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_quote1` (`estimate_id`),
+  ADD KEY `Refestimate_quote2` (`item_id`),
+  ADD KEY `Refestimate_quote3` (`equation_id`);
+
+--
 -- Indices de la tabla `function`
 --
 ALTER TABLE `function`
@@ -8301,6 +8326,12 @@ ALTER TABLE `estimate_project_type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_quote`
+--
+ALTER TABLE `estimate_quote`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
@@ -8586,6 +8617,14 @@ ALTER TABLE `estimate_estimator`
 ALTER TABLE `estimate_project_type`
   ADD CONSTRAINT `Refestimate_project_type1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
   ADD CONSTRAINT `Refestimate_project_type2` FOREIGN KEY (`type_id`) REFERENCES `project_type` (`type_id`);
+
+--
+-- Filtros para la tabla `estimate_quote`
+--
+ALTER TABLE `estimate_quote`
+  ADD CONSTRAINT `Refestimate_quote1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_quote2` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
+  ADD CONSTRAINT `Refestimate_quote3` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`);
 
 --
 -- Filtros para la tabla `item`

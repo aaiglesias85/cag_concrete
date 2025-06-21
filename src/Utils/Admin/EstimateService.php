@@ -5,10 +5,13 @@ namespace App\Utils\Admin;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\District;
+use App\Entity\Equation;
 use App\Entity\Estimate;
 use App\Entity\EstimateBidDeadline;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateProjectType;
+use App\Entity\EstimateQuote;
+use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
 use App\Entity\ProjectStage;
@@ -19,6 +22,147 @@ use App\Utils\Base;
 
 class EstimateService extends Base
 {
+
+    /**
+     * AgregarItem
+     * @param $item_id
+     * @param $item_name
+     * @param $unit_id
+     * @param $quantity
+     * @param $price
+     * @param $yield_calculation
+     * @param $equation_id
+     * @return array
+     */
+    public function AgregarItem($estimate_item_id, $estimate_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
+    {
+        $resultado = [];
+
+        $em = $this->getDoctrine()->getManager();
+
+        // validar si existe
+        if ($item_id !== '') {
+            $estimate_item = $this->getDoctrine()->getRepository(EstimateQuote::class)
+                ->BuscarItemEstimate($estimate_id, $item_id);
+            if (!empty($estimate_item) && $estimate_item_id != $estimate_item[0]->getId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The item already exists in the project estimate";
+                return $resultado;
+            }
+        } else {
+
+            //Verificar description
+            $item = $this->getDoctrine()->getRepository(Item::class)
+                ->findOneBy(['description' => $item_name]);
+            if ($item_id == '' && $item != null) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The item name is in use, please try entering another one.";
+                return $resultado;
+            }
+        }
+
+
+        $estimate_entity = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
+        if ($estimate_entity != null) {
+            $estimate_item_entity = null;
+
+            if (is_numeric($estimate_item_id)) {
+                $estimate_item_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
+                    ->find($estimate_item_id);
+            }
+
+            $is_new_estimate_item = false;
+            if ($estimate_item_entity == null) {
+                $estimate_item_entity = new EstimateQuote();
+                $is_new_estimate_item = true;
+            }
+
+            $estimate_item_entity->setYieldCalculation($yield_calculation);
+
+            $price = $price !== "" ? $price : NULL;
+            $estimate_item_entity->setPrice($price);
+
+            $estimate_item_entity->setQuantity($quantity);
+
+            $equation_entity = null;
+            if ($equation_id != '') {
+                $equation_entity = $this->getDoctrine()->getRepository(Equation::class)->find($equation_id);
+                $estimate_item_entity->setEquation($equation_entity);
+            }
+
+            $is_new_item = false;
+            if ($item_id != '') {
+                $item_entity = $this->getDoctrine()->getRepository(Item::class)->find($item_id);
+            } else {
+                // add new item
+                $new_item_data = json_encode([
+                    'item' => $item_name,
+                    'price' => $price,
+                    'yield_calculation' => $yield_calculation,
+                    'unit_id' => $unit_id
+                ]);
+                $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
+
+                $is_new_item = true;
+            }
+
+            $estimate_item_entity->setItem($item_entity);
+
+            if ($is_new_estimate_item) {
+                $estimate_item_entity->setEstimate($estimate_entity);
+
+                $em->persist($estimate_item_entity);
+            }
+
+            $em->flush();
+
+            $resultado['success'] = true;
+
+            // devolver item
+            $item = $this->DevolverItemDeEstimate($estimate_item_entity);
+            $resultado['item'] = $item;
+            $resultado['is_new_item'] = $is_new_item;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The project not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarItem: Elimina un item en la BD
+     * @param int $estimate_item_id Id
+     * @author Marcel
+     */
+    public function EliminarItem($estimate_item_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
+            ->find($estimate_item_id);
+        /**@var EstimateQuote $entity */
+        if ($entity != null) {
+
+            $item_name = $entity->getItem()->getDescription();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Estimate Item";
+            $log_descripcion = "The item: $item_name of the project estimate is deleted";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
 
     /**
      * EliminarBidDeadline: Elimina un bid deadline en la BD
@@ -114,7 +258,7 @@ class EstimateService extends Base
         /** @var Estimate $entity */
         if ($entity != null) {
 
-            $arreglo_resultado['project_id'] = $entity->getProjectId();
+            $arreglo_resultado['estimate_id'] = $entity->getProjectId();
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['bidDeadline'] = $entity->getBidDeadline() ? $entity->getBidDeadline()->format('m/d/Y H:i') : "";
             $arreglo_resultado['county'] = $entity->getCounty();
@@ -164,11 +308,63 @@ class EstimateService extends Base
             $bid_deadlines = $this->ListarBidDeadlines($estimate_id);
             $arreglo_resultado['bid_deadlines'] = $bid_deadlines;
 
+            // items
+            $items = $this->ListarItemsDeEstimate($estimate_id);
+            $arreglo_resultado['items'] = $items;
+
             $resultado['success'] = true;
             $resultado['estimate'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarItemsDeEstimate
+     * @param $estimate_id
+     * @return array
+     */
+    public function ListarItemsDeEstimate($estimate_id)
+    {
+        $items = [];
+
+        $lista = $this->getDoctrine()->getRepository(EstimateQuote::class)
+            ->ListarItemsDeEstimate($estimate_id);
+        foreach ($lista as $key => $value) {
+
+            $item = $this->DevolverItemDeEstimate($value, $key);
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    /**
+     * DevolverItemDeEstimate
+     * @param EstimateQuote $value
+     * @return array
+     */
+    public function DevolverItemDeEstimate($value, $key = -1)
+    {
+        $yield_calculation_name = $this->DevolverYieldCalculationDeItemProject($value);
+
+        $quantity = $value->getQuantity();
+        $price = $value->getPrice();
+        $total = $quantity * $price;
+
+        return [
+            'estimate_item_id' => $value->getId(),
+            "item_id" => $value->getItem()->getItemId(),
+            "item" => $value->getItem()->getDescription(),
+            "unit" => $value->getItem()->getUnit()->getDescription(),
+            "quantity" => $quantity,
+            "price" => $price,
+            "total" => $total,
+            "yield_calculation" => $value->getYieldCalculation(),
+            "yield_calculation_name" => $yield_calculation_name,
+            "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
+            "posicion" => $key
+        ];
     }
 
     // listar los bid deadlines del estimate
@@ -337,6 +533,13 @@ class EstimateService extends Base
             ->ListarBidDeadlineDeEstimate($estimate_id);
         foreach ($bid_deadlines as $bid_deadline) {
             $em->remove($bid_deadline);
+        }
+
+        // items
+        $estimate_items = $this->getDoctrine()->getRepository(EstimateQuote::class)
+            ->ListarItemsDeEstimate($estimate_id);
+        foreach ($estimate_items as $estimate_item) {
+            $em->remove($estimate_item);
         }
 
     }
@@ -557,7 +760,7 @@ class EstimateService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarEstimate($project_id, $name, $bidDeadline, $county, $priority,
+    public function SalvarEstimate($estimate_id, $name, $bidDeadline, $county, $priority,
                                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                                    $project_types_id, $estimators_id)
     {
@@ -574,7 +777,7 @@ class EstimateService extends Base
 
         $entity = new Estimate();
 
-        $entity->setProjectId($project_id);
+        $entity->setProjectId($estimate_id);
         $entity->setName($name);
         $entity->setCounty($county);
         $entity->setPriority($priority);

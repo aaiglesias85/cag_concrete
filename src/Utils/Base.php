@@ -10,6 +10,7 @@ use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingMaterial;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\EstimateEstimator;
+use App\Entity\EstimateQuote;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
@@ -774,7 +775,7 @@ class Base
 
     /**
      * DevolverYieldCalculationDeItemProject
-     * @param ProjectItem $item_entity
+     * @param ProjectItem|EstimateQuote $item_entity
      * @return string
      */
     public function DevolverYieldCalculationDeItemProject($item_entity)

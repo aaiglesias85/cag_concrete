@@ -313,6 +313,10 @@ var Estimates = function () {
         bid_deadlines = [];
         actualizarTableListaBidDeadLines();
 
+        // items
+        items = [];
+        actualizarTableListaItems();
+
         //Mostrar el primer tab
         resetWizard();
 
@@ -500,7 +504,7 @@ var Estimates = function () {
                 'bidInstructions': bidInstructions,
                 'planLink': planLink,
                 'plan_downloading_id': plan_downloading_id,
-                'bid_deadlines': JSON.stringify(bid_deadlines)
+                'bid_deadlines': JSON.stringify(bid_deadlines),
             },
             success: function (response) {
                 mApp.unblock('#form-estimate');
@@ -679,9 +683,13 @@ var Estimates = function () {
                     actualizarTableListaBidDeadLines();
                     actualizarTableListaProjectInformation();
 
+                    // items
+                    items = response.estimate.items;
+                    actualizarTableListaItems();
+
 
                     // habilitar tab
-                    totalTabs = 4;
+                    totalTabs = 5;
                     $('#btn-wizard-siguiente').removeClass('m--hide');
                     $('.nav-item-hide').removeClass('m--hide');
 
@@ -825,6 +833,10 @@ var Estimates = function () {
         initPortlets();
 
         $('.m-select2').select2();
+
+        $('#item').select2({
+            dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
+        });
 
         $('.select-stage').select2({
             templateResult: function (data) {
@@ -972,6 +984,69 @@ var Estimates = function () {
         $(document).off('change', "#company", changeCompany);
         $(document).on('change', "#company", changeCompany);
 
+        $('#item').change(changeItem);
+        $('#yield-calculation').change(changeYield);
+
+        $(document).off('switchChange.bootstrapSwitch', '#item-type');
+        $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
+
+    }
+
+    var changeItemType = function (event, state) {
+
+        // reset
+        $('#item').val('');
+        $('#item').trigger('change');
+        $('#div-item').removeClass('m--hide');
+
+        $('#item-name').val('');
+        $('#item-name').removeClass('m--hide').addClass('m--hide');
+
+        $('#unit').val('');
+        $('#unit').trigger('change');
+        $('#select-unit').removeClass('m--hide').addClass('m--hide');
+
+        if (!state) {
+            $('#div-item').removeClass('m--hide').addClass('m--hide');
+            $('#item-name').removeClass('m--hide');
+            $('#select-unit').removeClass('m--hide');
+        }
+    }
+
+    var changeYield = function () {
+        var yield_calculation = $('#yield-calculation').val();
+
+        // reset
+        $('#equation').val('');
+        $('#equation').trigger('change');
+        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+
+        if (yield_calculation == 'equation') {
+            $('#select-equation').removeClass('m--hide');
+        }
+    }
+
+    var changeItem = function () {
+        var item_id = $('#item').val();
+
+        // reset
+
+        $('#yield-calculation').val('');
+        $('#yield-calculation').trigger('change');
+
+        $('#equation').val('');
+        $('#equation').trigger('change');
+
+        if (item_id != '') {
+
+            var yield = $('#item option[value="' + item_id + '"]').data("yield");
+            $('#yield-calculation').val(yield);
+            $('#yield-calculation').trigger('change');
+
+            var equation = $('#item option[value="' + item_id + '"]').data("equation");
+            $('#equation').val(equation);
+            $('#equation').trigger('change');
+        }
     }
 
     // google maps
@@ -1128,6 +1203,9 @@ var Estimates = function () {
                     actualizarTableListaBidDeadLines();
                     break;
                 case 3:
+                    actualizarTableListaItems()
+                    break;
+                case 4:
                     actualizarTableListaProjectInformation();
                     break;
             }
@@ -1174,10 +1252,14 @@ var Estimates = function () {
                     actualizarTableListaBidDeadLines();
                     break;
                 case 3:
+                    $('#tab-quotes').tab('show');
+                    actualizarTableListaItems();
+                    break;
+                case 4:
                     $('#tab-project-information').tab('show');
                     actualizarTableListaProjectInformation();
                     break;
-                case 4:
+                case 5:
                     $('#tab-bid-information').tab('show');
                     break;
             }
@@ -1771,6 +1853,579 @@ var Estimates = function () {
 
     };
 
+    // items
+    var oTableItems;
+    var items = [];
+    var nEditingRowItem = null;
+    var rowDeleteItem = null;
+    var initTableItems = function () {
+        MyApp.block('#items-table-editable');
+
+        var table = $('#items-table-editable');
+
+        var aoColumns = [
+            {
+                field: "item",
+                title: "Item",
+            },
+            {
+                field: "unit",
+                title: "Unit",
+                width: 100,
+            },
+            {
+                field: "yield_calculation_name",
+                title: "Yield Calculation",
+            },
+            {
+                field: "quantity",
+                title: "Quantity",
+                width: 120,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "price",
+                title: "Price",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "total",
+                title: "Total",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableItems = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: items,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-items .m_form_search'),
+            }
+        });
+
+        //Events
+        oTableItems
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#items-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#items-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#items-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#items-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#items-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+        // totals
+        $('#total_count_items').val(items.length);
+
+        var total = calcularMontoTotalItems();
+        $('#total_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
+        // $('#contract_amount').val(MyApp.formatearNumero(total, 2, '.', ','));
+    };
+    var actualizarTableListaItems = function () {
+        if (oTableItems) {
+            oTableItems.destroy();
+        }
+
+        initTableItems();
+    }
+    var initFormItem = function () {
+        $("#item-form").validate({
+            rules: {
+                quantity: {
+                    required: true
+                },
+            },
+            showErrors: function (errorMap, errorList) {
+                // Clean up any tooltips for valid elements
+                $.each(this.validElements(), function (index, element) {
+                    var $element = $(element);
+
+                    $element.data("title", "") // Clear the title - there is no error associated anymore
+                        .removeClass("has-error")
+                        .tooltip("dispose");
+
+                    $element
+                        .closest('.form-group')
+                        .removeClass('has-error').addClass('success');
+                });
+
+                // Create new tooltips for invalid elements
+                $.each(errorList, function (index, error) {
+                    var $element = $(error.element);
+
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", error.message)
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+
+                });
+            },
+        });
+    };
+    var initAccionesItems = function () {
+
+        $(document).off('click', "#btn-agregar-item");
+        $(document).on('click', "#btn-agregar-item", function (e) {
+            // reset
+            resetFormItem();
+
+            $('#modal-item').modal({
+                'show': true
+            });
+        });
+
+        $(document).off('click', "#btn-salvar-item");
+        $(document).on('click', "#btn-salvar-item", function (e) {
+            e.preventDefault();
+
+            var item_type = $('#item-type').prop('checked');
+
+            var item_id = $('#item').val();
+            var item = item_type ? $("#item option:selected").text() : $('#item-name').val();
+            if (item_type) {
+                $('#item-name').val(item);
+            }
+
+
+            if ($('#item-form').valid() && isValidItem() && isValidYield() && isValidUnit()) {
+
+                var estimate_item_id = $('#estimate_item_id').val();
+                var unit_id = $('#unit').val();
+                var price = $('#item-price').val();
+                var quantity = $('#item-quantity').val();
+                var yield_calculation = $('#yield-calculation').val();
+                var equation_id = $('#equation').val();
+
+                MyApp.block('#modal-item .modal-content');
+
+                $.ajax({
+                    type: "POST",
+                    url: "estimate/agregarItem",
+                    dataType: "json",
+                    data: {
+                        estimate_item_id: estimate_item_id,
+                        estimate_id: $('#estimate_id').val(),
+                        item_id: item_id,
+                        item: item,
+                        unit_id: unit_id,
+                        price: price,
+                        quantity: quantity,
+                        yield_calculation: yield_calculation,
+                        equation_id: equation_id
+                    },
+                    success: function (response) {
+                        mApp.unblock('#modal-item .modal-content');
+                        if (response.success) {
+
+                            toastr.success(response.message, "Success");
+
+                            //add item
+                            var item_new = response.item;
+                            if (nEditingRowItem == null) {
+                                item_new.posicion = items.length;
+                                items.push(item_new);
+                            } else {
+                                item_new.posicion = items[nEditingRowItem].posicion;
+                                items[nEditingRowItem] = item_new;
+                            }
+
+                            // new item
+                            if (response.is_new_item) {
+                                $('#item').append(new Option(item_new.item, item_new.item_id, false, false));
+                                $('#item option[value="' + item_new.item_id + '"]').attr("data-price", item_new.price);
+                                $('#item option[value="' + item_new.item_id + '"]').attr("data-unit", item_new.unit);
+                                $('#item option[value="' + item_new.item_id + '"]').attr("data-equation", item_new.equation_id);
+                                $('#item option[value="' + item_new.item_id + '"]').attr("data-yield", item_new.yield_calculation);
+
+                                $('#item').select2();
+                            }
+
+                            //actualizar lista
+                            actualizarTableListaItems();
+
+                            if (nEditingRowItem != null) {
+                                $('#modal-item').modal('hide');
+                            }
+
+                            // reset
+                            resetFormItem();
+
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    },
+                    failure: function (response) {
+                        mApp.unblock('#modal-item .modal-content');
+
+                        toastr.error(response.error, "");
+                    }
+                });
+
+            } else {
+                if (!isValidItem()) {
+                    var $element = $('#select-item .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+                if (!isValidYield()) {
+                    var $element = $('#select-equation .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+                if (!isValidUnit()) {
+                    var $element = $('#select-unit .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+            }
+
+        });
+
+        $(document).off('click', "#items-table-editable a.edit");
+        $(document).on('click', "#items-table-editable a.edit", function (e) {
+            var posicion = $(this).data('posicion');
+            if (items[posicion]) {
+
+                // reset
+                resetFormItem();
+
+                nEditingRowItem = posicion;
+
+                $('#estimate_item_id').val(items[posicion].estimate_item_id);
+
+                $('#item').off('change', changeItem);
+
+                $('#item').val(items[posicion].item_id);
+                $('#item').trigger('change');
+
+                $('#item-price').val(items[posicion].price);
+                $('#item-quantity').val(items[posicion].quantity);
+
+                $('#item').on('change', changeItem);
+
+                // yield
+                $('#yield-calculation').off('change', changeYield);
+
+                $('#yield-calculation').val(items[posicion].yield_calculation);
+                $('#yield-calculation').trigger('change');
+
+                $('#equation').val(items[posicion].equation_id);
+                $('#equation').trigger('change');
+
+                if (items[posicion].equation_id != '') {
+                    $('#select-equation').removeClass('m--hide');
+                }
+
+                $('#yield-calculation').on('change', changeYield);
+
+                $(document).off('switchChange.bootstrapSwitch', '#item-type', changeItemType);
+
+                if (items[posicion].item_id == '') {
+
+                    $('#item-type').prop('checked', false);
+                    $("#item-type").bootstrapSwitch("state", false, true);
+
+                    $('#item-name').val(items[posicion].item);
+
+                    $('#unit').val(items[posicion].unit_id);
+                    $('#unit').trigger('change');
+                }
+
+                $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
+
+                // open modal
+                $('#modal-item').modal('show');
+
+            }
+        });
+
+        $(document).off('click', "#items-table-editable a.delete");
+        $(document).on('click', "#items-table-editable a.delete", function (e) {
+
+            e.preventDefault();
+            rowDeleteItem = $(this).data('posicion');
+            $('#modal-eliminar-item').modal({
+                'show': true
+            });
+        });
+
+        $(document).off('click', "#btn-delete-item");
+        $(document).on('click', "#btn-delete-item", function (e) {
+
+            e.preventDefault();
+            var posicion = rowDeleteItem;
+
+            if (items[posicion]) {
+
+                if (items[posicion].estimate_item_id != '') {
+                    MyApp.block('#items-table-editable');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "estimate/eliminarItem",
+                        dataType: "json",
+                        data: {
+                            'estimate_item_id': items[posicion].estimate_item_id
+                        },
+                        success: function (response) {
+                            mApp.unblock('#items-table-editable');
+                            if (response.success) {
+
+                                toastr.success(response.message, "Success");
+
+                                deleteItem(posicion);
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        },
+                        failure: function (response) {
+                            mApp.unblock('#items-table-editable');
+
+                            toastr.error(response.error, "");
+                        }
+                    });
+                } else {
+                    deleteItem(posicion);
+                }
+            }
+
+        });
+
+        function isValidItem() {
+            var valid = true;
+
+            var item_type = $('#item-type').prop('checked');
+            var item_id = $('#item').val();
+
+            if (item_type && item_id == '') {
+                valid = false;
+            }
+
+
+            return valid;
+        }
+
+        function isValidUnit() {
+            var valid = true;
+
+            var item_type = $('#item-type').prop('checked');
+            var unit_id = $('#unit').val();
+
+            if (!item_type && unit_id == '') {
+                valid = false;
+            }
+
+
+            return valid;
+        }
+
+        function isValidYield() {
+            var valid = true;
+
+            var yield_calculation = $('#yield-calculation').val();
+            var equation_id = $('#equation').val();
+            if (yield_calculation == 'equation' && equation_id == '') {
+                valid = false;
+            }
+
+
+            return valid;
+        }
+
+        function deleteItem(posicion) {
+            //Eliminar
+            items.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < items.length; i++) {
+                items[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaItems();
+        }
+    };
+    var resetFormItem = function () {
+        $('#item-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+
+        $('#item-type').prop('checked', true);
+        $("#item-type").bootstrapSwitch("state", true, true);
+
+        $('#item').val('');
+        $('#item').trigger('change');
+
+        $('#yield-calculation').val('');
+        $('#yield-calculation').trigger('change');
+
+        $('#equation').val('');
+        $('#equation').trigger('change');
+        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+
+        $('#div-item').removeClass('m--hide');
+        $('#item-name').removeClass('m--hide').addClass('m--hide');
+
+        $('#unit').val('');
+        $('#unit').trigger('change');
+        $('#select-unit').removeClass('m--hide').addClass('m--hide');
+
+        var $element = $('.select2');
+        $element.removeClass('has-error').tooltip("dispose");
+
+        nEditingRowItem = null;
+
+        // add datos de proyecto
+        $("#proyect-number-item").html($('#number').val());
+        $("#proyect-name-item").html($('#name').val());
+    };
+    // calcular el monto total
+    var calcularMontoTotalItems = function () {
+        var total = 0;
+
+        items.forEach(item => {
+            total += item.quantity * item.price;
+        });
+
+        return total;
+    }
+
+    // unit
+    var initAccionesUnit = function () {
+        $(document).off('click', "#btn-add-unit");
+        $(document).on('click', "#btn-add-unit", function (e) {
+            ModalUnit.mostrarModal();
+        });
+
+        $('#modal-unit').on('hidden.bs.modal', function () {
+            var unit = ModalUnit.getUnit();
+            if (unit != null) {
+                $('#unit').append(new Option(unit.description, unit.unit_id, false, false));
+                $('#unit').select2();
+
+                $('#unit').val(unit.unit_id);
+                $('#unit').trigger('change');
+            }
+        });
+    }
+
+    // equation
+    var initAccionesEquation = function () {
+        $(document).off('click', "#btn-add-equation");
+        $(document).on('click', "#btn-add-equation", function (e) {
+            ModalEquation.mostrarModal();
+        });
+
+        $('#modal-equation').on('hidden.bs.modal', function () {
+            var equation = ModalEquation.getEquation();
+            if (equation != null) {
+                $('#equation').append(new Option(`${equation.description} ${equation.equation}`, equation.equation_id, false, false));
+                $('#equation').select2();
+
+                $('#equation').val(equation.equation_id);
+                $('#equation').trigger('change');
+            }
+        });
+    }
 
     return {
         //main function to initiate the module
@@ -1798,6 +2453,15 @@ var Estimates = function () {
 
             // project information
             initAccionesProjectInformation();
+
+            // items
+            initTableItems();
+            initFormItem();
+            initAccionesItems();
+            // units
+            initAccionesUnit();
+            // equations
+            initAccionesEquation();
 
             initAccionChange();
         }

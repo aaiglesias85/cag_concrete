@@ -29,3 +29,12 @@ cambiarStageEstimateAdmin:
 eliminarBidDeadlineStageEstimateAdmin:
   path: /estimate/eliminarBidDeadline
   defaults: { _controller: App\Controller\Admin\EstimateController::eliminarBidDeadline, _format: json }
+
+#items
+eliminarItemEstimateAdmin:
+  path: /estimate/eliminarItem
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarItem, _format: json }
+
+agregarItemEstimateAdmin:
+  path: /estimate/agregarItem
+  defaults: { _controller: App\Controller\Admin\EstimateController::agregarItem, _format: json }

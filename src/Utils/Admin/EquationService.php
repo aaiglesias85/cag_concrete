@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\EstimateQuote;
 use App\Entity\Item;
 use App\Entity\Equation;
 use App\Entity\ProjectItem;
@@ -157,6 +158,14 @@ class EquationService extends Base
                 $item->setEquation(null);
             }
 
+            // estimates
+            $estimates = $this->getDoctrine()->getRepository(EstimateQuote::class)
+                ->ListarEstimateQuotesDeEquation($equation_id);
+            foreach ($estimates as $estimate) {
+                $estimate->setYieldCalculation(null);
+                $estimate->setEquation(null);
+            }
+
             $equation_descripcion = $entity->getDescription();
 
 
@@ -211,6 +220,14 @@ class EquationService extends Base
                             foreach ($items as $item) {
                                 $item->setYieldCalculation(null);
                                 $item->setEquation(null);
+                            }
+
+                            // estimates
+                            $estimates = $this->getDoctrine()->getRepository(EstimateQuote::class)
+                                ->ListarEstimateQuotesDeEquation($equation_id);
+                            foreach ($estimates as $estimate) {
+                                $estimate->setYieldCalculation(null);
+                                $estimate->setEquation(null);
                             }
 
                             $equation_descripcion = $entity->getDescription();

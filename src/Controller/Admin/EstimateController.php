@@ -4,11 +4,14 @@ namespace App\Controller\Admin;
 
 use App\Entity\Company;
 use App\Entity\District;
+use App\Entity\Equation;
+use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
 use App\Entity\ProjectStage;
 use App\Entity\ProjectType;
 use App\Entity\ProposalType;
+use App\Entity\Unit;
 use App\Entity\Usuario;
 use App\Utils\Admin\EstimateService;
 use Google\Cloud\Channel\V1\Plan;
@@ -64,6 +67,18 @@ class EstimateController extends AbstractController
                 $plan_downloadings = $this->estimateService->getDoctrine()->getRepository(PlanDownloading::class)
                     ->ListarOrdenados();
 
+                // items
+                $items = $this->estimateService->getDoctrine()->getRepository(Item::class)
+                    ->ListarOrdenados();
+
+                $equations = $this->estimateService->getDoctrine()->getRepository(Equation::class)
+                    ->ListarOrdenados();
+
+                $units = $this->estimateService->getDoctrine()->getRepository(Unit::class)
+                    ->ListarOrdenados();
+
+                $yields_calculation = $this->estimateService->ListarYieldsCalculation();
+
 
                 return $this->render('admin/estimate/index.html.twig', array(
                     'permiso' => $permiso[0],
@@ -75,6 +90,10 @@ class EstimateController extends AbstractController
                     'districts' => $districts,
                     'estimators' => $estimators,
                     'plan_downloadings' => $plan_downloadings,
+                    'items' => $items,
+                    'equations' => $equations,
+                    'yields_calculation' => $yields_calculation,
+                    'units' => $units
                 ));
             }
         } else {
@@ -218,6 +237,7 @@ class EstimateController extends AbstractController
 
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = "The operation was successful";
+
 
                 return $this->json($resultadoJson);
             } else {
@@ -379,5 +399,72 @@ class EstimateController extends AbstractController
 
             return $this->json($resultadoJson);
         }
+    }
+
+    /**
+     * eliminarItem Acción que elimina un item en la BD
+     *
+     */
+    public function eliminarItem(Request $request)
+    {
+        $estimate_item_id = $request->get('estimate_item_id');
+
+        try {
+            $resultado = $this->estimateService->EliminarItem($estimate_item_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
+    }
+
+    /**
+     * agregarItem Acción que agrega un item en la BD
+     *
+     */
+    public function agregarItem(Request $request)
+    {
+        $estimate_item_id = $request->get('estimate_item_id');
+        $estimate_id = $request->get('estimate_id');
+        $item_id = $request->get('item_id');
+        $item_name = $request->get('item');
+        $unit_id = $request->get('unit_id');
+        $quantity = $request->get('quantity');
+        $price = $request->get('price');
+        $yield_calculation = $request->get('yield_calculation');
+        $equation_id = $request->get('equation_id');
+
+        try {
+            $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['item'] = $resultado['item'];
+                $resultadoJson['is_new_item'] = $resultado['is_new_item'];
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
     }
 }

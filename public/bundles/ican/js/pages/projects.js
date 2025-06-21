@@ -1308,6 +1308,7 @@ var Projects = function () {
                                 item_new.posicion = items.length;
                                 items.push(item_new);
                             } else {
+                                item_new.posicion = items[nEditingRowItem].posicion;
                                 items[nEditingRowItem] = item_new;
                             }
 

@@ -5,6 +5,7 @@ namespace App\Utils\Admin;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
+use App\Entity\EstimateQuote;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;
 use App\Entity\DataTracking;
@@ -165,6 +166,13 @@ class ItemService extends Base
             ->ListarSubcontractsDeItem($item_id);
         foreach ($subcontract_items as $subcontract_item) {
             $em->remove($subcontract_item);
+        }
+
+        // estimates
+        $estimate_items = $this->getDoctrine()->getRepository(EstimateQuote::class)
+            ->ListarEstimatesDeItem($item_id);
+        foreach ($estimate_items as $estimate_item) {
+            $em->remove($estimate_item);
         }
     }
 

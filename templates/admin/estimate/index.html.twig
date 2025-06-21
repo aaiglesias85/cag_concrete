@@ -253,12 +253,18 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link wizard-tab" data-item="3"
+                           data-toggle="tab" href="#tab-content-quotes" id="tab-quotes">
+                            Quotes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="4"
                            data-toggle="tab" href="#tab-content-project-information" id="tab-project-information">
                             Project Information
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link wizard-tab" data-item="4"
+                        <a class="nav-link wizard-tab" data-item="5"
                            data-toggle="tab" href="#tab-content-bid-information" id="tab-bid-information">
                             Bid Information
                         </a>
@@ -712,6 +718,66 @@
 
                         </form>
                     </div>
+                    <div class="tab-pane" id="tab-content-quotes" role="tabpanel">
+                        <div class="row" id="lista-items">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                {% if permiso.agregar or permiso.editar %}
+                                                    <div class="col-md-2">
+                                                        <div class="btn-group">
+                                                            <button id="btn-agregar-item" class="btn btn-success"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                New <i class="la la-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="col-lg-2">
+                                                    <div class="input-group m-input-group">
+                                                        <div class="input-group-prepend"><span class="input-group-text"
+                                                                                               id="basic-addon1">Items:</span>
+                                                        </div>
+                                                        <input type="text" class="form-control m-input"
+                                                               id="total_count_items" value="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <div class="input-group m-input-group">
+                                                        <div class="input-group-prepend"><span class="input-group-text"
+                                                                                               id="basic-addon1">Total $:</span>
+                                                        </div>
+                                                        <input type="text" class="form-control m-input"
+                                                               id="total_total_items" value="" disabled>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2"></div>
+                                                <div class="col-md-3">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="items-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="tab-content-project-information" role="tabpanel">
                         <div class="row" id="lista-project-information">
                             <div class="col-lg-12">
@@ -933,9 +999,200 @@
         </div>
     </div>
 
+    <!-- items -->
+    <div class="modal fade" id="modal-item" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        New item
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="item-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <input type="hidden" id="estimate_item_id" name="estimate_item_id"/>
+
+                        <div class="form-group m-form__group">
+                            <div>
+                                <input type="checkbox" data-switch="true" id="item-type"
+                                       checked="checked" data-on-text="Existing item"
+                                       data-off-text="New item" data-on-color="success"
+                                       data-off-color="danger">
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Item
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <input type="text" class="form-control form-control-text m--hide"
+                                   id="item-name" name="item" placeholder="Enter the custom name"/>
+
+                            <div class="row" id="div-item">
+                                <div class="col-md-12" id="select-item">
+                                    <select class="form-control" id="item">
+                                        <option value="">Select</option>
+                                        {% for item in items %}
+                                            <option value="{{ item.itemId }}"
+                                                    data-unit="{{ item.unit.description }}"
+                                                    data-yield="{{ item.yieldCalculation }}"
+                                                    data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}">
+                                                {{ item.description }} - {{ item.unit.description }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Yield Calculation
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-12" id="select-yield-calculation">
+                                    <select class="form-control m-select2 event-change" id="yield-calculation"
+                                            name="yield">
+                                        <option value="">Select</option>
+                                        {% for item in yields_calculation %}
+                                            <option value="{{ item.id }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group m--hide" id="select-equation">
+                            <label>
+                                Equation
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="form-control m-select2 event-change" id="equation" name="equation">
+                                        <option value="">Select</option>
+                                        {% for item in equations %}
+                                            <option value="{{ item.equationId }}" data-equation="{{ item.equation }}">
+                                                {{ item.description }} {{ item.equation }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                    <a href="javascript:;" title="Add equation" id="btn-add-equation"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                        <i class="la la-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group m--hide" id="select-unit">
+                            <label>
+                                Unit
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="form-control m-select2 event-change" id="unit" name="unit">
+                                        <option value="">Select</option>
+                                        {% for item in units %}
+                                            <option value="{{ item.unitId }}">{{ item.description }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                    <a href="javascript:;" title="Add unit" id="btn-add-unit"
+                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                        <i class="la la-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Quantity
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-number" id="item-quantity"
+                                           name="quantity">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group m-form__group">
+                            <label>
+                                Price
+                                <span class="ic-small italic">(optional)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group m-input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="text" class="form-control form-control-number" id="item-price"
+                                               name="price">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-item">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-eliminar-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete the selected item?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="btn-delete-item">Yes
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- components -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalCompany')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalContactCompany')) }}
+
+    <!-- components -->
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
 
 {% endblock %}
 
@@ -969,6 +1226,8 @@
         jQuery(document).ready(function () {
             ModalCompany.init();
             ModalContactCompany.init();
+            ModalUnit.init();
+            ModalEquation.init();
         });
     </script>
 
