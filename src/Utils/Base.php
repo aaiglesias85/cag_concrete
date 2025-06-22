@@ -23,6 +23,7 @@ use App\Entity\Unit;
 use App\Entity\UserQbwcToken;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -36,16 +37,19 @@ class Base
     private $containerBag;
     public $mailer;
     public $security;
+    public LoggerInterface $logger;
 
     public function __construct(ContainerInterface    $container,
                                 MailerInterface       $mailer,
                                 ContainerBagInterface $containerBag,
-                                Security              $security)
+                                Security              $security,
+                                LoggerInterface $logger)
     {
         $this->container = $container;
         $this->mailer = $mailer;
         $this->containerBag = $containerBag;
         $this->security = $security;
+        $this->logger = $logger;
     }
 
     //doctrine manager
@@ -115,6 +119,9 @@ class Base
         } else {
             die("Error IO: writing file '{$filename}'");
         }
+
+        // Puedes usar otros niveles
+        $this->logger->info($txt);
     }
 
     // http://www.the-art-of-web.com/php/truncate/

@@ -1,0 +1,1 @@
+ALTER TABLE `invoice` ADD `txn_id` VARCHAR(255) NULL AFTER `project_id`, ADD `edit_sequence` VARCHAR(255) NULL AFTER `txn_id`;

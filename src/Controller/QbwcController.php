@@ -46,10 +46,15 @@ class QbwcController extends AbstractController
         $username = (string)$body->authenticate->strUserName;
         $password = (string)$body->authenticate->strPassword;
 
+        $this->qbwcService->writeLog("Intento de login: {$username}");
+
         // autenticar
         $user = $this->qbwcService->AutenticarLogin($username, $password);
 
         if (!$user) {
+
+            $this->qbwcService->writeLog("Login fallido para: {$username}");
+
             $response = '<authenticateResponse xmlns="http://developer.intuit.com/">
                 <authenticateResult>
                     <string></string>
@@ -64,6 +69,8 @@ class QbwcController extends AbstractController
 
         // salvar token
         $this->qbwcService->SalvarToken($user, $ticket);
+
+        $this->qbwcService->writeLog("Login exitoso para: {$username}, ticket: {$ticket}");
 
         $response = "<authenticateResponse xmlns=\"http://developer.intuit.com/\">
             <authenticateResult>
@@ -92,6 +99,9 @@ class QbwcController extends AbstractController
             return new Response($this->wrapSoapResponse('<sendRequestXMLResponse><sendRequestXMLResult></sendRequestXMLResult></sendRequestXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
 
+        $this->qbwcService->writeLog("sendRequestXML con ticket: {$ticket}");
+        $this->qbwcService->writeLog("XML enviado: " . $qbxml);
+
         $response = "<sendRequestXMLResponse xmlns=\"http://developer.intuit.com/\">
             <sendRequestXMLResult>{$qbxml}</sendRequestXMLResult>
         </sendRequestXMLResponse>";
@@ -111,7 +121,7 @@ class QbwcController extends AbstractController
         }
 
         // actualizar el estado
-        $this->qbwcService->UpdateSyncQueueQbwc();
+        $this->qbwcService->UpdateSyncQueueQbwc($request->getContent());
 
         $response = "<receiveResponseXMLResponse xmlns=\"http://developer.intuit.com/\">
             <receiveResponseXMLResult>100</receiveResponseXMLResult>

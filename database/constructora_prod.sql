@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-06-2025 a las 16:45:40
+-- Tiempo de generación: 22-06-2025 a las 18:57:19
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3024,8 +3024,8 @@ CREATE TABLE `estimate` (
 --
 
 INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `bid_description`, `bid_instructions`, `plan_link`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
-(2, '546546', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
-(3, '345435', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, 1, 2, 1, 22, NULL, NULL);
+(2, '', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
+(3, '', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 3, 1, 2, 1, 22, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3069,10 +3069,10 @@ CREATE TABLE `estimate_estimator` (
 --
 
 INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
-(16, 3, 2),
-(32, 2, 1),
-(33, 2, 3),
-(34, 2, 2);
+(38, 3, 2),
+(42, 2, 1),
+(43, 2, 3),
+(44, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -3091,10 +3091,10 @@ CREATE TABLE `estimate_project_type` (
 --
 
 INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
-(27, 3, 2),
-(28, 3, 3),
-(39, 2, 1),
-(40, 2, 4);
+(43, 3, 2),
+(44, 3, 3),
+(47, 2, 1),
+(48, 2, 4);
 
 -- --------------------------------------------------------
 
@@ -3111,6 +3111,17 @@ CREATE TABLE `estimate_quote` (
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate_quote`
+--
+
+INSERT INTO `estimate_quote` (`id`, `quantity`, `price`, `yield_calculation`, `estimate_id`, `item_id`, `equation_id`) VALUES
+(1, 10.000000, 100.000000, 'none', 2, 211, NULL),
+(3, 10.000000, 1000.000000, 'none', 3, 153, NULL),
+(4, 100.000000, NULL, 'same', 2, 228, NULL),
+(5, 10.000000, NULL, 'none', 2, 72, NULL),
+(6, 15.000000, NULL, 'none', 2, 129, NULL);
 
 -- --------------------------------------------------------
 
@@ -3203,26 +3214,28 @@ CREATE TABLE `invoice` (
   `paid` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  `project_id` int(11) DEFAULT NULL
+  `project_id` int(11) DEFAULT NULL,
+  `txn_id` varchar(255) DEFAULT NULL,
+  `edit_sequence` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `invoice`
 --
 
-INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`) VALUES
-(1, '1', '2024-06-26', '2024-07-15', '', 0, '2024-07-15 20:00:58', '2024-12-20 14:22:57', 12),
-(3, '2', '2023-12-01', '2025-01-31', 'test test test', 0, '2025-01-10 14:42:23', '2025-01-10 14:48:19', 53),
-(6, '3', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 18:19:05', NULL, 38),
-(8, '4', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:22:41', NULL, 53),
-(9, '5', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:31:15', NULL, 53),
-(10, '6', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:38:37', '2025-02-05 19:43:56', 52),
-(11, '7', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:56:05', NULL, 87),
-(12, '8', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:19:37', NULL, 87),
-(13, '9', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:24:03', NULL, 87),
-(14, '10', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:26:13', NULL, 87),
-(15, '11', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:28:09', '2025-02-10 15:46:18', 87),
-(16, '1', '2025-02-01', '2025-02-26', '', 0, '2025-02-26 15:23:01', '2025-04-16 01:35:31', 127);
+INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`) VALUES
+(1, '1', '2024-06-26', '2024-07-15', '', 0, '2024-07-15 20:00:58', '2024-12-20 14:22:57', 12, NULL, NULL),
+(3, '2', '2023-12-01', '2025-01-31', 'test test test', 0, '2025-01-10 14:42:23', '2025-01-10 14:48:19', 53, NULL, NULL),
+(6, '3', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 18:19:05', NULL, 38, NULL, NULL),
+(8, '4', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:22:41', NULL, 53, NULL, NULL),
+(9, '5', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:31:15', NULL, 53, NULL, NULL),
+(10, '6', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:38:37', '2025-02-05 19:43:56', 52, NULL, NULL),
+(11, '7', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:56:05', NULL, 87, NULL, NULL),
+(12, '8', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:19:37', NULL, 87, NULL, NULL),
+(13, '9', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:24:03', NULL, 87, NULL, NULL),
+(14, '10', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:26:13', NULL, 87, NULL, NULL),
+(15, '11', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:28:09', '2025-02-10 15:46:18', 87, NULL, NULL),
+(16, '1', '2025-02-01', '2025-02-26', '', 0, '2025-02-26 15:23:01', '2025-06-22 18:33:51', 127, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4392,7 +4405,13 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3430, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-18 03:26:55', 1),
 (3431, 'Delete', 'Bid Deadline Estimate', 'The bid deadline estimate is deleted: Test bid deadline Bid Deadline: 30/06/2025 23:25', '::1', '2025-06-18 03:27:04', 1),
 (3432, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-18 03:27:28', 1),
-(3433, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-19 01:50:15', 1);
+(3433, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-19 01:50:15', 1),
+(3434, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-21 17:52:33', 1),
+(3435, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-06-21 17:54:15', 1),
+(3436, 'Delete', 'Estimate Item', 'The item: 24 HOUR ACCELERATED CONC BRIDGE BARRIER of the project estimate is deleted', '::1', '2025-06-21 17:59:14', 1),
+(3437, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-21 17:59:17', 1),
+(3438, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-21 18:00:07', 1),
+(3439, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-06-22 18:33:51', 1);
 
 -- --------------------------------------------------------
 
@@ -7692,6 +7711,13 @@ CREATE TABLE `sync_queue_qbwc` (
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `sync_queue_qbwc`
+--
+
+INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`, `created_at`) VALUES
+(1, 'invoice', 16, 'pendiente', 0, '2025-06-22 18:33:51');
+
 -- --------------------------------------------------------
 
 --
@@ -8317,19 +8343,19 @@ ALTER TABLE `estimate_bid_deadline`
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
 --
 ALTER TABLE `estimate_quote`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `function`
@@ -8365,7 +8391,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3434;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3440;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8497,7 +8523,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`

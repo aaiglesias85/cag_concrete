@@ -34,6 +34,12 @@ class Invoice
     #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt;
 
+    #[ORM\Column(name: "txn_id", type: "string", length: 255, nullable: true)]
+    private ?string $txnId = null;
+
+    #[ORM\Column(name: "edit_sequence", type: "string", length: 255, nullable: true)]
+    private ?string $editSequence = null;
+
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
     #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
     private ?Project $project;
@@ -122,4 +128,10 @@ class Invoice
     {
         $this->paid = $paid;
     }
+
+    public function setTxnId(?string $txnId): void { $this->txnId = $txnId; }
+    public function getTxnId(): ?string { return $this->txnId; }
+
+    public function setEditSequence(?string $editSequence): void { $this->editSequence = $editSequence; }
+    public function getEditSequence(): ?string { return $this->editSequence; }
 }

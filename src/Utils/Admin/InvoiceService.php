@@ -8,6 +8,7 @@ use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 
 use App\Entity\ProjectItem;
+use App\Entity\SyncQueueQbwc;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -599,6 +600,9 @@ class InvoiceService extends Base
             // payments
             $this->SalvarPayments($entity, $payments);
 
+            // salvar en la cola
+            $this->SalvarInvoiceQuickbook($entity);
+
             $em->flush();
 
             //Salvar log
@@ -692,6 +696,9 @@ class InvoiceService extends Base
         // payments
         $this->SalvarPayments($entity, $payments);
 
+        // salvar en la cola
+        $this->SalvarInvoiceQuickbook($entity);
+
         $em->flush();
 
         //Salvar log
@@ -711,6 +718,39 @@ class InvoiceService extends Base
         $resultado['url'] = $url;
 
         return $resultado;
+    }
+
+    /**
+     * SalvarInvoiceQuickbook
+     * @param Invoice $entity
+     * @return void
+     */
+    public function SalvarInvoiceQuickbook($entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice_id = $entity->getInvoiceId();
+
+        $sync_queue_qbwc = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+            ->findOneBy(['tipo' => 'invoice', 'entidadId' => $invoice_id]);
+        $is_new_sync_queue_qbwc = false;
+        if($sync_queue_qbwc == null){
+            $sync_queue_qbwc = new SyncQueueQbwc();
+            $is_new_sync_queue_qbwc = true;
+        }
+
+        $sync_queue_qbwc->setEstado('pendiente');
+
+        if($is_new_sync_queue_qbwc){
+            $sync_queue_qbwc->setTipo('invoice');
+            $sync_queue_qbwc->setEntidadId($invoice_id);
+            $sync_queue_qbwc->setIntentos(0);
+
+            $sync_queue_qbwc->setCreatedAt(new \DateTime());
+
+            $em->persist($sync_queue_qbwc);
+        }
+
     }
 
     /**

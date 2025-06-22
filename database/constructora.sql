@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-06-2025 a las 16:45:12
+-- Tiempo de generación: 22-06-2025 a las 18:57:10
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -540,17 +540,19 @@ CREATE TABLE `invoice` (
   `paid` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  `project_id` int(11) DEFAULT NULL
+  `project_id` int(11) DEFAULT NULL,
+  `txn_id` varchar(255) DEFAULT NULL,
+  `edit_sequence` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `invoice`
 --
 
-INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`) VALUES
-(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2),
-(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2),
-(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2);
+INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`) VALUES
+(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL),
+(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL),
+(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
