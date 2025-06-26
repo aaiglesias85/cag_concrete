@@ -84,6 +84,7 @@ class QbwcController extends AbstractController
 
         $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
             ->BuscarToken($ticket);
+        $this->qbwcService->writeLog("BuscarToken" . var_export($session, true));
 
         if (!$session) {
             $this->qbwcService->writeLog("handleSendRequestXML No hay sesion");
