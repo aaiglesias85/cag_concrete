@@ -21,7 +21,6 @@ class QbwcController extends AbstractController
     public function qbwc(Request $request): Response
     {
         try {
-
             $xmlContent = $request->getContent();
             $this->qbwcService->writeLog("Solicitud recibida:\n" . $xmlContent);
 
