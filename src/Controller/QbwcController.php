@@ -25,15 +25,15 @@ class QbwcController extends AbstractController
 
         $this->qbwcService->writeLog(var_export($xml, true));
 
-        if (str_contains($xml, '<authenticate>')) {
+        if (str_contains($xml, 'authenticate')) {
             return $this->handleAuthenticate($request);
-        } elseif (str_contains($xml, '<sendRequestXML>')) {
+        } elseif (str_contains($xml, 'sendRequestXML')) {
             return $this->handleSendRequestXML($request);
-        } elseif (str_contains($xml, '<receiveResponseXML>')) {
+        } elseif (str_contains($xml, 'receiveResponseXML')) {
             return $this->handleReceiveResponseXML($request);
-        } elseif (str_contains($xml, '<getLastError>')) {
+        } elseif (str_contains($xml, 'getLastError')) {
             return $this->handleGetLastError($request);
-        } elseif (str_contains($xml, '<closeConnection>')) {
+        } elseif (str_contains($xml, 'closeConnection')) {
             return $this->handleCloseConnection($request);
         }
 
