@@ -86,6 +86,7 @@ class QbwcController extends AbstractController
             ->BuscarToken($ticket);
 
         if (!$session) {
+            $this->qbwcService->writeLog("handleSendRequestXML No hay sesion");
             return new Response($this->wrapSoapResponse('<sendRequestXMLResponse><sendRequestXMLResult></sendRequestXMLResult></sendRequestXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
 
