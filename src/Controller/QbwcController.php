@@ -20,22 +20,30 @@ class QbwcController extends AbstractController
 
     public function qbwc(Request $request): Response
     {
-        $xmlContent = $request->getContent();
-        $this->qbwcService->writeLog("Solicitud recibida:\n" . $xmlContent);
+        try {
 
-        if (str_contains($xmlContent, 'authenticate')) {
-            return $this->handleAuthenticate($xmlContent);
-        } elseif (str_contains($xmlContent, 'sendRequestXML')) {
-            return $this->handleSendRequestXML($xmlContent);
-        } elseif (str_contains($xmlContent, 'receiveResponseXML')) {
-            return $this->handleReceiveResponseXML($xmlContent);
-        } elseif (str_contains($xmlContent, 'getLastError')) {
-            return $this->handleGetLastError();
-        } elseif (str_contains($xmlContent, 'closeConnection')) {
-            return $this->handleCloseConnection($xmlContent);
+            $xmlContent = $request->getContent();
+            $this->qbwcService->writeLog("Solicitud recibida:\n" . $xmlContent);
+
+            if (str_contains($xmlContent, 'authenticate')) {
+                return $this->handleAuthenticate($xmlContent);
+            } elseif (str_contains($xmlContent, 'sendRequestXML')) {
+                return $this->handleSendRequestXML($xmlContent);
+            } elseif (str_contains($xmlContent, 'receiveResponseXML')) {
+                return $this->handleReceiveResponseXML($xmlContent);
+            } elseif (str_contains($xmlContent, 'getLastError')) {
+                return $this->handleGetLastError();
+            } elseif (str_contains($xmlContent, 'closeConnection')) {
+                return $this->handleCloseConnection($xmlContent);
+            }
+
+            return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
+        } catch (\Exception $e) {
+            $this->qbwcService->writelog($e->getMessage(), 'errorlog.txt');
+
+            return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
 
-        return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
     }
 
     private function handleAuthenticate(string $xmlContent): Response
@@ -84,7 +92,6 @@ class QbwcController extends AbstractController
 
         $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
             ->BuscarToken($ticket);
-        $this->qbwcService->writeLog("BuscarToken" . var_export($session, true));
 
         if (!$session) {
             $this->qbwcService->writeLog("handleSendRequestXML No hay sesion");
