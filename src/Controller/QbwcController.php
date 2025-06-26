@@ -44,7 +44,9 @@ class QbwcController extends AbstractController
     private function handleAuthenticate(Request $request): Response
     {
         $xml = simplexml_load_string($request->getContent());
+        $this->qbwcService->writeLog(var_export($xml, true));
         $body = $xml->children('soap', true)->Body;
+        $this->qbwcService->writeLog(var_export($body, true));
         $username = (string)$body->authenticate->strUserName;
         $password = (string)$body->authenticate->strPassword;
 
