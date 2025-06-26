@@ -80,15 +80,10 @@ class QbwcService extends Base
 
         $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
             ->ListarOrdenados('pendiente');
-
-        $this->writelog(var_export($items, true));
-
         if (!empty($items)) {
             $item = $items[0];
             $tipo = $item->getTipo();
             $entidadId = $item->getEntidadId();
-
-            $this->writelog("TIPO: " . var_export($tipo, true));
 
             switch ($tipo) {
                 case 'invoice':

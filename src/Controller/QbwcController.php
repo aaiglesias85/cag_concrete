@@ -99,8 +99,6 @@ class QbwcController extends AbstractController
         }
 
         $qbxml = $this->qbwcService->GenerarRequestQBXML();
-        $this->qbwcService->writeLog("XML generado: {$qbxml}");
-
         if ($qbxml === '') {
             return new Response($this->wrapSoapResponse('<sendRequestXMLResponse><sendRequestXMLResult></sendRequestXMLResult></sendRequestXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }

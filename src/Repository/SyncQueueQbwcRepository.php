@@ -21,7 +21,7 @@ class SyncQueueQbwcRepository extends EntityRepository
                 ->setParameter('estado', $estado);
         }
 
-        $consulta->orderBy('id', $order);
+        $consulta->orderBy('s_q_q.id', $order);
 
         return $consulta->getQuery()->getResult();
     }
