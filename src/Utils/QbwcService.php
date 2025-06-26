@@ -10,8 +10,6 @@ use App\Entity\Usuario;
 
 class QbwcService extends Base
 {
-
-    // eliminar token
     public function EliminarToken($token)
     {
         $em = $this->getDoctrine()->getManager();
@@ -24,27 +22,23 @@ class QbwcService extends Base
         }
     }
 
-    // actualizar el estado en la cola
     public function UpdateSyncQueueQbwc(string $xmlResponse): void
     {
         $xml = simplexml_load_string($xmlResponse);
         $xml->registerXPathNamespace('qb', 'http://developer.intuit.com/');
 
-        // Definir los tipos y sus XPaths para las respuestas de QuickBooks
         $responseTypes = [
-            'invoice' => '//InvoiceRet',
-            // Puedes agregar más tipos aquí, ejemplo:
-            // 'customer' => '//CustomerRet',
-            // 'item' => '//ItemServiceRet',
+            'invoice' => '//qb:InvoiceRet',
         ];
 
         $em = $this->getDoctrine()->getManager();
 
-        $this->writeLog("Recibido XML response: " . $xmlResponse);
+        $this->writeLog("Recibido XML response: \n" . $xmlResponse);
 
         foreach ($responseTypes as $tipo => $xpath) {
             $nodes = $xml->xpath($xpath);
             if (!$nodes || count($nodes) === 0) {
+                $this->writeLog("No se encontraron nodos para tipo: {$tipo}");
                 continue;
             }
 
@@ -54,14 +48,12 @@ class QbwcService extends Base
 
                 $this->writeLog("Procesando {$tipo}: TxnID={$txnId}, EditSequence={$editSequence}");
 
-                // Buscar el próximo item en la cola con estado "enviado"
                 $item = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
                     ->findOneBy(['tipo' => strtolower($tipo), 'estado' => 'enviado'], ['id' => 'ASC']);
 
                 if ($item && $txnId && $editSequence) {
                     $item->setEstado('sincronizado');
 
-                    // Actualizar la entidad vinculada con TxnID y EditSequence
                     $entityClass = match ($tipo) {
                         'invoice' => Invoice::class,
                         default => null,
@@ -72,17 +64,16 @@ class QbwcService extends Base
                         if ($entity !== null) {
                             $entity->setTxnId($txnId);
                             $entity->setEditSequence($editSequence);
+                            $this->writeLog("Actualizado entidad {$tipo} ID={$entity->getId()}");
                         }
                     }
                 }
             }
         }
 
-        // Guardar todos los cambios en la base de datos
         $em->flush();
     }
 
-    // generar el xml del request
     public function GenerarRequestQBXML(): string
     {
         $qbxml = "";
@@ -98,15 +89,11 @@ class QbwcService extends Base
             switch ($tipo) {
                 case 'invoice':
                     $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
-
                     $qbxml = $this->generateInvoiceQBXML($entidadId);
-
-                    $this->writeLog("XML generado: " . $qbxml);
+                    $this->writeLog("XML generado: \n" . $qbxml);
                     break;
-                // puedes agregar más tipos en el futuro aquí
             }
 
-            // actualizar estado si se generó correctamente
             if ($qbxml !== '') {
                 $item->setEstado('enviado');
                 $this->getDoctrine()->getManager()->flush();
@@ -116,19 +103,18 @@ class QbwcService extends Base
         return $qbxml;
     }
 
-    // invoice qbxml
     private function generateInvoiceQBXML(int $invoiceId): string
     {
         $invoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoiceId);
         if (!$invoice) return '';
 
-        // Si ya tiene TxnID y EditSequence → es modificación
         if ($invoice->getTxnId() && $invoice->getEditSequence() && $invoice->getUpdatedAt() > $invoice->getCreatedAt()) {
             return $this->generateInvoiceModQBXML($invoice);
         }
 
         return $this->generateInvoiceAddQBXML($invoice);
     }
+
     private function generateInvoiceAddQBXML(Invoice $invoice): string
     {
         $project = $invoice->getProject();
@@ -170,6 +156,7 @@ class QbwcService extends Base
 
         return "<?xml version=\"1.0\"?>\n" . $xml->asXML();
     }
+
     private function generateInvoiceModQBXML(Invoice $invoice): string
     {
         $project = $invoice->getProject();
@@ -215,42 +202,23 @@ class QbwcService extends Base
         return "<?xml version=\"1.0\"?>\n" . $xml->asXML();
     }
 
-
-    /**
-     * SalvarToken: Salvar token
-     *
-     * @param Usuario $usuario
-     * @param string $token
-     * @author Marcel
-     */
     public function SalvarToken($usuario, $token)
     {
         $em = $this->getDoctrine()->getManager();
 
         $user_qbwc_token = new UserQbwcToken();
-
         $user_qbwc_token->setToken($token);
         $user_qbwc_token->setUser($usuario);
 
         $em->persist($user_qbwc_token);
-
         $em->flush();
     }
 
-    /**
-     * AutenticarLogin: Chequear el login
-     *
-     * @param string $email Email
-     * @param string $pass Pass
-     * @author Marcel
-     */
     public function AutenticarLogin($email, $pass)
     {
-        // primero busco el usuario
         $usuario = $this->getDoctrine()->getRepository(Usuario::class)
             ->BuscarUsuarioPorEmail($email);
 
-        /** @var Usuario $usuario */
         if ($usuario != null && $this->VerificarPassword($pass, $usuario->getContrasenna())) {
             if ($usuario->getHabilitado() == 1) {
                 return $usuario;
@@ -259,5 +227,4 @@ class QbwcService extends Base
 
         return null;
     }
-
 }
