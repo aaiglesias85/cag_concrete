@@ -80,6 +80,8 @@ class QbwcController extends AbstractController
     private function handleSendRequestXML(string $xmlContent): Response
     {
         $ticket = $this->extractTicket($xmlContent, 'sendRequestXML');
+        $this->qbwcService->writeLog("handleSendRequestXML ticket: {$ticket}");
+
         $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
             ->BuscarToken($ticket);
 
@@ -146,14 +148,14 @@ class QbwcController extends AbstractController
         return new Response($this->wrapSoapResponse($response), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function extractTicket(string $xmlContent, string $function): ?string
+    private function extractTicket($xmlContent, string $function): ?string
     {
         $xml = simplexml_load_string($xmlContent);
-        $namespaces = $xml->getNamespaces(true);
-        $body = $xml->children($namespaces['soap'])->Body;
-        $func = $body->children($namespaces[''])->{$function};
+        $xml->registerXPathNamespace('soap', 'http://schemas.xmlsoap.org/soap/envelope/');
+        $xml->registerXPathNamespace('d', 'http://developer.intuit.com/');
 
-        return isset($func->ticket) ? (string)$func->ticket : null;
+        $result = $xml->xpath('//soap:Body/d:' . $function . '/d:ticket');
+        return $result && isset($result[0]) ? (string)$result[0] : null;
     }
 
     private function wrapSoapResponse(string $body): string
