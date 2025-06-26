@@ -23,6 +23,8 @@ class QbwcController extends AbstractController
     {
         $xml = $request->getContent();
 
+        $this->qbwcService->writeLog(var_export($xml, true));
+
         if (str_contains($xml, '<authenticate>')) {
             return $this->handleAuthenticate($request);
         } elseif (str_contains($xml, '<sendRequestXML>')) {
