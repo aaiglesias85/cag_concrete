@@ -24,7 +24,7 @@ class QbwcService extends Base
 
     public function UpdateSyncQueueQbwc(string $xmlResponse): void
     {
-        $xml = simplexml_load_string($xmlResponse);
+        $xml = simplexml_load_string($xmlResponse, 'SimpleXMLElement', 0, 'qb', true);
         $xml->registerXPathNamespace('qb', 'http://developer.intuit.com/');
 
         $responseTypes = [
@@ -121,7 +121,7 @@ class QbwcService extends Base
         $company = $project->getCompany();
         $companyName = trim($company?->getName() ?? '');
 
-        $xml = new \SimpleXMLElement('<QBXML></QBXML>');
+        $xml = new \SimpleXMLElement('<QBXML xmlns:qb="http://developer.intuit.com/"></QBXML>');
         $msgsRq = $xml->addChild('QBXMLMsgsRq');
         $msgsRq->addAttribute('onError', 'stopOnError');
         $invoiceAddRq = $msgsRq->addChild('InvoiceAddRq');
@@ -163,7 +163,7 @@ class QbwcService extends Base
         $company = $project->getCompany();
         $companyName = trim($company?->getName() ?? '');
 
-        $xml = new \SimpleXMLElement('<QBXML></QBXML>');
+        $xml = new \SimpleXMLElement('<QBXML xmlns:qb="http://developer.intuit.com/"></QBXML>');
         $msgsRq = $xml->addChild('QBXMLMsgsRq');
         $msgsRq->addAttribute('onError', 'stopOnError');
         $invoiceModRq = $msgsRq->addChild('InvoiceModRq');

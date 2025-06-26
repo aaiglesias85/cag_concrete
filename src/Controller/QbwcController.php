@@ -4,50 +4,49 @@ namespace App\Controller;
 
 use App\Entity\UserQbwcToken;
 use App\Utils\QbwcService;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 class QbwcController extends AbstractController
 {
-    private $qbwcService;
+    private QbwcService $qbwcService;
 
     public function __construct(QbwcService $qbwcService)
     {
         $this->qbwcService = $qbwcService;
     }
 
-    public function qbwc(Request $request)
+    public function qbwc(Request $request): Response
     {
-        $xml = $request->getContent();
-        $this->qbwcService->writeLog("Solicitud recibida: \n" . $xml);
+        $xmlContent = $request->getContent();
+        $this->qbwcService->writeLog("Solicitud recibida:\n" . $xmlContent);
 
-        if (str_contains($xml, 'authenticate')) {
-            return $this->handleAuthenticate($request);
-        } elseif (str_contains($xml, 'sendRequestXML')) {
-            return $this->handleSendRequestXML($request);
-        } elseif (str_contains($xml, 'receiveResponseXML')) {
-            return $this->handleReceiveResponseXML($request);
-        } elseif (str_contains($xml, 'getLastError')) {
-            return $this->handleGetLastError($request);
-        } elseif (str_contains($xml, 'closeConnection')) {
-            return $this->handleCloseConnection($request);
+        if (str_contains($xmlContent, 'authenticate')) {
+            return $this->handleAuthenticate($xmlContent);
+        } elseif (str_contains($xmlContent, 'sendRequestXML')) {
+            return $this->handleSendRequestXML($xmlContent);
+        } elseif (str_contains($xmlContent, 'receiveResponseXML')) {
+            return $this->handleReceiveResponseXML($xmlContent);
+        } elseif (str_contains($xmlContent, 'getLastError')) {
+            return $this->handleGetLastError();
+        } elseif (str_contains($xmlContent, 'closeConnection')) {
+            return $this->handleCloseConnection($xmlContent);
         }
 
         return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function handleAuthenticate(Request $request): Response
+    private function handleAuthenticate(string $xmlContent): Response
     {
-        $xml = simplexml_load_string($request->getContent());
-        $xml->registerXPathNamespace('soap', 'http://schemas.xmlsoap.org/soap/envelope/');
-        $xml->registerXPathNamespace('ns', 'http://developer.intuit.com/');
+        $xml = simplexml_load_string($xmlContent);
+        $namespaces = $xml->getNamespaces(true);
+        $body = $xml->children($namespaces['soap'])->Body;
+        $authNode = $body->children($namespaces[''])->authenticate;
 
-        $body = $xml->xpath('//soap:Body')[0];
-        $auth = $body->children('ns', true)->authenticate;
-
-        $username = (string)$auth->strUserName;
-        $password = (string)$auth->strPassword;
+        $username = (string)$authNode->strUserName;
+        $password = (string)$authNode->strPassword;
 
         $this->qbwcService->writeLog("Intento de login: {$username}");
 
@@ -66,7 +65,7 @@ class QbwcController extends AbstractController
 
         $ticket = bin2hex(random_bytes(16));
         $this->qbwcService->SalvarToken($user, $ticket);
-        $this->qbwcService->writeLog("Login exitoso para: {$username}, ticket: {$ticket}");
+        $this->qbwcService->writeLog("Login exitoso: {$username}, ticket: {$ticket}");
 
         $response = "<authenticateResponse xmlns=\"http://developer.intuit.com/\">
             <authenticateResult>
@@ -78,23 +77,23 @@ class QbwcController extends AbstractController
         return new Response($this->wrapSoapResponse($response), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function handleSendRequestXML(Request $request): Response
+    private function handleSendRequestXML(string $xmlContent): Response
     {
-        $ticket = $this->extractTicket($request, 'sendRequestXML');
-
+        $ticket = $this->extractTicket($xmlContent, 'sendRequestXML');
         $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
             ->BuscarToken($ticket);
+
         if (!$session) {
             return new Response($this->wrapSoapResponse('<sendRequestXMLResponse><sendRequestXMLResult></sendRequestXMLResult></sendRequestXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
 
         $qbxml = $this->qbwcService->GenerarRequestQBXML();
-
-        if ($qbxml === "") {
+        if ($qbxml === '') {
             return new Response($this->wrapSoapResponse('<sendRequestXMLResponse><sendRequestXMLResult></sendRequestXMLResult></sendRequestXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
 
-        $this->qbwcService->writeLog("XML generado para enviar: \n" . $qbxml);
+        $this->qbwcService->writeLog("Enviando QBXML para ticket: {$ticket}");
+        $this->qbwcService->writeLog("XML generado: {$qbxml}");
 
         $response = "<sendRequestXMLResponse xmlns=\"http://developer.intuit.com/\">
             <sendRequestXMLResult>{$qbxml}</sendRequestXMLResult>
@@ -103,19 +102,18 @@ class QbwcController extends AbstractController
         return new Response($this->wrapSoapResponse($response), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function handleReceiveResponseXML(Request $request): Response
+    private function handleReceiveResponseXML(string $xmlContent): Response
     {
-        $ticket = $this->extractTicket($request, 'receiveResponseXML');
+        $ticket = $this->extractTicket($xmlContent, 'receiveResponseXML');
 
         $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
             ->BuscarToken($ticket);
+
         if (!$session) {
             return new Response($this->wrapSoapResponse('<receiveResponseXMLResponse><receiveResponseXMLResult>0</receiveResponseXMLResult></receiveResponseXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
 
-        $xmlContent = $request->getContent();
-        $this->qbwcService->writeLog("Respuesta XML recibida: \n" . $xmlContent);
-
+        $this->qbwcService->writeLog("Recibiendo respuesta para ticket: {$ticket}");
         $this->qbwcService->UpdateSyncQueueQbwc($xmlContent);
 
         $response = "<receiveResponseXMLResponse xmlns=\"http://developer.intuit.com/\">
@@ -125,8 +123,9 @@ class QbwcController extends AbstractController
         return new Response($this->wrapSoapResponse($response), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function handleGetLastError(Request $request): Response
+    private function handleGetLastError(): Response
     {
+        $this->qbwcService->writeLog("Solicitud getLastError recibida");
         $response = "<getLastErrorResponse xmlns=\"http://developer.intuit.com/\">
             <getLastErrorResult>No error</getLastErrorResult>
         </getLastErrorResponse>";
@@ -134,12 +133,11 @@ class QbwcController extends AbstractController
         return new Response($this->wrapSoapResponse($response), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function handleCloseConnection(Request $request): Response
+    private function handleCloseConnection(string $xmlContent): Response
     {
-        $ticket = $this->extractTicket($request, 'closeConnection');
-
+        $ticket = $this->extractTicket($xmlContent, 'closeConnection');
         $this->qbwcService->EliminarToken($ticket);
-        $this->qbwcService->writeLog("Conexión cerrada para ticket: {$ticket}");
+        $this->qbwcService->writeLog("Cierre de sesión para ticket: {$ticket}");
 
         $response = "<closeConnectionResponse xmlns=\"http://developer.intuit.com/\">
             <closeConnectionResult>Conexión cerrada correctamente.</closeConnectionResult>
@@ -148,23 +146,23 @@ class QbwcController extends AbstractController
         return new Response($this->wrapSoapResponse($response), 200, ['Content-Type' => 'text/xml']);
     }
 
-    private function extractTicket(Request $request, string $function): ?string
+    private function extractTicket(string $xmlContent, string $function): ?string
     {
-        $xml = simplexml_load_string($request->getContent());
-        $xml->registerXPathNamespace('soap', 'http://schemas.xmlsoap.org/soap/envelope/');
-        $xml->registerXPathNamespace('ns', 'http://developer.intuit.com/');
+        $xml = simplexml_load_string($xmlContent);
+        $namespaces = $xml->getNamespaces(true);
+        $body = $xml->children($namespaces['soap'])->Body;
+        $func = $body->children($namespaces[''])->{$function};
 
-        $body = $xml->xpath('//soap:Body')[0];
-        return (string)$body->children('ns', true)->{$function}->ticket ?? null;
+        return isset($func->ticket) ? (string)$func->ticket : null;
     }
 
     private function wrapSoapResponse(string $body): string
     {
         return "<?xml version=\"1.0\" encoding=\"utf-8\"?>
                 <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">
-                <soap:Body>
-                {$body}
-                </soap:Body>
+                  <soap:Body>
+                    {$body}
+                  </soap:Body>
                 </soap:Envelope>";
     }
 }
