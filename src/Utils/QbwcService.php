@@ -81,8 +81,6 @@ class QbwcService extends Base
         $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
             ->ListarOrdenados('pendiente');
 
-        $this->writelog(var_export($items, true));
-
         if (!empty($items)) {
             $item = $items[0];
             $tipo = $item->getTipo();
@@ -156,7 +154,7 @@ class QbwcService extends Base
             $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
         }
 
-        return "<?xml version=\"1.0\"?>\n" . $xml->asXML();
+        return $xml->asXML();
     }
 
     private function generateInvoiceModQBXML(Invoice $invoice): string
@@ -201,7 +199,7 @@ class QbwcService extends Base
             $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
         }
 
-        return "<?xml version=\"1.0\"?>\n" . $xml->asXML();
+        return $xml->asXML();
     }
 
     public function SalvarToken($usuario, $token)
