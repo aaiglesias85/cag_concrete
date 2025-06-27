@@ -124,7 +124,10 @@ class QbwcService extends Base
         $xml = new \SimpleXMLElement('<QBXML xmlns:qb="http://developer.intuit.com/"></QBXML>');
         $msgsRq = $xml->addChild('QBXMLMsgsRq');
         $msgsRq->addAttribute('onError', 'stopOnError');
+
         $invoiceAddRq = $msgsRq->addChild('InvoiceAddRq');
+        $invoiceAddRq->addAttribute('requestID', (string)$invoice->getInvoiceId());
+
         $invoiceAdd = $invoiceAddRq->addChild('InvoiceAdd');
 
         $invoiceAdd->addChild('CustomerRef')->addChild('FullName', htmlspecialchars($companyName));
@@ -155,7 +158,7 @@ class QbwcService extends Base
         }
 
         $rawXml = $xml->asXML();
-        $finalXml = "<?xml version=\"1.0\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
+        $finalXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
         return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml));
     }
 
@@ -168,7 +171,10 @@ class QbwcService extends Base
         $xml = new \SimpleXMLElement('<QBXML xmlns:qb="http://developer.intuit.com/"></QBXML>');
         $msgsRq = $xml->addChild('QBXMLMsgsRq');
         $msgsRq->addAttribute('onError', 'stopOnError');
+
         $invoiceModRq = $msgsRq->addChild('InvoiceModRq');
+        $invoiceModRq->addAttribute('requestID', (string)$invoice->getInvoiceId());
+
         $invoiceMod = $invoiceModRq->addChild('InvoiceMod');
 
         $invoiceMod->addChild('TxnID', $invoice->getTxnId());
@@ -202,7 +208,7 @@ class QbwcService extends Base
         }
 
         $rawXml = $xml->asXML();
-        $finalXml = "<?xml version=\"1.0\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
+        $finalXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
         return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml));
     }
 
