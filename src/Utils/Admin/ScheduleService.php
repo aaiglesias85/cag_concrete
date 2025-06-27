@@ -41,7 +41,7 @@ class ScheduleService extends Base
         $spreadsheet = $reader->load("bundles/ican/excel/schedule.xlsx");
         $sheet = $spreadsheet->setActiveSheetIndex(0);
 
-        $fila = 10;
+        $fila = 1;
         $diasSemana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $columnas = range('A', 'K'); // A-K para 11 columnas
 
