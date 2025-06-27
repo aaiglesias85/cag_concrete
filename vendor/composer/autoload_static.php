@@ -27,6 +27,7 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '6a47392539ca2329373e0d33e1dba053' => __DIR__ . '/..' . '/symfony/polyfill-intl-icu/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
+        '4c903e653868d3c4bb9191776b7008a1' => __DIR__ . '/..' . '/eskrano/quickbooks-php-8/QuickBooks.php',
         '2c0bec7799c29ff80bb15ad0851de8f9' => __DIR__ . '/..' . '/google/cloud/BigQueryStorage/metadata/descriptor_fix.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '92c8763cd6170fce6fcfe7e26b4e8c10' => __DIR__ . '/..' . '/symfony/phpunit-bridge/bootstrap.php',

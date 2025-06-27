@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c98b6e1e934ea88750471ece0892a870",
+    "content-hash": "490f134456cb7a22225880b05891ed87",
     "packages": [
         {
             "name": "alexpechkarev/geometry-library",
@@ -1681,6 +1681,60 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "eskrano/quickbooks-php-8",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eskrano/quickbooks-php8.git",
+                "reference": "45bdaa2efe462c1b37cf66bd7470aaeb0645f186"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eskrano/quickbooks-php8/zipball/45bdaa2efe462c1b37cf66bd7470aaeb0645f186",
+                "reference": "45bdaa2efe462c1b37cf66bd7470aaeb0645f186",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "QuickBooks.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "EPL-1.0"
+            ],
+            "authors": [
+                {
+                    "name": "Keith Palmer",
+                    "email": "support@consolibyte.com",
+                    "homepage": "http://www.consolibyte.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "QuickBooks DevKit with support for Intuit Anywhere, Intuit Partner Platform, Web Connector, QuickBooks Merchant Services, and more.",
+            "homepage": "http://www.consolibyte.com/",
+            "keywords": [
+                "intuit",
+                "intuit anywhere",
+                "intuit data services",
+                "intuit merchant services",
+                "intuit partner platform",
+                "qbxml",
+                "quickbooks",
+                "quickbooks merchant services",
+                "quickbooks web connector",
+                "web connector"
+            ],
+            "support": {
+                "source": "https://github.com/eskrano/quickbooks-php8/tree/0.1.2"
+            },
+            "time": "2022-09-16T19:42:59+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -13231,9 +13285,7 @@
     "platform": {
         "php": ">=8.2",
         "ext-ctype": "*",
-        "ext-iconv": "*",
-        "ext-soap": "*",
-        "ext-simplexml": "*"
+        "ext-iconv": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"

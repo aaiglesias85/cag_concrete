@@ -8,6 +8,7 @@ use App\Utils\QbwcService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use QuickBooks_WebConnector_Server;
 
 class QbwcController extends AbstractController
 {

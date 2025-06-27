@@ -13,6 +13,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
         "econea/nusoap": "*",
+        "eskrano/quickbooks-php-8": "^0.1.2",
         "geniusreferrals/geniusreferrals": "*",
         "google/cloud": "^0.283.0",
         "google/recaptcha": "^1.3",

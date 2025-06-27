@@ -7,6 +7,8 @@ use App\Entity\InvoiceItem;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\UserQbwcToken;
 use App\Entity\Usuario;
+use QuickBooks_QBXML_Object_Invoice;
+use QuickBooks_QBXML_Object_Invoice_InvoiceLine;
 
 class QbwcService extends Base
 {
@@ -29,7 +31,6 @@ class QbwcService extends Base
 
         $responseTypes = [
             'invoice' => '//qb:InvoiceRet',
-            'customer' => '//qb:CustomerRet',
         ];
 
         $em = $this->getDoctrine()->getManager();
@@ -40,19 +41,6 @@ class QbwcService extends Base
             $nodes = $xml->xpath($xpath);
             if (!$nodes || count($nodes) === 0) {
                 $this->writeLog("No se encontraron nodos para tipo: {$tipo}");
-                continue;
-            }
-
-            // Si es customer, procesamos y salimos del loop
-            if ($tipo === 'customer') {
-                foreach ($nodes as $ret) {
-                    $fullName = (string)$ret->FullName;
-                    $listID = (string)$ret->ListID;
-                    $companyName = (string)($ret->CompanyName ?? '');
-                    $this->writeLog("Cliente encontrado: {$fullName} (ListID: {$listID}) " . ($companyName ? "- Empresa: {$companyName}" : ""));
-                    // Aquí podrías guardar en base de datos si deseas
-                }
-
                 continue;
             }
 
@@ -102,16 +90,10 @@ class QbwcService extends Base
             $entidadId = $item->getEntidadId();
 
             switch ($tipo) {
-                /*
+
                 case 'invoice':
                     $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
                     $qbxml = $this->generateInvoiceQBXML($entidadId);
-                    break;
-                */
-
-                case 'invoice': //'customer':
-                    $this->writeLog("Generando XML para tipo: {$tipo}");
-                    $qbxml = $this->generateCustomerQueryQBXML();
                     $this->writeLog($qbxml);
                     break;
             }
@@ -123,20 +105,6 @@ class QbwcService extends Base
         }
 
         return $qbxml;
-    }
-
-    private function generateCustomerQueryQBXML(): string
-    {
-        $xml = new \SimpleXMLElement('<QBXML></QBXML>');
-        $msgsRq = $xml->addChild('QBXMLMsgsRq');
-        $msgsRq->addAttribute('onError', 'stopOnError');
-
-        $customerQueryRq = $msgsRq->addChild('CustomerQueryRq');
-        $customerQueryRq->addChild('ActiveStatus', 'All');
-
-        $rawXml = $xml->asXML();
-        $finalXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
-        return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml));
     }
 
     private function generateInvoiceQBXML(int $invoiceId): string
@@ -155,47 +123,36 @@ class QbwcService extends Base
     {
         $project = $invoice->getProject();
         $company = $project->getCompany();
-        $companyName = trim($company?->getName() ?? '');
 
-        $xml = new \SimpleXMLElement('<QBXML xmlns:qb="http://developer.intuit.com/"></QBXML>');
-        $msgsRq = $xml->addChild('QBXMLMsgsRq');
-        $msgsRq->addAttribute('onError', 'stopOnError');
-
-        $invoiceAddRq = $msgsRq->addChild('InvoiceAddRq');
-        $invoiceAddRq->addAttribute('requestID', (string)$invoice->getInvoiceId());
-
-        $invoiceAdd = $invoiceAddRq->addChild('InvoiceAdd');
-
-        $invoiceAdd->addChild('CustomerRef')->addChild('FullName', htmlspecialchars($companyName));
-        $invoiceAdd->addChild('TxnDate', $invoice->getStartDate()->format('Y-m-d'));
-        $invoiceAdd->addChild('RefNumber', htmlspecialchars($invoice->getNumber()));
+        $qbInvoice = new QuickBooks_QBXML_Object_Invoice();
+        $qbInvoice->setCustomerFullName($company->getName());
+        $qbInvoice->setTxnDate($invoice->getStartDate()->format('Y-m-d'));
+        $qbInvoice->setRefNumber($invoice->getNumber());
 
         if ($invoice->getNotes()) {
-            $invoiceAdd->addChild('Memo', htmlspecialchars($invoice->getNotes()));
+            $qbInvoice->setMemo($invoice->getNotes());
         }
 
         if ($company->getAddress()) {
-            $billAddress = $invoiceAdd->addChild('BillAddress');
-            $billAddress->addChild('Addr1', htmlspecialchars($company->getAddress()));
+            $qbInvoice->setBillAddress( $company->getAddress());
         }
 
-        $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->ListarItems($invoice->getInvoiceId());
+        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice->getInvoiceId());
 
-        foreach ($invoiceItems as $item) {
+        foreach ($items as $item) {
             $projectItem = $item->getProjectItem();
             $itemName = trim($projectItem->getItem()->getDescription());
 
-            $line = $invoiceAdd->addChild('InvoiceLineAdd');
-            $line->addChild('ItemRef')->addChild('FullName', htmlspecialchars($itemName));
-            $line->addChild('Desc', 'Detalle generado desde sistema');
-            $line->addChild('Quantity', number_format($item->getQuantity(), 2, '.', ''));
-            $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
+            $line = new QuickBooks_QBXML_Object_Invoice_InvoiceLine();
+            $line->setItemFullName($itemName);
+            $line->setDesc('Detalle generado desde sistema');
+            $line->setQuantity($item->getQuantity());
+            $line->setRate($item->getPrice());
+            $qbInvoice->addInvoiceLine($line);
         }
 
-        $rawXml = $xml->asXML();
-        $finalXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
-        return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml));
+        $xml = $qbInvoice->asQBXML('InvoiceAddRq');
+        return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . $xml;
     }
 
     private function generateInvoiceModQBXML(Invoice $invoice): string

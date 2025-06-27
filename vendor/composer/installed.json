@@ -1740,6 +1740,63 @@
             "install-path": "../egulias/email-validator"
         },
         {
+            "name": "eskrano/quickbooks-php-8",
+            "version": "0.1.2",
+            "version_normalized": "0.1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eskrano/quickbooks-php8.git",
+                "reference": "45bdaa2efe462c1b37cf66bd7470aaeb0645f186"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eskrano/quickbooks-php8/zipball/45bdaa2efe462c1b37cf66bd7470aaeb0645f186",
+                "reference": "45bdaa2efe462c1b37cf66bd7470aaeb0645f186",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0.0"
+            },
+            "time": "2022-09-16T19:42:59+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "QuickBooks.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "EPL-1.0"
+            ],
+            "authors": [
+                {
+                    "name": "Keith Palmer",
+                    "email": "support@consolibyte.com",
+                    "homepage": "http://www.consolibyte.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "QuickBooks DevKit with support for Intuit Anywhere, Intuit Partner Platform, Web Connector, QuickBooks Merchant Services, and more.",
+            "homepage": "http://www.consolibyte.com/",
+            "keywords": [
+                "intuit",
+                "intuit anywhere",
+                "intuit data services",
+                "intuit merchant services",
+                "intuit partner platform",
+                "qbxml",
+                "quickbooks",
+                "quickbooks merchant services",
+                "quickbooks web connector",
+                "web connector"
+            ],
+            "support": {
+                "source": "https://github.com/eskrano/quickbooks-php8/tree/0.1.2"
+            },
+            "install-path": "../eskrano/quickbooks-php-8"
+        },
+        {
             "name": "firebase/php-jwt",
             "version": "v6.11.1",
             "version_normalized": "6.11.1.0",
