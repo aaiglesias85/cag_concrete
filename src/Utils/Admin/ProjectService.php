@@ -1587,6 +1587,7 @@ class ProjectService extends Base
             $arreglo_resultado[$cont] = array(
                 "id" => $project_id,
                 "projectNumber" => $value->getProjectNumber(),
+                "subcontract" => $value->getSubcontract(),
                 "name" => $value->getName(),
                 "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),

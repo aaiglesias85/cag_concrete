@@ -28,6 +28,11 @@ var Projects = function () {
                 width: 120,
             },
             {
+                field: "subcontract",
+                title: "Subcontract NO",
+                width: 120,
+            },
+            {
                 field: "status",
                 title: "Status",
                 responsive: {visible: 'lg'},
