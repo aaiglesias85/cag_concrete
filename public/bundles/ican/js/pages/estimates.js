@@ -395,26 +395,14 @@ var Estimates = function () {
 
             event_change = false;
 
-            var company_id = $('#company').val();
             var stage_id = $('#project-stage').val();
 
-            if ($('#estimate-form').valid() && company_id !== '' && stage_id !== "") {
+            if ($('#estimate-form').valid() && stage_id !== "") {
 
                 SalvarEstimate();
 
             } else {
-                if (company_id === "") {
-                    var $element = $('#select-company .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
                 if (stage_id === "") {
                     var $element = $('#select-project-stage .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
@@ -1279,28 +1267,13 @@ var Estimates = function () {
         if (activeTab == 1) {
 
             var stage_id = $('#project-stage').val();
-            var company_id = $('#company').val();
 
-            if (!$('#estimate-form').valid() || stage_id == '' || company_id == '') {
+            if (!$('#estimate-form').valid() || stage_id == '' ) {
                 result = false;
 
                 if (stage_id == "") {
 
                     var $element = $('#select-project-stage .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-
-                if (company_id == "") {
-
-                    var $element = $('#select-company .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                         .data("title", "This field is required")
                         .addClass("has-error")
