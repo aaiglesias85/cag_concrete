@@ -29,11 +29,12 @@ class QbwcService extends Base
 
         $responseTypes = [
             'invoice' => '//qb:InvoiceRet',
+            'customer' => '//qb:CustomerRet',
         ];
 
         $em = $this->getDoctrine()->getManager();
 
-        $this->writeLog("Recibido XML response: \n" . $xmlResponse);
+        $this->writeLog("Recibido XML response:\n" . $xmlResponse);
 
         foreach ($responseTypes as $tipo => $xpath) {
             $nodes = $xml->xpath($xpath);
@@ -42,6 +43,20 @@ class QbwcService extends Base
                 continue;
             }
 
+            // Si es customer, procesamos y salimos del loop
+            if ($tipo === 'customer') {
+                foreach ($nodes as $ret) {
+                    $fullName = (string)$ret->FullName;
+                    $listID = (string)$ret->ListID;
+                    $companyName = (string)($ret->CompanyName ?? '');
+                    $this->writeLog("Cliente encontrado: {$fullName} (ListID: {$listID}) " . ($companyName ? "- Empresa: {$companyName}" : ""));
+                    // Aquí podrías guardar en base de datos si deseas
+                }
+
+                continue;
+            }
+
+            // Proceso para otros tipos (por ahora solo invoice)
             foreach ($nodes as $ret) {
                 $txnId = (string)$ret->TxnID;
                 $editSequence = (string)$ret->EditSequence;
@@ -87,10 +102,16 @@ class QbwcService extends Base
             $entidadId = $item->getEntidadId();
 
             switch ($tipo) {
+                /*
                 case 'invoice':
                     $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
                     $qbxml = $this->generateInvoiceQBXML($entidadId);
-                    $this->writeLog("XML generado: \n" . $qbxml);
+                    break;
+                */
+
+                case 'invoice':
+                    $this->writeLog("Generando XML para tipo: {$tipo}");
+                    $qbxml = $this->generateCustomerQueryQBXML();
                     break;
             }
 
@@ -101,6 +122,20 @@ class QbwcService extends Base
         }
 
         return $qbxml;
+    }
+
+    private function generateCustomerQueryQBXML(): string
+    {
+        $xml = new \SimpleXMLElement('<QBXML></QBXML>');
+        $msgsRq = $xml->addChild('QBXMLMsgsRq');
+        $msgsRq->addAttribute('onError', 'stopOnError');
+
+        $customerQueryRq = $msgsRq->addChild('CustomerQueryRq');
+        $customerQueryRq->addChild('ActiveStatus', 'All');
+
+        $rawXml = $xml->asXML();
+        $finalXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
+        return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml));
     }
 
     private function generateInvoiceQBXML(int $invoiceId): string
