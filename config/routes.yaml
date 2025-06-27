@@ -63,6 +63,10 @@ definirconcretevendordatatracking:
 
 
 #qbwc
+qbwcconfig:
+  path: /qbwc-config
+  defaults: { _controller: App\Controller\QbwcController::config, _format: json }
+
 qbwc:
   path: /qbwc
   defaults: { _controller: App\Controller\QbwcController::qbwc, _format: json }

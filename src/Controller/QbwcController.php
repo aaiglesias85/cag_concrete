@@ -19,6 +19,42 @@ class QbwcController extends AbstractController
         $this->qbwcService = $qbwcService;
     }
 
+    public function config(): Response
+    {
+        $name = 'Symfony QuickBooks Integration';
+        $description = 'Symfony QuickBooks Integration';
+
+        $host = $this->qbwcService->ObtenerURL();
+        $appurl = $host . 'qbwc';
+        $appsupport = $appurl;
+
+        $username = 'admin@concrete.com';
+
+        $fileid = \QuickBooks_WebConnector_QWC::fileID();
+        $ownerid = \QuickBooks_WebConnector_QWC::ownerID();
+
+        $qbtype = QUICKBOOKS_TYPE_QBFS;
+        $readonly = false;
+        $run_every_n_seconds = 300; // 5 min
+
+        $qwc = new \QuickBooks_WebConnector_QWC(
+            $name,
+            $description,
+            $appurl,
+            $appsupport,
+            $username,
+            $fileid,
+            $ownerid,
+            $qbtype,
+            $readonly,
+            $run_every_n_seconds
+        );
+
+        $xml = $qwc->generate();
+
+        return new Response($xml, 200, ['Content-Type' => 'text/xml']);
+    }
+
     public function qbwc(Request $request): Response
     {
         try {
