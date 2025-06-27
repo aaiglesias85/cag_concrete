@@ -154,7 +154,17 @@ class QbwcService extends Base
             $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
         }
 
-        return $xml->asXML();
+        $rawXml = $xml->asXML();
+
+        // Reemplaza la línea XML original por una que incluya también la declaración qbxml
+        $finalXml = preg_replace(
+            '/<\?xml version="1\.0"\?>/',
+            "<?xml version=\"1.0\"?>\n<?qbxml version=\"16.0\"?>",
+            $rawXml
+        );
+
+        $xml_clean = preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml); // elimina caracteres de control invisibles
+        return trim($xml_clean);
     }
 
     private function generateInvoiceModQBXML(Invoice $invoice): string
@@ -199,7 +209,17 @@ class QbwcService extends Base
             $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
         }
 
-        return $xml->asXML();
+        $rawXml = $xml->asXML();
+
+        // Reemplaza la línea XML original por una que incluya también la declaración qbxml
+        $finalXml = preg_replace(
+            '/<\?xml version="1\.0"\?>/',
+            "<?xml version=\"1.0\"?>\n<?qbxml version=\"16.0\"?>",
+            $rawXml
+        );
+
+        $xml_clean = preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml); // elimina caracteres de control invisibles
+        return trim($xml_clean);
     }
 
     public function SalvarToken($usuario, $token)
