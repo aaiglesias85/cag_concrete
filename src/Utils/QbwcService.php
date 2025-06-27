@@ -12,6 +12,13 @@ use QuickBooks_QBXML_Object_Invoice_InvoiceLine;
 
 class QbwcService extends Base
 {
+
+    public function BuscarSesion($token)
+    {
+        return $this->getDoctrine()->getRepository(UserQbwcToken::class)
+        ->BuscarToken($token);
+    }
+
     public function EliminarToken($token)
     {
         $em = $this->getDoctrine()->getManager();

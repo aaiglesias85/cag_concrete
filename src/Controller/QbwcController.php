@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\UserQbwcToken;
 use App\Utils\QbwcService;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use QuickBooks_WebConnector_Server;
 
 class QbwcController extends AbstractController
 {
@@ -126,9 +124,7 @@ class QbwcController extends AbstractController
         $ticket = $this->extractTicket($xmlContent, 'sendRequestXML');
         $this->qbwcService->writeLog("handleSendRequestXML ticket: {$ticket}");
 
-        $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
-            ->BuscarToken($ticket);
-
+        $session = $this->qbwcService->BuscarSesion($ticket);
         if (!$session) {
             $this->qbwcService->writeLog("handleSendRequestXML No hay sesion");
             return new Response($this->wrapSoapResponse('<sendRequestXMLResponse><sendRequestXMLResult></sendRequestXMLResult></sendRequestXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
@@ -152,9 +148,7 @@ class QbwcController extends AbstractController
     {
         $ticket = $this->extractTicket($xmlContent, 'receiveResponseXML');
 
-        $session = $this->qbwcService->getDoctrine()->getRepository(UserQbwcToken::class)
-            ->BuscarToken($ticket);
-
+        $session = $this->qbwcService->BuscarSesion($ticket);
         if (!$session) {
             return new Response($this->wrapSoapResponse('<receiveResponseXMLResponse><receiveResponseXMLResult>0</receiveResponseXMLResult></receiveResponseXMLResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
