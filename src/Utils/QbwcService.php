@@ -109,9 +109,10 @@ class QbwcService extends Base
                     break;
                 */
 
-                case 'invoice':
+                case 'invoice': //'customer':
                     $this->writeLog("Generando XML para tipo: {$tipo}");
                     $qbxml = $this->generateCustomerQueryQBXML();
+                    $this->writeLog($qbxml);
                     break;
             }
 
