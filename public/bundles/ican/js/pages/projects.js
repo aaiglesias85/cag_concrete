@@ -29,7 +29,7 @@ var Projects = function () {
             },
             {
                 field: "subcontract",
-                title: "Subcontract NO",
+                title: "Prime Job No",
                 width: 120,
             },
             {
