@@ -12,17 +12,15 @@ use QuickBooks_QBXML_Object_Invoice_InvoiceLine;
 
 class QbwcService extends Base
 {
-
     public function BuscarSesion($token)
     {
         return $this->getDoctrine()->getRepository(UserQbwcToken::class)
-        ->BuscarToken($token);
+            ->BuscarToken($token);
     }
 
     public function EliminarToken($token)
     {
         $em = $this->getDoctrine()->getManager();
-
         $session = $this->getDoctrine()->getRepository(UserQbwcToken::class)
             ->BuscarToken($token);
         if ($session !== null) {
@@ -41,7 +39,6 @@ class QbwcService extends Base
         ];
 
         $em = $this->getDoctrine()->getManager();
-
         $this->writeLog("Recibido XML response:\n" . $xmlResponse);
 
         foreach ($responseTypes as $tipo => $xpath) {
@@ -51,7 +48,6 @@ class QbwcService extends Base
                 continue;
             }
 
-            // Proceso para otros tipos (por ahora solo invoice)
             foreach ($nodes as $ret) {
                 $txnId = (string)$ret->TxnID;
                 $editSequence = (string)$ret->EditSequence;
@@ -87,7 +83,6 @@ class QbwcService extends Base
     public function GenerarRequestQBXML(): string
     {
         $qbxml = "";
-
         $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
             ->ListarOrdenados('pendiente');
 
@@ -97,7 +92,6 @@ class QbwcService extends Base
             $entidadId = $item->getEntidadId();
 
             switch ($tipo) {
-
                 case 'invoice':
                     $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
                     $qbxml = $this->generateInvoiceQBXML($entidadId);
@@ -119,14 +113,24 @@ class QbwcService extends Base
         $invoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoiceId);
         if (!$invoice) return '';
 
-        if ($invoice->getTxnId() && $invoice->getEditSequence() && $invoice->getUpdatedAt() > $invoice->getCreatedAt()) {
-            return $this->generateInvoiceModQBXML($invoice);
-        }
+        $isModification = $invoice->getTxnId() && $invoice->getEditSequence() && $invoice->getUpdatedAt() > $invoice->getCreatedAt();
 
-        return $this->generateInvoiceAddQBXML($invoice);
+        $bodyXml = $isModification
+            ? $this->generateInvoiceModBodyQBXML($invoice)
+            : $this->generateInvoiceAddBodyQBXML($invoice);
+
+        $qbxml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        $qbxml .= "<?qbxml version=\"16.0\"?>\n";
+        $qbxml .= "<QBXML>\n";
+        $qbxml .= "  <QBXMLMsgsRq onError=\"stopOnError\">\n";
+        $qbxml .= $bodyXml . "\n";
+        $qbxml .= "  </QBXMLMsgsRq>\n";
+        $qbxml .= "</QBXML>";
+
+        return $qbxml;
     }
 
-    private function generateInvoiceAddQBXML(Invoice $invoice): string
+    private function generateInvoiceAddBodyQBXML(Invoice $invoice): string
     {
         $project = $invoice->getProject();
         $company = $project->getCompany();
@@ -141,7 +145,7 @@ class QbwcService extends Base
         }
 
         if ($company->getAddress()) {
-            $qbInvoice->setBillAddress( $company->getAddress());
+            $qbInvoice->setBillAddress($company->getAddress());
         }
 
         $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice->getInvoiceId());
@@ -158,28 +162,21 @@ class QbwcService extends Base
             $qbInvoice->addInvoiceLine($line);
         }
 
-        $xml = $qbInvoice->asQBXML('InvoiceAddRq');
-        return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . $xml;
+        return $qbInvoice->asQBXML('InvoiceAddRq');
     }
 
-    private function generateInvoiceModQBXML(Invoice $invoice): string
+    private function generateInvoiceModBodyQBXML(Invoice $invoice): string
     {
         $project = $invoice->getProject();
         $company = $project->getCompany();
         $companyName = trim($company?->getName() ?? '');
 
-        $xml = new \SimpleXMLElement('<QBXML xmlns:qb="http://developer.intuit.com/"></QBXML>');
-        $msgsRq = $xml->addChild('QBXMLMsgsRq');
-        $msgsRq->addAttribute('onError', 'stopOnError');
+        $xml = new \SimpleXMLElement('<InvoiceModRq></InvoiceModRq>');
+        $xml->addAttribute('requestID', (string)$invoice->getInvoiceId());
 
-        $invoiceModRq = $msgsRq->addChild('InvoiceModRq');
-        $invoiceModRq->addAttribute('requestID', (string)$invoice->getInvoiceId());
-
-        $invoiceMod = $invoiceModRq->addChild('InvoiceMod');
-
+        $invoiceMod = $xml->addChild('InvoiceMod');
         $invoiceMod->addChild('TxnID', $invoice->getTxnId());
         $invoiceMod->addChild('EditSequence', $invoice->getEditSequence());
-
         $invoiceMod->addChild('CustomerRef')->addChild('FullName', htmlspecialchars($companyName));
         $invoiceMod->addChild('TxnDate', $invoice->getStartDate()->format('Y-m-d'));
         $invoiceMod->addChild('RefNumber', htmlspecialchars($invoice->getNumber()));
@@ -189,14 +186,12 @@ class QbwcService extends Base
         }
 
         if ($company->getAddress()) {
-            $billAddress = $invoiceMod->addChild('BillAddress');
-            $billAddress->addChild('Addr1', htmlspecialchars($company->getAddress()));
+            $invoiceMod->addChild('BillAddress')->addChild('Addr1', htmlspecialchars($company->getAddress()));
         }
 
-        $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->ListarItems($invoice->getInvoiceId());
+        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice->getInvoiceId());
 
-        foreach ($invoiceItems as $item) {
+        foreach ($items as $item) {
             $projectItem = $item->getProjectItem();
             $itemName = trim($projectItem->getItem()->getDescription());
 
@@ -207,9 +202,8 @@ class QbwcService extends Base
             $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
         }
 
-        $rawXml = $xml->asXML();
-        $finalXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<?qbxml version=\"16.0\"?>\n" . preg_replace('/<\?xml.*?\?>\s*/', '', $rawXml);
-        return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $finalXml));
+        $body = $xml->asXML();
+        return preg_replace('/<\?xml.*?\?>\s*/', '', $body);
     }
 
     public function SalvarToken($usuario, $token)

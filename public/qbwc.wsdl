@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="QBWebConnectorSvc"
+             targetNamespace="http://developer.intuit.com/"
+             xmlns:tns="http://developer.intuit.com/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+    <types>
+        <xsd:schema targetNamespace="http://developer.intuit.com/">
+
+            <!-- authenticate -->
+            <xsd:element name="authenticate">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="strUserName" type="xsd:string"/>
+                        <xsd:element name="strPassword" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="authenticateResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="authenticateResult" type="tns:ArrayOfString"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:complexType name="ArrayOfString">
+                <xsd:sequence>
+                    <xsd:element name="string" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <!-- sendRequestXML -->
+            <xsd:element name="sendRequestXML">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="ticket" type="xsd:string"/>
+                        <xsd:element name="strHCPResponse" type="xsd:string"/>
+                        <xsd:element name="strCompanyFileName" type="xsd:string"/>
+                        <xsd:element name="qbXMLCountry" type="xsd:string"/>
+                        <xsd:element name="qbXMLMajorVers" type="xsd:int"/>
+                        <xsd:element name="qbXMLMinorVers" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="sendRequestXMLResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="sendRequestXMLResult" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </types>
+
+    <!-- Messages -->
+    <message name="authenticateRequest">
+        <part name="parameters" element="tns:authenticate"/>
+    </message>
+    <message name="authenticateResponse">
+        <part name="parameters" element="tns:authenticateResponse"/>
+    </message>
+
+    <message name="sendRequestXMLRequest">
+        <part name="parameters" element="tns:sendRequestXML"/>
+    </message>
+    <message name="sendRequestXMLResponse">
+        <part name="parameters" element="tns:sendRequestXMLResponse"/>
+    </message>
+
+    <!-- PortType -->
+    <portType name="QBWebConnectorSvcSoap">
+        <operation name="authenticate">
+            <input message="tns:authenticateRequest"/>
+            <output message="tns:authenticateResponse"/>
+        </operation>
+        <operation name="sendRequestXML">
+            <input message="tns:sendRequestXMLRequest"/>
+            <output message="tns:sendRequestXMLResponse"/>
+        </operation>
+    </portType>
+
+    <!-- Binding -->
+    <binding name="QBWebConnectorSvcSoap" type="tns:QBWebConnectorSvcSoap">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="authenticate">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="sendRequestXML">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+    </binding>
+
+    <!-- Service -->
+    <service name="QBWebConnectorSvc">
+        <port name="QBWebConnectorSvcSoap" binding="tns:QBWebConnectorSvcSoap">
+            <!--<soap:address location="http://localhost/constructora/public/qbwc"/>-->
+            <soap:address location="https://data-tracking-test.cagconcrete.net/public/qbwc"/>
+        </port>
+    </service>
+
+</definitions>
