@@ -31,15 +31,25 @@ class QbwcService extends Base
 
     public function UpdateSyncQueueQbwc(string $xmlResponse): void
     {
-        $xml = simplexml_load_string($xmlResponse, 'SimpleXMLElement', 0, 'qb', true);
-        $xml->registerXPathNamespace('qb', 'http://developer.intuit.com/');
+        $this->writeLog("Recibido XML bruto:\n" . $xmlResponse);
+
+        // Limpiar encabezados no válidos
+        $cleanXml = trim($xmlResponse);
+        $cleanXml = preg_replace('/<\?qbxml.*?\?>/i', '', $cleanXml);
+        $cleanXml = preg_replace('/^[\x00-\x1F\x7F\xFE\xFF]+/', '', $cleanXml); // limpieza extra
+
+        // Cargar XML
+        $xml = simplexml_load_string($cleanXml);
+        if (!$xml) {
+            $this->writeLog("Error al parsear XML.");
+            return;
+        }
 
         $responseTypes = [
-            'invoice' => '//qb:InvoiceRet',
+            'invoice' => '//InvoiceRet',
         ];
 
         $em = $this->getDoctrine()->getManager();
-        $this->writeLog("Recibido XML response:\n" . $xmlResponse);
 
         foreach ($responseTypes as $tipo => $xpath) {
             $nodes = $xml->xpath($xpath);
@@ -70,7 +80,7 @@ class QbwcService extends Base
                         if ($entity !== null) {
                             $entity->setTxnId($txnId);
                             $entity->setEditSequence($editSequence);
-                            $this->writeLog("Actualizado entidad {$tipo} ID={$entity->getId()}");
+                            $this->writeLog("Actualizado entidad {$tipo} ID={$entity->getInvoiceId()}");
                         }
                     }
                 }
@@ -79,6 +89,7 @@ class QbwcService extends Base
 
         $em->flush();
     }
+
 
     public function GenerarRequestQBXML(): string
     {

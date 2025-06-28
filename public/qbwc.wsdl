@@ -19,7 +19,6 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-
             <xsd:element name="authenticateResponse">
                 <xsd:complexType>
                     <xsd:sequence>
@@ -27,7 +26,6 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-
             <xsd:complexType name="ArrayOfString">
                 <xsd:sequence>
                     <xsd:element name="string" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -47,11 +45,93 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-
             <xsd:element name="sendRequestXMLResponse">
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="sendRequestXMLResult" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <!-- receiveResponseXML -->
+            <xsd:element name="receiveResponseXML">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="ticket" type="xsd:string"/>
+                        <xsd:element name="response" type="xsd:string"/>
+                        <xsd:element name="hresult" type="xsd:string"/>
+                        <xsd:element name="message" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="receiveResponseXMLResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="receiveResponseXMLResult" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <!-- getLastError -->
+            <xsd:element name="getLastError">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="ticket" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getLastErrorResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="getLastErrorResult" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <!-- closeConnection -->
+            <xsd:element name="closeConnection">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="ticket" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="closeConnectionResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="closeConnectionResult" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <!-- serverVersion -->
+            <xsd:element name="serverVersion">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="strVersion" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="serverVersionResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="serverVersionResult" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <!-- clientVersion -->
+            <xsd:element name="clientVersion">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="strVersion" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="clientVersionResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="clientVersionResult" type="xsd:string"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -74,6 +154,41 @@
         <part name="parameters" element="tns:sendRequestXMLResponse"/>
     </message>
 
+    <message name="receiveResponseXMLRequest">
+        <part name="parameters" element="tns:receiveResponseXML"/>
+    </message>
+    <message name="receiveResponseXMLResponse">
+        <part name="parameters" element="tns:receiveResponseXMLResponse"/>
+    </message>
+
+    <message name="getLastErrorRequest">
+        <part name="parameters" element="tns:getLastError"/>
+    </message>
+    <message name="getLastErrorResponse">
+        <part name="parameters" element="tns:getLastErrorResponse"/>
+    </message>
+
+    <message name="closeConnectionRequest">
+        <part name="parameters" element="tns:closeConnection"/>
+    </message>
+    <message name="closeConnectionResponse">
+        <part name="parameters" element="tns:closeConnectionResponse"/>
+    </message>
+
+    <message name="serverVersionRequest">
+        <part name="parameters" element="tns:serverVersion"/>
+    </message>
+    <message name="serverVersionResponse">
+        <part name="parameters" element="tns:serverVersionResponse"/>
+    </message>
+
+    <message name="clientVersionRequest">
+        <part name="parameters" element="tns:clientVersion"/>
+    </message>
+    <message name="clientVersionResponse">
+        <part name="parameters" element="tns:clientVersionResponse"/>
+    </message>
+
     <!-- PortType -->
     <portType name="QBWebConnectorSvcSoap">
         <operation name="authenticate">
@@ -83,6 +198,26 @@
         <operation name="sendRequestXML">
             <input message="tns:sendRequestXMLRequest"/>
             <output message="tns:sendRequestXMLResponse"/>
+        </operation>
+        <operation name="receiveResponseXML">
+            <input message="tns:receiveResponseXMLRequest"/>
+            <output message="tns:receiveResponseXMLResponse"/>
+        </operation>
+        <operation name="getLastError">
+            <input message="tns:getLastErrorRequest"/>
+            <output message="tns:getLastErrorResponse"/>
+        </operation>
+        <operation name="closeConnection">
+            <input message="tns:closeConnectionRequest"/>
+            <output message="tns:closeConnectionResponse"/>
+        </operation>
+        <operation name="serverVersion">
+            <input message="tns:serverVersionRequest"/>
+            <output message="tns:serverVersionResponse"/>
+        </operation>
+        <operation name="clientVersion">
+            <input message="tns:clientVersionRequest"/>
+            <output message="tns:clientVersionResponse"/>
         </operation>
     </portType>
 
@@ -95,6 +230,31 @@
             <output><soap:body use="literal"/></output>
         </operation>
         <operation name="sendRequestXML">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="receiveResponseXML">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="getLastError">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="closeConnection">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="serverVersion">
+            <soap:operation soapAction=""/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="clientVersion">
             <soap:operation soapAction=""/>
             <input><soap:body use="literal"/></input>
             <output><soap:body use="literal"/></output>
