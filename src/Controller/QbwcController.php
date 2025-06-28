@@ -54,35 +54,6 @@ class QbwcController extends AbstractController
         return new Response($xml, 200, ['Content-Type' => 'text/xml']);
     }
 
-    /*
-    public function qbwc(Request $request): Response
-    {
-        try {
-            $xmlContent = $request->getContent();
-            $this->qbwcService->writeLog("Solicitud recibida:\n" . $xmlContent);
-
-            if (str_contains($xmlContent, 'authenticate')) {
-                return $this->handleAuthenticate($xmlContent);
-            } elseif (str_contains($xmlContent, 'sendRequestXML')) {
-                return $this->handleSendRequestXML($xmlContent);
-            } elseif (str_contains($xmlContent, 'receiveResponseXML')) {
-                return $this->handleReceiveResponseXML($xmlContent);
-            } elseif (str_contains($xmlContent, 'getLastError')) {
-                return $this->handleGetLastError();
-            } elseif (str_contains($xmlContent, 'closeConnection')) {
-                return $this->handleCloseConnection($xmlContent);
-            }
-
-            return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
-        } catch (\Exception $e) {
-            $this->qbwcService->writelog($e->getMessage(), 'errorlog.txt');
-
-            return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
-        }
-
-    }
-    */
-
     // ruta para exponer el servidor soap
     public function qbwc(Request $request): Response
     {
