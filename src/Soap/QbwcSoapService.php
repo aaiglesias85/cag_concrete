@@ -17,6 +17,8 @@ class QbwcSoapService
 
     public function authenticate($username, $password)
     {
+        $this->qbwcService->writeLog("Intento de login: {$username}");
+
         $user = $this->qbwcService->AutenticarLogin($username, $password);
         if (!$user) {
             return ['', 'nvu'];
@@ -24,7 +26,20 @@ class QbwcSoapService
 
         $ticket = bin2hex(random_bytes(16));
         $this->qbwcService->SalvarToken($user, $ticket);
-        return [$ticket, ''];
+
+        $this->qbwcService->writeLog("Login exitoso: {$username}, ticket: {$ticket}");
+
+        // return [$ticket, ''];
+
+        return new \SoapVar(
+            '<authenticateResponse xmlns="http://developer.intuit.com/">
+                    <authenticateResult>
+                        <string>' . $ticket . '</string>
+                        <string></string>
+                    </authenticateResult>
+                    </authenticateResponse>',
+            XSD_ANYXML
+        );
     }
 
     public function sendRequestXML($ticket, $companyFileName, $qbXMLCountry, $qbXMLMajorVers, $qbXMLMinorVers)
