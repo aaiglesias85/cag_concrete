@@ -306,8 +306,8 @@
     </wsdl:binding>
     <wsdl:service name="QBWebConnectorSvc">
         <wsdl:port name="QBWebConnectorSvcSoap" binding="tns:QBWebConnectorSvcSoap">
-            <soap:address location="http://localhost/constructora/public/qbwc"/>
-            <!--<soap:address location="https://data-tracking-test.cagconcrete.net/public/qbwc"/>-->
+            <!--<soap:address location="http://localhost/constructora/public/qbwc"/>-->
+            <soap:address location="https://data-tracking-test.cagconcrete.net/public/qbwc"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
