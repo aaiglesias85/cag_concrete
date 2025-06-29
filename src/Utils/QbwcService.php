@@ -33,66 +33,83 @@ class QbwcService extends Base
     {
         $this->writeLog("Recibido XML bruto:\n" . $xmlResponse);
 
+        // Limpiar encabezados no válidos
         $cleanXml = trim($xmlResponse);
         $cleanXml = preg_replace('/<\?qbxml.*?\?>/i', '', $cleanXml);
-        $cleanXml = preg_replace('/^[\x00-\x1F\x7F\xFE\xFF]+/', '', $cleanXml);
+        $cleanXml = preg_replace('/^[\x00-\x1F\x7F\xFE\xFF]+/', '', $cleanXml); // limpieza extra
 
+        // Cargar XML
         $xml = simplexml_load_string($cleanXml);
         if (!$xml) {
             $this->writeLog("Error al parsear XML.");
             return;
         }
 
+        $responseTypes = [
+            'invoice' => '//InvoiceRet',
+        ];
+
         $em = $this->getDoctrine()->getManager();
-        $invoiceRets = $xml->xpath('//InvoiceRet');
 
-        if (!$invoiceRets || count($invoiceRets) === 0) {
-            $this->writeLog("No se encontraron nodos InvoiceRet");
-            return;
-        }
+        foreach ($responseTypes as $tipo => $xpath) {
+            $nodes = $xml->xpath($xpath);
+            if (!$nodes || count($nodes) === 0) {
+                $this->writeLog("No se encontraron nodos para tipo: {$tipo}");
+                continue;
+            }
 
-        foreach ($invoiceRets as $ret) {
-            $txnId = (string)$ret->TxnID;
-            $editSequence = (string)$ret->EditSequence;
+            foreach ($nodes as $ret) {
+                $txnId = (string)$ret->TxnID;
+                $editSequence = (string)$ret->EditSequence;
 
-            $this->writeLog("Procesando Invoice: TxnID={$txnId}, EditSequence={$editSequence}");
+                $this->writeLog("Procesando {$tipo}: TxnID={$txnId}, EditSequence={$editSequence}");
+                $this->writeLog(var_export($ret, true));
 
-            $item = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-                ->findOneBy(['tipo' => 'invoice', 'estado' => 'enviado'], ['id' => 'ASC']);
-            /** @var SyncQueueQbwc $item */
-            if ($item && $txnId && $editSequence) {
-                $item->setEstado('sincronizado');
+                $item = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+                    ->findOneBy(['tipo' => strtolower($tipo), 'estado' => 'enviado'], ['id' => 'ASC']);
+                /** @var SyncQueueQbwc $item */
+                if ($item && $txnId && $editSequence) {
+                    $item->setEstado('sincronizado');
 
-                $invoice = $this->getDoctrine()->getRepository(Invoice::class)
-                    ->find($item->getEntidadId());
-                /** @var Invoice $invoice */
-                if ($invoice !== null) {
-                    $invoice->setTxnId($txnId);
-                    $invoice->setEditSequence($editSequence);
-                    $this->writeLog("Actualizado Invoice ID={$invoice->getInvoiceId()}");
+                    $entityClass = match ($tipo) {
+                        'invoice' => Invoice::class,
+                        default => null,
+                    };
 
-                    // Procesar cada InvoiceLineRet
-                    foreach ($ret->InvoiceLineRet as $lineRet) {
-                        $txnLineId = (string)$lineRet->TxnLineID;
-                        $itemFullName = (string)$lineRet->ItemRef->FullName ?? null;
+                    if ($entityClass) {
+                        $entity = $this->getDoctrine()->getRepository($entityClass)->find($item->getEntidadId());
+                        if ($entity !== null) {
+                            $entity->setTxnId($txnId);
+                            $entity->setEditSequence($editSequence);
+                            $this->writeLog("Actualizado entidad {$tipo} ID={$item->getEntidadId()}");
 
-                        // Buscar el InvoiceItem correspondiente (por nombre o posición)
-                        $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                            ->ListarItems($invoice->getInvoiceId());
-                        $matched = null;
-                        foreach ($invoiceItems as $invoiceItem) {
-                            // Puedes mejorar el match aquí según cómo relates ProjectItem con FullName
-                            if ($invoiceItem->getProjectItem()->getItem()->getDescription() === $itemFullName) {
-                                $matched = $invoiceItem;
-                                break;
+                            // Procesar cada InvoiceLineRet
+                            if($tipo == 'invoice'){
+                                foreach ($ret->InvoiceLineRet as $lineRet) {
+                                    $txnLineId = (string)$lineRet->TxnLineID;
+                                    $itemFullName = (string)$lineRet->ItemRef->FullName ?? null;
+
+                                    // Buscar el InvoiceItem correspondiente (por nombre o posición)
+                                    $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                                        ->ListarItems($item->getEntidadId());
+                                    $matched = null;
+                                    foreach ($invoiceItems as $invoiceItem) {
+                                        // Puedes mejorar el match aquí según cómo relates ProjectItem con FullName
+                                        if ($invoiceItem->getProjectItem()->getItem()->getDescription() === $itemFullName) {
+                                            $matched = $invoiceItem;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($matched) {
+                                        $matched->setTxnId($txnLineId);
+                                        $this->writeLog("Actualizado InvoiceItem ID={$matched->getId()} con TxnLineID={$txnLineId}");
+                                    } else {
+                                        $this->writeLog("No se encontró InvoiceItem para TxnLineID={$txnLineId}");
+                                    }
+                                }
                             }
-                        }
 
-                        if ($matched) {
-                            $matched->setTxnId($txnLineId);
-                            $this->writeLog("Actualizado InvoiceItem ID={$matched->getId()} con TxnLineID={$txnLineId}");
-                        } else {
-                            $this->writeLog("No se encontró InvoiceItem para TxnLineID={$txnLineId}");
                         }
                     }
                 }
