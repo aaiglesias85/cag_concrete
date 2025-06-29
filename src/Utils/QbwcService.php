@@ -181,24 +181,20 @@ class QbwcService extends Base
     {
         $project = $invoice->getProject();
         $company = $project->getCompany();
-        $companyName = trim($company?->getName() ?? '');
 
-        $xml = new \SimpleXMLElement('<InvoiceModRq></InvoiceModRq>');
-        $xml->addAttribute('requestID', (string)$invoice->getInvoiceId());
-
-        $invoiceMod = $xml->addChild('InvoiceMod');
-        $invoiceMod->addChild('TxnID', $invoice->getTxnId());
-        $invoiceMod->addChild('EditSequence', $invoice->getEditSequence());
-        $invoiceMod->addChild('CustomerRef')->addChild('FullName', htmlspecialchars($companyName));
-        $invoiceMod->addChild('TxnDate', $invoice->getStartDate()->format('Y-m-d'));
-        $invoiceMod->addChild('RefNumber', htmlspecialchars($invoice->getNumber()));
+        $qbInvoice = new QuickBooks_QBXML_Object_Invoice();
+        $qbInvoice->setCustomerFullName($company->getName());
+        $qbInvoice->setTxnDate($invoice->getStartDate()->format('Y-m-d'));
+        $qbInvoice->setRefNumber($invoice->getNumber());
+        $qbInvoice->setTransactionID($invoice->getTxnId());
+        $qbInvoice->setEditSequence($invoice->getEditSequence());
 
         if ($invoice->getNotes()) {
-            $invoiceMod->addChild('Memo', htmlspecialchars($invoice->getNotes()));
+            $qbInvoice->setMemo($invoice->getNotes());
         }
 
         if ($company->getAddress()) {
-            $invoiceMod->addChild('BillAddress')->addChild('Addr1', htmlspecialchars($company->getAddress()));
+            $qbInvoice->setBillAddress($company->getAddress());
         }
 
         $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice->getInvoiceId());
@@ -207,15 +203,15 @@ class QbwcService extends Base
             $projectItem = $item->getProjectItem();
             $itemName = trim($projectItem->getItem()->getDescription());
 
-            $line = $invoiceMod->addChild('InvoiceLineMod');
-            $line->addChild('ItemRef')->addChild('FullName', htmlspecialchars($itemName));
-            $line->addChild('Desc', 'Detalle actualizado');
-            $line->addChild('Quantity', number_format($item->getQuantity(), 2, '.', ''));
-            $line->addChild('Rate', number_format($item->getPrice(), 2, '.', ''));
+            $line = new QuickBooks_QBXML_Object_Invoice_InvoiceLine();
+            $line->setItemFullName($itemName);
+            $line->setDesc('Detalle generado desde sistema');
+            $line->setQuantity($item->getQuantity());
+            $line->setRate($item->getPrice());
+            $qbInvoice->addInvoiceLine($line);
         }
 
-        $body = $xml->asXML();
-        return preg_replace('/<\?xml.*?\?>\s*/', '', $body);
+        return $qbInvoice->asQBXML('InvoiceModRq');
     }
 
     public function SalvarToken($usuario, $token)
