@@ -49,7 +49,10 @@ class QbwcSoapService
             return '';
         }
 
-        return $this->qbwcService->GenerarRequestQBXML();
+        $qbxml = $this->qbwcService->GenerarRequestQBXML();
+        $this->qbwcService->writelog($qbxml);
+
+        return $qbxml;
     }
 
     public function receiveResponseXML($ticket, $response, $hresult, $message)
