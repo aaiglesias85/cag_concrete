@@ -34,11 +34,15 @@ class QbwcSoapService
 
         $this->qbwcService->writeLog("Login exitoso: {$username}, ticket: {$ticket}");
 
-        return [
-            'authenticateResult' => [
-                'string' => [$ticket, '']
-            ]
-        ];
+        return new \SoapVar(
+            '<authenticateResponse xmlns="http://developer.intuit.com/">
+        <authenticateResult>
+            <string>' . $ticket . '</string>
+            <string></string>
+        </authenticateResult>
+    </authenticateResponse>',
+            XSD_ANYXML
+        );
     }
 
     public function sendRequestXML($params)

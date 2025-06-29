@@ -1,0 +1,2 @@
+2025-06-29 04:47:51	---	Intento de login: admin@concrete.com
+2025-06-29 04:47:52	---	Login exitoso: admin@concrete.com, ticket: d5b6ba201f88814e38ba31c42d7fef60
