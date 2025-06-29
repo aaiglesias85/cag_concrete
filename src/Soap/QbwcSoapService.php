@@ -32,12 +32,12 @@ class QbwcSoapService
         // return [$ticket, ''];
 
         return new \SoapVar(
-            '<authenticateResponse xmlns="http://developer.intuit.com/">
-                    <authenticateResult>
+            '
+                  <authenticateResult>
                         <string>' . $ticket . '</string>
                         <string></string>
                     </authenticateResult>
-                    </authenticateResponse>',
+                    ',
             XSD_ANYXML
         );
     }
