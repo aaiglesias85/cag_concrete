@@ -1,0 +1,1 @@
+ALTER TABLE `invoice_item` ADD `txn_id` VARCHAR(255) NULL AFTER `project_item_id`;

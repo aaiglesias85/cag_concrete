@@ -42,6 +42,9 @@ class InvoiceItem
     #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id')]
     private ?ProjectItem $projectItem;
 
+    #[ORM\Column(name: "txn_id", type: "string", length: 255, nullable: true)]
+    private ?string $txnId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -135,5 +138,15 @@ class InvoiceItem
     public function setProjectItem(?ProjectItem $projectItem): void
     {
         $this->projectItem = $projectItem;
+    }
+
+    public function getTxnId(): ?string
+    {
+        return $this->txnId;
+    }
+
+    public function setTxnId(?string $txnId): void
+    {
+        $this->txnId = $txnId;
     }
 }
