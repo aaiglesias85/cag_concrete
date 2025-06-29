@@ -111,7 +111,7 @@ class QbwcService extends Base
             }
 
             if ($qbxml !== '') {
-                //$item->setEstado('enviado');
+                $item->setEstado('enviado');
                 $this->getDoctrine()->getManager()->flush();
             }
         }
