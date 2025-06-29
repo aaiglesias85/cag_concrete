@@ -56,24 +56,26 @@ class QbwcController extends AbstractController
     }
 
     // ruta para exponer el servidor soap
-    /*
     public function qbwc(Request $request): Response
     {
         try {
 
+            $wsdl = $this->getParameter('kernel.project_dir') . '/public/qbwc.wsdl';
+
             $options = [
-                'uri' => $this->qbwcService->ObtenerURL() . 'qbwc',
-                'encoding' => 'UTF-8'
+                'uri' => 'http://developer.intuit.com/',
+                'soap_version' => SOAP_1_1,
+                'cache_wsdl' => WSDL_CACHE_NONE,
             ];
 
-            $soapServer = new \SoapServer(null, $options);
-            $soapServer->setObject(new QbwcSoapService($this->qbwcService));
+            $server = new \SoapServer($wsdl, $options);
+            $server->setObject(new QbwcSoapService($this->qbwcService));
 
             ob_start();
-            $soapServer->handle();
+            $server->handle();
             $response = ob_get_clean();
 
-            return new Response($response, 200, ['Content-Type' => 'text/xml']);
+            return new Response($response, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
 
         } catch (\Exception $e) {
             $this->qbwcService->writelog($e->getMessage(), 'errorlog.txt');
@@ -82,8 +84,9 @@ class QbwcController extends AbstractController
         }
 
     }
-    */
 
+
+/*
     public function qbwc(Request $request): Response
     {
         try {
@@ -110,6 +113,7 @@ class QbwcController extends AbstractController
         }
 
     }
+*/
 
     private function handleAuthenticate(string $xmlContent): Response
     {
