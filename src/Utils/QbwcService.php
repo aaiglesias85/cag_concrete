@@ -126,9 +126,13 @@ class QbwcService extends Base
 
         $isModification = $invoice->getTxnId() && $invoice->getEditSequence() && $invoice->getUpdatedAt() > $invoice->getCreatedAt();
 
+        $this->writelog('$isModification' . var_export($isModification, true));
+
         $bodyXml = $isModification
             ? $this->generateInvoiceModBodyQBXML($invoice)
             : $this->generateInvoiceAddBodyQBXML($invoice);
+
+        $this->writelog('XML' . $bodyXml);
 
         $qbxml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
         $qbxml .= "<?qbxml version=\"16.0\"?>\n";
