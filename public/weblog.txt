@@ -1,0 +1,190 @@
+2025-06-29 05:36:39	---	handleSendRequestXML ticket: 0b34a74ba3835547008ddf6305aa2e34
+2025-06-29 05:36:39	---	Generando XML para tipo: invoice ID: 16
+2025-06-29 05:36:39	---	<QBXML>
+  <QBXMLMsgsRq onError="stopOnError">
+<InvoiceAddRq>
+	<InvoiceAdd>
+		<CustomerRef>
+			<FullName>C. W. MATTHEWS CONTRACTING CO., INC.</FullName>
+		</CustomerRef>
+		<TxnDate>2025-02-01</TxnDate>
+		<RefNumber>1</RefNumber>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>PLAIN CONC PVMT CL 3 CONC, 10 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>81</Quantity>
+			<Rate>246</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>DRIVEWAY CONCRETE, 6 in tk</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>78</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC SLOPE DRAIN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>114</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC SIDEWALK 8 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>246.49</Quantity>
+			<Rate>121</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC SPILLWAY TP 3</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>1900</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC MEDIAN, 6 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>102</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC VALLEY GUTTER, 6 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>33.73</Quantity>
+			<Rate>80</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC HEADER CURB 4 IN TP1</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>106</Quantity>
+			<Rate>26</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>C&amp;G 8x30 IN, TP 2</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>60</Quantity>
+			<Rate>31</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>C&amp;G 8X30 IN, TP 9</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>31</Rate>
+		</InvoiceLineAdd>
+	</InvoiceAdd>
+</InvoiceAddRq>
+
+  </QBXMLMsgsRq>
+</QBXML>
+2025-06-29 05:36:39	---	<QBXML>
+  <QBXMLMsgsRq onError="stopOnError">
+<InvoiceAddRq>
+	<InvoiceAdd>
+		<CustomerRef>
+			<FullName>C. W. MATTHEWS CONTRACTING CO., INC.</FullName>
+		</CustomerRef>
+		<TxnDate>2025-02-01</TxnDate>
+		<RefNumber>1</RefNumber>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>PLAIN CONC PVMT CL 3 CONC, 10 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>81</Quantity>
+			<Rate>246</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>DRIVEWAY CONCRETE, 6 in tk</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>78</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC SLOPE DRAIN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>114</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC SIDEWALK 8 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>246.49</Quantity>
+			<Rate>121</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC SPILLWAY TP 3</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>1900</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC MEDIAN, 6 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>102</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC VALLEY GUTTER, 6 IN</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>33.73</Quantity>
+			<Rate>80</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>CONC HEADER CURB 4 IN TP1</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>106</Quantity>
+			<Rate>26</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>C&amp;G 8x30 IN, TP 2</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>60</Quantity>
+			<Rate>31</Rate>
+		</InvoiceLineAdd>
+		<InvoiceLineAdd>
+			<ItemRef>
+				<FullName>C&amp;G 8X30 IN, TP 9</FullName>
+			</ItemRef>
+			<Desc>Detalle generado desde sistema</Desc>
+			<Quantity>0</Quantity>
+			<Rate>31</Rate>
+		</InvoiceLineAdd>
+	</InvoiceAdd>
+</InvoiceAddRq>
+
+  </QBXMLMsgsRq>
+</QBXML>

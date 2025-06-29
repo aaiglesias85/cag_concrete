@@ -131,9 +131,10 @@ class QbwcService extends Base
             ? $this->generateInvoiceModBodyQBXML($invoice)
             : $this->generateInvoiceAddBodyQBXML($invoice);
 
-        $qbxml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        /*$qbxml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
         $qbxml .= "<?qbxml version=\"16.0\"?>\n";
-        $qbxml .= "<QBXML>\n";
+        */
+        $qbxml  = "<QBXML>\n";
         $qbxml .= "  <QBXMLMsgsRq onError=\"stopOnError\">\n";
         $qbxml .= $bodyXml . "\n";
         $qbxml .= "  </QBXMLMsgsRq>\n";
