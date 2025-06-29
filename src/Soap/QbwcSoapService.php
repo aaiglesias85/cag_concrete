@@ -1,5 +1,7 @@
 <?php
 
+// src/Soap/QbwcSoapService.php
+
 namespace App\Soap;
 
 use App\Utils\QbwcService;
@@ -13,112 +15,50 @@ class QbwcSoapService
         $this->qbwcService = $qbwcService;
     }
 
-    public function authenticate($params)
+    public function authenticate($username, $password)
     {
-        $username = $params->strUserName ?? '';
-        $password = $params->strPassword ?? '';
-
-        $this->qbwcService->writeLog("Intento de login: {$username}");
-
         $user = $this->qbwcService->AutenticarLogin($username, $password);
         if (!$user) {
-            return [
-                'authenticateResult' => [
-                    'string' => ['', 'nvu']
-                ]
-            ];
+            return ['', 'nvu'];
         }
 
         $ticket = bin2hex(random_bytes(16));
         $this->qbwcService->SalvarToken($user, $ticket);
-
-        $this->qbwcService->writeLog("Login exitoso: {$username}, ticket: {$ticket}");
-
-        return new \SoapVar(
-            '<authenticateResponse xmlns="http://developer.intuit.com/">
-                    <authenticateResult>
-                        <string>' . $ticket . '</string>
-                        <string></string>
-                    </authenticateResult>
-                    </authenticateResponse>',
-            XSD_ANYXML
-        );
+        return [$ticket, ''];
     }
 
-    public function sendRequestXML($params)
+    public function sendRequestXML($ticket, $companyFileName, $qbXMLCountry, $qbXMLMajorVers, $qbXMLMinorVers)
     {
-        $ticket = $params->ticket ?? '';
-        $companyFileName = $params->strCompanyFileName ?? '';
-        $qbXMLCountry = $params->qbXMLCountry ?? '';
-        $qbXMLMajorVers = $params->qbXMLMajorVers ?? 0;
-        $qbXMLMinorVers = $params->qbXMLMinorVers ?? 0;
-
-        $this->qbwcService->writeLog("handleSendRequestXML ticket: {$ticket}");
-
         $session = $this->qbwcService->BuscarSesion($ticket);
         if (!$session) {
-            $this->qbwcService->writeLog("handleSendRequestXML No hay sesión");
             return '';
         }
 
-        $qbxml = $this->qbwcService->GenerarRequestQBXML();
-        $this->qbwcService->writelog($qbxml);
-
-        if (empty($qbxml)) {
-            return '';
-        }
-
-        return new \SoapVar(
-            "<sendRequestXMLResponse><sendRequestXMLResult>{$qbxml}</sendRequestXMLResult></sendRequestXMLResponse>",
-            XSD_ANYXML
-        );
+        return $this->qbwcService->GenerarRequestQBXML();
     }
 
-    public function receiveResponseXML($params)
+    public function receiveResponseXML($ticket, $response, $hresult, $message)
     {
-        $ticket = $params->ticket ?? '';
-        $response = $params->response ?? '';
-        $hresult = $params->hresult ?? '';
-        $message = $params->message ?? '';
-
-        $this->qbwcService->writeLog("Recibiendo respuesta para ticket: {$ticket}");
-
         $session = $this->qbwcService->BuscarSesion($ticket);
         if (!$session) {
-            return ['receiveResponseXMLResult' => 0];
+            return 0;
         }
 
         $this->qbwcService->UpdateSyncQueueQbwc($response);
-
-        return ['receiveResponseXMLResult' => 100];
+        return 100; // 100 = completado
     }
 
-    public function getLastError($params)
+    public function getLastError($ticket)
     {
-        $ticket = $params->ticket ?? '';
-        $this->qbwcService->writeLog("Solicitud getLastError recibida para ticket: {$ticket}");
-
-        return ['getLastErrorResult' => 'No error'];
+        return 'No error';
     }
 
-    public function closeConnection($params)
+    public function closeConnection($ticket)
     {
-        $ticket = $params->ticket ?? '';
         $this->qbwcService->EliminarToken($ticket);
-        $this->qbwcService->writeLog("Cierre de sesión para ticket: {$ticket}");
-
-        return ['closeConnectionResult' => 'Conexión cerrada correctamente.'];
+        return 'Conexión cerrada correctamente.';
     }
 
-    public function serverVersion($params)
-    {
-        $version = $params->strVersion ?? '';
-        return ['serverVersionResult' => '1.0.0'];
-    }
-
-    public function clientVersion($params)
-    {
-        $strVersion = $params->strVersion ?? '';
-        return ['clientVersionResult' => ''];
-    }
+    public function serverVersion($version) { return '1.0'; }
+    public function clientVersion($strVersion) { return ''; }
 }

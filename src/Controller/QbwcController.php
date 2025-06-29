@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+
 use App\Soap\QbwcSoapService;
 use App\Utils\QbwcService;
 
@@ -59,19 +60,16 @@ class QbwcController extends AbstractController
     {
         try {
 
-            $wsdl = $this->getParameter('kernel.project_dir') . '/public/qbwc.wsdl';
-
             $options = [
-                'uri' => 'http://developer.intuit.com/',
-                'soap_version' => SOAP_1_1,
-                'cache_wsdl' => WSDL_CACHE_NONE,
+                'uri' => $this->qbwcService->ObtenerURL() . 'qbwc',
+                'encoding' => 'UTF-8'
             ];
 
-            $server = new \SoapServer($wsdl, $options);
-            $server->setObject(new QbwcSoapService($this->qbwcService));
+            $soapServer = new \SoapServer(null, $options);
+            $soapServer->setObject(new QbwcSoapService($this->qbwcService));
 
             ob_start();
-            $server->handle();
+            $soapServer->handle();
             $response = ob_get_clean();
 
             return new Response($response, 200, ['Content-Type' => 'text/xml']);
