@@ -65,10 +65,11 @@ class QbwcService extends Base
                 $this->writeLog("Procesando {$tipo}: TxnID={$txnId}, EditSequence={$editSequence}");
                 $this->writeLog(var_export($ret, true));
 
-                $item = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-                    ->findOneBy(['tipo' => strtolower($tipo), 'estado' => 'enviado'], ['id' => 'ASC']);
-                /** @var SyncQueueQbwc $item */
-                if ($item && $txnId && $editSequence) {
+                $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+                    ->findBy(['tipo' => strtolower($tipo), 'estado' => 'enviado'], ['id' => 'ASC']);
+                if (!empty($items) && $txnId && $editSequence) {
+                    /** @var SyncQueueQbwc $item */
+                    $item = $items[0];
                     $item->setEstado('sincronizado');
 
                     $entityClass = match ($tipo) {
