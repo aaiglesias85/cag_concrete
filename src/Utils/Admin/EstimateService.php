@@ -258,7 +258,7 @@ class EstimateService extends Base
         /** @var Estimate $entity */
         if ($entity != null) {
 
-            $arreglo_resultado['estimate_id'] = $entity->getProjectId();
+            $arreglo_resultado['project_id'] = $entity->getProjectId();
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['bidDeadline'] = $entity->getBidDeadline() ? $entity->getBidDeadline()->format('m/d/Y H:i') : "";
             $arreglo_resultado['county'] = $entity->getCounty();
@@ -760,7 +760,7 @@ class EstimateService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarEstimate($estimate_id, $name, $bidDeadline, $county, $priority,
+    public function SalvarEstimate($project_id, $name, $bidDeadline, $county, $priority,
                                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                                    $project_types_id, $estimators_id)
     {
@@ -777,7 +777,7 @@ class EstimateService extends Base
 
         $entity = new Estimate();
 
-        $entity->setProjectId($estimate_id);
+        $entity->setProjectId($project_id);
         $entity->setName($name);
         $entity->setCounty($county);
         $entity->setPriority($priority);

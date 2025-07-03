@@ -15,6 +15,8 @@ var Schedules = function () {
 
             if (mostrar_calendario) {
                 $('#div-lista-schedule').addClass('m--hide');
+                $('#nav-item-eliminar').addClass('m--hide');
+
                 $('#div-calendario').removeClass('m--hide');
 
                 listarCalendario();
@@ -23,6 +25,8 @@ var Schedules = function () {
 
             } else {
                 $('#div-lista-schedule').removeClass('m--hide');
+                $('#nav-item-eliminar').removeClass('m--hide');
+
                 $('#div-calendario').addClass('m--hide');
 
                 btnClickFiltrar();
