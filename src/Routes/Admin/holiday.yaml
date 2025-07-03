@@ -1,0 +1,23 @@
+holiday:
+  path:  /holiday
+  defaults: { _controller: App\Controller\Admin\HolidayController::index }
+
+listarHolidayAdmin:
+  path:  /holiday/listarHoliday
+  defaults: { _controller: App\Controller\Admin\HolidayController::listar, _format: json }
+
+eliminarHolidayAdmin:
+  path:  /holiday/eliminarHoliday
+  defaults: { _controller: App\Controller\Admin\HolidayController::eliminar, _format: json }
+
+eliminarHolidaysAdmin:
+  path:  /holiday/eliminarHolidays
+  defaults: { _controller: App\Controller\Admin\HolidayController::eliminarHolidays, _format: json }
+
+salvarHolidayAdmin:
+  path:  /holiday/salvarHoliday
+  defaults: { _controller: App\Controller\Admin\HolidayController::salvar, _format: json }
+
+cargarDatosHolidayAdmin:
+  path:  /holiday/cargarDatos
+  defaults: { _controller: App\Controller\Admin\HolidayController::cargarDatos, _format: json }

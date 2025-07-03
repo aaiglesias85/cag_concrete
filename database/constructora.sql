@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 29-06-2025 a las 22:10:11
+-- Tiempo de generación: 03-07-2025 a las 00:40:23
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -498,7 +498,20 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (27, 'plan_status', 'Plan Status'),
 (28, 'district', 'District'),
 (29, 'estimate', 'Estimates'),
-(30, 'plan_downloading', 'Plans Downloading');
+(30, 'plan_downloading', 'Plans Downloading'),
+(31, 'holiday', 'Holidays');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `holiday`
+--
+
+CREATE TABLE `holiday` (
+  `holiday_id` int(11) NOT NULL,
+  `day` date DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1446,7 +1459,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (39, 1, 1, 1, 1, 1, 27),
 (40, 1, 1, 1, 1, 1, 28),
 (41, 1, 1, 1, 1, 1, 29),
-(42, 1, 1, 1, 1, 1, 30);
+(42, 1, 1, 1, 1, 1, 30),
+(43, 1, 1, 1, 1, 1, 31);
 
 -- --------------------------------------------------------
 
@@ -1640,7 +1654,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (31, 1, 1, 1, 1, 1, 27),
 (32, 1, 1, 1, 1, 1, 28),
 (33, 1, 1, 1, 1, 1, 29),
-(34, 1, 1, 1, 1, 1, 30);
+(34, 1, 1, 1, 1, 1, 30),
+(35, 1, 1, 1, 1, 1, 31);
 
 -- --------------------------------------------------------
 
@@ -1811,6 +1826,12 @@ ALTER TABLE `estimate_quote`
 --
 ALTER TABLE `function`
   ADD PRIMARY KEY (`function_id`);
+
+--
+-- Indices de la tabla `holiday`
+--
+ALTER TABLE `holiday`
+  ADD PRIMARY KEY (`holiday_id`);
 
 --
 -- Indices de la tabla `inspector`
@@ -2150,7 +2171,13 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT de la tabla `holiday`
+--
+ALTER TABLE `holiday`
+  MODIFY `holiday_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -2276,7 +2303,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2330,7 +2357,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`

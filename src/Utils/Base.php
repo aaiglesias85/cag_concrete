@@ -373,6 +373,7 @@ class Base
             $menuDistrict = false;
             $menuEstimate = false;
             $menuPlanDownloading = false;
+            $menuHoliday = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -465,6 +466,9 @@ class Base
                 if ($permiso['funcion_id'] == 30 && $permiso['ver']) {
                     $menuPlanDownloading = true;
                 }
+                if ($permiso['funcion_id'] == 31 && $permiso['ver']) {
+                    $menuHoliday = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -497,6 +501,7 @@ class Base
                 'menuDistrict' => $menuDistrict,
                 'menuEstimate' => $menuEstimate,
                 'menuPlanDownloading' => $menuPlanDownloading,
+                'menuHoliday' => $menuHoliday,
             );
         }
 

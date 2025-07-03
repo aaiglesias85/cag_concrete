@@ -418,6 +418,13 @@
                                 Clone Schedule
                             </button>
                         {% endif %}
+
+                        {% if permiso.eliminar %}
+                            <button class="btn btn-danger m--hide" type="button" id="btn-delete-modal">
+                                Delete
+                            </button>
+                        {% endif %}
+
                         <button class="btn btn-danger cerrar-form-schedule" type="button">
                             Cancel
                         </button>

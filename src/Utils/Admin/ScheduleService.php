@@ -5,6 +5,7 @@ namespace App\Utils\Admin;
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\Employee;
+use App\Entity\Holiday;
 use App\Entity\Project;
 use App\Entity\ProjectContact;
 use App\Entity\Schedule;
@@ -30,7 +31,6 @@ class ScheduleService extends Base
     public function ExportarExcel($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin)
     {
         $semanas = $this->ObtenerSemanasReporteExcelSchedule($fecha_inicial, $fecha_fin);
-        $this->writelog(var_export($search, true));
 
         $employees = $this->ListarEmployeesLeads();
 
@@ -43,13 +43,14 @@ class ScheduleService extends Base
 
         $fila = 1;
         $diasSemana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        $columnas = range('A', 'K'); // A-K para 11 columnas
+        $columnas = range('A', 'K');
 
         $nombres = array_map(fn($e) => strtoupper($e['name']), $employees);
         $textoCrewLeads = 'CREW LEADS: ' . implode(', ', $nombres);
 
+        $feriados = $this->ListarFeriadosReporteExcelSchedule($semanas);
+
         foreach ($semanas as $semana) {
-            // Reordenar semana para comenzar en lunes
             $diasOrdenados = [];
             foreach ($diasSemana as $diaNombre) {
                 foreach ($semana->dias as $dia) {
@@ -111,6 +112,7 @@ class ScheduleService extends Base
 
             $repo = $this->getDoctrine()->getRepository(Schedule::class);
             $agregado = [];
+            $prioridades = [];
 
             foreach ($semana->dias as $dia) {
                 $schedules = $repo->ListarSchedulesParaCalendario($search, $project_id, $vendor_id, $dia, $dia);
@@ -132,27 +134,30 @@ class ScheduleService extends Base
                             'project' => $project->getProjectNumber() . ' - ' . $project->getDescription(),
                             'work' => $schedule->getDescription(),
                             'vendor' => $vendorName,
-                            'dias' => array_fill(0, 7, ''), // LUNES a domingo
+                            'dias' => array_fill(0, 7, ''),
                             'notes' => $schedule->getNotes(),
                         ];
                     }
 
                     if ($indexDia !== false) {
                         $hora = $schedule->getHour();
-                        $ampm = '';
-                        if ($hora != '') {
-                            $ampm = \DateTime::createFromFormat('H:i', $hora)?->format('g:i a');
-                        }
-
+                        $ampm = $hora ? \DateTime::createFromFormat('H:i', $hora)?->format('g:i a') : '';
                         $cantidad = $schedule->getQuantity();
                         $linea1 = 'NEED CREW';
-                        $linea2 = $ampm !== "" ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
-                        $agregado[$clave]['dias'][$indexDia] = $linea1 . "\n" . $linea2;
+                        $linea2 = $ampm !== '' ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
+                        $agregado[$clave]['dias'][$indexDia] = "$linea1\n$linea2";
+
+                        if ($schedule->getHighpriority()) {
+                            $prioridades[$clave][$indexDia] = true;
+                        }
                     }
                 }
             }
 
-            foreach ($agregado as $datos) {
+            $verdeClaro = 'CCFFCC';
+            $alternar = true;
+
+            foreach ($agregado as $clave => $datos) {
                 $filaDatos = array_merge(
                     [$datos['project'], $datos['work'], $datos['vendor']],
                     $datos['dias'],
@@ -162,10 +167,37 @@ class ScheduleService extends Base
                 foreach ($filaDatos as $i => $valor) {
                     if (!isset($columnas[$i])) continue;
                     $coord = "{$columnas[$i]}{$fila}";
+                    $estiloFila = $styleArray;
+
+                    if ($i <= 2 && $alternar) {
+                        $estiloFila['fill'] = [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => $verdeClaro],
+                        ];
+                    }
+
+                    if ($i >= 3 && $i <= 9) {
+                        $dia = $semana->dias[$i - 3];
+                        $fechaDia = \DateTime::createFromFormat('m/d/Y', $dia)?->format('Y-m-d');
+
+                        if (isset($feriados[$fechaDia])) {
+                            $valor = $feriados[$fechaDia];
+                            $estiloFila['fill'] = [
+                                'fillType' => Fill::FILL_SOLID,
+                                'startColor' => ['rgb' => '000000'],
+                            ];
+                            $estiloFila['font'] = ['color' => ['rgb' => 'FFFFFF']];
+                        } elseif (!empty($valor) && isset($prioridades[$clave][$i - 3])) {
+                            $estiloFila['font'] = ['color' => ['rgb' => 'FF0000']];
+                        }
+                    }
+
                     $sheet->setCellValueExplicit($coord, $valor, DataType::TYPE_STRING);
-                    $this->estilizarCelda($sheet, $coord, $styleArray, bold: false, align: Alignment::HORIZONTAL_LEFT, wrapText: true);
+                    $this->estilizarCelda($sheet, $coord, $estiloFila, bold: false, align: Alignment::HORIZONTAL_LEFT, wrapText: true);
                 }
+
                 $fila++;
+                $alternar = !$alternar;
             }
 
             $fila += 2;
@@ -179,6 +211,29 @@ class ScheduleService extends Base
         unset($spreadsheet);
 
         return $this->ObtenerURL() . 'uploads/excel/' . $fichero;
+    }
+
+    private function ListarFeriadosReporteExcelSchedule($semanas)
+    {
+        $repoHoliday = $this->getDoctrine()->getRepository(Holiday::class);
+        $feriados = [];
+
+        $fechasTodas = [];
+        foreach ($semanas as $s) {
+            foreach ($s->dias as $dia) {
+                $fecha = \DateTime::createFromFormat('m/d/Y', $dia);
+                if ($fecha) {
+                    $fechasTodas[] = $fecha->format('Y-m-d');
+                }
+            }
+        }
+
+        $feriadosDB = $repoHoliday->ListarFeriadosDeFecha($fechasTodas);
+        foreach ($feriadosDB as $feriado) {
+            $feriados[$feriado->getDay()->format('Y-m-d')] = strtoupper($feriado->getDescription());
+        }
+
+        return $feriados;
     }
 
     private function ObtenerSemanasReporteExcelSchedule(?string $fechaInicio, ?string $fechaFin, string $formato = 'm/d/Y'): array

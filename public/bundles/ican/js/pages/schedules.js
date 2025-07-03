@@ -460,6 +460,7 @@ var Schedules = function () {
         $('.date-new').removeClass('m--hide');
         $('#div-day').removeClass('m--hide').addClass('m--hide');
         $('#btn-clonar').removeClass('m--hide').addClass('m--hide');
+        $('#btn-delete-modal').removeClass('m--hide').addClass('m--hide');
 
     };
 
@@ -904,6 +905,7 @@ var Schedules = function () {
                     $('#highpriority').prop('checked', response.schedule.highpriority);
 
                     $('#btn-clonar').removeClass('m--hide');
+                    $('#btn-delete-modal').removeClass('m--hide');
 
                 } else {
                     toastr.error(response.error, "");
@@ -928,6 +930,19 @@ var Schedules = function () {
             $('#modal-eliminar').modal({
                 'show': true
             });
+        });
+
+        $(document).off('click', "#btn-delete-modal");
+        $(document).on('click', "#btn-delete-modal", function (e) {
+            e.preventDefault();
+
+            rowDelete = $('#schedule_id').val();
+
+            $('#modal-eliminar').modal({
+                'show': true
+            });
+
+            cerrarFormsConfirmated();
         });
 
         $(document).off('click', "#btn-eliminar-schedule");
@@ -981,7 +996,8 @@ var Schedules = function () {
                     mApp.unblock('#schedule-table-editable');
 
                     if (response.success) {
-                        oTable.load();
+
+                        btnClickFiltrar();
 
                         toastr.success(response.message, "Success");
 
@@ -1021,7 +1037,8 @@ var Schedules = function () {
                     mApp.unblock('#schedule-table-editable');
                     if (response.success) {
 
-                        oTable.load();
+                        btnClickFiltrar();
+
                         toastr.success(response.message, "Success");
 
                     } else {

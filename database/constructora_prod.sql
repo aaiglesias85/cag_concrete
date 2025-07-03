@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 29-06-2025 a las 22:10:22
+-- Tiempo de generación: 03-07-2025 a las 00:40:12
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3024,8 +3024,8 @@ CREATE TABLE `estimate` (
 --
 
 INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `bid_description`, `bid_instructions`, `plan_link`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
-(2, '', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
-(3, '', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 3, 1, 2, 1, NULL, NULL, NULL);
+(2, '345435435', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
+(3, 'tdfgdfgg', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 3, 1, 2, 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3069,10 +3069,10 @@ CREATE TABLE `estimate_estimator` (
 --
 
 INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
-(42, 2, 1),
-(43, 2, 3),
-(44, 2, 2),
-(45, 3, 2);
+(46, 2, 1),
+(47, 2, 3),
+(48, 2, 2),
+(49, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -3091,10 +3091,10 @@ CREATE TABLE `estimate_project_type` (
 --
 
 INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
-(47, 2, 1),
-(48, 2, 4),
-(49, 3, 2),
-(50, 3, 3);
+(51, 2, 1),
+(52, 2, 4),
+(53, 3, 2),
+(54, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -3169,7 +3169,20 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (27, 'plan_status', 'Plan Status'),
 (28, 'district', 'District'),
 (29, 'estimate', 'Estimates'),
-(30, 'plan_downloading', 'Plans Downloading');
+(30, 'plan_downloading', 'Plans Downloading'),
+(31, 'holiday', 'Holidays');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `holiday`
+--
+
+CREATE TABLE `holiday` (
+  `holiday_id` int(11) NOT NULL,
+  `day` date DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -4414,7 +4427,9 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3438, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-06-21 18:00:07', 1),
 (3439, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-06-22 18:33:51', 1),
 (3440, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-06-27 19:41:38', 1),
-(3441, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-06-28 20:30:38', 1);
+(3441, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-06-28 20:30:38', 1),
+(3442, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-07-03 00:30:22', 1),
+(3443, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-03 00:30:32', 1);
 
 -- --------------------------------------------------------
 
@@ -7485,7 +7500,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (180, 1, 1, 1, 1, 1, 27),
 (181, 1, 1, 1, 1, 1, 28),
 (182, 1, 1, 1, 1, 1, 29),
-(183, 1, 1, 1, 1, 1, 30);
+(183, 1, 1, 1, 1, 1, 30),
+(184, 1, 1, 1, 1, 1, 31);
 
 -- --------------------------------------------------------
 
@@ -7857,7 +7873,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (825, 1, 1, 1, 1, 1, 27),
 (826, 1, 1, 1, 1, 1, 28),
 (827, 1, 1, 1, 1, 1, 29),
-(828, 1, 1, 1, 1, 1, 30);
+(828, 1, 1, 1, 1, 1, 30),
+(829, 1, 1, 1, 1, 1, 31);
 
 -- --------------------------------------------------------
 
@@ -8044,6 +8061,12 @@ ALTER TABLE `estimate_quote`
 --
 ALTER TABLE `function`
   ADD PRIMARY KEY (`function_id`);
+
+--
+-- Indices de la tabla `holiday`
+--
+ALTER TABLE `holiday`
+  ADD PRIMARY KEY (`holiday_id`);
 
 --
 -- Indices de la tabla `inspector`
@@ -8362,13 +8385,13 @@ ALTER TABLE `estimate_bid_deadline`
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -8380,7 +8403,13 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT de la tabla `holiday`
+--
+ALTER TABLE `holiday`
+  MODIFY `holiday_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `inspector`
@@ -8410,7 +8439,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3442;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3444;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8506,7 +8535,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=184;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -8560,7 +8589,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=829;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=830;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
