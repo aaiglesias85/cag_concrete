@@ -555,115 +555,115 @@ var DataTracking = function () {
 
             editRow(data_tracking_id);
         });
+    };
 
-        function editRow(data_tracking_id) {
+    var editRow = function(data_tracking_id) {
 
-            MyApp.block('#modal-data-tracking .modal-content');
+        MyApp.block('#modal-data-tracking .modal-content');
 
-            $.ajax({
-                type: "POST",
-                url: "data-tracking/cargarDatos",
-                dataType: "json",
-                data: {
-                    'data_tracking_id': data_tracking_id
-                },
-                success: function (response) {
-                    mApp.unblock('#modal-data-tracking .modal-content');
-                    if (response.success) {
+        $.ajax({
+            type: "POST",
+            url: "data-tracking/cargarDatos",
+            dataType: "json",
+            data: {
+                'data_tracking_id': data_tracking_id
+            },
+            success: function (response) {
+                mApp.unblock('#modal-data-tracking .modal-content');
+                if (response.success) {
 
-                        // datos project
-                        $('#project').off('change', changeProject);
+                    // datos project
+                    $('#project').off('change', changeProject);
 
-                        $('#project').val(response.data_tracking.project_id);
-                        $('#project').trigger('change');
+                    $('#project').val(response.data_tracking.project_id);
+                    $('#project').trigger('change');
 
-                        $('#project').on('change', changeProject);
+                    $('#project').on('change', changeProject);
 
-                        $('#proyect-number').html(response.data_tracking.project_number);
-                        $('#proyect-name').html(response.data_tracking.project_description);
+                    $('#proyect-number').html(response.data_tracking.project_number);
+                    $('#proyect-name').html(response.data_tracking.project_description);
 
-                        $('#data-tracking-date').val(response.data_tracking.date);
+                    $('#data-tracking-date').val(response.data_tracking.date);
 
-                        $('#inspector').val(response.data_tracking.inspector_id);
-                        $('#inspector').trigger('change');
+                    $('#inspector').val(response.data_tracking.inspector_id);
+                    $('#inspector').trigger('change');
 
-                        $('#station_number').val(response.data_tracking.station_number);
-                        $('#measured_by').val(response.data_tracking.measured_by);
+                    $('#station_number').val(response.data_tracking.station_number);
+                    $('#measured_by').val(response.data_tracking.measured_by);
 
-                        $('#crew_lead').val(response.data_tracking.crew_lead);
-                        $('#notes').val(response.data_tracking.notes);
-                        $('#other_materials').val(response.data_tracking.other_materials);
-
-
-                        $('#total_people').off('change', calcularTotalOverheadPrice);
-                        $('#overhead_price').off('change', calcularTotalOverheadPrice);
-
-                        $('#total_people').val(response.data_tracking.total_people);
-
-                        $('#overhead_price').val(response.data_tracking.overhead_price_id);
-                        $('#overhead_price').trigger('change');
-
-                        calcularTotalOverheadPrice();
-
-                        $('#total_people').on('change', calcularTotalOverheadPrice);
-                        $('#overhead_price').on('change', calcularTotalOverheadPrice);
-
-                        $('#total_stamps').val(response.data_tracking.total_stamps);
-
-                        $('#color_used').off('change', calcularTotalColorPrice);
-                        $('#color_price').off('change', calcularTotalColorPrice);
-
-                        $('#color_used').val(response.data_tracking.color_used);
-                        $('#color_price').val(response.data_tracking.color_price);
-
-                        calcularTotalColorPrice();
-
-                        $('#color_used').on('change', calcularTotalColorPrice);
-                        $('#color_price').on('change', calcularTotalColorPrice);
-
-                        // items
-                        items_data_tracking = response.data_tracking.items;
-                        actualizarTableListaItems();
-
-                        // project items
-                        items = response.data_tracking.project_items;
-                        actualizarSelectProjectItems();
-
-                        // labor
-                        labor = response.data_tracking.labor;
-
-                        // materials
-                        materials = response.data_tracking.materials;
-
-                        // conc vendors
-                        conc_vendors = response.data_tracking.conc_vendors;
-
-                        // subcontracts
-                        subcontracts = response.data_tracking.subcontracts;
-
-                        // totals
-                        $('#form-group-totals').removeClass('m--hide');
-                        $('#total_concrete_yiel').val(MyApp.formatearNumero(response.data_tracking.total_concrete_yiel, 2, '.', ','));
-                        $('#total_quantity_today').val(response.data_tracking.total_quantity_today);
+                    $('#crew_lead').val(response.data_tracking.crew_lead);
+                    $('#notes').val(response.data_tracking.notes);
+                    $('#other_materials').val(response.data_tracking.other_materials);
 
 
-                        $('#total_daily_today').val(MyApp.formatearNumero(response.data_tracking.total_daily_today, 2, '.', ','));
+                    $('#total_people').off('change', calcularTotalOverheadPrice);
+                    $('#overhead_price').off('change', calcularTotalOverheadPrice);
 
-                        $('#profit').val(MyApp.formatearNumero(response.data_tracking.profit, 2, '.', ','));
+                    $('#total_people').val(response.data_tracking.total_people);
 
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#modal-data-tracking .modal-content');
+                    $('#overhead_price').val(response.data_tracking.overhead_price_id);
+                    $('#overhead_price').trigger('change');
 
+                    calcularTotalOverheadPrice();
+
+                    $('#total_people').on('change', calcularTotalOverheadPrice);
+                    $('#overhead_price').on('change', calcularTotalOverheadPrice);
+
+                    $('#total_stamps').val(response.data_tracking.total_stamps);
+
+                    $('#color_used').off('change', calcularTotalColorPrice);
+                    $('#color_price').off('change', calcularTotalColorPrice);
+
+                    $('#color_used').val(response.data_tracking.color_used);
+                    $('#color_price').val(response.data_tracking.color_price);
+
+                    calcularTotalColorPrice();
+
+                    $('#color_used').on('change', calcularTotalColorPrice);
+                    $('#color_price').on('change', calcularTotalColorPrice);
+
+                    // items
+                    items_data_tracking = response.data_tracking.items;
+                    actualizarTableListaItems();
+
+                    // project items
+                    items = response.data_tracking.project_items;
+                    actualizarSelectProjectItems();
+
+                    // labor
+                    labor = response.data_tracking.labor;
+
+                    // materials
+                    materials = response.data_tracking.materials;
+
+                    // conc vendors
+                    conc_vendors = response.data_tracking.conc_vendors;
+
+                    // subcontracts
+                    subcontracts = response.data_tracking.subcontracts;
+
+                    // totals
+                    $('#form-group-totals').removeClass('m--hide');
+                    $('#total_concrete_yiel').val(MyApp.formatearNumero(response.data_tracking.total_concrete_yiel, 2, '.', ','));
+                    $('#total_quantity_today').val(response.data_tracking.total_quantity_today);
+
+
+                    $('#total_daily_today').val(MyApp.formatearNumero(response.data_tracking.total_daily_today, 2, '.', ','));
+
+                    $('#profit').val(MyApp.formatearNumero(response.data_tracking.profit, 2, '.', ','));
+
+                } else {
                     toastr.error(response.error, "");
                 }
-            });
+            },
+            failure: function (response) {
+                mApp.unblock('#modal-data-tracking .modal-content');
 
-        }
-    };
+                toastr.error(response.error, "");
+            }
+        });
+
+    }
 
     var actualizarSelectProjectItems = function () {
         // reset
@@ -3780,6 +3780,21 @@ var DataTracking = function () {
             initTableSubcontracts();
             initFormSubcontract();
             initAccionesSubcontracts();
+
+            // editar
+            var data_tracking_id_edit = localStorage.getItem('data_tracking_id_edit');
+            if (data_tracking_id_edit) {
+                resetForms();
+
+                $('#data_tracking_id').val(data_tracking_id_edit);
+
+                // open modal
+                $('#modal-data-tracking').modal('show');
+
+                localStorage.removeItem('data_tracking_id_edit');
+
+                editRow(data_tracking_id_edit);
+            }
         }
 
     };

@@ -74,90 +74,90 @@ var DataTrackingDetalle = function () {
 
             editRow(data_tracking_id);
         });
+    };
 
-        function editRow(data_tracking_id) {
+    var editRow = function (data_tracking_id) {
 
-            MyApp.block('#modal-data-tracking-detalle .modal-content');
+        MyApp.block('#modal-data-tracking-detalle .modal-content');
 
-            $.ajax({
-                type: "POST",
-                url: "data-tracking/cargarDatos",
-                dataType: "json",
-                data: {
-                    'data_tracking_id': data_tracking_id
-                },
-                success: function (response) {
-                    mApp.unblock('#modal-data-tracking-detalle .modal-content');
-                    if (response.success) {
+        $.ajax({
+            type: "POST",
+            url: "data-tracking/cargarDatos",
+            dataType: "json",
+            data: {
+                'data_tracking_id': data_tracking_id
+            },
+            success: function (response) {
+                mApp.unblock('#modal-data-tracking-detalle .modal-content');
+                if (response.success) {
 
-                        // datos project
-                        $('#proyect-number-detalle').html(response.data_tracking.project_number);
-                        $('#proyect-name-detalle').html(response.data_tracking.project_description);
+                    // datos project
+                    $('#proyect-number-detalle').html(response.data_tracking.project_number);
+                    $('#proyect-name-detalle').html(response.data_tracking.project_description);
 
-                        $('#data-tracking-date-detalle').val(response.data_tracking.date);
+                    $('#data-tracking-date-detalle').val(response.data_tracking.date);
 
-                        $('#inspector-detalle').val(response.data_tracking.inspector_id);
-                        $('#inspector-detalle').trigger('change');
+                    $('#inspector-detalle').val(response.data_tracking.inspector_id);
+                    $('#inspector-detalle').trigger('change');
 
-                        $('#station_number-detalle').val(response.data_tracking.station_number);
-                        $('#measured_by-detalle').val(response.data_tracking.measured_by);
+                    $('#station_number-detalle').val(response.data_tracking.station_number);
+                    $('#measured_by-detalle').val(response.data_tracking.measured_by);
 
-                        $('#crew_lead-detalle').val(response.data_tracking.crew_lead);
-                        $('#notes-detalle').val(response.data_tracking.notes);
-                        $('#other_materials-detalle').val(response.data_tracking.other_materials);
+                    $('#crew_lead-detalle').val(response.data_tracking.crew_lead);
+                    $('#notes-detalle').val(response.data_tracking.notes);
+                    $('#other_materials-detalle').val(response.data_tracking.other_materials);
 
 
-                        $('#total_people-detalle').val(response.data_tracking.total_people);
-                        $('#overhead_price-detalle').val(response.data_tracking.overhead_price);
+                    $('#total_people-detalle').val(response.data_tracking.total_people);
+                    $('#overhead_price-detalle').val(response.data_tracking.overhead_price);
 
-                        calcularTotalOverheadPrice();
+                    calcularTotalOverheadPrice();
 
-                        $('#total_stamps-detalle').val(response.data_tracking.total_stamps);
+                    $('#total_stamps-detalle').val(response.data_tracking.total_stamps);
 
-                        $('#color_used-detalle').val(response.data_tracking.color_used);
-                        $('#color_price-detalle').val(response.data_tracking.color_price);
+                    $('#color_used-detalle').val(response.data_tracking.color_used);
+                    $('#color_price-detalle').val(response.data_tracking.color_price);
 
-                        calcularTotalColorPrice();
+                    calcularTotalColorPrice();
 
-                        // items
-                        items_data_tracking = response.data_tracking.items;
-                        actualizarTableListaItems();
+                    // items
+                    items_data_tracking = response.data_tracking.items;
+                    actualizarTableListaItems();
 
-                        // labor
-                        labor = response.data_tracking.labor;
-                        actualizarTableListaLabor();
+                    // labor
+                    labor = response.data_tracking.labor;
+                    actualizarTableListaLabor();
 
-                        // materials
-                        materials = response.data_tracking.materials;
-                        actualizarTableListaMaterial()
+                    // materials
+                    materials = response.data_tracking.materials;
+                    actualizarTableListaMaterial()
 
-                        // conc vendors
-                        conc_vendors = response.data_tracking.conc_vendors;
-                        actualizarTableListaConcVendors();
+                    // conc vendors
+                    conc_vendors = response.data_tracking.conc_vendors;
+                    actualizarTableListaConcVendors();
 
-                        // subcontracts
-                        subcontracts = response.data_tracking.subcontracts;
-                        actualizarTableListaSubcontracts();
+                    // subcontracts
+                    subcontracts = response.data_tracking.subcontracts;
+                    actualizarTableListaSubcontracts();
 
-                        // totals
-                        $('#total_concrete_yiel-detalle').val(response.data_tracking.total_concrete_yiel);
-                        $('#total_quantity_today-detalle').val(response.data_tracking.total_quantity_today);
-                        $('#total_daily_today-detalle').val(response.data_tracking.total_daily_today);
-                        $('#profit-detalle').val(response.data_tracking.profit);
+                    // totals
+                    $('#total_concrete_yiel-detalle').val(response.data_tracking.total_concrete_yiel);
+                    $('#total_quantity_today-detalle').val(response.data_tracking.total_quantity_today);
+                    $('#total_daily_today-detalle').val(response.data_tracking.total_daily_today);
+                    $('#profit-detalle').val(response.data_tracking.profit);
 
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#modal-data-tracking-detalle .modal-content');
-
+                } else {
                     toastr.error(response.error, "");
                 }
-            });
+            },
+            failure: function (response) {
+                mApp.unblock('#modal-data-tracking-detalle .modal-content');
 
-        }
-    };
+                toastr.error(response.error, "");
+            }
+        });
+
+    }
 
     var calcularTotalOverheadPrice = function () {
         var cantidad = $('#total_people-detalle').val();
@@ -929,6 +929,21 @@ var DataTrackingDetalle = function () {
             initTableConcVendor();
             // subcontracts
             initTableSubcontracts();
+
+            // editar
+            var data_tracking_id_view = localStorage.getItem('data_tracking_id_view');
+            if (data_tracking_id_view) {
+                resetForms();
+
+                $('#data_tracking_id').val(data_tracking_id_view);
+
+                // open modal
+                $('#modal-data-tracking-detalle').modal('show');
+
+                localStorage.removeItem('data_tracking_id_view');
+
+                editRow(data_tracking_id_view);
+            }
         }
 
     };

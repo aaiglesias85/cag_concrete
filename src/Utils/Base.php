@@ -4,6 +4,7 @@ namespace App\Utils;
 
 use App\Entity\CompanyContact;
 use App\Entity\ConcreteVendorContact;
+use App\Entity\DataTracking;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
@@ -1119,6 +1120,81 @@ class Base
         }
 
         return $contacts;
+    }
+
+    /**
+     * CalcularTotalConcreteYiel
+     * @param $data_tracking_id
+     * @return float
+     */
+    public function CalcularTotalConcreteYiel($data_tracking_id)
+    {
+        $total_conc_yiel = 0;
+
+        $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+            ->ListarItems($data_tracking_id);
+        foreach ($data_tracking_items as $data_tracking_item) {
+            // aplicar el yield
+            $quantity_yield = $this->CalcularTotalConcreteYielItem($data_tracking_item);
+            $total_conc_yiel += $quantity_yield;
+
+        }
+
+        return $total_conc_yiel;
+    }
+
+    /**
+     * CalcularTotalConcreteYielItem
+     * @param DataTrackingItem $data_tracking_item
+     * @return float
+     */
+    public function CalcularTotalConcreteYielItem($data_tracking_item)
+    {
+
+        $quantity_yield = 0;
+
+        if ($data_tracking_item->getProjectItem()->getYieldCalculation() != '' && $data_tracking_item->getProjectItem()->getYieldCalculation() != 'none') {
+            if ($data_tracking_item->getProjectItem()->getYieldCalculation() == "equation" && $data_tracking_item->getProjectItem()->getEquation() != null) {
+                $quantity = $data_tracking_item->getQuantity();
+                $quantity_yield = $this->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+            } else {
+                $quantity_yield = $data_tracking_item->getQuantity();
+            }
+        }
+
+        return $quantity_yield;
+    }
+
+    /**
+     * CalcularLostConcrete
+     * @param DataTracking $value
+     * @return float
+     */
+    public function CalcularLostConcrete($value)
+    {
+        $total_conc_item = 0;
+
+        $data_tracking_id = $value->getId();
+
+        $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
+            ->TotalConcUsed($data_tracking_id);
+
+        $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+            ->ListarItems($data_tracking_id);
+        foreach ($data_tracking_items as $data_tracking_item) {
+
+            // aplicar el yield
+            $quantity = $data_tracking_item->getQuantity();
+            $quantity_yield = $quantity;
+            if ($data_tracking_item->getProjectItem()->getYieldCalculation() == "equation" && $data_tracking_item->getProjectItem()->getEquation() != null) {
+                $quantity_yield = $this->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+            }
+
+            $total_conc_item += $quantity_yield;
+
+        }
+
+        return round($total_conc_used - $total_conc_item, 2);
     }
 
 }

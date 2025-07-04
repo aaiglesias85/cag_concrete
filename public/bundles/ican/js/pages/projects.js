@@ -678,7 +678,7 @@ var Projects = function () {
 
                     // ir al tab de notas
                     if (editar_notas) {
-                        activeTab = 4;
+                        activeTab = 5;
                         mostrarTab();
                     }
 
@@ -963,6 +963,9 @@ var Projects = function () {
                 case 5:
                     actualizarTableListaInvoices();
                     break;
+                case 6:
+                    btnClickFiltrarDataTracking();
+                    break;
             }
 
         });
@@ -1019,6 +1022,10 @@ var Projects = function () {
                 case 5:
                     $('#tab-invoices').tab('show');
                     actualizarTableListaInvoices();
+                    break;
+                case 6:
+                    $('#tab-data-tracking').tab('show');
+                    btnClickFiltrarDataTracking();
                     break;
 
             }
@@ -2605,6 +2612,239 @@ var Projects = function () {
 
     };
 
+    // datatracking
+    var oTableDataTracking;
+    var initTableDataTracking = function () {
+        MyApp.block('#data-tracking-table-editable');
+
+        var table = $('#data-tracking-table-editable');
+
+        var aoColumns = [
+            {
+                field: "date",
+                title: "Date",
+                width: 100,
+                textAlign: 'center'
+            },
+            {
+                field: "leads",
+                title: "Lead",
+                width: 150,
+                sortable: false,
+            },
+            {
+                field: "totalConcUsed",
+                title: "Conc. Used (CY)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.totalConcUsed, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "total_concrete_yiel",
+                title: "Conc. Yield (CY)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.total_concrete_yiel, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "lostConcrete",
+                title: "Difference (CY)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.lostConcrete, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "total_concrete",
+                title: "Conc. Total ($)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>$${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "totalLabor",
+                title: "Labor Total ($)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>$${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "total_daily_today",
+                title: "Daily Total ($)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>$${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "profit",
+                title: "Profit ($)",
+                width: 100,
+                textAlign: 'center',
+                sortable: false,
+                template: function (row) {
+                    return `<span>$${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "acciones",
+                width: 80,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center'
+            }
+        ];
+        oTableDataTracking = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'remote',
+                source: {
+                    read: {
+                        url: 'project/listarDataTracking',
+                    }
+                },
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                },
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            rows: {
+                afterTemplate: function (row, data, index) {
+                    if (data.pending === 1) {
+                        $(row).addClass('row-pending');
+                    }
+                }
+            }
+        });
+
+        //Events
+        oTableDataTracking
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#data-tracking-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#data-tracking-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#data-tracking-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#data-tracking-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#data-tracking-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+        //Busqueda
+        var query = oTableDataTracking.getDataSourceQuery();
+        $('#lista-data-tracking .m_form_search').on('keyup', function (e) {
+            btnClickFiltrarDataTracking();
+        }).val(query.generalSearch);
+    };
+    var initAccionFiltrarDataTracking = function () {
+
+        $(document).off('click', "#btn-filtrar-data-tracking");
+        $(document).on('click', "#btn-filtrar-data-tracking", function (e) {
+            btnClickFiltrarDataTracking();
+        });
+
+    };
+    var btnClickFiltrarDataTracking = function () {
+        var query = oTableDataTracking.getDataSourceQuery();
+
+        var generalSearch = $('#lista-data-tracking .m_form_search').val();
+        query.generalSearch = generalSearch;
+
+        var project_id = $('#project_id').val();
+        query.project_id = project_id;
+
+        var fechaInicial = $('#fechaInicial-data-tracking').val();
+        query.fechaInicial = fechaInicial;
+
+        var fechaFin = $('#fechaFin-data-tracking').val();
+        query.fechaFin = fechaFin;
+
+        var pending = $('#pending-data-tracking').val();
+        query.pending = pending;
+
+        oTableDataTracking.setDataSourceQuery(query);
+        oTableDataTracking.load();
+    }
+    var initAccionesDataTracking = function () {
+
+        $(document).off('click', "#data-tracking-table-editable a.edit");
+        $(document).on('click', "#data-tracking-table-editable a.edit", function (e) {
+
+            var data_tracking_id = $(this).data('id');
+            localStorage.setItem('data_tracking_id_edit', data_tracking_id);
+
+            // open
+            window.location.href = url_datatracking;
+        });
+
+        $(document).off('click', "#data-tracking-table-editable a.view");
+        $(document).on('click', "#data-tracking-table-editable a.view", function (e) {
+
+            var data_tracking_id = $(this).data('id');
+            localStorage.setItem('data_tracking_id_view', data_tracking_id);
+
+            // open
+            window.location.href = url_datatracking;
+        });
+
+    };
+
 
     return {
         //main function to initiate the module
@@ -2645,6 +2885,11 @@ var Projects = function () {
             // invoices
             initTableInvoices();
             initAccionesInvoices();
+
+            // data tracking
+            initTableDataTracking();
+            initAccionFiltrarDataTracking();
+            initAccionesDataTracking();
 
             initAccionChange();
 
