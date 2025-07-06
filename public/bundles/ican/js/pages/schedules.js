@@ -39,15 +39,18 @@ var Schedules = function () {
         $(document).off('click', ".fc-event, .fc-list-item");
         $(document).on('click', ".fc-event, .fc-list-item", function (e) {
 
-            resetForms();
+            var schedule_id = $(this).data('id').toString();
+            if (!schedule_id.includes('holiday')) {
+                resetForms();
 
-            var schedule_id = $(this).data('id');
-            $('#schedule_id').val(schedule_id);
+                $('#schedule_id').val(schedule_id);
 
-            $('#form-schedule').removeClass('m--hide');
-            $('#lista-schedule').addClass('m--hide');
+                $('#form-schedule').removeClass('m--hide');
+                $('#lista-schedule').addClass('m--hide');
 
-            editRow(schedule_id);
+                editRow(schedule_id);
+            }
+
 
         });
 
@@ -105,9 +108,22 @@ var Schedules = function () {
             TODAY = todayDate.format('Y-m-d');
         }
 
+        // feriados
+        const feriadoEvents = holidays.map(feriado => ({
+            id: `holiday-${feriado.holiday_id}`,
+            title: feriado.description.toUpperCase(),
+            start: feriado.fecha,
+            allDay: true,
+            display: 'background', // para marcar el fondo del día
+            classNames: ['feriado-event']
+        }));
+
+        // todos los eventos
+        const allEvents = [...schedules, ...feriadoEvents];
+
         var calendarEl = document.getElementById('calendario');
         calendar = new FullCalendar.Calendar(calendarEl, {
-            plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+            plugins: ['interaction', 'dayGrid', 'timeGrid', 'list'],
 
             isRTL: false,
             header: {
@@ -124,9 +140,9 @@ var Schedules = function () {
             now: TODAY + 'T09:25:00', // just for demo
 
             views: {
-                dayGridMonth: { buttonText: 'month' },
-                timeGridWeek: { buttonText: 'week' },
-                timeGridDay: { buttonText: 'day' }
+                dayGridMonth: {buttonText: 'month'},
+                timeGridWeek: {buttonText: 'week'},
+                timeGridDay: {buttonText: 'day'}
             },
 
             defaultView: 'dayGridMonth',
@@ -135,9 +151,9 @@ var Schedules = function () {
             editable: true,
             eventLimit: true, // allow "more" link when too many events
             navLinks: true,
-            events: schedules,
+            events: allEvents,
 
-            eventRender: function(info) {
+            eventRender: function (info) {
                 var element = $(info.el);
 
                 //Para editar
@@ -193,10 +209,19 @@ var Schedules = function () {
 
         calendar.render();
 
+        // agregar clase holiday
+        holidays.forEach(feriado => {
+            const selector = `[data-date="${feriado.fecha}"]`;
+            const cell = document.querySelector(selector);
+            if (cell) {
+                cell.classList.add('feriado-cell');
+            }
+        });
+
     }
     var actualizarCalendario = function () {
         // destroy
-        if(calendar){
+        if (calendar) {
             calendar.destroy();
         }
 
@@ -1369,6 +1394,7 @@ var Schedules = function () {
             });
 
         };
+
         function resetFormsClonar() {
             $('#clonar-schedule-form input').each(function (e) {
                 $element = $(this);

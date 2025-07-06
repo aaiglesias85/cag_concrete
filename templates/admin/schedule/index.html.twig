@@ -16,6 +16,31 @@
         .fc-slats .fc-time {
             display: none !important;
         }
+
+        .fc-event.feriado-event {
+            background-color: black !important;
+            color: white !important;
+            border: none !important;
+            font-weight: bold;
+        }
+
+        .fc-event.feriado-event .fc-title {
+            color: #fff !important;
+        }
+
+        .fc-unthemed .feriado-event.fc-start .fc-content:before {
+            background: #fff !important;
+        }
+
+        .fc-day.feriado-cell {
+            background-color: black !important;
+            color: white !important;
+        }
+
+        .fc-day.feriado-cell .fc-day-number,
+        .fc-day.feriado-cell .fc-event {
+            color: white !important;
+        }
     </style>
 {% endblock %}
 
@@ -551,6 +576,9 @@
             editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
             eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
         };
+
+        var holidays = {{ holidays|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+        console.log(holidays);
 
         jQuery(document).ready(function () {
             Schedules.init();

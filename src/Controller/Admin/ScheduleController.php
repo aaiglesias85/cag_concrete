@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\ConcreteVendor;
+use App\Entity\Holiday;
 use App\Entity\Project;
 use App\Utils\Admin\ScheduleService;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,11 +34,15 @@ class ScheduleController extends AbstractController
                 $concrete_vendors = $this->scheduleService->getDoctrine()->getRepository(ConcreteVendor::class)
                     ->ListarOrdenados();
 
+                // holidays
+                $holidays = $this->scheduleService->ListarTodosHolidays();
+
 
                 return $this->render('admin/schedule/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
-                    'concrete_vendors' => $concrete_vendors
+                    'concrete_vendors' => $concrete_vendors,
+                    'holidays' => $holidays
                 ));
             }
         } else {

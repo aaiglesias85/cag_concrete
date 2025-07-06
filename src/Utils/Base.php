@@ -12,6 +12,7 @@ use App\Entity\DataTrackingMaterial;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateQuote;
+use App\Entity\Holiday;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
@@ -1195,6 +1196,27 @@ class Base
         }
 
         return round($total_conc_used - $total_conc_item, 2);
+    }
+
+    /**
+     * ListarTodosHolidays
+     *
+     * @return array
+     */
+    public function ListarTodosHolidays()
+    {
+        $holidays = [];
+
+        $lista = $this->getDoctrine()->getRepository(Holiday::class)->ListarOrdenados();;
+        foreach ($lista as $value) {
+            $holidays[] = [
+                'holiday_id' => $value->getHolidayId(),
+                'fecha' => $value->getDay()->format('Y-m-d'),
+                'description' => $value->getDescription(),
+            ];
+        }
+
+        return $holidays;
     }
 
 }
