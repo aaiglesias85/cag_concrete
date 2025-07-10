@@ -376,7 +376,7 @@ class ScheduleService extends Base
                     "highpriority" => $highpriority,
                 ];
 
-                $horaActual->modify('+90 minutes'); // incremento de 90 min
+                $horaActual->modify('+10 minutes'); // incremento de 90 min
                 $cont++;
             }
         }
