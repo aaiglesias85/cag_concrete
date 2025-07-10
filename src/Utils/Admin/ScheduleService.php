@@ -342,16 +342,21 @@ class ScheduleService extends Base
             $porFecha[$item['day']][] = $item['value'];
         }
 
-        $cont = 0;
-
         foreach ($porFecha as $fecha => $items) {
-            $horaActual = \DateTime::createFromFormat('Y-m-d H:i', $fecha . ' 00:00');
+            $totalEventos = count($items);
+            $horaInicio = \DateTime::createFromFormat('Y-m-d H:i', $fecha . ' 08:00');
+            $horaFinDia = \DateTime::createFromFormat('Y-m-d H:i', $fecha . ' 20:00');
+
+            // Calcular minutos disponibles
+            $minutosDisponibles = ($horaFinDia->getTimestamp() - $horaInicio->getTimestamp()) / 60;
+
+            // Separación en minutos entre eventos (mínimo 10 minutos para evitar que se solapen)
+            $separacionMinutos = max(30, floor($minutosDisponibles / $totalEventos)); // mínimo 30 minutos
 
             foreach ($items as $value) {
                 $schedule_id = $value->getScheduleId();
                 $title = $value->getProject()->getProjectNumber();
-
-                $dayOriginal = $value->getDay(); // Fecha original con hora de la DB
+                $dayOriginal = $value->getDay();
 
                 $class = "m-fc-event--brand";
                 $highpriority = $value->getHighpriority();
@@ -359,25 +364,28 @@ class ScheduleService extends Base
                     $class = "m-fc-event--danger m-fc-event--solid-danger";
                 }
 
-                $arreglo_resultado[$cont] = [
+                $inicioEvento = clone $horaInicio;
+                $finEvento = (clone $inicioEvento)->modify("+25 minutes"); // duración visual fija si quieres
+
+                $arreglo_resultado[] = [
                     "id" => $schedule_id,
                     "title" => $title,
-                    'start' => $horaActual->format('Y-m-d H:i'), // hora artificial para mostrar en calendario
-                    'end' => $horaActual->format('Y-m-d H:i'),
+                    'start' => $inicioEvento->format('Y-m-d H:i'),
+                    'end' => $finEvento->format('Y-m-d H:i'),
                     'className' => $class,
                     "location" => $value->getLocation(),
                     "description" => $value->getDescription(),
                     "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
                     "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
-                    "day" => $dayOriginal->format('m/d/Y'), // original de la DB
+                    "day" => $dayOriginal->format('m/d/Y'),
                     "hour" => $value->getHour() != null ? $value->getHour() : "",
                     "quantity" => $value->getQuantity(),
                     "notes" => $value->getNotes(),
                     "highpriority" => $highpriority,
                 ];
 
-                $horaActual->modify('+10 minutes'); // incremento de 90 min
-                $cont++;
+                // Avanza al siguiente bloque de tiempo
+                $horaInicio->modify("+{$separacionMinutos} minutes");
             }
         }
 
