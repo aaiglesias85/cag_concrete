@@ -471,4 +471,36 @@ class DataTrackingLaborRepository extends EntityRepository
         return $consulta->getQuery()->getResult();
     }
 
+    /**
+     * ListarLeadsDeFecha: Lista los leads de una fecha
+     *
+     * @return DataTrackingLabor[]
+     */
+    public function ListarLeadsDeFecha(?string $project_id = null, ?string $fecha = null) {
+        $consulta = $this->createQueryBuilder('d_t_l')
+            ->leftJoin('d_t_l.employee', 'e')
+            ->leftJoin('d_t_l.dataTracking', 'd_t')
+            ->leftJoin('d_t.project', 'p')
+            ->where('d_t_l.employee IS NOT NULL')
+            ->andWhere('e.position = :position')
+            ->setParameter('position', 'Lead');
+
+        // Filtro por project_id
+        if ($project_id) {
+            $consulta->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        // Filtro por fecha
+        if ($fecha) {
+            $consulta->andWhere('d_t.date >= :fecha')
+                ->setParameter('fecha', $fecha);
+        }
+
+        // Ordenación
+        $consulta->orderBy("d_t.date", "DESC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
 }

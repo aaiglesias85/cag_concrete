@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
+use App\Entity\DataTrackingLabor;
 use App\Entity\Employee;
 use App\Entity\Holiday;
 use App\Entity\Project;
@@ -143,7 +144,11 @@ class ScheduleService extends Base
                         $hora = $schedule->getHour();
                         $ampm = $hora ? \DateTime::createFromFormat('H:i', $hora)?->format('g:i a') : '';
                         $cantidad = $schedule->getQuantity();
-                        $linea1 = 'NEED CREW';
+
+                        // lead
+                        $lead = $this->DevolverLeadDeFecha($project->getProjectId(), $schedule->getDay()->format('Y-m-d'));
+                        $linea1 = $lead ? $lead->getName() : 'NEED CREW';
+
                         $linea2 = $ampm !== '' ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
                         $agregado[$clave]['dias'][$indexDia] = "$linea1\n$linea2";
 
@@ -367,6 +372,12 @@ class ScheduleService extends Base
                 $inicioEvento = clone $horaInicio;
                 $finEvento = (clone $inicioEvento)->modify("+25 minutes"); // duración visual fija si quieres
 
+                // lead
+                $lead = $this->DevolverLeadDeFecha($value->getProject()->getProjectId(), $value->getDay()->format('Y-m-d'));
+                if ($lead) {
+                    $title = "{$title}   ({$lead->getName()})";
+                }
+
                 $arreglo_resultado[] = [
                     "id" => $schedule_id,
                     "title" => $title,
@@ -390,6 +401,23 @@ class ScheduleService extends Base
         }
 
         return $arreglo_resultado;
+    }
+
+    /**
+     * DevolverLeadDeFecha
+     * @param $project_id
+     * @param $date
+     * @return Employee|null
+     */
+    private function DevolverLeadDeFecha($project_id, $date)
+    {
+        $leads = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarLeadsDeFecha($project_id, $date);
+        if (!empty($leads)) {
+            return $leads[0]->getEmployee();
+        }
+
+        return null;
     }
 
 
