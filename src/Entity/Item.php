@@ -39,6 +39,12 @@ class Item
     #[ORM\JoinColumn(name: 'equation_id', referencedColumnName: 'equation_id')]
     private ?Equation $equation;
 
+    #[ORM\Column(name: "txn_id", type: "string", length: 255, nullable: true)]
+    private ?string $txnId = null;
+
+    #[ORM\Column(name: "edit_sequence", type: "string", length: 255, nullable: true)]
+    private ?string $editSequence = null;
+
     public function getItemId(): ?int
     {
         return $this->itemId;
@@ -124,4 +130,10 @@ class Item
     {
         $this->equation = $equation;
     }
+
+    public function setTxnId(?string $txnId): void { $this->txnId = $txnId; }
+    public function getTxnId(): ?string { return $this->txnId; }
+
+    public function setEditSequence(?string $editSequence): void { $this->editSequence = $editSequence; }
+    public function getEditSequence(): ?string { return $this->editSequence; }
 }

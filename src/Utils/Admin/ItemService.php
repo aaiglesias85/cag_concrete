@@ -10,6 +10,7 @@ use App\Entity\InvoiceItem;
 use App\Entity\Item;
 use App\Entity\DataTracking;
 use App\Entity\ProjectItem;
+use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
 use App\Utils\Base;
 
@@ -300,6 +301,9 @@ class ItemService extends Base
                 $this->ActualizarEquationItemProjects($item_id, $yield_calculation, $equation);
             }
 
+            // salvar en la cola
+            $this->SalvarItemQuickbook($entity);
+
             $em->flush();
 
             //Salvar log
@@ -372,6 +376,11 @@ class ItemService extends Base
 
         $em->flush();
 
+        // salvar en la cola
+        $this->SalvarItemQuickbook($entity);
+
+        $em->flush();
+
         //Salvar log
         $log_operacion = "Add";
         $log_categoria = "Item";
@@ -382,6 +391,39 @@ class ItemService extends Base
         $resultado['item'] = $this->DevolverItem($entity);
 
         return $resultado;
+    }
+
+    /**
+     * SalvarItemQuickbook
+     * @param Item $entity
+     * @return void
+     */
+    public function SalvarItemQuickbook($entity)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $item_id = $entity->getItemId();
+
+        $sync_queue_qbwc = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+            ->findOneBy(['tipo' => 'item', 'entidadId' => $item_id]);
+        $is_new_sync_queue_qbwc = false;
+        if ($sync_queue_qbwc == null) {
+            $sync_queue_qbwc = new SyncQueueQbwc();
+            $is_new_sync_queue_qbwc = true;
+        }
+
+        $sync_queue_qbwc->setEstado('pendiente');
+
+        if ($is_new_sync_queue_qbwc) {
+            $sync_queue_qbwc->setTipo('item');
+            $sync_queue_qbwc->setEntidadId($item_id);
+            $sync_queue_qbwc->setIntentos(0);
+
+            $sync_queue_qbwc->setCreatedAt(new \DateTime());
+
+            $em->persist($sync_queue_qbwc);
+        }
+
     }
 
     /**

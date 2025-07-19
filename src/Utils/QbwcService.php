@@ -4,6 +4,7 @@ namespace App\Utils;
 
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
+use App\Entity\Item;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\UserQbwcToken;
 use App\Entity\Usuario;
@@ -33,92 +34,123 @@ class QbwcService extends Base
     {
         $this->writeLog("Recibido XML bruto:\n" . $xmlResponse);
 
-        // Limpiar encabezados no válidos
         $cleanXml = trim($xmlResponse);
         $cleanXml = preg_replace('/<\?qbxml.*?\?>/i', '', $cleanXml);
-        $cleanXml = preg_replace('/^[\x00-\x1F\x7F\xFE\xFF]+/', '', $cleanXml); // limpieza extra
+        $cleanXml = preg_replace('/^[\x00-\x1F\x7F\xFE\xFF]+/', '', $cleanXml);
 
-        // Cargar XML
         $xml = simplexml_load_string($cleanXml);
         if (!$xml) {
             $this->writeLog("Error al parsear XML.");
             return;
         }
 
-        $responseTypes = [
-            'invoice' => '//InvoiceRet',
-        ];
-
         $em = $this->getDoctrine()->getManager();
 
-        foreach ($responseTypes as $tipo => $xpath) {
-            $nodes = $xml->xpath($xpath);
-            if (!$nodes || count($nodes) === 0) {
-                $this->writeLog("No se encontraron nodos para tipo: {$tipo}");
-                continue;
-            }
+        // 1. Procesar facturas como antes
+        $invoiceRets = $xml->xpath('//InvoiceRet');
+        foreach ($invoiceRets as $ret) {
+            $txnId = (string)$ret->TxnID;
+            $editSequence = (string)$ret->EditSequence;
 
-            foreach ($nodes as $ret) {
-                $txnId = (string)$ret->TxnID;
-                $editSequence = (string)$ret->EditSequence;
+            $this->writeLog("Procesando Invoice: TxnID={$txnId}, EditSequence={$editSequence}");
+            $this->writeLog(var_export($ret, true));
 
-                $this->writeLog("Procesando {$tipo}: TxnID={$txnId}, EditSequence={$editSequence}");
-                $this->writeLog(var_export($ret, true));
+            $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+                ->findBy(['tipo' => 'invoice', 'estado' => 'enviado'], ['id' => 'ASC']);
 
-                $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-                    ->findBy(['tipo' => strtolower($tipo), 'estado' => 'enviado'], ['id' => 'ASC']);
-                if (!empty($items) && $txnId && $editSequence) {
-                    /** @var SyncQueueQbwc $item */
-                    $item = $items[0];
-                    $item->setEstado('sincronizado');
+            if (!empty($items) && $txnId && $editSequence) {
+                $item = $items[0];
+                $item->setEstado('sincronizado');
 
-                    $entityClass = match ($tipo) {
-                        'invoice' => Invoice::class,
-                        default => null,
-                    };
+                $invoice = $this->getDoctrine()->getRepository(Invoice::class)->find($item->getEntidadId());
+                if ($invoice !== null) {
+                    $invoice->setTxnId($txnId);
+                    $invoice->setEditSequence($editSequence);
+                    $this->writeLog("Actualizado entidad invoice ID={$item->getEntidadId()}");
 
-                    if ($entityClass) {
-                        $entity = $this->getDoctrine()->getRepository($entityClass)->find($item->getEntidadId());
-                        if ($entity !== null) {
-                            $entity->setTxnId($txnId);
-                            $entity->setEditSequence($editSequence);
-                            $this->writeLog("Actualizado entidad {$tipo} ID={$item->getEntidadId()}");
+                    foreach ($ret->InvoiceLineRet as $lineRet) {
+                        $txnLineId = (string)$lineRet->TxnLineID;
+                        $itemFullName = (string)$lineRet->ItemRef->FullName ?? null;
 
-                            // Procesar cada InvoiceLineRet
-                            if($tipo == 'invoice'){
-                                foreach ($ret->InvoiceLineRet as $lineRet) {
-                                    $txnLineId = (string)$lineRet->TxnLineID;
-                                    $itemFullName = (string)$lineRet->ItemRef->FullName ?? null;
-
-                                    // Buscar el InvoiceItem correspondiente (por nombre o posición)
-                                    $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                                        ->ListarItems($item->getEntidadId());
-                                    $matched = null;
-                                    foreach ($invoiceItems as $invoiceItem) {
-                                        // Puedes mejorar el match aquí según cómo relates ProjectItem con FullName
-                                        if ($invoiceItem->getProjectItem()->getItem()->getDescription() === $itemFullName) {
-                                            $matched = $invoiceItem;
-                                            break;
-                                        }
-                                    }
-
-                                    if ($matched) {
-                                        $matched->setTxnId($txnLineId);
-                                        $this->writeLog("Actualizado InvoiceItem ID={$matched->getId()} con TxnLineID={$txnLineId}");
-                                    } else {
-                                        $this->writeLog("No se encontró InvoiceItem para TxnLineID={$txnLineId}");
-                                    }
-                                }
+                        $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                            ->ListarItems($item->getEntidadId());
+                        $matched = null;
+                        foreach ($invoiceItems as $invoiceItem) {
+                            if ($invoiceItem->getProjectItem()->getItem()->getDescription() === $itemFullName) {
+                                $matched = $invoiceItem;
+                                break;
                             }
+                        }
 
+                        if ($matched) {
+                            $matched->setTxnId($txnLineId);
+                            $this->writeLog("Actualizado InvoiceItem ID={$matched->getId()} con TxnLineID={$txnLineId}");
+                        } else {
+                            $this->writeLog("No se encontró InvoiceItem para TxnLineID={$txnLineId}");
                         }
                     }
                 }
             }
         }
 
+        // 2. Procesar respuesta de creación o modificación de ítems
+        $itemRets = array_merge(
+            $xml->xpath('//ItemServiceRet') ?: []
+        );
+        foreach ($itemRets as $itemRet) {
+            $listId = (string)$itemRet->ListID;
+            $editSequence = (string)$itemRet->EditSequence;
+            $name = (string)$itemRet->Name;
+
+            $this->writeLog("Procesando Item creado o modificado: Name={$name}, ListID={$listId}, EditSequence={$editSequence}");
+
+            $queueItems = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+                ->findBy(['tipo' => 'item', 'estado' => 'enviado'], ['id' => 'ASC']);
+
+            if (!empty($queueItems) && $txnId && $editSequence) {
+                /** @var SyncQueueQbwc $syncItem */
+                $syncItem = $queueItems[0];
+                $syncItem->setEstado('sincronizado');
+
+                /** @var Item $item */
+                $item = $this->getDoctrine()->getRepository(Item::class)->find($syncItem->getEntidadId());
+                if ($item !== null) {
+                    $item->setTxnId($listId);
+                    $item->setEditSequence($editSequence);
+
+                    $this->writeLog("Actualizado Item ID={$item->getItemId()} con ListID y EditSequence");
+                } else {
+                    $this->writeLog("No se encontró entidad Item con ID={$syncItem->getEntidadId()}");
+                }
+            }
+        }
+
+
+        // 3. Procesar ItemQueryRs
+        $itemTypes = ['ItemServiceRet', 'ItemInventoryRet', 'ItemNonInventoryRet', 'ItemOtherChargeRet'];
+        $quickbooksItems = [];
+        foreach ($itemTypes as $itemType) {
+            $items = $xml->xpath("//{$itemType}");
+            foreach ($items as $item) {
+                $listId = (string)$item->ListID;
+                $name = (string)$item->Name;
+                $desc = (string)($item->SalesOrPurchase->Desc ?? '');
+                $price = (float)($item->SalesOrPurchase->Price ?? 0.0);
+
+                $quickbooksItems[] = [
+                    'type' => $itemType,
+                    'list_id' => $listId,
+                    'name' => $name,
+                    'description' => $desc,
+                    'price' => $price,
+                ];
+            }
+        }
+        $this->writeLog("Ítems recibidos desde QuickBooks:\n" . var_export($quickbooksItems, true));
+
         $em->flush();
     }
+
 
     public function GenerarRequestQBXML(): string
     {
@@ -137,21 +169,151 @@ class QbwcService extends Base
                     $qbxml = $this->generateInvoiceQBXML($entidadId);
                     $this->writeLog($qbxml);
                     break;
+                case 'item':
+                    $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
+                    $qbxml = $this->generateItemQBXML($entidadId);
+                    $this->writeLog($qbxml);
+                    break;
             }
 
             if ($qbxml !== '') {
                 $item->setEstado('enviado');
                 $this->getDoctrine()->getManager()->flush();
             }
+        } else {
+            // si no hay nada listar los items
+            $this->writeLog("Generando XML para listar items");
+            $qbxml = $this->generateListarItemsQBXML();
+            $this->writeLog($qbxml);
         }
 
         return $qbxml;
     }
 
+    private function generateItemQBXML(int $itemId): string
+    {
+        $item = $this->getDoctrine()->getRepository(Item::class)->find($itemId);
+        /** @var Item $item */
+        if (!$item) return '';
+
+        $isModification = $item->getTxnId() && $item->getEditSequence() && $item->getUpdatedAt() > $item->getCreatedAt();
+
+        $bodyXml = $isModification
+            ? $this->generateItemModBodyQBXML($item)
+            : $this->generateItemAddBodyQBXML($item);
+
+        $qbxml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        $qbxml .= "<?qbxml version=\"16.0\"?>\n";
+        $qbxml .= "<QBXML>\n";
+        $qbxml .= "  <QBXMLMsgsRq onError=\"stopOnError\">\n";
+        $qbxml .= $bodyXml . "\n";
+        $qbxml .= "  </QBXMLMsgsRq>\n";
+        $qbxml .= "</QBXML>";
+
+        return $qbxml;
+    }
+
+    private function generateItemAddBodyQBXML(Item $item): string
+    {
+        $unit = $item->getUnit();
+        $accountName = "Sales";
+
+        $description = $item->getDescription();
+        $description = htmlspecialchars($description, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+
+        // Solo incluir si hay unidad
+        $unitXml = '';
+        if ($unit !== null && $unit->getDescription()) {
+            $unitName = htmlspecialchars($unit->getDescription(), ENT_XML1 | ENT_QUOTES, 'UTF-8');
+            $unitXml = <<<XML
+                        <UnitOfMeasureSetRef>
+                          <FullName>{$unitName}</FullName>
+                        </UnitOfMeasureSetRef>
+                        XML;
+        }
+
+        return <<<XML
+                <ItemServiceAddRq>
+                  <ItemServiceAdd>
+                    <Name>{$description}</Name>
+                    <IsActive>true</IsActive>
+                    {$unitXml}
+                    <SalesOrPurchase>
+                      <Desc>{$description}</Desc>
+                      <AccountRef>
+                        <FullName>{$accountName}</FullName>
+                      </AccountRef>
+                    </SalesOrPurchase>
+                  </ItemServiceAdd>
+                </ItemServiceAddRq>
+                XML;
+    }
+
+    private function generateItemModBodyQBXML(Item $item): string
+    {
+        $unit = $item->getUnit();
+        $accountName = "Sales";
+
+        $description = htmlspecialchars($item->getDescription(), ENT_XML1 | ENT_QUOTES, 'UTF-8');
+
+        $listId = $item->getTxnId();
+        $editSequence = $item->getEditSequence();
+
+        if (!$listId || !$editSequence) {
+            return '';
+        }
+
+        // Solo incluir si hay unidad
+        $unitXml = '';
+        if ($unit !== null && $unit->getDescription()) {
+            $unitName = htmlspecialchars($unit->getDescription(), ENT_XML1 | ENT_QUOTES, 'UTF-8');
+            $unitXml = <<<XML
+                        <UnitOfMeasureSetRef>
+                          <FullName>{$unitName}</FullName>
+                        </UnitOfMeasureSetRef>
+                        XML;
+        }
+
+        return <<<XML
+                <ItemServiceModRq>
+                  <ItemServiceMod>
+                    <ListID>{$listId}</ListID>
+                    <EditSequence>{$editSequence}</EditSequence>
+                    <Name>{$description}</Name>
+                    <IsActive>true</IsActive>
+                    {$unitXml}
+                    <SalesOrPurchase>
+                      <Desc>{$description}</Desc>
+                      <AccountRef>
+                        <FullName>{$accountName}</FullName>
+                      </AccountRef>
+                    </SalesOrPurchase>
+                  </ItemServiceMod>
+                </ItemServiceModRq>
+                XML;
+    }
+
+
+    private function generateListarItemsQBXML()
+    {
+        $xml = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
+        $xml .= '<?qbxml version="16.0"?>' . "\n";
+        $xml .= '<QBXML>';
+        $xml .= '<QBXMLMsgsRq onError="stopOnError">';
+        $xml .= '  <ItemQueryRq>';
+        $xml .= '    <MaxReturned>1000</MaxReturned>';
+        $xml .= '    <ActiveStatus>All</ActiveStatus>';
+        $xml .= '  </ItemQueryRq>';
+        $xml .= '</QBXMLMsgsRq>';
+        $xml .= '</QBXML>';
+
+        return $xml;
+    }
+
     private function generateInvoiceQBXML(int $invoiceId): string
     {
         $invoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoiceId);
-        /** @var Invoice $invoice  */
+        /** @var Invoice $invoice */
         if (!$invoice) return '';
 
         $isModification = $invoice->getTxnId() && $invoice->getEditSequence() && $invoice->getUpdatedAt() > $invoice->getCreatedAt();
