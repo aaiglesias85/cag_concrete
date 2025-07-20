@@ -37,7 +37,7 @@ class Item
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Equation')]
     #[ORM\JoinColumn(name: 'equation_id', referencedColumnName: 'equation_id')]
-    private ?Equation $equation;
+    private ?Equation $equation = null;
 
     #[ORM\Column(name: "txn_id", type: "string", length: 255, nullable: true)]
     private ?string $txnId = null;
