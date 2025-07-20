@@ -216,7 +216,7 @@ class QbwcService extends Base
     private function generateItemAddBodyQBXML(Item $item): string
     {
         $unit = $item->getUnit();
-        $accountName = "Sales";
+        $accountName = "Construction Income";
 
         $description = $item->getDescription();
         $description = htmlspecialchars($description, ENT_XML1 | ENT_QUOTES, 'UTF-8');
@@ -252,7 +252,7 @@ class QbwcService extends Base
     private function generateItemModBodyQBXML(Item $item): string
     {
         $unit = $item->getUnit();
-        $accountName = "Sales";
+        $accountName = "Construction Income";
 
         $description = htmlspecialchars($item->getDescription(), ENT_XML1 | ENT_QUOTES, 'UTF-8');
 
