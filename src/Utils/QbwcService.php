@@ -237,6 +237,22 @@ class QbwcService extends Base
                   <ItemServiceAdd>
                     <Name>{$description}</Name>
                     <IsActive>true</IsActive>
+                    <SalesOrPurchase>
+                      <Desc>{$description}</Desc>
+                      <AccountRef>
+                        <FullName>{$accountName}</FullName>
+                      </AccountRef>
+                    </SalesOrPurchase>
+                  </ItemServiceAdd>
+                </ItemServiceAddRq>
+                XML;
+
+        /*
+        return <<<XML
+                <ItemServiceAddRq>
+                  <ItemServiceAdd>
+                    <Name>{$description}</Name>
+                    <IsActive>true</IsActive>
                     {$unitXml}
                     <SalesOrPurchase>
                       <Desc>{$description}</Desc>
@@ -247,6 +263,7 @@ class QbwcService extends Base
                   </ItemServiceAdd>
                 </ItemServiceAddRq>
                 XML;
+        */
     }
 
     private function generateItemModBodyQBXML(Item $item): string
@@ -281,6 +298,24 @@ class QbwcService extends Base
                     <EditSequence>{$editSequence}</EditSequence>
                     <Name>{$description}</Name>
                     <IsActive>true</IsActive>
+                    <SalesOrPurchase>
+                      <Desc>{$description}</Desc>
+                      <AccountRef>
+                        <FullName>{$accountName}</FullName>
+                      </AccountRef>
+                    </SalesOrPurchase>
+                  </ItemServiceMod>
+                </ItemServiceModRq>
+                XML;
+
+        /*
+        return <<<XML
+                <ItemServiceModRq>
+                  <ItemServiceMod>
+                    <ListID>{$listId}</ListID>
+                    <EditSequence>{$editSequence}</EditSequence>
+                    <Name>{$description}</Name>
+                    <IsActive>true</IsActive>
                     {$unitXml}
                     <SalesOrPurchase>
                       <Desc>{$description}</Desc>
@@ -291,6 +326,7 @@ class QbwcService extends Base
                   </ItemServiceMod>
                 </ItemServiceModRq>
                 XML;
+        */
     }
 
 
