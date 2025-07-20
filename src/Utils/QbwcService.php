@@ -299,13 +299,6 @@ class QbwcService extends Base
                     <ListID>{$listId}</ListID>
                     <EditSequence>{$editSequence}</EditSequence>
                     <Name>{$description}</Name>
-                    <IsActive>true</IsActive>
-                    <SalesOrPurchase>
-                      <Desc>{$description}</Desc>
-                      <AccountRef>
-                        <FullName>{$accountName}</FullName>
-                      </AccountRef>
-                    </SalesOrPurchase>
                   </ItemServiceMod>
                 </ItemServiceModRq>
                 XML;
