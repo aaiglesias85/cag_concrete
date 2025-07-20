@@ -271,7 +271,6 @@ class QbwcService extends Base
     private function generateItemModBodyQBXML(Item $item): string
     {
         $unit = $item->getUnit();
-        $accountName = "Construction Income";
 
         $description = htmlspecialchars($item->getDescription(), ENT_XML1 | ENT_QUOTES, 'UTF-8');
 
@@ -310,14 +309,7 @@ class QbwcService extends Base
                     <ListID>{$listId}</ListID>
                     <EditSequence>{$editSequence}</EditSequence>
                     <Name>{$description}</Name>
-                    <IsActive>true</IsActive>
                     {$unitXml}
-                    <SalesOrPurchase>
-                      <Desc>{$description}</Desc>
-                      <AccountRef>
-                        <FullName>{$accountName}</FullName>
-                      </AccountRef>
-                    </SalesOrPurchase>
                   </ItemServiceMod>
                 </ItemServiceModRq>
                 XML;
