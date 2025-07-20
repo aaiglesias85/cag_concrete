@@ -450,12 +450,8 @@ class InvoiceService extends Base
         /**@var Invoice $entity */
         if ($entity != null) {
 
-            // items
-            $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                ->ListarItems($invoice_id);
-            foreach ($items as $item) {
-                $em->remove($item);
-            }
+            // eliminar informacion
+            $this->EliminarInformacionDeInvoice($invoice_id);
 
             $number = $entity->getNumber();
 
@@ -498,12 +494,8 @@ class InvoiceService extends Base
                     /**@var Invoice $entity */
                     if ($entity != null) {
 
-                        // items
-                        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                            ->ListarItems($invoice_id);
-                        foreach ($items as $item) {
-                            $em->remove($item);
-                        }
+                        // eliminar informacion
+                        $this->EliminarInformacionDeInvoice($invoice_id);
 
                         $number = $entity->getNumber();
 
@@ -533,6 +525,29 @@ class InvoiceService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * EliminarInformacionDeInvoice
+     * @param $invoice_id
+     * @return void
+     */
+    private function EliminarInformacionDeInvoice($invoice_id){
+        $em = $this->getDoctrine()->getManager();
+
+        // items
+        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
+            ->ListarItems($invoice_id);
+        foreach ($items as $item) {
+            $em->remove($item);
+        }
+
+        // quickbooks
+        $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+            ->ListarRegistrosDeEntidadId("invoice", $invoice_id);
+        foreach ($quickbooks as $quickbook) {
+            $em->remove($quickbook);
+        }
     }
 
     /**
@@ -734,14 +749,14 @@ class InvoiceService extends Base
         $sync_queue_qbwc = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
             ->findOneBy(['tipo' => 'invoice', 'entidadId' => $invoice_id]);
         $is_new_sync_queue_qbwc = false;
-        if($sync_queue_qbwc == null){
+        if ($sync_queue_qbwc == null) {
             $sync_queue_qbwc = new SyncQueueQbwc();
             $is_new_sync_queue_qbwc = true;
         }
 
         $sync_queue_qbwc->setEstado('pendiente');
 
-        if($is_new_sync_queue_qbwc){
+        if ($is_new_sync_queue_qbwc) {
             $sync_queue_qbwc->setTipo('invoice');
             $sync_queue_qbwc->setEntidadId($invoice_id);
             $sync_queue_qbwc->setIntentos(0);

@@ -175,6 +175,13 @@ class ItemService extends Base
         foreach ($estimate_items as $estimate_item) {
             $em->remove($estimate_item);
         }
+
+        // quickbooks
+        $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+            ->ListarRegistrosDeEntidadId("item", $item_id);
+        foreach ($quickbooks as $quickbook) {
+            $em->remove($quickbook);
+        }
     }
 
     /**
