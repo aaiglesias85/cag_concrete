@@ -107,7 +107,7 @@ class QbwcService extends Base
             $queueItems = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
                 ->findBy(['tipo' => 'item', 'estado' => 'enviado'], ['id' => 'ASC']);
 
-            if (!empty($queueItems) && $txnId && $editSequence) {
+            if (!empty($queueItems) && $listId && $editSequence) {
                 /** @var SyncQueueQbwc $syncItem */
                 $syncItem = $queueItems[0];
                 $syncItem->setEstado('sincronizado');
@@ -182,9 +182,9 @@ class QbwcService extends Base
             }
         } else {
             // si no hay nada listar los items
-            $this->writeLog("Generando XML para listar items");
-            $qbxml = $this->generateListarItemsQBXML();
-            $this->writeLog($qbxml);
+            // $this->writeLog("Generando XML para listar items");
+            // $qbxml = $this->generateListarItemsQBXML();
+            // $this->writeLog($qbxml);
         }
 
         return $qbxml;
