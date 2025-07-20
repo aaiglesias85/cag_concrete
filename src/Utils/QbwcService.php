@@ -127,6 +127,7 @@ class QbwcService extends Base
 
 
         // 3. Procesar ItemQueryRs
+        /*
         $itemTypes = ['ItemServiceRet', 'ItemInventoryRet', 'ItemNonInventoryRet', 'ItemOtherChargeRet'];
         $quickbooksItems = [];
         foreach ($itemTypes as $itemType) {
@@ -147,6 +148,7 @@ class QbwcService extends Base
             }
         }
         $this->writeLog("Ítems recibidos desde QuickBooks:\n" . var_export($quickbooksItems, true));
+        */
 
         $em->flush();
     }
