@@ -218,7 +218,7 @@ class QbwcService extends Base
     private function generateItemAddBodyQBXML(Item $item): string
     {
         $unit = $item->getUnit();
-        $accountName = "Construction Income";
+        $accountName = $this->getParameter('quickbook_account_name');
 
         $description = $item->getDescription();
         $description = htmlspecialchars($description, ENT_XML1 | ENT_QUOTES, 'UTF-8');
