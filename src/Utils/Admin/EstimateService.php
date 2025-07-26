@@ -995,6 +995,7 @@ class EstimateService extends Base
         }
 
         $primerNombre = htmlspecialchars($companies[0], ENT_QUOTES, 'UTF-8');
+        $primerNombre = $this->truncate($primerNombre, 40);
         $html = '<div class="d-inline-flex align-items-center" style="gap: 8px;">';
 
         $restantes = array_slice($companies, 1);
