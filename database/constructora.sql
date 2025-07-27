@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-07-2025 a las 18:20:08
+-- Tiempo de generación: 27-07-2025 a las 15:49:30
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -1481,7 +1481,8 @@ CREATE TABLE `schedule` (
   `notes` text,
   `project_id` int(11) DEFAULT NULL,
   `project_contact_id` int(11) DEFAULT NULL,
-  `vendor_id` int(11) DEFAULT NULL
+  `vendor_id` int(11) DEFAULT NULL,
+  `employee_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -1987,7 +1988,8 @@ ALTER TABLE `schedule`
   ADD PRIMARY KEY (`schedule_id`),
   ADD KEY `Refscheduleprojectid` (`project_id`),
   ADD KEY `Refscheduleprojectcontactid` (`project_contact_id`),
-  ADD KEY `Refscheduleconcvendorid` (`vendor_id`);
+  ADD KEY `Refscheduleconcvendorid` (`vendor_id`),
+  ADD KEY `employee_id` (`employee_id`);
 
 --
 -- Indices de la tabla `schedule_concrete_vendor_contact`
@@ -2554,6 +2556,7 @@ ALTER TABLE `rol_permission`
 --
 ALTER TABLE `schedule`
   ADD CONSTRAINT `Refscheduleconcvendorid` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`),
+  ADD CONSTRAINT `Refscheduleemployeeid` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`),
   ADD CONSTRAINT `Refscheduleprojectcontactid` FOREIGN KEY (`project_contact_id`) REFERENCES `project_contact` (`contact_id`),
   ADD CONSTRAINT `Refscheduleprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 

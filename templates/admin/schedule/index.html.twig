@@ -339,7 +339,7 @@
                                     <input type="text" class="form-control event-change" id="description"
                                            name="description">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <label>
                                         Location
                                         <span class="ic-small italic">(optional)</span>
@@ -351,6 +351,19 @@
                                                name="location">
 
                                     </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>
+                                        Lead
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change" id="employee"
+                                            name="employee">
+                                        <option value="">Select</option>
+                                        {% for item in leads %}
+                                            <option value="{{ item.employeeId }}">{{ item.name }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
 
                             </div>

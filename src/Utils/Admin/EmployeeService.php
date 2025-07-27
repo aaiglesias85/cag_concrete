@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\DataTrackingLabor;
 use App\Entity\Employee;
+use App\Entity\Schedule;
 use App\Utils\Base;
 
 class EmployeeService extends Base
@@ -121,6 +122,13 @@ class EmployeeService extends Base
                 $em->remove($data_tracking_labor);
             }
 
+            // schedules
+            $schedules = $this->getDoctrine()->getRepository(Schedule::class)
+                ->ListarSchedulesDeEmployee($employee_id);
+            foreach ($schedules as $schedule) {
+                $schedule->setEmployee(NULL);
+            }
+
             $employee_descripcion = $entity->getName();
 
 
@@ -168,6 +176,13 @@ class EmployeeService extends Base
                             ->ListarDataTrackingsDeEmployee($employee_id);
                         foreach ($data_tracking_labors as $data_tracking_labor) {
                             $em->remove($data_tracking_labor);
+                        }
+
+                        // schedules
+                        $schedules = $this->getDoctrine()->getRepository(Schedule::class)
+                            ->ListarSchedulesDeEmployee($employee_id);
+                        foreach ($schedules as $schedule) {
+                            $schedule->setEmployee(NULL);
                         }
 
                         $employee_descripcion = $entity->getName();

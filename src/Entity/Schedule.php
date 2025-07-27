@@ -53,6 +53,10 @@ class Schedule
     #[ORM\JoinColumn(name: "vendor_id", referencedColumnName: "vendor_id", nullable: true)]
     private ?ConcreteVendor $concreteVendor;
 
+    #[ORM\ManyToOne(targetEntity: Employee::class)]
+    #[ORM\JoinColumn(name: 'employee_id', referencedColumnName: 'employee_id')]
+    private ?Employee $employee;
+
     public function getScheduleId(): ?int
     {
         return $this->scheduleId;
@@ -176,5 +180,15 @@ class Schedule
     public function setHighpriority(?bool $highpriority): void
     {
         $this->highpriority = $highpriority;
+    }
+
+    public function getEmployee(): ?Employee
+    {
+        return $this->employee;
+    }
+
+    public function setEmployee(?Employee $employee): void
+    {
+        $this->employee = $employee;
     }
 }

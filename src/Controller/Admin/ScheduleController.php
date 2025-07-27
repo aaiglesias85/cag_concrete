@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\ConcreteVendor;
+use App\Entity\Employee;
 use App\Entity\Holiday;
 use App\Entity\Project;
 use App\Utils\Admin\ScheduleService;
@@ -37,12 +38,17 @@ class ScheduleController extends AbstractController
                 // holidays
                 $holidays = $this->scheduleService->ListarTodosHolidays();
 
+                // leads
+                $leads = $this->scheduleService->getDoctrine()->getRepository(Employee::class)
+                    ->findBy(['position' => 'Lead'], ['name' => 'ASC']);
+
 
                 return $this->render('admin/schedule/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'projects' => $projects,
                     'concrete_vendors' => $concrete_vendors,
-                    'holidays' => $holidays
+                    'holidays' => $holidays,
+                    'leads' => $leads,
                 ));
             }
         } else {
@@ -140,11 +146,13 @@ class ScheduleController extends AbstractController
         $notes = $request->get('notes');
         $highpriority = $request->get('highpriority');
 
+        $employee_id = $request->get('employee_id');
+
         try {
 
             $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
                 $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id,
-                $hours, $quantity, $notes, $highpriority);
+                $hours, $quantity, $notes, $highpriority, $employee_id);
 
             if ($resultado['success']) {
 
@@ -191,10 +199,12 @@ class ScheduleController extends AbstractController
         $notes = $request->get('notes');
         $highpriority = $request->get('highpriority');
 
+        $employee_id = $request->get('employee_id');
+
         try {
 
             $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
-                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority);
+                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employee_id);
 
             if ($resultado['success']) {
 

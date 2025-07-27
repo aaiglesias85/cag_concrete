@@ -146,7 +146,7 @@ class ScheduleService extends Base
                         $cantidad = $schedule->getQuantity();
 
                         // lead
-                        $lead = $this->DevolverLeadDeFecha($project->getProjectId(), $schedule->getDay()->format('Y-m-d'));
+                        $lead = $schedule->getEmployee() ?? $this->DevolverLeadDeFecha($project->getProjectId(), $schedule->getDay()->format('Y-m-d'));
                         $linea1 = $lead ? $lead->getName() : 'NEED CREW';
 
                         $linea2 = $ampm !== '' ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
@@ -456,6 +456,9 @@ class ScheduleService extends Base
             $vendor_id = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId() : '';
             $arreglo_resultado['vendor_id'] = $vendor_id;
 
+            $employee_id = $entity->getEmployee() != null ? $entity->getEmployee()->getEmployeeId() : '';
+            $arreglo_resultado['employee_id'] = $employee_id;
+
             // schedule concrete vendor contacts ids
             $schedule_concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
             $arreglo_resultado['schedule_concrete_vendor_contacts_id'] = $schedule_concrete_vendor_contacts_id;
@@ -617,6 +620,7 @@ class ScheduleService extends Base
             $latitud = $entity->getLatitud();
             $longitud = $entity->getLongitud();
             $vendor_id = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
+            $employee_id = $entity->getEmployee() ? $entity->getEmployee()->getEmployeeId() : "";
             $quantity = $entity->getQuantity();
             $notes = $entity->getNotes();
 
@@ -645,7 +649,7 @@ class ScheduleService extends Base
                 */
 
                 $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority);
+                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id);
 
             }
 
@@ -670,7 +674,7 @@ class ScheduleService extends Base
      * @author Marcel
      */
     public function ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
-                                       $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority)
+                                       $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employee_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -715,6 +719,13 @@ class ScheduleService extends Base
                 $entity->setConcreteVendor($concrete_vendor);
             }
 
+            $entity->setEmployee(NULL);
+            if ($employee_id != '') {
+                $employee = $this->getDoctrine()->getRepository(Employee::class)
+                    ->find($employee_id);
+                $entity->setEmployee($employee);
+            }
+
             // salvar contactos
             $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id, false);
 
@@ -738,7 +749,7 @@ class ScheduleService extends Base
      * @author Marcel
      */
     public function SalvarSchedule($project_id, $project_contact_id, $date_start_param, $date_stop_param, $description, $location, $latitud, $longitud,
-                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes, $highpriority)
+                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes, $highpriority, $employee_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -767,7 +778,7 @@ class ScheduleService extends Base
                 */
 
                 $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority);
+                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id);
 
             }
 
@@ -796,7 +807,7 @@ class ScheduleService extends Base
                     */
 
                     $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority);
+                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id);
 
                 }
             }
@@ -817,7 +828,7 @@ class ScheduleService extends Base
     }
 
     private function Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                            $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority)
+                            $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -849,6 +860,12 @@ class ScheduleService extends Base
             $concrete_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
                 ->find($vendor_id);
             $entity->setConcreteVendor($concrete_vendor);
+        }
+
+        if ($employee_id != '') {
+            $employee = $this->getDoctrine()->getRepository(Employee::class)
+                ->find($employee_id);
+            $entity->setEmployee($employee);
         }
 
         if (empty($lista)) {

@@ -75,6 +75,50 @@ class ScheduleRepository extends EntityRepository
     }
 
     /**
+     * ListarSchedulesDeEmployee: Lista el schedule de employee
+     *
+     * @return Schedule[]
+     */
+    public function ListarSchedulesDeEmployee($employee_id)
+    {
+        $consulta = $this->createQueryBuilder('s')
+            ->leftJoin('s.employee', 'e');
+
+        if ($employee_id != '') {
+            $consulta->andWhere('e.employeeId = :employee_id')
+                ->setParameter('employee_id', $employee_id);
+        }
+
+        $consulta->orderBy('s.day', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
+     * BuscarEmployeeDeSchedule: Lista el lead del schedule
+     *
+     * @return Schedule[]
+     */
+    public function BuscarEmployeeDeSchedule($project_id, $day)
+    {
+        $consulta = $this->createQueryBuilder('s')
+            ->leftJoin('s.project', 'p')
+            ->where('s.employee is not null');
+
+        if ($project_id != '') {
+            $consulta->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        if ($day != "") {
+            $consulta->andWhere('s.day >= :day')
+                ->setParameter('day', $day);
+        }
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarSchedulesDeContactProject: Lista el schedule de un contact project
      *
      * @return Schedule[]

@@ -599,6 +599,8 @@ var Schedules = function () {
             var notes = $('#notes').val();
             var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
 
+            var employee_id = $('#employee').val();
+
             MyApp.block('#form-schedule');
 
             $.ajax({
@@ -620,6 +622,7 @@ var Schedules = function () {
                     'quantity': quantity,
                     'notes': notes,
                     'highpriority': highpriority,
+                    'employee_id': employee_id,
 
                 },
                 success: function (response) {
@@ -680,6 +683,8 @@ var Schedules = function () {
             var notes = $('#notes').val();
             var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
 
+            var employee_id = $('#employee').val();
+
             MyApp.block('#form-schedule');
 
             $.ajax({
@@ -701,6 +706,7 @@ var Schedules = function () {
                     'quantity': quantity,
                     'notes': notes,
                     'highpriority': highpriority,
+                    'employee_id': employee_id,
 
                 },
                 success: function (response) {
@@ -912,6 +918,9 @@ var Schedules = function () {
                     $('#contact-concrete-vendor').trigger('change');
 
                     $(document).on('change', "#concrete-vendor", changeConcreteVendor);
+
+                    $('#employee').val(response.schedule.employee_id);
+                    $('#employee').trigger('change');
 
                     $('#day').val(response.schedule.day);
                     $('#div-day').removeClass('m--hide');

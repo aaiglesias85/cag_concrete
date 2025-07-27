@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-07-2025 a las 18:20:16
+-- Tiempo de generación: 27-07-2025 a las 15:49:38
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3028,7 +3028,7 @@ CREATE TABLE `estimate` (
 
 INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `bid_description`, `bid_instructions`, `plan_link`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
 (2, '345435435', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
-(3, 'tdfgdfgg', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 3, 1, 2, 1, NULL, NULL, NULL);
+(3, 'tdfgdfgg', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 3, 1, 2, 1, 29, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3075,7 +3075,7 @@ INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
 (46, 2, 1),
 (47, 2, 3),
 (48, 2, 2),
-(49, 3, 2);
+(51, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -3096,8 +3096,8 @@ CREATE TABLE `estimate_project_type` (
 INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (51, 2, 1),
 (52, 2, 4),
-(53, 3, 2),
-(54, 3, 3);
+(57, 3, 2),
+(58, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -3707,7 +3707,9 @@ INSERT INTO `item` (`item_id`, `description`, `price`, `yield_calculation`, `sta
 (292, 'REPAIR CONC C&G 6X34 TO 8X30', 45.00, '', 1, '2025-03-03 21:54:38', NULL, 12, NULL, NULL, NULL),
 (293, 'CURB CUT WHEELCHAIR RAMPS ALL TYPES', 2350.00, '', 1, '2025-03-03 21:55:47', NULL, 15, NULL, NULL, NULL),
 (294, 'REM CONC CURB ALL SIZES', 40.00, '', 1, '2025-03-03 21:56:35', NULL, 12, NULL, NULL, NULL),
-(295, 'REM CONC SIDEWALK', 50.00, '', 1, '2025-03-03 21:58:26', NULL, 13, NULL, NULL, NULL);
+(295, 'REM CONC SIDEWALK', 50.00, '', 1, '2025-03-03 21:58:26', NULL, 13, NULL, NULL, NULL),
+(296, 'Test Quickbooks', NULL, 'none', 1, '2025-07-20 19:27:45', NULL, 19, NULL, NULL, NULL),
+(297, 'Test 2', NULL, 'none', 1, '2025-07-20 19:28:37', NULL, 23, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4459,7 +4461,11 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3458, 'Delete', 'Holiday', 'The holiday is deleted: Memorial Day', '::1', '2025-07-04 04:49:41', 1),
 (3459, 'Add', 'Data Tracking', 'The data tracking is add, Project: ERS05031 - SR 59 BRIDGE, Date: 07/01/2025', '::1', '2025-07-19 15:26:15', 1),
 (3460, 'Add', 'Schedule', 'The schedule is added: Prueba Lead, Start date: 07/01/2025 Stop date: 07/20/2025', '::1', '2025-07-19 15:28:48', 1),
-(3461, 'Delete', 'Schedule', 'The schedule is deleted: Prueba Lead', '::1', '2025-07-19 15:29:03', 1);
+(3461, 'Delete', 'Schedule', 'The schedule is deleted: Prueba Lead', '::1', '2025-07-19 15:29:03', 1),
+(3462, 'Add', 'Item', 'The item is added: Test Quickbooks', '::1', '2025-07-20 19:27:45', 1),
+(3463, 'Add', 'Item', 'The item is added: Test 2', '::1', '2025-07-20 19:28:37', 1),
+(3464, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 01:59:36', 1),
+(3465, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 02:00:34', 1);
 
 -- --------------------------------------------------------
 
@@ -7552,104 +7558,105 @@ CREATE TABLE `schedule` (
   `highpriority` tinyint(1) DEFAULT NULL,
   `project_id` int(11) DEFAULT NULL,
   `project_contact_id` int(11) DEFAULT NULL,
-  `vendor_id` int(11) DEFAULT NULL
+  `vendor_id` int(11) DEFAULT NULL,
+  `employee_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `schedule`
 --
 
-INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `day`, `hour`, `quantity`, `notes`, `highpriority`, `project_id`, `project_contact_id`, `vendor_id`) VALUES
-(49, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-11', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(50, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-12', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(51, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-13', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(52, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-14', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(53, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-15', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(54, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-16', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(55, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-17', NULL, 10.000000, 'test', NULL, 256, NULL, 3),
-(56, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-11', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(57, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-12', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
-(58, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-13', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
-(59, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-14', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
-(60, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-15', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
-(61, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-16', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
-(62, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-17', NULL, 10.000000, 'test', NULL, 257, NULL, 20),
-(63, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-18', '', 0.000000, '', 1, 287, NULL, 11),
-(64, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-19', '', 0.000000, '', 1, 287, NULL, 11),
-(65, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-20', '', 0.000000, '', 1, 287, NULL, 11),
-(66, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-21', '', 0.000000, '', 1, 287, NULL, 11),
-(67, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-22', '', 0.000000, '', 1, 287, NULL, 11),
-(68, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-23', '', 0.000000, '', 1, 287, NULL, 11),
-(69, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-24', '', 0.000000, '', 1, 287, NULL, 11),
-(70, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-25', '', 0.000000, '', 1, 287, NULL, 11),
-(71, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-26', '', 0.000000, '', 1, 287, NULL, 11),
-(72, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-27', '', 0.000000, '', 1, 287, NULL, 11),
-(73, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-28', '', 0.000000, '', 1, 287, NULL, 11),
-(74, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-29', '', 0.000000, '', 1, 287, NULL, 11),
-(75, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-30', '', 0.000000, '', 1, 287, NULL, 11),
-(76, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-31', '', 0.000000, '', 1, 287, NULL, 11),
-(77, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-18', '', 0.000000, '', 0, 292, NULL, 2),
-(78, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-19', '', 0.000000, '', 0, 292, NULL, 2),
-(79, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-20', '', 0.000000, '', 0, 292, NULL, 2),
-(80, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-21', '', 0.000000, '', 0, 292, NULL, 2),
-(81, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-22', '', 0.000000, '', 0, 292, NULL, 2),
-(82, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-23', '', 0.000000, '', 0, 292, NULL, 2),
-(83, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-24', '', 0.000000, '', 0, 292, NULL, 2),
-(84, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-25', '', 0.000000, '', 0, 292, NULL, 2),
-(85, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-26', '', 0.000000, '', 0, 292, NULL, 2),
-(86, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-27', '', 0.000000, '', 0, 292, NULL, 2),
-(87, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-28', '', 0.000000, '', 0, 292, NULL, 2),
-(88, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-29', '', 0.000000, '', 0, 292, NULL, 2),
-(89, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-30', '', 0.000000, '', 0, 292, NULL, 2),
-(90, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-31', '', 0.000000, '', 0, 292, NULL, 2),
-(91, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-01', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(92, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-02', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(93, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-03', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(94, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-04', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(95, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-05', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(96, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-06', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(97, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-07', '10:30', 10.000000, 'test', 1, 257, NULL, 20),
-(98, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-01', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(99, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-02', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(100, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-03', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(101, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-04', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(102, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-05', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(103, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-06', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(104, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-07', '', 10.000000, 'test', NULL, 256, NULL, 3),
-(105, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-15', '', 0.000000, '', 0, 292, NULL, 2),
-(106, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-16', '', 0.000000, '', 0, 292, NULL, 2),
-(107, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-17', '', 0.000000, '', 0, 292, NULL, 2),
-(108, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-18', '', 0.000000, '', 0, 292, NULL, 2),
-(109, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-19', '', 0.000000, '', 0, 292, NULL, 2),
-(110, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-20', '', 0.000000, '', 0, 292, NULL, 2),
-(111, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-21', '', 0.000000, '', 0, 292, NULL, 2),
-(112, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-01', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
-(113, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-02', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
-(114, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-03', '10:30', 10.000000, 'test', 0, 257, NULL, 20),
-(117, 'Deploy', '', '', '', '2025-07-01', '', 0.000000, '', 0, 260, NULL, 15),
-(118, 'Deploy', '', '', '', '2025-07-02', '', 0.000000, '', 0, 260, NULL, 15),
-(119, 'Deploy', '', '', '', '2025-07-03', '', 0.000000, '', 0, 260, NULL, 15),
-(120, 'Jenkis', '', '', '', '2025-07-01', '', 0.000000, '', 1, 23, NULL, 14),
-(121, 'Jenkis', '', '', '', '2025-07-02', '', 0.000000, '', 1, 23, NULL, 14),
-(122, 'Jenkis', '', '', '', '2025-07-03', '', 0.000000, '', 1, 23, NULL, 14),
-(123, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-01', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(124, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-02', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(125, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-03', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(127, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-05', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(128, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-06', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(129, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-07', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(130, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-08', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(131, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-09', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(132, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-10', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(133, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-11', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(134, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-12', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(135, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-13', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(136, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-14', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(137, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-15', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(138, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-16', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(139, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-17', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(140, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-18', '10:00', 5.000000, '', 1, 256, NULL, 1),
-(141, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-19', '10:00', 5.000000, '', 1, 256, NULL, 1);
+INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `longitud`, `day`, `hour`, `quantity`, `notes`, `highpriority`, `project_id`, `project_contact_id`, `vendor_id`, `employee_id`) VALUES
+(49, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-11', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(50, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-12', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(51, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-13', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(52, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-14', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(53, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-15', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(54, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-16', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(55, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-05-17', NULL, 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(56, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-11', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(57, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-12', NULL, 10.000000, 'test', NULL, 257, NULL, 20, NULL),
+(58, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-13', NULL, 10.000000, 'test', NULL, 257, NULL, 20, NULL),
+(59, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-14', NULL, 10.000000, 'test', NULL, 257, NULL, 20, NULL),
+(60, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-15', NULL, 10.000000, 'test', NULL, 257, NULL, 20, NULL),
+(61, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-16', NULL, 10.000000, 'test', NULL, 257, NULL, 20, NULL),
+(62, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-05-17', NULL, 10.000000, 'test', NULL, 257, NULL, 20, NULL),
+(63, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-18', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(64, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-19', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(65, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-20', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(66, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-21', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(67, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-22', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(68, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-23', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(69, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-24', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(70, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-25', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(71, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-26', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(72, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-27', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(73, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-28', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(74, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-29', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(75, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-30', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(76, 'Test', 'Cupertino Way, San Mateo, California, EE. UU.', '37.5389567', '-122.2870183', '2025-05-31', '', 0.000000, '', 1, 287, NULL, 11, NULL),
+(77, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-18', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(78, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-19', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(79, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-20', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(80, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-21', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(81, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-22', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(82, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-23', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(83, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-24', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(84, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-25', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(85, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-26', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(86, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-27', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(87, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-28', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(88, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-29', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(89, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-30', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(90, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-05-31', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(91, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-01', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(92, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-02', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(93, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-03', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(94, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-04', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(95, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-05', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(96, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-06', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(97, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-06-07', '10:30', 10.000000, 'test', 1, 257, NULL, 20, NULL),
+(98, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-01', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(99, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-02', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(100, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-03', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(101, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-04', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(102, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-05', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(103, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-06', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(104, 'Prueba', 'Canal Street, Nueva York, EE. UU.', '40.7194023', '-74.00188969999999', '2025-06-07', '', 10.000000, 'test', NULL, 256, NULL, 3, NULL),
+(105, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-15', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(106, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-16', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(107, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-17', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(108, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-18', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(109, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-19', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(110, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-20', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(111, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-21', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(112, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-01', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(113, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-02', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(114, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-03', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(117, 'Deploy', '', '', '', '2025-07-01', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(118, 'Deploy', '', '', '', '2025-07-02', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(119, 'Deploy', '', '', '', '2025-07-03', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(120, 'Jenkis', '', '', '', '2025-07-01', '', 0.000000, '', 1, 23, NULL, 14, NULL),
+(121, 'Jenkis', '', '', '', '2025-07-02', '', 0.000000, '', 1, 23, NULL, 14, NULL),
+(122, 'Jenkis', '', '', '', '2025-07-03', '', 0.000000, '', 1, 23, NULL, 14, NULL),
+(123, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-01', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(124, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-02', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(125, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-03', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(127, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-05', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(128, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-06', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(129, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-07', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(130, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-08', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(131, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-09', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(132, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-10', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(133, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-11', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(134, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-12', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(135, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-13', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(136, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-14', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(137, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-15', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(138, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-16', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(139, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-17', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(140, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-18', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(141, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-19', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -7787,7 +7794,9 @@ CREATE TABLE `sync_queue_qbwc` (
 --
 
 INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`, `created_at`) VALUES
-(1, 'invoice', 16, 'enviado', 0, '2025-06-22 18:33:51');
+(1, 'invoice', 16, 'enviado', 0, '2025-06-22 18:33:51'),
+(2, 'item', 296, 'pendiente', 0, '2025-07-20 19:27:45'),
+(3, 'item', 297, 'pendiente', 0, '2025-07-20 19:28:37');
 
 -- --------------------------------------------------------
 
@@ -8269,7 +8278,8 @@ ALTER TABLE `schedule`
   ADD PRIMARY KEY (`schedule_id`),
   ADD KEY `Refscheduleprojectid` (`project_id`),
   ADD KEY `Refscheduleprojectcontactid` (`project_contact_id`),
-  ADD KEY `Refscheduleconcvendorid` (`vendor_id`);
+  ADD KEY `Refscheduleconcvendorid` (`vendor_id`),
+  ADD KEY `employee_id` (`employee_id`);
 
 --
 -- Indices de la tabla `schedule_concrete_vendor_contact`
@@ -8437,13 +8447,13 @@ ALTER TABLE `estimate_bid_deadline`
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -8485,13 +8495,13 @@ ALTER TABLE `invoice_item`
 -- AUTO_INCREMENT de la tabla `item`
 --
 ALTER TABLE `item`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=296;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=298;
 
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3462;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3466;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8623,7 +8633,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -8823,6 +8833,7 @@ ALTER TABLE `rol_permission`
 --
 ALTER TABLE `schedule`
   ADD CONSTRAINT `Refscheduleconcvendorid` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`),
+  ADD CONSTRAINT `Refscheduleemployeeid` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`),
   ADD CONSTRAINT `Refscheduleprojectcontactid` FOREIGN KEY (`project_contact_id`) REFERENCES `project_contact` (`contact_id`),
   ADD CONSTRAINT `Refscheduleprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
