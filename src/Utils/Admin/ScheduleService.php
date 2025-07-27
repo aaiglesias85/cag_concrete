@@ -373,7 +373,7 @@ class ScheduleService extends Base
                 $finEvento = (clone $inicioEvento)->modify("+25 minutes"); // duración visual fija si quieres
 
                 // lead
-                $lead = $this->DevolverLeadDeFecha($value->getProject()->getProjectId(), $value->getDay()->format('Y-m-d'));
+                $lead = $value->getEmployee() ?? $this->DevolverLeadDeFecha($value->getProject()->getProjectId(), $value->getDay()->format('Y-m-d'));
                 if ($lead) {
                     $title = "{$title}   ({$lead->getName()})";
                 }
