@@ -995,13 +995,13 @@ class EstimateService extends Base
         }
 
         $primerNombre = htmlspecialchars($companies[0], ENT_QUOTES, 'UTF-8');
-        $primerNombre = $this->truncate($primerNombre, 40);
+        $primerNombre_truncado = $this->truncate($primerNombre, 30);
         $html = '<div class="d-inline-flex align-items-center" style="gap: 8px;">';
 
         $restantes = array_slice($companies, 1);
 
         // Estilo base para los badges
-        $estiloBase = 'padding: 3px 9px; font-size: 11px;';
+        $estiloBase = 'padding: 3px 9px; font-size: 11px;cursor:pointer;';
 
         // Si hay más de una empresa, agregar borde izquierdo rojo al primer badge
         $estiloPrincipal = $estiloBase;
@@ -1010,7 +1010,7 @@ class EstimateService extends Base
         }
 
         // Badge principal
-        $html .= '<span class="badge badge-info" style="' . $estiloPrincipal . '">' . $primerNombre . '</span>';
+        $html .= '<span class="badge badge-info" style="' . $estiloPrincipal . '" title="' . $primerNombre . '">' . $primerNombre_truncado . '</span>';
 
         if (count($restantes) > 0) {
             // Badges del popover
