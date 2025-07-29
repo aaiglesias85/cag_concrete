@@ -40,7 +40,7 @@ class ScheduleController extends AbstractController
 
                 // leads
                 $leads = $this->scheduleService->getDoctrine()->getRepository(Employee::class)
-                    ->findBy(['position' => 'Lead'], ['name' => 'ASC']);
+                    ->ListarOrdenados();
 
 
                 return $this->render('admin/schedule/index.html.twig', array(

@@ -12,12 +12,18 @@ class EmployeeRepository extends EntityRepository
      *
      * @return Employee[]
      */
-    public function ListarOrdenados(): array
+    public function ListarOrdenados($position = ''): array
     {
-        return $this->createQueryBuilder('e')
-            ->orderBy('e.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $consulta = $this->createQueryBuilder('e');
+
+        if ($position != '') {
+            $consulta->andWhere('e.position = :position')
+                ->setParameter('position', $position);
+        }
+
+        $consulta->orderBy('e.name', 'ASC');
+
+        return $consulta->getQuery()->getResult();
     }
 
     /**
@@ -85,6 +91,6 @@ class EmployeeRepository extends EntityRepository
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 }
