@@ -474,6 +474,9 @@ var Schedules = function () {
             placeholder: 'Select contacts',
         });
 
+        $('#employee').val([]);
+        $('#employee').trigger('change');
+
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
@@ -599,7 +602,8 @@ var Schedules = function () {
             var notes = $('#notes').val();
             var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
 
-            var employee_id = $('#employee').val();
+            var employees_id = $('#employee').val();
+            employees_id = employees_id.length > 0 ? employees_id.join(',') : '';
 
             MyApp.block('#form-schedule');
 
@@ -622,7 +626,7 @@ var Schedules = function () {
                     'quantity': quantity,
                     'notes': notes,
                     'highpriority': highpriority,
-                    'employee_id': employee_id,
+                    'employees_id': employees_id,
 
                 },
                 success: function (response) {
@@ -683,7 +687,8 @@ var Schedules = function () {
             var notes = $('#notes').val();
             var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
 
-            var employee_id = $('#employee').val();
+            var employees_id = $('#employee').val();
+            employees_id = employees_id.length > 0 ? employees_id.join(',') : '';
 
             MyApp.block('#form-schedule');
 
@@ -706,7 +711,7 @@ var Schedules = function () {
                     'quantity': quantity,
                     'notes': notes,
                     'highpriority': highpriority,
-                    'employee_id': employee_id,
+                    'employees_id': employees_id,
 
                 },
                 success: function (response) {
@@ -919,7 +924,7 @@ var Schedules = function () {
 
                     $(document).on('change', "#concrete-vendor", changeConcreteVendor);
 
-                    $('#employee').val(response.schedule.employee_id);
+                    $('#employee').val(response.schedule.employees_id);
                     $('#employee').trigger('change');
 
                     $('#day').val(response.schedule.day);
@@ -1101,6 +1106,10 @@ var Schedules = function () {
 
         $('#contact-concrete-vendor').select2({
             placeholder: 'Select contacts',
+        });
+
+        $('#employee').select2({
+            placeholder: 'Select leads',
         });
 
         // google maps

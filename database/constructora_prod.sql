@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 27-07-2025 a las 15:49:38
+-- Tiempo de generación: 01-08-2025 a las 19:16:29
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -4465,7 +4465,8 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3462, 'Add', 'Item', 'The item is added: Test Quickbooks', '::1', '2025-07-20 19:27:45', 1),
 (3463, 'Add', 'Item', 'The item is added: Test 2', '::1', '2025-07-20 19:28:37', 1),
 (3464, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 01:59:36', 1),
-(3465, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 02:00:34', 1);
+(3465, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 02:00:34', 1),
+(3466, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-07-27 17:23:22', 1);
 
 -- --------------------------------------------------------
 
@@ -7630,7 +7631,7 @@ INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `lo
 (109, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-19', '', 0.000000, '', 0, 292, NULL, 2, NULL),
 (110, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-20', '', 0.000000, '', 0, 292, NULL, 2, NULL),
 (111, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-06-21', '', 0.000000, '', 0, 292, NULL, 2, NULL),
-(112, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-01', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(112, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-01', '10:30', 10.000000, 'test', 0, 257, NULL, 20, 4),
 (113, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-02', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
 (114, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-07-03', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
 (117, 'Deploy', '', '', '', '2025-07-01', '', 0.000000, '', 0, 260, NULL, 15, NULL),
@@ -7703,6 +7704,18 @@ INSERT INTO `schedule_concrete_vendor_contact` (`id`, `schedule_id`, `contact_id
 (34, 103, 2),
 (35, 104, 3),
 (36, 104, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `schedule_employee`
+--
+
+CREATE TABLE `schedule_employee` (
+  `id` int(11) NOT NULL,
+  `schedule_id` int(11) DEFAULT NULL,
+  `employee_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -8290,6 +8303,14 @@ ALTER TABLE `schedule_concrete_vendor_contact`
   ADD KEY `Refs_chedule_concrete_vendor_contacts_contactid` (`contact_id`);
 
 --
+-- Indices de la tabla `schedule_employee`
+--
+ALTER TABLE `schedule_employee`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refschedule_employee1` (`schedule_id`),
+  ADD KEY `Refschedule_employee2` (`employee_id`);
+
+--
 -- Indices de la tabla `subcontractor`
 --
 ALTER TABLE `subcontractor`
@@ -8501,7 +8522,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3466;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3467;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8610,6 +8631,12 @@ ALTER TABLE `schedule`
 --
 ALTER TABLE `schedule_concrete_vendor_contact`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT de la tabla `schedule_employee`
+--
+ALTER TABLE `schedule_employee`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -8843,6 +8870,13 @@ ALTER TABLE `schedule`
 ALTER TABLE `schedule_concrete_vendor_contact`
   ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_cheduleid` FOREIGN KEY (`schedule_id`) REFERENCES `schedule` (`schedule_id`),
   ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_contactid` FOREIGN KEY (`contact_id`) REFERENCES `concrete_vendor_contact` (`contact_id`);
+
+--
+-- Filtros para la tabla `schedule_employee`
+--
+ALTER TABLE `schedule_employee`
+  ADD CONSTRAINT `Refschedule_employee1` FOREIGN KEY (`schedule_id`) REFERENCES `schedule` (`schedule_id`),
+  ADD CONSTRAINT `Refschedule_employee2` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`);
 
 --
 -- Filtros para la tabla `subcontractor_employee`

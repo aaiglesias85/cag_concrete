@@ -146,13 +146,13 @@ class ScheduleController extends AbstractController
         $notes = $request->get('notes');
         $highpriority = $request->get('highpriority');
 
-        $employee_id = $request->get('employee_id');
+        $employees_id = $request->get('employees_id');
 
         try {
 
             $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
                 $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id,
-                $hours, $quantity, $notes, $highpriority, $employee_id);
+                $hours, $quantity, $notes, $highpriority, $employees_id);
 
             if ($resultado['success']) {
 
@@ -199,12 +199,12 @@ class ScheduleController extends AbstractController
         $notes = $request->get('notes');
         $highpriority = $request->get('highpriority');
 
-        $employee_id = $request->get('employee_id');
+        $employees_id = $request->get('employees_id');
 
         try {
 
             $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
-                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employee_id);
+                $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employees_id);
 
             if ($resultado['success']) {
 

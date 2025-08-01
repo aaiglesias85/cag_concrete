@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 27-07-2025 a las 15:49:30
+-- Tiempo de generación: 01-08-2025 a las 19:16:21
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -1500,6 +1500,18 @@ CREATE TABLE `schedule_concrete_vendor_contact` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `schedule_employee`
+--
+
+CREATE TABLE `schedule_employee` (
+  `id` int(11) NOT NULL,
+  `schedule_id` int(11) DEFAULT NULL,
+  `employee_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `subcontractor`
 --
 
@@ -2000,6 +2012,14 @@ ALTER TABLE `schedule_concrete_vendor_contact`
   ADD KEY `Refs_chedule_concrete_vendor_contacts_contactid` (`contact_id`);
 
 --
+-- Indices de la tabla `schedule_employee`
+--
+ALTER TABLE `schedule_employee`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refschedule_employee1` (`schedule_id`),
+  ADD KEY `Refschedule_employee2` (`employee_id`);
+
+--
 -- Indices de la tabla `subcontractor`
 --
 ALTER TABLE `subcontractor`
@@ -2322,6 +2342,12 @@ ALTER TABLE `schedule_concrete_vendor_contact`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `schedule_employee`
+--
+ALTER TABLE `schedule_employee`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `subcontractor`
 --
 ALTER TABLE `subcontractor`
@@ -2566,6 +2592,13 @@ ALTER TABLE `schedule`
 ALTER TABLE `schedule_concrete_vendor_contact`
   ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_cheduleid` FOREIGN KEY (`schedule_id`) REFERENCES `schedule` (`schedule_id`),
   ADD CONSTRAINT `Refs_chedule_concrete_vendor_contacts_contactid` FOREIGN KEY (`contact_id`) REFERENCES `concrete_vendor_contact` (`contact_id`);
+
+--
+-- Filtros para la tabla `schedule_employee`
+--
+ALTER TABLE `schedule_employee`
+  ADD CONSTRAINT `Refschedule_employee1` FOREIGN KEY (`schedule_id`) REFERENCES `schedule` (`schedule_id`),
+  ADD CONSTRAINT `Refschedule_employee2` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`);
 
 --
 -- Filtros para la tabla `subcontractor_employee`

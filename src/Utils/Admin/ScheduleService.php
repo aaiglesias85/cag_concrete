@@ -11,6 +11,7 @@ use App\Entity\Project;
 use App\Entity\ProjectContact;
 use App\Entity\Schedule;
 use App\Entity\ScheduleConcreteVendorContact;
+use App\Entity\ScheduleEmployee;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -157,8 +158,29 @@ class ScheduleService extends Base
                         $cantidad = $schedule->getQuantity();
 
                         // lead
-                        $lead = $schedule->getEmployee() ?? $this->DevolverLeadDeFecha($project->getProjectId(), $schedule->getDay()->format('Y-m-d'));
-                        $linea1 = $lead ? $lead->getName() : 'NEED CREW';
+                        $schedule_employees = $this->ListarEmployeesDeSchedule($schedule->getScheduleId());
+                        $schedule_leads = $this->DevolverLeadsDeFecha($project->getProjectId(), $schedule->getDay()->format('Y-m-d'));
+
+                        // Calcular el lead y los adicionales
+                        $lead = null;
+                        $otros = 0;
+
+                        if (!empty($schedule_employees)) {
+                            $lead = $schedule_employees[0];
+                            $otros = count($schedule_employees) - 1;
+                        } elseif (!empty($schedule_leads)) {
+                            $lead = $schedule_leads[0];
+                            $otros = count($schedule_leads) - 1;
+                        }
+
+                        if ($lead) {
+                            $linea1 = $lead->getName();
+                            if ($otros > 0) {
+                                $linea1 .= "\n+{$otros}";
+                            }
+                        } else {
+                            $linea1 = 'NEED CREW';
+                        }
 
                         $linea2 = $ampm !== '' ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
                         $agregado[$clave]['dias'][$indexDia] = "$linea1\n$linea2";
@@ -384,9 +406,26 @@ class ScheduleService extends Base
                 $finEvento = (clone $inicioEvento)->modify("+25 minutes"); // duración visual fija si quieres
 
                 // lead
-                $lead = $value->getEmployee() ?? $this->DevolverLeadDeFecha($value->getProject()->getProjectId(), $value->getDay()->format('Y-m-d'));
+                $schedule_employees = $this->ListarEmployeesDeSchedule($schedule_id);
+                $schedule_leads = $this->DevolverLeadsDeFecha($value->getProject()->getProjectId(), $value->getDay()->format('Y-m-d'));
+
+                $lead = !empty($schedule_employees)
+                    ? $schedule_employees[0]
+                    : (!empty($schedule_leads) ? $schedule_leads[0] : null);
+
+                $otros = 0;
+                if (!empty($schedule_employees)) {
+                    $otros = count($schedule_employees) - 1;
+                } elseif (!empty($schedule_leads)) {
+                    $otros = count($schedule_leads) - 1;
+                }
+
                 if ($lead) {
-                    $title = "{$title}   ({$lead->getName()})";
+                    $tituloLider = $lead->getName();
+                    if ($otros > 0) {
+                        $tituloLider .= " +{$otros}";
+                    }
+                    $title = "{$title}   ({$tituloLider})";
                 }
 
                 $arreglo_resultado[] = [
@@ -415,20 +454,22 @@ class ScheduleService extends Base
     }
 
     /**
-     * DevolverLeadDeFecha
+     * DevolverLeadsDeFecha
      * @param $project_id
      * @param $date
-     * @return Employee|null
+     * @return Employee[]
      */
-    private function DevolverLeadDeFecha($project_id, $date)
+    private function DevolverLeadsDeFecha($project_id, $date)
     {
+        $lista = [];
+
         $leads = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
             ->ListarLeadsDeFecha($project_id, $date);
-        if (!empty($leads)) {
-            return $leads[0]->getEmployee();
+        foreach ($leads as $lead) {
+            $lista[] = $lead->getEmployee();
         }
 
-        return null;
+        return $lista;
     }
 
 
@@ -467,12 +508,13 @@ class ScheduleService extends Base
             $vendor_id = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId() : '';
             $arreglo_resultado['vendor_id'] = $vendor_id;
 
-            $employee_id = $entity->getEmployee() != null ? $entity->getEmployee()->getEmployeeId() : '';
-            $arreglo_resultado['employee_id'] = $employee_id;
-
             // schedule concrete vendor contacts ids
             $schedule_concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
             $arreglo_resultado['schedule_concrete_vendor_contacts_id'] = $schedule_concrete_vendor_contacts_id;
+
+            // employees id
+            $employees_id = $this->ListarEmployeesIdDeSchedule($schedule_id);
+            $arreglo_resultado['employees_id'] = $employees_id;
 
             // project contacts
             $contacts_project = $this->ListarContactsDeProject($project_id);
@@ -501,6 +543,34 @@ class ScheduleService extends Base
         }
 
         return $ids;
+    }
+
+    // listar los employees id del schedule
+    private function ListarEmployeesIdDeSchedule($schedule_id)
+    {
+        $ids = [];
+
+        $schedule_employees = $this->getDoctrine()->getRepository(ScheduleEmployee::class)
+            ->ListarEmployeesDeSchedule($schedule_id);
+        foreach ($schedule_employees as $schedule_employee) {
+            $ids[] = $schedule_employee->getEmployee()->getEmployeeId();
+        }
+
+        return $ids;
+    }
+
+    // listar los employees del schedule
+    private function ListarEmployeesDeSchedule($schedule_id)
+    {
+        $lista = [];
+
+        $schedule_employees = $this->getDoctrine()->getRepository(ScheduleEmployee::class)
+            ->ListarEmployeesDeSchedule($schedule_id);
+        foreach ($schedule_employees as $schedule_employee) {
+            $lista[] = $schedule_employee->getEmployee();
+        }
+
+        return $lista;
     }
 
     /**
@@ -607,6 +677,13 @@ class ScheduleService extends Base
             $em->remove($schedule_contact);
         }
 
+        // employees
+        $schedules_employees = $this->getDoctrine()->getRepository(ScheduleEmployee::class)
+            ->ListarEmployeesDeSchedule($schedule_id);
+        foreach ($schedules_employees as $schedules_employee) {
+            $em->remove($schedules_employee);
+        }
+
     }
 
     /**
@@ -631,12 +708,14 @@ class ScheduleService extends Base
             $latitud = $entity->getLatitud();
             $longitud = $entity->getLongitud();
             $vendor_id = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
-            $employee_id = $entity->getEmployee() ? $entity->getEmployee()->getEmployeeId() : "";
             $quantity = $entity->getQuantity();
             $notes = $entity->getNotes();
 
             $concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
             $concrete_vendor_contacts_id = implode(",", $concrete_vendor_contacts_id);
+
+            $employees_id = $this->ListarEmployeesIdDeSchedule($schedule_id);
+            $employees_id = implode(",", $employees_id);
 
             // validar
             $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
@@ -660,7 +739,7 @@ class ScheduleService extends Base
                 */
 
                 $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id);
+                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id);
 
             }
 
@@ -685,7 +764,7 @@ class ScheduleService extends Base
      * @author Marcel
      */
     public function ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
-                                       $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employee_id)
+                                       $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employees_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -730,15 +809,11 @@ class ScheduleService extends Base
                 $entity->setConcreteVendor($concrete_vendor);
             }
 
-            $entity->setEmployee(NULL);
-            if ($employee_id != '') {
-                $employee = $this->getDoctrine()->getRepository(Employee::class)
-                    ->find($employee_id);
-                $entity->setEmployee($employee);
-            }
-
             // salvar contactos
             $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id, false);
+
+            // salvar employees
+            $this->SalvarEmployees($entity, $employees_id, false);
 
             $em->flush();
 
@@ -760,7 +835,7 @@ class ScheduleService extends Base
      * @author Marcel
      */
     public function SalvarSchedule($project_id, $project_contact_id, $date_start_param, $date_stop_param, $description, $location, $latitud, $longitud,
-                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes, $highpriority, $employee_id)
+                                   $vendor_id, $concrete_vendor_contacts_id, $hours, $quantity, $notes, $highpriority, $employees_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -789,7 +864,7 @@ class ScheduleService extends Base
                 */
 
                 $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id);
+                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id);
 
             }
 
@@ -818,7 +893,7 @@ class ScheduleService extends Base
                     */
 
                     $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id);
+                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id);
 
                 }
             }
@@ -839,7 +914,7 @@ class ScheduleService extends Base
     }
 
     private function Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                            $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employee_id)
+                            $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -873,18 +948,15 @@ class ScheduleService extends Base
             $entity->setConcreteVendor($concrete_vendor);
         }
 
-        if ($employee_id != '') {
-            $employee = $this->getDoctrine()->getRepository(Employee::class)
-                ->find($employee_id);
-            $entity->setEmployee($employee);
-        }
-
         if (empty($lista)) {
             $em->persist($entity);
         }
 
         // salvar contactos
         $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
+
+        // salvar employees
+        $this->SalvarEmployees($entity, $employees_id);
     }
 
 
@@ -947,6 +1019,37 @@ class ScheduleService extends Base
                     $concrete_vendor_contact_entity->setContact($contact_entity);
 
                     $em->persist($concrete_vendor_contact_entity);
+                }
+            }
+        }
+    }
+
+    // salvar employees
+    public function SalvarEmployees($entity, $employees_id, $is_new = true)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // eliminar anteriores
+        if (!$is_new) {
+            $schedules_employees = $this->getDoctrine()->getRepository(ScheduleEmployee::class)
+                ->ListarEmployeesDeSchedule($entity->getScheduleId());
+            foreach ($schedules_employees as $schedules_employee) {
+                $em->remove($schedules_employee);
+            }
+        }
+
+        if ($employees_id !== '') {
+            $employees_id = explode(',', $employees_id);
+            foreach ($employees_id as $employee_id) {
+                $employee_entity = $this->getDoctrine()->getRepository(Employee::class)
+                    ->find($employee_id);
+                if ($employee_entity !== null) {
+                    $schedule_employee_entity = new ScheduleEmployee();
+
+                    $schedule_employee_entity->setSchedule($entity);
+                    $schedule_employee_entity->setEmployee($employee_entity);
+
+                    $em->persist($schedule_employee_entity);
                 }
             }
         }
