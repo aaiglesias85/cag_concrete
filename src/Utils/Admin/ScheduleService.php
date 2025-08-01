@@ -47,7 +47,18 @@ class ScheduleService extends Base
         $columnas = range('A', 'K');
 
         $nombres = array_map(fn($e) => strtoupper($e['name']), $employees);
-        $textoCrewLeads = 'CREW LEADS: ' . implode(', ', $nombres);
+         $textoCrewLeads = 'CREW LEADS: ' . implode(', ', [
+            'CARLOS ARROYO',
+            'CRUZ CORTEZ',
+            'FRANCISCO GUTIERREZ',
+            'JOSE DUARTE',
+            'JULIAN BAUTISTA',
+            'LUIS G.CORDOVA',
+            'MIGUEL MURILLO',
+            'VICTOR CORDOVA',
+            'VICTOR SORIANO',
+            'GERARDO ALVARADO'
+        ]);
 
         $feriados = $this->ListarFeriadosReporteExcelSchedule($semanas);
 
