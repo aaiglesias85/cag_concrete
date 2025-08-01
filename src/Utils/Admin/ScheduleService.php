@@ -162,24 +162,14 @@ class ScheduleService extends Base
                         $schedule_leads = $this->DevolverLeadsDeFecha($project->getProjectId(), $schedule->getDay()->format('Y-m-d'));
 
                         // Calcular el lead y los adicionales
-                        $lead = null;
-                        $otros = 0;
+                        $linea1 = 'NEED CREW';
 
                         if (!empty($schedule_employees)) {
-                            $lead = $schedule_employees[0];
-                            $otros = count($schedule_employees) - 1;
+                            $nombres = array_map(fn($e) => $e->getName(), $schedule_employees);
+                            $linea1 = implode("\n", $nombres);
                         } elseif (!empty($schedule_leads)) {
-                            $lead = $schedule_leads[0];
-                            $otros = count($schedule_leads) - 1;
-                        }
-
-                        if ($lead) {
-                            $linea1 = $lead->getName();
-                            if ($otros > 0) {
-                                $linea1 .= "\n+{$otros}";
-                            }
-                        } else {
-                            $linea1 = 'NEED CREW';
+                            $nombres = array_map(fn($l) => $l->getName(), $schedule_leads);
+                            $linea1 = implode("\n", $nombres);
                         }
 
                         $linea2 = $ampm !== '' ? "($ampm, {$cantidad}+)" : "{$cantidad}+";
