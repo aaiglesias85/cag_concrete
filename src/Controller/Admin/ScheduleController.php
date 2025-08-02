@@ -233,7 +233,7 @@ class ScheduleController extends AbstractController
     public function clonar(Request $request)
     {
 
-        $schedule_id = $request->get('schedule_id');
+        $schedules_id = $request->get('schedules_id');
         $highpriority = $request->get('highpriority');
 
         $date_start = $request->get('date_start');
@@ -241,7 +241,7 @@ class ScheduleController extends AbstractController
 
         try {
 
-            $resultado = $this->scheduleService->ClonarSchedule($schedule_id, $highpriority, $date_start, $date_stop);
+            $resultado = $this->scheduleService->ClonarSchedule($schedules_id, $highpriority, $date_start, $date_stop);
 
             if ($resultado['success']) {
 

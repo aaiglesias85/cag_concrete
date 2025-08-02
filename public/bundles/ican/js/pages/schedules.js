@@ -15,6 +15,7 @@ var Schedules = function () {
 
             if (mostrar_calendario) {
                 $('#div-lista-schedule').addClass('m--hide');
+                $('#nav-item-clonar').addClass('m--hide');
                 $('#nav-item-eliminar').addClass('m--hide');
 
                 $('#div-calendario').removeClass('m--hide');
@@ -25,6 +26,7 @@ var Schedules = function () {
 
             } else {
                 $('#div-lista-schedule').removeClass('m--hide');
+                $('#nav-item-clonar').removeClass('m--hide');
                 $('#nav-item-eliminar').removeClass('m--hide');
 
                 $('#div-calendario').addClass('m--hide');
@@ -148,7 +150,7 @@ var Schedules = function () {
             defaultView: 'dayGridMonth',
             defaultDate: TODAY,
 
-            editable: true,
+            editable: false,
             eventLimit: true, // allow "more" link when too many events
             navLinks: true,
             events: allEvents,
@@ -1290,6 +1292,7 @@ var Schedules = function () {
     }
 
     // clonar
+    var schedules_id = '';
     var initAccionClonar = function () {
         // validacion
         initFormClonar();
@@ -1300,6 +1303,7 @@ var Schedules = function () {
             resetFormsClonar();
 
             var schedule_id = $(this).data('id');
+            schedules_id = schedule_id;
             $('#schedule_id').val(schedule_id);
 
             var highpriority = $(this).data('highpriority') === '1' ? true : false;
@@ -1313,18 +1317,45 @@ var Schedules = function () {
 
             resetFormsClonar();
 
+            schedules_id = $('#schedule_id').val();
+
             var highpriority = $('#highpriority').prop('checked');
             $('#highpriority-clonar').prop('checked', highpriority);
 
             $('#modal-clonar-schedule').modal('show');
         });
 
+        $(document).off('click', "#btn-clonar-schedule-listado");
+        $(document).on('click', "#btn-clonar-schedule-listado", function (e) {
+
+            var ids = '';
+            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
+                if ($(this).prop('checked')) {
+                    var value = $(this).attr('value');
+                    if (value != undefined) {
+                        ids += value + ',';
+                    }
+                }
+            });
+
+            if (ids != '') {
+
+                resetFormsClonar();
+
+                schedules_id = ids;
+
+                $('#modal-clonar-schedule').modal('show');
+
+            } else {
+                toastr.error('Select schedules to clone', "");
+            }
+
+        });
+
         $(document).off('click', "#btn-clonar-schedule");
         $(document).on('click', "#btn-clonar-schedule", function (e) {
 
-            var schedule_id = $('#schedule_id').val();
-
-            if ($('#clonar-schedule-form').valid()) {
+            if ($('#clonar-schedule-form').valid() && schedules_id !== '') {
 
                 var date_start = $('#date-start-clonar').val();
                 var date_stop = $('#date-stop-clonar').val();
@@ -1337,7 +1368,7 @@ var Schedules = function () {
                     url: "schedule/clonar",
                     dataType: "json",
                     data: {
-                        'schedule_id': schedule_id,
+                        'schedules_id': schedules_id,
                         'date_start': date_start,
                         'date_stop': date_stop,
                         'highpriority': highpriority

@@ -48,18 +48,18 @@ class ScheduleService extends Base
         $columnas = range('A', 'K');
 
         $nombres = array_map(fn($e) => strtoupper($e['name']), $employees);
-         $textoCrewLeads = 'CREW LEADS: ' . implode(', ', [
-            'CARLOS ARROYO',
-            'CRUZ CORTEZ',
-            'FRANCISCO GUTIERREZ',
-            'JOSE DUARTE',
-            'JULIAN BAUTISTA',
-            'LUIS G.CORDOVA',
-            'MIGUEL MURILLO',
-            'VICTOR CORDOVA',
-            'VICTOR SORIANO',
-            'GERARDO ALVARADO'
-        ]);
+        $textoCrewLeads = 'CREW LEADS: ' . implode(', ', [
+                'CARLOS ARROYO',
+                'CRUZ CORTEZ',
+                'FRANCISCO GUTIERREZ',
+                'JOSE DUARTE',
+                'JULIAN BAUTISTA',
+                'LUIS G.CORDOVA',
+                'MIGUEL MURILLO',
+                'VICTOR CORDOVA',
+                'VICTOR SORIANO',
+                'GERARDO ALVARADO'
+            ]);
 
         $feriados = $this->ListarFeriadosReporteExcelSchedule($semanas);
 
@@ -686,74 +686,78 @@ class ScheduleService extends Base
 
     /**
      * ClonarSchedule: Clonar los datos del schedule en la BD
-     * @param int $schedule_id Id
+     * @param int $schedules_id Id
      * @author Marcel
      */
-    public function ClonarSchedule($schedule_id, $highpriority, $date_start_param, $date_stop_param)
+    public function ClonarSchedule($schedules_id, $highpriority, $date_start_param, $date_stop_param)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $this->getDoctrine()->getRepository(Schedule::class)
-            ->find($schedule_id);
-        /** @var Schedule $entity */
-        if ($entity != null) {
+        $schedules_id = explode(',', $schedules_id);
+        foreach ($schedules_id as $schedule_id) {
+            $entity = $this->getDoctrine()->getRepository(Schedule::class)
+                ->find($schedule_id);
+            /** @var Schedule $entity */
+            if ($entity != null) {
 
-            $project_id = $entity->getProject()->getProjectId();
-            $project_contact_id = $entity->getContactProject() ? $entity->getContactProject()->getContactId() : "";
-            $hour = $entity->getHour() !== null ? $entity->getHour() : "";
-            $description = $entity->getDescription();
-            $location = $entity->getLocation();
-            $latitud = $entity->getLatitud();
-            $longitud = $entity->getLongitud();
-            $vendor_id = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
-            $quantity = $entity->getQuantity();
-            $notes = $entity->getNotes();
+                $project_id = $entity->getProject()->getProjectId();
+                $project_contact_id = $entity->getContactProject() ? $entity->getContactProject()->getContactId() : "";
+                $hour = $entity->getHour() !== null ? $entity->getHour() : "";
+                $description = $entity->getDescription();
+                $location = $entity->getLocation();
+                $latitud = $entity->getLatitud();
+                $longitud = $entity->getLongitud();
+                $vendor_id = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
+                $quantity = $entity->getQuantity();
+                $notes = $entity->getNotes();
 
-            $concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
-            $concrete_vendor_contacts_id = implode(",", $concrete_vendor_contacts_id);
+                $concrete_vendor_contacts_id = $this->ListarSchedulesConcreteVendorContactsId($schedule_id);
+                $concrete_vendor_contacts_id = implode(",", $concrete_vendor_contacts_id);
 
-            $employees_id = $this->ListarEmployeesIdDeSchedule($schedule_id);
-            $employees_id = implode(",", $employees_id);
+                $employees_id = $this->ListarEmployeesIdDeSchedule($schedule_id);
+                $employees_id = implode(",", $employees_id);
 
-            // validar
-            $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
-            if ($validar_fecha_error) {
-                $resultado['success'] = false;
-                $resultado['error'] = $validar_fecha_error;
-                return $resultado;
-            }
-
-            $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
-            $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
-
-            $intervalo = new \DateInterval('P1D');
-            $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
-            foreach ($periodo as $dia) {
-
-                /*
-                if ($dia->format('w') === '0') {
-                    continue; // Saltar domingos
+                // validar
+                $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
+                if ($validar_fecha_error) {
+                    $resultado['success'] = false;
+                    $resultado['error'] = $validar_fecha_error;
+                    return $resultado;
                 }
-                */
 
-                $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                    $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id);
+                $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
+                $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
 
+                $intervalo = new \DateInterval('P1D');
+                $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
+                foreach ($periodo as $dia) {
+
+                    /*
+                    if ($dia->format('w') === '0') {
+                        continue; // Saltar domingos
+                    }
+                    */
+
+                    $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
+                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id);
+
+                }
+
+
+                $em->flush();
+
+                //Salvar log
+                $log_operacion = "Add";
+                $log_categoria = "Schedule";
+                $log_descripcion = "The schedule is added: $description, Start date: " . $date_start->format('m/d/Y') . " Stop date: " . $date_stop->format('m/d/Y');
+                $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
             }
-
-
-            $em->flush();
-
-            //Salvar log
-            $log_operacion = "Add";
-            $log_categoria = "Schedule";
-            $log_descripcion = "The schedule is added: $description, Start date: " . $date_start->format('m/d/Y') . " Stop date: " . $date_stop->format('m/d/Y');
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-
-            return $resultado;
         }
+
+        $resultado['success'] = true;
+
+        return $resultado;
+
     }
 
     /**
