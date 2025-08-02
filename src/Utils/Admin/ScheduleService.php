@@ -413,10 +413,16 @@ class ScheduleService extends Base
                 }
 
                 if ($lead) {
-                    $tituloLider = $lead->getName();
+                    $leadName = $lead->getName();
+                    $nombreParts = explode(' ', trim($leadName));
+                    $nombre = $nombreParts[0]; // First name
+                    $inicialApellido = isset($nombreParts[1]) ? strtoupper(substr($nombreParts[1], 0, 1)) . '.' : '';
+                    $tituloLider = $nombre . ' ' . $inicialApellido;
+
                     if ($otros > 0) {
                         $tituloLider .= " +{$otros}";
                     }
+
                     $title = "{$title}   ({$tituloLider})";
                 }
 
