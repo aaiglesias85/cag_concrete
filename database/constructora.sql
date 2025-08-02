@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 01-08-2025 a las 19:16:21
+-- Tiempo de generación: 02-08-2025 a las 18:50:55
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -113,6 +113,18 @@ CREATE TABLE `concrete_vendor_contact` (
   `role` varchar(50) DEFAULT NULL,
   `notes` text,
   `vendor_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `county`
+--
+
+CREATE TABLE `county` (
+  `county_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -311,7 +323,8 @@ INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `da
 CREATE TABLE `district` (
   `district_id` int(11) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL
+  `status` tinyint(1) DEFAULT NULL,
+  `county_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -388,10 +401,12 @@ CREATE TABLE `estimate` (
   `bid_description` text,
   `bid_instructions` text,
   `plan_link` text,
+  `quote_received` tinyint(1) DEFAULT NULL,
   `project_stage_id` int(11) DEFAULT NULL,
   `proposal_type_id` int(11) DEFAULT NULL,
   `status_id` int(11) DEFAULT NULL,
   `district_id` int(11) DEFAULT NULL,
+  `county_id` int(11) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
   `contact_id` int(11) DEFAULT NULL,
   `plan_downloading_id` int(11) DEFAULT NULL
@@ -499,7 +514,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (28, 'district', 'District'),
 (29, 'estimate', 'Estimates'),
 (30, 'plan_downloading', 'Plans Downloading'),
-(31, 'holiday', 'Holidays');
+(31, 'holiday', 'Holidays'),
+(32, 'county', 'County');
 
 -- --------------------------------------------------------
 
@@ -1199,17 +1215,18 @@ CREATE TABLE `project` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
-  `inspector_id` int(11) DEFAULT NULL
+  `inspector_id` int(11) DEFAULT NULL,
+  `county_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project`
 --
 
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`) VALUES
-(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', 1, 1),
-(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', 1, 1),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', 3, 1);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', 1, 1, NULL),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', 1, 1, NULL),
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', 3, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -1462,7 +1479,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (40, 1, 1, 1, 1, 1, 28),
 (41, 1, 1, 1, 1, 1, 29),
 (42, 1, 1, 1, 1, 1, 30),
-(43, 1, 1, 1, 1, 1, 31);
+(43, 1, 1, 1, 1, 1, 31),
+(44, 1, 1, 1, 1, 1, 32);
 
 -- --------------------------------------------------------
 
@@ -1670,7 +1688,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (32, 1, 1, 1, 1, 1, 28),
 (33, 1, 1, 1, 1, 1, 29),
 (34, 1, 1, 1, 1, 1, 30),
-(35, 1, 1, 1, 1, 1, 31);
+(35, 1, 1, 1, 1, 1, 31),
+(36, 1, 1, 1, 1, 1, 32);
 
 -- --------------------------------------------------------
 
@@ -1719,6 +1738,12 @@ ALTER TABLE `concrete_vendor`
 ALTER TABLE `concrete_vendor_contact`
   ADD PRIMARY KEY (`contact_id`),
   ADD KEY `Refcontactconcvendor1` (`vendor_id`);
+
+--
+-- Indices de la tabla `county`
+--
+ALTER TABLE `county`
+  ADD PRIMARY KEY (`county_id`);
 
 --
 -- Indices de la tabla `data_tracking`
@@ -1776,7 +1801,8 @@ ALTER TABLE `data_tracking_subcontract`
 -- Indices de la tabla `district`
 --
 ALTER TABLE `district`
-  ADD PRIMARY KEY (`district_id`);
+  ADD PRIMARY KEY (`district_id`),
+  ADD KEY `county_id` (`county_id`);
 
 --
 -- Indices de la tabla `employee`
@@ -1801,7 +1827,8 @@ ALTER TABLE `estimate`
   ADD KEY `Refestimate4` (`district_id`),
   ADD KEY `Refestimate5` (`company_id`),
   ADD KEY `Refestimate6` (`contact_id`),
-  ADD KEY `plan_downloading_id` (`plan_downloading_id`);
+  ADD KEY `plan_downloading_id` (`plan_downloading_id`),
+  ADD KEY `county_id` (`county_id`);
 
 --
 -- Indices de la tabla `estimate_bid_deadline`
@@ -1922,7 +1949,8 @@ ALTER TABLE `plan_status`
 ALTER TABLE `project`
   ADD PRIMARY KEY (`project_id`),
   ADD KEY `Ref6467` (`company_id`),
-  ADD KEY `Ref6573` (`inspector_id`);
+  ADD KEY `Ref6573` (`inspector_id`),
+  ADD KEY `county_id` (`county_id`);
 
 --
 -- Indices de la tabla `project_contact`
@@ -2108,6 +2136,12 @@ ALTER TABLE `concrete_vendor_contact`
   MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `county`
+--
+ALTER TABLE `county`
+  MODIFY `county_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -2195,7 +2229,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -2327,7 +2361,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2387,7 +2421,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -2458,6 +2492,12 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
 
 --
+-- Filtros para la tabla `district`
+--
+ALTER TABLE `district`
+  ADD CONSTRAINT `Refdistrictcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
+
+--
 -- Filtros para la tabla `estimate`
 --
 ALTER TABLE `estimate`
@@ -2467,7 +2507,8 @@ ALTER TABLE `estimate`
   ADD CONSTRAINT `Refestimate4` FOREIGN KEY (`district_id`) REFERENCES `district` (`district_id`),
   ADD CONSTRAINT `Refestimate5` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`),
-  ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`);
+  ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`),
+  ADD CONSTRAINT `Refestimatecountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
 
 --
 -- Filtros para la tabla `estimate_bid_deadline`
@@ -2541,7 +2582,8 @@ ALTER TABLE `notification`
 --
 ALTER TABLE `project`
   ADD CONSTRAINT `Refcontractor67` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
-  ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`);
+  ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),
+  ADD CONSTRAINT `Refprojectcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
 
 --
 -- Filtros para la tabla `project_contact`

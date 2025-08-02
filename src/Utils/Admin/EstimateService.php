@@ -280,7 +280,7 @@ class EstimateService extends Base
             $arreglo_resultado['bidDescription'] = $entity->getBidDescription();
             $arreglo_resultado['bidInstructions'] = $entity->getBidInstructions();
             $arreglo_resultado['planLink'] = $entity->getPlanLink();
-
+            $arreglo_resultado['quoteReceived'] = $entity->getQuoteReceived();
 
             $arreglo_resultado['stage_id'] = $entity->getStage() != null ? $entity->getStage()->getStageId() : '';
             $arreglo_resultado['proposal_type_id'] = $entity->getProposalType() != null ? $entity->getProposalType()->getTypeId() : '';
@@ -386,7 +386,7 @@ class EstimateService extends Base
             $bid_deadlines[] = [
                 'id' => $estimate_bid_deadline->getId(),
                 'bidDeadline' => $estimate_bid_deadline->getBidDeadline()->format('m/d/Y H:i'),
-                'tag'=> $estimate_bid_deadline->getTag() ?? '',
+                'tag' => $estimate_bid_deadline->getTag() ?? '',
                 'address' => $estimate_bid_deadline->getAddress() ?? '',
                 'company_id' => $estimate_bid_deadline->getCompany()->getCompanyId(),
                 'company' => $estimate_bid_deadline->getCompany()->getName(),
@@ -560,7 +560,7 @@ class EstimateService extends Base
     public function ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
                                        $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                                        $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                                       $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink)
+                                       $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -591,6 +591,7 @@ class EstimateService extends Base
             $entity->setBidDescription($bidDescription);
             $entity->setBidInstructions($bidInstructions);
             $entity->setPlanLink($planLink);
+            $entity->setQuoteReceived($quoteReceived);
 
             $entity->setBidDeadline(NULL);
             if ($bidDeadline != '') {
@@ -973,9 +974,14 @@ class EstimateService extends Base
             // stage
             $stage = $this->DevolverStageParaListado($estimate_id, $value->getStage());
 
+            // name
+            $name = $value->getName() . ($value->getQuoteReceived()
+                    ? ' <i class="fa fa-check-circle" style="color: green;" title="Quote received"></i>'
+                    : '');
+
             $arreglo_resultado[$cont] = array(
                 "id" => $estimate_id,
-                "name" => $value->getName(),
+                "name" => $name,
                 "company" => $companies,
                 "bidDeadline" => $bidDeadline,
                 "estimators" => $estimators,

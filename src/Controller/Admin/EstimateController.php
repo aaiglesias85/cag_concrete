@@ -204,6 +204,7 @@ class EstimateController extends AbstractController
         $bidDescription = $request->get('bidDescription');
         $bidInstructions = $request->get('bidInstructions');
         $planLink = $request->get('planLink');
+        $quoteReceived = $request->get('quoteReceived');
 
         $stage_id = $request->get('stage_id');
         $proposal_type_id = $request->get('proposal_type_id');
@@ -233,7 +234,7 @@ class EstimateController extends AbstractController
                 $resultado = $this->estimateService->ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
                     $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                     $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink);
+                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived);
             }
 
             if ($resultado['success']) {

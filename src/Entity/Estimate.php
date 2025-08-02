@@ -49,6 +49,9 @@ class Estimate
     #[ORM\Column(name: "plan_link", type: "text", nullable: true)]
     private ?string $planLink;
 
+    #[ORM\Column(name: "quote_received", type: "boolean", nullable: true)]
+    private ?bool $quoteReceived;
+
     #[ORM\Column(name: 'job_walk', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $jobWalk;
 
@@ -402,5 +405,15 @@ class Estimate
     public function setCountyObj(?County $countyObj): void
     {
         $this->countyObj = $countyObj;
+    }
+
+    public function getQuoteReceived(): ?bool
+    {
+        return $this->quoteReceived;
+    }
+
+    public function setQuoteReceived(?bool $quoteReceived): void
+    {
+        $this->quoteReceived = $quoteReceived;
     }
 }

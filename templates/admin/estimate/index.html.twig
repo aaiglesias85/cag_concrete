@@ -9,10 +9,12 @@
             padding-top: 5px;
             padding-bottom: 5px;
         }
+
         .m-widget4 .m-widget4__item .m-widget4__info {
             padding-left: 0;
         }
-        .popover-company{
+
+        .popover-company {
             cursor: pointer;
         }
     </style>
@@ -247,13 +249,13 @@
                     <li class="nav-item">
                         <a class="nav-link active wizard-tab" data-item="1"
                            data-toggle="tab" href="#tab-content-general" id="tab-general">
-                            General
+                            Bid Details
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link wizard-tab" data-item="2"
                            data-toggle="tab" href="#tab-content-bid-details" id="tab-bid-details">
-                            Bid Details
+                            Bidders
                         </a>
                     </li>
                     <li class="nav-item">
@@ -271,7 +273,7 @@
                     <li class="nav-item">
                         <a class="nav-link wizard-tab" data-item="5"
                            data-toggle="tab" href="#tab-content-bid-information" id="tab-bid-information">
-                            Bid Information
+                            Notes
                         </a>
                     </li>
                 </ul>
@@ -456,106 +458,9 @@
 
                                 <div class="form-group m-form__group ic-form-group">
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <label>
-                                                <span class="ic-step-number">5</span>
-                                                Company
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <div class="row" id="select-company">
-                                                <div class="col-md-10">
-                                                    <select class="form-control m-select2 event-change select-company" id="company"
-                                                            name="company">
-                                                        <option value="">Select</option>
-                                                        {% for item in companies %}
-                                                            <option value="{{ item.companyId }}">{{ item.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                                    <a href="javascript:;" title="Add company"
-                                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only btn-add-company">
-                                                        <i class="la la-plus"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>
-                                                Contact name
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <div class="row" id="select-contact">
-                                                <div class="col-md-10">
-                                                    <select class="form-control m-select2 event-change" id="contact"
-                                                            name="contact">
-                                                        <option value="">Select</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
-                                                    <a href="javascript:;" title="Add contact" id="btn-add-contact"
-                                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
-                                                        <i class="la la-plus"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>
-                                                <span class="ic-step-number">6</span>
-                                                Phone
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <input type="text" class="form-control event-change" id="phone"
-                                                   name="phone">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label>
-                                                Email
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <input type="text" class="form-control event-change" id="email"
-                                                   name="email">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </form>
-                    </div>
-                    <div class="tab-pane" id="tab-content-bid-details" role="tabpanel">
-                        <form class="m-form" id="estimate-bid-details-form" action="#" enctype="multipart/form-data"
-                              method="post">
-
-                            <div class="m-form__section m-form__section--first">
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <label>
-                                        <span class="ic-step-number">1</span>
-                                        Bid Deadline
-                                        <span class="ic-small italic">(optional)</span>
-                                    </label>
-                                    <div>
-                                        <a href="javascript:;" class="btn btn-success btn-sm mb-3 btn-agregar-bid-deadline">
-                                            <i class="la la-plus"></i> Add deadline
-                                        </a>
-                                    </div>
-                                    <div id="lista-bid-deadline" class="m-widget4 m-widget4--chart-bottom">
-
-                                    </div>
-                                </div>
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
                                         <div class="col-md-2">
                                             <label>
-                                                <span class="ic-step-number">2</span>
+                                                <span class="ic-step-number">5</span>
                                                 Job walk
                                                 <span class="ic-small italic">(optional)</span>
                                             </label>
@@ -663,7 +568,7 @@
                                     <div class="row">
                                         <div class="col-md-2">
                                             <label>
-                                                <span class="ic-step-number">3</span>
+                                                <span class="ic-step-number">6</span>
                                                 Lost Date
                                                 <span class="ic-small italic">(optional)</span>
                                             </label>
@@ -718,6 +623,105 @@
                                             </select>
                                         </div>
 
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-content-bid-details" role="tabpanel">
+                        <form class="m-form" id="estimate-bid-details-form" action="#" enctype="multipart/form-data"
+                              method="post">
+
+                            <div class="m-form__section m-form__section--first">
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label>
+                                        <span class="ic-step-number">1</span>
+                                        Bid Deadline
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <div>
+                                        <a href="javascript:;"
+                                           class="btn btn-success btn-sm mb-3 btn-agregar-bid-deadline">
+                                            <i class="la la-plus"></i> Add deadline
+                                        </a>
+                                    </div>
+                                    <div id="lista-bid-deadline" class="m-widget4 m-widget4--chart-bottom">
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>
+                                                <span class="ic-step-number">2</span>
+                                                Company
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <div class="row" id="select-company">
+                                                <div class="col-md-10">
+                                                    <select class="form-control m-select2 event-change select-company"
+                                                            id="company"
+                                                            name="company">
+                                                        <option value="">Select</option>
+                                                        {% for item in companies %}
+                                                            <option value="{{ item.companyId }}">{{ item.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                                    <a href="javascript:;" title="Add company"
+                                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only btn-add-company">
+                                                        <i class="la la-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>
+                                                Contact name
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <div class="row" id="select-contact">
+                                                <div class="col-md-10">
+                                                    <select class="form-control m-select2 event-change" id="contact"
+                                                            name="contact">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2" style="padding-top: 3px; padding-left: 0px;">
+                                                    <a href="javascript:;" title="Add contact" id="btn-add-contact"
+                                                       class="btn btn-success m-btn m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>
+                                                <span class="ic-step-number">3</span>
+                                                Phone
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="phone"
+                                                   name="phone">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>
+                                                Email
+                                                <span class="ic-small italic">(optional)</span>
+                                            </label>
+                                            <input type="text" class="form-control event-change" id="email"
+                                                   name="email">
+                                        </div>
                                     </div>
                                 </div>
 
@@ -796,8 +800,9 @@
                                                 <div class="col-md-8">
                                                     {% if permiso.agregar or permiso.editar %}
                                                         <div class="btn-group">
-                                                            <button class="btn btn-success btn-agregar-bid-deadline" style="margin-bottom: 20px; margin-top: 10px;">
-                                                                <i class="la la-plus"></i>  Manage companies
+                                                            <button class="btn btn-success btn-agregar-bid-deadline"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                <i class="la la-plus"></i> Manage companies
                                                             </button>
                                                         </div>
                                                     {% endif %}
@@ -832,12 +837,14 @@
                                 <div class="form-group m-form__group ic-form-group">
                                     <label>
                                         <span class="ic-step-number">1</span>
-                                        Description
+                                        Estimating Notes
                                         <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <textarea class="form-control" id="bidDescription" name="biddescription" rows="3"></textarea>
+                                    <textarea class="form-control" id="bidDescription" name="biddescription"
+                                              rows="3"></textarea>
                                 </div>
 
+                                {#
                                 <div class="form-group m-form__group ic-form-group">
                                     <label>
                                         <span class="ic-step-number">2</span>
@@ -854,6 +861,22 @@
                                         <span class="ic-small italic">(optional)</span>
                                     </label>
                                     <textarea class="form-control" id="planLink" name="planlink" rows="3"></textarea>
+                                </div>
+                                #}
+
+                                <div class="form-group m-form__group ic-form-group">
+                                    <label>
+                                        <span class="ic-step-number">2</span>
+                                        Concrete Quote Received
+                                        <span class="ic-small italic">(optional)</span>
+                                    </label>
+                                    <div>
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" class="form-control event-change"
+                                                   id="quoteReceived" name="quote_received"> Concrete Quote Received
+                                            <span></span>
+                                        </label>
+                                    </div>
                                 </div>
 
                             </div>
@@ -961,15 +984,16 @@
                                         <input type='text' class="form-control m-input date-picker event-change"
                                                placeholder="Select a date" autocomplete="off"
                                                id="bid-deadline-date" name="biddeadlinedate"/>
-                                            <div class="input-group-append">
+                                        <div class="input-group-append">
                                                 <span class="input-group-text">
                                                     <i class="la la-calendar glyphicon-th"></i>
                                                 </span>
-                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4" id="select-bid-deadline-hour">
-                                    <select class="form-control m-select2 event-change" id="bid-deadline-hour" name="hour">
+                                    <select class="form-control m-select2 event-change" id="bid-deadline-hour"
+                                            name="hour">
                                         <option value="">Hour</option>
                                         {% for h in 0..23 %}
                                             {% set hour = "%02d:00"|format(h) %}
@@ -987,9 +1011,10 @@
                                 <span class="ic-small italic">(required)</span>
                             </label>
 
-                            <div class="row"  id="select-company-bid-deadline">
+                            <div class="row" id="select-company-bid-deadline">
                                 <div class="col-md-10">
-                                    <select class="form-control m-select2 event-change select-company" id="company-bid-deadline"
+                                    <select class="form-control m-select2 event-change select-company"
+                                            id="company-bid-deadline"
                                             name="company">
                                         <option value="">Select</option>
                                         {% for item in companies %}

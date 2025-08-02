@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 01-08-2025 a las 19:16:29
+-- Tiempo de generación: 02-08-2025 a las 18:51:03
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -136,7 +136,8 @@ INSERT INTO `company_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `
 (6, 'BRANDON ORAVETZ', '', '', '', '', 41),
 (7, 'Emily Wallace', '', '', 'Business Manager', '', 41),
 (8, 'Joana Garcia', '', '', 'TESTING TESTER TESTED', 'TEST TEST TEST', 46),
-(9, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '', '', ' ', 14);
+(9, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '', '', ' ', 14),
+(10, 'Geydis Marquez', 'geydismarquezplanes@gmail.com', '955383354', 'Obrero', 'test ', 35);
 
 -- --------------------------------------------------------
 
@@ -202,6 +203,144 @@ CREATE TABLE `concrete_vendor_contact` (
 INSERT INTO `concrete_vendor_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `notes`, `vendor_id`) VALUES
 (2, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(955)383-3543', 'sad fsdfsd', 'f sdf sd fdsf f df dsf', 3),
 (3, 'Andres Iglesisas', 'admin@admin.com', '(234)324-2343', '', '', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `county`
+--
+
+CREATE TABLE `county` (
+  `county_id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `county`
+--
+
+INSERT INTO `county` (`county_id`, `description`, `status`) VALUES
+(1, 'Deploy', 0),
+(2, 'DeKalb', 1),
+(3, 'CLARKE', 1),
+(4, 'HOUSTON', 1),
+(5, 'BIBB', 1),
+(6, 'JACKSON', 1),
+(7, 'JEFFERSON', 1),
+(8, 'FULTON', 1),
+(9, 'ROCKDALE ', 1),
+(10, 'HAMILTON', 1),
+(11, 'Henry', 1),
+(12, 'Cobb', 1),
+(13, 'Hall', 1),
+(14, 'Gwinnett', 1),
+(15, 'Cobb Fulton', 1),
+(16, 'Oconee', 1),
+(17, 'Muscogee', 1),
+(18, 'Dade', 1),
+(19, 'Habersham', 1),
+(20, 'HJAIA', 1),
+(21, 'HEARD', 1),
+(22, 'CLAYTON', 1),
+(23, 'COWETA', 1),
+(24, 'CARROLL', 1),
+(25, 'GWINNETT & FULTON', 1),
+(26, 'CITY OF SANDY SPRINGS', 1),
+(27, 'CHATHAM, EFFINGHAM', 1),
+(28, 'CHATHAM', 1),
+(29, 'PAULDING', 1),
+(30, 'CHEROKEE', 1),
+(31, 'GILMER', 1),
+(32, 'POLK', 1),
+(33, 'HARALSON', 1),
+(34, 'BARROW', 1),
+(35, 'RICHMOND', 1),
+(36, 'PAULING', 1),
+(37, 'COLUMBIA', 1),
+(38, 'JASPER, NEWTON', 1),
+(39, 'DOUGLAS', 1),
+(40, 'FANNIN', 1),
+(41, 'WALTON', 1),
+(42, 'CLAYTON, HENRY', 1),
+(43, 'JASPER, MONROE', 1),
+(44, 'ELBERT', 1),
+(45, 'AUGUSTA', 1),
+(46, 'MORGAN', 1),
+(47, 'CITY OF ROSWELL', 1),
+(48, 'MADISON', 1),
+(49, 'TROUP', 1),
+(50, 'WARREN', 1),
+(51, 'FOREST PARK', 1),
+(52, 'DEKALB, HENRY', 1),
+(53, 'RABUN', 1),
+(54, 'NEWTON', 1),
+(55, 'DEKALB, FULTON', 1),
+(56, 'EAST POINT', 1),
+(57, 'COBB- HJAIA', 1),
+(58, 'BRYAN', 1),
+(59, 'BALDWIN', 1),
+(60, 'WILKINSON', 1),
+(61, 'BANKS', 1),
+(62, 'FLOYD', 1),
+(63, 'test', 1),
+(64, 'BURKE', 1),
+(65, 'COWETA, FULTON', 1),
+(66, 'Walton, Morgan', 1),
+(67, 'TALBERT', 1),
+(68, 'TOWNS', 1),
+(69, 'PEACH', 1),
+(70, 'WALTON, NEWTON, MORGAN', 1),
+(71, 'EFFINGHAM', 1),
+(72, 'SPALDING', 1),
+(73, 'FRANKLIN', 1),
+(74, 'FAYETTE', 1),
+(75, 'LIBERTY', 1),
+(76, 'LAURENS', 1),
+(77, 'TATTNALL, TOOMBS', 1),
+(78, 'BULLOCH', 1),
+(79, 'DOUGHERTY', 1),
+(80, 'CITY OF ATLANTA', 1),
+(81, 'LOWNDES', 1),
+(82, 'ROCKDA', 1),
+(83, 'SCREVEN', 1),
+(84, 'CITY OF SAVANNAH', 1),
+(85, 'HARRIS', 1),
+(86, 'CAMPBELLTON', 1),
+(87, 'GORDON', 1),
+(88, 'Augusta-Richmond', 1),
+(89, 'EATONTON', 1),
+(90, 'ROME', 1),
+(91, 'MORGAN, NEWTON', 1),
+(92, 'LINCOLN', 1),
+(93, 'BARROW, GWINNETT', 1),
+(94, 'CHATTAHOOCHEE', 1),
+(95, 'TALLULAH FALLS', 1),
+(96, 'FANNIN COUNTY', 1),
+(97, 'CITY OF BALDWIN', 1),
+(98, 'MORGAN, OGLETHORPE', 1),
+(99, 'FLOYD, WALKER', 1),
+(100, 'COBB, FULTON', 1),
+(101, 'MONROE', 1),
+(102, 'DADE GORDON WHITEFIELD', 1),
+(103, 'UNION', 1),
+(104, 'CATOOSA', 1),
+(105, 'WALKER', 1),
+(106, 'HENRY, NEWTON', 1),
+(107, 'CHATTOOGA', 1),
+(108, 'BARTOW', 1),
+(109, 'TOOMBS', 1),
+(110, 'JENKINS', 1),
+(111, 'GREENE', 1),
+(112, 'PULASKI', 1),
+(113, 'COBB, PAULDING', 1),
+(114, 'CAMDEN', 1),
+(115, 'HJAIA- CITY OF ATLANTA', 1),
+(116, 'DAWSON', 1),
+(117, 'JONES', 1),
+(118, 'TEFLFAIR', 1),
+(119, 'FULTON/COBB', 1),
+(120, 'Florida', 1);
 
 -- --------------------------------------------------------
 
@@ -2820,19 +2959,20 @@ INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `da
 CREATE TABLE `district` (
   `district_id` int(11) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL
+  `status` tinyint(1) DEFAULT NULL,
+  `county_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `district`
 --
 
-INSERT INTO `district` (`district_id`, `description`, `status`) VALUES
-(1, 'District 1', 1),
-(2, 'District 2', 1),
-(3, 'District 3', 1),
-(4, 'District 4', 1),
-(5, 'District 5', 1);
+INSERT INTO `district` (`district_id`, `description`, `status`, `county_id`) VALUES
+(1, 'District 1', 1, 45),
+(2, 'District 2', 1, 59),
+(3, 'District 3', 1, 61),
+(4, 'District 4', 1, 34),
+(5, 'District 5', 1, 108);
 
 -- --------------------------------------------------------
 
@@ -3013,10 +3153,12 @@ CREATE TABLE `estimate` (
   `bid_description` text,
   `bid_instructions` text,
   `plan_link` text,
+  `quote_received` tinyint(1) DEFAULT NULL,
   `project_stage_id` int(11) DEFAULT NULL,
   `proposal_type_id` int(11) DEFAULT NULL,
   `status_id` int(11) DEFAULT NULL,
   `district_id` int(11) DEFAULT NULL,
+  `county_id` int(11) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
   `contact_id` int(11) DEFAULT NULL,
   `plan_downloading_id` int(11) DEFAULT NULL
@@ -3026,9 +3168,9 @@ CREATE TABLE `estimate` (
 -- Volcado de datos para la tabla `estimate`
 --
 
-INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `bid_description`, `bid_instructions`, `plan_link`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
-(2, '345435435', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', 1, 3, 1, 1, 24, NULL, 1),
-(3, 'tdfgdfgg', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', 3, 1, 2, 1, 29, NULL, NULL);
+INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `county`, `priority`, `bid_no`, `work_hour`, `phone`, `email`, `job_walk`, `rfi_due_date`, `project_start`, `project_end`, `submitted_date`, `awarded_date`, `lost_date`, `location`, `sector`, `bid_description`, `bid_instructions`, `plan_link`, `quote_received`, `project_stage_id`, `proposal_type_id`, `status_id`, `district_id`, `county_id`, `company_id`, `contact_id`, `plan_downloading_id`) VALUES
+(2, '345435435', 'Test bid deadline', '2025-06-14 16:00:00', 'Florida', 'Low', '456456', '54', '', '', '2025-06-14 19:55:00', '2025-06-17 19:45:00', '2025-06-09 12:40:00', '2025-06-17 13:25:00', '2025-06-25 09:25:00', '2025-06-26 17:25:00', '2025-06-26 17:25:00', 'Chambers Street, Nueva York, EE. UU.', 'Private', 'dfgdf gfd g', 'df gdf gdf', 'g dfg dfgd f', NULL, 1, 3, 1, 1, NULL, 24, NULL, 1),
+(3, 'tdfgdfgg', 'Other project', '2025-06-25 22:00:00', 'Florida', 'Low', '435435', '67', '435435435,955383354', 'cyborgmnk@gmail.com,geydismarquezplanes@gmail.com', '2025-08-02 14:35:00', NULL, NULL, NULL, NULL, NULL, NULL, '123 Street view', '', '', '', '', NULL, 3, 1, 2, NULL, NULL, 35, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -3053,7 +3195,8 @@ INSERT INTO `estimate_bid_deadline` (`id`, `bid_deadline`, `tag`, `address`, `es
 (1, '2025-06-14 17:00:00', 'High Priority', 'dsf sdf dsfsd', 2, 16),
 (2, '2025-06-18 17:05:00', 'Medium Priority', ' sd fsd fsf', 2, 24),
 (3, '2025-06-26 17:10:00', 'Low Priority', 'df sdf sdf sdfsd fsd', 2, 44),
-(5, '2025-06-30 23:25:00', 'Don\'t Bid', 'dsf dsfsdf sdf', 2, 26);
+(5, '2025-06-30 23:25:00', 'Don\'t Bid', 'dsf dsfsdf sdf', 2, 26),
+(6, '2025-08-03 15:00:00', '', '', 3, 14);
 
 -- --------------------------------------------------------
 
@@ -3072,10 +3215,10 @@ CREATE TABLE `estimate_estimator` (
 --
 
 INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
-(46, 2, 1),
-(47, 2, 3),
-(48, 2, 2),
-(51, 3, 2);
+(52, 2, 1),
+(53, 2, 3),
+(54, 2, 2),
+(61, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -3094,10 +3237,10 @@ CREATE TABLE `estimate_project_type` (
 --
 
 INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
-(51, 2, 1),
-(52, 2, 4),
-(57, 3, 2),
-(58, 3, 3);
+(59, 2, 1),
+(60, 2, 4),
+(73, 3, 2),
+(74, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -3173,7 +3316,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (28, 'district', 'District'),
 (29, 'estimate', 'Estimates'),
 (30, 'plan_downloading', 'Plans Downloading'),
-(31, 'holiday', 'Holidays');
+(31, 'holiday', 'Holidays'),
+(32, 'county', 'County');
 
 -- --------------------------------------------------------
 
@@ -4466,7 +4610,35 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3463, 'Add', 'Item', 'The item is added: Test 2', '::1', '2025-07-20 19:28:37', 1),
 (3464, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 01:59:36', 1),
 (3465, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-07-26 02:00:34', 1),
-(3466, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-07-27 17:23:22', 1);
+(3466, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-07-27 17:23:22', 1),
+(3467, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-08-01 19:50:09', 1),
+(3468, 'Update', 'Schedule', 'The schedule is modified: test', '::1', '2025-08-01 19:53:44', 1),
+(3469, 'Add', 'Schedule', 'The schedule is added: Prueba Leads, Start date: 08/01/2025 Stop date: 09/01/2025', '::1', '2025-08-01 20:07:22', 1);
+INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `created_at`, `user_id`) VALUES
+(3470, 'Add', 'County', 'The county is added: Deploy', '::1', '2025-08-01 21:48:55', 1),
+(3471, 'Update', 'County', 'The county is modified: Deploy', '::1', '2025-08-01 21:48:59', 1),
+(3472, 'Update', 'Project', 'The project is modified: SR 15', '::1', '2025-08-02 00:01:38', 1),
+(3473, 'Update', 'Project', 'The project is modified: LAURENS', '::1', '2025-08-02 00:02:18', 1),
+(3474, 'Update', 'District', 'The district is modified: District 1', '::1', '2025-08-02 15:09:20', 1),
+(3475, 'Update', 'District', 'The district is modified: District 2', '::1', '2025-08-02 15:09:24', 1),
+(3476, 'Update', 'District', 'The district is modified: District 3', '::1', '2025-08-02 15:09:28', 1),
+(3477, 'Update', 'District', 'The district is modified: District 4', '::1', '2025-08-02 15:09:35', 1),
+(3478, 'Update', 'District', 'The district is modified: District 5', '::1', '2025-08-02 15:09:40', 1),
+(3479, 'Update', 'District', 'The district is modified: District 1', '::1', '2025-08-02 15:09:46', 1),
+(3480, 'Update', 'District', 'The district is modified: District 1', '::1', '2025-08-02 15:09:50', 1),
+(3481, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-08-02 17:48:13', 1),
+(3482, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 17:48:25', 1),
+(3483, 'Add', 'Schedule', 'The schedule is added: Prueba Leads, Start date: 08/03/2025 Stop date: 08/10/2025', '::1', '2025-08-02 18:05:54', 1),
+(3484, 'Add', 'Schedule', 'The schedule is added: Prueba Leads, Start date: 08/10/2025 Stop date: 08/17/2025', '::1', '2025-08-02 18:12:25', 1),
+(3485, 'Add', 'Schedule', 'The schedule is added: Prueba Leads, Start date: 08/10/2025 Stop date: 08/17/2025', '::1', '2025-08-02 18:12:25', 1),
+(3486, 'Add', 'Schedule', 'The schedule is added: Prueba Leads, Start date: 08/10/2025 Stop date: 08/17/2025', '::1', '2025-08-02 18:12:25', 1),
+(3487, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 18:32:51', 1),
+(3488, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 18:38:59', 1),
+(3489, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 18:39:22', 1),
+(3490, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 18:40:43', 1),
+(3491, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 18:40:53', 1),
+(3492, 'Add', 'Company Contact', 'The company contact is added: Geydis Marquez', '::1', '2025-08-02 18:46:33', 1),
+(3493, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-02 18:46:37', 1);
 
 -- --------------------------------------------------------
 
@@ -4643,300 +4815,301 @@ CREATE TABLE `project` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
-  `inspector_id` int(11) DEFAULT NULL
+  `inspector_id` int(11) DEFAULT NULL,
+  `county_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project`
 --
 
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`) VALUES
-(6, 'N/A', 'ERS05039', 'N/A', NULL, 'BUFORD HWY PED IMPROVEMENTS', NULL, 'DOT', '60294-9754', 1371500.00, 1, 'DeKalb', 0, '', 1, '2023-05-10', '2025-03-31', '2024-07-25', '', 1, NULL, NULL, '2024-07-08 14:37:28', '2024-11-25 19:28:06', 5, NULL),
-(7, 'N/A', 'ERS05066', 'N/A', NULL, 'BEN EPPS TAXIWAY', NULL, 'UNIFIED GOV. OF ATHENS-CLARKE', '50429-9754', 77691.00, 1, 'CLARKE', 0, '', 0, '2024-06-24', '2024-10-31', '2024-07-31', '', 1, NULL, NULL, '2024-07-08 15:12:55', '2024-11-25 17:56:33', 5, NULL),
-(8, NULL, 'PO-0195-GRW', NULL, NULL, 'WOODLANDS TRINITY', 'WOODLANDS TRINITY', 'WOODLANDS SUBDIVISION', '', NULL, 0, 'HOUSTON', 0, '', 0, '2020-09-07', NULL, '2024-07-31', 'Cliff Gradwell', 1, '', '', '2024-07-08 15:27:25', '2024-07-09 14:38:27', 6, NULL),
-(9, 'N/A', 'CWM04099', 'N/A', NULL, 'HIDDEN ACRES DRIVE', NULL, 'N/A', 'N/A', 99.76, 0, 'DEKALB', 0, '', 0, '2024-07-02', '2024-07-02', '2024-07-31', 'Mike Lunsford', 0, NULL, NULL, '2024-07-08 16:06:19', '2025-02-17 17:56:54', 7, NULL),
-(10, NULL, 'WEB56001', NULL, NULL, 'BIBB', 'BIBB', 'GDOT', '2021CW1K00026', NULL, 1, 'BIBB', 0, '', 0, '2022-03-29', NULL, '2024-07-31', '', 1, '', '', '2024-07-08 16:21:32', '2024-07-09 15:38:45', 8, NULL),
-(11, '0016523', 'ERS05059', 'B1CBA2302156-0', NULL, 'VALENTINE BLVD BRIDGE', NULL, 'DOT', '60336-9754', 101910.00, 1, 'JACKSON', 0, '', 0, '2024-06-18', '2024-09-30', '2024-07-31', '', 2, NULL, NULL, '2024-07-08 19:19:11', '2025-02-14 16:13:36', 5, NULL),
-(12, '-', 'REEV50013', '', NULL, 'JEFFERSON-WIDENING US 221-US1-SR4', NULL, 'DOT', '0', 6120.00, 1, 'JEFFERSON', 0, '', 1, '2024-05-17', '2025-03-04', '2024-07-25', 'Michael Schriver', 1, NULL, NULL, '2024-07-09 14:24:19', '2024-12-02 15:33:03', 9, NULL),
-(13, NULL, 'STEB19010', NULL, NULL, '2021 LMIG STREET RESURFACING GROUP 1 NORTH', 'FULTON-COA', 'FULTON COUNTY', '52305-03', NULL, 0, 'FULTON', 0, '', 0, '2024-08-21', NULL, '2024-07-31', '', 1, '', '', '2024-07-09 15:59:34', NULL, 10, NULL),
-(14, 'N/A', 'RW74001', 'N/A', NULL, 'FULTON', NULL, 'GDOT', 'N/A', 342832.00, 0, 'FULTON', 0, '', 0, '2024-04-24', '2024-11-30', '2024-07-31', '', 1, NULL, NULL, '2024-07-09 16:16:48', '2024-12-02 14:35:23', 11, NULL),
-(15, NULL, 'PC25028', NULL, NULL, 'ROCKDALE - Roundabout 138 Union Church Rd', 'ROCKDALE - Roundabout 138 Union Church Rd', 'DOT', '1809', NULL, 1, 'ROCKDALE ', 0, '', 1, '2023-03-03', '2024-07-31', '2024-07-31', 'ROBERT MOON- rmoon@pittman-construction.com', 1, '0009989', 'B1CBA2202367-0', '2024-07-09 16:22:29', '2024-07-24 18:16:29', 12, NULL),
-(19, 'IFB-C-1210246', 'CWM04043', '', NULL, 'CASCADE RD AVE STREETSCAPE, PH 1', NULL, 'City of Atlanta', '32742', 4663597.00, 0, 'FULTON', 0, '', 0, '2024-07-12', '2024-08-31', '2024-08-31', '', 1, NULL, NULL, '2024-08-14 18:06:41', '2025-02-19 20:17:12', 7, NULL),
-(20, 'IM/NH-75-1(131)', 'WRB21009', '33005-1185-44', NULL, 'Design-Build I-75@ I-24, Ph II', NULL, 'TDOT', '01-0703-3969', 626404.80, 1, 'HAMILTON', 0, '', 1, '2024-09-23', '2026-10-01', '2024-10-24', '', 1, NULL, NULL, '2024-10-03 16:38:29', '2025-02-19 18:12:32', 36, NULL),
-(21, '0014482', 'ERS05074', 'B3CBA2401992-0', NULL, 'Henry Western Parallel Connector', NULL, 'GDOT', '60376-9754', 3069748.87, 1, 'Henry', 0, '', 1, '0024-08-12', '2026-11-30', NULL, '', 1, NULL, NULL, '2024-10-03 17:13:48', '2025-02-17 18:00:38', 5, NULL),
-(22, '1148.02', 'BP02020', '', NULL, 'Windy Hill Boulevard', NULL, 'City of Smyrna', '159944-01', 527211.75, 0, 'Cobb', 0, '', 0, '2024-08-10', '2025-03-30', NULL, '', 1, NULL, NULL, '2024-10-04 15:04:04', '2024-12-02 17:41:22', 17, NULL),
-(23, '019-45', 'ERS05070', '', NULL, 'Hall, White Sulphur Road', NULL, 'Hall County Board of Comm', '50446-9754', 731972.72, 0, 'Hall', 0, '', 0, '2024-08-01', '2025-07-02', NULL, '', 1, NULL, NULL, '2024-10-04 18:11:30', '2025-02-17 18:04:29', 5, NULL),
-(25, '0013809', 'CMES60005', 'B1CBA2402186-0', NULL, 'Bridge Construction on SR14 over CSX Railroad', NULL, 'GDOT', '24030', 445588.50, 1, 'Fulton', 0, '', 0, '2024-08-03', '2027-09-30', NULL, '', 1, NULL, NULL, '2024-10-04 19:59:12', '2024-11-25 19:16:50', 26, NULL),
-(28, 'F-1251-01 & M-1238-31', 'ERS05071', 'BL079-24', NULL, 'Lakeview Road Bridge', NULL, 'Gwinnett County Tax Commission', '50445', 241343.25, 0, 'Gwinnett', 0, '', 0, '2024-08-13', '2025-03-01', NULL, '', 1, NULL, NULL, '2024-10-09 13:21:47', '2025-02-17 17:03:33', 5, NULL),
-(29, 'M006298', 'ERS05072', '', NULL, 'I-285 RESURFACING', NULL, 'GDOT', '60385', 80243.62, 1, 'Cobb Fulton', 1, '', 1, '2024-08-19', '2025-10-31', NULL, '', 1, NULL, NULL, '2024-10-09 18:14:26', '2025-02-17 17:25:13', 5, NULL),
-(30, '0015656', 'ERS05073', '', NULL, 'Clotfelter Road Bridge', NULL, 'GDOT', '60386', 15462.16, 1, 'Oconee', 0, '', 1, '2023-01-30', '2025-12-31', NULL, '', 1, NULL, NULL, '2024-10-10 14:51:15', '2025-02-19 18:29:01', 5, NULL),
-(31, '0011434', 'SCR16010', 'B3TIA2202312-0', NULL, 'Cusseta Road GDOT Project 0011434', NULL, 'GDOT', '2117004', 1814416.50, 1, 'Muscogee', 0, '', 0, '2024-08-12', '2026-03-31', NULL, '', 1, NULL, NULL, '2024-10-10 15:29:42', '2025-02-17 21:04:40', 37, NULL),
-(32, 'M006453', 'COM34017', 'B1CBA2401801-0', NULL, 'B1CBA2401801-0 Dade', NULL, 'GDOT- Office of Bridges and Structures', '293-SUB04', 73728.00, 1, 'Dade', 0, '', 0, '2024-08-01', '2025-12-31', NULL, '', 1, NULL, NULL, '2024-10-10 18:28:27', '2024-11-25 17:42:11', 29, NULL),
-(33, 'M006156', 'COM34018', '', NULL, 'Slygo Slope Paving', NULL, 'GDOT', '277-SUB11', 58121.00, 1, 'Dade', 0, '', 0, '2024-09-11', '2025-10-11', NULL, '', 1, NULL, NULL, '2024-10-10 19:01:21', '2024-12-02 16:07:14', 29, NULL),
-(34, '403906', 'SESD18022', '', NULL, 'McDonough Parkway Extension', NULL, 'Henry County Georgia', '24-442-010', 622532.00, 0, 'Henry', 0, '', 0, '2024-08-01', '2026-08-27', NULL, '', 1, NULL, NULL, '2024-10-10 19:30:25', '2024-12-02 15:42:57', 38, NULL),
-(35, '0015636', 'TAL20034', '', NULL, 'CR 225 over little Creek', NULL, 'GDOT- Habershame', '24032.06', 33560.00, 0, 'Habersham', 0, '', 0, '2024-09-04', '2025-10-31', NULL, '', 1, NULL, NULL, '2024-10-10 20:30:51', '2024-12-02 13:42:53', 39, NULL),
-(36, '0013894', 'CMES60004', 'B3CBA2401402-0', NULL, 'Intersection Improvement on SR 316 at Cedars Road', NULL, 'GDOT', '24010.12628', 187511.50, 1, 'Gwinnett', 0, '', 1, '2024-04-23', '2025-05-31', NULL, '', 1, NULL, NULL, '2024-10-11 13:00:19', '2024-12-02 15:20:13', 26, NULL),
-(37, '0017130', 'AW42004', '', NULL, 'GDOR I-285 Westbound Auxiliary Lane', NULL, 'GDOT', '222113', 522586.64, 1, 'Fulton', 0, '', 1, '2024-04-16', '2027-04-16', NULL, '', 1, NULL, NULL, '2024-10-16 13:50:47', '2024-12-02 14:38:12', 15, NULL),
-(38, '0013915', 'AW42003', '', NULL, 'I-285/I-20 EAST INTERCHANGE', NULL, 'GDOT', '222108', 2746078.10, 1, 'Dekalb', 0, '', 1, NULL, '2026-06-01', NULL, '', 1, NULL, NULL, '2024-10-16 18:40:46', '2025-02-17 17:20:24', 15, NULL),
-(39, '0017129', 'AW42002', '', NULL, 'I-285 Eastside Bridge Replacements', NULL, 'GDOT', '221063', 733674.00, 1, 'Dekalb', 0, '', 1, NULL, '2025-08-30', NULL, '', 1, NULL, NULL, '2024-10-16 20:00:47', '2025-02-25 18:53:44', 15, NULL),
-(40, 'F.40.15.010', 'AW42001', 'IFB-C-1200348', NULL, 'South Deicing Complex Ramp', NULL, 'City of Atlanta', '220113', 44853.00, 0, 'HJAIA', 0, '', 1, '2022-10-11', '2024-10-18', NULL, '', 1, NULL, NULL, '2024-10-17 12:56:19', '2024-12-02 16:11:44', 15, NULL),
-(41, '0014168', 'AG01008', 'B1CBA2302158-0', NULL, 'SR HEARD COUNTY SR 34 2 BRIDGE REPLACEMENTS', NULL, 'GDOT', '24-191-007', 225755.00, 1, 'HEARD', 0, '', 0, NULL, '2025-01-31', NULL, '', 1, NULL, NULL, '2024-10-17 13:24:28', '2024-12-02 16:54:50', 16, NULL),
-(42, '0015998', 'BP02019', 'B1CBA2302781-1', NULL, 'SR3 (Northside Drive) Widening & Pedestrian Upgrades', NULL, 'GDOT', '320101-01', 387118.31, 1, 'Fulton', 0, '', 1, NULL, '2025-12-31', NULL, '', 1, NULL, NULL, '2024-10-17 14:11:50', '2024-12-02 16:56:35', 17, NULL),
-(43, '0015432', 'BP02018', 'B3CBA2302700-0', NULL, 'SR3 Connector at Upper Riverdale Road, Clayton County', NULL, 'GDOT', '320087-01', 165938.00, 1, 'CLAYTON', 0, '', 0, '2023-10-26', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-10-17 14:38:13', '2025-02-14 17:00:46', 17, NULL),
-(44, '0009967', 'BP02017', 'B1CBA2201350-0', NULL, 'SR 14 & SR41 ROUNDABOUT', NULL, 'GDOT', 'UNKNOWN', 398154.50, 1, 'COWETA', 0, '', 0, '2022-04-26', '2024-03-31', NULL, '', 1, NULL, NULL, '2024-10-17 15:20:47', '2024-12-02 16:29:48', 17, NULL),
-(45, 'N/A', 'BP02016', '22-09', NULL, '22-09 Widening of CP 1344/Valley Hill Road', NULL, 'Clayton County Board of Commissioners', 'Unknown', 566370.75, 0, 'Clayton', 0, '', 0, '2022-04-26', '2024-11-24', NULL, '', 1, NULL, NULL, '2024-10-17 17:34:47', '2025-02-14 15:39:27', 17, NULL),
-(46, '631490', 'AG01007', 'B1CBA2201629-0', NULL, 'VILLA RICA BYPASS', NULL, 'GDOT', '24-186-015', 952473.50, 1, 'CARROLL', 0, '', 1, NULL, '2025-09-30', NULL, '', 1, NULL, NULL, '2024-10-18 17:14:24', '2024-12-02 17:25:32', 16, NULL),
-(47, '0014160', 'AG01006', '', NULL, 'ROGERS BRIDGE @ CHATAHOOCHE RIVER - PEDESTRIAN BRIDGE', NULL, 'CITIES OF DULUTH IN GWINNETT COUNTY AND JOHNS CREEK FULTON COUNTY', '10-217-003', 71911.05, 0, 'GWINNETT & FULTON', 0, '', 0, NULL, '2025-05-18', NULL, '', 1, NULL, NULL, '2024-10-18 18:48:06', '2024-11-08 02:12:37', 16, NULL),
-(48, 'TS-00164', 'AG01005', '', NULL, 'WINDSOR PKWY SIDEWALK', NULL, 'CITY OF SANDY SPRINGS', '20-171-013', 133094.10, 0, 'CITY OF SANDY SPRINGS', 0, '', 0, '0020-04-10', '0024-10-31', NULL, '', 1, NULL, NULL, '2024-10-18 19:41:22', '2024-12-02 17:40:18', 16, NULL),
-(49, '0006700', 'BB27001', 'B3CBA2101501-0', NULL, 'COMPLETION OF EFFINGHAM PARKWAY BEGINNING AT SR 30 AND EXTENDING TO BLUE JAY RD', NULL, 'GDOT', '20001024-SC-001', 221048.92, 1, 'CHATHAM, EFFINGHAM', 0, '', 0, '2022-01-12', '2025-04-30', NULL, '', 1, NULL, NULL, '2024-10-18 20:30:24', '2024-11-25 21:11:30', 18, NULL),
-(50, '00077259 & 522790', 'BB27000', 'B3CBA1701600-0', NULL, 'Jimmy Deloach Parkway Extension from I-16 to SR/26 US 80', NULL, 'GDOT', '2036-SC-002', 503316.80, 1, 'CHATHAM', 0, '', 0, NULL, '2021-10-31', NULL, '', 2, NULL, NULL, '2024-10-21 14:33:38', '2024-12-02 15:36:26', 18, NULL),
-(51, 'PR-IMP-CR710-(65)(32)', 'BAR59011', '21008-1505', NULL, 'DALLAS ACWORTH HWY @FREY ROAD & MT TABOR CHURCH RD INTERSECTION IMPROVEMENT', NULL, 'Paulding County Board of Commissioners', '20-7040-S10', 42404.00, 0, 'PAULDING', 0, '', 0, '2024-07-15', '2024-12-31', NULL, '', 1, NULL, NULL, '2024-10-21 15:29:59', '2024-12-02 14:05:11', 19, NULL),
-(52, '72123', 'BAR59010', '2024-020', NULL, 'EAST CHEROKEE DR. AT MILL CREEK DR. INTERSECTION IMPROVEMENTS #72123', NULL, 'CHEROKEE COUNTY BOARD OF COMMISSIONERS', '24-7024-S3', 358493.00, 0, 'CHEROKEE', 0, '', 0, '2024-05-13', '2024-11-10', NULL, '', 1, NULL, NULL, '2024-10-21 15:57:18', '2024-12-02 14:20:31', 19, NULL),
-(53, '0017698', 'BAR59009', 'B1CBA2302142-0', NULL, 'GDOT CALL 015, 0017698', NULL, 'GDOT', '23-9002-S2', 123528.00, 1, 'GILMER', 0, '', 1, '2023-12-05', '2024-12-31', NULL, '', 1, NULL, NULL, '2024-10-21 18:29:30', '2025-02-19 17:58:48', 19, NULL),
-(54, '0016106', 'BAR59008', 'B1CBA2301905-0', NULL, 'CALL 020 US278/SR6 AT SR100', NULL, 'GDOT', '23-9001-S1', 442795.50, 1, 'POLK', 0, '', 1, NULL, '2025-01-31', NULL, '', 1, NULL, NULL, '2024-10-21 19:14:52', '2024-11-25 19:50:45', 19, NULL),
-(55, '0009901', 'CWM04037', 'B1CBA2101668-0', NULL, '0009901, CONST OF ROUNDABOUT ON I-20/SR402 @ WACO RD- HARALSON COUNTY', NULL, 'GDOT', '12711', 71186.00, 1, 'HARALSON', 0, '', 1, '2021-08-17', '2023-03-03', '2025-02-01', '', 2, NULL, NULL, '2024-10-22 18:22:41', '2025-02-20 15:57:01', 7, NULL),
-(56, '0016105', 'BAR59007', 'B1CBA2202374-0', NULL, 'CHEROKEE CALL 07, 0016105', NULL, 'GDOT', '22-9003-S11', 85811.00, 1, 'CHEROKEE', 0, '', 1, '2023-01-14', '2024-04-30', NULL, '', 1, NULL, NULL, '2024-10-22 18:52:11', '2024-11-25 20:20:29', 19, NULL),
-(57, 'M006324', 'BAR59005', 'B1CBA2202026-0', NULL, 'GDOT, CALL 039, M006324', NULL, 'GDOT', '22-9002-S5', 98740.00, 1, 'POLK', 0, '', 1, '2023-02-02', '2023-05-31', NULL, '', 1, NULL, NULL, '2024-10-22 19:27:08', '2025-02-19 17:56:38', 19, NULL),
-(58, '0013806', 'ERS05069', 'B1CBA2401543-0', NULL, 'US 78 @ NORTH OCONEE', NULL, 'GDOT', '60371', 255519.12, 1, 'CLARKE', 0, '', 1, '2024-06-25', '2026-12-31', NULL, '', 1, NULL, NULL, '2024-10-23 13:36:18', '2024-12-02 17:15:35', 5, NULL),
-(59, '0017771', 'ERS05067', 'B1CBA2401555-0', NULL, 'BARROW - ROBERTSON BRIDGE ROAD', NULL, 'GDOT', '60370', 6967.35, 1, 'BARROW', 0, '', 1, '2024-04-09', '2025-01-31', NULL, '', 1, NULL, NULL, '2024-10-23 14:28:30', '2024-11-25 17:51:01', 5, NULL),
-(60, 'M006361', 'ERS05065', 'B1CBA2302803-0', NULL, 'CLAYTON SR54 RESURFACING', NULL, 'GDOT', '60357', 27210.00, 1, 'CLAYTON', 1, '', 1, '2024-01-30', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-23 14:42:28', '2024-11-25 20:44:47', 5, NULL),
-(61, '0012866', 'ERS05064', '23-184', NULL, 'CR 601/Wheeler Road at CR 124/CR 2157/Robert C. Daniel Parkway', NULL, 'CITY OF AUGUSTA', '50420', 246205.01, 0, 'RICHMOND', 0, '', 0, '2024-10-24', '2024-10-24', NULL, '', 1, NULL, NULL, '2024-10-23 14:55:24', '2024-12-02 13:52:41', 5, NULL),
-(62, '0016122', 'ERS05063', '24001-1501', NULL, 'BURNT HICKORY RD ROUNDABOUT EXT PAULING', NULL, 'PAULING COUNTY', '50419', 220790.00, 0, 'PAULING', 0, '', 0, '2023-10-30', '2026-10-29', NULL, '', 1, NULL, NULL, '2024-10-23 15:28:06', '2024-11-25 19:37:35', 5, NULL),
-(63, '122890', 'ERS05062', 'B1CBA2302237-0', NULL, 'CLARKE ATLANTA HWY INTERCHANGE', NULL, 'GDOT', '60341', 3376213.55, 1, 'CLARKE', 0, '', 1, '2023-10-16', '2027-04-30', NULL, '', 1, NULL, NULL, '2024-10-23 16:04:02', '2024-11-25 20:22:07', 5, NULL),
-(64, 'NA', 'ERS05061', '', NULL, 'JEFFERSPM SR 82 - JETT ROBERTS ROUNDABOUT', NULL, 'CITY OF JEFFERSON', '50418', 395660.12, 0, 'JEFFERSON', 0, '', 0, '2023-08-28', '2024-08-28', NULL, '', 1, NULL, NULL, '2024-10-23 17:40:28', '2025-02-17 16:55:08', 5, NULL),
-(65, '259416', 'ERS05060', '2023010-BID3313', NULL, 'COLUMBIA 2023 TIA RESURFACING GROUP 2', NULL, 'COLUMBIA COUNTY ROADS AND BRIDGES', '50416', 12240.00, 0, 'COLUMBIA', 1, '', 0, '2023-07-25', '2024-01-21', NULL, '', 1, NULL, NULL, '2024-10-23 18:13:56', '2024-11-25 21:04:01', 5, NULL),
-(66, '0015646', 'ERS05058', 'B1CBA2302251-0', NULL, 'DEKALB MERCER UNIV BRIDGE', NULL, 'GDOT', '60334', 88725.53, 1, 'DEKALB', 0, '', 1, '2023-07-18', '2024-12-31', NULL, '', 1, NULL, NULL, '2024-10-23 18:52:53', '2024-12-02 14:09:04', 5, NULL),
-(67, '0013715', 'ERS05057', 'B1CBA2301635-0', NULL, 'CLARKE SR 10 LOOP BRIDGES', NULL, 'GDOT', '60331', 487905.56, 1, 'CLARKE', 0, '', 0, '2023-04-23', '2025-12-31', '2024-10-23', '', 1, NULL, NULL, '2024-10-23 20:27:25', '2025-02-19 18:31:48', 5, NULL),
-(68, '0013603', 'ERS05056', 'B1CBA2301519-0', NULL, 'JASPER SR12 OVER LAKE JACKSON', NULL, 'GDOT', '60328', 85048.32, 1, 'JASPER, NEWTON', 0, '', 1, '0023-04-27', '2025-09-30', NULL, '', 1, NULL, NULL, '2024-10-24 13:24:11', '2025-02-17 16:58:02', 5, NULL),
-(69, '0007535/ F-0831-03/F-1387-19/M-0907-', 'ERS05055', 'BL086-22', NULL, 'EVERMORE NORTH BLVD', NULL, 'GWINNETT COUNTY AP', '50407', 1232898.39, 0, 'GWINNETT', 0, '', 0, '2023-05-08', '2025-09-30', NULL, '', 1, NULL, NULL, '2024-10-24 13:36:15', '2025-02-17 20:48:46', 5, NULL),
-(70, '0015547', 'ERS05054', 'B1CBA2301446-0', NULL, 'GILMER SR 515 NB BRIDGE', NULL, 'GDOT', '60327', 88914.00, 1, 'GILMER', 0, '', 1, '2023-04-09', '2025-03-31', NULL, '', 1, NULL, NULL, '2024-10-24 13:56:48', '2025-02-17 20:11:45', 5, NULL),
-(71, 'M006333', 'ERS05053', 'B1CBA2301482-0', NULL, 'DOUGLAS SR 6 RESURFACING', NULL, 'GDOT', '60326', 6669.60, 1, 'DOUGLAS', 1, '', 1, '2023-04-04', '0024-02-29', NULL, '', 1, NULL, NULL, '2024-10-24 14:28:51', '2024-12-02 14:19:37', 5, NULL),
-(72, '0014167', 'ERS05052', 'B1CBA2202400-0', NULL, 'FANNIN SHALLOWFORD RD BRIDGE', NULL, 'GDOT', '60316', 33165.38, 1, 'FANNIN', 0, '', 1, '2023-03-23', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-10-24 14:57:56', '2024-12-02 14:29:56', 5, NULL),
-(73, '0000411', 'ERS05051', 'B3CBA2201972-0', NULL, 'WALTON MONROE BYPASS', NULL, 'GDOT', '60314', 1193116.01, 1, 'WALTON', 0, '', 1, '2023-03-14', '2025-10-31', NULL, '', 1, NULL, NULL, '2024-10-24 15:24:15', '2024-12-02 17:27:12', 5, NULL),
-(74, 'M006248', 'ERS05050', 'B1CBA2202375-0', NULL, 'SR 138 RESURFACING', NULL, 'GDOT', '60315', 80789.50, 1, 'CLAYTON, HENRY', 1, '', 1, '2023-01-30', '2023-10-31', NULL, '', 1, NULL, NULL, '2024-10-24 16:02:50', '2024-12-02 16:21:26', 5, NULL),
-(75, '0013813', 'ERS05068', 'B1CBA2401581-0', NULL, 'JASPER MONROE SR 83 BRIDGE', NULL, 'GDOT', '60369', 85406.61, 1, 'JASPER, MONROE', 0, '', 1, '2024-06-18', '2026-09-30', NULL, '', 1, NULL, NULL, '2024-10-24 17:53:35', '2025-02-17 17:00:41', 5, NULL),
-(76, '0015543', 'ERS05049', 'B3CBA2202040-1', NULL, 'ELBERT SR 77 BRIDGE OVER COLDWATER CREEK', NULL, 'GDOT', '60319', 66090.57, 1, 'ELBERT', 0, '', 1, '2023-02-22', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-24 18:33:36', '2025-02-17 20:29:12', 5, NULL),
-(77, 'N/A', 'ERS05048', '22-195', NULL, '13TH ST IMPROV & TELFAIR ST IMPROV', NULL, 'CITY OF AUGUSTA', '50400', 2662239.82, 0, 'AUGUSTA', 0, '', 0, '2023-02-23', '2026-10-10', NULL, '', 1, NULL, NULL, '2024-10-28 15:21:59', '2025-02-17 14:37:34', 5, NULL),
-(78, '0014903', 'ERS05047', 'B1CBA2202034-0', NULL, 'MORGAN - I-20 BRIDGES', NULL, 'GDOT', '60309', 4565.50, 0, 'MORGAN', 0, '', 1, '2022-10-17', '2024-04-30', NULL, '', 1, NULL, NULL, '2024-10-28 15:58:22', '2024-10-28 15:59:33', 5, NULL),
-(79, 'N/A', 'ERS05046', '19-197-G', NULL, 'SR 9 @ OXBO ROAD', NULL, 'CITY OF ROSWELL', '50303', 198363.09, 0, 'CITY OF ROSWELL', 0, '', 0, '2022-09-19', '2023-07-01', NULL, '', 2, NULL, NULL, '2024-10-28 17:18:08', '2024-12-02 16:53:54', 5, NULL),
-(80, 'M0006342', 'ERS05045', 'B1CBA2202003-0', NULL, 'SR 100 RESURFACING', NULL, 'GDOT', '60305', 16100.00, 1, 'HARALSON', 1, '', 1, '2022-07-21', '2023-05-31', NULL, '', 1, NULL, NULL, '2024-10-28 17:33:15', '2024-12-02 16:16:05', 5, NULL),
-(81, '0013996', 'ERS05044', 'B1CBA2101553-0', NULL, 'US 29 BRIDGE REPLACEMENT', NULL, 'GDOT', '60273', 38874.00, 1, 'MADISON', 0, '', 1, '2021-07-12', '2023-05-31', NULL, '', 1, NULL, NULL, '2024-10-28 18:21:25', '2024-12-02 17:14:35', 5, NULL),
-(82, '0013942', 'ERS05043', 'B1CBA2201633-0', NULL, 'TROUP - SR 1 BRIDGE OVER LONG CREEK', NULL, 'GDOT', '60298', 62276.00, 1, 'TROUP', 0, '', 1, '2022-06-07', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-29 13:37:40', '2024-12-02 17:10:11', 5, NULL),
-(83, '0008057', 'ERS05042', 'B1CBA2201022-0', NULL, 'WARREN - SR 16 BRIDGE OVER SHORT CREEK', NULL, 'GDOT', '60291', 5700.00, 1, 'WARREN', 0, '', 1, '2022-04-06', '0023-03-31', NULL, '', 2, NULL, NULL, '2024-10-29 13:47:50', '2025-02-14 16:04:02', 5, NULL),
-(84, 'M006283', 'ERS05041', 'B1CBA2201216-0', NULL, 'SR 138 RESURFACING', NULL, 'GDOT', '60293', 225185.00, 1, 'CLAYTON', 1, '', 1, '2022-04-08', '2023-01-23', NULL, '', 1, NULL, NULL, '2024-10-29 14:12:28', '2024-12-02 16:26:28', 5, NULL),
-(85, 'M006284', 'ERS05040', 'B1CBA2201213-0', NULL, 'SR 279 RESURFACING', NULL, 'GDOT', '60295', 58105.00, 1, 'FULTON', 1, '', 1, '2022-04-19', '2023-01-31', NULL, '', 1, NULL, NULL, '2024-10-29 14:21:11', '2024-12-02 16:43:55', 5, NULL),
-(86, '0015689', 'CMES60006', 'B1CBA2402595-0', NULL, 'CONSTRUCTION OF ROUNDABOUT ON SR81 AT NEW MORN DRIVE CR204', NULL, 'GDOT', '24040', 580093.25, 1, 'HENRY', 0, '', 1, '2024-10-25', '2026-08-31', NULL, '', 1, NULL, NULL, '2024-10-29 14:39:10', '2024-11-25 21:19:00', 26, NULL),
-(87, '0004428', 'CMES60002', '20-014', NULL, 'C.R. 817/LEE RD WIDENING AND RECONSTRUCTION', NULL, 'DOUGLAS COUNTY COARD OF COMMISSIONERS', 'CSSTP-0004-00(428)', 2272391.50, 0, 'DOUGLAS', 0, '', 1, '2022-03-12', '2025-11-30', NULL, '', 1, NULL, NULL, '2024-10-29 18:52:10', '2024-11-25 19:44:37', 26, NULL),
-(88, 'NA', 'CMES60001', '', NULL, 'ANVIL BLOCK ROAD PHASE III - CITY OF FOREST PARK', NULL, 'URBAN DEVELOPMENT AGENCY OF CITY OF FOREST PARK', 'NA', 55960.00, 0, 'FOREST PARK', 0, '', 0, '2021-07-07', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-29 19:18:27', '2024-10-29 19:20:12', 26, NULL),
-(89, '0013686', 'CMES60000', 'B1CBA2101083-0', NULL, 'DOT Call #006 SR155 @ Panola Rd Roundabout', NULL, 'GDOT', 'na', 264969.50, 1, 'DEKALB, HENRY', 0, '', 1, '2021-04-21', '0022-05-31', NULL, '', 2, NULL, NULL, '2024-10-29 20:33:09', '2024-12-02 14:18:42', 26, NULL),
-(90, '0015318', 'BP02015', 'B1CBA2201876-0', NULL, 'US41 AT NORTH AVENUE REALIGNMENT FULTON ', NULL, 'GDOT', 'NA', 188251.00, 1, 'FULTON', 0, '', 0, '2022-06-30', '2023-08-31', NULL, '', 2, NULL, NULL, '2024-10-30 20:33:36', '2024-12-02 17:16:27', 17, NULL),
-(91, '0017000', 'PC25019', 'B3CBA2101769-0', NULL, 'RABUN COUNTY B3CBA2101769-0', NULL, 'GDOT', '1742', 282403.00, 1, 'RABUN', 0, '', 0, '2021-08-20', '2022-06-30', NULL, '', 2, NULL, NULL, '2024-10-31 13:30:59', '2025-02-17 14:24:15', 12, NULL),
-(92, 'M005099, M001685', 'PC25030', 'B1CBA2202414-1', NULL, 'SR 12 WARREN', NULL, 'GDOT', '1833', 83200.00, 1, 'WARREN', 0, '', 0, '2023-06-01', '2024-03-31', NULL, '', 1, NULL, NULL, '2024-10-31 14:28:25', '2025-02-17 13:59:19', 12, NULL),
-(93, 'M005601', 'PC25029', 'B1CBA2301175-0', NULL, 'NEWTON COUNTY SR 81', NULL, 'GDOT', '1819', 142044.00, 1, 'NEWTON', 0, '', 0, NULL, '2023-12-31', NULL, '', 2, NULL, NULL, '2024-10-31 14:52:48', '2025-01-24 15:12:17', 12, NULL),
-(94, '0013531', 'PC25027', 'B3CBA2202331-0', NULL, 'SR 20 @ I-75 SR 401 HENRY', NULL, 'GDOT', '1813', 2352672.22, 1, 'HENRY', 0, '', 1, '2023-01-06', '2025-05-31', NULL, '', 1, NULL, NULL, '2024-10-31 15:56:17', '2024-12-02 16:30:14', 12, NULL),
-(95, '0003626', 'ERS05076', 'B3CBA2402629-0', NULL, 'SARDIS RD CONNECTOR', NULL, 'GDOT', '60395', 6417925.82, 1, 'HALL', 0, '', 1, '2024-11-01', '2028-09-30', NULL, '', 1, NULL, NULL, '2024-11-01 17:33:42', '2024-12-02 16:05:05', 5, NULL),
-(96, 'M006326', 'PC25026', 'B1CBA2202028-1', NULL, 'SR 10 @ MEMORIAL DRIVE', NULL, 'GDOT', '1807', 101708.00, 1, 'DEKALB', 0, '', 0, '2023-02-07', '2023-10-31', NULL, '', 2, NULL, NULL, '2024-11-04 15:20:12', '2024-12-02 16:13:38', 12, NULL),
-(97, 'M006327', 'PC25025', 'B1CBA2202000-0', NULL, 'SR 236 DEKALB COUNTY', NULL, 'GDOT', '1790', 8100.00, 1, 'DEKALB', 0, '', 0, '2022-11-28', '2023-05-31', NULL, '', 2, NULL, NULL, '2024-11-04 16:13:41', '2024-12-02 16:38:18', 12, NULL),
-(98, 'M006325', 'PC25024', 'B1CBA2201838-0', NULL, 'SR 42 DEKALB FULTON', NULL, 'GDOT', '1787', 66880.00, 1, 'DEKALB, FULTON', 0, '', 0, '2022-06-29', '2023-04-30', NULL, '', 2, NULL, NULL, '2024-11-04 16:38:19', '2024-12-02 16:52:23', 12, NULL),
-(99, 'T-17-0012', 'PC25023', '21-32', NULL, 'ROCKDALE SPLOST 4A ROADWAY', NULL, 'ROCKDALE COUNTY GA', '1787', 401150.00, 0, 'ROCKDALE', 0, '', 0, '2022-04-22', '2022-11-04', NULL, '', 2, NULL, NULL, '2024-11-04 16:58:38', '2024-12-02 15:49:19', 12, NULL),
-(100, '005314', 'PC25021', 'B1CBA2102166-0', NULL, 'I-85 @SR154', NULL, 'GDOT', '1770', 144430.00, 1, 'EAST POINT', 0, '', 0, '2022-02-17', '2022-08-31', NULL, '', 2, NULL, NULL, '2024-11-04 19:20:47', '2024-11-04 19:27:26', 12, NULL),
-(101, 'M006287', 'PC25020', 'B1CBA2200992-0', NULL, 'SR 212 DEKALB COUNTY', NULL, 'GDOT', '1772', 109200.00, 1, 'DEKALB', 1, '', 0, '2022-02-26', '2022-12-31', NULL, '', 2, NULL, NULL, '2024-11-04 19:34:51', '2024-12-02 16:37:20', 12, NULL),
-(102, 'CW 18-05E', 'CWM04103', '24-11', NULL, 'S HOUSTON LAKE ROAD @ SMITHVILLE CHURCH ROAD', NULL, 'HOUSTON COUNTY, GEORGIA', '3154', 86860.00, 0, 'HOUSTON', 0, '', 0, '2024-10-29', '2025-07-26', NULL, '', 1, NULL, NULL, '2024-11-05 15:49:50', '2025-02-14 19:48:50', 7, NULL),
-(103, 'FC-9938-C', 'CWM04101', '', NULL, 'AIRFIELD SHOULDER REPLACEMENT', NULL, 'CITY OF ATLANTA', '162890', 93874.00, 0, 'COBB- HJAIA', 0, '', 0, '2024-09-12', '2024-12-01', NULL, '', 1, NULL, NULL, '2024-11-05 20:05:42', '2024-11-25 17:26:15', 7, NULL),
-(104, '0016618 ', 'CWM04100', '', NULL, 'PI# 0016618 US 280/SR 30 WIDEN & INTRCHNG IMPRV DB, BRYAN', NULL, 'GDOT', '53033', 839460.00, 1, 'BRYAN', 0, '', 0, '2024-06-28', '2026-03-31', NULL, '', 1, NULL, NULL, '2024-11-05 21:23:40', '2024-12-02 15:46:34', 7, NULL),
-(105, '0013886', 'GGC78001', 'B1CBA2302109-1', NULL, 'B1CBA2302109-1: Call:002 Project: 0013886', NULL, 'GDOT', 'NA', 0.00, 1, 'BALDWIN', 0, '', 1, '2024-10-31', '2026-04-30', NULL, '', 1, NULL, NULL, '2024-11-07 14:33:13', '2024-11-25 17:40:25', 40, NULL),
-(106, '0017229', 'GGC78000', 'B3CBA2401794-0', NULL, 'B3CBA2401794-0: Call:013 Project: 0017229 WILKINSON', NULL, 'GDOT', 'na', 61405.00, 1, 'WILKINSON', 0, '', 0, '2024-07-18', '2025-02-28', NULL, '', 1, NULL, NULL, '2024-11-08 13:52:58', '2024-11-08 13:54:15', 40, NULL),
-(107, '0015670, 0016000', 'CWM04098', 'B3CBA2202166-0', NULL, 'US441/SR15 Pedestrian Upgrades & Realign, Banks County', NULL, 'GDOT', '52842', 783718.00, 1, 'BANKS', 0, '', 0, '2024-04-05', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-11-08 14:40:01', '2024-12-02 17:20:11', 7, NULL),
-(108, 'M006377', 'CWM04097', 'B1CBA240144-0', NULL, 'M006377; GDOT #002 SR 1 LOOP; Mill/Inlay/Resurface - Floyd', NULL, 'GDOT', '3067', 13640.00, 1, 'FLOYD', 1, '', 1, '2024-04-27', '2025-01-31', NULL, '', 1, NULL, NULL, '2024-11-08 15:47:28', '2024-12-02 15:39:18', 7, NULL),
-(109, 'tesr', 'test', '', NULL, 'test', NULL, 'test', 'test', 0.00, 0, 'test', 0, '', 0, '2024-11-07', '0024-08-08', NULL, '', 1, NULL, NULL, '2024-11-11 19:52:45', NULL, 14, NULL),
-(110, '0007841', 'ERS05075', 'B1CBA2402591-0', NULL, 'I-85 SR 74 INTERCHANGE', NULL, 'GDOT', '60391', 0.00, 1, 'FULTON', 0, '', 1, '2024-10-07', '2027-10-31', NULL, '', 1, NULL, NULL, '2024-11-13 19:06:05', '2025-02-17 17:10:29', 5, NULL),
-(111, '0013997', 'ERS05038', 'B3CBA2200983-0', NULL, 'SR 281 BRIDGE OVER BROAD RIVER', NULL, 'GDOT', '60292', 16872.00, 1, 'MADISON', 0, '', 1, '2022-03-18', '2024-04-30', NULL, '', 2, NULL, NULL, '2024-11-13 19:13:30', '2024-12-02 16:50:03', 5, NULL),
-(112, '0016841', 'BP02014', 'B1CBA2102133-0', NULL, 'Asbun RD over Trestle creek', NULL, 'GDOT', 'NA', 0.00, 1, 'Carroll', 0, '', 0, '2021-11-23', '2022-10-31', NULL, '', 2, NULL, NULL, '2024-11-13 19:22:32', '2024-11-25 17:36:18', 17, NULL),
-(113, 'M006402', 'REEV50017', '', NULL, 'SR 24 Resurfacing', NULL, 'GDOT', '10338910', 37832.00, 1, 'BURKE', 1, '', 1, '2024-11-15', '2025-08-31', NULL, '', 1, NULL, NULL, '2024-11-22 16:10:08', '2024-12-02 16:42:23', 9, NULL),
-(114, 'PO 590', 'RTS75003', '', NULL, 'BETHANY CHURCH ROAD @ QUINBERY ROAD', NULL, 'RIVERSIDE TRAFFIC SOLUTIONS LLC', '590', 42500.00, 0, 'GWINNETT', 0, '', 0, '2024-11-26', '2025-11-26', NULL, '', 1, NULL, NULL, '2024-11-26 16:37:18', '2024-11-26 16:39:34', 41, NULL),
-(115, 'M005976.02', 'BP02012', 'B1CBA2102122-0', NULL, 'SR42 RESURFACING', NULL, 'GDOT', 'M005976.02', 140440.00, 1, 'FULTON', 1, '', 1, '2021-11-08', '2022-08-21', NULL, '', 1, NULL, NULL, '2024-11-27 20:20:28', '2024-12-02 17:09:09', 17, NULL),
-(116, '0013119', 'BP02011', 'B1CBA2101994-1', NULL, 'HARPER ST & COBB ST IMPROVEMENTS / 0013119', NULL, 'GDOT', '0013119', 30101.50, 1, 'COWETA, FULTON', 0, '', 0, '2021-11-04', '2021-09-17', NULL, '', 1, NULL, NULL, '2024-11-27 20:39:08', '2024-11-27 20:40:51', 17, NULL),
-(117, '0016468', 'BP02009', 'B1CBA2001820-0', NULL, 'I-75@I-85 S. Ramp/#0016468', NULL, 'GDOT', '0016468', 66062.00, 1, 'FULTON', 0, '', 0, '2020-10-13', '2021-10-13', NULL, '', 1, NULL, NULL, '2024-11-27 21:01:39', '2024-12-02 15:13:52', 17, NULL),
-(118, '0018361', 'CWM04096', '', NULL, 'I-20 @ CR 249 Old Mill Rd', NULL, 'GDOT', '163043', 1553290.50, 1, 'Walton, Morgan', 0, '', 1, '2024-01-30', '2025-10-01', NULL, '', 1, NULL, NULL, '2024-12-02 16:08:34', '2024-12-02 16:17:42', 7, NULL),
-(119, 'M006350', 'CWM04095', 'B3CBA2302762-1', NULL, 'M006350; GDOT # 011 SR 22/SR 540 Mill, Inlay & Resurf; Muscogee', NULL, 'GDOT', '3059', 14896.00, 1, 'MUSCOGEE', 1, '', 0, '2024-01-22', '2024-11-30', NULL, '', 1, NULL, NULL, '2024-12-02 16:54:03', '2025-02-17 15:24:45', 7, NULL),
-(120, '0015652', 'CWM04094', 'B1CBA2302714-0', NULL, '0015652; GDOT #019 Gorman Rd Bridge over CSX RR', NULL, 'GDOT', '63054', 134566.00, 1, 'TALBERT', 0, '', 1, '2024-01-15', '2025-07-31', NULL, '', 1, NULL, NULL, '2024-12-02 16:59:13', '2025-02-14 14:45:58', 7, NULL),
-(121, 'M006335', 'CWM04093', 'B1CBA2302786-0', NULL, 'M006335; SR 9 Mill/Inlay/Resurf; Fulton', NULL, 'GDOT', '33052', 59760.00, 1, 'FULTON', 1, '', 1, '2024-01-05', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-12-02 19:34:47', '2024-12-02 19:35:39', 7, NULL),
-(122, 'M006347', 'CWM04092', 'B1CBA2302749-0', NULL, 'M006347 – GDOT #006 SR 5/SR 280 Mill/Inlay/Resurf - Cobb', NULL, 'GDOT', '33035', 37028.00, 1, 'COBB', 1, '', 1, '2023-11-05', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-12-02 19:43:16', '2025-02-17 15:27:49', 7, NULL),
-(123, '0017462, 0019545', 'CWM04089', 'B1CBA2302710-0', NULL, '0017462, 0019545; SR 515 Widen & Trout Restoration; Towns County', NULL, 'GDOT', '13024', 1455411.00, 1, 'TOWNS', 0, '', 1, '2023-09-22', '2026-07-31', NULL, '', 1, NULL, NULL, '2024-12-02 20:00:33', '2025-02-14 15:09:19', 7, NULL),
-(124, '0013921', 'CWM04088', 'B1CBA2302673-0', NULL, '0013921 CONSTR OF A BRIDGE & APPR I-475/SR 408, BIBB', NULL, 'GDOT', '3025', 84155.00, 1, 'BIBB', 0, '', 1, '2023-10-10', '2026-02-28', NULL, '', 1, NULL, NULL, '2024-12-02 20:35:08', '2024-12-02 20:53:05', 7, NULL),
-(125, 'FC-8468', 'CWM04087', '22-02-001', NULL, 'H-JAIA INTERNATIONAL SOUTH DECK PHASE 1', NULL, 'CITY OF ATLANTA', '300220', 54032.00, 0, 'HJAIA', 0, '', 0, '0023-09-20', '2024-09-20', NULL, '', 1, NULL, NULL, '2024-12-02 21:07:17', '2024-12-02 21:10:16', 7, NULL),
-(126, '0017391', 'CWM04086', 'B3CBA2301688-0', NULL, 'INTERSECTION IMPROVEMENTS US341/SR 7', NULL, 'GDOT', '13026', 172576.00, 1, 'PEACH', 0, '', 0, '2023-09-26', '2025-05-31', NULL, '', 1, NULL, NULL, '2024-12-03 13:43:44', '2025-02-06 15:17:46', 7, NULL),
-(127, '0015692', 'CWM04085', 'B1CBA2302125-0', NULL, '0015692, GDOT #004 SR 87 @ Bass/Arkwright Rd Roundabout – Bibb County', NULL, 'GDOT', '13010', 386309.00, 1, 'BIBB', 0, '', 1, NULL, '2025-05-31', NULL, '', 1, NULL, NULL, '2024-12-03 14:22:07', '2025-02-24 21:05:57', 7, NULL),
-(128, '0017219 & 0018363', 'CWM04084', '', NULL, 'US 278, FRONTAGE ROAD DESIGN BUILD, CITY OF MORGAN, CALHOUN', NULL, 'GDOT', '182855', 886202.50, 1, 'WALTON, NEWTON, MORGAN', 0, '', 0, '2022-12-27', '2024-06-01', NULL, '', 1, NULL, NULL, '2024-12-03 14:30:58', '2025-02-14 16:31:33', 7, NULL),
-(129, '0015544', 'CWM04083', 'B1CBA2301256-0', NULL, '0015544; SR 293 Const of Bridge/Approaches over Dykes Ck – Floyd County', NULL, 'GDOT', '12969', 83429.00, 1, 'FLOYD', 0, '', 1, '2023-04-19', '2025-12-31', NULL, '', 1, NULL, NULL, '2024-12-03 14:41:19', '2024-12-03 14:45:20', 7, NULL),
-(130, 'M006330', 'CWM04082', 'B1CBA2301501-0', NULL, 'M006330 MILL, INLAY, RESURFACING SR 120, COBB', NULL, 'GDOT', '2967', 29100.00, 1, 'COBB', 1, '', 1, '2023-04-15', '2024-02-29', NULL, '', 1, NULL, NULL, '2024-12-03 20:51:04', '2024-12-03 20:53:07', 7, NULL),
-(131, 'M006369', 'CWM04081', 'B1CBA2301493-0', NULL, 'M006369, SR 21 Mill/Inlay/Resurf/Shldr Rehab – Effingham County', NULL, 'GDOT', '32968', 19600.00, 1, 'EFFINGHAM', 1, '', 1, '2023-04-21', '2024-02-29', NULL, '', 1, NULL, NULL, '2024-12-03 20:56:50', '2024-12-03 20:57:37', 7, NULL),
-(132, 'M006352', 'CWM04080', 'B1CBA2301491-0', NULL, 'M006352 GDOT003 SR 247 MILL & RESURFACE; BIBB', NULL, 'GDOT', '32965', 35240.00, 1, 'BIBB', 1, '', 0, '2023-04-21', '2024-02-29', NULL, '', 1, NULL, NULL, '2024-12-03 21:07:46', '2024-12-03 21:08:51', 7, NULL),
-(133, 'M006329', 'CWM04079', 'B1CBA2301295-0', NULL, 'M006329; GDOT # 101 - SR 139 Mill/Inlay/Resurf; Fulton County', NULL, 'GDOT', '32952', 26150.00, 1, 'FULTON', 1, '', 1, '2023-04-07', '2024-01-31', NULL, '', 1, NULL, NULL, '2024-12-03 21:19:47', '2024-12-03 21:20:22', 7, NULL),
-(134, 'M005002', 'CWM04078', 'B1CBA2301274-0', NULL, 'M005002, SR 92 Mill/Inlay/Resurf – Spalding County', NULL, 'GDOT', '32953', 90550.00, 1, 'SPALDING', 1, '', 1, '2023-04-05', '2024-01-31', NULL, '', 1, NULL, NULL, '2024-12-03 21:27:37', '2024-12-03 21:28:23', 7, NULL),
-(135, 'M006214', 'CWM04077', 'B1CBA2301115-0', NULL, 'M006214; GDOT #006- SR 26 Mill & Resurfacing; Chatham', NULL, 'GDOT', '32939', 131464.00, 1, 'CHATHAM', 1, '', 1, '2023-03-17', '2023-12-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:00:15', '2025-02-17 15:43:33', 7, NULL),
-(136, 'M0063626', 'CWM04076', 'B1CBA2301127-0', NULL, 'M0063626 MILL, INLAY, RESURAF SR 120, COBB', NULL, 'GDOT', '32940', 48045.00, 1, 'COBB', 1, '', 1, '2023-03-14', '2023-12-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:04:26', '2024-12-04 20:06:07', 7, NULL),
-(137, 'M006102', 'CWM04075', 'B1CBA2202341-0', NULL, 'M006102 - SR 219 Mill/Inlay/Resurf – Muscogee County', NULL, 'GDOT', '62873', 151525.00, 1, 'MUSCOGEE', 1, '', 1, '2023-01-06', '2023-09-30', NULL, '', 1, NULL, NULL, '2024-12-04 20:09:51', '2024-12-04 20:10:25', 7, NULL),
-(138, 'M006328', 'CWM04074', 'B1CBA2202002-1', NULL, 'M006328, SR 139 Mill/Inlay/Resurf/Shldr Rehab – Cobb County', NULL, 'GDOT', '32881', 69316.00, 1, 'COBB', 1, '', 1, '2023-01-12', '2023-10-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:12:58', '2024-12-04 20:14:56', 7, NULL),
-(139, 'M004965', 'CWM04072', '', NULL, 'M004965, SR 92 Mill/Inlay/Resurf/Shldr Rehab – Douglas County', NULL, 'GDOT', '32869', 54360.00, 1, 'DOUGLAS', 1, '', 1, '2022-12-14', '2023-12-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:19:38', '2025-02-17 16:23:39', 7, NULL),
-(140, 'M006353', 'CWM04071', 'B1CBA2301118-1', NULL, 'M006353, US 27/ SR 1 Mill/Inlay/Resurf – Troup County', NULL, 'GDOT', '32985', 4120.00, 1, 'TROUP', 1, '', 1, NULL, '2024-03-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:34:35', '2024-12-04 20:35:04', 7, NULL),
-(141, '0014896', 'CWM04070', 'B1CBA2201358-1', NULL, '0014896; Bass Road – Bridge over NSRR; Bibb County', NULL, 'GDOT', '12878', 193984.00, 1, 'BIBB', 0, '', 1, '2022-12-12', '2024-07-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:37:43', '2025-02-28 19:44:03', 7, NULL),
-(142, 'M006127', 'CWM04068', 'B1CBA2102153-0', NULL, 'M006127 RESURFACING & SHOULDER REHAB, FRANKLIN', NULL, 'GDOT', '32579', 48900.00, 1, 'FRANKLIN', 1, '', 1, '2022-10-31', '2023-10-31', NULL, '', 1, NULL, NULL, '2024-12-04 21:17:14', '2024-12-04 21:24:37', 7, NULL),
-(143, 'M006499', 'CWM04104', 'B3CBA2402654-0', NULL, 'M006499 MILL, INLAY, RESURF SR 20/SR 81, HENRY', NULL, 'GDOT', '3161', 120800.00, 1, 'HENRY', 1, '', 0, '2024-11-19', '2025-08-31', NULL, '', 1, NULL, NULL, '2024-12-11 15:35:47', '2024-12-11 18:43:07', 7, NULL),
-(144, '0017812', 'ERS05077', '2428-B', NULL, 'FAYETTE COUNTY 2025 RESURFACING', NULL, 'FAYETTE COUNTY', '50454', 78920.00, 0, 'FAYETTE', 1, '', 0, '2024-12-03', '2025-07-01', NULL, '', 1, NULL, NULL, '2024-12-11 19:01:00', '2025-01-09 19:27:14', 5, NULL),
-(145, '0019451', 'CWM04106', '', NULL, 'I-16 at Old Cuyler Road New Interchange', NULL, 'GDOT', '163138', 2310914.00, 1, 'Bryan', 0, '', 0, '2024-12-19', '2027-07-01', NULL, '', 1, NULL, NULL, '2025-01-07 21:08:12', '2025-01-24 21:31:23', 7, NULL),
-(146, 'M006549', 'REEV50018', 'B1CBA2402656-0', NULL, 'M006549 LIBERTY COUNTY, US84/SR 38 RESURFACE', NULL, 'GDOT', '10339339', 68420.00, 1, 'LIBERTY', 1, '', 1, '2024-12-19', '2025-08-31', NULL, '', 1, NULL, NULL, '2025-01-08 14:22:54', '2025-02-28 13:52:57', 9, NULL),
-(147, '23-234', 'REEV50016', 'NA', NULL, 'DENNIS ROAD IMPROVEMENT PROJECT', NULL, 'CITY OF AUGUSTA - RICHMOND COUNTY GA', '10321224', 383681.00, 0, 'AUGUSTA', 0, '', 0, '2024-06-21', '2025-07-21', NULL, '', 1, NULL, NULL, '2025-01-08 14:50:48', '2025-01-08 14:52:53', 9, NULL),
-(148, '262027', 'REEV50015', 'B3TIS2401124-1', NULL, 'LAURENS E CHEROKEE @ MILL CREEK', NULL, 'GDOT', '10319628', 1878238.20, 1, 'LAURENS', 0, '', 0, '2024-04-10', '2027-01-31', NULL, '', 1, NULL, NULL, '2025-01-08 20:54:15', '2025-01-08 20:58:14', 9, NULL),
-(149, '0012575', 'REEV50014', 'B37TIA1902082-0', NULL, 'SR 56 - US 25 Bypass to Cates Mead Rd. (CR-54) Widening', NULL, 'FIDELITY & DEPOSIT COMPANYOF MARYLAND (SURETY FOR GDOT)', '10321452', 170008.42, 1, 'BURKE', 0, '', 0, '2024-04-06', '0024-12-30', NULL, '', 1, NULL, NULL, '2025-01-08 21:14:02', '2025-01-08 21:15:03', 9, NULL),
-(150, '23-183', 'REEV50012', '23-183', NULL, 'RFP # 23-183 –CR 1502 / Barton Chapel Road at SR 10 / US 78', NULL, 'CITY OF AUGUSTA, RICHMOND COUNTY', '10321150', 332685.00, 0, 'RICHMOND', 0, '', 0, '2024-04-17', '2025-07-05', NULL, '', 1, NULL, NULL, '2025-01-08 21:21:06', '2025-01-08 21:24:07', 9, NULL),
-(151, 'M005288', 'REEV50011', 'B1CBA2302748-0', NULL, 'RESURFACING SR 292 BEGINNING SOUTH OF WASHINGTONSTREET AND EXTENDING TO THE EVANS COUNTY LINE', NULL, 'GDOT', '1962871', 35050.00, 1, 'TATTNALL, TOOMBS', 1, '', 0, '2024-04-09', '2024-08-31', NULL, '', 1, NULL, NULL, '2025-01-08 22:24:35', '2025-01-08 22:25:40', 9, NULL),
-(152, 'M006403', 'REEV50010', 'B1CBA2302796-0', NULL, 'M006403 - SR 24 RESURFACING JEFFERSON COUNTY', NULL, 'GDOT', '10315299', 32400.00, 1, 'JEFFERSON', 1, '', 1, '2024-02-05', '2024-10-31', NULL, '', 1, NULL, NULL, '2025-01-08 22:28:13', '2025-01-08 22:30:21', 9, NULL),
-(153, '0016117', 'REEV50009', 'B1CBA2301907-0', NULL, 'ROUNDABOUT ON SR247 CONN AT HOUSERS MILLER RD', NULL, 'GDOT', '10302434', 337579.00, 1, 'PEACH', 0, '', 0, '2023-07-17', '2024-08-31', NULL, '', 1, NULL, NULL, '2025-01-08 22:40:40', '2025-01-08 22:46:38', 9, NULL),
-(154, 'M006366', 'REEV50008', 'B1CBA2301159-0', NULL, 'M006366 SR 121 RESURFACING RICHMOND COUNTY', NULL, 'GDOT', '10295583', 24400.00, 1, 'RICHMOND', 1, '', 0, '2023-04-03', '2023-12-31', NULL, '', 2, NULL, NULL, '2025-01-08 22:49:59', '2025-01-08 22:50:51', 9, NULL),
-(155, 'M006216', 'REEV50007', 'B1CBA2301287-0', NULL, 'M006216 CHATHAM COUNTY SR 204 RESURFACE', NULL, 'GDOT', '10294928', 23750.00, 1, 'CHATHAM', 1, '', 1, '2023-04-13', '0024-01-31', NULL, '', 2, NULL, NULL, '2025-01-09 01:35:10', '2025-02-17 15:42:13', 9, NULL),
-(156, 'M006367', 'REEV50006', 'B1CBA2202431-0', NULL, 'RESURFACING JEFFERSON STREET', NULL, 'GDOT', '10292733', 2848.00, 1, 'LAURENS', 1, '', 0, '2023-02-07', '2023-11-30', NULL, '', 2, NULL, NULL, '2025-01-09 02:52:39', '2025-02-14 16:11:02', 9, NULL),
-(157, 'M006219', 'REEV50005', 'B1CBA2202355-0', NULL, 'SR 67 BYPSS RESURFACING', NULL, 'GDOT', '1634786', 68626.00, 1, 'BULLOCH', 1, '', 0, '2023-01-31', '2023-09-30', NULL, '', 2, NULL, NULL, '2025-01-09 02:56:39', '2025-01-09 03:02:26', 9, NULL),
-(158, '0013727', 'REEV50004', '', NULL, 'SR 307/DEAN FOREST RD @ I-16 DDI Project', NULL, 'GDOT', '1636754', 1220101.00, 1, 'CHATHAM', 0, '', 0, '2023-01-24', '2023-12-30', NULL, '', 2, NULL, NULL, '2025-01-09 03:14:42', '2025-01-09 03:47:54', 9, NULL),
-(159, '0016111', 'REEV50003', 'B1CBA2101546-0', NULL, 'ROUNDABOUT US 129/SR247', NULL, 'GDOT', '10253712', 199491.50, 1, 'HOUSTON', 0, '', 0, '2021-06-30', '2022-07-31', NULL, '', 2, NULL, NULL, '2025-01-09 13:49:46', '2025-01-09 13:54:30', 9, NULL),
-(160, 'M005590', 'REEV50002', 'B1CBA2100828-0', NULL, 'US 441/S 29 RESURFACING AND REHABILITATION', NULL, 'GDOT', '10243890', 45828.00, 1, 'WILKINSON', 1, '', 0, '2021-04-23', '2021-12-31', NULL, '', 2, NULL, NULL, '2025-01-09 14:07:12', '2025-02-14 16:23:31', 9, NULL),
-(161, '0010121', 'AL22014', 'B1CBA1701424-0', '18 TRAFFIC', '18 TRAFFIC SIGNAL UPGRADES', NULL, 'GDOT', '1551707', 194000.00, 1, 'DOUGHERTY', 0, '', 0, '2020-12-10', '2021-12-10', NULL, '', 2, NULL, NULL, '2025-01-09 16:09:56', '2025-04-16 01:28:20', 14, NULL),
-(162, '0013214', 'AL22010', 'B1CBA1900832-0', NULL, '0013214 FULTON COUNTY', NULL, 'GDOT', 'NA', 10400.00, 1, 'FULTON', 0, '', 0, '2020-06-04', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-01-09 16:34:06', '2025-01-09 17:04:22', 14, NULL),
-(163, 'NA', 'AL22009', '', NULL, 'SIGNAL UPGRADES @MARIETTA BLVD', NULL, 'GDOT', '1551521-09', 121336.00, 1, 'CITY OF ATLANTA', 0, '', 0, '2019-09-16', '2020-09-16', NULL, '', 2, NULL, NULL, '2025-01-09 18:43:59', '2025-01-09 19:07:22', 14, NULL),
-(164, 'NA', 'AL22006', '', NULL, '1 TRAFFIC SIGNAL UPGRADE', NULL, 'ALS', '1551802', 29800.00, 0, 'CHATHAM', 0, '', 0, '2019-01-18', '2020-01-18', NULL, '', 2, NULL, NULL, '2025-01-09 19:10:44', '2025-02-14 15:18:37', 14, NULL),
-(165, '0012846', 'AL22005', 'B1CBA1701581-0', NULL, '15 TRAFFIC SIGNAL UPGRADES', NULL, 'GDOT', '1551719', 429330.00, 1, 'LOWNDES', 0, '', 1, '2019-01-18', '2020-01-18', NULL, '', 2, NULL, NULL, '2025-01-09 19:14:03', '2025-02-14 15:26:08', 14, NULL),
-(166, 'S014943', 'AL22004', '', NULL, 'INSTALL HAWK CROSSWALK SYSTEM', NULL, 'GDOT', '1551803', 21700.00, 1, 'CHATHAM', 0, '', 0, '2019-01-19', '2020-01-19', NULL, '', 2, NULL, NULL, '2025-01-09 19:42:38', '2025-01-09 19:53:18', 14, NULL),
-(167, 'FC-8552', 'AL22003', '', NULL, 'FULTON COUNTY 11551521-10', NULL, 'ALS', '1551521-10', 43800.00, 0, 'FULTON', 0, '', 0, '2018-02-09', '2019-02-09', NULL, '', 2, NULL, NULL, '2025-01-09 19:57:34', '2025-01-09 20:00:21', 14, NULL),
-(168, '0012672', 'AL22002', 'B1CBA1700726-0', NULL, 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN BA', NULL, 'GDOT', '1551701', 182140.00, 1, 'BARROW', 0, '', 0, '2018-03-17', '2019-03-17', NULL, '', 2, NULL, NULL, '2025-01-09 20:03:09', '2025-01-09 20:05:05', 14, NULL),
-(169, '0012669', 'AL22001', 'B1CBA1700765-0', NULL, 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS AT CH', NULL, 'GDOT', '1551703', 236100.00, 1, 'CHEROKEE', 0, '', 1, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-09 20:06:31', '2025-01-09 20:15:34', 14, NULL),
-(170, '0012673', 'AL22000', '', NULL, 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', NULL, 'GDOT', '1551704', 146960.00, 1, 'ROCKDA', 0, '', 0, '2018-03-17', '2019-03-17', NULL, '', 2, NULL, NULL, '2025-01-09 20:21:13', '2025-02-14 16:41:25', 14, NULL),
-(171, 'M005779', 'APAC47000', 'B3CBA1902085-0', NULL, 'SCREVEN COUNTY M005779', NULL, 'GDOT', 'M005779', 11520.00, 1, 'SCREVEN', 0, '', 0, '2020-03-23', '2020-10-31', NULL, '', 2, NULL, NULL, '2025-01-09 20:53:18', '2025-01-09 21:11:13', 13, NULL),
-(172, '118250101', 'APAC47001', '', NULL, 'STILES AVENUE - CITY OF SAVANNAH (AECOM)', NULL, 'APAC - ATLANTIC INC', '765072', 256315.00, 1, 'CITY OF SAVANNAH', 0, '', 1, '2021-10-20', '2022-10-20', NULL, '', 2, NULL, NULL, '2025-01-09 21:06:12', '2025-01-09 21:08:02', 13, NULL),
-(173, 'TE-709-03', 'APAC47002', '', NULL, 'GWINNETT STREET WIDENING', NULL, 'CITY OF SAVANNAH', '765067', 362749.00, 0, 'CITY OF SAVANNAH', 0, '', 0, '2022-02-21', '2023-02-21', NULL, '', 2, NULL, NULL, '2025-01-10 13:26:42', '2025-01-10 13:34:37', 13, NULL),
-(174, '21-0149-4', 'APAC47003', '', NULL, '2021 wILMINGTON IS ROAD SAFETY ENCHANMENTS & LANSING AVENUE / CENTRAL AVENUE', NULL, 'CHATHAM COUNTY', '765096', 54775.00, 0, 'CHATHAM', 0, '', 0, '2022-04-19', '2022-07-30', NULL, '', 2, NULL, NULL, '2025-01-10 13:39:40', '2025-01-10 13:46:19', 13, NULL),
-(175, '19-LD-089', 'APAC47004', '', NULL, 'OP544 AREA SURFACE LOT', NULL, 'CITY OF SAVANNAH', '765083', 165744.00, 0, 'CITY OF SAVANNAH', 0, '', 0, '2022-06-06', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-01-10 13:53:39', '2025-01-10 13:59:22', 13, NULL),
-(176, 'M006212', 'APAC47005', 'B1CBA2201842-0', NULL, 'M006212 – Rehab beginning SR 119 N of Airport Rd & extending S of SR144 – Liberty County', NULL, 'GDOT', '765098', 66900.00, 1, 'LIBERTY', 0, '', 1, '2022-08-23', '2023-04-30', NULL, '', 1, NULL, NULL, '2025-01-10 14:04:37', '2025-01-10 14:05:27', 13, NULL),
-(177, '371150', 'BP02008', 'B1CBA20011860-0', NULL, 'FORTUNE HOLE RD OVER WILLIAMS CREEK', NULL, 'GDOT', '2BA150', 33152.00, 1, 'HARRIS', 0, '', 1, '2020-08-28', '2021-06-30', NULL, '', 2, NULL, NULL, '2025-01-10 14:42:32', '2025-01-10 14:43:40', 17, NULL),
-(178, '0013175', 'BP02007', 'B1CBA1900848-0', NULL, '0013175 hIGHWAY CONSTRUCTION', NULL, 'GDOT', '0013175', 135863.00, 1, 'DEKALB', 0, '', 0, '2019-07-30', '2020-06-30', NULL, '', 2, NULL, NULL, '2025-01-10 14:50:42', '2025-01-10 15:04:50', 17, NULL),
-(179, 'GA20160259', 'BP02006', '', NULL, 'HIGHWAY GA20160259', NULL, 'GDOT', 'GA20160259', 148055.00, 1, 'COBB', 0, '', 0, '2019-08-26', '2019-11-30', NULL, '', 2, NULL, NULL, '2025-01-10 15:20:12', '2025-01-10 15:24:29', 17, NULL),
-(180, '0010941', 'BP02005', 'B1CBA1701576-0', NULL, '0010941 CAMPBELLTON', NULL, 'GDOT', '0010941', 138410.00, 1, 'CAMPBELLTON', 0, '', 0, '2017-06-30', '2019-06-30', NULL, '', 2, NULL, NULL, '2025-01-10 15:29:32', '2025-01-10 15:39:09', 17, NULL),
-(181, 'CSHPP-0007-00(313)', 'BP02004', 'B15040-15-000-0', NULL, 'CRABAPPLE CSHPP-0007-00(313)', NULL, 'GDOT', 'CSHPP-0007-00(313)', 561176.00, 1, 'FULTON', 0, '', 0, '2016-02-18', '2018-02-18', NULL, '', 2, NULL, NULL, '2025-01-10 15:49:21', '2025-01-10 16:06:42', 17, NULL),
-(182, '0010419', 'BP02003', 'B14881-15-000-0', NULL, '0010419 FULTON', NULL, 'GDOT', '0010419', 322229.00, 1, 'FULTON', 0, '', 0, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-10 16:41:45', '2025-02-10 20:45:16', 17, NULL),
-(183, 'B14793-14-000-0', 'BP02001', '', NULL, 'BRIDGE AND APPROACHEDS ON SR 372 OVER ETOWAH RIVER', NULL, 'GDOT', 'B14793-14-000-0', 82359.00, 1, 'CHEROKEE', 0, '', 0, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-10 17:07:00', '2025-01-10 17:17:49', 17, NULL),
-(184, '0012832', 'BP02000', 'B1CBA1600600-0', NULL, '0012832 CAMPCREEK', NULL, 'GDOT', '0012832', 62500.00, 1, 'FULTON', 0, '', 0, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-10 17:19:54', '2025-01-10 17:21:27', 17, NULL),
-(185, 'M005999', 'BAR59000', 'B1CBA2100998-0', NULL, 'M005999 GORDON DETECTABLE WARNING SURFACE', NULL, 'GDOT', '21-9002-S2', 8050.00, 1, 'GORDON', 0, '', 0, '2021-05-25', '2022-01-31', NULL, '', 2, NULL, NULL, '2025-01-15 13:55:59', '2025-01-15 13:57:59', 19, NULL),
-(186, '0062097', 'BAR59003', '2022-038', NULL, 'BELLS FERRY ROAD & VICTORY DRIVE', NULL, 'BARTOW PAVING', '22-7010-S3', 127983.00, 0, 'CHEROKEE', 0, '', 0, '2022-03-31', '2022-12-26', NULL, '', 2, NULL, NULL, '2025-01-15 14:00:44', '2025-01-15 14:04:22', 19, NULL),
-(187, 'NA', 'BEA36002', 'NA', NULL, 'TOBACCO ROAD INTERSECTION IMPROVEMENTS AT ZEMULA DRIVE', NULL, 'BEAM\'S CONTRACTING, INC', 'NA', 34398.00, 0, 'Augusta-Richmond', 0, '', 0, '2024-08-15', '2024-08-15', NULL, '', 1, NULL, NULL, '2025-01-15 14:12:33', '2025-02-14 16:49:41', 20, NULL),
-(188, 'M006242', 'BEA36001', 'B3CBA2302354-0', NULL, 'US 25 / SR 121 RESURFACING - RICHMOND COUNTY', NULL, 'GDOT', '23430', 3936.00, 1, 'RICHMOND', 1, '', 0, '2023-10-10', '2024-08-31', NULL, '', 1, NULL, NULL, '2025-01-15 14:42:07', '2025-01-15 14:42:36', 20, NULL),
-(189, '220680', 'BEA36000', 'B3TIA1901746-0', NULL, '220680 RICHMOND', NULL, 'GDOT', '220680', 622945.25, 1, 'RICHMOND', 0, '', 0, '2022-03-22', '2022-06-30', NULL, '', 2, NULL, NULL, '2025-01-15 14:44:59', '2025-01-15 14:58:51', 20, NULL),
-(190, 'SP2009-03', 'BMK33000', '18-18', NULL, 'NE SENIOR CENTER', NULL, 'BM&K CONSTRUCTION & ENGINEERING', '18-18', 92874.51, 0, 'CLAYTON', 0, '', 0, '2021-06-16', '2022-06-16', NULL, '', 2, NULL, NULL, '2025-01-15 15:12:04', '2025-01-15 15:24:12', 21, NULL),
-(191, 'EEXK3900', 'BG390001', '', NULL, 'Wallace Dam Forebay Oxygenation SysteM', NULL, 'GEOGIA POWER COMPANY', '25679-103', 17346.00, 0, 'EATONTON', 0, '', 0, '2021-09-01', '2022-09-01', NULL, '', 2, NULL, NULL, '2025-01-15 16:00:16', '2025-01-15 16:13:25', 22, NULL),
-(192, '0016092', 'BBH26021', '', NULL, '0016092 SR 282 & MADDOX DR', NULL, 'BROOKS BERRY HAYNIE & ASSOCIATES', '13291', 36034.00, 0, 'GILMER', 0, '', 0, '2023-02-22', '2024-02-22', NULL, '', 1, NULL, NULL, '2025-01-15 16:28:51', '2025-01-15 16:31:21', 23, NULL),
-(193, 'NA', 'BBH26015', 'OCR-Z2-1031', NULL, 'OCR - 280 S INT IMPROVEMENTS', NULL, 'BROOKS BERRY HAYNIE & ASSOCIATES', 'OCR-Z2-1031', 11930.00, 0, 'COBB', 0, '', 0, '2020-07-31', '2020-10-01', NULL, '', 2, NULL, NULL, '2025-01-15 16:40:37', '2025-01-15 16:55:00', 23, NULL),
-(194, 'OCR-D6-2122', 'BBH26013', '', NULL, 'SR20 @ CHATEU RD/DODD BLVD ROME', NULL, 'GDOT', 'OCR-D6-2122', 24600.00, 1, 'ROME', 0, '', 0, '2021-11-10', '2022-11-10', NULL, '', 2, NULL, NULL, '2025-01-15 20:32:10', '2025-02-14 17:02:08', 23, NULL),
-(195, 'S015357', 'BBH26009', '', NULL, 'SR 49 @ SR 29 HAWK SIGNAL', NULL, 'GDOT', '14116.010354', 41353.00, 1, 'BALDWIN', 0, '', 0, '2020-07-07', '2021-07-07', NULL, '', 2, NULL, NULL, '2025-01-16 00:47:02', '2025-01-16 00:58:32', 23, NULL),
-(196, '14116', 'BBH26005', '', NULL, '14116 ATLANTA', NULL, 'GDOT', '14116.010354', 41353.00, 1, 'BALDWIN', 0, '', 0, '2020-07-31', '2021-07-31', NULL, '', 2, NULL, NULL, '2025-01-16 13:39:17', '2025-01-16 13:48:58', 23, NULL),
-(197, '0012825', 'BBH26004', 'B1CBA1901323-0', NULL, '0012825 FULTON TRAFFIC SIGNALS', NULL, 'GDOT', '0012825', 274925.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-07', NULL, '', 2, NULL, NULL, '2025-01-16 13:55:14', '2025-01-16 13:59:35', 23, NULL),
-(198, '0013214', 'BBH26003', 'B1CBA1900832-0', NULL, 'FULTON INTERSECTIONS', NULL, 'GDOT', '0013214', 10400.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-01-16 14:04:48', '2025-01-16 14:06:32', 23, NULL),
-(199, '0013198', 'BBH26002', 'B1CBA1801391-0', NULL, '0013198 MORGAN, NEWTON', NULL, 'GDOT', '0013198', 233960.00, 1, 'MORGAN, NEWTON', 0, '', 0, '2019-05-21', '2019-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 14:08:17', '2025-01-16 14:10:26', 23, NULL),
-(200, '0012678', 'BBH26000', 'B1CBA1701307-0', NULL, '0012678 ROCKDALE', NULL, 'GDOT', '0012678', 113910.00, 1, 'ROCKDALE', 0, '', 0, '2018-07-16', '2019-07-16', NULL, '', 2, NULL, NULL, '2025-01-16 14:37:15', '2025-01-16 14:48:27', 23, NULL),
-(201, '222150', 'CHP03009', 'B3TIA1902031-0', NULL, 'US 221 / US 1 / SR 4', NULL, 'GDOT', 'A. 401', 1254551.00, 1, 'JEFFERSON', 0, '', 1, '2020-02-12', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:15:06', '2025-02-14 16:38:03', 24, NULL),
-(202, '0011377', 'CHP03010', 'B3TIA2002302-0', NULL, '0011377 LINCOLN', NULL, 'GDOT', '0011377', 22050.00, 1, 'LINCOLN', 0, '', 0, '2020-10-16', '0022-04-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:37:29', '2025-01-16 15:38:12', 24, NULL);
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`) VALUES
-(203, 'M006053', 'CHO03011', 'B1CBA2101131-0', NULL, 'M006053 SCREVEN', NULL, 'GDOT', 'M006053', 6600.00, 1, 'SCREVEN', 0, '', 0, '2021-05-12', '2022-02-08', NULL, '', 2, NULL, NULL, '2025-01-16 15:42:25', '2025-01-16 15:43:38', 24, NULL),
-(204, 'M006133', 'CHP03012', 'B1CBA2101544-0', NULL, 'JEFFERSON M006133', NULL, 'GDOT', 'M006133', 15120.00, 1, 'JEFFERSON', 0, '', 0, '2021-07-06', '2022-04-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:45:01', '2025-01-16 15:53:30', 24, NULL),
-(205, '0015609', 'CSC70004', 'B1CBA2302114-0', NULL, 'Project #0015609, Bridge and Approaches on Harbins Rd/Patrick Mill over Apalachee River', NULL, 'GDOT', '0015609', 5171.00, 1, 'BARROW, GWINNETT', 0, '', 0, '2024-05-21', '2024-07-31', NULL, '', 2, NULL, NULL, '2025-01-16 15:58:53', '2025-01-16 16:33:30', 25, NULL),
-(206, '0015568', 'CSC70003', 'B1CBA2302273-0', NULL, 'Project #0015568, Bridge and Approaches on SR 83 over Polecat Creek', NULL, 'GDOT', '0015568', 106114.00, 1, 'WALTON', 0, '', 0, '2023-11-09', '2024-05-31', NULL, '', 2, NULL, NULL, '2025-01-16 16:08:19', '2025-01-16 16:18:49', 25, NULL),
-(207, '0017780', 'CSC70002', 'B1CBA2302153-0', NULL, 'Project #0017780, Bridges and Approaches Garretts Ferry Rd. over Chattahoochee River Tributary', NULL, 'GDOT', '0017780', 95687.00, 1, 'FULTON', 0, '', 0, '2023-09-25', '2024-06-30', NULL, '', 2, NULL, NULL, '2025-01-16 16:41:20', '2025-02-17 14:28:11', 25, NULL),
-(208, '0013991', 'CSC70001', 'B1CBA2201976-0', NULL, 'PI #0013991, SR 42 / Briarcliff Road at Southfork Peachtree Creek Bridge Replacement', NULL, 'GDOT', '0013991', 89006.00, 1, 'DEKALB', 0, '', 0, '2023-05-15', '2024-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 16:53:03', '2025-01-16 16:55:33', 25, NULL),
-(209, '0015097', 'CSC70000', '22-11', NULL, 'PI #0015097, CR 511 / Brown Bridge Road at Snapping Shoals Creek including Realignment and Bridge Replacement', NULL, 'GDOT', '0015097', 55380.00, 1, 'NEWTON', 0, '', 0, '2023-02-15', '2025-02-14', NULL, '', 1, NULL, NULL, '2025-01-16 16:57:13', '2025-01-16 16:57:40', 25, NULL),
-(210, '0015687', 'CWM04107', 'B1CBA2402674-0', NULL, 'CONSTRUCTION OF A ROUNDABOUT SR 1', NULL, 'GDOT', '3169', 607329.00, 1, 'CHATTAHOOCHEE', 0, '', 1, '2025-01-10', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-01-16 19:06:41', '2025-01-31 21:24:09', 7, NULL),
-(211, 'M006405 ', 'REEV50019', 'B1CBA2402750-0', NULL, 'M006405 resurfacing and shoulder rehab on SR 199 from I-16 SR 404 to SR 29', NULL, 'GDOT', '10340206', 12300.00, 1, 'LAURENS', 0, '', 0, '2025-01-10', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-01-16 19:52:06', '2025-02-13 14:22:26', 9, NULL),
-(212, 'M005791', 'COLD40000', 'B1CBA1901691-0', NULL, 'M005791 GLIMMER', NULL, 'GDOT', 'M005791', 7000.00, 1, 'GILMER', 0, '', 0, '2019-06-26', '2020-12-15', NULL, '', 2, NULL, NULL, '2025-01-16 20:28:33', '2025-01-16 20:30:32', 35, NULL),
-(213, 'DNR-462-492-88276', 'COLD40001', '', NULL, 'TALLULAH FALLS STATE PARK VISITOR CENTER', NULL, 'GEORGIA DNR', '1132020', 18028.00, 0, 'TALLULAH FALLS', 0, '', 0, '2020-02-24', '2022-02-24', NULL, '', 2, NULL, NULL, '2025-01-16 21:50:26', '2025-01-16 21:52:15', 35, NULL),
-(214, '5272024', 'COLD40002', '', NULL, 'CITY OF BLUE RIDGE', NULL, 'CITY OF BLUE RIDGE', '5272024', 25784.00, 0, 'FANNIN COUNTY', 0, '', 0, '2021-05-28', '2022-05-28', NULL, '', 2, NULL, NULL, '2025-01-16 22:00:09', '2025-01-16 22:12:11', 35, NULL),
-(215, '0010677', 'CCC38000', '6616015', NULL, 'CS 562 / WEST MAIN ST FROM CS 571 CITY OF BLUE RIDGE', NULL, 'CITY OF BLUE RIDGE', '0010677', 110428.00, 0, 'FANNIN COUNTY', 0, '', 0, '2019-10-03', '2020-01-31', NULL, '', 2, NULL, NULL, '2025-01-16 23:02:38', '2025-01-16 23:11:11', 28, NULL),
-(216, '0010688', 'CCC38001', '', NULL, 'CITY OF YOUNG HARRIS WALKER STREET SIDEWALK PROJECT', NULL, 'GDOT', '0010688', 58871.00, 0, 'TOWNS', 0, '', 0, '2019-08-30', '2020-02-26', NULL, '', 2, NULL, NULL, '2025-01-16 23:21:50', '2025-01-16 23:23:46', 28, NULL),
-(217, '17-002/01-21', 'CCC38002', '00100', NULL, 'DOWNTOWN PARK IMPROVEMENTS FINAL PHASE', NULL, 'COLWELL CONSTRUCTION COMPANY', '17-002/01-21', 46025.20, 0, 'CITY OF BALDWIN', 0, '', 0, '2021-08-04', '2022-12-02', NULL, '', 2, NULL, NULL, '2025-01-16 23:36:30', '2025-01-17 01:01:47', 28, NULL),
-(218, 'M006344', 'COM34016', 'B1CBA2302539-0', NULL, 'M006344 MORGAN, OGLETHORPE', NULL, 'GDOT', '290-SUB06', 12400.00, 1, 'MORGAN, OGLETHORPE', 0, '', 0, '2024-03-05', '2025-03-31', NULL, '', 1, NULL, NULL, '2025-01-17 01:12:18', '2025-01-17 20:19:47', 29, NULL),
-(219, '48400-DOT0002823', 'COM34014', '48400-DOT0002823', NULL, 'ITB Morgan Co - SR 83 - App Slab', NULL, 'GDOT', '287-SUB03', 41300.00, 1, 'MORGAN', 0, '', 0, '2023-10-11', '2023-10-21', NULL, '', 2, NULL, NULL, '2025-01-17 01:29:46', '2025-01-17 01:30:43', 29, NULL),
-(220, 'M006263', 'COM34013', 'B1CBA2302471-0', NULL, 'M006263 BRIDGE REHABILIATION', NULL, 'GDOT', '289-SUB09', 23438.00, 1, 'FLOYD, WALKER', 0, '', 0, '2023-09-25', '2025-03-31', NULL, '', 1, NULL, NULL, '2025-01-17 01:36:55', '2025-02-17 15:41:06', 29, NULL),
-(221, 'M006090', 'COM34011', 'B1CBA2202193-1', NULL, 'GORDON BRIDGE REHAB', NULL, 'GDOT', '282-SUB04', 30000.00, 1, 'GORDON', 0, '', 0, '2023-03-13', '2023-10-31', NULL, '', 2, NULL, NULL, '2025-01-20 13:50:16', '2025-01-20 13:51:42', 29, NULL),
-(222, 'M006050', 'COM34010', 'B1CBA2201215-0', NULL, 'M006050 APPROACH SLAB REPLACEMENT', NULL, 'C. W. MATTHEWS CONTRACTING CO', '272-SUB02', 307360.00, 1, 'FULTON', 0, '', 0, '2022-05-26', '2023-01-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:00:17', '2025-01-20 14:04:45', 29, NULL),
-(223, 'M006076', 'COM34009', 'B1CBA2102129-0', NULL, 'M006076 BRIDGE REHABILITATION', NULL, 'GDOT', '264-SUB05', 111288.00, 1, 'COBB, FULTON', 0, '', 0, '2021-11-19', '2022-10-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:07:05', '2025-01-20 14:28:49', 29, NULL),
-(224, 'M006152', 'COM34007', 'B1CBA2100891-0', NULL, 'M006152 BRIDGE REHABILITATION ON I-475/SR 408', NULL, 'GDOT', '260-SUB05', 6000.00, 1, 'MONROE', 0, '', 0, '2021-04-26', '2021-08-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:31:26', '2025-01-20 14:32:02', 29, NULL),
-(225, 'NA', 'COM34004', '', NULL, 'SR 316 EMERGENCY PROJECT', NULL, 'GDOT', '250-SUB03', 118420.00, 1, 'GWINNETT', 0, '', 0, '2020-02-20', '2021-02-20', NULL, '', 2, NULL, NULL, '2025-01-20 14:49:35', '2025-01-20 14:52:35', 29, NULL),
-(226, 'M005947', 'COM34003', 'B1CBA1902044-0', NULL, 'M005947 FULTON', NULL, 'GDOT', '248-SUB04', 66950.00, 1, 'FULTON', 0, '', 0, '2020-06-04', '2020-07-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:57:49', '2025-01-20 15:29:07', 29, NULL),
-(227, 'M005701', 'COM34000', 'B1CBA1800985-0', NULL, 'M005701 DADE GORDON WHITEFIELD', NULL, 'GDOT', '236-SUB04', 293064.00, 1, 'DADE GORDON WHITEFIELD', 0, '', 0, '2019-01-10', '2019-01-31', NULL, '', 2, NULL, NULL, '2025-01-20 15:32:44', '2025-01-20 15:35:34', 29, NULL),
-(228, '0006328', 'SB62002', 'B3CBA2101559-0', NULL, 'B3CBA2101559-0 BRIDGE CONSTRUCTION BRAMPTON ROAD CONNECTOR SBC JOB NO 732', NULL, 'GDOT', '732', 625126.00, 1, 'CHATHAM', 0, '', 0, '2022-08-29', '2025-05-31', NULL, '', 1, NULL, NULL, '2025-01-20 19:07:46', '2025-01-20 20:52:21', 42, NULL),
-(229, '0009011', 'ERS05034', 'B3CBA2100843-0', NULL, 'US 441 SR 53 WIDENING', NULL, 'GDOT', '60261', 1272788.06, 1, 'OCONEE', 0, '', 1, '2021-04-27', '2024-06-30', NULL, '', 1, NULL, NULL, '2025-01-20 19:47:08', '2025-02-05 16:16:50', 5, NULL),
-(230, '522570', 'REEV50020', 'B1CBA2402253-0', NULL, 'Liberty Connector US84/SR38', NULL, 'GDOT', '10340586', 80089.50, 1, 'LIBERTY', 0, '', 1, '2025-01-20', '2027-03-31', NULL, '', 1, NULL, NULL, '2025-01-21 16:04:09', '2025-02-28 13:41:40', 9, NULL),
-(231, '0013918', 'CWM04108', '404600', NULL, 'I-285 & I-20 WEST INTERCHANGE', NULL, 'GDOT', '3149', 2375824.00, 1, 'COBB, FULTON', 0, '', 1, '2025-01-23', '2030-06-30', NULL, '', 1, NULL, NULL, '2025-01-23 21:24:57', '2025-02-10 20:11:44', 7, NULL),
-(232, 'M006524', 'PC25031', '', NULL, 'SR 154 M006524', NULL, 'GDOT', '1885', 3154.00, 1, 'DEKALB', 0, '', 1, '2025-01-24', '2025-08-31', NULL, '', 1, NULL, NULL, '2025-01-24 20:11:14', '2025-02-14 19:33:22', 12, NULL),
-(233, '409906', 'CWM04109', '24-0121-5', NULL, '2024 PAVEMENT RESURFACING OF COUNTY ROADS', NULL, 'COBB COUNTY DEAPARTMENT OF TRANSPORTATION', '3165', 105040.00, 1, 'CHATHAM', 1, '', 0, '2025-01-24', '2025-06-30', NULL, '', 1, NULL, NULL, '2025-01-24 20:27:42', '2025-01-30 13:32:17', 7, NULL),
-(237, '0013751', 'CSC70005', 'B1CBA2402631-0', NULL, 'BRIDGE REPLACEMENT ON SR81 OVER DRIED INDIAN CREEK', NULL, 'GDOT', 'NA', 78118.00, 1, 'NEWTON', 0, '', 1, '2025-01-27', '2026-05-31', NULL, '', 0, NULL, NULL, '2025-01-30 14:29:49', '2025-01-30 14:38:05', 25, NULL),
-(238, '0007055', 'ERS05078', 'B1CBA2402183-2', NULL, 'SR180 BRIDGE', NULL, 'GDOT', '60394', 68527.16, 1, 'UNION', 0, '', 1, '2025-01-28', '2026-12-31', NULL, '', 1, NULL, NULL, '2025-01-30 14:41:16', '2025-02-28 19:46:22', 5, NULL),
-(239, 'M004985', 'CWM04000', 'B1CBA1601506-0', NULL, 'MILL INLAY PLANTMIX RESURF SINGLE SURF TRTMT PAVING SR 1', NULL, 'GDOT', '32274', 3600.00, 1, 'TROUP', 1, '', 0, '2016-03-07', '2017-03-07', NULL, '', 2, NULL, NULL, '2025-01-30 16:05:08', '2025-02-11 20:28:35', 7, NULL),
-(240, '0015537', 'WRB21007', 'B1CBA2200986-0', NULL, 'US27/SR 1 BRIDGE REPLACEMENT', NULL, 'GDOT', '01-0674', 336384.54, 1, 'CARROLL', 0, '', 1, '2022-05-19', '2024-05-31', NULL, '', 2, NULL, NULL, '2025-01-30 17:08:51', '2025-02-14 16:17:50', 36, NULL),
-(241, '0015096', 'WRB21008', '23-06', NULL, 'CR 511/Brown Bridge Road over Yellow River', NULL, 'NEWTON CO GA BOARD OF COMMISSIONERS', '01-0697', 449417.53, 0, 'NEWTON', 0, '', 0, '2023-02-11', '2025-09-30', NULL, '', 1, NULL, NULL, '2025-01-30 18:27:43', '2025-01-30 19:34:02', 36, NULL),
-(242, '0015538', 'WRB21010', 'B1CBA2302760-0', NULL, 'US 41 BRIDGE OVER PEAVINE CRK', NULL, 'GDOT', '01-0745', 191315.46, 1, 'CATOOSA', 0, '', 0, '2024-01-23', '2026-04-30', NULL, '', 1, NULL, NULL, '2025-01-30 19:12:05', '2025-01-30 19:33:24', 36, NULL),
-(243, '0013943', 'WRB21006', 'B1CBA2101793-0', NULL, 'US 27-SR 1 BR REPLACEMENT', NULL, 'GDOT', '01-0626', 127891.75, 1, 'WALKER', 0, '', 0, '2021-09-13', '2023-04-30', NULL, '', 2, NULL, NULL, '2025-01-30 19:55:50', '2025-01-30 20:08:54', 36, NULL),
-(244, '0013363', 'WRB21005', 'B1CBA2002011-0', NULL, 'SR 81 BRIDGE', NULL, 'GDOT', '01-0612', 74793.00, 1, 'HENRY, NEWTON', 0, '', 0, '2020-09-22', '2021-11-30', NULL, '', 2, NULL, NULL, '2025-01-30 20:24:36', '2025-01-30 21:12:08', 36, NULL),
-(245, '0005530', 'WRB21003', 'B3BCBA1801525-0', NULL, 'CHATTOOGA', NULL, 'GDOT', 'BID-20', 79164.00, 1, 'CHATTOOGA', 0, '', 0, '2018-08-14', '2023-05-31', NULL, '', 2, NULL, NULL, '2025-01-30 22:09:13', '2025-01-30 22:11:32', 36, NULL),
-(246, 'NA', 'WRB21002', 'NA', NULL, 'BARTOW CITY LAKEPOINT PARKWAY EXTENSION', NULL, 'WRIGHT BROTHERS CONSTRUCTION', '01-0519', 967787.21, 0, 'BARTOW', 0, '', 0, '2018-03-20', '2019-10-31', NULL, '', 2, NULL, NULL, '2025-01-30 22:16:16', '2025-01-30 22:25:10', 36, NULL),
-(247, '0009860', 'WRB21001', 'B1CBA1701318-0', NULL, 'US 41 BRIDGE REPLACEMENT', NULL, 'GDOT', '01-0505', 74744.00, 1, 'BARTOW', 0, '', 0, '2017-09-27', '2019-10-31', NULL, '', 2, NULL, NULL, '2025-01-31 13:36:24', '2025-02-14 16:29:03', 36, NULL),
-(248, '0016108', 'WCM69000', 'B1CBA2301170-0', NULL, 'Construction of a roundabout on SR 16 at Columbia Dr and Brumbelow Rd', NULL, 'GDOT', 'NA', 604787.00, 1, 'CARROLL', 0, '', 1, '2023-02-21', '2024-10-31', NULL, '', 1, NULL, NULL, '2025-01-31 14:56:53', '2025-01-31 15:05:52', 43, NULL),
-(249, '0013209', 'WIL37000', 'B1CBA1901648-0', NULL, 'ON SR139 AND SR402', NULL, 'GDOT', '001-0', 56270.00, 1, 'FULTON', 0, '', 0, '2020-03-03', '2021-03-03', NULL, '', 2, NULL, NULL, '2025-01-31 15:34:29', '2025-02-17 14:42:16', 44, NULL),
-(250, '522200', 'UIG49008', '', NULL, 'US1 SR4 SWIFT CREEK', NULL, 'GDOT', '2406', 221172.00, 1, 'TOOMBS', 0, '', 0, '2024-06-10', '2025-06-10', NULL, '', 1, NULL, NULL, '2025-02-03 21:28:20', '2025-02-14 16:19:22', 45, NULL),
-(251, '0019197', 'UIG49007', 'B3TIA2302211-0', NULL, 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', NULL, 'GDOT', '2308', 855413.00, 1, 'TOOMBS', 0, '', 0, '2023-07-24', '2026-05-31', NULL, '', 1, NULL, NULL, '2025-02-03 21:52:15', '2025-02-12 14:34:43', 45, NULL),
-(252, '0015623', 'UIG49006', 'B1CBA2301890-0', NULL, 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', NULL, 'GDOT', '2307-0004', 85330.96, 1, 'JENKINS', 0, '', 0, '2023-07-08', '2024-05-31', NULL, '', 1, NULL, NULL, '2025-02-04 13:34:05', '2025-02-04 13:35:25', 45, NULL),
-(253, '0012867', 'ERS05079', '24-213', NULL, 'AGUSTA -COA- WHEELER SUM OUT', NULL, 'CITY OF AUGUTA', '50449', 851574.43, 0, 'RICHMOND', 0, '', 0, '2025-02-04', '2026-08-06', NULL, '', 1, NULL, NULL, '2025-02-04 19:39:53', '2025-02-28 19:46:29', 5, NULL),
-(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', NULL, 'TESTING PROJECT FOR SOFTWARE', NULL, 'C&G CONCRETE', '00011122223333', 442418.00, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', '2025-02-20', 'Andres Iglesias', 1, NULL, NULL, '2025-02-10 16:43:27', '2025-02-20 15:42:20', 46, NULL),
-(255, 'M006468', 'CWM04110', 'B1CBA2402829-0', NULL, 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', 7, NULL),
-(256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', NULL, 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', NULL, '', 1, NULL, NULL, '2025-02-10 20:26:00', '2025-04-16 01:22:09', 5, NULL),
-(257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', 7, NULL),
-(259, '0012757 & 0012758', 'SAV57000', '', 'MMIP PROJECT', 'I-16 & I-95 MMIP PROJECT', NULL, 'GDOT', 'SMC-056-S', 1435095.12, 1, 'CHATHAM', 0, '', 0, '2020-10-02', '2025-10-31', NULL, '', 3, NULL, NULL, '2025-02-11 21:19:30', '2025-06-06 22:44:03', 47, NULL),
-(260, '24112201', 'PC25032', 'B1CBA2402749-0', NULL, 'SR 15 ', NULL, 'GDOT', '1886', 6050.00, 1, 'GREENE', 0, '', 1, '2025-01-31', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-02-13 14:10:07', '2025-02-13 14:11:03', 12, NULL),
-(261, '0015759', 'EDG45000', 'B3CBA1901689-1', NULL, 'LAURENS ', NULL, 'GDOT', '0015759', 208017.00, 1, 'LAURENS', 0, '', 0, '2019-01-05', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-02-13 15:03:16', '2025-02-13 15:06:53', 34, NULL),
-(262, 'CSBRG-0007-00(050)', 'GAB', 'B3CBA1601188-0', NULL, 'PULASKI', NULL, 'GDOT', 'CSBRG-0007-00(050)', 23160.00, 1, 'PULASKI', 0, '', 0, '2016-07-20', '2017-07-20', NULL, '', 2, NULL, NULL, '2025-02-13 15:39:03', '2025-02-13 15:49:40', 48, NULL),
-(263, 'M006213', 'CWM04067', 'B1CBA2201852-0', NULL, 'SR 26 MILL/INLAY/RESURF', NULL, 'GDOT', '32818', 55425.00, 1, 'CHATHAM', 1, '', 0, '2022-07-25', '2023-04-30', NULL, '', 2, NULL, NULL, '2025-02-13 19:20:46', '2025-02-13 19:27:26', 7, NULL),
-(264, 'IFB-C-1220225', 'CWM04065', '', NULL, 'AIRFIELD SEWERS ENHANCEMENTS GRADES 4&5', NULL, 'CITY OF ATLANTA', '278520', 0.00, 0, 'CLAYTON', 0, '', 0, '2022-08-08', '2023-08-08', NULL, '', 2, NULL, NULL, '2025-02-13 19:52:19', '2025-02-13 19:53:06', 7, NULL),
-(265, '001757', 'CWM04064', '', NULL, 'SR 400 PHASE 1 DESIGN BUILD PROJECT', NULL, 'GDOT', '162816', 1296162.00, 1, 'FULTON', 0, '', 0, '2022-08-22', '2025-08-07', NULL, '', 1, NULL, NULL, '2025-02-13 20:41:56', '2025-02-13 21:25:14', 7, NULL),
-(266, 'M006343', 'CWM04063', 'B1CBA2201991-0', NULL, 'SR 16 MILL/INLAY/RESURF', NULL, 'GDOT', '32828', 3400.00, 1, 'CARROLL', 1, '', 0, '2022-08-18', '2023-05-31', NULL, '', 2, NULL, NULL, '2025-02-13 21:31:36', '2025-02-14 19:30:16', 7, NULL),
-(268, '0014170, M006227', 'CWM04062', 'B1CBA2201414-0', NULL, 'SR 22 SPUR MILL/INLAY/RESURFACING', NULL, 'GDOT', '12798', 286150.00, 1, 'MUSCOGEE', 1, '', 0, '2022-06-24', '2024-08-31', NULL, '', 2, NULL, NULL, '2025-02-14 15:33:26', '2025-02-14 15:41:18', 7, NULL),
-(269, '0006857, 0006866', 'CWM04061', 'B1CBA2201375-0', NULL, 'SR 92 WIDENING & RECONST.', NULL, 'GDOT', '12796', 1095904.00, 1, 'COBB, PAULDING', 0, '', 0, '2022-06-07', '2025-06-07', NULL, '', 1, NULL, NULL, '2025-02-14 15:43:48', '2025-02-14 15:44:55', 7, NULL),
-(270, 'M006292', 'CWM04060', 'B1CBA2201627-0', NULL, 'SR 155 MILL/INLAY/RESURF', NULL, 'GDOT', '32811', 108400.00, 1, 'DEKALB', 1, '', 0, '2022-07-06', '2023-03-31', NULL, '', 2, NULL, NULL, '2025-02-14 15:46:26', '2025-02-14 19:31:37', 7, NULL),
-(271, 'M006285', 'CWM04059', 'B1CBA2201614-0', NULL, 'SR 3 MILL/INLAY/RESURF', NULL, 'GDOT', '32813', 19100.00, 1, 'FULTON', 1, '', 0, '2022-06-30', '2023-03-31', NULL, '', 2, NULL, NULL, '2025-02-14 16:00:03', '2025-02-14 18:02:56', 7, NULL),
-(272, 'SPLOST CW18-05A', 'CWM04058', '22-15', NULL, 'S. HOUSTON LAKE RD & FEAGIN MILL INTERSECTION RESURF', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12807', 271465.00, 0, 'HOUSTON', 1, '', 0, '2022-04-11', '2023-04-11', NULL, '', 2, NULL, NULL, '2025-02-14 16:23:38', '2025-02-14 16:44:02', 7, NULL),
-(273, 'SPLOST CW12-02', 'CWM04056', '22-03', NULL, 'ELBERTA RD PH 1 IMPROVEMENTS', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12805', 937982.00, 0, 'HOUSTON', 0, '', 0, '2022-04-27', '2025-06-01', NULL, '', 1, NULL, NULL, '2025-02-14 22:20:09', '2025-02-17 16:27:14', 7, NULL),
-(274, 'M006290', 'CWM04055', 'B1CBA2201024-0', NULL, 'SR 280 MILL/INLAY/RESURF', NULL, 'GDOT', '32801', 163225.00, 1, 'COBB', 1, '', 0, '2022-04-01', '2022-12-31', NULL, '', 2, NULL, NULL, '2025-02-17 18:23:48', '2025-02-17 18:56:00', 7, NULL),
-(275, '0016440', 'CWM04054', 'B3CBA2200993-0', NULL, 'RECONST/REHAB FOR TURN LANES ON SR 22 @ SR 85', NULL, 'GDOT', '12775', 60944.00, 1, 'MUSCOGEE', 0, '', 0, '2022-04-05', '2023-03-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:10:26', '2025-02-17 19:19:08', 7, NULL),
-(276, 'M006222', 'CWM04052', 'B1CBA2201038-0', NULL, 'MILL, INLAY, RESURFACING SR 113', NULL, 'GDOT', '32773', 6375.00, 1, 'CARROLL', 1, '', 0, '2022-03-24', '2022-12-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:29:35', '2025-02-17 19:30:31', 7, NULL),
-(277, '0012577', 'CWM04051', 'B3TIA1902107-1', NULL, 'I-85 / SR 411 @BUENA VISTA RD DDI', NULL, 'GDOT', '52604', 78425.50, 1, 'MUSCOGEE', 0, '', 0, '2022-03-15', '2023-05-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:51:33', '2025-02-17 19:54:20', 7, NULL),
-(278, 'M006096', 'CWM04050', 'B1CBA2201020-0', NULL, 'SR 83 MILL/RESURF/SHLDER REHAB', NULL, 'GDOT', '32774', 76550.00, 1, 'MONROE', 1, '', 0, '2022-03-24', '2022-12-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:58:08', '2025-02-17 20:23:50', 7, NULL),
-(279, 'M006286', 'CWM04049', 'B1CBA2102185-0', NULL, 'SR 3 CONN MILL/INLAY/RESURF', NULL, 'GDOT', '32766', 22800.00, 1, 'COBB', 1, '', 0, '2022-02-17', '2022-11-30', NULL, '', 2, NULL, NULL, '2025-02-17 20:31:19', '2025-02-17 20:47:41', 7, NULL),
-(280, 'M005990', 'CWM04048', 'B1CBA2102169-0', NULL, 'MILL INLAY RESURFACING', NULL, 'GDOT', '32768', 197200.00, 1, 'DEKALB', 1, '', 0, '2022-02-18', '2022-11-30', NULL, '', 2, NULL, NULL, '2025-02-17 20:51:33', '2025-02-18 13:19:05', 7, NULL),
-(281, 'M006082', 'CWM04047', 'B1CBA2102175-0', NULL, 'MILL INLAY RESURFACING & SHOULDER REHAB', NULL, 'GDOT', '32765', 4050.00, 1, 'CHATHAM', 1, '', 0, '2022-02-18', '2022-11-30', NULL, '', 2, NULL, NULL, '2025-02-18 13:16:14', '2025-02-18 13:17:41', 7, NULL),
-(282, 'M006391', 'ECA72001', 'B1CBA2301707-0', NULL, 'RESURFACING SR40', NULL, 'GDOT', 'NA', 58500.00, 1, 'CAMDEN', 1, '', 1, '2024-01-04', '2024-06-30', NULL, '', 2, NULL, NULL, '2025-02-19 21:42:29', '2025-02-19 21:45:21', 33, NULL),
-(283, 'IFB-C-1210316', 'CWM04046', '', NULL, 'SOUTH CARGO BUILDING A PARKING LOT EXPANSION', NULL, 'CITY OF ATLANTA', '162718', 401014.00, 0, 'HJAIA- CITY OF ATLANTA', 0, '', 0, '2021-12-03', '2022-05-12', NULL, '', 2, NULL, NULL, '2025-02-25 21:03:01', '2025-02-25 21:27:19', 7, NULL),
-(284, '0015686', 'CWM04073', 'B1CBA2201575-1', NULL, 'CONSTR OF A ROUNDABOUT US41/SR247', NULL, 'GDOT', '12859', 475031.00, 1, 'BIBB', 0, '', 1, '2022-12-07', '2024-10-31', NULL, '', 1, NULL, NULL, '2025-02-25 22:18:34', '2025-02-25 22:51:18', 7, NULL),
-(285, 'FC-9142', 'CWM04045', '', NULL, 'CARGO MAINTENANCE BUILDING', NULL, 'CITY OF ATLANTA', '270020', 0.00, 0, 'HJAIA', 0, '', 0, '2021-11-17', '2025-11-17', NULL, '', 1, NULL, NULL, '2025-02-25 22:59:16', '2025-02-25 23:16:53', 7, NULL),
-(286, '0017038', 'CWM04044', 'B3CBA2101268-0', NULL, 'SR 5 WIDENING & RECONSTRUCTION', NULL, 'GDOT', '12682', 469862.00, 1, 'FANNIN', 0, '', 1, '2021-11-01', '2022-10-31', NULL, '', 2, NULL, NULL, '2025-02-26 01:38:16', '2025-02-26 01:40:58', 7, NULL),
-(287, '72120', 'COLD40007', '2025-009', NULL, 'DAMASCUS ROAD AT UPPER BETHANT ROAD', NULL, 'GDOT', '72120', 21725.00, 1, 'CHEROKEE', 0, '', 0, '2025-02-27', '2025-06-27', NULL, '', 1, NULL, NULL, '2025-02-27 21:20:56', '2025-02-27 21:25:29', 35, NULL),
-(288, '461-24', 'COLD40008', '', NULL, 'HARBOUR RIDGE PAVING PROJECT', NULL, 'DAWSON COUNTY BOARD OF COMMISSIONERS', 'NA', 7600.00, 0, 'DAWSON', 0, '', 0, '2025-02-27', '2025-06-27', NULL, '', 1, NULL, NULL, '2025-02-27 21:27:35', '2025-02-27 21:30:52', 35, NULL),
-(289, 'M006497', 'CWM04105', 'B1CBA2402810-0', NULL, 'MILL INLAY RESURFACING SR 74', NULL, 'GDOT', '3185', 41200.00, 1, 'BIBB', 1, '', 1, '2025-02-06', '2025-11-30', NULL, '', 0, NULL, NULL, '2025-02-28 14:36:45', '2025-02-28 14:37:40', 7, NULL),
-(290, 'M006504', 'CWM04111', 'B1CBA2402760-0', NULL, 'SR18 MILLING & RESURFACING', NULL, 'GDOT', '3180', 10000.00, 1, 'JONES', 1, '', 1, '2025-02-11', '2025-10-31', NULL, '', 0, NULL, NULL, '2025-02-28 14:41:11', '2025-02-28 14:41:42', 7, NULL),
-(291, 'NA', 'COM34019', 'EMERGENCY REQUEST', NULL, 'PARKWAY OVER I-16 APPROACH SLAB', NULL, 'C. W. MATTHEWS CONTRACTING CO., INC', '296-SUB02', 68855.00, 1, 'CHATHAM', 0, '', 0, '2025-02-27', '2025-03-31', NULL, '', 1, NULL, NULL, '2025-02-28 14:44:29', '2025-02-28 14:46:39', 29, NULL),
-(292, 'M006464', 'BP02021', '', NULL, 'SR 13 RESURFACING', NULL, 'GDOT', '310133-03', 4290.00, 1, 'FULTON', 1, '', 1, '2025-02-18', '2025-10-31', NULL, '', 0, NULL, NULL, '2025-02-28 14:49:16', '2025-02-28 14:49:50', 17, NULL),
-(293, 'M006419', 'GGC78003', 'B1CBA2402809-0', NULL, 'B1CBA2402809-0 Call:019 M006419 ', NULL, 'GDOT', 'M006419', 23360.00, 1, 'TEFLFAIR', 0, '', 0, '2025-02-19', '2025-11-30', NULL, '', 0, NULL, NULL, '2025-02-28 14:52:33', '2025-02-28 14:53:31', 40, NULL),
-(294, '0013918', 'ERS05080', '', NULL, 'WEST INTERCHANGE', NULL, 'C. W. MATTHEWS CONTRACTING CO', '60389', 476136.00, 1, 'FULTON/COBB', 0, '', 1, '2025-02-20', '2030-06-30', NULL, '', 1, NULL, NULL, '2025-02-28 14:55:12', '2025-02-28 19:46:38', 5, NULL),
-(295, 'M006097', 'ERS05037', 'B1CBA2102137-0', NULL, 'SR 34 RESURFACING', NULL, 'GDOT', '60286', 14000.00, 1, 'COWETA', 1, '', 0, '2022-01-06', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-02-28 21:30:37', '2025-02-28 21:35:49', 5, NULL),
-(296, '222120', 'ERS05036', 'B3TIA2101474-0', NULL, 'JEFFERSON US 1 SOUTH', NULL, 'GDOT', '60275', 327170.00, 1, 'JEFFERSON', 0, '', 0, '2021-10-06', '2024-06-30', NULL, '', 2, NULL, NULL, '2025-02-28 21:40:36', '2025-02-28 21:44:09', 5, NULL),
-(297, '0016803', 'ERS05035', 'B1CBA2100829-0', NULL, 'LAURENS COUNTY', NULL, 'GDOT', '0016803', 3600.00, 1, 'LAURENS', 0, '', 0, '2021-05-21', '2021-10-31', NULL, '', 2, NULL, NULL, '2025-02-28 21:46:14', '2025-02-28 21:49:11', 5, NULL),
-(298, 'M004941', 'ERS05032', 'B1CBA2100986-0', NULL, 'US 278 RESURFACING', NULL, 'GDOT', '602964', 101700.00, 1, 'COBB', 1, '', 0, '2021-04-21', '2022-01-31', NULL, '', 2, NULL, NULL, '2025-02-28 21:50:32', '2025-02-28 21:52:03', 5, NULL),
-(299, '0013614', 'ERS05029', 'B3CBA2002348-0', NULL, 'US 441 WIDENING', NULL, 'GDOT', '60256', 643843.25, 1, 'MORGAN', 0, '', 1, '2021-03-09', '2022-03-10', NULL, '', 2, NULL, NULL, '2025-03-03 20:59:26', '2025-03-03 21:11:29', 5, NULL),
-(300, 'ITB #20-30', 'ERS05025', '', NULL, '2020 SPLOST MILLING & RESURF', NULL, 'E. R. SNELL', 'ITB #20-30', 137500.00, 0, 'CLAYTON', 0, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, '2025-03-03 21:42:27', '2025-03-03 22:04:56', 5, NULL),
-(301, 'ITB #20-03', 'ERS05026', '', NULL, '2020 SPLOST MILLING & RESURFACING', NULL, 'E. R. SNELL', 'ITB #20-03', 229710.00, 0, 'CLAYTON', 1, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, '2025-03-03 22:13:17', '2025-03-03 22:20:19', 5, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
+(6, 'N/A', 'ERS05039', 'N/A', NULL, 'BUFORD HWY PED IMPROVEMENTS', NULL, 'DOT', '60294-9754', 1371500.00, 1, 'DeKalb', 0, '', 1, '2023-05-10', '2025-03-31', '2024-07-25', '', 1, NULL, NULL, '2024-07-08 14:37:28', '2024-11-25 19:28:06', 5, NULL, 2),
+(7, 'N/A', 'ERS05066', 'N/A', NULL, 'BEN EPPS TAXIWAY', NULL, 'UNIFIED GOV. OF ATHENS-CLARKE', '50429-9754', 77691.00, 1, 'CLARKE', 0, '', 0, '2024-06-24', '2024-10-31', '2024-07-31', '', 1, NULL, NULL, '2024-07-08 15:12:55', '2024-11-25 17:56:33', 5, NULL, 3),
+(8, NULL, 'PO-0195-GRW', NULL, NULL, 'WOODLANDS TRINITY', 'WOODLANDS TRINITY', 'WOODLANDS SUBDIVISION', '', NULL, 0, 'HOUSTON', 0, '', 0, '2020-09-07', NULL, '2024-07-31', 'Cliff Gradwell', 1, '', '', '2024-07-08 15:27:25', '2024-07-09 14:38:27', 6, NULL, 4),
+(9, 'N/A', 'CWM04099', 'N/A', NULL, 'HIDDEN ACRES DRIVE', NULL, 'N/A', 'N/A', 99.76, 0, 'DEKALB', 0, '', 0, '2024-07-02', '2024-07-02', '2024-07-31', 'Mike Lunsford', 0, NULL, NULL, '2024-07-08 16:06:19', '2025-02-17 17:56:54', 7, NULL, 2),
+(10, NULL, 'WEB56001', NULL, NULL, 'BIBB', 'BIBB', 'GDOT', '2021CW1K00026', NULL, 1, 'BIBB', 0, '', 0, '2022-03-29', NULL, '2024-07-31', '', 1, '', '', '2024-07-08 16:21:32', '2024-07-09 15:38:45', 8, NULL, 5),
+(11, '0016523', 'ERS05059', 'B1CBA2302156-0', NULL, 'VALENTINE BLVD BRIDGE', NULL, 'DOT', '60336-9754', 101910.00, 1, 'JACKSON', 0, '', 0, '2024-06-18', '2024-09-30', '2024-07-31', '', 2, NULL, NULL, '2024-07-08 19:19:11', '2025-02-14 16:13:36', 5, NULL, 6),
+(12, '-', 'REEV50013', '', NULL, 'JEFFERSON-WIDENING US 221-US1-SR4', NULL, 'DOT', '0', 6120.00, 1, 'JEFFERSON', 0, '', 1, '2024-05-17', '2025-03-04', '2024-07-25', 'Michael Schriver', 1, NULL, NULL, '2024-07-09 14:24:19', '2024-12-02 15:33:03', 9, NULL, 7),
+(13, NULL, 'STEB19010', NULL, NULL, '2021 LMIG STREET RESURFACING GROUP 1 NORTH', 'FULTON-COA', 'FULTON COUNTY', '52305-03', NULL, 0, 'FULTON', 0, '', 0, '2024-08-21', NULL, '2024-07-31', '', 1, '', '', '2024-07-09 15:59:34', NULL, 10, NULL, 8),
+(14, 'N/A', 'RW74001', 'N/A', NULL, 'FULTON', NULL, 'GDOT', 'N/A', 342832.00, 0, 'FULTON', 0, '', 0, '2024-04-24', '2024-11-30', '2024-07-31', '', 1, NULL, NULL, '2024-07-09 16:16:48', '2024-12-02 14:35:23', 11, NULL, 8),
+(15, NULL, 'PC25028', NULL, NULL, 'ROCKDALE - Roundabout 138 Union Church Rd', 'ROCKDALE - Roundabout 138 Union Church Rd', 'DOT', '1809', NULL, 1, 'ROCKDALE ', 0, '', 1, '2023-03-03', '2024-07-31', '2024-07-31', 'ROBERT MOON- rmoon@pittman-construction.com', 1, '0009989', 'B1CBA2202367-0', '2024-07-09 16:22:29', '2024-07-24 18:16:29', 12, NULL, 9),
+(19, 'IFB-C-1210246', 'CWM04043', '', NULL, 'CASCADE RD AVE STREETSCAPE, PH 1', NULL, 'City of Atlanta', '32742', 4663597.00, 0, 'FULTON', 0, '', 0, '2024-07-12', '2024-08-31', '2024-08-31', '', 1, NULL, NULL, '2024-08-14 18:06:41', '2025-02-19 20:17:12', 7, NULL, 8),
+(20, 'IM/NH-75-1(131)', 'WRB21009', '33005-1185-44', NULL, 'Design-Build I-75@ I-24, Ph II', NULL, 'TDOT', '01-0703-3969', 626404.80, 1, 'HAMILTON', 0, '', 1, '2024-09-23', '2026-10-01', '2024-10-24', '', 1, NULL, NULL, '2024-10-03 16:38:29', '2025-02-19 18:12:32', 36, NULL, 10),
+(21, '0014482', 'ERS05074', 'B3CBA2401992-0', NULL, 'Henry Western Parallel Connector', NULL, 'GDOT', '60376-9754', 3069748.87, 1, 'Henry', 0, '', 1, '0024-08-12', '2026-11-30', NULL, '', 1, NULL, NULL, '2024-10-03 17:13:48', '2025-02-17 18:00:38', 5, NULL, 11),
+(22, '1148.02', 'BP02020', '', NULL, 'Windy Hill Boulevard', NULL, 'City of Smyrna', '159944-01', 527211.75, 0, 'Cobb', 0, '', 0, '2024-08-10', '2025-03-30', NULL, '', 1, NULL, NULL, '2024-10-04 15:04:04', '2024-12-02 17:41:22', 17, NULL, 12),
+(23, '019-45', 'ERS05070', '', NULL, 'Hall, White Sulphur Road', NULL, 'Hall County Board of Comm', '50446-9754', 731972.72, 0, 'Hall', 0, '', 0, '2024-08-01', '2025-07-02', NULL, '', 1, NULL, NULL, '2024-10-04 18:11:30', '2025-02-17 18:04:29', 5, NULL, 13),
+(25, '0013809', 'CMES60005', 'B1CBA2402186-0', NULL, 'Bridge Construction on SR14 over CSX Railroad', NULL, 'GDOT', '24030', 445588.50, 1, 'Fulton', 0, '', 0, '2024-08-03', '2027-09-30', NULL, '', 1, NULL, NULL, '2024-10-04 19:59:12', '2024-11-25 19:16:50', 26, NULL, 8),
+(28, 'F-1251-01 & M-1238-31', 'ERS05071', 'BL079-24', NULL, 'Lakeview Road Bridge', NULL, 'Gwinnett County Tax Commission', '50445', 241343.25, 0, 'Gwinnett', 0, '', 0, '2024-08-13', '2025-03-01', NULL, '', 1, NULL, NULL, '2024-10-09 13:21:47', '2025-02-17 17:03:33', 5, NULL, 14),
+(29, 'M006298', 'ERS05072', '', NULL, 'I-285 RESURFACING', NULL, 'GDOT', '60385', 80243.62, 1, 'Cobb Fulton', 1, '', 1, '2024-08-19', '2025-10-31', NULL, '', 1, NULL, NULL, '2024-10-09 18:14:26', '2025-02-17 17:25:13', 5, NULL, 15),
+(30, '0015656', 'ERS05073', '', NULL, 'Clotfelter Road Bridge', NULL, 'GDOT', '60386', 15462.16, 1, 'Oconee', 0, '', 1, '2023-01-30', '2025-12-31', NULL, '', 1, NULL, NULL, '2024-10-10 14:51:15', '2025-02-19 18:29:01', 5, NULL, 16),
+(31, '0011434', 'SCR16010', 'B3TIA2202312-0', NULL, 'Cusseta Road GDOT Project 0011434', NULL, 'GDOT', '2117004', 1814416.50, 1, 'Muscogee', 0, '', 0, '2024-08-12', '2026-03-31', NULL, '', 1, NULL, NULL, '2024-10-10 15:29:42', '2025-02-17 21:04:40', 37, NULL, 17),
+(32, 'M006453', 'COM34017', 'B1CBA2401801-0', NULL, 'B1CBA2401801-0 Dade', NULL, 'GDOT- Office of Bridges and Structures', '293-SUB04', 73728.00, 1, 'Dade', 0, '', 0, '2024-08-01', '2025-12-31', NULL, '', 1, NULL, NULL, '2024-10-10 18:28:27', '2024-11-25 17:42:11', 29, NULL, 18),
+(33, 'M006156', 'COM34018', '', NULL, 'Slygo Slope Paving', NULL, 'GDOT', '277-SUB11', 58121.00, 1, 'Dade', 0, '', 0, '2024-09-11', '2025-10-11', NULL, '', 1, NULL, NULL, '2024-10-10 19:01:21', '2024-12-02 16:07:14', 29, NULL, 18),
+(34, '403906', 'SESD18022', '', NULL, 'McDonough Parkway Extension', NULL, 'Henry County Georgia', '24-442-010', 622532.00, 0, 'Henry', 0, '', 0, '2024-08-01', '2026-08-27', NULL, '', 1, NULL, NULL, '2024-10-10 19:30:25', '2024-12-02 15:42:57', 38, NULL, 11),
+(35, '0015636', 'TAL20034', '', NULL, 'CR 225 over little Creek', NULL, 'GDOT- Habershame', '24032.06', 33560.00, 0, 'Habersham', 0, '', 0, '2024-09-04', '2025-10-31', NULL, '', 1, NULL, NULL, '2024-10-10 20:30:51', '2024-12-02 13:42:53', 39, NULL, 19),
+(36, '0013894', 'CMES60004', 'B3CBA2401402-0', NULL, 'Intersection Improvement on SR 316 at Cedars Road', NULL, 'GDOT', '24010.12628', 187511.50, 1, 'Gwinnett', 0, '', 1, '2024-04-23', '2025-05-31', NULL, '', 1, NULL, NULL, '2024-10-11 13:00:19', '2024-12-02 15:20:13', 26, NULL, 14),
+(37, '0017130', 'AW42004', '', NULL, 'GDOR I-285 Westbound Auxiliary Lane', NULL, 'GDOT', '222113', 522586.64, 1, 'Fulton', 0, '', 1, '2024-04-16', '2027-04-16', NULL, '', 1, NULL, NULL, '2024-10-16 13:50:47', '2024-12-02 14:38:12', 15, NULL, 8),
+(38, '0013915', 'AW42003', '', NULL, 'I-285/I-20 EAST INTERCHANGE', NULL, 'GDOT', '222108', 2746078.10, 1, 'Dekalb', 0, '', 1, NULL, '2026-06-01', NULL, '', 1, NULL, NULL, '2024-10-16 18:40:46', '2025-02-17 17:20:24', 15, NULL, 2),
+(39, '0017129', 'AW42002', '', NULL, 'I-285 Eastside Bridge Replacements', NULL, 'GDOT', '221063', 733674.00, 1, 'Dekalb', 0, '', 1, NULL, '2025-08-30', NULL, '', 1, NULL, NULL, '2024-10-16 20:00:47', '2025-02-25 18:53:44', 15, NULL, 2),
+(40, 'F.40.15.010', 'AW42001', 'IFB-C-1200348', NULL, 'South Deicing Complex Ramp', NULL, 'City of Atlanta', '220113', 44853.00, 0, 'HJAIA', 0, '', 1, '2022-10-11', '2024-10-18', NULL, '', 1, NULL, NULL, '2024-10-17 12:56:19', '2024-12-02 16:11:44', 15, NULL, 20),
+(41, '0014168', 'AG01008', 'B1CBA2302158-0', NULL, 'SR HEARD COUNTY SR 34 2 BRIDGE REPLACEMENTS', NULL, 'GDOT', '24-191-007', 225755.00, 1, 'HEARD', 0, '', 0, NULL, '2025-01-31', NULL, '', 1, NULL, NULL, '2024-10-17 13:24:28', '2024-12-02 16:54:50', 16, NULL, 21),
+(42, '0015998', 'BP02019', 'B1CBA2302781-1', NULL, 'SR3 (Northside Drive) Widening & Pedestrian Upgrades', NULL, 'GDOT', '320101-01', 387118.31, 1, 'Fulton', 0, '', 1, NULL, '2025-12-31', NULL, '', 1, NULL, NULL, '2024-10-17 14:11:50', '2024-12-02 16:56:35', 17, NULL, 8),
+(43, '0015432', 'BP02018', 'B3CBA2302700-0', NULL, 'SR3 Connector at Upper Riverdale Road, Clayton County', NULL, 'GDOT', '320087-01', 165938.00, 1, 'CLAYTON', 0, '', 0, '2023-10-26', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-10-17 14:38:13', '2025-02-14 17:00:46', 17, NULL, 22),
+(44, '0009967', 'BP02017', 'B1CBA2201350-0', NULL, 'SR 14 & SR41 ROUNDABOUT', NULL, 'GDOT', 'UNKNOWN', 398154.50, 1, 'COWETA', 0, '', 0, '2022-04-26', '2024-03-31', NULL, '', 1, NULL, NULL, '2024-10-17 15:20:47', '2024-12-02 16:29:48', 17, NULL, 23),
+(45, 'N/A', 'BP02016', '22-09', NULL, '22-09 Widening of CP 1344/Valley Hill Road', NULL, 'Clayton County Board of Commissioners', 'Unknown', 566370.75, 0, 'Clayton', 0, '', 0, '2022-04-26', '2024-11-24', NULL, '', 1, NULL, NULL, '2024-10-17 17:34:47', '2025-02-14 15:39:27', 17, NULL, 22),
+(46, '631490', 'AG01007', 'B1CBA2201629-0', NULL, 'VILLA RICA BYPASS', NULL, 'GDOT', '24-186-015', 952473.50, 1, 'CARROLL', 0, '', 1, NULL, '2025-09-30', NULL, '', 1, NULL, NULL, '2024-10-18 17:14:24', '2024-12-02 17:25:32', 16, NULL, 24),
+(47, '0014160', 'AG01006', '', NULL, 'ROGERS BRIDGE @ CHATAHOOCHE RIVER - PEDESTRIAN BRIDGE', NULL, 'CITIES OF DULUTH IN GWINNETT COUNTY AND JOHNS CREEK FULTON COUNTY', '10-217-003', 71911.05, 0, 'GWINNETT & FULTON', 0, '', 0, NULL, '2025-05-18', NULL, '', 1, NULL, NULL, '2024-10-18 18:48:06', '2024-11-08 02:12:37', 16, NULL, 25),
+(48, 'TS-00164', 'AG01005', '', NULL, 'WINDSOR PKWY SIDEWALK', NULL, 'CITY OF SANDY SPRINGS', '20-171-013', 133094.10, 0, 'CITY OF SANDY SPRINGS', 0, '', 0, '0020-04-10', '0024-10-31', NULL, '', 1, NULL, NULL, '2024-10-18 19:41:22', '2024-12-02 17:40:18', 16, NULL, 26),
+(49, '0006700', 'BB27001', 'B3CBA2101501-0', NULL, 'COMPLETION OF EFFINGHAM PARKWAY BEGINNING AT SR 30 AND EXTENDING TO BLUE JAY RD', NULL, 'GDOT', '20001024-SC-001', 221048.92, 1, 'CHATHAM, EFFINGHAM', 0, '', 0, '2022-01-12', '2025-04-30', NULL, '', 1, NULL, NULL, '2024-10-18 20:30:24', '2024-11-25 21:11:30', 18, NULL, 27),
+(50, '00077259 & 522790', 'BB27000', 'B3CBA1701600-0', NULL, 'Jimmy Deloach Parkway Extension from I-16 to SR/26 US 80', NULL, 'GDOT', '2036-SC-002', 503316.80, 1, 'CHATHAM', 0, '', 0, NULL, '2021-10-31', NULL, '', 2, NULL, NULL, '2024-10-21 14:33:38', '2024-12-02 15:36:26', 18, NULL, 28),
+(51, 'PR-IMP-CR710-(65)(32)', 'BAR59011', '21008-1505', NULL, 'DALLAS ACWORTH HWY @FREY ROAD & MT TABOR CHURCH RD INTERSECTION IMPROVEMENT', NULL, 'Paulding County Board of Commissioners', '20-7040-S10', 42404.00, 0, 'PAULDING', 0, '', 0, '2024-07-15', '2024-12-31', NULL, '', 1, NULL, NULL, '2024-10-21 15:29:59', '2024-12-02 14:05:11', 19, NULL, 29),
+(52, '72123', 'BAR59010', '2024-020', NULL, 'EAST CHEROKEE DR. AT MILL CREEK DR. INTERSECTION IMPROVEMENTS #72123', NULL, 'CHEROKEE COUNTY BOARD OF COMMISSIONERS', '24-7024-S3', 358493.00, 0, 'CHEROKEE', 0, '', 0, '2024-05-13', '2024-11-10', NULL, '', 1, NULL, NULL, '2024-10-21 15:57:18', '2024-12-02 14:20:31', 19, NULL, 30),
+(53, '0017698', 'BAR59009', 'B1CBA2302142-0', NULL, 'GDOT CALL 015, 0017698', NULL, 'GDOT', '23-9002-S2', 123528.00, 1, 'GILMER', 0, '', 1, '2023-12-05', '2024-12-31', NULL, '', 1, NULL, NULL, '2024-10-21 18:29:30', '2025-02-19 17:58:48', 19, NULL, 31),
+(54, '0016106', 'BAR59008', 'B1CBA2301905-0', NULL, 'CALL 020 US278/SR6 AT SR100', NULL, 'GDOT', '23-9001-S1', 442795.50, 1, 'POLK', 0, '', 1, NULL, '2025-01-31', NULL, '', 1, NULL, NULL, '2024-10-21 19:14:52', '2024-11-25 19:50:45', 19, NULL, 32),
+(55, '0009901', 'CWM04037', 'B1CBA2101668-0', NULL, '0009901, CONST OF ROUNDABOUT ON I-20/SR402 @ WACO RD- HARALSON COUNTY', NULL, 'GDOT', '12711', 71186.00, 1, 'HARALSON', 0, '', 1, '2021-08-17', '2023-03-03', '2025-02-01', '', 2, NULL, NULL, '2024-10-22 18:22:41', '2025-02-20 15:57:01', 7, NULL, 33),
+(56, '0016105', 'BAR59007', 'B1CBA2202374-0', NULL, 'CHEROKEE CALL 07, 0016105', NULL, 'GDOT', '22-9003-S11', 85811.00, 1, 'CHEROKEE', 0, '', 1, '2023-01-14', '2024-04-30', NULL, '', 1, NULL, NULL, '2024-10-22 18:52:11', '2024-11-25 20:20:29', 19, NULL, 30),
+(57, 'M006324', 'BAR59005', 'B1CBA2202026-0', NULL, 'GDOT, CALL 039, M006324', NULL, 'GDOT', '22-9002-S5', 98740.00, 1, 'POLK', 0, '', 1, '2023-02-02', '2023-05-31', NULL, '', 1, NULL, NULL, '2024-10-22 19:27:08', '2025-02-19 17:56:38', 19, NULL, 32),
+(58, '0013806', 'ERS05069', 'B1CBA2401543-0', NULL, 'US 78 @ NORTH OCONEE', NULL, 'GDOT', '60371', 255519.12, 1, 'CLARKE', 0, '', 1, '2024-06-25', '2026-12-31', NULL, '', 1, NULL, NULL, '2024-10-23 13:36:18', '2024-12-02 17:15:35', 5, NULL, 3),
+(59, '0017771', 'ERS05067', 'B1CBA2401555-0', NULL, 'BARROW - ROBERTSON BRIDGE ROAD', NULL, 'GDOT', '60370', 6967.35, 1, 'BARROW', 0, '', 1, '2024-04-09', '2025-01-31', NULL, '', 1, NULL, NULL, '2024-10-23 14:28:30', '2024-11-25 17:51:01', 5, NULL, 34),
+(60, 'M006361', 'ERS05065', 'B1CBA2302803-0', NULL, 'CLAYTON SR54 RESURFACING', NULL, 'GDOT', '60357', 27210.00, 1, 'CLAYTON', 1, '', 1, '2024-01-30', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-23 14:42:28', '2024-11-25 20:44:47', 5, NULL, 22),
+(61, '0012866', 'ERS05064', '23-184', NULL, 'CR 601/Wheeler Road at CR 124/CR 2157/Robert C. Daniel Parkway', NULL, 'CITY OF AUGUSTA', '50420', 246205.01, 0, 'RICHMOND', 0, '', 0, '2024-10-24', '2024-10-24', NULL, '', 1, NULL, NULL, '2024-10-23 14:55:24', '2024-12-02 13:52:41', 5, NULL, 35),
+(62, '0016122', 'ERS05063', '24001-1501', NULL, 'BURNT HICKORY RD ROUNDABOUT EXT PAULING', NULL, 'PAULING COUNTY', '50419', 220790.00, 0, 'PAULING', 0, '', 0, '2023-10-30', '2026-10-29', NULL, '', 1, NULL, NULL, '2024-10-23 15:28:06', '2024-11-25 19:37:35', 5, NULL, 36),
+(63, '122890', 'ERS05062', 'B1CBA2302237-0', NULL, 'CLARKE ATLANTA HWY INTERCHANGE', NULL, 'GDOT', '60341', 3376213.55, 1, 'CLARKE', 0, '', 1, '2023-10-16', '2027-04-30', NULL, '', 1, NULL, NULL, '2024-10-23 16:04:02', '2024-11-25 20:22:07', 5, NULL, 3),
+(64, 'NA', 'ERS05061', '', NULL, 'JEFFERSPM SR 82 - JETT ROBERTS ROUNDABOUT', NULL, 'CITY OF JEFFERSON', '50418', 395660.12, 0, 'JEFFERSON', 0, '', 0, '2023-08-28', '2024-08-28', NULL, '', 1, NULL, NULL, '2024-10-23 17:40:28', '2025-02-17 16:55:08', 5, NULL, 7),
+(65, '259416', 'ERS05060', '2023010-BID3313', NULL, 'COLUMBIA 2023 TIA RESURFACING GROUP 2', NULL, 'COLUMBIA COUNTY ROADS AND BRIDGES', '50416', 12240.00, 0, 'COLUMBIA', 1, '', 0, '2023-07-25', '2024-01-21', NULL, '', 1, NULL, NULL, '2024-10-23 18:13:56', '2024-11-25 21:04:01', 5, NULL, 37),
+(66, '0015646', 'ERS05058', 'B1CBA2302251-0', NULL, 'DEKALB MERCER UNIV BRIDGE', NULL, 'GDOT', '60334', 88725.53, 1, 'DEKALB', 0, '', 1, '2023-07-18', '2024-12-31', NULL, '', 1, NULL, NULL, '2024-10-23 18:52:53', '2024-12-02 14:09:04', 5, NULL, 2),
+(67, '0013715', 'ERS05057', 'B1CBA2301635-0', NULL, 'CLARKE SR 10 LOOP BRIDGES', NULL, 'GDOT', '60331', 487905.56, 1, 'CLARKE', 0, '', 0, '2023-04-23', '2025-12-31', '2024-10-23', '', 1, NULL, NULL, '2024-10-23 20:27:25', '2025-02-19 18:31:48', 5, NULL, 3),
+(68, '0013603', 'ERS05056', 'B1CBA2301519-0', NULL, 'JASPER SR12 OVER LAKE JACKSON', NULL, 'GDOT', '60328', 85048.32, 1, 'JASPER, NEWTON', 0, '', 1, '0023-04-27', '2025-09-30', NULL, '', 1, NULL, NULL, '2024-10-24 13:24:11', '2025-02-17 16:58:02', 5, NULL, 38),
+(69, '0007535/ F-0831-03/F-1387-19/M-0907-', 'ERS05055', 'BL086-22', NULL, 'EVERMORE NORTH BLVD', NULL, 'GWINNETT COUNTY AP', '50407', 1232898.39, 0, 'GWINNETT', 0, '', 0, '2023-05-08', '2025-09-30', NULL, '', 1, NULL, NULL, '2024-10-24 13:36:15', '2025-02-17 20:48:46', 5, NULL, 14),
+(70, '0015547', 'ERS05054', 'B1CBA2301446-0', NULL, 'GILMER SR 515 NB BRIDGE', NULL, 'GDOT', '60327', 88914.00, 1, 'GILMER', 0, '', 1, '2023-04-09', '2025-03-31', NULL, '', 1, NULL, NULL, '2024-10-24 13:56:48', '2025-02-17 20:11:45', 5, NULL, 31),
+(71, 'M006333', 'ERS05053', 'B1CBA2301482-0', NULL, 'DOUGLAS SR 6 RESURFACING', NULL, 'GDOT', '60326', 6669.60, 1, 'DOUGLAS', 1, '', 1, '2023-04-04', '0024-02-29', NULL, '', 1, NULL, NULL, '2024-10-24 14:28:51', '2024-12-02 14:19:37', 5, NULL, 39),
+(72, '0014167', 'ERS05052', 'B1CBA2202400-0', NULL, 'FANNIN SHALLOWFORD RD BRIDGE', NULL, 'GDOT', '60316', 33165.38, 1, 'FANNIN', 0, '', 1, '2023-03-23', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-10-24 14:57:56', '2024-12-02 14:29:56', 5, NULL, 40),
+(73, '0000411', 'ERS05051', 'B3CBA2201972-0', NULL, 'WALTON MONROE BYPASS', NULL, 'GDOT', '60314', 1193116.01, 1, 'WALTON', 0, '', 1, '2023-03-14', '2025-10-31', NULL, '', 1, NULL, NULL, '2024-10-24 15:24:15', '2024-12-02 17:27:12', 5, NULL, 41),
+(74, 'M006248', 'ERS05050', 'B1CBA2202375-0', NULL, 'SR 138 RESURFACING', NULL, 'GDOT', '60315', 80789.50, 1, 'CLAYTON, HENRY', 1, '', 1, '2023-01-30', '2023-10-31', NULL, '', 1, NULL, NULL, '2024-10-24 16:02:50', '2024-12-02 16:21:26', 5, NULL, 42),
+(75, '0013813', 'ERS05068', 'B1CBA2401581-0', NULL, 'JASPER MONROE SR 83 BRIDGE', NULL, 'GDOT', '60369', 85406.61, 1, 'JASPER, MONROE', 0, '', 1, '2024-06-18', '2026-09-30', NULL, '', 1, NULL, NULL, '2024-10-24 17:53:35', '2025-02-17 17:00:41', 5, NULL, 43),
+(76, '0015543', 'ERS05049', 'B3CBA2202040-1', NULL, 'ELBERT SR 77 BRIDGE OVER COLDWATER CREEK', NULL, 'GDOT', '60319', 66090.57, 1, 'ELBERT', 0, '', 1, '2023-02-22', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-24 18:33:36', '2025-02-17 20:29:12', 5, NULL, 44),
+(77, 'N/A', 'ERS05048', '22-195', NULL, '13TH ST IMPROV & TELFAIR ST IMPROV', NULL, 'CITY OF AUGUSTA', '50400', 2662239.82, 0, 'AUGUSTA', 0, '', 0, '2023-02-23', '2026-10-10', NULL, '', 1, NULL, NULL, '2024-10-28 15:21:59', '2025-02-17 14:37:34', 5, NULL, 45),
+(78, '0014903', 'ERS05047', 'B1CBA2202034-0', NULL, 'MORGAN - I-20 BRIDGES', NULL, 'GDOT', '60309', 4565.50, 0, 'MORGAN', 0, '', 1, '2022-10-17', '2024-04-30', NULL, '', 1, NULL, NULL, '2024-10-28 15:58:22', '2024-10-28 15:59:33', 5, NULL, 46),
+(79, 'N/A', 'ERS05046', '19-197-G', NULL, 'SR 9 @ OXBO ROAD', NULL, 'CITY OF ROSWELL', '50303', 198363.09, 0, 'CITY OF ROSWELL', 0, '', 0, '2022-09-19', '2023-07-01', NULL, '', 2, NULL, NULL, '2024-10-28 17:18:08', '2024-12-02 16:53:54', 5, NULL, 47),
+(80, 'M0006342', 'ERS05045', 'B1CBA2202003-0', NULL, 'SR 100 RESURFACING', NULL, 'GDOT', '60305', 16100.00, 1, 'HARALSON', 1, '', 1, '2022-07-21', '2023-05-31', NULL, '', 1, NULL, NULL, '2024-10-28 17:33:15', '2024-12-02 16:16:05', 5, NULL, 33),
+(81, '0013996', 'ERS05044', 'B1CBA2101553-0', NULL, 'US 29 BRIDGE REPLACEMENT', NULL, 'GDOT', '60273', 38874.00, 1, 'MADISON', 0, '', 1, '2021-07-12', '2023-05-31', NULL, '', 1, NULL, NULL, '2024-10-28 18:21:25', '2024-12-02 17:14:35', 5, NULL, 48),
+(82, '0013942', 'ERS05043', 'B1CBA2201633-0', NULL, 'TROUP - SR 1 BRIDGE OVER LONG CREEK', NULL, 'GDOT', '60298', 62276.00, 1, 'TROUP', 0, '', 1, '2022-06-07', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-29 13:37:40', '2024-12-02 17:10:11', 5, NULL, 49),
+(83, '0008057', 'ERS05042', 'B1CBA2201022-0', NULL, 'WARREN - SR 16 BRIDGE OVER SHORT CREEK', NULL, 'GDOT', '60291', 5700.00, 1, 'WARREN', 0, '', 1, '2022-04-06', '0023-03-31', NULL, '', 2, NULL, NULL, '2024-10-29 13:47:50', '2025-02-14 16:04:02', 5, NULL, 50),
+(84, 'M006283', 'ERS05041', 'B1CBA2201216-0', NULL, 'SR 138 RESURFACING', NULL, 'GDOT', '60293', 225185.00, 1, 'CLAYTON', 1, '', 1, '2022-04-08', '2023-01-23', NULL, '', 1, NULL, NULL, '2024-10-29 14:12:28', '2024-12-02 16:26:28', 5, NULL, 22),
+(85, 'M006284', 'ERS05040', 'B1CBA2201213-0', NULL, 'SR 279 RESURFACING', NULL, 'GDOT', '60295', 58105.00, 1, 'FULTON', 1, '', 1, '2022-04-19', '2023-01-31', NULL, '', 1, NULL, NULL, '2024-10-29 14:21:11', '2024-12-02 16:43:55', 5, NULL, 8),
+(86, '0015689', 'CMES60006', 'B1CBA2402595-0', NULL, 'CONSTRUCTION OF ROUNDABOUT ON SR81 AT NEW MORN DRIVE CR204', NULL, 'GDOT', '24040', 580093.25, 1, 'HENRY', 0, '', 1, '2024-10-25', '2026-08-31', NULL, '', 1, NULL, NULL, '2024-10-29 14:39:10', '2024-11-25 21:19:00', 26, NULL, 11),
+(87, '0004428', 'CMES60002', '20-014', NULL, 'C.R. 817/LEE RD WIDENING AND RECONSTRUCTION', NULL, 'DOUGLAS COUNTY COARD OF COMMISSIONERS', 'CSSTP-0004-00(428)', 2272391.50, 0, 'DOUGLAS', 0, '', 1, '2022-03-12', '2025-11-30', NULL, '', 1, NULL, NULL, '2024-10-29 18:52:10', '2024-11-25 19:44:37', 26, NULL, 39),
+(88, 'NA', 'CMES60001', '', NULL, 'ANVIL BLOCK ROAD PHASE III - CITY OF FOREST PARK', NULL, 'URBAN DEVELOPMENT AGENCY OF CITY OF FOREST PARK', 'NA', 55960.00, 0, 'FOREST PARK', 0, '', 0, '2021-07-07', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-10-29 19:18:27', '2024-10-29 19:20:12', 26, NULL, 51),
+(89, '0013686', 'CMES60000', 'B1CBA2101083-0', NULL, 'DOT Call #006 SR155 @ Panola Rd Roundabout', NULL, 'GDOT', 'na', 264969.50, 1, 'DEKALB, HENRY', 0, '', 1, '2021-04-21', '0022-05-31', NULL, '', 2, NULL, NULL, '2024-10-29 20:33:09', '2024-12-02 14:18:42', 26, NULL, 52),
+(90, '0015318', 'BP02015', 'B1CBA2201876-0', NULL, 'US41 AT NORTH AVENUE REALIGNMENT FULTON ', NULL, 'GDOT', 'NA', 188251.00, 1, 'FULTON', 0, '', 0, '2022-06-30', '2023-08-31', NULL, '', 2, NULL, NULL, '2024-10-30 20:33:36', '2024-12-02 17:16:27', 17, NULL, 8),
+(91, '0017000', 'PC25019', 'B3CBA2101769-0', NULL, 'RABUN COUNTY B3CBA2101769-0', NULL, 'GDOT', '1742', 282403.00, 1, 'RABUN', 0, '', 0, '2021-08-20', '2022-06-30', NULL, '', 2, NULL, NULL, '2024-10-31 13:30:59', '2025-02-17 14:24:15', 12, NULL, 53),
+(92, 'M005099, M001685', 'PC25030', 'B1CBA2202414-1', NULL, 'SR 12 WARREN', NULL, 'GDOT', '1833', 83200.00, 1, 'WARREN', 0, '', 0, '2023-06-01', '2024-03-31', NULL, '', 1, NULL, NULL, '2024-10-31 14:28:25', '2025-02-17 13:59:19', 12, NULL, 50),
+(93, 'M005601', 'PC25029', 'B1CBA2301175-0', NULL, 'NEWTON COUNTY SR 81', NULL, 'GDOT', '1819', 142044.00, 1, 'NEWTON', 0, '', 0, NULL, '2023-12-31', NULL, '', 2, NULL, NULL, '2024-10-31 14:52:48', '2025-01-24 15:12:17', 12, NULL, 54),
+(94, '0013531', 'PC25027', 'B3CBA2202331-0', NULL, 'SR 20 @ I-75 SR 401 HENRY', NULL, 'GDOT', '1813', 2352672.22, 1, 'HENRY', 0, '', 1, '2023-01-06', '2025-05-31', NULL, '', 1, NULL, NULL, '2024-10-31 15:56:17', '2024-12-02 16:30:14', 12, NULL, 11),
+(95, '0003626', 'ERS05076', 'B3CBA2402629-0', NULL, 'SARDIS RD CONNECTOR', NULL, 'GDOT', '60395', 6417925.82, 1, 'HALL', 0, '', 1, '2024-11-01', '2028-09-30', NULL, '', 1, NULL, NULL, '2024-11-01 17:33:42', '2024-12-02 16:05:05', 5, NULL, 13),
+(96, 'M006326', 'PC25026', 'B1CBA2202028-1', NULL, 'SR 10 @ MEMORIAL DRIVE', NULL, 'GDOT', '1807', 101708.00, 1, 'DEKALB', 0, '', 0, '2023-02-07', '2023-10-31', NULL, '', 2, NULL, NULL, '2024-11-04 15:20:12', '2024-12-02 16:13:38', 12, NULL, 2),
+(97, 'M006327', 'PC25025', 'B1CBA2202000-0', NULL, 'SR 236 DEKALB COUNTY', NULL, 'GDOT', '1790', 8100.00, 1, 'DEKALB', 0, '', 0, '2022-11-28', '2023-05-31', NULL, '', 2, NULL, NULL, '2024-11-04 16:13:41', '2024-12-02 16:38:18', 12, NULL, 2),
+(98, 'M006325', 'PC25024', 'B1CBA2201838-0', NULL, 'SR 42 DEKALB FULTON', NULL, 'GDOT', '1787', 66880.00, 1, 'DEKALB, FULTON', 0, '', 0, '2022-06-29', '2023-04-30', NULL, '', 2, NULL, NULL, '2024-11-04 16:38:19', '2024-12-02 16:52:23', 12, NULL, 55),
+(99, 'T-17-0012', 'PC25023', '21-32', NULL, 'ROCKDALE SPLOST 4A ROADWAY', NULL, 'ROCKDALE COUNTY GA', '1787', 401150.00, 0, 'ROCKDALE', 0, '', 0, '2022-04-22', '2022-11-04', NULL, '', 2, NULL, NULL, '2024-11-04 16:58:38', '2024-12-02 15:49:19', 12, NULL, 9),
+(100, '005314', 'PC25021', 'B1CBA2102166-0', NULL, 'I-85 @SR154', NULL, 'GDOT', '1770', 144430.00, 1, 'EAST POINT', 0, '', 0, '2022-02-17', '2022-08-31', NULL, '', 2, NULL, NULL, '2024-11-04 19:20:47', '2024-11-04 19:27:26', 12, NULL, 56),
+(101, 'M006287', 'PC25020', 'B1CBA2200992-0', NULL, 'SR 212 DEKALB COUNTY', NULL, 'GDOT', '1772', 109200.00, 1, 'DEKALB', 1, '', 0, '2022-02-26', '2022-12-31', NULL, '', 2, NULL, NULL, '2024-11-04 19:34:51', '2024-12-02 16:37:20', 12, NULL, 2),
+(102, 'CW 18-05E', 'CWM04103', '24-11', NULL, 'S HOUSTON LAKE ROAD @ SMITHVILLE CHURCH ROAD', NULL, 'HOUSTON COUNTY, GEORGIA', '3154', 86860.00, 0, 'HOUSTON', 0, '', 0, '2024-10-29', '2025-07-26', NULL, '', 1, NULL, NULL, '2024-11-05 15:49:50', '2025-02-14 19:48:50', 7, NULL, 4),
+(103, 'FC-9938-C', 'CWM04101', '', NULL, 'AIRFIELD SHOULDER REPLACEMENT', NULL, 'CITY OF ATLANTA', '162890', 93874.00, 0, 'COBB- HJAIA', 0, '', 0, '2024-09-12', '2024-12-01', NULL, '', 1, NULL, NULL, '2024-11-05 20:05:42', '2024-11-25 17:26:15', 7, NULL, 57),
+(104, '0016618 ', 'CWM04100', '', NULL, 'PI# 0016618 US 280/SR 30 WIDEN & INTRCHNG IMPRV DB, BRYAN', NULL, 'GDOT', '53033', 839460.00, 1, 'BRYAN', 0, '', 0, '2024-06-28', '2026-03-31', NULL, '', 1, NULL, NULL, '2024-11-05 21:23:40', '2024-12-02 15:46:34', 7, NULL, 58),
+(105, '0013886', 'GGC78001', 'B1CBA2302109-1', NULL, 'B1CBA2302109-1: Call:002 Project: 0013886', NULL, 'GDOT', 'NA', 0.00, 1, 'BALDWIN', 0, '', 1, '2024-10-31', '2026-04-30', NULL, '', 1, NULL, NULL, '2024-11-07 14:33:13', '2024-11-25 17:40:25', 40, NULL, 59),
+(106, '0017229', 'GGC78000', 'B3CBA2401794-0', NULL, 'B3CBA2401794-0: Call:013 Project: 0017229 WILKINSON', NULL, 'GDOT', 'na', 61405.00, 1, 'WILKINSON', 0, '', 0, '2024-07-18', '2025-02-28', NULL, '', 1, NULL, NULL, '2024-11-08 13:52:58', '2024-11-08 13:54:15', 40, NULL, 60),
+(107, '0015670, 0016000', 'CWM04098', 'B3CBA2202166-0', NULL, 'US441/SR15 Pedestrian Upgrades & Realign, Banks County', NULL, 'GDOT', '52842', 783718.00, 1, 'BANKS', 0, '', 0, '2024-04-05', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-11-08 14:40:01', '2024-12-02 17:20:11', 7, NULL, 61),
+(108, 'M006377', 'CWM04097', 'B1CBA240144-0', NULL, 'M006377; GDOT #002 SR 1 LOOP; Mill/Inlay/Resurface - Floyd', NULL, 'GDOT', '3067', 13640.00, 1, 'FLOYD', 1, '', 1, '2024-04-27', '2025-01-31', NULL, '', 1, NULL, NULL, '2024-11-08 15:47:28', '2024-12-02 15:39:18', 7, NULL, 62),
+(109, 'tesr', 'test', '', NULL, 'test', NULL, 'test', 'test', 0.00, 0, 'test', 0, '', 0, '2024-11-07', '0024-08-08', NULL, '', 1, NULL, NULL, '2024-11-11 19:52:45', NULL, 14, NULL, 63),
+(110, '0007841', 'ERS05075', 'B1CBA2402591-0', NULL, 'I-85 SR 74 INTERCHANGE', NULL, 'GDOT', '60391', 0.00, 1, 'FULTON', 0, '', 1, '2024-10-07', '2027-10-31', NULL, '', 1, NULL, NULL, '2024-11-13 19:06:05', '2025-02-17 17:10:29', 5, NULL, 8),
+(111, '0013997', 'ERS05038', 'B3CBA2200983-0', NULL, 'SR 281 BRIDGE OVER BROAD RIVER', NULL, 'GDOT', '60292', 16872.00, 1, 'MADISON', 0, '', 1, '2022-03-18', '2024-04-30', NULL, '', 2, NULL, NULL, '2024-11-13 19:13:30', '2024-12-02 16:50:03', 5, NULL, 48),
+(112, '0016841', 'BP02014', 'B1CBA2102133-0', NULL, 'Asbun RD over Trestle creek', NULL, 'GDOT', 'NA', 0.00, 1, 'Carroll', 0, '', 0, '2021-11-23', '2022-10-31', NULL, '', 2, NULL, NULL, '2024-11-13 19:22:32', '2024-11-25 17:36:18', 17, NULL, 24),
+(113, 'M006402', 'REEV50017', '', NULL, 'SR 24 Resurfacing', NULL, 'GDOT', '10338910', 37832.00, 1, 'BURKE', 1, '', 1, '2024-11-15', '2025-08-31', NULL, '', 1, NULL, NULL, '2024-11-22 16:10:08', '2024-12-02 16:42:23', 9, NULL, 64),
+(114, 'PO 590', 'RTS75003', '', NULL, 'BETHANY CHURCH ROAD @ QUINBERY ROAD', NULL, 'RIVERSIDE TRAFFIC SOLUTIONS LLC', '590', 42500.00, 0, 'GWINNETT', 0, '', 0, '2024-11-26', '2025-11-26', NULL, '', 1, NULL, NULL, '2024-11-26 16:37:18', '2024-11-26 16:39:34', 41, NULL, 14),
+(115, 'M005976.02', 'BP02012', 'B1CBA2102122-0', NULL, 'SR42 RESURFACING', NULL, 'GDOT', 'M005976.02', 140440.00, 1, 'FULTON', 1, '', 1, '2021-11-08', '2022-08-21', NULL, '', 1, NULL, NULL, '2024-11-27 20:20:28', '2024-12-02 17:09:09', 17, NULL, 8),
+(116, '0013119', 'BP02011', 'B1CBA2101994-1', NULL, 'HARPER ST & COBB ST IMPROVEMENTS / 0013119', NULL, 'GDOT', '0013119', 30101.50, 1, 'COWETA, FULTON', 0, '', 0, '2021-11-04', '2021-09-17', NULL, '', 1, NULL, NULL, '2024-11-27 20:39:08', '2024-11-27 20:40:51', 17, NULL, 65),
+(117, '0016468', 'BP02009', 'B1CBA2001820-0', NULL, 'I-75@I-85 S. Ramp/#0016468', NULL, 'GDOT', '0016468', 66062.00, 1, 'FULTON', 0, '', 0, '2020-10-13', '2021-10-13', NULL, '', 1, NULL, NULL, '2024-11-27 21:01:39', '2024-12-02 15:13:52', 17, NULL, 8),
+(118, '0018361', 'CWM04096', '', NULL, 'I-20 @ CR 249 Old Mill Rd', NULL, 'GDOT', '163043', 1553290.50, 1, 'Walton, Morgan', 0, '', 1, '2024-01-30', '2025-10-01', NULL, '', 1, NULL, NULL, '2024-12-02 16:08:34', '2024-12-02 16:17:42', 7, NULL, 66),
+(119, 'M006350', 'CWM04095', 'B3CBA2302762-1', NULL, 'M006350; GDOT # 011 SR 22/SR 540 Mill, Inlay & Resurf; Muscogee', NULL, 'GDOT', '3059', 14896.00, 1, 'MUSCOGEE', 1, '', 0, '2024-01-22', '2024-11-30', NULL, '', 1, NULL, NULL, '2024-12-02 16:54:03', '2025-02-17 15:24:45', 7, NULL, 17),
+(120, '0015652', 'CWM04094', 'B1CBA2302714-0', NULL, '0015652; GDOT #019 Gorman Rd Bridge over CSX RR', NULL, 'GDOT', '63054', 134566.00, 1, 'TALBERT', 0, '', 1, '2024-01-15', '2025-07-31', NULL, '', 1, NULL, NULL, '2024-12-02 16:59:13', '2025-02-14 14:45:58', 7, NULL, 67),
+(121, 'M006335', 'CWM04093', 'B1CBA2302786-0', NULL, 'M006335; SR 9 Mill/Inlay/Resurf; Fulton', NULL, 'GDOT', '33052', 59760.00, 1, 'FULTON', 1, '', 1, '2024-01-05', '2024-10-31', NULL, '', 1, NULL, NULL, '2024-12-02 19:34:47', '2024-12-02 19:35:39', 7, NULL, 8),
+(122, 'M006347', 'CWM04092', 'B1CBA2302749-0', NULL, 'M006347 – GDOT #006 SR 5/SR 280 Mill/Inlay/Resurf - Cobb', NULL, 'GDOT', '33035', 37028.00, 1, 'COBB', 1, '', 1, '2023-11-05', '2024-08-31', NULL, '', 1, NULL, NULL, '2024-12-02 19:43:16', '2025-02-17 15:27:49', 7, NULL, 12),
+(123, '0017462, 0019545', 'CWM04089', 'B1CBA2302710-0', NULL, '0017462, 0019545; SR 515 Widen & Trout Restoration; Towns County', NULL, 'GDOT', '13024', 1455411.00, 1, 'TOWNS', 0, '', 1, '2023-09-22', '2026-07-31', NULL, '', 1, NULL, NULL, '2024-12-02 20:00:33', '2025-02-14 15:09:19', 7, NULL, 68),
+(124, '0013921', 'CWM04088', 'B1CBA2302673-0', NULL, '0013921 CONSTR OF A BRIDGE & APPR I-475/SR 408, BIBB', NULL, 'GDOT', '3025', 84155.00, 1, 'BIBB', 0, '', 1, '2023-10-10', '2026-02-28', NULL, '', 1, NULL, NULL, '2024-12-02 20:35:08', '2024-12-02 20:53:05', 7, NULL, 5),
+(125, 'FC-8468', 'CWM04087', '22-02-001', NULL, 'H-JAIA INTERNATIONAL SOUTH DECK PHASE 1', NULL, 'CITY OF ATLANTA', '300220', 54032.00, 0, 'HJAIA', 0, '', 0, '0023-09-20', '2024-09-20', NULL, '', 1, NULL, NULL, '2024-12-02 21:07:17', '2024-12-02 21:10:16', 7, NULL, 20),
+(126, '0017391', 'CWM04086', 'B3CBA2301688-0', NULL, 'INTERSECTION IMPROVEMENTS US341/SR 7', NULL, 'GDOT', '13026', 172576.00, 1, 'PEACH', 0, '', 0, '2023-09-26', '2025-05-31', NULL, '', 1, NULL, NULL, '2024-12-03 13:43:44', '2025-02-06 15:17:46', 7, NULL, 69),
+(127, '0015692', 'CWM04085', 'B1CBA2302125-0', NULL, '0015692, GDOT #004 SR 87 @ Bass/Arkwright Rd Roundabout – Bibb County', NULL, 'GDOT', '13010', 386309.00, 1, 'BIBB', 0, '', 1, NULL, '2025-05-31', NULL, '', 1, NULL, NULL, '2024-12-03 14:22:07', '2025-02-24 21:05:57', 7, NULL, 5),
+(128, '0017219 & 0018363', 'CWM04084', '', NULL, 'US 278, FRONTAGE ROAD DESIGN BUILD, CITY OF MORGAN, CALHOUN', NULL, 'GDOT', '182855', 886202.50, 1, 'WALTON, NEWTON, MORGAN', 0, '', 0, '2022-12-27', '2024-06-01', NULL, '', 1, NULL, NULL, '2024-12-03 14:30:58', '2025-02-14 16:31:33', 7, NULL, 70),
+(129, '0015544', 'CWM04083', 'B1CBA2301256-0', NULL, '0015544; SR 293 Const of Bridge/Approaches over Dykes Ck – Floyd County', NULL, 'GDOT', '12969', 83429.00, 1, 'FLOYD', 0, '', 1, '2023-04-19', '2025-12-31', NULL, '', 1, NULL, NULL, '2024-12-03 14:41:19', '2024-12-03 14:45:20', 7, NULL, 62),
+(130, 'M006330', 'CWM04082', 'B1CBA2301501-0', NULL, 'M006330 MILL, INLAY, RESURFACING SR 120, COBB', NULL, 'GDOT', '2967', 29100.00, 1, 'COBB', 1, '', 1, '2023-04-15', '2024-02-29', NULL, '', 1, NULL, NULL, '2024-12-03 20:51:04', '2024-12-03 20:53:07', 7, NULL, 12),
+(131, 'M006369', 'CWM04081', 'B1CBA2301493-0', NULL, 'M006369, SR 21 Mill/Inlay/Resurf/Shldr Rehab – Effingham County', NULL, 'GDOT', '32968', 19600.00, 1, 'EFFINGHAM', 1, '', 1, '2023-04-21', '2024-02-29', NULL, '', 1, NULL, NULL, '2024-12-03 20:56:50', '2024-12-03 20:57:37', 7, NULL, 71),
+(132, 'M006352', 'CWM04080', 'B1CBA2301491-0', NULL, 'M006352 GDOT003 SR 247 MILL & RESURFACE; BIBB', NULL, 'GDOT', '32965', 35240.00, 1, 'BIBB', 1, '', 0, '2023-04-21', '2024-02-29', NULL, '', 1, NULL, NULL, '2024-12-03 21:07:46', '2024-12-03 21:08:51', 7, NULL, 5),
+(133, 'M006329', 'CWM04079', 'B1CBA2301295-0', NULL, 'M006329; GDOT # 101 - SR 139 Mill/Inlay/Resurf; Fulton County', NULL, 'GDOT', '32952', 26150.00, 1, 'FULTON', 1, '', 1, '2023-04-07', '2024-01-31', NULL, '', 1, NULL, NULL, '2024-12-03 21:19:47', '2024-12-03 21:20:22', 7, NULL, 8),
+(134, 'M005002', 'CWM04078', 'B1CBA2301274-0', NULL, 'M005002, SR 92 Mill/Inlay/Resurf – Spalding County', NULL, 'GDOT', '32953', 90550.00, 1, 'SPALDING', 1, '', 1, '2023-04-05', '2024-01-31', NULL, '', 1, NULL, NULL, '2024-12-03 21:27:37', '2024-12-03 21:28:23', 7, NULL, 72),
+(135, 'M006214', 'CWM04077', 'B1CBA2301115-0', NULL, 'M006214; GDOT #006- SR 26 Mill & Resurfacing; Chatham', NULL, 'GDOT', '32939', 131464.00, 1, 'CHATHAM', 1, '', 1, '2023-03-17', '2023-12-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:00:15', '2025-02-17 15:43:33', 7, NULL, 28),
+(136, 'M0063626', 'CWM04076', 'B1CBA2301127-0', NULL, 'M0063626 MILL, INLAY, RESURAF SR 120, COBB', NULL, 'GDOT', '32940', 48045.00, 1, 'COBB', 1, '', 1, '2023-03-14', '2023-12-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:04:26', '2024-12-04 20:06:07', 7, NULL, 12),
+(137, 'M006102', 'CWM04075', 'B1CBA2202341-0', NULL, 'M006102 - SR 219 Mill/Inlay/Resurf – Muscogee County', NULL, 'GDOT', '62873', 151525.00, 1, 'MUSCOGEE', 1, '', 1, '2023-01-06', '2023-09-30', NULL, '', 1, NULL, NULL, '2024-12-04 20:09:51', '2024-12-04 20:10:25', 7, NULL, 17),
+(138, 'M006328', 'CWM04074', 'B1CBA2202002-1', NULL, 'M006328, SR 139 Mill/Inlay/Resurf/Shldr Rehab – Cobb County', NULL, 'GDOT', '32881', 69316.00, 1, 'COBB', 1, '', 1, '2023-01-12', '2023-10-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:12:58', '2024-12-04 20:14:56', 7, NULL, 12),
+(139, 'M004965', 'CWM04072', '', NULL, 'M004965, SR 92 Mill/Inlay/Resurf/Shldr Rehab – Douglas County', NULL, 'GDOT', '32869', 54360.00, 1, 'DOUGLAS', 1, '', 1, '2022-12-14', '2023-12-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:19:38', '2025-02-17 16:23:39', 7, NULL, 39),
+(140, 'M006353', 'CWM04071', 'B1CBA2301118-1', NULL, 'M006353, US 27/ SR 1 Mill/Inlay/Resurf – Troup County', NULL, 'GDOT', '32985', 4120.00, 1, 'TROUP', 1, '', 1, NULL, '2024-03-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:34:35', '2024-12-04 20:35:04', 7, NULL, 49),
+(141, '0014896', 'CWM04070', 'B1CBA2201358-1', NULL, '0014896; Bass Road – Bridge over NSRR; Bibb County', NULL, 'GDOT', '12878', 193984.00, 1, 'BIBB', 0, '', 1, '2022-12-12', '2024-07-31', NULL, '', 1, NULL, NULL, '2024-12-04 20:37:43', '2025-02-28 19:44:03', 7, NULL, 5),
+(142, 'M006127', 'CWM04068', 'B1CBA2102153-0', NULL, 'M006127 RESURFACING & SHOULDER REHAB, FRANKLIN', NULL, 'GDOT', '32579', 48900.00, 1, 'FRANKLIN', 1, '', 1, '2022-10-31', '2023-10-31', NULL, '', 1, NULL, NULL, '2024-12-04 21:17:14', '2024-12-04 21:24:37', 7, NULL, 73),
+(143, 'M006499', 'CWM04104', 'B3CBA2402654-0', NULL, 'M006499 MILL, INLAY, RESURF SR 20/SR 81, HENRY', NULL, 'GDOT', '3161', 120800.00, 1, 'HENRY', 1, '', 0, '2024-11-19', '2025-08-31', NULL, '', 1, NULL, NULL, '2024-12-11 15:35:47', '2024-12-11 18:43:07', 7, NULL, 11),
+(144, '0017812', 'ERS05077', '2428-B', NULL, 'FAYETTE COUNTY 2025 RESURFACING', NULL, 'FAYETTE COUNTY', '50454', 78920.00, 0, 'FAYETTE', 1, '', 0, '2024-12-03', '2025-07-01', NULL, '', 1, NULL, NULL, '2024-12-11 19:01:00', '2025-01-09 19:27:14', 5, NULL, 74),
+(145, '0019451', 'CWM04106', '', NULL, 'I-16 at Old Cuyler Road New Interchange', NULL, 'GDOT', '163138', 2310914.00, 1, 'Bryan', 0, '', 0, '2024-12-19', '2027-07-01', NULL, '', 1, NULL, NULL, '2025-01-07 21:08:12', '2025-01-24 21:31:23', 7, NULL, 58),
+(146, 'M006549', 'REEV50018', 'B1CBA2402656-0', NULL, 'M006549 LIBERTY COUNTY, US84/SR 38 RESURFACE', NULL, 'GDOT', '10339339', 68420.00, 1, 'LIBERTY', 1, '', 1, '2024-12-19', '2025-08-31', NULL, '', 1, NULL, NULL, '2025-01-08 14:22:54', '2025-02-28 13:52:57', 9, NULL, 75),
+(147, '23-234', 'REEV50016', 'NA', NULL, 'DENNIS ROAD IMPROVEMENT PROJECT', NULL, 'CITY OF AUGUSTA - RICHMOND COUNTY GA', '10321224', 383681.00, 0, 'AUGUSTA', 0, '', 0, '2024-06-21', '2025-07-21', NULL, '', 1, NULL, NULL, '2025-01-08 14:50:48', '2025-01-08 14:52:53', 9, NULL, 45),
+(148, '262027', 'REEV50015', 'B3TIS2401124-1', NULL, 'LAURENS E CHEROKEE @ MILL CREEK', NULL, 'GDOT', '10319628', 1878238.20, 1, 'LAURENS', 0, '', 0, '2024-04-10', '2027-01-31', NULL, '', 1, NULL, NULL, '2025-01-08 20:54:15', '2025-01-08 20:58:14', 9, NULL, 76),
+(149, '0012575', 'REEV50014', 'B37TIA1902082-0', NULL, 'SR 56 - US 25 Bypass to Cates Mead Rd. (CR-54) Widening', NULL, 'FIDELITY & DEPOSIT COMPANYOF MARYLAND (SURETY FOR GDOT)', '10321452', 170008.42, 1, 'BURKE', 0, '', 0, '2024-04-06', '0024-12-30', NULL, '', 1, NULL, NULL, '2025-01-08 21:14:02', '2025-01-08 21:15:03', 9, NULL, 64),
+(150, '23-183', 'REEV50012', '23-183', NULL, 'RFP # 23-183 –CR 1502 / Barton Chapel Road at SR 10 / US 78', NULL, 'CITY OF AUGUSTA, RICHMOND COUNTY', '10321150', 332685.00, 0, 'RICHMOND', 0, '', 0, '2024-04-17', '2025-07-05', NULL, '', 1, NULL, NULL, '2025-01-08 21:21:06', '2025-01-08 21:24:07', 9, NULL, 35),
+(151, 'M005288', 'REEV50011', 'B1CBA2302748-0', NULL, 'RESURFACING SR 292 BEGINNING SOUTH OF WASHINGTONSTREET AND EXTENDING TO THE EVANS COUNTY LINE', NULL, 'GDOT', '1962871', 35050.00, 1, 'TATTNALL, TOOMBS', 1, '', 0, '2024-04-09', '2024-08-31', NULL, '', 1, NULL, NULL, '2025-01-08 22:24:35', '2025-01-08 22:25:40', 9, NULL, 77),
+(152, 'M006403', 'REEV50010', 'B1CBA2302796-0', NULL, 'M006403 - SR 24 RESURFACING JEFFERSON COUNTY', NULL, 'GDOT', '10315299', 32400.00, 1, 'JEFFERSON', 1, '', 1, '2024-02-05', '2024-10-31', NULL, '', 1, NULL, NULL, '2025-01-08 22:28:13', '2025-01-08 22:30:21', 9, NULL, 7),
+(153, '0016117', 'REEV50009', 'B1CBA2301907-0', NULL, 'ROUNDABOUT ON SR247 CONN AT HOUSERS MILLER RD', NULL, 'GDOT', '10302434', 337579.00, 1, 'PEACH', 0, '', 0, '2023-07-17', '2024-08-31', NULL, '', 1, NULL, NULL, '2025-01-08 22:40:40', '2025-01-08 22:46:38', 9, NULL, 69),
+(154, 'M006366', 'REEV50008', 'B1CBA2301159-0', NULL, 'M006366 SR 121 RESURFACING RICHMOND COUNTY', NULL, 'GDOT', '10295583', 24400.00, 1, 'RICHMOND', 1, '', 0, '2023-04-03', '2023-12-31', NULL, '', 2, NULL, NULL, '2025-01-08 22:49:59', '2025-01-08 22:50:51', 9, NULL, 35),
+(155, 'M006216', 'REEV50007', 'B1CBA2301287-0', NULL, 'M006216 CHATHAM COUNTY SR 204 RESURFACE', NULL, 'GDOT', '10294928', 23750.00, 1, 'CHATHAM', 1, '', 1, '2023-04-13', '0024-01-31', NULL, '', 2, NULL, NULL, '2025-01-09 01:35:10', '2025-02-17 15:42:13', 9, NULL, 28),
+(156, 'M006367', 'REEV50006', 'B1CBA2202431-0', NULL, 'RESURFACING JEFFERSON STREET', NULL, 'GDOT', '10292733', 2848.00, 1, 'LAURENS', 1, '', 0, '2023-02-07', '2023-11-30', NULL, '', 2, NULL, NULL, '2025-01-09 02:52:39', '2025-02-14 16:11:02', 9, NULL, 76),
+(157, 'M006219', 'REEV50005', 'B1CBA2202355-0', NULL, 'SR 67 BYPSS RESURFACING', NULL, 'GDOT', '1634786', 68626.00, 1, 'BULLOCH', 1, '', 0, '2023-01-31', '2023-09-30', NULL, '', 2, NULL, NULL, '2025-01-09 02:56:39', '2025-01-09 03:02:26', 9, NULL, 78),
+(158, '0013727', 'REEV50004', '', NULL, 'SR 307/DEAN FOREST RD @ I-16 DDI Project', NULL, 'GDOT', '1636754', 1220101.00, 1, 'CHATHAM', 0, '', 0, '2023-01-24', '2023-12-30', NULL, '', 2, NULL, NULL, '2025-01-09 03:14:42', '2025-01-09 03:47:54', 9, NULL, 28),
+(159, '0016111', 'REEV50003', 'B1CBA2101546-0', NULL, 'ROUNDABOUT US 129/SR247', NULL, 'GDOT', '10253712', 199491.50, 1, 'HOUSTON', 0, '', 0, '2021-06-30', '2022-07-31', NULL, '', 2, NULL, NULL, '2025-01-09 13:49:46', '2025-01-09 13:54:30', 9, NULL, 4),
+(160, 'M005590', 'REEV50002', 'B1CBA2100828-0', NULL, 'US 441/S 29 RESURFACING AND REHABILITATION', NULL, 'GDOT', '10243890', 45828.00, 1, 'WILKINSON', 1, '', 0, '2021-04-23', '2021-12-31', NULL, '', 2, NULL, NULL, '2025-01-09 14:07:12', '2025-02-14 16:23:31', 9, NULL, 60),
+(161, '0010121', 'AL22014', 'B1CBA1701424-0', '18 TRAFFIC', '18 TRAFFIC SIGNAL UPGRADES', NULL, 'GDOT', '1551707', 194000.00, 1, 'DOUGHERTY', 0, '', 0, '2020-12-10', '2021-12-10', NULL, '', 2, NULL, NULL, '2025-01-09 16:09:56', '2025-04-16 01:28:20', 14, NULL, 79),
+(162, '0013214', 'AL22010', 'B1CBA1900832-0', NULL, '0013214 FULTON COUNTY', NULL, 'GDOT', 'NA', 10400.00, 1, 'FULTON', 0, '', 0, '2020-06-04', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-01-09 16:34:06', '2025-01-09 17:04:22', 14, NULL, 8),
+(163, 'NA', 'AL22009', '', NULL, 'SIGNAL UPGRADES @MARIETTA BLVD', NULL, 'GDOT', '1551521-09', 121336.00, 1, 'CITY OF ATLANTA', 0, '', 0, '2019-09-16', '2020-09-16', NULL, '', 2, NULL, NULL, '2025-01-09 18:43:59', '2025-01-09 19:07:22', 14, NULL, 80),
+(164, 'NA', 'AL22006', '', NULL, '1 TRAFFIC SIGNAL UPGRADE', NULL, 'ALS', '1551802', 29800.00, 0, 'CHATHAM', 0, '', 0, '2019-01-18', '2020-01-18', NULL, '', 2, NULL, NULL, '2025-01-09 19:10:44', '2025-02-14 15:18:37', 14, NULL, 28),
+(165, '0012846', 'AL22005', 'B1CBA1701581-0', NULL, '15 TRAFFIC SIGNAL UPGRADES', NULL, 'GDOT', '1551719', 429330.00, 1, 'LOWNDES', 0, '', 1, '2019-01-18', '2020-01-18', NULL, '', 2, NULL, NULL, '2025-01-09 19:14:03', '2025-02-14 15:26:08', 14, NULL, 81),
+(166, 'S014943', 'AL22004', '', NULL, 'INSTALL HAWK CROSSWALK SYSTEM', NULL, 'GDOT', '1551803', 21700.00, 1, 'CHATHAM', 0, '', 0, '2019-01-19', '2020-01-19', NULL, '', 2, NULL, NULL, '2025-01-09 19:42:38', '2025-01-09 19:53:18', 14, NULL, 28),
+(167, 'FC-8552', 'AL22003', '', NULL, 'FULTON COUNTY 11551521-10', NULL, 'ALS', '1551521-10', 43800.00, 0, 'FULTON', 0, '', 0, '2018-02-09', '2019-02-09', NULL, '', 2, NULL, NULL, '2025-01-09 19:57:34', '2025-01-09 20:00:21', 14, NULL, 8),
+(168, '0012672', 'AL22002', 'B1CBA1700726-0', NULL, 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN BA', NULL, 'GDOT', '1551701', 182140.00, 1, 'BARROW', 0, '', 0, '2018-03-17', '2019-03-17', NULL, '', 2, NULL, NULL, '2025-01-09 20:03:09', '2025-01-09 20:05:05', 14, NULL, 34),
+(169, '0012669', 'AL22001', 'B1CBA1700765-0', NULL, 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS AT CH', NULL, 'GDOT', '1551703', 236100.00, 1, 'CHEROKEE', 0, '', 1, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-09 20:06:31', '2025-01-09 20:15:34', 14, NULL, 30),
+(170, '0012673', 'AL22000', '', NULL, 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', NULL, 'GDOT', '1551704', 146960.00, 1, 'ROCKDA', 0, '', 0, '2018-03-17', '2019-03-17', NULL, '', 2, NULL, NULL, '2025-01-09 20:21:13', '2025-02-14 16:41:25', 14, NULL, 82),
+(171, 'M005779', 'APAC47000', 'B3CBA1902085-0', NULL, 'SCREVEN COUNTY M005779', NULL, 'GDOT', 'M005779', 11520.00, 1, 'SCREVEN', 0, '', 0, '2020-03-23', '2020-10-31', NULL, '', 2, NULL, NULL, '2025-01-09 20:53:18', '2025-01-09 21:11:13', 13, NULL, 83),
+(172, '118250101', 'APAC47001', '', NULL, 'STILES AVENUE - CITY OF SAVANNAH (AECOM)', NULL, 'APAC - ATLANTIC INC', '765072', 256315.00, 1, 'CITY OF SAVANNAH', 0, '', 1, '2021-10-20', '2022-10-20', NULL, '', 2, NULL, NULL, '2025-01-09 21:06:12', '2025-01-09 21:08:02', 13, NULL, 84),
+(173, 'TE-709-03', 'APAC47002', '', NULL, 'GWINNETT STREET WIDENING', NULL, 'CITY OF SAVANNAH', '765067', 362749.00, 0, 'CITY OF SAVANNAH', 0, '', 0, '2022-02-21', '2023-02-21', NULL, '', 2, NULL, NULL, '2025-01-10 13:26:42', '2025-01-10 13:34:37', 13, NULL, 84),
+(174, '21-0149-4', 'APAC47003', '', NULL, '2021 wILMINGTON IS ROAD SAFETY ENCHANMENTS & LANSING AVENUE / CENTRAL AVENUE', NULL, 'CHATHAM COUNTY', '765096', 54775.00, 0, 'CHATHAM', 0, '', 0, '2022-04-19', '2022-07-30', NULL, '', 2, NULL, NULL, '2025-01-10 13:39:40', '2025-01-10 13:46:19', 13, NULL, 28),
+(175, '19-LD-089', 'APAC47004', '', NULL, 'OP544 AREA SURFACE LOT', NULL, 'CITY OF SAVANNAH', '765083', 165744.00, 0, 'CITY OF SAVANNAH', 0, '', 0, '2022-06-06', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-01-10 13:53:39', '2025-01-10 13:59:22', 13, NULL, 84),
+(176, 'M006212', 'APAC47005', 'B1CBA2201842-0', NULL, 'M006212 – Rehab beginning SR 119 N of Airport Rd & extending S of SR144 – Liberty County', NULL, 'GDOT', '765098', 66900.00, 1, 'LIBERTY', 0, '', 1, '2022-08-23', '2023-04-30', NULL, '', 1, NULL, NULL, '2025-01-10 14:04:37', '2025-01-10 14:05:27', 13, NULL, 75),
+(177, '371150', 'BP02008', 'B1CBA20011860-0', NULL, 'FORTUNE HOLE RD OVER WILLIAMS CREEK', NULL, 'GDOT', '2BA150', 33152.00, 1, 'HARRIS', 0, '', 1, '2020-08-28', '2021-06-30', NULL, '', 2, NULL, NULL, '2025-01-10 14:42:32', '2025-01-10 14:43:40', 17, NULL, 85),
+(178, '0013175', 'BP02007', 'B1CBA1900848-0', NULL, '0013175 hIGHWAY CONSTRUCTION', NULL, 'GDOT', '0013175', 135863.00, 1, 'DEKALB', 0, '', 0, '2019-07-30', '2020-06-30', NULL, '', 2, NULL, NULL, '2025-01-10 14:50:42', '2025-01-10 15:04:50', 17, NULL, 2),
+(179, 'GA20160259', 'BP02006', '', NULL, 'HIGHWAY GA20160259', NULL, 'GDOT', 'GA20160259', 148055.00, 1, 'COBB', 0, '', 0, '2019-08-26', '2019-11-30', NULL, '', 2, NULL, NULL, '2025-01-10 15:20:12', '2025-01-10 15:24:29', 17, NULL, 12),
+(180, '0010941', 'BP02005', 'B1CBA1701576-0', NULL, '0010941 CAMPBELLTON', NULL, 'GDOT', '0010941', 138410.00, 1, 'CAMPBELLTON', 0, '', 0, '2017-06-30', '2019-06-30', NULL, '', 2, NULL, NULL, '2025-01-10 15:29:32', '2025-01-10 15:39:09', 17, NULL, 86),
+(181, 'CSHPP-0007-00(313)', 'BP02004', 'B15040-15-000-0', NULL, 'CRABAPPLE CSHPP-0007-00(313)', NULL, 'GDOT', 'CSHPP-0007-00(313)', 561176.00, 1, 'FULTON', 0, '', 0, '2016-02-18', '2018-02-18', NULL, '', 2, NULL, NULL, '2025-01-10 15:49:21', '2025-01-10 16:06:42', 17, NULL, 8),
+(182, '0010419', 'BP02003', 'B14881-15-000-0', NULL, '0010419 FULTON', NULL, 'GDOT', '0010419', 322229.00, 1, 'FULTON', 0, '', 0, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-10 16:41:45', '2025-02-10 20:45:16', 17, NULL, 8),
+(183, 'B14793-14-000-0', 'BP02001', '', NULL, 'BRIDGE AND APPROACHEDS ON SR 372 OVER ETOWAH RIVER', NULL, 'GDOT', 'B14793-14-000-0', 82359.00, 1, 'CHEROKEE', 0, '', 0, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-10 17:07:00', '2025-01-10 17:17:49', 17, NULL, 30),
+(184, '0012832', 'BP02000', 'B1CBA1600600-0', NULL, '0012832 CAMPCREEK', NULL, 'GDOT', '0012832', 62500.00, 1, 'FULTON', 0, '', 0, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, '2025-01-10 17:19:54', '2025-01-10 17:21:27', 17, NULL, 8),
+(185, 'M005999', 'BAR59000', 'B1CBA2100998-0', NULL, 'M005999 GORDON DETECTABLE WARNING SURFACE', NULL, 'GDOT', '21-9002-S2', 8050.00, 1, 'GORDON', 0, '', 0, '2021-05-25', '2022-01-31', NULL, '', 2, NULL, NULL, '2025-01-15 13:55:59', '2025-01-15 13:57:59', 19, NULL, 87),
+(186, '0062097', 'BAR59003', '2022-038', NULL, 'BELLS FERRY ROAD & VICTORY DRIVE', NULL, 'BARTOW PAVING', '22-7010-S3', 127983.00, 0, 'CHEROKEE', 0, '', 0, '2022-03-31', '2022-12-26', NULL, '', 2, NULL, NULL, '2025-01-15 14:00:44', '2025-01-15 14:04:22', 19, NULL, 30),
+(187, 'NA', 'BEA36002', 'NA', NULL, 'TOBACCO ROAD INTERSECTION IMPROVEMENTS AT ZEMULA DRIVE', NULL, 'BEAM\'S CONTRACTING, INC', 'NA', 34398.00, 0, 'Augusta-Richmond', 0, '', 0, '2024-08-15', '2024-08-15', NULL, '', 1, NULL, NULL, '2025-01-15 14:12:33', '2025-02-14 16:49:41', 20, NULL, 88),
+(188, 'M006242', 'BEA36001', 'B3CBA2302354-0', NULL, 'US 25 / SR 121 RESURFACING - RICHMOND COUNTY', NULL, 'GDOT', '23430', 3936.00, 1, 'RICHMOND', 1, '', 0, '2023-10-10', '2024-08-31', NULL, '', 1, NULL, NULL, '2025-01-15 14:42:07', '2025-01-15 14:42:36', 20, NULL, 35),
+(189, '220680', 'BEA36000', 'B3TIA1901746-0', NULL, '220680 RICHMOND', NULL, 'GDOT', '220680', 622945.25, 1, 'RICHMOND', 0, '', 0, '2022-03-22', '2022-06-30', NULL, '', 2, NULL, NULL, '2025-01-15 14:44:59', '2025-01-15 14:58:51', 20, NULL, 35),
+(190, 'SP2009-03', 'BMK33000', '18-18', NULL, 'NE SENIOR CENTER', NULL, 'BM&K CONSTRUCTION & ENGINEERING', '18-18', 92874.51, 0, 'CLAYTON', 0, '', 0, '2021-06-16', '2022-06-16', NULL, '', 2, NULL, NULL, '2025-01-15 15:12:04', '2025-01-15 15:24:12', 21, NULL, 22),
+(191, 'EEXK3900', 'BG390001', '', NULL, 'Wallace Dam Forebay Oxygenation SysteM', NULL, 'GEOGIA POWER COMPANY', '25679-103', 17346.00, 0, 'EATONTON', 0, '', 0, '2021-09-01', '2022-09-01', NULL, '', 2, NULL, NULL, '2025-01-15 16:00:16', '2025-01-15 16:13:25', 22, NULL, 89),
+(192, '0016092', 'BBH26021', '', NULL, '0016092 SR 282 & MADDOX DR', NULL, 'BROOKS BERRY HAYNIE & ASSOCIATES', '13291', 36034.00, 0, 'GILMER', 0, '', 0, '2023-02-22', '2024-02-22', NULL, '', 1, NULL, NULL, '2025-01-15 16:28:51', '2025-01-15 16:31:21', 23, NULL, 31),
+(193, 'NA', 'BBH26015', 'OCR-Z2-1031', NULL, 'OCR - 280 S INT IMPROVEMENTS', NULL, 'BROOKS BERRY HAYNIE & ASSOCIATES', 'OCR-Z2-1031', 11930.00, 0, 'COBB', 0, '', 0, '2020-07-31', '2020-10-01', NULL, '', 2, NULL, NULL, '2025-01-15 16:40:37', '2025-01-15 16:55:00', 23, NULL, 12),
+(194, 'OCR-D6-2122', 'BBH26013', '', NULL, 'SR20 @ CHATEU RD/DODD BLVD ROME', NULL, 'GDOT', 'OCR-D6-2122', 24600.00, 1, 'ROME', 0, '', 0, '2021-11-10', '2022-11-10', NULL, '', 2, NULL, NULL, '2025-01-15 20:32:10', '2025-02-14 17:02:08', 23, NULL, 90),
+(195, 'S015357', 'BBH26009', '', NULL, 'SR 49 @ SR 29 HAWK SIGNAL', NULL, 'GDOT', '14116.010354', 41353.00, 1, 'BALDWIN', 0, '', 0, '2020-07-07', '2021-07-07', NULL, '', 2, NULL, NULL, '2025-01-16 00:47:02', '2025-01-16 00:58:32', 23, NULL, 59),
+(196, '14116', 'BBH26005', '', NULL, '14116 ATLANTA', NULL, 'GDOT', '14116.010354', 41353.00, 1, 'BALDWIN', 0, '', 0, '2020-07-31', '2021-07-31', NULL, '', 2, NULL, NULL, '2025-01-16 13:39:17', '2025-01-16 13:48:58', 23, NULL, 59),
+(197, '0012825', 'BBH26004', 'B1CBA1901323-0', NULL, '0012825 FULTON TRAFFIC SIGNALS', NULL, 'GDOT', '0012825', 274925.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-07', NULL, '', 2, NULL, NULL, '2025-01-16 13:55:14', '2025-01-16 13:59:35', 23, NULL, 8),
+(198, '0013214', 'BBH26003', 'B1CBA1900832-0', NULL, 'FULTON INTERSECTIONS', NULL, 'GDOT', '0013214', 10400.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-01-16 14:04:48', '2025-01-16 14:06:32', 23, NULL, 8),
+(199, '0013198', 'BBH26002', 'B1CBA1801391-0', NULL, '0013198 MORGAN, NEWTON', NULL, 'GDOT', '0013198', 233960.00, 1, 'MORGAN, NEWTON', 0, '', 0, '2019-05-21', '2019-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 14:08:17', '2025-01-16 14:10:26', 23, NULL, 91);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
+(200, '0012678', 'BBH26000', 'B1CBA1701307-0', NULL, '0012678 ROCKDALE', NULL, 'GDOT', '0012678', 113910.00, 1, 'ROCKDALE', 0, '', 0, '2018-07-16', '2019-07-16', NULL, '', 2, NULL, NULL, '2025-01-16 14:37:15', '2025-01-16 14:48:27', 23, NULL, 9),
+(201, '222150', 'CHP03009', 'B3TIA1902031-0', NULL, 'US 221 / US 1 / SR 4', NULL, 'GDOT', 'A. 401', 1254551.00, 1, 'JEFFERSON', 0, '', 1, '2020-02-12', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:15:06', '2025-02-14 16:38:03', 24, NULL, 7),
+(202, '0011377', 'CHP03010', 'B3TIA2002302-0', NULL, '0011377 LINCOLN', NULL, 'GDOT', '0011377', 22050.00, 1, 'LINCOLN', 0, '', 0, '2020-10-16', '0022-04-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:37:29', '2025-01-16 15:38:12', 24, NULL, 92),
+(203, 'M006053', 'CHO03011', 'B1CBA2101131-0', NULL, 'M006053 SCREVEN', NULL, 'GDOT', 'M006053', 6600.00, 1, 'SCREVEN', 0, '', 0, '2021-05-12', '2022-02-08', NULL, '', 2, NULL, NULL, '2025-01-16 15:42:25', '2025-01-16 15:43:38', 24, NULL, 83),
+(204, 'M006133', 'CHP03012', 'B1CBA2101544-0', NULL, 'JEFFERSON M006133', NULL, 'GDOT', 'M006133', 15120.00, 1, 'JEFFERSON', 0, '', 0, '2021-07-06', '2022-04-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:45:01', '2025-01-16 15:53:30', 24, NULL, 7),
+(205, '0015609', 'CSC70004', 'B1CBA2302114-0', NULL, 'Project #0015609, Bridge and Approaches on Harbins Rd/Patrick Mill over Apalachee River', NULL, 'GDOT', '0015609', 5171.00, 1, 'BARROW, GWINNETT', 0, '', 0, '2024-05-21', '2024-07-31', NULL, '', 2, NULL, NULL, '2025-01-16 15:58:53', '2025-01-16 16:33:30', 25, NULL, 93),
+(206, '0015568', 'CSC70003', 'B1CBA2302273-0', NULL, 'Project #0015568, Bridge and Approaches on SR 83 over Polecat Creek', NULL, 'GDOT', '0015568', 106114.00, 1, 'WALTON', 0, '', 0, '2023-11-09', '2024-05-31', NULL, '', 2, NULL, NULL, '2025-01-16 16:08:19', '2025-01-16 16:18:49', 25, NULL, 41),
+(207, '0017780', 'CSC70002', 'B1CBA2302153-0', NULL, 'Project #0017780, Bridges and Approaches Garretts Ferry Rd. over Chattahoochee River Tributary', NULL, 'GDOT', '0017780', 95687.00, 1, 'FULTON', 0, '', 0, '2023-09-25', '2024-06-30', NULL, '', 2, NULL, NULL, '2025-01-16 16:41:20', '2025-02-17 14:28:11', 25, NULL, 8),
+(208, '0013991', 'CSC70001', 'B1CBA2201976-0', NULL, 'PI #0013991, SR 42 / Briarcliff Road at Southfork Peachtree Creek Bridge Replacement', NULL, 'GDOT', '0013991', 89006.00, 1, 'DEKALB', 0, '', 0, '2023-05-15', '2024-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 16:53:03', '2025-01-16 16:55:33', 25, NULL, 2),
+(209, '0015097', 'CSC70000', '22-11', NULL, 'PI #0015097, CR 511 / Brown Bridge Road at Snapping Shoals Creek including Realignment and Bridge Replacement', NULL, 'GDOT', '0015097', 55380.00, 1, 'NEWTON', 0, '', 0, '2023-02-15', '2025-02-14', NULL, '', 1, NULL, NULL, '2025-01-16 16:57:13', '2025-01-16 16:57:40', 25, NULL, 54),
+(210, '0015687', 'CWM04107', 'B1CBA2402674-0', NULL, 'CONSTRUCTION OF A ROUNDABOUT SR 1', NULL, 'GDOT', '3169', 607329.00, 1, 'CHATTAHOOCHEE', 0, '', 1, '2025-01-10', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-01-16 19:06:41', '2025-01-31 21:24:09', 7, NULL, 94),
+(211, 'M006405 ', 'REEV50019', 'B1CBA2402750-0', NULL, 'M006405 resurfacing and shoulder rehab on SR 199 from I-16 SR 404 to SR 29', NULL, 'GDOT', '10340206', 12300.00, 1, 'LAURENS', 0, '', 0, '2025-01-10', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-01-16 19:52:06', '2025-02-13 14:22:26', 9, NULL, 76),
+(212, 'M005791', 'COLD40000', 'B1CBA1901691-0', NULL, 'M005791 GLIMMER', NULL, 'GDOT', 'M005791', 7000.00, 1, 'GILMER', 0, '', 0, '2019-06-26', '2020-12-15', NULL, '', 2, NULL, NULL, '2025-01-16 20:28:33', '2025-01-16 20:30:32', 35, NULL, 31),
+(213, 'DNR-462-492-88276', 'COLD40001', '', NULL, 'TALLULAH FALLS STATE PARK VISITOR CENTER', NULL, 'GEORGIA DNR', '1132020', 18028.00, 0, 'TALLULAH FALLS', 0, '', 0, '2020-02-24', '2022-02-24', NULL, '', 2, NULL, NULL, '2025-01-16 21:50:26', '2025-01-16 21:52:15', 35, NULL, 95),
+(214, '5272024', 'COLD40002', '', NULL, 'CITY OF BLUE RIDGE', NULL, 'CITY OF BLUE RIDGE', '5272024', 25784.00, 0, 'FANNIN COUNTY', 0, '', 0, '2021-05-28', '2022-05-28', NULL, '', 2, NULL, NULL, '2025-01-16 22:00:09', '2025-01-16 22:12:11', 35, NULL, 96),
+(215, '0010677', 'CCC38000', '6616015', NULL, 'CS 562 / WEST MAIN ST FROM CS 571 CITY OF BLUE RIDGE', NULL, 'CITY OF BLUE RIDGE', '0010677', 110428.00, 0, 'FANNIN COUNTY', 0, '', 0, '2019-10-03', '2020-01-31', NULL, '', 2, NULL, NULL, '2025-01-16 23:02:38', '2025-01-16 23:11:11', 28, NULL, 96),
+(216, '0010688', 'CCC38001', '', NULL, 'CITY OF YOUNG HARRIS WALKER STREET SIDEWALK PROJECT', NULL, 'GDOT', '0010688', 58871.00, 0, 'TOWNS', 0, '', 0, '2019-08-30', '2020-02-26', NULL, '', 2, NULL, NULL, '2025-01-16 23:21:50', '2025-01-16 23:23:46', 28, NULL, 68),
+(217, '17-002/01-21', 'CCC38002', '00100', NULL, 'DOWNTOWN PARK IMPROVEMENTS FINAL PHASE', NULL, 'COLWELL CONSTRUCTION COMPANY', '17-002/01-21', 46025.20, 0, 'CITY OF BALDWIN', 0, '', 0, '2021-08-04', '2022-12-02', NULL, '', 2, NULL, NULL, '2025-01-16 23:36:30', '2025-01-17 01:01:47', 28, NULL, 97),
+(218, 'M006344', 'COM34016', 'B1CBA2302539-0', NULL, 'M006344 MORGAN, OGLETHORPE', NULL, 'GDOT', '290-SUB06', 12400.00, 1, 'MORGAN, OGLETHORPE', 0, '', 0, '2024-03-05', '2025-03-31', NULL, '', 1, NULL, NULL, '2025-01-17 01:12:18', '2025-01-17 20:19:47', 29, NULL, 98),
+(219, '48400-DOT0002823', 'COM34014', '48400-DOT0002823', NULL, 'ITB Morgan Co - SR 83 - App Slab', NULL, 'GDOT', '287-SUB03', 41300.00, 1, 'MORGAN', 0, '', 0, '2023-10-11', '2023-10-21', NULL, '', 2, NULL, NULL, '2025-01-17 01:29:46', '2025-01-17 01:30:43', 29, NULL, 46),
+(220, 'M006263', 'COM34013', 'B1CBA2302471-0', NULL, 'M006263 BRIDGE REHABILIATION', NULL, 'GDOT', '289-SUB09', 23438.00, 1, 'FLOYD, WALKER', 0, '', 0, '2023-09-25', '2025-03-31', NULL, '', 1, NULL, NULL, '2025-01-17 01:36:55', '2025-02-17 15:41:06', 29, NULL, 99),
+(221, 'M006090', 'COM34011', 'B1CBA2202193-1', NULL, 'GORDON BRIDGE REHAB', NULL, 'GDOT', '282-SUB04', 30000.00, 1, 'GORDON', 0, '', 0, '2023-03-13', '2023-10-31', NULL, '', 2, NULL, NULL, '2025-01-20 13:50:16', '2025-01-20 13:51:42', 29, NULL, 87),
+(222, 'M006050', 'COM34010', 'B1CBA2201215-0', NULL, 'M006050 APPROACH SLAB REPLACEMENT', NULL, 'C. W. MATTHEWS CONTRACTING CO', '272-SUB02', 307360.00, 1, 'FULTON', 0, '', 0, '2022-05-26', '2023-01-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:00:17', '2025-01-20 14:04:45', 29, NULL, 8),
+(223, 'M006076', 'COM34009', 'B1CBA2102129-0', NULL, 'M006076 BRIDGE REHABILITATION', NULL, 'GDOT', '264-SUB05', 111288.00, 1, 'COBB, FULTON', 0, '', 0, '2021-11-19', '2022-10-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:07:05', '2025-01-20 14:28:49', 29, NULL, 100),
+(224, 'M006152', 'COM34007', 'B1CBA2100891-0', NULL, 'M006152 BRIDGE REHABILITATION ON I-475/SR 408', NULL, 'GDOT', '260-SUB05', 6000.00, 1, 'MONROE', 0, '', 0, '2021-04-26', '2021-08-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:31:26', '2025-01-20 14:32:02', 29, NULL, 101),
+(225, 'NA', 'COM34004', '', NULL, 'SR 316 EMERGENCY PROJECT', NULL, 'GDOT', '250-SUB03', 118420.00, 1, 'GWINNETT', 0, '', 0, '2020-02-20', '2021-02-20', NULL, '', 2, NULL, NULL, '2025-01-20 14:49:35', '2025-01-20 14:52:35', 29, NULL, 14),
+(226, 'M005947', 'COM34003', 'B1CBA1902044-0', NULL, 'M005947 FULTON', NULL, 'GDOT', '248-SUB04', 66950.00, 1, 'FULTON', 0, '', 0, '2020-06-04', '2020-07-31', NULL, '', 2, NULL, NULL, '2025-01-20 14:57:49', '2025-01-20 15:29:07', 29, NULL, 8),
+(227, 'M005701', 'COM34000', 'B1CBA1800985-0', NULL, 'M005701 DADE GORDON WHITEFIELD', NULL, 'GDOT', '236-SUB04', 293064.00, 1, 'DADE GORDON WHITEFIELD', 0, '', 0, '2019-01-10', '2019-01-31', NULL, '', 2, NULL, NULL, '2025-01-20 15:32:44', '2025-01-20 15:35:34', 29, NULL, 102),
+(228, '0006328', 'SB62002', 'B3CBA2101559-0', NULL, 'B3CBA2101559-0 BRIDGE CONSTRUCTION BRAMPTON ROAD CONNECTOR SBC JOB NO 732', NULL, 'GDOT', '732', 625126.00, 1, 'CHATHAM', 0, '', 0, '2022-08-29', '2025-05-31', NULL, '', 1, NULL, NULL, '2025-01-20 19:07:46', '2025-01-20 20:52:21', 42, NULL, 28),
+(229, '0009011', 'ERS05034', 'B3CBA2100843-0', NULL, 'US 441 SR 53 WIDENING', NULL, 'GDOT', '60261', 1272788.06, 1, 'OCONEE', 0, '', 1, '2021-04-27', '2024-06-30', NULL, '', 1, NULL, NULL, '2025-01-20 19:47:08', '2025-02-05 16:16:50', 5, NULL, 16),
+(230, '522570', 'REEV50020', 'B1CBA2402253-0', NULL, 'Liberty Connector US84/SR38', NULL, 'GDOT', '10340586', 80089.50, 1, 'LIBERTY', 0, '', 1, '2025-01-20', '2027-03-31', NULL, '', 1, NULL, NULL, '2025-01-21 16:04:09', '2025-02-28 13:41:40', 9, NULL, 75),
+(231, '0013918', 'CWM04108', '404600', NULL, 'I-285 & I-20 WEST INTERCHANGE', NULL, 'GDOT', '3149', 2375824.00, 1, 'COBB, FULTON', 0, '', 1, '2025-01-23', '2030-06-30', NULL, '', 1, NULL, NULL, '2025-01-23 21:24:57', '2025-02-10 20:11:44', 7, NULL, 100),
+(232, 'M006524', 'PC25031', '', NULL, 'SR 154 M006524', NULL, 'GDOT', '1885', 3154.00, 1, 'DEKALB', 0, '', 1, '2025-01-24', '2025-08-31', NULL, '', 1, NULL, NULL, '2025-01-24 20:11:14', '2025-02-14 19:33:22', 12, NULL, 2),
+(233, '409906', 'CWM04109', '24-0121-5', NULL, '2024 PAVEMENT RESURFACING OF COUNTY ROADS', NULL, 'COBB COUNTY DEAPARTMENT OF TRANSPORTATION', '3165', 105040.00, 1, 'CHATHAM', 1, '', 0, '2025-01-24', '2025-06-30', NULL, '', 1, NULL, NULL, '2025-01-24 20:27:42', '2025-01-30 13:32:17', 7, NULL, 28),
+(237, '0013751', 'CSC70005', 'B1CBA2402631-0', NULL, 'BRIDGE REPLACEMENT ON SR81 OVER DRIED INDIAN CREEK', NULL, 'GDOT', 'NA', 78118.00, 1, 'NEWTON', 0, '', 1, '2025-01-27', '2026-05-31', NULL, '', 0, NULL, NULL, '2025-01-30 14:29:49', '2025-01-30 14:38:05', 25, NULL, 54),
+(238, '0007055', 'ERS05078', 'B1CBA2402183-2', NULL, 'SR180 BRIDGE', NULL, 'GDOT', '60394', 68527.16, 1, 'UNION', 0, '', 1, '2025-01-28', '2026-12-31', NULL, '', 1, NULL, NULL, '2025-01-30 14:41:16', '2025-02-28 19:46:22', 5, NULL, 103),
+(239, 'M004985', 'CWM04000', 'B1CBA1601506-0', NULL, 'MILL INLAY PLANTMIX RESURF SINGLE SURF TRTMT PAVING SR 1', NULL, 'GDOT', '32274', 3600.00, 1, 'TROUP', 1, '', 0, '2016-03-07', '2017-03-07', NULL, '', 2, NULL, NULL, '2025-01-30 16:05:08', '2025-02-11 20:28:35', 7, NULL, 49),
+(240, '0015537', 'WRB21007', 'B1CBA2200986-0', NULL, 'US27/SR 1 BRIDGE REPLACEMENT', NULL, 'GDOT', '01-0674', 336384.54, 1, 'CARROLL', 0, '', 1, '2022-05-19', '2024-05-31', NULL, '', 2, NULL, NULL, '2025-01-30 17:08:51', '2025-02-14 16:17:50', 36, NULL, 24),
+(241, '0015096', 'WRB21008', '23-06', NULL, 'CR 511/Brown Bridge Road over Yellow River', NULL, 'NEWTON CO GA BOARD OF COMMISSIONERS', '01-0697', 449417.53, 0, 'NEWTON', 0, '', 0, '2023-02-11', '2025-09-30', NULL, '', 1, NULL, NULL, '2025-01-30 18:27:43', '2025-01-30 19:34:02', 36, NULL, 54),
+(242, '0015538', 'WRB21010', 'B1CBA2302760-0', NULL, 'US 41 BRIDGE OVER PEAVINE CRK', NULL, 'GDOT', '01-0745', 191315.46, 1, 'CATOOSA', 0, '', 0, '2024-01-23', '2026-04-30', NULL, '', 1, NULL, NULL, '2025-01-30 19:12:05', '2025-01-30 19:33:24', 36, NULL, 104),
+(243, '0013943', 'WRB21006', 'B1CBA2101793-0', NULL, 'US 27-SR 1 BR REPLACEMENT', NULL, 'GDOT', '01-0626', 127891.75, 1, 'WALKER', 0, '', 0, '2021-09-13', '2023-04-30', NULL, '', 2, NULL, NULL, '2025-01-30 19:55:50', '2025-01-30 20:08:54', 36, NULL, 105),
+(244, '0013363', 'WRB21005', 'B1CBA2002011-0', NULL, 'SR 81 BRIDGE', NULL, 'GDOT', '01-0612', 74793.00, 1, 'HENRY, NEWTON', 0, '', 0, '2020-09-22', '2021-11-30', NULL, '', 2, NULL, NULL, '2025-01-30 20:24:36', '2025-01-30 21:12:08', 36, NULL, 106),
+(245, '0005530', 'WRB21003', 'B3BCBA1801525-0', NULL, 'CHATTOOGA', NULL, 'GDOT', 'BID-20', 79164.00, 1, 'CHATTOOGA', 0, '', 0, '2018-08-14', '2023-05-31', NULL, '', 2, NULL, NULL, '2025-01-30 22:09:13', '2025-01-30 22:11:32', 36, NULL, 107),
+(246, 'NA', 'WRB21002', 'NA', NULL, 'BARTOW CITY LAKEPOINT PARKWAY EXTENSION', NULL, 'WRIGHT BROTHERS CONSTRUCTION', '01-0519', 967787.21, 0, 'BARTOW', 0, '', 0, '2018-03-20', '2019-10-31', NULL, '', 2, NULL, NULL, '2025-01-30 22:16:16', '2025-01-30 22:25:10', 36, NULL, 108),
+(247, '0009860', 'WRB21001', 'B1CBA1701318-0', NULL, 'US 41 BRIDGE REPLACEMENT', NULL, 'GDOT', '01-0505', 74744.00, 1, 'BARTOW', 0, '', 0, '2017-09-27', '2019-10-31', NULL, '', 2, NULL, NULL, '2025-01-31 13:36:24', '2025-02-14 16:29:03', 36, NULL, 108),
+(248, '0016108', 'WCM69000', 'B1CBA2301170-0', NULL, 'Construction of a roundabout on SR 16 at Columbia Dr and Brumbelow Rd', NULL, 'GDOT', 'NA', 604787.00, 1, 'CARROLL', 0, '', 1, '2023-02-21', '2024-10-31', NULL, '', 1, NULL, NULL, '2025-01-31 14:56:53', '2025-01-31 15:05:52', 43, NULL, 24),
+(249, '0013209', 'WIL37000', 'B1CBA1901648-0', NULL, 'ON SR139 AND SR402', NULL, 'GDOT', '001-0', 56270.00, 1, 'FULTON', 0, '', 0, '2020-03-03', '2021-03-03', NULL, '', 2, NULL, NULL, '2025-01-31 15:34:29', '2025-02-17 14:42:16', 44, NULL, 8),
+(250, '522200', 'UIG49008', '', NULL, 'US1 SR4 SWIFT CREEK', NULL, 'GDOT', '2406', 221172.00, 1, 'TOOMBS', 0, '', 0, '2024-06-10', '2025-06-10', NULL, '', 1, NULL, NULL, '2025-02-03 21:28:20', '2025-02-14 16:19:22', 45, NULL, 109),
+(251, '0019197', 'UIG49007', 'B3TIA2302211-0', NULL, 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', NULL, 'GDOT', '2308', 855413.00, 1, 'TOOMBS', 0, '', 0, '2023-07-24', '2026-05-31', NULL, '', 1, NULL, NULL, '2025-02-03 21:52:15', '2025-02-12 14:34:43', 45, NULL, 109),
+(252, '0015623', 'UIG49006', 'B1CBA2301890-0', NULL, 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', NULL, 'GDOT', '2307-0004', 85330.96, 1, 'JENKINS', 0, '', 0, '2023-07-08', '2024-05-31', NULL, '', 1, NULL, NULL, '2025-02-04 13:34:05', '2025-02-04 13:35:25', 45, NULL, 110),
+(253, '0012867', 'ERS05079', '24-213', NULL, 'AGUSTA -COA- WHEELER SUM OUT', NULL, 'CITY OF AUGUTA', '50449', 851574.43, 0, 'RICHMOND', 0, '', 0, '2025-02-04', '2026-08-06', NULL, '', 1, NULL, NULL, '2025-02-04 19:39:53', '2025-02-28 19:46:29', 5, NULL, 35),
+(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', NULL, 'TESTING PROJECT FOR SOFTWARE', NULL, 'C&G CONCRETE', '00011122223333', 442418.00, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', '2025-02-20', 'Andres Iglesias', 1, NULL, NULL, '2025-02-10 16:43:27', '2025-02-20 15:42:20', 46, NULL, 8),
+(255, 'M006468', 'CWM04110', 'B1CBA2402829-0', NULL, 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', 7, NULL, 22),
+(256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', NULL, 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', NULL, '', 1, NULL, NULL, '2025-02-10 20:26:00', '2025-04-16 01:22:09', 5, NULL, 73),
+(257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', 7, NULL, 11),
+(259, '0012757 & 0012758', 'SAV57000', '', 'MMIP PROJECT', 'I-16 & I-95 MMIP PROJECT', NULL, 'GDOT', 'SMC-056-S', 1435095.12, 1, 'CHATHAM', 0, '', 0, '2020-10-02', '2025-10-31', NULL, '', 3, NULL, NULL, '2025-02-11 21:19:30', '2025-06-06 22:44:03', 47, NULL, 28),
+(260, '24112201', 'PC25032', 'B1CBA2402749-0', 'SR 15', 'SR 15 ', NULL, 'GDOT', '1886', 6050.00, 1, 'GREENE', 0, '', 1, '2025-01-31', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-02-13 14:10:07', '2025-08-02 00:01:38', 12, NULL, 111),
+(261, '0015759', 'EDG45000', 'B3CBA1901689-1', 'LAURENS', 'LAURENS ', NULL, 'GDOT', '0015759', 208017.00, 1, 'LAURENS', 0, '', 0, '2019-01-05', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-02-13 15:03:16', '2025-08-02 00:02:17', 34, NULL, 76),
+(262, 'CSBRG-0007-00(050)', 'GAB', 'B3CBA1601188-0', NULL, 'PULASKI', NULL, 'GDOT', 'CSBRG-0007-00(050)', 23160.00, 1, 'PULASKI', 0, '', 0, '2016-07-20', '2017-07-20', NULL, '', 2, NULL, NULL, '2025-02-13 15:39:03', '2025-02-13 15:49:40', 48, NULL, 112),
+(263, 'M006213', 'CWM04067', 'B1CBA2201852-0', NULL, 'SR 26 MILL/INLAY/RESURF', NULL, 'GDOT', '32818', 55425.00, 1, 'CHATHAM', 1, '', 0, '2022-07-25', '2023-04-30', NULL, '', 2, NULL, NULL, '2025-02-13 19:20:46', '2025-02-13 19:27:26', 7, NULL, 28),
+(264, 'IFB-C-1220225', 'CWM04065', '', NULL, 'AIRFIELD SEWERS ENHANCEMENTS GRADES 4&5', NULL, 'CITY OF ATLANTA', '278520', 0.00, 0, 'CLAYTON', 0, '', 0, '2022-08-08', '2023-08-08', NULL, '', 2, NULL, NULL, '2025-02-13 19:52:19', '2025-02-13 19:53:06', 7, NULL, 22),
+(265, '001757', 'CWM04064', '', NULL, 'SR 400 PHASE 1 DESIGN BUILD PROJECT', NULL, 'GDOT', '162816', 1296162.00, 1, 'FULTON', 0, '', 0, '2022-08-22', '2025-08-07', NULL, '', 1, NULL, NULL, '2025-02-13 20:41:56', '2025-02-13 21:25:14', 7, NULL, 8),
+(266, 'M006343', 'CWM04063', 'B1CBA2201991-0', NULL, 'SR 16 MILL/INLAY/RESURF', NULL, 'GDOT', '32828', 3400.00, 1, 'CARROLL', 1, '', 0, '2022-08-18', '2023-05-31', NULL, '', 2, NULL, NULL, '2025-02-13 21:31:36', '2025-02-14 19:30:16', 7, NULL, 24),
+(268, '0014170, M006227', 'CWM04062', 'B1CBA2201414-0', NULL, 'SR 22 SPUR MILL/INLAY/RESURFACING', NULL, 'GDOT', '12798', 286150.00, 1, 'MUSCOGEE', 1, '', 0, '2022-06-24', '2024-08-31', NULL, '', 2, NULL, NULL, '2025-02-14 15:33:26', '2025-02-14 15:41:18', 7, NULL, 17),
+(269, '0006857, 0006866', 'CWM04061', 'B1CBA2201375-0', NULL, 'SR 92 WIDENING & RECONST.', NULL, 'GDOT', '12796', 1095904.00, 1, 'COBB, PAULDING', 0, '', 0, '2022-06-07', '2025-06-07', NULL, '', 1, NULL, NULL, '2025-02-14 15:43:48', '2025-02-14 15:44:55', 7, NULL, 113),
+(270, 'M006292', 'CWM04060', 'B1CBA2201627-0', NULL, 'SR 155 MILL/INLAY/RESURF', NULL, 'GDOT', '32811', 108400.00, 1, 'DEKALB', 1, '', 0, '2022-07-06', '2023-03-31', NULL, '', 2, NULL, NULL, '2025-02-14 15:46:26', '2025-02-14 19:31:37', 7, NULL, 2),
+(271, 'M006285', 'CWM04059', 'B1CBA2201614-0', NULL, 'SR 3 MILL/INLAY/RESURF', NULL, 'GDOT', '32813', 19100.00, 1, 'FULTON', 1, '', 0, '2022-06-30', '2023-03-31', NULL, '', 2, NULL, NULL, '2025-02-14 16:00:03', '2025-02-14 18:02:56', 7, NULL, 8),
+(272, 'SPLOST CW18-05A', 'CWM04058', '22-15', NULL, 'S. HOUSTON LAKE RD & FEAGIN MILL INTERSECTION RESURF', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12807', 271465.00, 0, 'HOUSTON', 1, '', 0, '2022-04-11', '2023-04-11', NULL, '', 2, NULL, NULL, '2025-02-14 16:23:38', '2025-02-14 16:44:02', 7, NULL, 4),
+(273, 'SPLOST CW12-02', 'CWM04056', '22-03', NULL, 'ELBERTA RD PH 1 IMPROVEMENTS', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12805', 937982.00, 0, 'HOUSTON', 0, '', 0, '2022-04-27', '2025-06-01', NULL, '', 1, NULL, NULL, '2025-02-14 22:20:09', '2025-02-17 16:27:14', 7, NULL, 4),
+(274, 'M006290', 'CWM04055', 'B1CBA2201024-0', NULL, 'SR 280 MILL/INLAY/RESURF', NULL, 'GDOT', '32801', 163225.00, 1, 'COBB', 1, '', 0, '2022-04-01', '2022-12-31', NULL, '', 2, NULL, NULL, '2025-02-17 18:23:48', '2025-02-17 18:56:00', 7, NULL, 12),
+(275, '0016440', 'CWM04054', 'B3CBA2200993-0', NULL, 'RECONST/REHAB FOR TURN LANES ON SR 22 @ SR 85', NULL, 'GDOT', '12775', 60944.00, 1, 'MUSCOGEE', 0, '', 0, '2022-04-05', '2023-03-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:10:26', '2025-02-17 19:19:08', 7, NULL, 17),
+(276, 'M006222', 'CWM04052', 'B1CBA2201038-0', NULL, 'MILL, INLAY, RESURFACING SR 113', NULL, 'GDOT', '32773', 6375.00, 1, 'CARROLL', 1, '', 0, '2022-03-24', '2022-12-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:29:35', '2025-02-17 19:30:31', 7, NULL, 24),
+(277, '0012577', 'CWM04051', 'B3TIA1902107-1', NULL, 'I-85 / SR 411 @BUENA VISTA RD DDI', NULL, 'GDOT', '52604', 78425.50, 1, 'MUSCOGEE', 0, '', 0, '2022-03-15', '2023-05-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:51:33', '2025-02-17 19:54:20', 7, NULL, 17),
+(278, 'M006096', 'CWM04050', 'B1CBA2201020-0', NULL, 'SR 83 MILL/RESURF/SHLDER REHAB', NULL, 'GDOT', '32774', 76550.00, 1, 'MONROE', 1, '', 0, '2022-03-24', '2022-12-31', NULL, '', 2, NULL, NULL, '2025-02-17 19:58:08', '2025-02-17 20:23:50', 7, NULL, 101),
+(279, 'M006286', 'CWM04049', 'B1CBA2102185-0', NULL, 'SR 3 CONN MILL/INLAY/RESURF', NULL, 'GDOT', '32766', 22800.00, 1, 'COBB', 1, '', 0, '2022-02-17', '2022-11-30', NULL, '', 2, NULL, NULL, '2025-02-17 20:31:19', '2025-02-17 20:47:41', 7, NULL, 12),
+(280, 'M005990', 'CWM04048', 'B1CBA2102169-0', NULL, 'MILL INLAY RESURFACING', NULL, 'GDOT', '32768', 197200.00, 1, 'DEKALB', 1, '', 0, '2022-02-18', '2022-11-30', NULL, '', 2, NULL, NULL, '2025-02-17 20:51:33', '2025-02-18 13:19:05', 7, NULL, 2),
+(281, 'M006082', 'CWM04047', 'B1CBA2102175-0', NULL, 'MILL INLAY RESURFACING & SHOULDER REHAB', NULL, 'GDOT', '32765', 4050.00, 1, 'CHATHAM', 1, '', 0, '2022-02-18', '2022-11-30', NULL, '', 2, NULL, NULL, '2025-02-18 13:16:14', '2025-02-18 13:17:41', 7, NULL, 28),
+(282, 'M006391', 'ECA72001', 'B1CBA2301707-0', NULL, 'RESURFACING SR40', NULL, 'GDOT', 'NA', 58500.00, 1, 'CAMDEN', 1, '', 1, '2024-01-04', '2024-06-30', NULL, '', 2, NULL, NULL, '2025-02-19 21:42:29', '2025-02-19 21:45:21', 33, NULL, 114),
+(283, 'IFB-C-1210316', 'CWM04046', '', NULL, 'SOUTH CARGO BUILDING A PARKING LOT EXPANSION', NULL, 'CITY OF ATLANTA', '162718', 401014.00, 0, 'HJAIA- CITY OF ATLANTA', 0, '', 0, '2021-12-03', '2022-05-12', NULL, '', 2, NULL, NULL, '2025-02-25 21:03:01', '2025-02-25 21:27:19', 7, NULL, 115),
+(284, '0015686', 'CWM04073', 'B1CBA2201575-1', NULL, 'CONSTR OF A ROUNDABOUT US41/SR247', NULL, 'GDOT', '12859', 475031.00, 1, 'BIBB', 0, '', 1, '2022-12-07', '2024-10-31', NULL, '', 1, NULL, NULL, '2025-02-25 22:18:34', '2025-02-25 22:51:18', 7, NULL, 5),
+(285, 'FC-9142', 'CWM04045', '', NULL, 'CARGO MAINTENANCE BUILDING', NULL, 'CITY OF ATLANTA', '270020', 0.00, 0, 'HJAIA', 0, '', 0, '2021-11-17', '2025-11-17', NULL, '', 1, NULL, NULL, '2025-02-25 22:59:16', '2025-02-25 23:16:53', 7, NULL, 20),
+(286, '0017038', 'CWM04044', 'B3CBA2101268-0', NULL, 'SR 5 WIDENING & RECONSTRUCTION', NULL, 'GDOT', '12682', 469862.00, 1, 'FANNIN', 0, '', 1, '2021-11-01', '2022-10-31', NULL, '', 2, NULL, NULL, '2025-02-26 01:38:16', '2025-02-26 01:40:58', 7, NULL, 40),
+(287, '72120', 'COLD40007', '2025-009', NULL, 'DAMASCUS ROAD AT UPPER BETHANT ROAD', NULL, 'GDOT', '72120', 21725.00, 1, 'CHEROKEE', 0, '', 0, '2025-02-27', '2025-06-27', NULL, '', 1, NULL, NULL, '2025-02-27 21:20:56', '2025-02-27 21:25:29', 35, NULL, 30),
+(288, '461-24', 'COLD40008', '', NULL, 'HARBOUR RIDGE PAVING PROJECT', NULL, 'DAWSON COUNTY BOARD OF COMMISSIONERS', 'NA', 7600.00, 0, 'DAWSON', 0, '', 0, '2025-02-27', '2025-06-27', NULL, '', 1, NULL, NULL, '2025-02-27 21:27:35', '2025-02-27 21:30:52', 35, NULL, 116),
+(289, 'M006497', 'CWM04105', 'B1CBA2402810-0', NULL, 'MILL INLAY RESURFACING SR 74', NULL, 'GDOT', '3185', 41200.00, 1, 'BIBB', 1, '', 1, '2025-02-06', '2025-11-30', NULL, '', 0, NULL, NULL, '2025-02-28 14:36:45', '2025-02-28 14:37:40', 7, NULL, 5),
+(290, 'M006504', 'CWM04111', 'B1CBA2402760-0', NULL, 'SR18 MILLING & RESURFACING', NULL, 'GDOT', '3180', 10000.00, 1, 'JONES', 1, '', 1, '2025-02-11', '2025-10-31', NULL, '', 0, NULL, NULL, '2025-02-28 14:41:11', '2025-02-28 14:41:42', 7, NULL, 117),
+(291, 'NA', 'COM34019', 'EMERGENCY REQUEST', NULL, 'PARKWAY OVER I-16 APPROACH SLAB', NULL, 'C. W. MATTHEWS CONTRACTING CO., INC', '296-SUB02', 68855.00, 1, 'CHATHAM', 0, '', 0, '2025-02-27', '2025-03-31', NULL, '', 1, NULL, NULL, '2025-02-28 14:44:29', '2025-02-28 14:46:39', 29, NULL, 28),
+(292, 'M006464', 'BP02021', '', NULL, 'SR 13 RESURFACING', NULL, 'GDOT', '310133-03', 4290.00, 1, 'FULTON', 1, '', 1, '2025-02-18', '2025-10-31', NULL, '', 0, NULL, NULL, '2025-02-28 14:49:16', '2025-02-28 14:49:50', 17, NULL, 8),
+(293, 'M006419', 'GGC78003', 'B1CBA2402809-0', NULL, 'B1CBA2402809-0 Call:019 M006419 ', NULL, 'GDOT', 'M006419', 23360.00, 1, 'TEFLFAIR', 0, '', 0, '2025-02-19', '2025-11-30', NULL, '', 0, NULL, NULL, '2025-02-28 14:52:33', '2025-02-28 14:53:31', 40, NULL, 118),
+(294, '0013918', 'ERS05080', '', NULL, 'WEST INTERCHANGE', NULL, 'C. W. MATTHEWS CONTRACTING CO', '60389', 476136.00, 1, 'FULTON/COBB', 0, '', 1, '2025-02-20', '2030-06-30', NULL, '', 1, NULL, NULL, '2025-02-28 14:55:12', '2025-02-28 19:46:38', 5, NULL, 119),
+(295, 'M006097', 'ERS05037', 'B1CBA2102137-0', NULL, 'SR 34 RESURFACING', NULL, 'GDOT', '60286', 14000.00, 1, 'COWETA', 1, '', 0, '2022-01-06', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-02-28 21:30:37', '2025-02-28 21:35:49', 5, NULL, 23),
+(296, '222120', 'ERS05036', 'B3TIA2101474-0', NULL, 'JEFFERSON US 1 SOUTH', NULL, 'GDOT', '60275', 327170.00, 1, 'JEFFERSON', 0, '', 0, '2021-10-06', '2024-06-30', NULL, '', 2, NULL, NULL, '2025-02-28 21:40:36', '2025-02-28 21:44:09', 5, NULL, 7),
+(297, '0016803', 'ERS05035', 'B1CBA2100829-0', NULL, 'LAURENS COUNTY', NULL, 'GDOT', '0016803', 3600.00, 1, 'LAURENS', 0, '', 0, '2021-05-21', '2021-10-31', NULL, '', 2, NULL, NULL, '2025-02-28 21:46:14', '2025-02-28 21:49:11', 5, NULL, 76),
+(298, 'M004941', 'ERS05032', 'B1CBA2100986-0', NULL, 'US 278 RESURFACING', NULL, 'GDOT', '602964', 101700.00, 1, 'COBB', 1, '', 0, '2021-04-21', '2022-01-31', NULL, '', 2, NULL, NULL, '2025-02-28 21:50:32', '2025-02-28 21:52:03', 5, NULL, 12),
+(299, '0013614', 'ERS05029', 'B3CBA2002348-0', NULL, 'US 441 WIDENING', NULL, 'GDOT', '60256', 643843.25, 1, 'MORGAN', 0, '', 1, '2021-03-09', '2022-03-10', NULL, '', 2, NULL, NULL, '2025-03-03 20:59:26', '2025-03-03 21:11:29', 5, NULL, 46),
+(300, 'ITB #20-30', 'ERS05025', '', NULL, '2020 SPLOST MILLING & RESURF', NULL, 'E. R. SNELL', 'ITB #20-30', 137500.00, 0, 'CLAYTON', 0, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, '2025-03-03 21:42:27', '2025-03-03 22:04:56', 5, NULL, 22),
+(301, 'ITB #20-03', 'ERS05026', '', NULL, '2020 SPLOST MILLING & RESURFACING', NULL, 'E. R. SNELL', 'ITB #20-03', 229710.00, 0, 'CLAYTON', 1, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, '2025-03-03 22:13:17', '2025-03-03 22:20:19', 5, NULL, 22);
 
 -- --------------------------------------------------------
 
@@ -7276,7 +7449,9 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (672, 'Change name, old value: ', '2025-04-19', 257),
 (673, 'Change name, old value: ', '2025-06-06', 259),
 (674, 'Change status, old value: In Progress', '2025-06-06', 259),
-(675, 'Change contract amount, old value: 1435095.12', '2025-06-06', 259);
+(675, 'Change contract amount, old value: 1435095.12', '2025-06-06', 259),
+(676, 'Change name, old value: ', '2025-08-02', 260),
+(677, 'Change name, old value: ', '2025-08-02', 261);
 
 -- --------------------------------------------------------
 
@@ -7538,7 +7713,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (181, 1, 1, 1, 1, 1, 28),
 (182, 1, 1, 1, 1, 1, 29),
 (183, 1, 1, 1, 1, 1, 30),
-(184, 1, 1, 1, 1, 1, 31);
+(184, 1, 1, 1, 1, 1, 31),
+(185, 1, 1, 1, 1, 1, 32);
 
 -- --------------------------------------------------------
 
@@ -7657,7 +7833,128 @@ INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `lo
 (138, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-16', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
 (139, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-17', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
 (140, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-18', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
-(141, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-19', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL);
+(141, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-07-19', '10:00', 5.000000, '', 1, 256, NULL, 1, NULL),
+(142, 'Prueba Leads', '1234 Street', '', '', '2025-08-01', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(143, 'Prueba Leads', '1234 Street', '', '', '2025-08-02', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(144, 'Prueba Leads', '1234 Street', '', '', '2025-08-03', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(145, 'Prueba Leads', '1234 Street', '', '', '2025-08-04', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(146, 'Prueba Leads', '1234 Street', '', '', '2025-08-05', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(147, 'Prueba Leads', '1234 Street', '', '', '2025-08-06', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(148, 'Prueba Leads', '1234 Street', '', '', '2025-08-07', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(149, 'Prueba Leads', '1234 Street', '', '', '2025-08-08', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(150, 'Prueba Leads', '1234 Street', '', '', '2025-08-09', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(151, 'Prueba Leads', '1234 Street', '', '', '2025-08-10', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(152, 'Prueba Leads', '1234 Street', '', '', '2025-08-11', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(153, 'Prueba Leads', '1234 Street', '', '', '2025-08-12', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(154, 'Prueba Leads', '1234 Street', '', '', '2025-08-13', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(155, 'Prueba Leads', '1234 Street', '', '', '2025-08-14', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(156, 'Prueba Leads', '1234 Street', '', '', '2025-08-15', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(157, 'Prueba Leads', '1234 Street', '', '', '2025-08-16', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(158, 'Prueba Leads', '1234 Street', '', '', '2025-08-17', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(159, 'Prueba Leads', '1234 Street', '', '', '2025-08-18', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(160, 'Prueba Leads', '1234 Street', '', '', '2025-08-19', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(161, 'Prueba Leads', '1234 Street', '', '', '2025-08-20', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(162, 'Prueba Leads', '1234 Street', '', '', '2025-08-21', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(163, 'Prueba Leads', '1234 Street', '', '', '2025-08-22', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(164, 'Prueba Leads', '1234 Street', '', '', '2025-08-23', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(165, 'Prueba Leads', '1234 Street', '', '', '2025-08-24', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(166, 'Prueba Leads', '1234 Street', '', '', '2025-08-25', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(167, 'Prueba Leads', '1234 Street', '', '', '2025-08-26', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(168, 'Prueba Leads', '1234 Street', '', '', '2025-08-27', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(169, 'Prueba Leads', '1234 Street', '', '', '2025-08-28', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(170, 'Prueba Leads', '1234 Street', '', '', '2025-08-29', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(171, 'Prueba Leads', '1234 Street', '', '', '2025-08-30', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(172, 'Prueba Leads', '1234 Street', '', '', '2025-08-31', '00:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(173, 'Prueba Leads', '1234 Street', '', '', '2025-08-01', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(174, 'Prueba Leads', '1234 Street', '', '', '2025-08-02', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(175, 'Prueba Leads', '1234 Street', '', '', '2025-08-03', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(176, 'Prueba Leads', '1234 Street', '', '', '2025-08-04', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(177, 'Prueba Leads', '1234 Street', '', '', '2025-08-05', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(178, 'Prueba Leads', '1234 Street', '', '', '2025-08-06', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(179, 'Prueba Leads', '1234 Street', '', '', '2025-08-07', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(180, 'Prueba Leads', '1234 Street', '', '', '2025-08-08', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(181, 'Prueba Leads', '1234 Street', '', '', '2025-08-09', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(182, 'Prueba Leads', '1234 Street', '', '', '2025-08-10', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(183, 'Prueba Leads', '1234 Street', '', '', '2025-08-11', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(184, 'Prueba Leads', '1234 Street', '', '', '2025-08-12', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(185, 'Prueba Leads', '1234 Street', '', '', '2025-08-13', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(186, 'Prueba Leads', '1234 Street', '', '', '2025-08-14', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(187, 'Prueba Leads', '1234 Street', '', '', '2025-08-15', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(188, 'Prueba Leads', '1234 Street', '', '', '2025-08-16', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(189, 'Prueba Leads', '1234 Street', '', '', '2025-08-17', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(190, 'Prueba Leads', '1234 Street', '', '', '2025-08-18', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(191, 'Prueba Leads', '1234 Street', '', '', '2025-08-19', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(192, 'Prueba Leads', '1234 Street', '', '', '2025-08-20', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(193, 'Prueba Leads', '1234 Street', '', '', '2025-08-21', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(194, 'Prueba Leads', '1234 Street', '', '', '2025-08-22', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(195, 'Prueba Leads', '1234 Street', '', '', '2025-08-23', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(196, 'Prueba Leads', '1234 Street', '', '', '2025-08-24', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(197, 'Prueba Leads', '1234 Street', '', '', '2025-08-25', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(198, 'Prueba Leads', '1234 Street', '', '', '2025-08-26', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(199, 'Prueba Leads', '1234 Street', '', '', '2025-08-27', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(200, 'Prueba Leads', '1234 Street', '', '', '2025-08-28', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(201, 'Prueba Leads', '1234 Street', '', '', '2025-08-29', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(202, 'Prueba Leads', '1234 Street', '', '', '2025-08-30', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(203, 'Prueba Leads', '1234 Street', '', '', '2025-08-31', '00:45', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(204, 'Prueba Leads', '1234 Street', '', '', '2025-08-01', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(205, 'Prueba Leads', '1234 Street', '', '', '2025-08-02', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(206, 'Prueba Leads', '1234 Street', '', '', '2025-08-03', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(207, 'Prueba Leads', '1234 Street', '', '', '2025-08-04', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(208, 'Prueba Leads', '1234 Street', '', '', '2025-08-05', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(209, 'Prueba Leads', '1234 Street', '', '', '2025-08-06', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(210, 'Prueba Leads', '1234 Street', '', '', '2025-08-07', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(211, 'Prueba Leads', '1234 Street', '', '', '2025-08-08', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(212, 'Prueba Leads', '1234 Street', '', '', '2025-08-09', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(213, 'Prueba Leads', '1234 Street', '', '', '2025-08-10', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(214, 'Prueba Leads', '1234 Street', '', '', '2025-08-11', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(215, 'Prueba Leads', '1234 Street', '', '', '2025-08-12', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(216, 'Prueba Leads', '1234 Street', '', '', '2025-08-13', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(217, 'Prueba Leads', '1234 Street', '', '', '2025-08-14', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(218, 'Prueba Leads', '1234 Street', '', '', '2025-08-15', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(219, 'Prueba Leads', '1234 Street', '', '', '2025-08-16', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(220, 'Prueba Leads', '1234 Street', '', '', '2025-08-17', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(221, 'Prueba Leads', '1234 Street', '', '', '2025-08-18', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(222, 'Prueba Leads', '1234 Street', '', '', '2025-08-19', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(223, 'Prueba Leads', '1234 Street', '', '', '2025-08-20', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(224, 'Prueba Leads', '1234 Street', '', '', '2025-08-21', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(225, 'Prueba Leads', '1234 Street', '', '', '2025-08-22', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(226, 'Prueba Leads', '1234 Street', '', '', '2025-08-23', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(227, 'Prueba Leads', '1234 Street', '', '', '2025-08-24', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(228, 'Prueba Leads', '1234 Street', '', '', '2025-08-25', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(229, 'Prueba Leads', '1234 Street', '', '', '2025-08-26', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(230, 'Prueba Leads', '1234 Street', '', '', '2025-08-27', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(231, 'Prueba Leads', '1234 Street', '', '', '2025-08-28', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(232, 'Prueba Leads', '1234 Street', '', '', '2025-08-29', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(233, 'Prueba Leads', '1234 Street', '', '', '2025-08-30', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(234, 'Prueba Leads', '1234 Street', '', '', '2025-08-31', '01:00', 10.000000, 'Prueba', 0, 260, NULL, 2, NULL),
+(235, 'Prueba Leads', '1234 Street', '', '', '2025-08-03', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(236, 'Prueba Leads', '1234 Street', '', '', '2025-08-04', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(237, 'Prueba Leads', '1234 Street', '', '', '2025-08-05', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(238, 'Prueba Leads', '1234 Street', '', '', '2025-08-06', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(239, 'Prueba Leads', '1234 Street', '', '', '2025-08-07', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(240, 'Prueba Leads', '1234 Street', '', '', '2025-08-08', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(241, 'Prueba Leads', '1234 Street', '', '', '2025-08-09', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(242, 'Prueba Leads', '1234 Street', '', '', '2025-08-10', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(243, 'Prueba Leads', '1234 Street', '', '', '2025-08-11', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(244, 'Prueba Leads', '1234 Street', '', '', '2025-08-12', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(245, 'Prueba Leads', '1234 Street', '', '', '2025-08-13', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(246, 'Prueba Leads', '1234 Street', '', '', '2025-08-14', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(247, 'Prueba Leads', '1234 Street', '', '', '2025-08-15', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(248, 'Prueba Leads', '1234 Street', '', '', '2025-08-16', '00:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(249, 'Prueba Leads', '1234 Street', '', '', '2025-08-10', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(250, 'Prueba Leads', '1234 Street', '', '', '2025-08-11', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(251, 'Prueba Leads', '1234 Street', '', '', '2025-08-12', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(252, 'Prueba Leads', '1234 Street', '', '', '2025-08-13', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(253, 'Prueba Leads', '1234 Street', '', '', '2025-08-14', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(254, 'Prueba Leads', '1234 Street', '', '', '2025-08-15', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(255, 'Prueba Leads', '1234 Street', '', '', '2025-08-16', '00:45', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(256, 'Prueba Leads', '1234 Street', '', '', '2025-08-10', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(257, 'Prueba Leads', '1234 Street', '', '', '2025-08-11', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(258, 'Prueba Leads', '1234 Street', '', '', '2025-08-12', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(259, 'Prueba Leads', '1234 Street', '', '', '2025-08-13', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(260, 'Prueba Leads', '1234 Street', '', '', '2025-08-14', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(261, 'Prueba Leads', '1234 Street', '', '', '2025-08-15', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL),
+(262, 'Prueba Leads', '1234 Street', '', '', '2025-08-16', '01:00', 10.000000, 'Prueba', 1, 260, NULL, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -7716,6 +8013,377 @@ CREATE TABLE `schedule_employee` (
   `schedule_id` int(11) DEFAULT NULL,
   `employee_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `schedule_employee`
+--
+
+INSERT INTO `schedule_employee` (`id`, `schedule_id`, `employee_id`) VALUES
+(1, 112, 49),
+(2, 112, 47),
+(3, 142, 49),
+(4, 142, 47),
+(5, 142, 1),
+(6, 143, 49),
+(7, 143, 47),
+(8, 143, 1),
+(9, 144, 49),
+(10, 144, 47),
+(11, 144, 1),
+(12, 145, 49),
+(13, 145, 47),
+(14, 145, 1),
+(15, 146, 49),
+(16, 146, 47),
+(17, 146, 1),
+(18, 147, 49),
+(19, 147, 47),
+(20, 147, 1),
+(21, 148, 49),
+(22, 148, 47),
+(23, 148, 1),
+(24, 149, 49),
+(25, 149, 47),
+(26, 149, 1),
+(27, 150, 49),
+(28, 150, 47),
+(29, 150, 1),
+(30, 151, 49),
+(31, 151, 47),
+(32, 151, 1),
+(33, 152, 49),
+(34, 152, 47),
+(35, 152, 1),
+(36, 153, 49),
+(37, 153, 47),
+(38, 153, 1),
+(39, 154, 49),
+(40, 154, 47),
+(41, 154, 1),
+(42, 155, 49),
+(43, 155, 47),
+(44, 155, 1),
+(45, 156, 49),
+(46, 156, 47),
+(47, 156, 1),
+(48, 157, 49),
+(49, 157, 47),
+(50, 157, 1),
+(51, 158, 49),
+(52, 158, 47),
+(53, 158, 1),
+(54, 159, 49),
+(55, 159, 47),
+(56, 159, 1),
+(57, 160, 49),
+(58, 160, 47),
+(59, 160, 1),
+(60, 161, 49),
+(61, 161, 47),
+(62, 161, 1),
+(63, 162, 49),
+(64, 162, 47),
+(65, 162, 1),
+(66, 163, 49),
+(67, 163, 47),
+(68, 163, 1),
+(69, 164, 49),
+(70, 164, 47),
+(71, 164, 1),
+(72, 165, 49),
+(73, 165, 47),
+(74, 165, 1),
+(75, 166, 49),
+(76, 166, 47),
+(77, 166, 1),
+(78, 167, 49),
+(79, 167, 47),
+(80, 167, 1),
+(81, 168, 49),
+(82, 168, 47),
+(83, 168, 1),
+(84, 169, 49),
+(85, 169, 47),
+(86, 169, 1),
+(87, 170, 49),
+(88, 170, 47),
+(89, 170, 1),
+(90, 171, 49),
+(91, 171, 47),
+(92, 171, 1),
+(93, 172, 49),
+(94, 172, 47),
+(95, 172, 1),
+(96, 173, 49),
+(97, 173, 47),
+(98, 173, 1),
+(99, 174, 49),
+(100, 174, 47),
+(101, 174, 1),
+(102, 175, 49),
+(103, 175, 47),
+(104, 175, 1),
+(105, 176, 49),
+(106, 176, 47),
+(107, 176, 1),
+(108, 177, 49),
+(109, 177, 47),
+(110, 177, 1),
+(111, 178, 49),
+(112, 178, 47),
+(113, 178, 1),
+(114, 179, 49),
+(115, 179, 47),
+(116, 179, 1),
+(117, 180, 49),
+(118, 180, 47),
+(119, 180, 1),
+(120, 181, 49),
+(121, 181, 47),
+(122, 181, 1),
+(123, 182, 49),
+(124, 182, 47),
+(125, 182, 1),
+(126, 183, 49),
+(127, 183, 47),
+(128, 183, 1),
+(129, 184, 49),
+(130, 184, 47),
+(131, 184, 1),
+(132, 185, 49),
+(133, 185, 47),
+(134, 185, 1),
+(135, 186, 49),
+(136, 186, 47),
+(137, 186, 1),
+(138, 187, 49),
+(139, 187, 47),
+(140, 187, 1),
+(141, 188, 49),
+(142, 188, 47),
+(143, 188, 1),
+(144, 189, 49),
+(145, 189, 47),
+(146, 189, 1),
+(147, 190, 49),
+(148, 190, 47),
+(149, 190, 1),
+(150, 191, 49),
+(151, 191, 47),
+(152, 191, 1),
+(153, 192, 49),
+(154, 192, 47),
+(155, 192, 1),
+(156, 193, 49),
+(157, 193, 47),
+(158, 193, 1),
+(159, 194, 49),
+(160, 194, 47),
+(161, 194, 1),
+(162, 195, 49),
+(163, 195, 47),
+(164, 195, 1),
+(165, 196, 49),
+(166, 196, 47),
+(167, 196, 1),
+(168, 197, 49),
+(169, 197, 47),
+(170, 197, 1),
+(171, 198, 49),
+(172, 198, 47),
+(173, 198, 1),
+(174, 199, 49),
+(175, 199, 47),
+(176, 199, 1),
+(177, 200, 49),
+(178, 200, 47),
+(179, 200, 1),
+(180, 201, 49),
+(181, 201, 47),
+(182, 201, 1),
+(183, 202, 49),
+(184, 202, 47),
+(185, 202, 1),
+(186, 203, 49),
+(187, 203, 47),
+(188, 203, 1),
+(189, 204, 49),
+(190, 204, 47),
+(191, 204, 1),
+(192, 205, 49),
+(193, 205, 47),
+(194, 205, 1),
+(195, 206, 49),
+(196, 206, 47),
+(197, 206, 1),
+(198, 207, 49),
+(199, 207, 47),
+(200, 207, 1),
+(201, 208, 49),
+(202, 208, 47),
+(203, 208, 1),
+(204, 209, 49),
+(205, 209, 47),
+(206, 209, 1),
+(207, 210, 49),
+(208, 210, 47),
+(209, 210, 1),
+(210, 211, 49),
+(211, 211, 47),
+(212, 211, 1),
+(213, 212, 49),
+(214, 212, 47),
+(215, 212, 1),
+(216, 213, 49),
+(217, 213, 47),
+(218, 213, 1),
+(219, 214, 49),
+(220, 214, 47),
+(221, 214, 1),
+(222, 215, 49),
+(223, 215, 47),
+(224, 215, 1),
+(225, 216, 49),
+(226, 216, 47),
+(227, 216, 1),
+(228, 217, 49),
+(229, 217, 47),
+(230, 217, 1),
+(231, 218, 49),
+(232, 218, 47),
+(233, 218, 1),
+(234, 219, 49),
+(235, 219, 47),
+(236, 219, 1),
+(237, 220, 49),
+(238, 220, 47),
+(239, 220, 1),
+(240, 221, 49),
+(241, 221, 47),
+(242, 221, 1),
+(243, 222, 49),
+(244, 222, 47),
+(245, 222, 1),
+(246, 223, 49),
+(247, 223, 47),
+(248, 223, 1),
+(249, 224, 49),
+(250, 224, 47),
+(251, 224, 1),
+(252, 225, 49),
+(253, 225, 47),
+(254, 225, 1),
+(255, 226, 49),
+(256, 226, 47),
+(257, 226, 1),
+(258, 227, 49),
+(259, 227, 47),
+(260, 227, 1),
+(261, 228, 49),
+(262, 228, 47),
+(263, 228, 1),
+(264, 229, 49),
+(265, 229, 47),
+(266, 229, 1),
+(267, 230, 49),
+(268, 230, 47),
+(269, 230, 1),
+(270, 231, 49),
+(271, 231, 47),
+(272, 231, 1),
+(273, 232, 49),
+(274, 232, 47),
+(275, 232, 1),
+(276, 233, 49),
+(277, 233, 47),
+(278, 233, 1),
+(279, 234, 49),
+(280, 234, 47),
+(281, 234, 1),
+(282, 235, 49),
+(283, 235, 47),
+(284, 235, 1),
+(285, 236, 49),
+(286, 236, 47),
+(287, 236, 1),
+(288, 237, 49),
+(289, 237, 47),
+(290, 237, 1),
+(291, 238, 49),
+(292, 238, 47),
+(293, 238, 1),
+(294, 239, 49),
+(295, 239, 47),
+(296, 239, 1),
+(297, 240, 49),
+(298, 240, 47),
+(299, 240, 1),
+(300, 241, 49),
+(301, 241, 47),
+(302, 241, 1),
+(303, 242, 49),
+(304, 242, 47),
+(305, 242, 1),
+(306, 243, 49),
+(307, 243, 47),
+(308, 243, 1),
+(309, 244, 49),
+(310, 244, 47),
+(311, 244, 1),
+(312, 245, 49),
+(313, 245, 47),
+(314, 245, 1),
+(315, 246, 49),
+(316, 246, 47),
+(317, 246, 1),
+(318, 247, 49),
+(319, 247, 47),
+(320, 247, 1),
+(321, 248, 49),
+(322, 248, 47),
+(323, 248, 1),
+(324, 249, 49),
+(325, 249, 47),
+(326, 249, 1),
+(327, 250, 49),
+(328, 250, 47),
+(329, 250, 1),
+(330, 251, 49),
+(331, 251, 47),
+(332, 251, 1),
+(333, 252, 49),
+(334, 252, 47),
+(335, 252, 1),
+(336, 253, 49),
+(337, 253, 47),
+(338, 253, 1),
+(339, 254, 49),
+(340, 254, 47),
+(341, 254, 1),
+(342, 255, 49),
+(343, 255, 47),
+(344, 255, 1),
+(345, 256, 49),
+(346, 256, 47),
+(347, 256, 1),
+(348, 257, 49),
+(349, 257, 47),
+(350, 257, 1),
+(351, 258, 49),
+(352, 258, 47),
+(353, 258, 1),
+(354, 259, 49),
+(355, 259, 47),
+(356, 259, 1),
+(357, 260, 49),
+(358, 260, 47),
+(359, 260, 1),
+(360, 261, 49),
+(361, 261, 47),
+(362, 261, 1),
+(363, 262, 49),
+(364, 262, 47),
+(365, 262, 1);
 
 -- --------------------------------------------------------
 
@@ -7948,7 +8616,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (826, 1, 1, 1, 1, 1, 28),
 (827, 1, 1, 1, 1, 1, 29),
 (828, 1, 1, 1, 1, 1, 30),
-(829, 1, 1, 1, 1, 1, 31);
+(829, 1, 1, 1, 1, 1, 31),
+(830, 1, 1, 1, 1, 1, 32);
 
 -- --------------------------------------------------------
 
@@ -8015,6 +8684,12 @@ ALTER TABLE `concrete_vendor_contact`
   ADD KEY `Refcontactconcvendor1` (`vendor_id`);
 
 --
+-- Indices de la tabla `county`
+--
+ALTER TABLE `county`
+  ADD PRIMARY KEY (`county_id`);
+
+--
 -- Indices de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -8070,7 +8745,8 @@ ALTER TABLE `data_tracking_subcontract`
 -- Indices de la tabla `district`
 --
 ALTER TABLE `district`
-  ADD PRIMARY KEY (`district_id`);
+  ADD PRIMARY KEY (`district_id`),
+  ADD KEY `county_id` (`county_id`);
 
 --
 -- Indices de la tabla `employee`
@@ -8095,7 +8771,8 @@ ALTER TABLE `estimate`
   ADD KEY `Refestimate4` (`district_id`),
   ADD KEY `Refestimate5` (`company_id`),
   ADD KEY `Refestimate6` (`contact_id`),
-  ADD KEY `plan_downloading_id` (`plan_downloading_id`);
+  ADD KEY `plan_downloading_id` (`plan_downloading_id`),
+  ADD KEY `county_id` (`county_id`);
 
 --
 -- Indices de la tabla `estimate_bid_deadline`
@@ -8213,7 +8890,8 @@ ALTER TABLE `plan_status`
 ALTER TABLE `project`
   ADD PRIMARY KEY (`project_id`),
   ADD KEY `Ref6467` (`company_id`),
-  ADD KEY `Ref6573` (`inspector_id`);
+  ADD KEY `Ref6573` (`inspector_id`),
+  ADD KEY `county_id` (`county_id`);
 
 --
 -- Indices de la tabla `project_contact`
@@ -8384,7 +9062,7 @@ ALTER TABLE `company`
 -- AUTO_INCREMENT de la tabla `company_contact`
 --
 ALTER TABLE `company_contact`
-  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `concrete_vendor`
@@ -8397,6 +9075,12 @@ ALTER TABLE `concrete_vendor`
 --
 ALTER TABLE `concrete_vendor_contact`
   MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `county`
+--
+ALTER TABLE `county`
+  MODIFY `county_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking`
@@ -8462,19 +9146,19 @@ ALTER TABLE `estimate`
 -- AUTO_INCREMENT de la tabla `estimate_bid_deadline`
 --
 ALTER TABLE `estimate_bid_deadline`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -8486,7 +9170,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -8522,7 +9206,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3467;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3494;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -8576,7 +9260,7 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=676;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=678;
 
 --
 -- AUTO_INCREMENT de la tabla `project_stage`
@@ -8618,13 +9302,13 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=186;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
 --
 ALTER TABLE `schedule`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=263;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule_concrete_vendor_contact`
@@ -8636,7 +9320,7 @@ ALTER TABLE `schedule_concrete_vendor_contact`
 -- AUTO_INCREMENT de la tabla `schedule_employee`
 --
 ALTER TABLE `schedule_employee`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=366;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -8678,7 +9362,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=830;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=831;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -8749,6 +9433,12 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
 
 --
+-- Filtros para la tabla `district`
+--
+ALTER TABLE `district`
+  ADD CONSTRAINT `Refdistrictcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
+
+--
 -- Filtros para la tabla `estimate`
 --
 ALTER TABLE `estimate`
@@ -8758,7 +9448,8 @@ ALTER TABLE `estimate`
   ADD CONSTRAINT `Refestimate4` FOREIGN KEY (`district_id`) REFERENCES `district` (`district_id`),
   ADD CONSTRAINT `Refestimate5` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`),
-  ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`);
+  ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`),
+  ADD CONSTRAINT `Refestimatecountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
 
 --
 -- Filtros para la tabla `estimate_bid_deadline`
@@ -8819,7 +9510,8 @@ ALTER TABLE `notification`
 --
 ALTER TABLE `project`
   ADD CONSTRAINT `Refcontractor67` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
-  ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`);
+  ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),
+  ADD CONSTRAINT `Refprojectcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
 
 --
 -- Filtros para la tabla `project_contact`

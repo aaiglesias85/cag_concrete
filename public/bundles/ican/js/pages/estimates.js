@@ -315,6 +315,8 @@ var Estimates = function () {
         $('#phone').importTags('');
         $('#email').importTags('');
 
+        $('#quoteReceived').prop('checked', false);
+
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
 
@@ -462,6 +464,7 @@ var Estimates = function () {
         var bidDescription = $('#bidDescription').val();
         var bidInstructions = $('#bidInstructions').val();
         var planLink = $('#planLink').val();
+        var quoteReceived = $('#quoteReceived').prop('checked') ? 1 : 0;
 
         MyApp.block('#form-estimate');
 
@@ -500,6 +503,7 @@ var Estimates = function () {
                 'bidDescription': bidDescription,
                 'bidInstructions': bidInstructions,
                 'planLink': planLink,
+                'quoteReceived': quoteReceived,
                 'plan_downloading_id': plan_downloading_id,
                 'bid_deadlines': JSON.stringify(bid_deadlines),
             },
@@ -686,6 +690,7 @@ var Estimates = function () {
                     $('#bidDescription').val(response.estimate.bidDescription);
                     $('#bidInstructions').val(response.estimate.bidInstructions);
                     $('#planLink').val(response.estimate.planLink);
+                    $('#quoteReceived').prop('checked', response.estimate.quoteReceived);
 
                     // bid deadlines
                     bid_deadlines = response.estimate.bid_deadlines;
@@ -1429,6 +1434,14 @@ var Estimates = function () {
 
                 $('#contact').val(contact.contact_id);
                 $('#contact').trigger('change');
+
+                // phone
+                var phones = $('#phone').val() == '' ? contact.phone : $('#phone').val() + ',' + contact.phone;
+                $('#phone').importTags(phones);
+
+                // email
+                var emails = $('#email').val() == '' ? contact.email : $('#email').val() + ',' + contact.email;
+                $('#email').importTags(emails);
             }
         });
     }
@@ -1641,6 +1654,16 @@ var Estimates = function () {
                 resetFormBidDeadLines();
                 $('#modal-bid-deadline').modal('hide');
 
+                // Obtener la fecha más próxima en el futuro (ascendente)
+                var fechasOrdenadas = bid_deadlines
+                    .filter(b => b.bidDeadline)
+                    .sort((a, b) => parseFecha(a.bidDeadline) - parseFecha(b.bidDeadline));
+
+                // Tomar la fecha más cercana
+                var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
+                $('#bidDeadline').val(fechaMasCercana);
+
+
             } else {
                 if (company_id === "") {
                     var $element = $('#select-company-bid-deadline .select2');
@@ -1669,6 +1692,14 @@ var Estimates = function () {
             }
 
         });
+
+        function parseFecha(fechaStr) {
+            // formato esperado: m/d/Y hh:mm
+            const [fecha, hora] = fechaStr.split(' ');
+            const [mes, dia, anio] = fecha.split('/');
+            const [horas, minutos] = hora.split(':');
+            return new Date(anio, mes - 1, dia, horas, minutos);
+        }
 
         $(document).off('click', "#lista-bid-deadline a.edit");
         $(document).on('click', "#lista-bid-deadline a.edit", function () {

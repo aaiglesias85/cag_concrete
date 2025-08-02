@@ -47,3 +47,6 @@ ALTER TABLE `estimate` ADD `county_id` INT(11) NULL AFTER `district_id`, ADD IND
 
 ALTER TABLE `estimate` ADD CONSTRAINT `Refestimatecountyid` FOREIGN KEY (`county_id`) REFERENCES
     `county`(`county_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+ALTER TABLE `estimate` ADD `quote_received` BOOLEAN NULL AFTER `plan_link`;
