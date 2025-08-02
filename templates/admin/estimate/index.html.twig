@@ -958,15 +958,24 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-time-picker event-change"
+                                        <input type='text' class="form-control m-input date-picker event-change"
                                                placeholder="Select a date" autocomplete="off"
                                                id="bid-deadline-date" name="biddeadlinedate"/>
-                                        <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="la la-calendar glyphicon-th"></i>
-                                    </span>
-                                        </div>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    <i class="la la-calendar glyphicon-th"></i>
+                                                </span>
+                                            </div>
                                     </div>
+                                </div>
+                                <div class="col-md-4" id="select-bid-deadline-hour">
+                                    <select class="form-control m-select2 event-change" id="bid-deadline-hour" name="hour">
+                                        <option value="">Hour</option>
+                                        {% for h in 0..23 %}
+                                            {% set hour = "%02d:00"|format(h) %}
+                                            <option value="{{ hour }}">{{ hour }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>

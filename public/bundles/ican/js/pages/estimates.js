@@ -1604,17 +1604,19 @@ var Estimates = function () {
             e.preventDefault();
 
             var company_id = $('#company-bid-deadline').val();
+            var hour = $('#bid-deadline-hour').val();
 
-            if ($('#bid-deadline-form').valid() && company_id !== "") {
+            if ($('#bid-deadline-form').valid() && company_id !== "" && hour !== "") {
 
                 var bidDeadline = $('#bid-deadline-date').val();
+
                 var company = $("#company-bid-deadline option:selected").text();
 
                 if (nEditingRowBidDeadlines == null) {
 
                     bid_deadlines.push({
                         id: '',
-                        bidDeadline: bidDeadline,
+                        bidDeadline: `${bidDeadline} ${hour}`,
                         company_id: company_id,
                         company: company,
                         tag: '',
@@ -1625,7 +1627,7 @@ var Estimates = function () {
                 } else {
                     var posicion = nEditingRowBidDeadlines;
                     if (bid_deadlines[posicion]) {
-                        bid_deadlines[posicion].bidDeadline = bidDeadline;
+                        bid_deadlines[posicion].bidDeadline = `${bidDeadline} ${hour}`;
                         bid_deadlines[posicion].company_id = company_id;
                         bid_deadlines[posicion].company = company;
                     }
@@ -1652,6 +1654,18 @@ var Estimates = function () {
                     $element.closest('.form-group')
                         .removeClass('has-success').addClass('has-error');
                 }
+                if (hour === "") {
+                    var $element = $('#select-bid-deadline-hour .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
             }
 
         });
@@ -1666,7 +1680,12 @@ var Estimates = function () {
 
                 nEditingRowBidDeadlines = posicion;
 
-                $('#bid-deadline-date').val(bid_deadlines[posicion].bidDeadline);
+                var date_array = bid_deadlines[posicion].bidDeadline.split(' ');
+
+                $('#bid-deadline-date').val(date_array[0]);
+
+                $('#bid-deadline-hour').val(date_array[1]);
+                $('#bid-deadline-hour').trigger('change');
 
                 $('#company-bid-deadline').val(bid_deadlines[posicion].company_id);
                 $('#company-bid-deadline').trigger('change');
@@ -1746,6 +1765,9 @@ var Estimates = function () {
 
         $('#company-bid-deadline').val('');
         $('#company-bid-deadline').trigger('change');
+
+        $('#bid-deadline-hour').val('');
+        $('#bid-deadline-hour').trigger('change');
 
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
