@@ -30,7 +30,7 @@
             <!-- menu projects -->
             {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor or
                 menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
-                menu.menuEstimate %}
+                menu.menuEstimate or menu.menuCounty %}
 
                 <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true" m-menu-submenu-toggle="click">
                     <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
@@ -82,7 +82,8 @@
                             {% endif %}
 
                             <!-- menu estimates -->
-                            {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or menu.menuEstimate or menu.menuPlanDownloading %}
+                            {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
+                                menu.menuEstimate or menu.menuPlanDownloading or menu.menuCounty %}
 
                                 <li class="m-menu__item  m-menu__item--parent" aria-haspopup="true">
                                     <span class="m-menu__link"><span class="m-menu__link-text">Estimates</span></span>
@@ -144,6 +145,16 @@
                                                         <a href="{{ url('plan_status') }}" class="m-menu__link ">
                                                             <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                                             <span class="m-menu__link-text">Plan Status</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                {% if menu.menuCounty %}
+                                                    <li class="m-menu__item " aria-haspopup="true"
+                                                        m-menu-link-redirect="1">
+                                                        <a href="{{ url('county') }}" class="m-menu__link ">
+                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                            <span class="m-menu__link-text">Counties</span>
                                                         </a>
                                                     </li>
                                                 {% endif %}
@@ -337,7 +348,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-
                         </ul>
                     </div>
                 </li>

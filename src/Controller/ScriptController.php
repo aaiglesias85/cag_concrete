@@ -53,6 +53,13 @@ class ScriptController extends AbstractController
         return new Response('OK', 200);
     }
 
+    public function definircountyprojectestimate()
+    {
+        $this->scriptService->DefinirCountyProjectEstimate();
+
+        return new Response('OK', 200);
+    }
+
     public function cronreminders()
     {
         $this->scriptService->CronReminders();

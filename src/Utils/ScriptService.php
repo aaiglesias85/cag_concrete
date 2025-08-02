@@ -3,10 +3,12 @@
 namespace App\Utils;
 
 use App\Entity\ConcreteVendor;
+use App\Entity\County;
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
+use App\Entity\Estimate;
 use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
@@ -19,6 +21,53 @@ use Symfony\Component\Mime\Address;
 
 class ScriptService extends Base
 {
+
+    /**
+     * DefinirCountyProjectEstimate
+     */
+    public function DefinirCountyProjectEstimate()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // projects
+        $projects = $this->getDoctrine()->getRepository(Project::class)->findAll();
+        foreach ($projects as $project) {
+            $county = $project->getCounty();
+            $county_entity = $this->CrearCounty($county);
+            $project->setCountyObj($county_entity);
+        }
+
+        // estimates
+        $estimates = $this->getDoctrine()->getRepository(Estimate::class)->findAll();
+        foreach ($estimates as $estimate) {
+            $county = $estimate->getCounty();
+            $county_entity = $this->CrearCounty($county);
+            $estimate->setCountyObj($county_entity);
+        }
+
+        $em->flush();
+
+
+    }
+
+    private function CrearCounty($descripcion)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //Verificar name
+        $county = $this->getDoctrine()->getRepository(County::class)
+            ->findOneBy(['description' => $descripcion]);
+        if ($county == null) {
+            $county = new County();
+            $county->setDescription($descripcion);
+            $county->setStatus(1);
+            $em->persist($county);
+            $em->flush();
+        }
+
+
+        return $county;
+    }
 
     /**
      * CronReminders
@@ -50,7 +99,7 @@ class ScriptService extends Base
             // to
             $reminder_usuarios = $this->getDoctrine()->getRepository(ReminderRecipient::class)
                 ->ListarUsuariosDeReminder($reminder_id);
-            foreach ($reminder_usuarios as $reminder_usuario){
+            foreach ($reminder_usuarios as $reminder_usuario) {
                 $mensaje->addTo(new Address($reminder_usuario->getUser()->getEmail(), $reminder_usuario->getUser()->getNombreCompleto()));
             }
 
@@ -83,7 +132,7 @@ class ScriptService extends Base
 
             $conc_vendor = $data_tracking_conc_vendor->getConcVendor();
             $concrete_vendor = $this->SalvarConcreteVendor($conc_vendor);
-            if($concrete_vendor){
+            if ($concrete_vendor) {
                 $data_tracking_conc_vendor->setConcVendor(NULL);
                 $data_tracking_conc_vendor->setConcreteVendor($concrete_vendor);
 
@@ -102,7 +151,7 @@ class ScriptService extends Base
         //Verificar name
         $entity = $this->getDoctrine()->getRepository(ConcreteVendor::class)
             ->findOneBy(['name' => $name]);
-        if($entity === null){
+        if ($entity === null) {
 
             $entity = new ConcreteVendor();
 

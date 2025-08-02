@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\Company;
 use App\Entity\CompanyContact;
+use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Equation;
 use App\Entity\Estimate;
@@ -261,7 +262,6 @@ class EstimateService extends Base
             $arreglo_resultado['project_id'] = $entity->getProjectId();
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['bidDeadline'] = $entity->getBidDeadline() ? $entity->getBidDeadline()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['county'] = $entity->getCounty();
             $arreglo_resultado['priority'] = $entity->getPriority();
             $arreglo_resultado['bidNo'] = $entity->getBidNo();
             $arreglo_resultado['workHour'] = $entity->getWorkHour();
@@ -285,12 +285,20 @@ class EstimateService extends Base
             $arreglo_resultado['stage_id'] = $entity->getStage() != null ? $entity->getStage()->getStageId() : '';
             $arreglo_resultado['proposal_type_id'] = $entity->getProposalType() != null ? $entity->getProposalType()->getTypeId() : '';
             $arreglo_resultado['status_id'] = $entity->getStatus() != null ? $entity->getStatus()->getStatusId() : '';
+
+            $county_id = $entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : null;
+            $arreglo_resultado['county_id'] = $county_id;
+
             $arreglo_resultado['district_id'] = $entity->getDistrict() != null ? $entity->getDistrict()->getDistrictId() : '';
             $arreglo_resultado['plan_downloading_id'] = $entity->getPlanDownloading() != null ? $entity->getPlanDownloading()->getPlanDownloadingId() : '';
 
             $company_id = $entity->getCompany() != null ? $entity->getCompany()->getCompanyId() : '';
             $arreglo_resultado['company_id'] = $company_id;
             $arreglo_resultado['contact_id'] = $entity->getContact() != null ? $entity->getContact()->getContactId() : '';
+
+            // districts
+            $districts = $this->ListarDistrictsDeCounty($county_id);
+            $arreglo_resultado['districts'] = $districts;
 
             // contacts
             $contacts = $this->ListarContactsDeCompany($company_id);
@@ -549,7 +557,7 @@ class EstimateService extends Base
      * @param int $estimate_id Id
      * @author Marcel
      */
-    public function ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county, $priority,
+    public function ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
                                        $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                                        $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
                                        $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink)
@@ -572,7 +580,6 @@ class EstimateService extends Base
 
             $entity->setProjectId($project_id);
             $entity->setName($name);
-            $entity->setCounty($county);
             $entity->setPriority($priority);
             $entity->setBidNo($bidNo);
             $entity->setWorkHour($workHour);
@@ -610,6 +617,13 @@ class EstimateService extends Base
                 $plan_status = $this->getDoctrine()->getRepository(PlanStatus::class)
                     ->find($status_id);
                 $entity->setStatus($plan_status);
+            }
+
+            $entity->setCountyObj(NULL);
+            if ($county_id != '') {
+                $county = $this->getDoctrine()->getRepository(County::class)
+                    ->find($county_id);
+                $entity->setCountyObj($county);
             }
 
             $entity->setDistrict(NULL);
@@ -760,7 +774,7 @@ class EstimateService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarEstimate($project_id, $name, $bidDeadline, $county, $priority,
+    public function SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
                                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                                    $project_types_id, $estimators_id)
     {
@@ -779,7 +793,6 @@ class EstimateService extends Base
 
         $entity->setProjectId($project_id);
         $entity->setName($name);
-        $entity->setCounty($county);
         $entity->setPriority($priority);
         $entity->setBidNo($bidNo);
         $entity->setWorkHour($workHour);
@@ -807,6 +820,12 @@ class EstimateService extends Base
             $plan_status = $this->getDoctrine()->getRepository(PlanStatus::class)
                 ->find($status_id);
             $entity->setStatus($plan_status);
+        }
+
+        if ($county_id != '') {
+            $county = $this->getDoctrine()->getRepository(County::class)
+                ->find($county_id);
+            $entity->setCountyObj($county);
         }
 
         if ($district_id != '') {
@@ -919,7 +938,7 @@ class EstimateService extends Base
      * @author Marcel
      */
     public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $project_type_id,
-                                    $proposal_type_id, $status_id, $district_id, $fecha_inicial, $fecha_fin)
+                                    $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin)
     {
         $arreglo_resultado = array();
         $cont = 0;
@@ -928,10 +947,10 @@ class EstimateService extends Base
         $lista = [];
         if ($project_type_id === "") {
             $lista = $this->getDoctrine()->getRepository(Estimate::class)
-                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $proposal_type_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
         } else {
             $estimates_project_type = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $proposal_type_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
             foreach ($estimates_project_type as $estimate_project_type) {
                 $lista[] = $estimate_project_type->getEstimate();
             }
@@ -1123,14 +1142,14 @@ class EstimateService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalEstimates($sSearch, $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $district_id, $fecha_inicial, $fecha_fin)
+    public function TotalEstimates($sSearch, $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin)
     {
         if ($project_type_id === '') {
             return $this->getDoctrine()->getRepository(Estimate::class)
-                ->TotalEstimates($sSearch, $company_id, $stage_id, $proposal_type_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+                ->TotalEstimates($sSearch, $company_id, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
         } else {
             return $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->TotalEstimates($sSearch, $company_id, $stage_id, $proposal_type_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+                ->TotalEstimates($sSearch, $company_id, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
         }
 
     }

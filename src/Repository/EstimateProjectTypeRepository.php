@@ -61,7 +61,7 @@ class EstimateProjectTypeRepository extends EntityRepository
      * @return EstimateProjectType[]
      */
     public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id = '', $stage_id = '', $proposal_type_id = '',
-                                    $status_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
+                                    $status_id = '', $county_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('e_p_t')
             ->leftJoin('e_p_t.estimate', 'e')
@@ -70,11 +70,12 @@ class EstimateProjectTypeRepository extends EntityRepository
             ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'p_t')
             ->leftJoin('e.status', 'pl_s')
+            ->leftJoin('e.countyObj', 'c_o')
             ->leftJoin('e.district', 'd')
             ->leftJoin('e.stage', 'pr_s');
 
         if ($sSearch != "") {
-            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR e.county LIKE :search OR e.priority LIKE :search OR
+            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
             e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
             p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search OR
             t.description LIKE :search')
@@ -94,6 +95,11 @@ class EstimateProjectTypeRepository extends EntityRepository
         if ($status_id != '') {
             $consulta->andWhere('pl_s.statusId = :status_id')
                 ->setParameter('status_id', $status_id);
+        }
+
+        if ($county_id != '') {
+            $consulta->andWhere('c_o.countyId = :county_id')
+                ->setParameter('county_id', $county_id);
         }
 
         if ($district_id != '') {
@@ -157,7 +163,7 @@ class EstimateProjectTypeRepository extends EntityRepository
      * @return int
      */
     public function TotalEstimates($sSearch, $company_id = '', $stage_id = '', $proposal_type_id = '',
-                                   $status_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
+                                   $status_id = '', $county_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
 
         $consulta = $this->createQueryBuilder('e_p_t')
@@ -168,11 +174,12 @@ class EstimateProjectTypeRepository extends EntityRepository
             ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'pl_t')
             ->leftJoin('e.status', 'p_s')
+            ->leftJoin('e.countyObj', 'c_o')
             ->leftJoin('e.district', 'd')
             ->leftJoin('e.stage', 'pr_s');
 
         if ($sSearch != "") {
-            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR e.county LIKE :search OR e.priority LIKE :search OR
+            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
             e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
             p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search OR
             t.description LIKE :search')
@@ -192,6 +199,11 @@ class EstimateProjectTypeRepository extends EntityRepository
         if ($status_id != '') {
             $consulta->andWhere('pl_s.statusId = :status_id')
                 ->setParameter('status_id', $status_id);
+        }
+
+        if ($county_id != '') {
+            $consulta->andWhere('c_o.countyId = :county_id')
+                ->setParameter('county_id', $county_id);
         }
 
         if ($district_id != '') {

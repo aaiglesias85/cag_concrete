@@ -4,14 +4,14 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "district")]
-#[ORM\Entity(repositoryClass: "App\Repository\DistrictRepository")]
-class District
+#[ORM\Table(name: "county")]
+#[ORM\Entity(repositoryClass: "App\Repository\CountyRepository")]
+class County
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "district_id", type: "integer", nullable: false)]
-    private ?int $districtId;
+    #[ORM\Column(name: "county_id", type: "integer", nullable: false)]
+    private ?int $countyId;
 
     #[ORM\Column(name: "description", type: "string", length: 255, nullable: true)]
     private ?string $description;
@@ -19,13 +19,9 @@ class District
     #[ORM\Column(name: 'status', type: 'boolean', nullable: true)]
     private ?bool $status = null;
 
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\County')]
-    #[ORM\JoinColumn(name: 'county_id', referencedColumnName: 'county_id')]
-    private ?County $county;
-
-    public function getDistrictId(): ?int
+    public function getCountyId(): ?int
     {
-        return $this->districtId;
+        return $this->countyId;
     }
 
     public function setDescription(?string $description): void
@@ -47,15 +43,5 @@ class District
     {
         $this->status = $status;
         return $this;
-    }
-
-    public function getCounty(): ?County
-    {
-        return $this->county;
-    }
-
-    public function setCounty(?County $county): void
-    {
-        $this->county = $county;
     }
 }

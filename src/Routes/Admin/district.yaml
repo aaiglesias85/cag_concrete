@@ -21,3 +21,7 @@ eliminarDistrictsAdmin:
 cargarDatosDistrictAdmin:
   path: /district/cargarDatos
   defaults: { _controller: App\Controller\Admin\DistrictController::cargarDatos, _format: json }
+
+listarDistrictsDeCountyAdmin:
+  path: /district/listarDeCounty
+  defaults: { _controller: App\Controller\Admin\DistrictController::listarDeCounty, _format: json }

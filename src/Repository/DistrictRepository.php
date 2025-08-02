@@ -13,9 +13,10 @@ class DistrictRepository extends EntityRepository
      *
      * @return District[]
      */
-    public function ListarOrdenados($sSearch = "", $status = "")
+    public function ListarOrdenados($sSearch = "", $status = "", $county_id = "")
     {
-        $consulta = $this->createQueryBuilder('d');
+        $consulta = $this->createQueryBuilder('d')
+        ->leftJoin('d.county', 'c');
 
         if ($sSearch != "") {
             $consulta->andWhere('d.description LIKE :search')
@@ -26,6 +27,28 @@ class DistrictRepository extends EntityRepository
             $consulta->andWhere('d.status = :status')
                 ->setParameter('status', $status);
         }
+
+        if($county_id !== ""){
+            $consulta->andWhere('c.countyId = :county_id')
+                ->setParameter('county_id', $county_id);
+        }
+
+        $consulta->orderBy('d.description', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
+     * ListarDistrictsDeCounty: Lista los districts de un county
+     *
+     * @return District[]
+     */
+    public function ListarDistrictsDeCounty($county_id)
+    {
+        $consulta = $this->createQueryBuilder('d')
+            ->leftJoin('d.county', 'c')
+            ->andWhere('c.countyId = :county_id')
+            ->setParameter('county_id', $county_id);
 
         $consulta->orderBy('d.description', "ASC");
 
@@ -40,16 +63,30 @@ class DistrictRepository extends EntityRepository
      *
      * @return District[]
      */
-    public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $county_id = "")
     {
-        $consulta = $this->createQueryBuilder('d');
+        $consulta = $this->createQueryBuilder('d')
+            ->leftJoin('d.county', 'c');
 
         if ($sSearch != "") {
-            $consulta->andWhere('d.description LIKE :search')
+            $consulta->andWhere('d.description LIKE :search OR c.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        $consulta->orderBy("d.$iSortCol_0", $sSortDir_0);
+        if($county_id !== ""){
+            $consulta->andWhere('c.countyId = :county_id')
+                ->setParameter('county_id', $county_id);
+        }
+
+        // Ordenar por columna especificada
+        switch ($iSortCol_0) {
+            case "county":
+                $consulta->orderBy("c.description", $sSortDir_0);
+                break;
+            default:
+                $consulta->orderBy("d.$iSortCol_0", $sSortDir_0);
+                break;
+        }
 
         if ($limit > 0) {
             $consulta->setMaxResults($limit);
@@ -65,14 +102,20 @@ class DistrictRepository extends EntityRepository
      *
      * @return int
      */
-    public function TotalDistricts($sSearch)
+    public function TotalDistricts($sSearch, $county_id = "")
     {
         $consulta = $this->createQueryBuilder('d')
-            ->select('COUNT(d.districtId)');
+            ->select('COUNT(d.districtId)')
+            ->leftJoin('d.county', 'c');
 
         if ($sSearch != "") {
-            $consulta->andWhere('d.description LIKE :search')
+            $consulta->andWhere('d.description LIKE :search OR c.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if($county_id !== ""){
+            $consulta->andWhere('c.countyId = :county_id')
+                ->setParameter('county_id', $county_id);
         }
 
         return (int)$consulta->getQuery()->getSingleScalarResult();

@@ -184,8 +184,11 @@ var Estimates = function () {
             $('#filtro-plan-status').val('');
             $('#filtro-plan-status').trigger('change');
 
-            $('#filtro-district').val('');
-            $('#filtro-district').trigger('change');
+            $('#filtro-county').val('');
+            $('#filtro-county').trigger('change');
+
+            // limpiar select
+            MyApp.limpiarSelect('#filtro-district');
 
             $('#fechaInicial').val('');
 
@@ -221,6 +224,9 @@ var Estimates = function () {
 
         var status_id = $('#filtro-plan-status').val();
         query.status_id = status_id;
+
+        var county_id = $('#filtro-county').val();
+        query.county_id = county_id;
 
         var district_id = $('#filtro-district').val();
         query.district_id = district_id;
@@ -281,8 +287,11 @@ var Estimates = function () {
         $('#plan-status').val('');
         $('#plan-status').trigger('change');
 
-        $('#district').val('');
-        $('#district').trigger('change');
+        $('#county').val('');
+        $('#county').trigger('change');
+
+        // limpiar select
+        MyApp.limpiarSelect('#district');
 
         $('#priority').val('');
         $('#priority').trigger('change');
@@ -426,7 +435,7 @@ var Estimates = function () {
         var bidDeadline = $('#bidDeadline').val();
         var estimators_id = $('#estimator').val();
         var stage_id = $('#project-stage').val();
-        var county = $('#county').val();
+        var county_id = $('#county_id').val();
         var project_types_id = $('#project-type').val();
         var proposal_type_id = $('#proposal-type').val();
         var status_id = $('#plan-status').val();
@@ -466,7 +475,7 @@ var Estimates = function () {
                 'bidDeadline': bidDeadline,
                 'estimators_id': estimators_id,
                 'stage_id': stage_id,
-                'county': county,
+                'county_id': county_id,
                 'project_types_id': project_types_id,
                 'proposal_type_id': proposal_type_id,
                 'status_id': status_id,
@@ -605,8 +614,6 @@ var Estimates = function () {
                     $('#project-stage').val(response.estimate.stage_id);
                     $('#project-stage').trigger('change');
 
-                    $('#county').val(response.estimate.county);
-
                     $('#project-type').val(response.estimate.project_types_id);
                     $('#project-type').trigger('change');
 
@@ -616,8 +623,22 @@ var Estimates = function () {
                     $('#plan-status').val(response.estimate.status_id);
                     $('#plan-status').trigger('change');
 
+                    // select dependientes
+                    $(document).off('change', "#county", changeCounty);
+
+                    $('#county').val(response.estimate.county_id);
+                    $('#county').trigger('change');
+
+                    // llenar select district
+                    MyApp.limpiarSelect('#district');
+                    for (let district of response.estimate.districts) {
+                        $('#district').append(new Option(district.description, district.district_id, false, false));
+                    }
+
                     $('#district').val(response.estimate.district_id);
                     $('#district').trigger('change');
+
+                    $(document).on('change', "#county", changeCounty);
 
                     $('#priority').val(response.estimate.priority);
                     $('#priority').trigger('change');
@@ -972,6 +993,12 @@ var Estimates = function () {
         $(document).off('change', "#company", changeCompany);
         $(document).on('change', "#company", changeCompany);
 
+        $(document).off('change', "#filtro-county", changeFiltroCounty);
+        $(document).on('change', "#filtro-county", changeFiltroCounty);
+
+        $(document).off('change', "#county", changeCounty);
+        $(document).on('change', "#county", changeCounty);
+
         $('#item').change(changeItem);
         $('#yield-calculation').change(changeYield);
 
@@ -1141,6 +1168,70 @@ var Estimates = function () {
         $(select).select2();
     }
 
+    var changeFiltroCounty = function (e) {
+        var county_id = $(this).val();
+        var select = '#filtro-district';
+        var block_element = '#select-filtro-district';
+
+        listarDistrictsDeCounty(county_id, select, block_element);
+    }
+    var changeCounty = function (e) {
+        var county_id = $(this).val();
+        var select = '#district';
+        var block_element = '#select-district';
+
+        listarDistrictsDeCounty(county_id, select, block_element);
+    }
+    var listarDistrictsDeCounty = function (id, select, block_element) {
+        // reset
+        MyApp.limpiarSelect(select)
+
+        if (id !== '') {
+            MyApp.block(block_element);
+
+            $.ajax({
+                type: "POST",
+                url: "district/listarDeCounty",
+                dataType: "json",
+                data: {
+                    'county_id': id
+                },
+                success: function (response) {
+                    mApp.unblock(block_element);
+                    if (response.success) {
+
+                        // llenar select
+                        actualizarSelectDistricts(response.districts, select);
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                },
+                failure: function (response) {
+                    mApp.unblock(block_element);
+
+                    toastr.error(response.error, "");
+                }
+            });
+        }
+    }
+    var actualizarSelectDistricts = function (districts, select) {
+
+        // reset
+        MyApp.limpiarSelect(select);
+
+        for (var i = 0; i < districts.length; i++) {
+            $(select).append(new Option(districts[i].description, districts[i].district_id, false, false));
+        }
+        $(select).select2();
+
+        // seleccionar si solo hay uno
+        if (select === '#district' && districts.length === 1) {
+            $(select).val(districts[0].district_id);
+            $(select).trigger('change');
+        }
+    }
+
     var initPortlets = function () {
         var portlet = new mPortlet('lista-estimate');
         portlet.on('afterFullscreenOn', function (portlet) {
@@ -1268,7 +1359,7 @@ var Estimates = function () {
 
             var stage_id = $('#project-stage').val();
 
-            if (!$('#estimate-form').valid() || stage_id == '' ) {
+            if (!$('#estimate-form').valid() || stage_id == '') {
                 result = false;
 
                 if (stage_id == "") {
@@ -1661,7 +1752,7 @@ var Estimates = function () {
 
         nEditingRowBidDeadlines = null;
     };
-    
+
     // project information
     var oTableListaProjectInformation;
     var initTableListaProjectInformation = function () {
@@ -1670,12 +1761,12 @@ var Estimates = function () {
         var table = $('#project-information-table-editable');
 
         const tagOptions = [
-            { text: "" },
-            { text: "No Tag" },
-            { text: "High Priority" },
-            { text: "Medium Priority" },
-            { text: "Low Priority" },
-            { text: "Don't Bid" },
+            {text: ""},
+            {text: "No Tag"},
+            {text: "High Priority"},
+            {text: "Medium Priority"},
+            {text: "Low Priority"},
+            {text: "Don't Bid"},
         ];
 
         var aoColumns = [
@@ -1790,7 +1881,7 @@ var Estimates = function () {
 
     };
     var actualizarTableListaProjectInformation = function () {
-        if(oTableListaProjectInformation){
+        if (oTableListaProjectInformation) {
             oTableListaProjectInformation.destroy();
         }
 

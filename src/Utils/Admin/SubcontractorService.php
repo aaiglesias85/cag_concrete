@@ -572,7 +572,7 @@ class SubcontractorService extends Base
                 "name" => $value->getName(),
                 "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),
-                "county" => $value->getCounty(),
+                "county" => $value->getCountyObj() ? $value->getCountyObj()->getDescription() : "",
                 "status" => $value->getStatus(),
                 "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
                 "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',

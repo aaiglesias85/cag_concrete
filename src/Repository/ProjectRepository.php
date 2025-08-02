@@ -101,6 +101,23 @@ class ProjectRepository extends EntityRepository
     }
 
     /**
+     * ListarProjectsDeCounty: Lista los projects de un county
+     *
+     * @return Project[]
+     */
+    public function ListarProjectsDeCounty($county_id)
+    {
+        $consulta = $this->createQueryBuilder('p')
+            ->leftJoin('p.countyObj', 'c')
+            ->andWhere('c.countyId = :county_id')
+            ->setParameter('county_id', $county_id);
+
+        $consulta->orderBy('p.name', "ASC");
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarProjects: Lista los projects con filtros y paginación
      * @param int $start Inicio
      * @param int $limit Limite
@@ -113,7 +130,8 @@ class ProjectRepository extends EntityRepository
     {
         $consulta = $this->createQueryBuilder('p')
             ->leftJoin('p.company', 'c')
-            ->leftJoin('p.inspector', 'i');
+            ->leftJoin('p.inspector', 'i')
+            ->leftJoin('p.countyObj', 'c_o');
 
         // Agrupar todas las condiciones de búsqueda en una sola
         if ($sSearch !== "") {
@@ -126,7 +144,8 @@ class ProjectRepository extends EntityRepository
                 p.name LIKE :search OR
                 p.description LIKE :search OR
                 p.poNumber LIKE :search OR
-                p.poCG LIKE :search
+                p.poCG LIKE :search OR
+                c_o.description LIKE :search
             ')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -170,6 +189,9 @@ class ProjectRepository extends EntityRepository
             case "inspector":
                 $consulta->orderBy("i.name", $sSortDir_0);
                 break;
+            case "county":
+                $consulta->orderBy("c_o.description", $sSortDir_0);
+                break;
             default:
                 $consulta->orderBy("p.$iSortCol_0", $sSortDir_0);
                 break;
@@ -195,7 +217,8 @@ class ProjectRepository extends EntityRepository
         $consulta = $this->createQueryBuilder('p')
             ->select('COUNT(p.projectId)')
             ->leftJoin('p.company', 'c')
-            ->leftJoin('p.inspector', 'i');
+            ->leftJoin('p.inspector', 'i')
+            ->leftJoin('p.countyObj', 'c_o');
 
         // Agrupar todas las condiciones de búsqueda en una sola
         if ($sSearch !== "") {
@@ -208,7 +231,8 @@ class ProjectRepository extends EntityRepository
                 p.name LIKE :search OR
                 p.description LIKE :search OR
                 p.poNumber LIKE :search OR
-                p.poCG LIKE :search
+                p.poCG LIKE :search OR
+                c_o.description LIKE :search
             ')
                 ->setParameter('search', "%{$sSearch}%");
         }

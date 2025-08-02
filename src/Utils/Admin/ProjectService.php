@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\Company;
+use App\Entity\County;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
@@ -152,7 +153,7 @@ class ProjectService extends Base
             ->ListarLabor($data_tracking_id);
         foreach ($lista as $key => $value) {
 
-            if($value->getRole() === 'Lead' && ($value->getEmployee() !== null || $value->getEmployeeSubcontractor() !== null)) {
+            if ($value->getRole() === 'Lead' && ($value->getEmployee() !== null || $value->getEmployeeSubcontractor() !== null)) {
                 $employee_name = $value->getEmployee() !== null ? $value->getEmployee()->getName() : $value->getEmployeeSubcontractor()->getName();
                 $items[] = $employee_name;
             }
@@ -916,6 +917,8 @@ class ProjectService extends Base
             $arreglo_resultado['company'] = $entity->getCompany()->getName();
             $arreglo_resultado['inspector_id'] = $entity->getInspector() != null ? $entity->getInspector()->getInspectorId() : '';
             $arreglo_resultado['inspector'] = $entity->getInspector() != null ? $entity->getInspector()->getName() : '';
+            $arreglo_resultado['county_id'] = $entity->getCountyObj() != null ? $entity->getCountyObj()->getCountyId() : '';
+            $arreglo_resultado['county'] = $entity->getCountyObj() != null ? $entity->getCountyObj()->getDescription() : '';
 
             $arreglo_resultado['number'] = $entity->getProjectNumber();
             $arreglo_resultado['name'] = $entity->getName();
@@ -928,7 +931,6 @@ class ProjectService extends Base
             $arreglo_resultado['owner'] = $entity->getOwner();
             $arreglo_resultado['subcontract'] = $entity->getSubcontract();
             $arreglo_resultado['federal_funding'] = $entity->getFederalFunding();
-            $arreglo_resultado['county'] = $entity->getCounty();
             $arreglo_resultado['resurfacing'] = $entity->getResurfacing();
             $arreglo_resultado['invoice_contact'] = $entity->getInvoiceContact();
             $arreglo_resultado['certified_payrolls'] = $entity->getCertifiedPayrolls();
@@ -1208,7 +1210,7 @@ class ProjectService extends Base
      */
     public function ActualizarProject($project_id, $company_id, $inspector_id, $number, $name, $description, $location,
                                       $po_number, $po_cg, $manager, $status, $owner, $subcontract,
-                                      $federal_funding, $county, $resurfacing, $invoice_contact,
+                                      $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                       $certified_payrolls, $start_date, $end_date, $due_date,
                                       $contract_amount, $proposal_number, $project_id_number, $items, $contacts)
     {
@@ -1351,6 +1353,23 @@ class ProjectService extends Base
                 $entity->setInspector($inspector);
             }
 
+            // county
+            $county_id_old = $entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : "";
+            $county_descripcion_old = $entity->getCountyObj() ? $entity->getCountyObj()->getDescription() : "";
+            if ($county_id != '') {
+
+                if ($county_id != $county_id_old) {
+                    $notas[] = [
+                        'notes' => 'Change county, old value: ' . $county_descripcion_old,
+                        'date' => new \DateTime()
+                    ];
+                }
+
+                $county = $this->getDoctrine()->getRepository(County::class)
+                    ->find($county_id);
+                $entity->setCountyObj($county);
+            }
+
 
             if ($owner != $entity->getOwner()) {
                 $notas[] = [
@@ -1375,14 +1394,6 @@ class ProjectService extends Base
                 ];
             }
             $entity->setFederalFunding($federal_funding);
-
-            if ($county != $entity->getCounty()) {
-                $notas[] = [
-                    'notes' => 'Change county, old value: ' . $entity->getCounty(),
-                    'date' => new \DateTime()
-                ];
-            }
-            $entity->setCounty($county);
 
             if ($resurfacing != $entity->getResurfacing()) {
                 $notas[] = [
@@ -1514,7 +1525,7 @@ class ProjectService extends Base
      */
     public function SalvarProject($company_id, $inspector_id, $number, $name, $description, $location,
                                   $po_number, $po_cg, $manager, $status, $owner, $subcontract,
-                                  $federal_funding, $county, $resurfacing, $invoice_contact,
+                                  $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                   $certified_payrolls, $start_date, $end_date, $due_date,
                                   $contract_amount, $proposal_number, $project_id_number, $items, $contacts)
     {
@@ -1554,10 +1565,15 @@ class ProjectService extends Base
             $entity->setInspector($inspector);
         }
 
+        if ($county_id !== "") {
+            $county = $this->getDoctrine()->getRepository(County::class)
+                ->find($county_id);
+            $entity->setCountyObj($county);
+        }
+
         $entity->setOwner($owner);
         $entity->setSubcontract($subcontract);
         $entity->setFederalFunding($federal_funding);
-        $entity->setCounty($county);
         $entity->setResurfacing($resurfacing);
         $entity->setInvoiceContact($invoice_contact);
         $entity->setCertifiedPayrolls($certified_payrolls);
@@ -1763,7 +1779,7 @@ class ProjectService extends Base
                 "name" => $value->getName(),
                 "description" => $value->getDescription(),
                 "company" => $value->getCompany()->getName(),
-                "county" => $value->getCounty(),
+                "county" => $value->getCountyObj() ? $value->getCountyObj()->getDescription() : "",
                 "status" => $value->getStatus(),
                 "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
                 "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',

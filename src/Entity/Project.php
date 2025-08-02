@@ -90,6 +90,10 @@ class Project
     #[ORM\JoinColumn(name: 'inspector_id', referencedColumnName: 'inspector_id')]
     private ?Inspector $inspector;
 
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\County')]
+    #[ORM\JoinColumn(name: 'county_id', referencedColumnName: 'county_id')]
+    private ?County $countyObj;
+
     public function getProjectId(): ?int
     {
         return $this->projectId;
@@ -343,5 +347,15 @@ class Project
     public function setName(?string $name): void
     {
         $this->name = $name;
+    }
+
+    public function getCountyObj(): ?County
+    {
+        return $this->countyObj;
+    }
+
+    public function setCountyObj(?County $countyObj)
+    {
+        $this->countyObj = $countyObj;
     }
 }

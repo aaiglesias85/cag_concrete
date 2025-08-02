@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Equation;
 use App\Entity\Item;
@@ -15,6 +16,7 @@ use App\Entity\Unit;
 use App\Entity\Usuario;
 use App\Utils\Admin\EstimateService;
 use Google\Cloud\Channel\V1\Plan;
+use PHPUnit\Framework\Constraint\Count;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -55,8 +57,8 @@ class EstimateController extends AbstractController
                 $plan_status = $this->estimateService->getDoctrine()->getRepository(PlanStatus::class)
                     ->ListarOrdenados();
 
-                // districts
-                $districts = $this->estimateService->getDoctrine()->getRepository(District::class)
+                // countys
+                $countys = $this->estimateService->getDoctrine()->getRepository(County::class)
                     ->ListarOrdenados();
 
                 // estimators
@@ -87,7 +89,7 @@ class EstimateController extends AbstractController
                     'project_types' => $project_types,
                     'proposal_types' => $proposal_types,
                     'plan_status' => $plan_status,
-                    'districts' => $districts,
+                    'countys' => $countys,
                     'estimators' => $estimators,
                     'plan_downloadings' => $plan_downloadings,
                     'items' => $items,
@@ -116,6 +118,7 @@ class EstimateController extends AbstractController
         $project_type_id = isset($query['project_type_id']) && is_string($query['project_type_id']) ? $query['project_type_id'] : '';
         $proposal_type_id = isset($query['proposal_type_id']) && is_string($query['proposal_type_id']) ? $query['proposal_type_id'] : '';
         $status_id = isset($query['status_id']) && is_string($query['status_id']) ? $query['status_id'] : '';
+        $county_id = isset($query['county_id']) && is_string($query['county_id']) ? $query['county_id'] : '';
         $district_id = isset($query['district_id']) && is_string($query['district_id']) ? $query['district_id'] : '';
         $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
         $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
@@ -132,7 +135,7 @@ class EstimateController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->estimateService->TotalEstimates($sSearch, $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+            $total = $this->estimateService->TotalEstimates($sSearch, $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -153,7 +156,7 @@ class EstimateController extends AbstractController
             );
 
             $data = $this->estimateService->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+                $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -182,7 +185,7 @@ class EstimateController extends AbstractController
         $project_id = $request->get('project_id');
         $name = $request->get('name');
         $bidDeadline = $request->get('bidDeadline');
-        $county = $request->get('county');
+        $county_id = $request->get('county_id');
         $priority = $request->get('priority');
         $bidNo = $request->get('bidNo');
         $workHour = $request->get('workHour');
@@ -223,11 +226,11 @@ class EstimateController extends AbstractController
         try {
 
             if ($estimate_id === '') {
-                $resultado = $this->estimateService->SalvarEstimate($project_id, $name, $bidDeadline, $county, $priority,
+                $resultado = $this->estimateService->SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
                     $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                     $project_types_id, $estimators_id);
             } else {
-                $resultado = $this->estimateService->ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county, $priority,
+                $resultado = $this->estimateService->ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
                     $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
                     $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
                     $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink);

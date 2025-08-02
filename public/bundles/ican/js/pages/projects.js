@@ -241,6 +241,9 @@ var Projects = function () {
         $('#inspector').val('');
         $('#inspector').trigger('change');
 
+        $('#county').val('');
+        $('#county').trigger('change');
+
         $('#estadoactivo').val(1);
         $('#estadoinactivo').val(0);
         $('#estadocompleted').val(2);
@@ -296,9 +299,6 @@ var Projects = function () {
                     required: true
                 },
                 number: {
-                    required: true
-                },
-                county: {
                     required: true
                 },
                 name: {
@@ -373,14 +373,27 @@ var Projects = function () {
             event_change = false;
 
             var company_id = $('#company').val();
+            var county_id = $('#county').val();
 
-            if ($('#project-form').valid() && company_id != '') {
+            if ($('#project-form').valid() && company_id != '' && county_id !== "") {
 
                 SalvarProject();
 
             } else {
                 if (company_id == "") {
                     var $element = $('#select-company .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+                if (county_id == "") {
+                    var $element = $('#select-county .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                         .data("title", "This field is required")
                         .addClass("has-error")
@@ -423,7 +436,7 @@ var Projects = function () {
 
         var owner = $('#owner').val();
         var subcontract = $('#subcontract').val();
-        var county = $('#county').val();
+        var county_id = $('#county').val();
         var federal_funding = ($('#federal_funding').prop('checked')) ? 1 : 0;
         var resurfacing = ($('#resurfacing').prop('checked')) ? 1 : 0;
         var certified_payrolls = ($('#certified_payrolls').prop('checked')) ? 1 : 0;
@@ -452,7 +465,7 @@ var Projects = function () {
                 'status': status,
                 'owner': owner,
                 'subcontract': subcontract,
-                'county': county,
+                'county_id': county_id,
                 'federal_funding': federal_funding,
                 'resurfacing': resurfacing,
                 'certified_payrolls': certified_payrolls,
@@ -616,6 +629,9 @@ var Projects = function () {
                     $('#inspector').val(response.project.inspector_id);
                     $('#inspector').trigger('change');
 
+                    $('#county').val(response.project.county_id);
+                    $('#county').trigger('change');
+
                     $('#name').val(response.project.name);
                     $('#description').val(response.project.description);
                     $('#number').val(response.project.number);
@@ -626,7 +642,6 @@ var Projects = function () {
                     $('#manager').val(response.project.manager);
                     $('#owner').val(response.project.owner);
                     $('#subcontract').val(response.project.subcontract);
-                    $('#county').val(response.project.county);
                     $('#invoice_contact').val(response.project.invoice_contact);
 
 

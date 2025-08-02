@@ -75,7 +75,7 @@ class ItemService extends Base
                 "manager" => $value->getProject()->getManager(),
                 "status" => $value->getProject()->getStatus(),
                 "owner" => $value->getProject()->getOwner(),
-                "county" => $value->getProject()->getCounty(),
+                "county" => $value->getProject()->getCountyObj() ? $value->getProject()->getCountyObj()->getDescription() : "",
                 "posicion" => $key
             ];
             $projects[] = $project;

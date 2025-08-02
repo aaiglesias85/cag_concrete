@@ -10,6 +10,7 @@ use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingMaterial;
 use App\Entity\DataTrackingSubcontract;
+use App\Entity\District;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateQuote;
 use App\Entity\Holiday;
@@ -376,6 +377,7 @@ class Base
             $menuEstimate = false;
             $menuPlanDownloading = false;
             $menuHoliday = false;
+            $menuCounty = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -471,6 +473,9 @@ class Base
                 if ($permiso['funcion_id'] == 31 && $permiso['ver']) {
                     $menuHoliday = true;
                 }
+                if ($permiso['funcion_id'] == 32 && $permiso['ver']) {
+                    $menuCounty = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -504,6 +509,7 @@ class Base
                 'menuEstimate' => $menuEstimate,
                 'menuPlanDownloading' => $menuPlanDownloading,
                 'menuHoliday' => $menuHoliday,
+                'menuCounty' => $menuCounty,
             );
         }
 
@@ -1217,6 +1223,27 @@ class Base
         }
 
         return $holidays;
+    }
+
+    /**
+     * ListarDistrictsDeCounty
+     * @param $county_id
+     * @return array
+     */
+    public function ListarDistrictsDeCounty($county_id)
+    {
+        $districts = [];
+
+        $lista = $this->getDoctrine()->getRepository(District::class)
+            ->ListarOrdenados("", "", $county_id);
+        foreach ($lista as $value) {
+            $districts[] = [
+                'district_id' => $value->getDistrictId(),
+                'description' => $value->getDescription()
+            ];
+        }
+
+        return $districts;
     }
 
 }

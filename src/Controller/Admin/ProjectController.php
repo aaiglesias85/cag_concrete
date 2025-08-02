@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\County;
 use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Item;
@@ -48,6 +49,10 @@ class ProjectController extends AbstractController
 
                 $yields_calculation = $this->projectService->ListarYieldsCalculation();
 
+                // countys
+                $countys = $this->projectService->getDoctrine()->getRepository(County::class)
+                    ->ListarOrdenados();
+
                 return $this->render('admin/project/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'companies' => $companies,
@@ -55,7 +60,8 @@ class ProjectController extends AbstractController
                     'items' => $items,
                     'equations' => $equations,
                     'yields_calculation' => $yields_calculation,
-                    'units' => $units
+                    'units' => $units,
+                    'countys' => $countys
                 ));
             }
         } else {
@@ -153,7 +159,7 @@ class ProjectController extends AbstractController
         $owner = $request->get('owner');
         $subcontract = $request->get('subcontract');
         $federal_funding = $request->get('federal_funding');
-        $county = $request->get('county');
+        $county_id = $request->get('county_id');
         $resurfacing = $request->get('resurfacing');
         $invoice_contact = $request->get('invoice_contact');
         $certified_payrolls = $request->get('certified_payrolls');
@@ -173,12 +179,12 @@ class ProjectController extends AbstractController
 
             if ($project_id == "") {
                 $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name, $description,
-                    $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
+                    $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             } else {
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
-                    $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county,
+                    $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
                     $proposal_number, $project_id_number, $items, $contacts);
             }

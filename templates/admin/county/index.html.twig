@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block subtitle %} - Districts{% endblock %}
+{% block subtitle %} - Counties{% endblock %}
 
 {% block stylesheetspecific %}{% endblock %}
 
@@ -10,7 +10,7 @@
         <div class="d-flex align-items-center">
             <div class="mr-auto">
                 <h3 class="m-subheader__title m-subheader__title--separator">
-                    Districts
+                    Counties
                 </h3>
                 <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
                     <li class="m-nav__item m-nav__item--home">
@@ -21,13 +21,13 @@
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Districts</span>
+                            <span class="m-nav__link-text">Counties</span>
                         </a>
                     </li>
                     <li class="m-nav__separator">-</li>
                     <li class="m-nav__item">
                         <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Manage districts</span>
+                            <span class="m-nav__link-text">Manage Counties</span>
                         </a>
                     </li>
                 </ul>
@@ -37,26 +37,20 @@
     <!-- END: Subheader -->
 
     <div class="m-content">
-        <div id="lista-district" class="m-portlet m-portlet--mobile" m-portlet="true">
+        <div id="lista-county" class="m-portlet m-portlet--mobile" m-portlet="true">
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
-                            Districts
+                            Counties
                         </h3>
                     </div>
-                    <a href="javascript:;" id="btn-reset-filtrar" class="btn mr-1">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>Reset filters</span>
-                            </span>
-                    </a>
                 </div>
                 <div class="m-portlet__head-tools">
                     <ul class="m-portlet__nav">
                         {% if permiso.agregar %}
                             <li class="m-portlet__nav-item">
-                                <a id="btn-nuevo-district"
+                                <a id="btn-nuevo-county"
                                    class="btn btn-success btn-icon"
                                    href="javascript:;">
                                     <span>
@@ -68,7 +62,7 @@
                         {% endif %}
                         {% if permiso.eliminar %}
                             <li class="m-portlet__nav-item">
-                                <a id="btn-eliminar-district"
+                                <a id="btn-eliminar-county"
                                    class="btn btn-danger btn-icon"
                                    href="javascript:;">
                                     <span>
@@ -90,18 +84,8 @@
             <div class="m-portlet__body">
 
                 <!--begin: Search Form -->
-                <div class="form-group m-form__group row align-items-center mb-3">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-2">
-                        <select class="form-control m-select2" id="filtro-county">
-                            <option value="">County</option>
-                            {% for item in countys %}
-                                <option value="{{ item.countyId }}">{{ item.description }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3">
+                <div class="form-group m-form__group row align-items-center mb-2">
+                    <div class="col-md-4">
                         <div class="m-input-icon m-input-icon--left">
                             <input type="text" class="form-control m-input m_form_search"
                                    placeholder="Search...">
@@ -110,31 +94,21 @@
 								</span>
                         </div>
                     </div>
-                    <div class="col-md-1">
-                        <a href="javascript:;" id="btn-filtrar"
-                           class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>Search</span>
-                                        </span>
-                        </a>
-                    </div>
-                    <div class="col-md-3"></div>
                 </div>
                 <!--end: Search Form -->
 
                 <!--begin: Datatable -->
-                <div class="m_datatable" id="district-table-editable"></div>
+                <div class="m_datatable" id="county-table-editable"></div>
                 <!--end: Datatable -->
             </div>
         </div>
 
-        <div id="form-district" class="m-portlet m--hide">
+        <div id="form-county" class="m-portlet m--hide">
             <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text" id="form-district-title">
-                            Do you want to create a new district? Follow the next steps:
+                        <h3 class="m-portlet__head-text" id="form-county-title">
+                            Do you want to create a new county? Follow the next steps:
                         </h3>
                     </div>
                 </div>
@@ -142,45 +116,29 @@
                     <ul class="m-portlet__nav">
                         <li class="m-portlet__nav-item">
                             <a href="javascript:;"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-district"><i
+                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-county"><i
                                         class="la la-close"></i></a>
                         </li>
                     </ul>
                 </div>
             </div>
-            <form class="m-form" id="district-form" action="#"
+            <form class="m-form" id="county-form" action="#"
                   enctype="multipart/form-data" method="post">
 
-                <input type="hidden" id="district_id" name="district_id"/>
+                <input type="hidden" id="county_id" name="county_id"/>
 
                 <div class="m-portlet__body">
                     <div class="m-form__section m-form__section--first">
 
                         <div class="form-group m-form__group ic-form-group">
-                            <div class="row mb-3">
-                                <div class="col-md-3" id="select-county">
-                                    <label>
-                                        <span class="ic-step-number">1</span>
-                                        County
-                                        <span class="ic-small italic">(required)</span>
-                                    </label>
-                                    <select class="form-control m-select2 event-change" id="county" name="county">
-                                        <option value="">Select</option>
-                                        {% for item in countys %}
-                                            <option value="{{ item.countyId }}">{{ item.description }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-9">
-                                    <label>
-                                        Name
-                                        <span class="ic-small italic">(required)</span>
-                                    </label>
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                Name
+                                <span class="ic-small italic">(required)</span>
+                            </label>
 
-                                    <input type="text" class="form-control form-control-text event-change"
-                                           id="description" name="description"/>
-                                </div>
-                            </div>
+                            <input type="text" class="form-control form-control-text event-change"
+                                   id="description" name="description"/>
                         </div>
 
                         <div class="form-group m-form__group ic-form-group">
@@ -210,11 +168,11 @@
                     </div>
                     <div class="m-form__actions">
                         {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-salvar-district" class="btn btn-success" type="button">
+                            <button id="btn-salvar-county" class="btn btn-success" type="button">
                                 Save
                             </button>
                         {% endif %}
-                        <button class="btn btn-danger cerrar-form-district" type="button">
+                        <button class="btn btn-danger cerrar-form-county" type="button">
                             Cancel
                         </button>
                     </div>
@@ -227,7 +185,7 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
-    <script src="{{ asset('bundles/ican/js/pages/districts.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('bundles/ican/js/pages/counties.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {
@@ -237,7 +195,7 @@
         };
 
         jQuery(document).ready(function () {
-            Districts.init();
+            Counties.init();
         });
     </script>
 {% endblock %}

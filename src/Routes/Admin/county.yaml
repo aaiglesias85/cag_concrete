@@ -1,0 +1,23 @@
+county:
+  path: /county
+  defaults: { _controller: App\Controller\Admin\CountyController::index }
+
+listarCountyAdmin:
+  path: /county/listar
+  defaults: { _controller: App\Controller\Admin\CountyController::listar, _format: json }
+
+salvarCountyAdmin:
+  path: /county/salvar
+  defaults: { _controller: App\Controller\Admin\CountyController::salvar, _format: json }
+
+eliminarCountyAdmin:
+  path: /county/eliminar
+  defaults: { _controller: App\Controller\Admin\CountyController::eliminar, _format: json }
+
+eliminarCountysAdmin:
+  path: /county/eliminarCountys
+  defaults: { _controller: App\Controller\Admin\CountyController::eliminarCountys, _format: json }
+
+cargarDatosCountyAdmin:
+  path: /county/cargarDatos
+  defaults: { _controller: App\Controller\Admin\CountyController::cargarDatos, _format: json }

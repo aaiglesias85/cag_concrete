@@ -439,6 +439,16 @@ var MyApp = function () {
         return `${firstDay.getMonth() + 1}/${firstDay.getDate()}/${firstDay.getFullYear()}`;
     }
 
+    // limpiar select
+    var limpiarSelect = function (id) {
+        $(id + ' option').each(function (e) {
+            if ($(this).val() != "")
+                $(this).remove();
+        });
+
+        $(id).select2();
+    }
+
 
     return {
         //main function to initiate the module
@@ -478,7 +488,8 @@ var MyApp = function () {
         },
         getSalt: function () {
             return '$2a$10$sh/ip53Dl5Uk45WaMsRdI.';
-        }
+        },
+        limpiarSelect: limpiarSelect
     };
 
 }();

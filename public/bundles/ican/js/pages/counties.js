@@ -1,13 +1,13 @@
-var Districts = function () {
+var Counties = function () {
 
     var oTable;
     var rowDelete = null;
 
     //Inicializar table
     var initTable = function () {
-        MyApp.block('#district-table-editable');
+        MyApp.block('#county-table-editable');
 
-        var table = $('#district-table-editable');
+        var table = $('#county-table-editable');
 
         var aoColumns = [];
 
@@ -26,10 +26,6 @@ var Districts = function () {
             {
                 field: "description",
                 title: "Name",
-            },
-            {
-                field: "county",
-                title: "County"
             },
             {
                 field: "status",
@@ -60,7 +56,7 @@ var Districts = function () {
                 type: 'remote',
                 source: {
                     read: {
-                        url: 'district/listar',
+                        url: 'county/listar',
                     }
                 },
                 pageSize: 25,
@@ -101,19 +97,19 @@ var Districts = function () {
         //Events
         oTable
             .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#district-table-editable');
+                mApp.unblock('#county-table-editable');
             })
             .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#district-table-editable');
+                mApp.unblock('#county-table-editable');
             })
             .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#district-table-editable');
+                MyApp.block('#county-table-editable');
             })
             .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#district-table-editable');
+                MyApp.block('#county-table-editable');
             })
             .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#district-table-editable');
+                MyApp.block('#county-table-editable');
             })
             .on('m-datatable--on-check', function (e, args) {
                 //eventsWriter('Checkbox active: ' + args.toString());
@@ -124,51 +120,19 @@ var Districts = function () {
 
         //Busqueda
         var query = oTable.getDataSourceQuery();
-        $('#lista-district .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
+        $('#lista-county .m_form_search').on('keyup', function (e) {
+            // shortcode to datatable.getDataSourceParam('query');
+            var query = oTable.getDataSourceQuery();
+            query.generalSearch = $(this).val().toLowerCase();
+            // shortcode to datatable.setDataSourceParam('query', query);
+            oTable.setDataSourceQuery(query);
+            oTable.load();
         }).val(query.generalSearch);
     };
 
-    //Filtrar
-    var initAccionFiltrar = function () {
-
-        $(document).off('click', "#btn-filtrar");
-        $(document).on('click', "#btn-filtrar", function (e) {
-            btnClickFiltrar();
-        });
-
-    };
-    var initAccionResetFiltrar = function () {
-
-        $(document).off('click', "#btn-reset-filtrar");
-        $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-district .m_form_search').val('');
-
-            $('#filtro-county').val('');
-            $('#filtro-county').trigger('change');
-
-            btnClickFiltrar();
-
-        });
-
-    };
-    var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
-
-        var generalSearch = $('#lista-district .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var county_id = $('#filtro-county').val();
-        query.county_id = county_id;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
-    }
-
     //Reset forms
     var resetForms = function () {
-        $('#district-form input').each(function (e) {
+        $('#county-form input').each(function (e) {
             $element = $(this);
             $element.val('');
 
@@ -178,16 +142,13 @@ var Districts = function () {
         
         $('#estadoactivo').prop('checked', true);
 
-        $('#county').val('');
-        $('#county').trigger('change');
-
         event_change = false;
     };
 
     //Validacion
     var initForm = function () {
         //Validacion
-        $("#district-form").validate({
+        $("#county-form").validate({
             rules: {
                 description: {
                     required: true
@@ -229,23 +190,23 @@ var Districts = function () {
 
     //Nuevo
     var initAccionNuevo = function () {
-        $(document).off('click', "#btn-nuevo-district");
-        $(document).on('click', "#btn-nuevo-district", function (e) {
+        $(document).off('click', "#btn-nuevo-county");
+        $(document).on('click', "#btn-nuevo-county", function (e) {
             btnClickNuevo();
         });
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new distric? Follow the next steps:";
-            $('#form-district-title').html(formTitle);
-            $('#form-district').removeClass('m--hide');
-            $('#lista-district').addClass('m--hide');
+            var formTitle = "Do you want to create a new county? Follow the next steps:";
+            $('#form-county-title').html(formTitle);
+            $('#form-county').removeClass('m--hide');
+            $('#lista-county').addClass('m--hide');
         };
     };
     //Salvar
     var initAccionSalvar = function () {
-        $(document).off('click', "#btn-salvar-district");
-        $(document).on('click', "#btn-salvar-district", function (e) {
+        $(document).off('click', "#btn-salvar-county");
+        $(document).on('click', "#btn-salvar-county", function (e) {
             btnClickSalvarForm();
         });
 
@@ -253,30 +214,27 @@ var Districts = function () {
             mUtil.scrollTo();
 
             event_change = false;
-
-            var county_id = $('#county').val();
             
-            if ($('#district-form').valid() && county_id !== "") {
+            if ($('#county-form').valid()) {
 
-                var district_id = $('#district_id').val();
+                var county_id = $('#county_id').val();
 
                 var description = $('#description').val();
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
 
-                MyApp.block('#form-district');
+                MyApp.block('#form-county');
 
                 $.ajax({
                     type: "POST",
-                    url: "district/salvar",
+                    url: "county/salvar",
                     dataType: "json",
                     data: {
-                        'district_id': district_id,
                         'county_id': county_id,
                         'description': description,
                         'status': status
                     },
                     success: function (response) {
-                        mApp.unblock('#form-district');
+                        mApp.unblock('#form-county');
                         if (response.success) {
 
                             toastr.success(response.message, "");
@@ -289,31 +247,18 @@ var Districts = function () {
                         }
                     },
                     failure: function (response) {
-                        mApp.unblock('#form-district');
+                        mApp.unblock('#form-county');
 
                         toastr.error(response.error, "");
                     }
                 });
-            }else{
-                if (county_id === "") {
-                    var $element = $('#select-county .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
             }
         };
     }
     //Cerrar form
     var initAccionCerrar = function () {
-        $(document).off('click', ".cerrar-form-district");
-        $(document).on('click', ".cerrar-form-district", function (e) {
+        $(document).off('click', ".cerrar-form-county");
+        $(document).on('click', ".cerrar-form-county", function (e) {
             cerrarForms();
         });
     }
@@ -344,53 +289,50 @@ var Districts = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-district').addClass('m--hide');
-        $('#lista-district').removeClass('m--hide');
+        $('#form-county').addClass('m--hide');
+        $('#lista-county').removeClass('m--hide');
     };
     //Editar
     var initAccionEditar = function () {
-        $(document).off('click', "#district-table-editable a.edit");
-        $(document).on('click', "#district-table-editable a.edit", function (e) {
+        $(document).off('click', "#county-table-editable a.edit");
+        $(document).on('click', "#county-table-editable a.edit", function (e) {
             e.preventDefault();
             resetForms();
 
-            var district_id = $(this).data('id');
-            $('#district_id').val(district_id);
+            var county_id = $(this).data('id');
+            $('#county_id').val(county_id);
 
-            $('#form-district').removeClass('m--hide');
-            $('#lista-district').addClass('m--hide');
+            $('#form-county').removeClass('m--hide');
+            $('#lista-county').addClass('m--hide');
 
-            editRow(district_id);
+            editRow(county_id);
         });
 
-        function editRow(district_id) {
+        function editRow(county_id) {
 
-            MyApp.block('#form-district');
+            MyApp.block('#form-county');
 
             $.ajax({
                 type: "POST",
-                url: "district/cargarDatos",
+                url: "county/cargarDatos",
                 dataType: "json",
                 data: {
-                    'district_id': district_id
+                    'county_id': county_id
                 },
                 success: function (response) {
-                    mApp.unblock('#form-district');
+                    mApp.unblock('#form-county');
                     if (response.success) {
                         //Datos reminder
 
-                        var formTitle = "You want to update the district? Follow the next steps:";
-                        $('#form-district-title').html(formTitle);
+                        var formTitle = "You want to update the county? Follow the next steps:";
+                        $('#form-county-title').html(formTitle);
 
-                        $('#description').val(response.district.description);
+                        $('#description').val(response.county.description);
 
-                        if (!response.district.status) {
+                        if (!response.county.status) {
                             $('#estadoactivo').prop('checked', false);
                             $('#estadoinactivo').prop('checked', true);
                         }
-
-                        $('#county').val(response.district.county_id);
-                        $('#county').trigger('change');
 
                         event_change = false;
 
@@ -399,7 +341,7 @@ var Districts = function () {
                     }
                 },
                 failure: function (response) {
-                    mApp.unblock('#form-district');
+                    mApp.unblock('#form-county');
 
                     toastr.error(response.error, "");
                 }
@@ -409,8 +351,8 @@ var Districts = function () {
     };
     //Eliminar
     var initAccionEliminar = function () {
-        $(document).off('click', "#district-table-editable a.delete");
-        $(document).on('click', "#district-table-editable a.delete", function (e) {
+        $(document).off('click', "#county-table-editable a.delete");
+        $(document).on('click', "#county-table-editable a.delete", function (e) {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
@@ -419,8 +361,8 @@ var Districts = function () {
             });
         });
 
-        $(document).off('click', "#btn-eliminar-district");
-        $(document).on('click', "#btn-eliminar-district", function (e) {
+        $(document).off('click', "#btn-eliminar-county");
+        $(document).on('click', "#btn-eliminar-county", function (e) {
             btnClickEliminar();
         });
 
@@ -450,24 +392,24 @@ var Districts = function () {
                     'show': true
                 });
             } else {
-                toastr.error('Select districts to delete', "");
+                toastr.error('Select proposal types to delete', "");
             }
         };
 
         function btnClickModalEliminar() {
-            var district_id = rowDelete;
+            var county_id = rowDelete;
 
-            MyApp.block('#district-table-editable');
+            MyApp.block('#county-table-editable');
 
             $.ajax({
                 type: "POST",
-                url: "district/eliminar",
+                url: "county/eliminar",
                 dataType: "json",
                 data: {
-                    'district_id': district_id
+                    'county_id': county_id
                 },
                 success: function (response) {
-                    mApp.unblock('#district-table-editable');
+                    mApp.unblock('#county-table-editable');
 
                     if (response.success) {
                         oTable.load();
@@ -479,7 +421,7 @@ var Districts = function () {
                     }
                 },
                 failure: function (response) {
-                    mApp.unblock('#district-table-editable');
+                    mApp.unblock('#county-table-editable');
 
                     toastr.error(response.error, "");
                 }
@@ -499,17 +441,17 @@ var Districts = function () {
                 }
             });
 
-            MyApp.block('#district-table-editable');
+            MyApp.block('#county-table-editable');
 
             $.ajax({
                 type: "POST",
-                url: "district/eliminarDistricts",
+                url: "county/eliminarCountys",
                 dataType: "json",
                 data: {
                     'ids': ids
                 },
                 success: function (response) {
-                    mApp.unblock('#district-table-editable');
+                    mApp.unblock('#county-table-editable');
                     if (response.success) {
 
                         oTable.load();
@@ -520,7 +462,7 @@ var Districts = function () {
                     }
                 },
                 failure: function (response) {
-                    mApp.unblock('#district-table-editable');
+                    mApp.unblock('#county-table-editable');
 
                     toastr.error(response.error, "");
                 }
@@ -532,12 +474,10 @@ var Districts = function () {
     var initWidgets = function () {
 
         initPortlets();
-
-        $('.m-select2').select2();
     }
 
     var initPortlets = function () {
-        var portlet = new mPortlet('lista-district');
+        var portlet = new mPortlet('lista-county');
         portlet.on('afterFullscreenOn', function (portlet) {
             $('.m-portlet').addClass('m-portlet--fullscreen');
         });
@@ -560,9 +500,6 @@ var Districts = function () {
             initAccionCerrar();
             initAccionEditar();
             initAccionEliminar();
-
-            initAccionFiltrar();
-            initAccionResetFiltrar();
 
             initAccionChange();
 

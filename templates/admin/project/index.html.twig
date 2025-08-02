@@ -379,13 +379,18 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-3" id="select-county">
                                             <label>
                                                 County
                                                 <span class="ic-small italic">(required)</span>
                                             </label>
-                                            <input type="text" class="form-control event-change" id="county"
-                                                   name="county">
+                                            <select class="form-control m-select2 event-change" id="county"
+                                                    name="county">
+                                                <option value="">Select</option>
+                                                {% for item in countys %}
+                                                    <option value="{{ item.countyId }}">{{ item.description }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="col-md-4" id="select-inspector">
                                             <label>

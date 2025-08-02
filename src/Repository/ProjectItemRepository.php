@@ -111,12 +111,13 @@ class ProjectItemRepository extends EntityRepository
             ->leftJoin('p_i.project', 'p')
             ->leftJoin('p_i.item', 'it')
             ->leftJoin('p.company', 'c')
-            ->leftJoin('p.inspector', 'i');
+            ->leftJoin('p.inspector', 'i')
+            ->leftJoin('p.countyObj', 'c_o');
 
         // Filtro por búsqueda
         if (!empty($sSearch)) {
             $qb->andWhere('it.description LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search 
-                OR p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search 
+                OR p.manager LIKE :search OR c_o.description LIKE :search OR p.projectNumber LIKE :search 
                 OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search 
                 OR p.poCG LIKE :search OR c.name LIKE :search OR p.projectIdNumber LIKE :search 
                 OR p.location LIKE :search OR p.subcontract LIKE :search OR p.proposalNumber LIKE :search')
@@ -159,6 +160,9 @@ class ProjectItemRepository extends EntityRepository
             case "inspector":
                 $qb->orderBy("i.name", $sSortDir_0);
                 break;
+            case "county":
+                $qb->orderBy("c_o.description", $sSortDir_0);
+                break;
             default:
                 $qb->orderBy("p.$iSortCol_0", $sSortDir_0);
                 break;
@@ -188,12 +192,13 @@ class ProjectItemRepository extends EntityRepository
             ->leftJoin('p_i.project', 'p')
             ->leftJoin('p_i.item', 'it')
             ->leftJoin('p.company', 'c')
-            ->leftJoin('p.inspector', 'i');
+            ->leftJoin('p.inspector', 'i')
+            ->leftJoin('p.countyObj', 'c_o');
 
         // Filtro por búsqueda
         if (!empty($sSearch)) {
             $qb->andWhere('it.description LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search 
-                OR p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search 
+                OR p.manager LIKE :search OR c_o.description LIKE :search OR p.projectNumber LIKE :search 
                 OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search 
                 OR p.poCG LIKE :search OR c.name LIKE :search OR p.projectIdNumber LIKE :search 
                 OR p.location LIKE :search OR p.subcontract LIKE :search OR p.proposalNumber LIKE :search')

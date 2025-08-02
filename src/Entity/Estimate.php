@@ -88,6 +88,10 @@ class Estimate
     #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'status_id')]
     private ?PlanStatus $status = null;
 
+    #[ORM\ManyToOne(targetEntity: County::class)]
+    #[ORM\JoinColumn(name: 'county_id', referencedColumnName: 'county_id')]
+    private ?County $countyObj = null;
+
     #[ORM\ManyToOne(targetEntity: District::class)]
     #[ORM\JoinColumn(name: 'district_id', referencedColumnName: 'district_id')]
     private ?District $district = null;
@@ -388,5 +392,15 @@ class Estimate
     public function setPlanLink(?string $planLink): void
     {
         $this->planLink = $planLink;
+    }
+
+    public function getCountyObj(): ?County
+    {
+        return $this->countyObj;
+    }
+
+    public function setCountyObj(?County $countyObj): void
+    {
+        $this->countyObj = $countyObj;
     }
 }
