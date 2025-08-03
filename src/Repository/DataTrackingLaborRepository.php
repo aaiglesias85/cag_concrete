@@ -493,7 +493,7 @@ class DataTrackingLaborRepository extends EntityRepository
 
         // Filtro por fecha
         if ($fecha) {
-            $consulta->andWhere('d_t.date >= :fecha')
+            $consulta->andWhere('d_t.date = :fecha')
                 ->setParameter('fecha', $fecha);
         }
 
