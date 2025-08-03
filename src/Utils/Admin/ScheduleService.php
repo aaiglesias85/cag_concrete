@@ -694,15 +694,20 @@ class ScheduleService extends Base
         $em = $this->getDoctrine()->getManager();
 
         $schedules_id = explode(',', $schedules_id);
+        $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
+        $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
+
+        $intervalo = new \DateInterval('P1D');
+        $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
+
         foreach ($schedules_id as $schedule_id) {
-            $entity = $this->getDoctrine()->getRepository(Schedule::class)
-                ->find($schedule_id);
+            $entity = $this->getDoctrine()->getRepository(Schedule::class)->find($schedule_id);
             /** @var Schedule $entity */
             if ($entity != null) {
 
                 $project_id = $entity->getProject()->getProjectId();
                 $project_contact_id = $entity->getContactProject() ? $entity->getContactProject()->getContactId() : "";
-                $hour = $entity->getHour() !== null ? $entity->getHour() : "";
+                $hour = $entity->getHour() ?? "";
                 $description = $entity->getDescription();
                 $location = $entity->getLocation();
                 $latitud = $entity->getLatitud();
@@ -717,48 +722,52 @@ class ScheduleService extends Base
                 $employees_id = $this->ListarEmployeesIdDeSchedule($schedule_id);
                 $employees_id = implode(",", $employees_id);
 
-                // validar
+                // Validar fechas y hora
                 $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
                 if ($validar_fecha_error) {
-                    $resultado['success'] = false;
-                    $resultado['error'] = $validar_fecha_error;
-                    return $resultado;
+                    return ['success' => false, 'error' => $validar_fecha_error];
                 }
 
-                $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
-                $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
+                // Día de la semana original (0=domingo, 1=lunes, ..., 6=sábado)
+                $originalWeekday = $entity->getDay()->format('w');
 
-                $intervalo = new \DateInterval('P1D');
-                $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
                 foreach ($periodo as $dia) {
-
-                    /*
-                    if ($dia->format('w') === '0') {
-                        continue; // Saltar domingos
+                    if ($dia->format('w') != $originalWeekday) {
+                        continue; // Solo clonar si coincide el día de la semana
                     }
-                    */
 
-                    $this->Salvar($project_id, $project_contact_id, $dia, $description, $location, $latitud, $longitud,
-                        $vendor_id, $concrete_vendor_contacts_id, $hour, $quantity, $notes, $highpriority, $employees_id);
-
+                    $this->Salvar(
+                        $project_id,
+                        $project_contact_id,
+                        $dia,
+                        $description,
+                        $location,
+                        $latitud,
+                        $longitud,
+                        $vendor_id,
+                        $concrete_vendor_contacts_id,
+                        $hour,
+                        $quantity,
+                        $notes,
+                        $highpriority,
+                        $employees_id
+                    );
                 }
-
 
                 $em->flush();
 
-                //Salvar log
-                $log_operacion = "Add";
-                $log_categoria = "Schedule";
-                $log_descripcion = "The schedule is added: $description, Start date: " . $date_start->format('m/d/Y') . " Stop date: " . $date_stop->format('m/d/Y');
-                $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                // Log
+                $this->SalvarLog(
+                    "Add",
+                    "Schedule",
+                    "The schedule was cloned: $description, From " . $date_start->format('m/d/Y') . " to " . $date_stop->format('m/d/Y')
+                );
             }
         }
 
-        $resultado['success'] = true;
-
-        return $resultado;
-
+        return ['success' => true];
     }
+
 
     /**
      * ActualizarSchedule: Actuializa los datos del rol en la BD
