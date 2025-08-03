@@ -399,11 +399,17 @@ class ScheduleService extends Base
 
                 // lead
                 $schedule_employees = $this->ListarEmployeesDeSchedule($schedule_id);
-                $lead = !empty($schedule_employees) ? $schedule_employees[0] : null;
+                $schedule_leads = $this->DevolverLeadsDeFecha($value->getProject()->getProjectId(), $value->getDay()->format('Y-m-d'));
+
+                $lead = !empty($schedule_employees)
+                    ? $schedule_employees[0]
+                    : (!empty($schedule_leads) ? $schedule_leads[0] : null);
 
                 $otros = 0;
                 if (!empty($schedule_employees)) {
                     $otros = count($schedule_employees) - 1;
+                } elseif (!empty($schedule_leads)) {
+                    $otros = count($schedule_leads) - 1;
                 }
 
                 if ($lead) {
