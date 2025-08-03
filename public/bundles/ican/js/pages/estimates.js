@@ -660,17 +660,20 @@ var Estimates = function () {
 
                     // company
                     $(document).off('change', "#company", changeCompany);
+                    $(document).off('change', "#contact", changeContact);
 
                     $('#company').val(response.estimate.company_id);
                     $('#company').trigger('change');
 
                     // contacts
+                    contacts_company = response.estimate.contacts;
                     actualizarSelectContacts(response.estimate.contacts);
 
                     $('#contact').val(response.estimate.contact_id);
                     $('#contact').trigger('change');
 
                     $(document).on('change', "#company", changeCompany);
+                    $(document).on('change', "#contact", changeContact);
 
                     $('#jobWalk').val(response.estimate.jobWalk);
                     $('#rfiDueDate').val(response.estimate.rfiDueDate);
@@ -998,6 +1001,9 @@ var Estimates = function () {
         $(document).off('change', "#company", changeCompany);
         $(document).on('change', "#company", changeCompany);
 
+        $(document).off('change', "#contact", changeContact);
+        $(document).on('change', "#contact", changeContact);
+
         $(document).off('change', "#filtro-county", changeFiltroCounty);
         $(document).on('change', "#filtro-county", changeFiltroCounty);
 
@@ -1117,15 +1123,13 @@ var Estimates = function () {
     }
 
 
+    // change company
+    var contacts_company = [];
     var changeCompany = function (e) {
         var company_id = $('#company').val();
 
         // reset
-        $('#contact option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#contact').select2();
+        MyApp.limpiarSelect('#contact');
 
         if (company_id !== '') {
             MyApp.block('#select-contact');
@@ -1142,7 +1146,8 @@ var Estimates = function () {
                     if (response.success) {
 
                         // llenar select
-                        actualizarSelectContacts(response.contacts);
+                        contacts_company = response.contacts;
+                        actualizarSelectContacts();
 
                     } else {
                         toastr.error(response.error, "");
@@ -1156,21 +1161,50 @@ var Estimates = function () {
             });
         }
     }
-    var actualizarSelectContacts = function (contacts) {
+    var actualizarSelectContacts = function () {
 
         const select = '#contact';
 
         // reset
-        $(select + ' option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $(select).select2();
+        MyApp.limpiarSelect(select);
 
-        for (var i = 0; i < contacts.length; i++) {
-            $(select).append(new Option(contacts[i].name, contacts[i].contact_id, false, false));
+        for (var i = 0; i < contacts_company.length; i++) {
+            $(select).append(new Option(contacts_company[i].name, contacts_company[i].contact_id, false, false));
         }
         $(select).select2();
+    }
+
+    // change contact
+    var changeContact = function (e) {
+        var contact_id = $('#contact').val();
+
+        var contact = contacts_company.find(item => Number(item.contact_id) === Number(contact_id));
+        if (contact) {
+            actualizarTagsContact(contact);
+        }
+    }
+    var actualizarTagsContact = function (contact) {
+        // Obtener y dividir los valores actuales
+        var existingPhones = $('#phone').val() ? $('#phone').val().split(',') : [];
+        var existingEmails = $('#email').val() ? $('#email').val().split(',') : [];
+
+        // Limpiar espacios y normalizar
+        existingPhones = existingPhones.map(p => p.trim());
+        existingEmails = existingEmails.map(e => e.trim().toLowerCase());
+
+        // Agregar nuevo teléfono si no existe
+        if (contact.phone && !existingPhones.includes(contact.phone.trim())) {
+            existingPhones.push(contact.phone.trim());
+        }
+
+        // Agregar nuevo email si no existe
+        if (contact.email && !existingEmails.includes(contact.email.trim().toLowerCase())) {
+            existingEmails.push(contact.email.trim());
+        }
+
+        // Importar sin duplicados
+        $('#phone').importTags(existingPhones.join(','));
+        $('#email').importTags(existingEmails.join(','));
     }
 
     var changeFiltroCounty = function (e) {
@@ -1435,13 +1469,8 @@ var Estimates = function () {
                 $('#contact').val(contact.contact_id);
                 $('#contact').trigger('change');
 
-                // phone
-                var phones = $('#phone').val() == '' ? contact.phone : $('#phone').val() + ',' + contact.phone;
-                $('#phone').importTags(phones);
-
-                // email
-                var emails = $('#email').val() == '' ? contact.email : $('#email').val() + ',' + contact.email;
-                $('#email').importTags(emails);
+                // actualizar tags
+                actualizarTagsContact(contact);
             }
         });
     }
@@ -1654,15 +1683,8 @@ var Estimates = function () {
                 resetFormBidDeadLines();
                 $('#modal-bid-deadline').modal('hide');
 
-                // Obtener la fecha más próxima en el futuro (ascendente)
-                var fechasOrdenadas = bid_deadlines
-                    .filter(b => b.bidDeadline)
-                    .sort((a, b) => parseFecha(a.bidDeadline) - parseFecha(b.bidDeadline));
-
-                // Tomar la fecha más cercana
-                var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
-                $('#bidDeadline').val(fechaMasCercana);
-
+                // definir la fecha mas reciente
+                definirFechaMasReciente();
 
             } else {
                 if (company_id === "") {
@@ -1692,14 +1714,6 @@ var Estimates = function () {
             }
 
         });
-
-        function parseFecha(fechaStr) {
-            // formato esperado: m/d/Y hh:mm
-            const [fecha, hora] = fechaStr.split(' ');
-            const [mes, dia, anio] = fecha.split('/');
-            const [horas, minutos] = hora.split(':');
-            return new Date(anio, mes - 1, dia, horas, minutos);
-        }
 
         $(document).off('click', "#lista-bid-deadline a.edit");
         $(document).on('click', "#lista-bid-deadline a.edit", function () {
@@ -1783,6 +1797,9 @@ var Estimates = function () {
             //actualizar lista
             actualizarTableListaBidDeadLines();
             actualizarTableListaProjectInformation();
+
+            // definir la fecha mas reciente
+            definirFechaMasReciente();
         }
     }
     var resetFormBidDeadLines = function () {
@@ -1805,6 +1822,25 @@ var Estimates = function () {
 
         nEditingRowBidDeadlines = null;
     };
+    var definirFechaMasReciente = function () {
+        // Obtener la fecha más próxima en el futuro (ascendente)
+        var fechasOrdenadas = bid_deadlines
+            .filter(b => b.bidDeadline)
+            .sort((a, b) => parseFecha(a.bidDeadline) - parseFecha(b.bidDeadline));
+
+        // Tomar la fecha más cercana
+        var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
+        $('#bidDeadline').val(fechaMasCercana);
+
+        // funcion para parsear
+        function parseFecha(fechaStr) {
+            // formato esperado: m/d/Y hh:mm
+            const [fecha, hora] = fechaStr.split(' ');
+            const [mes, dia, anio] = fecha.split('/');
+            const [horas, minutos] = hora.split(':');
+            return new Date(anio, mes - 1, dia, horas, minutos);
+        }
+    }
 
     // project information
     var oTableListaProjectInformation;
