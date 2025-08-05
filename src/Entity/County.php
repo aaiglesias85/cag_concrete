@@ -19,6 +19,10 @@ class County
     #[ORM\Column(name: 'status', type: 'boolean', nullable: true)]
     private ?bool $status = null;
 
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\District')]
+    #[ORM\JoinColumn(name: 'district_id', referencedColumnName: 'district_id')]
+    private ?District $district;
+
     public function getCountyId(): ?int
     {
         return $this->countyId;
@@ -43,5 +47,15 @@ class County
     {
         $this->status = $status;
         return $this;
+    }
+
+    public function getDistrict(): ?District
+    {
+        return $this->district;
+    }
+
+    public function setDistrict(?District $district): void
+    {
+        $this->district = $district;
     }
 }

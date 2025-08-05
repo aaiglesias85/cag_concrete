@@ -29,7 +29,6 @@ class DistrictService extends Base
 
             $arreglo_resultado['description'] = $entity->getDescription();
             $arreglo_resultado['status'] = $entity->getStatus();
-            $arreglo_resultado['county_id'] = $entity->getCounty() ? $entity->getCounty()->getCountyId() : "";
 
             $resultado['success'] = true;
             $resultado['district'] = $arreglo_resultado;
@@ -52,12 +51,11 @@ class DistrictService extends Base
         /**@var District $entity */
         if ($entity != null) {
 
-            // estimates
-            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
-                ->ListarEstimatesDeDistrict($district_id);
-            if (count($estimates) > 0) {
+            // verificar si se puede eliminar
+            $se_puede_eliminar = $this->SePuedeEliminarDistrict($district_id);
+            if ($se_puede_eliminar != '') {
                 $resultado['success'] = false;
-                $resultado['error'] = "The district could not be deleted, because it is related to a project estimate";
+                $resultado['error'] = $se_puede_eliminar;
                 return $resultado;
             }
 
@@ -103,10 +101,9 @@ class DistrictService extends Base
                     /** @var District $entity */
                     if ($entity != null) {
 
-                        // estimates
-                        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
-                            ->ListarEstimatesDeDistrict($district_id);
-                        if (count($estimates) == 0) {
+                        // verificar si se puede eliminar
+                        $se_puede_eliminar = $this->SePuedeEliminarDistrict($district_id);
+                        if ($se_puede_eliminar === '') {
                             $district_descripcion = $entity->getDescription();
 
                             $em->remove($entity);
@@ -139,11 +136,37 @@ class DistrictService extends Base
     }
 
     /**
+     * SePuedeEliminarDistrict
+     * @param $district_id
+     * @return string
+     */
+    private function SePuedeEliminarDistrict($district_id)
+    {
+        $texto_error = '';
+
+        // countys
+        $countys = $this->getDoctrine()->getRepository(County::class)
+            ->ListarCountysDeDistrict($district_id);
+        if (count($countys) > 0) {
+            $texto_error = "The district could not be deleted because it is related to one or more districts.";
+        }
+
+        // estimates
+        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+            ->ListarEstimatesDeDistrict($district_id);
+        if (count($estimates) > 0) {
+            $texto_error = "The district could not be deleted because it is related to one or more project estimates.";
+        }
+
+        return $texto_error;
+    }
+
+    /**
      * ActualizarDistrict: Actuializa los datos del rol en la BD
      * @param int $district_id Id
      * @author Marcel
      */
-    public function ActualizarDistrict($district_id, $description, $status, $county_id)
+    public function ActualizarDistrict($district_id, $description, $status)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -154,7 +177,7 @@ class DistrictService extends Base
 
             //Verificar name
             $district = $this->getDoctrine()->getRepository(District::class)
-                ->findOneBy(['description' => $description, 'county' => $county_id]);
+                ->findOneBy(['description' => $description]);
             if ($district != null && $entity->getDistrictId() != $district->getDistrictId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = "The district name is in use, please try entering another one.";
@@ -163,12 +186,6 @@ class DistrictService extends Base
 
             $entity->setDescription($description);
             $entity->setStatus($status);
-
-            if ($county_id !== "") {
-                $county = $this->getDoctrine()->getRepository(County::class)
-                    ->find($county_id);
-                $entity->setCounty($county);
-            }
 
             $em->flush();
 
@@ -190,13 +207,13 @@ class DistrictService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarDistrict($description, $status, $county_id)
+    public function SalvarDistrict($description, $status)
     {
         $em = $this->getDoctrine()->getManager();
 
         //Verificar name
         $district = $this->getDoctrine()->getRepository(District::class)
-            ->findOneBy(['description' => $description, 'county' => $county_id]);
+            ->findOneBy(['description' => $description]);
         if ($district != null) {
             $resultado['success'] = false;
             $resultado['error'] = "The district name is in use, please try entering another one.";
@@ -207,12 +224,6 @@ class DistrictService extends Base
 
         $entity->setDescription($description);
         $entity->setStatus($status);
-
-        if ($county_id !== "") {
-            $county = $this->getDoctrine()->getRepository(County::class)
-                ->find($county_id);
-            $entity->setCounty($county);
-        }
 
         $em->persist($entity);
 
@@ -240,13 +251,13 @@ class DistrictService extends Base
      *
      * @author Marcel
      */
-    public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $county_id)
+    public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
         $arreglo_resultado = array();
         $cont = 0;
 
         $lista = $this->getDoctrine()->getRepository(District::class)
-            ->ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $county_id);
+            ->ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
         foreach ($lista as $value) {
             $district_id = $value->getDistrictId();
@@ -256,7 +267,6 @@ class DistrictService extends Base
             $arreglo_resultado[$cont] = array(
                 "id" => $district_id,
                 "description" => $value->getDescription(),
-                "county" => $value->getCounty() ? $value->getCounty()->getDescription() : "",
                 "status" => $value->getStatus() ? 1 : 0,
                 "acciones" => $acciones
             );
@@ -273,10 +283,10 @@ class DistrictService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalDistricts($sSearch, $county_id)
+    public function TotalDistricts($sSearch)
     {
         return $this->getDoctrine()->getRepository(District::class)
-            ->TotalDistricts($sSearch, $county_id);
+            ->TotalDistricts($sSearch);
     }
 
     /**

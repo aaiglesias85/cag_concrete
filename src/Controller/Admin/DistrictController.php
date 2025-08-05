@@ -23,13 +23,8 @@ class DistrictController extends AbstractController
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
-                // countys
-                $countys = $this->districtService->getDoctrine()->getRepository(County::class)
-                    ->ListarOrdenados();
-
                 return $this->render('admin/district/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'countys' => $countys
+                    'permiso' => $permiso[0]
                 ));
             }
         } else {
@@ -47,7 +42,6 @@ class DistrictController extends AbstractController
         // search filter by keywords
         $query = !empty($request->get('query')) ? $request->get('query') : array();
         $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $county_id = isset($query['county_id']) && is_string($query['county_id']) ? $query['county_id'] : '';
 
         //Sort
         $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
@@ -61,7 +55,7 @@ class DistrictController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->districtService->TotalDistricts($sSearch, $county_id);
+            $total = $this->districtService->TotalDistricts($sSearch);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -81,7 +75,7 @@ class DistrictController extends AbstractController
                 'sort' => $sSortDir_0
             );
 
-            $data = $this->districtService->ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $county_id);
+            $data = $this->districtService->ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -106,16 +100,15 @@ class DistrictController extends AbstractController
     {
         $district_id = $request->get('district_id');
 
-        $county_id = $request->get('county_id');
         $description = $request->get('description');
         $status = $request->get('status');
 
         try {
 
             if ($district_id === "") {
-                $resultado = $this->districtService->SalvarDistrict($description, $status, $county_id);
+                $resultado = $this->districtService->SalvarDistrict($description, $status);
             } else {
-                $resultado = $this->districtService->ActualizarDistrict($district_id, $description, $status, $county_id);
+                $resultado = $this->districtService->ActualizarDistrict($district_id, $description, $status);
             }
 
             if ($resultado['success']) {
@@ -217,32 +210,6 @@ class DistrictController extends AbstractController
 
                 return $this->json($resultadoJson);
             }
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
-
-            return $this->json($resultadoJson);
-        }
-    }
-
-    /**
-     * listarDeCounty Acción que lista los district de un county
-     *
-     */
-    public function listarDeCounty(Request $request)
-    {
-
-        $county_id = $request->get('county_id');
-
-        try {
-
-            $lista = $this->districtService->ListarDistrictsDeCounty($county_id);
-
-            $resultadoJson['success'] = true;
-            $resultadoJson['districts'] = $lista;
-
-            return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

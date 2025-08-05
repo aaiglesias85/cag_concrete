@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 02-08-2025 a las 18:50:55
+-- Tiempo de generación: 05-08-2025 a las 01:52:31
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -124,7 +124,8 @@ CREATE TABLE `concrete_vendor_contact` (
 CREATE TABLE `county` (
   `county_id` int(11) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL
+  `status` tinyint(1) DEFAULT NULL,
+  `district_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -323,8 +324,7 @@ INSERT INTO `data_tracking_subcontract` (`id`, `quantity`, `price`, `notes`, `da
 CREATE TABLE `district` (
   `district_id` int(11) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT NULL,
-  `county_id` int(11) DEFAULT NULL
+  `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -1743,7 +1743,8 @@ ALTER TABLE `concrete_vendor_contact`
 -- Indices de la tabla `county`
 --
 ALTER TABLE `county`
-  ADD PRIMARY KEY (`county_id`);
+  ADD PRIMARY KEY (`county_id`),
+  ADD KEY `district_id` (`district_id`);
 
 --
 -- Indices de la tabla `data_tracking`
@@ -1801,8 +1802,7 @@ ALTER TABLE `data_tracking_subcontract`
 -- Indices de la tabla `district`
 --
 ALTER TABLE `district`
-  ADD PRIMARY KEY (`district_id`),
-  ADD KEY `county_id` (`county_id`);
+  ADD PRIMARY KEY (`district_id`);
 
 --
 -- Indices de la tabla `employee`
@@ -2446,6 +2446,12 @@ ALTER TABLE `concrete_vendor_contact`
   ADD CONSTRAINT `Refcontactconcvendor1` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`);
 
 --
+-- Filtros para la tabla `county`
+--
+ALTER TABLE `county`
+  ADD CONSTRAINT `Refcountydistrictid` FOREIGN KEY (`district_id`) REFERENCES `district` (`district_id`);
+
+--
 -- Filtros para la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
@@ -2490,12 +2496,6 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
-
---
--- Filtros para la tabla `district`
---
-ALTER TABLE `district`
-  ADD CONSTRAINT `Refdistrictcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
 
 --
 -- Filtros para la tabla `estimate`

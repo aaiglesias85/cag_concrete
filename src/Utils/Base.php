@@ -4,6 +4,7 @@ namespace App\Utils;
 
 use App\Entity\CompanyContact;
 use App\Entity\ConcreteVendorContact;
+use App\Entity\County;
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
@@ -1226,24 +1227,24 @@ class Base
     }
 
     /**
-     * ListarDistrictsDeCounty
-     * @param $county_id
+     * ListarCountysDeDistrict
+     * @param $district_id
      * @return array
      */
-    public function ListarDistrictsDeCounty($county_id)
+    public function ListarCountysDeDistrict($district_id)
     {
-        $districts = [];
+        $arreglo_resultado = [];
 
-        $lista = $this->getDoctrine()->getRepository(District::class)
-            ->ListarOrdenados("", "", $county_id);
+        $lista = $this->getDoctrine()->getRepository(County::class)
+            ->ListarOrdenados("", "", $district_id);
         foreach ($lista as $value) {
-            $districts[] = [
-                'district_id' => $value->getDistrictId(),
+            $arreglo_resultado[] = [
+                'county_id' => $value->getCountyId(),
                 'description' => $value->getDescription()
             ];
         }
 
-        return $districts;
+        return $arreglo_resultado;
     }
 
 }

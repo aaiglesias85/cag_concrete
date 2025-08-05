@@ -28,6 +28,10 @@ var Counties = function () {
                 title: "Name",
             },
             {
+                field: "county",
+                title: "County"
+            },
+            {
                 field: "status",
                 title: "Status",
                 responsive: {visible: 'lg'},
@@ -121,14 +125,46 @@ var Counties = function () {
         //Busqueda
         var query = oTable.getDataSourceQuery();
         $('#lista-county .m_form_search').on('keyup', function (e) {
-            // shortcode to datatable.getDataSourceParam('query');
-            var query = oTable.getDataSourceQuery();
-            query.generalSearch = $(this).val().toLowerCase();
-            // shortcode to datatable.setDataSourceParam('query', query);
-            oTable.setDataSourceQuery(query);
-            oTable.load();
+            btnClickFiltrar();
         }).val(query.generalSearch);
     };
+
+    //Filtrar
+    var initAccionFiltrar = function () {
+
+        $(document).off('click', "#btn-filtrar");
+        $(document).on('click', "#btn-filtrar", function (e) {
+            btnClickFiltrar();
+        });
+
+    };
+    var initAccionResetFiltrar = function () {
+
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+
+            $('#lista-district .m_form_search').val('');
+
+            $('#filtro-county').val('');
+            $('#filtro-county').trigger('change');
+
+            btnClickFiltrar();
+
+        });
+
+    };
+    var btnClickFiltrar = function () {
+        var query = oTable.getDataSourceQuery();
+
+        var generalSearch = $('#lista-district .m_form_search').val();
+        query.generalSearch = generalSearch;
+
+        var county_id = $('#filtro-county').val();
+        query.county_id = county_id;
+
+        oTable.setDataSourceQuery(query);
+        oTable.load();
+    }
 
     //Reset forms
     var resetForms = function () {
@@ -139,8 +175,14 @@ var Counties = function () {
             $element.data("title", "").removeClass("has-error").tooltip("dispose");
             $element.closest('.form-group').removeClass('has-error').addClass('success');
         });
-        
+
         $('#estadoactivo').prop('checked', true);
+
+        $('#county').val('');
+        $('#county').trigger('change');
+
+        var $element = $('.select2');
+        $element.removeClass('has-error').tooltip("dispose");
 
         event_change = false;
     };
@@ -214,8 +256,10 @@ var Counties = function () {
             mUtil.scrollTo();
 
             event_change = false;
-            
-            if ($('#county-form').valid()) {
+
+            var county_id = $('#county').val();
+
+            if ($('#county-form').valid() && county_id !== "") {
 
                 var county_id = $('#county_id').val();
 
@@ -229,6 +273,7 @@ var Counties = function () {
                     url: "county/salvar",
                     dataType: "json",
                     data: {
+                        'county_id': county_id,
                         'county_id': county_id,
                         'description': description,
                         'status': status
@@ -252,6 +297,19 @@ var Counties = function () {
                         toastr.error(response.error, "");
                     }
                 });
+            } else {
+                if (county_id === "") {
+                    var $element = $('#select-county .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
             }
         };
     }
@@ -333,6 +391,9 @@ var Counties = function () {
                             $('#estadoactivo').prop('checked', false);
                             $('#estadoinactivo').prop('checked', true);
                         }
+
+                        $('#county').val(response.district.county_id);
+                        $('#county').trigger('change');
 
                         event_change = false;
 
@@ -474,6 +535,8 @@ var Counties = function () {
     var initWidgets = function () {
 
         initPortlets();
+
+        $('.m-select2').select2();
     }
 
     var initPortlets = function () {
@@ -500,6 +563,9 @@ var Counties = function () {
             initAccionCerrar();
             initAccionEditar();
             initAccionEliminar();
+
+            initAccionFiltrar();
+            initAccionResetFiltrar();
 
             initAccionChange();
 

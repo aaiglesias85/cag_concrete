@@ -45,6 +45,12 @@
                             Counties
                         </h3>
                     </div>
+                    <a href="javascript:;" id="btn-reset-filtrar" class="btn mr-1">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>Reset filters</span>
+                            </span>
+                    </a>
                 </div>
                 <div class="m-portlet__head-tools">
                     <ul class="m-portlet__nav">
@@ -84,8 +90,18 @@
             <div class="m-portlet__body">
 
                 <!--begin: Search Form -->
-                <div class="form-group m-form__group row align-items-center mb-2">
-                    <div class="col-md-4">
+                <div class="form-group m-form__group row align-items-center mb-3">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-2">
+                        <select class="form-control m-select2" id="filtro-county">
+                            <option value="">County</option>
+                            {% for item in countys %}
+                                <option value="{{ item.countyId }}">{{ item.description }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
                         <div class="m-input-icon m-input-icon--left">
                             <input type="text" class="form-control m-input m_form_search"
                                    placeholder="Search...">
@@ -94,6 +110,16 @@
 								</span>
                         </div>
                     </div>
+                    <div class="col-md-1">
+                        <a href="javascript:;" id="btn-filtrar"
+                           class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                            <span>Search</span>
+                                        </span>
+                        </a>
+                    </div>
+                    <div class="col-md-3"></div>
                 </div>
                 <!--end: Search Form -->
 
@@ -131,14 +157,30 @@
                     <div class="m-form__section m-form__section--first">
 
                         <div class="form-group m-form__group ic-form-group">
-                            <label>
-                                <span class="ic-step-number">1</span>
-                                Name
-                                <span class="ic-small italic">(required)</span>
-                            </label>
+                            <div class="row mb-3">
+                                <div class="col-md-3" id="select-county">
+                                    <label>
+                                        <span class="ic-step-number">1</span>
+                                        County
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
+                                    <select class="form-control m-select2 event-change" id="county" name="county">
+                                        <option value="">Select</option>
+                                        {% for item in countys %}
+                                            <option value="{{ item.countyId }}">{{ item.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-9">
+                                    <label>
+                                        Name
+                                        <span class="ic-small italic">(required)</span>
+                                    </label>
 
-                            <input type="text" class="form-control form-control-text event-change"
-                                   id="description" name="description"/>
+                                    <input type="text" class="form-control form-control-text event-change"
+                                           id="description" name="description"/>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group m-form__group ic-form-group">
