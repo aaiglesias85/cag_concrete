@@ -172,6 +172,10 @@
                         <div class="col-md-2" id="select-filtro-district">
                             <select class="form-control m-select2" id="filtro-district">
                                 <option value="">District</option>
+                                {% for item in districts %}
+                                    <option value="{{ item.districtId }}">{{ item.description }}
+                                    </option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -360,7 +364,8 @@
                                                     name="county">
                                                 <option value="">Select</option>
                                                 {% for item in countys %}
-                                                    <option value="{{ item.countyId }}">{{ item.description }}</option>
+                                                    <option value="{{ item.countyId }}"
+                                                    data-district="{% if item.district %}{{ item.district.districtId }}{% endif %}">{{ item.description }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -416,6 +421,9 @@
                                             <select class="form-control m-select2 event-change" id="district"
                                                     name="district">
                                                 <option value="">Select</option>
+                                                {% for item in districts %}
+                                                    <option value="{{ item.districtId }}">{{ item.description }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                         <div class="col-md-3">

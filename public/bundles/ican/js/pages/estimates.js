@@ -290,8 +290,8 @@ var Estimates = function () {
         $('#county').val('');
         $('#county').trigger('change');
 
-        // limpiar select
-        MyApp.limpiarSelect('#district');
+        $('#district').val('');
+        $('#district').trigger('change');
 
         $('#priority').val('');
         $('#priority').trigger('change');
@@ -632,12 +632,6 @@ var Estimates = function () {
 
                     $('#county').val(response.estimate.county_id);
                     $('#county').trigger('change');
-
-                    // llenar select district
-                    MyApp.limpiarSelect('#district');
-                    for (let district of response.estimate.districts) {
-                        $('#district').append(new Option(district.description, district.district_id, false, false));
-                    }
 
                     $('#district').val(response.estimate.district_id);
                     $('#district').trigger('change');
@@ -1004,9 +998,6 @@ var Estimates = function () {
         $(document).off('change', "#contact", changeContact);
         $(document).on('change', "#contact", changeContact);
 
-        $(document).off('change', "#filtro-county", changeFiltroCounty);
-        $(document).on('change', "#filtro-county", changeFiltroCounty);
-
         $(document).off('change', "#county", changeCounty);
         $(document).on('change', "#county", changeCounty);
 
@@ -1206,69 +1197,19 @@ var Estimates = function () {
         $('#phone').importTags(existingPhones.join(','));
         $('#email').importTags(existingEmails.join(','));
     }
-
-    var changeFiltroCounty = function (e) {
-        var county_id = $(this).val();
-        var select = '#filtro-district';
-        var block_element = '#select-filtro-district';
-
-        listarDistrictsDeCounty(county_id, select, block_element);
-    }
     var changeCounty = function (e) {
         var county_id = $(this).val();
-        var select = '#district';
-        var block_element = '#select-district';
-
-        listarDistrictsDeCounty(county_id, select, block_element);
-    }
-    var listarDistrictsDeCounty = function (id, select, block_element) {
-        // reset
-        MyApp.limpiarSelect(select)
-
-        if (id !== '') {
-            MyApp.block(block_element);
-
-            $.ajax({
-                type: "POST",
-                url: "district/listarDeCounty",
-                dataType: "json",
-                data: {
-                    'county_id': id
-                },
-                success: function (response) {
-                    mApp.unblock(block_element);
-                    if (response.success) {
-
-                        // llenar select
-                        actualizarSelectDistricts(response.districts, select);
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock(block_element);
-
-                    toastr.error(response.error, "");
-                }
-            });
-        }
-    }
-    var actualizarSelectDistricts = function (districts, select) {
 
         // reset
-        MyApp.limpiarSelect(select);
+        $('#district').val('');
+        $('#district').trigger('change');
 
-        for (var i = 0; i < districts.length; i++) {
-            $(select).append(new Option(districts[i].description, districts[i].district_id, false, false));
+        var district_id = $('#county option[value="' + county_id + '"]').attr("data-district");
+        if (district_id) {
+            $('#district').val(district_id);
+            $('#district').trigger('change');
         }
-        $(select).select2();
 
-        // seleccionar si solo hay uno
-        if (select === '#district' && districts.length === 1) {
-            $(select).val(districts[0].district_id);
-            $(select).trigger('change');
-        }
     }
 
     var initPortlets = function () {

@@ -61,6 +61,10 @@ class EstimateController extends AbstractController
                 $countys = $this->estimateService->getDoctrine()->getRepository(County::class)
                     ->ListarOrdenados();
 
+                // districts
+                $districts = $this->estimateService->getDoctrine()->getRepository(District::class)
+                    ->ListarOrdenados();
+
                 // estimators
                 $estimators = $this->estimateService->getDoctrine()->getRepository(Usuario::class)
                     ->ListarOrdenados("", 1);
@@ -90,6 +94,7 @@ class EstimateController extends AbstractController
                     'proposal_types' => $proposal_types,
                     'plan_status' => $plan_status,
                     'countys' => $countys,
+                    'districts' => $districts,
                     'estimators' => $estimators,
                     'plan_downloadings' => $plan_downloadings,
                     'items' => $items,

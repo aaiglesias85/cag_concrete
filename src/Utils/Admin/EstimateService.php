@@ -296,10 +296,6 @@ class EstimateService extends Base
             $arreglo_resultado['company_id'] = $company_id;
             $arreglo_resultado['contact_id'] = $entity->getContact() != null ? $entity->getContact()->getContactId() : '';
 
-            // districts
-            $districts = $this->ListarDistrictsDeCounty($county_id);
-            $arreglo_resultado['districts'] = $districts;
-
             // contacts
             $contacts = $this->ListarContactsDeCompany($company_id);
             $arreglo_resultado['contacts'] = $contacts;
