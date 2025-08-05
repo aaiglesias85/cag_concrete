@@ -706,7 +706,7 @@ var Estimates = function () {
 
 
                     // habilitar tab
-                    totalTabs = 5;
+                    totalTabs = 4;
                     $('#btn-wizard-siguiente').removeClass('m--hide');
                     $('.nav-item-hide').removeClass('m--hide');
 
@@ -1323,9 +1323,9 @@ var Estimates = function () {
                 case 3:
                     actualizarTableListaItems()
                     break;
-                case 4:
-                    actualizarTableListaProjectInformation();
-                    break;
+                // case 4:
+                //     actualizarTableListaProjectInformation();
+                //    break;
             }
 
         });
@@ -1373,11 +1373,11 @@ var Estimates = function () {
                     $('#tab-quotes').tab('show');
                     actualizarTableListaItems();
                     break;
+                // case 4:
+                //     $('#tab-project-information').tab('show');
+                //     actualizarTableListaProjectInformation();
+                //     break;
                 case 4:
-                    $('#tab-project-information').tab('show');
-                    actualizarTableListaProjectInformation();
-                    break;
-                case 5:
                     $('#tab-bid-information').tab('show');
                     break;
             }
