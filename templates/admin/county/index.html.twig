@@ -93,10 +93,10 @@
                 <div class="form-group m-form__group row align-items-center mb-3">
                     <div class="col-md-3"></div>
                     <div class="col-md-2">
-                        <select class="form-control m-select2" id="filtro-county">
-                            <option value="">County</option>
-                            {% for item in countys %}
-                                <option value="{{ item.countyId }}">{{ item.description }}
+                        <select class="form-control m-select2" id="filtro-district">
+                            <option value="">District</option>
+                            {% for item in districts %}
+                                <option value="{{ item.districtId }}">{{ item.description }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -158,16 +158,16 @@
 
                         <div class="form-group m-form__group ic-form-group">
                             <div class="row mb-3">
-                                <div class="col-md-3" id="select-county">
+                                <div class="col-md-3" id="select-district">
                                     <label>
                                         <span class="ic-step-number">1</span>
-                                        County
+                                        District
                                         <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="county" name="county">
+                                    <select class="form-control m-select2 event-change" id="district" name="district">
                                         <option value="">Select</option>
-                                        {% for item in countys %}
-                                            <option value="{{ item.countyId }}">{{ item.description }}</option>
+                                        {% for item in districts %}
+                                            <option value="{{ item.districtId }}">{{ item.description }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

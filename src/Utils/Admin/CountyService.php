@@ -29,6 +29,7 @@ class CountyService extends Base
 
             $arreglo_resultado['description'] = $entity->getDescription();
             $arreglo_resultado['status'] = $entity->getStatus();
+            $arreglo_resultado['district_id'] = $entity->getDistrict() ? $entity->getDistrict()->getDistrictId() : "";
 
             $resultado['success'] = true;
             $resultado['county'] = $arreglo_resultado;
@@ -178,7 +179,7 @@ class CountyService extends Base
      * @param int $county_id Id
      * @author Marcel
      */
-    public function ActualizarCounty($county_id, $description, $status)
+    public function ActualizarCounty($county_id, $description, $status, $district_id)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -189,7 +190,7 @@ class CountyService extends Base
 
             //Verificar name
             $county = $this->getDoctrine()->getRepository(County::class)
-                ->findOneBy(['description' => $description]);
+                ->findOneBy(['description' => $description, 'district' => $district_id]);
             if ($county != null && $entity->getCountyId() != $county->getCountyId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = "The county name is in use, please try entering another one.";
@@ -198,6 +199,12 @@ class CountyService extends Base
 
             $entity->setDescription($description);
             $entity->setStatus($status);
+
+            $entity->setDistrict(NULL);
+            if ($district_id !== '') {
+                $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
+                $entity->setDistrict($district);
+            }
 
             $em->flush();
 
@@ -219,13 +226,13 @@ class CountyService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarCounty($description, $status)
+    public function SalvarCounty($description, $status, $district_id)
     {
         $em = $this->getDoctrine()->getManager();
 
         //Verificar name
         $county = $this->getDoctrine()->getRepository(County::class)
-            ->findOneBy(['description' => $description]);
+            ->findOneBy(['description' => $description, 'district' => $district_id]);
         if ($county != null) {
             $resultado['success'] = false;
             $resultado['error'] = "The county name is in use, please try entering another one.";
@@ -236,6 +243,11 @@ class CountyService extends Base
 
         $entity->setDescription($description);
         $entity->setStatus($status);
+
+        if ($district_id !== '') {
+            $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
+            $entity->setDistrict($district);
+        }
 
         $em->persist($entity);
 
@@ -263,13 +275,13 @@ class CountyService extends Base
      *
      * @author Marcel
      */
-    public function ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id)
     {
         $arreglo_resultado = array();
         $cont = 0;
 
         $lista = $this->getDoctrine()->getRepository(County::class)
-            ->ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+            ->ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id);
 
         foreach ($lista as $value) {
             $county_id = $value->getCountyId();
@@ -279,6 +291,7 @@ class CountyService extends Base
             $arreglo_resultado[$cont] = array(
                 "id" => $county_id,
                 "description" => $value->getDescription(),
+                "district" => $value->getDistrict() ? $value->getDistrict()->getDescription() : "",
                 "status" => $value->getStatus() ? 1 : 0,
                 "acciones" => $acciones
             );
@@ -295,10 +308,10 @@ class CountyService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalCountys($sSearch)
+    public function TotalCountys($sSearch, $district_id)
     {
         return $this->getDoctrine()->getRepository(County::class)
-            ->TotalCountys($sSearch);
+            ->TotalCountys($sSearch, $district_id);
     }
 
     /**

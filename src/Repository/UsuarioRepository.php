@@ -109,11 +109,12 @@ class UsuarioRepository extends ServiceEntityRepository
         // Ordenación
         $qb->orderBy($iSortCol_0 === 'perfil' ? 'r.nombre' : "u.$iSortCol_0", $sSortDir_0);
 
-        // Paginación
-        $qb->setFirstResult($start)
-            ->setMaxResults($limit);
+        if ($limit > 0) {
+            $qb->setMaxResults($limit);
+        }
 
-        return $qb->getQuery()->getResult();
+        return $qb->setFirstResult($start)
+            ->getQuery()->getResult();
     }
 
     /**

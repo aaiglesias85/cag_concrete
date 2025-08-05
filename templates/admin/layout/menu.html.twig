@@ -149,22 +149,22 @@
                                                     </li>
                                                 {% endif %}
 
-                                                {% if menu.menuCounty %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('county') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Counties</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
                                                 {% if menu.menuDistrict %}
                                                     <li class="m-menu__item " aria-haspopup="true"
                                                         m-menu-link-redirect="1">
                                                         <a href="{{ url('district') }}" class="m-menu__link ">
                                                             <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
                                                             <span class="m-menu__link-text">Districts</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                {% if menu.menuCounty %}
+                                                    <li class="m-menu__item " aria-haspopup="true"
+                                                        m-menu-link-redirect="1">
+                                                        <a href="{{ url('county') }}" class="m-menu__link ">
+                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
+                                                            <span class="m-menu__link-text">Counties</span>
                                                         </a>
                                                     </li>
                                                 {% endif %}

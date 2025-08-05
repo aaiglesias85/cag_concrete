@@ -28,8 +28,8 @@ var Counties = function () {
                 title: "Name",
             },
             {
-                field: "county",
-                title: "County"
+                field: "district",
+                title: "District"
             },
             {
                 field: "status",
@@ -143,10 +143,10 @@ var Counties = function () {
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
 
-            $('#lista-district .m_form_search').val('');
+            $('#lista-county .m_form_search').val('');
 
-            $('#filtro-county').val('');
-            $('#filtro-county').trigger('change');
+            $('#filtro-district').val('');
+            $('#filtro-district').trigger('change');
 
             btnClickFiltrar();
 
@@ -156,11 +156,11 @@ var Counties = function () {
     var btnClickFiltrar = function () {
         var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-district .m_form_search').val();
+        var generalSearch = $('#lista-county .m_form_search').val();
         query.generalSearch = generalSearch;
 
-        var county_id = $('#filtro-county').val();
-        query.county_id = county_id;
+        var district_id = $('#filtro-district').val();
+        query.district_id = district_id;
 
         oTable.setDataSourceQuery(query);
         oTable.load();
@@ -178,8 +178,8 @@ var Counties = function () {
 
         $('#estadoactivo').prop('checked', true);
 
-        $('#county').val('');
-        $('#county').trigger('change');
+        $('#district').val('');
+        $('#district').trigger('change');
 
         var $element = $('.select2');
         $element.removeClass('has-error').tooltip("dispose");
@@ -257,9 +257,9 @@ var Counties = function () {
 
             event_change = false;
 
-            var county_id = $('#county').val();
+            var district_id = $('#district').val();
 
-            if ($('#county-form').valid() && county_id !== "") {
+            if ($('#county-form').valid() && district_id !== "") {
 
                 var county_id = $('#county_id').val();
 
@@ -274,7 +274,7 @@ var Counties = function () {
                     dataType: "json",
                     data: {
                         'county_id': county_id,
-                        'county_id': county_id,
+                        'district_id': district_id,
                         'description': description,
                         'status': status
                     },
@@ -298,8 +298,8 @@ var Counties = function () {
                     }
                 });
             } else {
-                if (county_id === "") {
-                    var $element = $('#select-county .select2');
+                if (district_id === "") {
+                    var $element = $('#select-district .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
                         .data("title", "This field is required")
                         .addClass("has-error")
@@ -392,8 +392,8 @@ var Counties = function () {
                             $('#estadoinactivo').prop('checked', true);
                         }
 
-                        $('#county').val(response.district.county_id);
-                        $('#county').trigger('change');
+                        $('#district').val(response.county.district_id);
+                        $('#district').trigger('change');
 
                         event_change = false;
 

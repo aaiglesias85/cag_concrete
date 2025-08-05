@@ -83,7 +83,15 @@ class CountyRepository extends EntityRepository
                 ->setParameter('district_id', $district_id);
         }
 
-        $consulta->orderBy("c.$iSortCol_0", $sSortDir_0);
+        // Ordenar según la columna seleccionada
+        switch ($iSortCol_0) {
+            case "district":
+                $consulta->orderBy('d.description', $sSortDir_0);
+                break;
+            default:
+                $consulta->orderBy("c.$iSortCol_0", $sSortDir_0);
+                break;
+        }
 
         if ($limit > 0) {
             $consulta->setMaxResults($limit);

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\District;
 use App\Utils\Admin\CountyService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,8 +23,13 @@ class CountyController extends AbstractController
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
+                // districts
+                $districts = $this->countyService->getDoctrine()->getRepository(District::class)
+                    ->ListarOrdenados();
+
                 return $this->render('admin/county/index.html.twig', array(
                     'permiso' => $permiso[0],
+                    'districts' => $districts,
                 ));
             }
         } else {
@@ -41,6 +47,7 @@ class CountyController extends AbstractController
         // search filter by keywords
         $query = !empty($request->get('query')) ? $request->get('query') : array();
         $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
+        $district_id = isset($query['district_id']) && is_string($query['district_id']) ? $query['district_id'] : '';
 
         //Sort
         $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
@@ -54,7 +61,7 @@ class CountyController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->countyService->TotalCountys($sSearch);
+            $total = $this->countyService->TotalCountys($sSearch, $district_id);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -74,7 +81,7 @@ class CountyController extends AbstractController
                 'sort' => $sSortDir_0
             );
 
-            $data = $this->countyService->ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+            $data = $this->countyService->ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -99,15 +106,16 @@ class CountyController extends AbstractController
     {
         $county_id = $request->get('county_id');
 
+        $district_id = $request->get('district_id');
         $description = $request->get('description');
         $status = $request->get('status');
 
         try {
 
             if ($county_id === "") {
-                $resultado = $this->countyService->SalvarCounty($description, $status);
+                $resultado = $this->countyService->SalvarCounty($description, $status, $district_id);
             } else {
-                $resultado = $this->countyService->ActualizarCounty($county_id, $description, $status);
+                $resultado = $this->countyService->ActualizarCounty($county_id, $description, $status, $district_id);
             }
 
             if ($resultado['success']) {
