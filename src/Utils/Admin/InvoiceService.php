@@ -22,6 +22,44 @@ class InvoiceService extends Base
 {
 
     /**
+     * ChangeNumber: Cambiar el number de un invoice
+     * @param int $invoice_id Id
+     * @author Marcel
+     */
+    public function ChangeNumber($invoice_id, $number)
+    {
+        $resultado = array();
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(Invoice::class)
+            ->find($invoice_id);
+        /** @var Invoice $entity */
+        if (!is_null($entity)) {
+
+            $project_id = $entity->getProject()->getProjectId();
+
+            // verificar number
+            $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+                ->findOneBy(['number' => $number, 'project' => $project_id]);
+            if ($invoice != null && $invoice->getInvoiceId() != $entity->getInvoiceId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The invoice number is in use, please try entering another one.";
+                return $resultado;
+            }
+
+            $entity->setNumber($number);
+
+            $em->flush();
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+        return $resultado;
+    }
+
+    /**
      * PaidInvoice: Paga un invoice
      * @param int $invoice_id Id
      * @author Marcel
@@ -534,7 +572,8 @@ class InvoiceService extends Base
      * @param $invoice_id
      * @return void
      */
-    private function EliminarInformacionDeInvoice($invoice_id){
+    private function EliminarInformacionDeInvoice($invoice_id)
+    {
         $em = $this->getDoctrine()->getManager();
 
         // items
@@ -557,7 +596,7 @@ class InvoiceService extends Base
      * @param int $invoice_id Id
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
+    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -596,6 +635,16 @@ class InvoiceService extends Base
                 return $resultado;
             }
 
+            // verificar number
+            $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+                ->findOneBy(['number' => $number, 'project' => $project_id]);
+            if ($invoice != null && $invoice->getInvoiceId() != $entity->getInvoiceId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The invoice number is in use, please try entering another one.";
+                return $resultado;
+            }
+
+            $entity->setNumber($number);
 
             $entity->setStartDate($start_date);
             $entity->setEndDate($end_date);
@@ -649,7 +698,7 @@ class InvoiceService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
+    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -683,10 +732,26 @@ class InvoiceService extends Base
             return $resultado;
         }
 
+        // verificar number
+        if ($number !== '') {
+            $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+                ->findOneBy(['number' => $number, 'project' => $project_id]);
+            if ($invoice != null) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The invoice number is in use, please try entering another one.";
+                return $resultado;
+            }
+        } else {
+            // number
+            $invoices = $this->getDoctrine()->getRepository(Invoice::class)->ListarInvoicesDeProject($project_id);
+            $number = 1;
+            if(!empty($invoices)){
+                $number = intval($invoices[0]->getNumber()) + 1;
+            }
+        }
+
         $entity = new Invoice();
 
-        // number
-        $number = $this->getDoctrine()->getRepository(Invoice::class)->TotalInvoices('', '', $project_id) + 1;
         $entity->setNumber($number);
 
         $entity->setStartDate($start_date);

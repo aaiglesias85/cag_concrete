@@ -26,6 +26,9 @@ var Invoices = function () {
                 field: "number",
                 title: "Number",
                 width: 80,
+                template: function (row) {
+                    return `<input type="text" class="form-control invoice-number just-number" data-id="${row.id}" value="${row.number}" />`;
+                }
             },
             {
                 field: "company",
@@ -344,9 +347,11 @@ var Invoices = function () {
 
             var project_id = $('#project').val();
 
-            if ($('#invoice-form').valid() && project_id != '') {
+            if ($('#invoice-form').valid() && project_id != '' && isValidNumber()) {
 
                 var invoice_id = $('#invoice_id').val();
+
+                var number = $('#number').val();
 
                 var start_date = $('#start_date').val();
                 var end_date = $('#end_date').val();
@@ -361,6 +366,7 @@ var Invoices = function () {
                     dataType: "json",
                     data: {
                         'invoice_id': invoice_id,
+                        'number': number,
                         'project_id': project_id,
                         'start_date': start_date,
                         'end_date': end_date,
@@ -379,7 +385,7 @@ var Invoices = function () {
 
                             btnClickFiltrar();
 
-                            if(response.url != ''){
+                            if (response.url != '') {
                                 document.location = response.url;
                             }
                         } else {
@@ -408,6 +414,30 @@ var Invoices = function () {
             }
         };
     }
+
+    var isValidNumber = function () {
+        var valid = true;
+
+        var invoice_id = $('#invoice_id').val();
+        var number = $('#number').val();
+        if (invoice_id !== '' && number === '') {
+            valid = false;
+
+            var $element = $('#number');
+            $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                .data("title", "This field is required")
+                .addClass("has-error")
+                .tooltip({
+                    placement: 'bottom'
+                }); // Create a new tooltip based on the error messsage we just set in the title
+
+            $element.closest('.form-group')
+                .removeClass('has-success').addClass('has-error');
+        }
+
+        return valid;
+    }
+
     //Cerrar form
     var initAccionCerrar = function () {
         $(document).off('click', ".cerrar-form-invoice");
@@ -462,7 +492,7 @@ var Invoices = function () {
             editRow(invoice_id);
         });
     };
-    var editRow = function(invoice_id) {
+    var editRow = function (invoice_id) {
 
         MyApp.block('#form-invoice');
 
@@ -481,6 +511,8 @@ var Invoices = function () {
 
                     var formTitle = "You want to update the invoice? Follow the next steps:";
                     $('#form-invoice-title').html(formTitle);
+
+                    $('#number').val(response.invoice.number);
 
                     $('#company').off('change', changeCompany);
                     $('#project').off('change', listarItems);
@@ -543,6 +575,44 @@ var Invoices = function () {
             }
         });
 
+    };
+
+    // change number
+    var initAccionChangeNumber = function () {
+        $(document).off('change', "#invoice-table-editable .invoice-number");
+        $(document).on('change', "#invoice-table-editable .invoice-number", function (e) {
+            e.preventDefault();
+
+            var invoice_id = $(this).data('id');
+            var number = $(this).val();
+
+            MyApp.block('#invoice-table-editable');
+
+            $.ajax({
+                type: "POST",
+                url: "invoice/changeNumber",
+                dataType: "json",
+                data: {
+                    'invoice_id': invoice_id,
+                    'number': number
+                },
+                success: function (response) {
+                    mApp.unblock('#invoice-table-editable');
+                    if (response.success) {
+
+                        toastr.success(response.message, "");
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                },
+                failure: function (response) {
+                    mApp.unblock('#invoice-table-editable');
+
+                    toastr.error(response.error, "");
+                }
+            });
+        });
     };
 
     //Eliminar
@@ -1036,7 +1106,7 @@ var Invoices = function () {
         if (activeTab == 1) {
 
             var project_id = $('#project').val();
-            if (!$('#invoice-form').valid() || project_id == '') {
+            if (!$('#invoice-form').valid() || project_id == '' || !isValidNumber()) {
                 result = false;
 
                 if (project_id == "") {
@@ -1123,7 +1193,7 @@ var Invoices = function () {
                 textAlign: 'center',
                 template: function (row) {
                     var output = `<span>${MyApp.formatearNumero(row.unpaid_from_previous, 2, '.', ',')}</span>`;
-                    if(invoice === null || !invoice.paid){
+                    if (invoice === null || !invoice.paid) {
                         output = `<input type="number" class="form-control unpaid_qty" value="${row.unpaid_from_previous}" data-position="${row.posicion}" />`;
                     }
                     return output;
@@ -1314,7 +1384,7 @@ var Invoices = function () {
                     var quantity_from_previous = items[posicion].quantity_from_previous ?? 0
                     items[posicion].quantity_completed = quantity + quantity_from_previous;
 
-                    var total_amount = items[posicion].quantity_completed  * price;
+                    var total_amount = items[posicion].quantity_completed * price;
                     items[posicion].total_amount = total_amount;
                 }
 
@@ -1377,7 +1447,7 @@ var Invoices = function () {
                 actualizarTableListaItems();
 
                 var payment_posicion = payments.findIndex(item => item.project_item_id === items[posicion].project_item_id);
-                if(payments[payment_posicion]){
+                if (payments[payment_posicion]) {
 
                     var unpaid_from_previous = parseFloat(items[posicion].unpaid_from_previous);
                     var quantity = items[posicion].quantity ?? 0
@@ -1523,7 +1593,7 @@ var Invoices = function () {
                 textAlign: 'center',
                 template: function (row) {
                     var output = `<span>${MyApp.formatearNumero(row.paid_qty, 2, '.', ',')}</span>`;
-                    if(invoice === null || !invoice.paid){
+                    if (invoice === null || !invoice.paid) {
                         output = `<input type="number" class="form-control paid_qty" value="${row.paid_qty}" data-position="${row.posicion}" />`;
                     }
                     return output;
@@ -1858,6 +1928,7 @@ var Invoices = function () {
             initAccionSalvar();
             initAccionCerrar();
             initAccionEditar();
+            initAccionChangeNumber();
             initAccionEliminar();
             initAccionExportar();
             initAccionFiltrar();

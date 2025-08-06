@@ -111,6 +111,7 @@ class InvoiceController extends AbstractController
     {
         $invoice_id = $request->get('invoice_id');
 
+        $number = $request->get('number');
         $project_id = $request->get('project_id');
         $start_date = $request->get('start_date');
         $end_date = $request->get('end_date');
@@ -130,9 +131,9 @@ class InvoiceController extends AbstractController
         try {
 
             if ($invoice_id == "") {
-                $resultado = $this->invoiceService->SalvarInvoice($project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar);
+                $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar);
             } else {
-                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $project_id, $start_date, $end_date, $notes, $paid, $items,$payments, $exportar);
+                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar);
             }
 
             if ($resultado['success']) {
@@ -312,6 +313,36 @@ class InvoiceController extends AbstractController
             if ($resultado['success']) {
 
                 $resultadoJson['success'] = $resultado['success'];
+                return $this->json($resultadoJson);
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+                return $this->json($resultadoJson);
+            }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
+    }
+
+    /**
+     * changeNumber Acción para cambiar el number de un invoice
+     *
+     */
+    public function changeNumber(Request $request)
+    {
+        $invoice_id = $request->get('invoice_id');
+        $number = $request->get('number');
+
+        try {
+            $resultado = $this->invoiceService->ChangeNumber($invoice_id, $number);
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
                 return $this->json($resultadoJson);
             } else {
                 $resultadoJson['success'] = $resultado['success'];

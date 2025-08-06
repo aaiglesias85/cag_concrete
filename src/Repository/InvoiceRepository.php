@@ -21,7 +21,7 @@ class InvoiceRepository extends EntityRepository
             ->andWhere('p.projectId = :project_id')
             ->setParameter('project_id', $project_id);
 
-        $consulta->orderBy('i.createdAt', "ASC");
+        $consulta->orderBy('i.createdAt', "DESC");
 
         return $consulta->getQuery()->getResult();
     }

@@ -33,3 +33,7 @@ exportarExcelInvoiceAdmin:
 paidInvoiceAdmin:
   path:  /invoice/paid
   defaults: { _controller: App\Controller\Admin\InvoiceController::paid, _format: json }
+
+changeNumberInvoiceAdmin:
+  path:  /invoice/changeNumber
+  defaults: { _controller: App\Controller\Admin\InvoiceController::changeNumber, _format: json }
