@@ -65,6 +65,10 @@ definircountyprojectestimate:
   path:  /definir-county-project-estimate
   defaults: { _controller: App\Controller\ScriptController::definircountyprojectestimate }
 
+definircompanyestimate:
+  path:  /definir-company-estimate
+  defaults: { _controller: App\Controller\ScriptController::definircompanyestimate }
+
 
 #qbwc
 qbwcconfig:

@@ -9,6 +9,7 @@ use App\Entity\District;
 use App\Entity\Equation;
 use App\Entity\Estimate;
 use App\Entity\EstimateBidDeadline;
+use App\Entity\EstimateCompany;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateProjectType;
 use App\Entity\EstimateQuote;
@@ -23,6 +24,41 @@ use App\Utils\Base;
 
 class EstimateService extends Base
 {
+
+    /**
+     * EliminarCompany: Elimina un company en la BD
+     * @param int $id Id
+     * @author Marcel
+     */
+    public function EliminarCompany($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(EstimateCompany::class)
+            ->find($id);
+        /**@var EstimateCompany $entity */
+        if ($entity != null) {
+
+            $estimate_name = $entity->getEstimate()->getName();
+            $company_name = $entity->getCompany()->getName();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Company Estimate";
+            $log_descripcion = "The company estimate is deleted: $estimate_name Company: $company_name";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
 
     /**
      * AgregarItem
@@ -292,14 +328,6 @@ class EstimateService extends Base
             $arreglo_resultado['district_id'] = $entity->getDistrict() != null ? $entity->getDistrict()->getDistrictId() : '';
             $arreglo_resultado['plan_downloading_id'] = $entity->getPlanDownloading() != null ? $entity->getPlanDownloading()->getPlanDownloadingId() : '';
 
-            $company_id = $entity->getCompany() != null ? $entity->getCompany()->getCompanyId() : '';
-            $arreglo_resultado['company_id'] = $company_id;
-            $arreglo_resultado['contact_id'] = $entity->getContact() != null ? $entity->getContact()->getContactId() : '';
-
-            // contacts
-            $contacts = $this->ListarContactsDeCompany($company_id);
-            $arreglo_resultado['contacts'] = $contacts;
-
             // estimators ids
             $estimators_id = $this->ListarEstimatorsId($estimate_id);
             $arreglo_resultado['estimators_id'] = $estimators_id;
@@ -316,11 +344,40 @@ class EstimateService extends Base
             $items = $this->ListarItemsDeEstimate($estimate_id);
             $arreglo_resultado['items'] = $items;
 
+            // companys
+            $companys = $this->ListarCompanys($estimate_id);
+            $arreglo_resultado['companys'] = $companys;
+
             $resultado['success'] = true;
             $resultado['estimate'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    // listar los companys del estimate
+    private function ListarCompanys($estimate_id)
+    {
+        $companys = [];
+
+        $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
+            ->ListarCompanysDeEstimate($estimate_id);
+        foreach ($estimate_companys as $key => $estimate_company) {
+
+            $contacts = $this->ListarContactsDeCompany($estimate_company->getCompany()->getCompanyId());
+
+            $companys[] = [
+                'id' => $estimate_company->getId(),
+                'company_id' => $estimate_company->getCompany()->getCompanyId(),
+                'company' => $estimate_company->getCompany()->getName(),
+                'contact_id' => $estimate_company->getContact()->getContactId(),
+                'contact' => $estimate_company->getContact()->getName(),
+                'contacts' => $contacts,
+                "posicion" => $key
+            ];
+        }
+
+        return $companys;
     }
 
     /**
@@ -546,6 +603,13 @@ class EstimateService extends Base
             $em->remove($estimate_item);
         }
 
+        // companys
+        $companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
+            ->ListarCompanysDeEstimate($estimate_id);
+        foreach ($companys as $company) {
+            $em->remove($company);
+        }
+
     }
 
     /**
@@ -554,9 +618,10 @@ class EstimateService extends Base
      * @author Marcel
      */
     public function ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
-                                       $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
+                                       $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
                                        $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                                       $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived)
+                                       $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions,
+                                       $planLink, $quoteReceived, $companys)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -630,20 +695,6 @@ class EstimateService extends Base
                 $entity->setDistrict($district);
             }
 
-            $entity->setCompany(NULL);
-            if ($company_id != '') {
-                $company = $this->getDoctrine()->getRepository(Company::class)
-                    ->find($company_id);
-                $entity->setCompany($company);
-            }
-
-            $entity->setContact(NULL);
-            if ($contact_id != '') {
-                $contact = $this->getDoctrine()->getRepository(CompanyContact::class)
-                    ->find($contact_id);
-                $entity->setContact($contact);
-            }
-
             $entity->setJobWalk(NULL);
             if ($jobWalk != '') {
                 $jobWalk = \DateTime::createFromFormat('m/d/Y H:i', $jobWalk);
@@ -701,6 +752,9 @@ class EstimateService extends Base
 
             // bid_deadlines
             $this->SalvarBidDeadlines($entity, $bid_deadlines);
+
+            // companys
+            $this->SalvarCompanys($entity, $companys);
 
             $em->flush();
 
@@ -767,12 +821,60 @@ class EstimateService extends Base
     }
 
     /**
+     * SalvarCompanys
+     * @param $companys
+     * @param Estimate $entity
+     * @return void
+     */
+    public function SalvarCompanys($entity, $companys)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if (!empty($companys)) {
+            foreach ($companys as $value) {
+
+                $estimate_company_entity = null;
+
+                if (is_numeric($value->id)) {
+                    $estimate_company_entity = $this->getDoctrine()->getRepository(EstimateCompany::class)
+                        ->find($value->id);
+                }
+
+                $is_new_estimate_company = false;
+                if ($estimate_company_entity == null) {
+                    $estimate_company_entity = new EstimateCompany();
+                    $is_new_estimate_company = true;
+                }
+
+                if ($value->company_id != '') {
+                    $company = $this->getDoctrine()->getRepository(Company::class)
+                        ->find($value->company_id);
+                    $estimate_company_entity->setCompany($company);
+                }
+
+                if ($value->contact_id != '') {
+                    $contact = $this->getDoctrine()->getRepository(CompanyContact::class)
+                        ->find($value->contact_id);
+                    $estimate_company_entity->setContact($contact);
+                }
+
+                if ($is_new_estimate_company) {
+                    $estimate_company_entity->setEstimate($entity);
+
+                    $em->persist($estimate_company_entity);
+                }
+            }
+        }
+
+    }
+
+    /**
      * SalvarEstimate: Guarda los datos de estimate en la BD
      * @param string $description Nombre
      * @author Marcel
      */
     public function SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
-                                   $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
+                                   $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
                                    $project_types_id, $estimators_id)
     {
         $em = $this->getDoctrine()->getManager();
@@ -829,18 +931,6 @@ class EstimateService extends Base
             $district = $this->getDoctrine()->getRepository(District::class)
                 ->find($district_id);
             $entity->setDistrict($district);
-        }
-
-        if ($company_id != '') {
-            $company = $this->getDoctrine()->getRepository(Company::class)
-                ->find($company_id);
-            $entity->setCompany($company);
-        }
-
-        if ($contact_id != '') {
-            $contact = $this->getDoctrine()->getRepository(CompanyContact::class)
-                ->find($contact_id);
-            $entity->setContact($contact);
         }
 
         $em->persist($entity);
@@ -934,7 +1024,7 @@ class EstimateService extends Base
      *
      * @author Marcel
      */
-    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $project_type_id,
+    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $project_type_id,
                                     $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin)
     {
         $arreglo_resultado = array();
@@ -944,10 +1034,10 @@ class EstimateService extends Base
         $lista = [];
         if ($project_type_id === "") {
             $lista = $this->getDoctrine()->getRepository(Estimate::class)
-                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
         } else {
             $estimates_project_type = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
             foreach ($estimates_project_type as $estimate_project_type) {
                 $lista[] = $estimate_project_type->getEstimate();
             }
@@ -997,13 +1087,14 @@ class EstimateService extends Base
     {
         $companies = [];
 
-        if ($estimate->getCompany()) {
-            $companies[] = $estimate->getCompany()->getName();
+        $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
+            ->ListarCompanysDeEstimate($estimate->getEstimateId());
+        foreach ($estimate_companys as $estimate_company) {
+            $companies[] = $estimate_company->getCompany()->getName();
         }
 
         $lista = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
             ->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
-
         foreach ($lista as $value) {
             $nombre = $value->getCompany()->getName();
             if (!in_array($nombre, $companies)) {
@@ -1144,14 +1235,14 @@ class EstimateService extends Base
      * @param string $sSearch Para buscar
      * @author Marcel
      */
-    public function TotalEstimates($sSearch, $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin)
+    public function TotalEstimates($sSearch, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin)
     {
         if ($project_type_id === '') {
             return $this->getDoctrine()->getRepository(Estimate::class)
-                ->TotalEstimates($sSearch, $company_id, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+                ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
         } else {
             return $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->TotalEstimates($sSearch, $company_id, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+                ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
         }
 
     }

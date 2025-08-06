@@ -9,6 +9,7 @@ use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Estimate;
+use App\Entity\EstimateCompany;
 use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
@@ -21,6 +22,35 @@ use Symfony\Component\Mime\Address;
 
 class ScriptService extends Base
 {
+
+    /**
+     * DefinirCompanyEstimate
+     */
+    public function DefinirCompanyEstimate()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // estimates
+        $estimates = $this->getDoctrine()->getRepository(Estimate::class)->findAll();
+        foreach ($estimates as $estimate) {
+            $company = $estimate->getCompany();
+            $contact = $estimate->getContact();
+
+            if ($company !== null || $contact !== null) {
+                $estimate_company = new EstimateCompany();
+
+                $estimate_company->setCompany($company);
+                $estimate_company->setContact($contact);
+                $estimate_company->setEstimate($estimate);
+
+                $em->persist($estimate_company);
+            }
+        }
+
+        $em->flush();
+
+
+    }
 
     /**
      * DefinirCountyProjectEstimate

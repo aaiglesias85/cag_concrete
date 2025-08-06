@@ -60,14 +60,12 @@ class EstimateProjectTypeRepository extends EntityRepository
      *
      * @return EstimateProjectType[]
      */
-    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id = '', $stage_id = '', $proposal_type_id = '',
+    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id = '', $proposal_type_id = '',
                                     $status_id = '', $county_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('e_p_t')
             ->leftJoin('e_p_t.estimate', 'e')
             ->leftJoin('e_p_t.type', 't')
-            ->leftJoin('e.company', 'c')
-            ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'p_t')
             ->leftJoin('e.status', 'pl_s')
             ->leftJoin('e.countyObj', 'c_o')
@@ -76,7 +74,7 @@ class EstimateProjectTypeRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
-            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
+            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR
             p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search OR
             t.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
@@ -105,11 +103,6 @@ class EstimateProjectTypeRepository extends EntityRepository
         if ($district_id != '') {
             $consulta->andWhere('d.districtId = :district_id')
                 ->setParameter('district_id', $district_id);
-        }
-
-        if ($company_id != '') {
-            $consulta->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
         }
 
         if ($project_type_id != '') {
@@ -162,7 +155,7 @@ class EstimateProjectTypeRepository extends EntityRepository
      *
      * @return int
      */
-    public function TotalEstimates($sSearch, $company_id = '', $stage_id = '', $proposal_type_id = '',
+    public function TotalEstimates($sSearch, $stage_id = '', $proposal_type_id = '',
                                    $status_id = '', $county_id = '', $district_id = '', $project_type_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
 
@@ -170,8 +163,6 @@ class EstimateProjectTypeRepository extends EntityRepository
             ->select('COUNT(DISTINCT e.estimateId)') // Contar estimates únicos
             ->leftJoin('e_p_t.estimate', 'e')
             ->leftJoin('e_p_t.type', 't')
-            ->leftJoin('e.company', 'c')
-            ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'pl_t')
             ->leftJoin('e.status', 'p_s')
             ->leftJoin('e.countyObj', 'c_o')
@@ -180,7 +171,7 @@ class EstimateProjectTypeRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
-            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
+            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR
             p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search OR
             t.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
@@ -209,11 +200,6 @@ class EstimateProjectTypeRepository extends EntityRepository
         if ($district_id != '') {
             $consulta->andWhere('d.districtId = :district_id')
                 ->setParameter('district_id', $district_id);
-        }
-
-        if ($company_id != '') {
-            $consulta->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
         }
 
         if ($project_type_id != '') {

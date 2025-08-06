@@ -156,13 +156,6 @@ class CountyService extends Base
             $texto_error = "The county could not be deleted because it is related to one or more projects.";
         }
 
-        // districts
-        $districts = $this->getDoctrine()->getRepository(District::class)
-            ->ListarDistrictsDeCounty($county_id);
-        if (count($districts) > 0) {
-            $texto_error = "The county could not be deleted because it is related to one or more districts.";
-        }
-
         // estimates
         $estimates = $this->getDoctrine()->getRepository(Estimate::class)
             ->ListarEstimatesDeCounty($county_id);

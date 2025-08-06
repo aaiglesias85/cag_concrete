@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 05-08-2025 a las 01:52:31
+-- Tiempo de generación: 05-08-2025 a las 23:50:48
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -425,6 +425,19 @@ CREATE TABLE `estimate_bid_deadline` (
   `address` text,
   `estimate_id` int(11) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_company`
+--
+
+CREATE TABLE `estimate_company` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `company_id` int(11) DEFAULT NULL,
+  `contact_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -1839,6 +1852,15 @@ ALTER TABLE `estimate_bid_deadline`
   ADD KEY `Refestimate_bid_dealine2` (`company_id`);
 
 --
+-- Indices de la tabla `estimate_company`
+--
+ALTER TABLE `estimate_company`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_company1` (`estimate_id`),
+  ADD KEY `Refestimate_company2` (`company_id`),
+  ADD KEY `Refestimate_company3` (`contact_id`);
+
+--
 -- Indices de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
@@ -2208,6 +2230,12 @@ ALTER TABLE `estimate_bid_deadline`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_company`
+--
+ALTER TABLE `estimate_company`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
@@ -2516,6 +2544,14 @@ ALTER TABLE `estimate`
 ALTER TABLE `estimate_bid_deadline`
   ADD CONSTRAINT `Refestimate_bid_dealine1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
   ADD CONSTRAINT `Refestimate_bid_dealine2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`);
+
+--
+-- Filtros para la tabla `estimate_company`
+--
+ALTER TABLE `estimate_company`
+  ADD CONSTRAINT `Refestimate_company1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_company2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
+  ADD CONSTRAINT `Refestimate_company3` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
 
 --
 -- Filtros para la tabla `estimate_estimator`

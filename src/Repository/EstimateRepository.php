@@ -109,46 +109,6 @@ class EstimateRepository extends EntityRepository
     }
 
     /**
-     * ListarEstimatesDeCompany: Lista los estimates de un company
-     *
-     * @return Estimate[]
-     */
-    public function ListarEstimatesDeCompany($company_id)
-    {
-        $consulta = $this->createQueryBuilder('e')
-            ->leftJoin('e.company', 'c');
-
-        if ($company_id != '') {
-            $consulta->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
-
-        $consulta->orderBy('e.name', "ASC");
-
-        return $consulta->getQuery()->getResult();
-    }
-
-    /**
-     * ListarEstimatesDeContact: Lista los estimates de un contact company
-     *
-     * @return Estimate[]
-     */
-    public function ListarEstimatesDeContact($contact_id)
-    {
-        $consulta = $this->createQueryBuilder('e')
-            ->leftJoin('e.contact', 'c');
-
-        if ($contact_id != '') {
-            $consulta->andWhere('c.contactId = :contact_id')
-                ->setParameter('contact_id', $contact_id);
-        }
-
-        $consulta->orderBy('e.name', "ASC");
-
-        return $consulta->getQuery()->getResult();
-    }
-
-    /**
      * ListarEstimatesDePlanDownloading: Lista los estimates de un plan downloading
      *
      * @return Estimate[]
@@ -176,12 +136,10 @@ class EstimateRepository extends EntityRepository
      *
      * @return Estimate[]
      */
-    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id = '', $stage_id = '', $proposal_type_id = '',
+    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id = '', $proposal_type_id = '',
                                     $status_id = '', $county_id = '', $district_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('e')
-            ->leftJoin('e.company', 'c')
-            ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'p_t')
             ->leftJoin('e.status', 'pl_s')
             ->leftJoin('e.countyObj', 'c_o')
@@ -190,7 +148,7 @@ class EstimateRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
-            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
+            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR 
             p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -220,11 +178,6 @@ class EstimateRepository extends EntityRepository
                 ->setParameter('district_id', $district_id);
         }
 
-        if ($company_id != '') {
-            $consulta->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
-
         if ($fecha_inicial != "") {
             $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
             $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
@@ -242,9 +195,6 @@ class EstimateRepository extends EntityRepository
         }
 
         switch ($iSortCol_0) {
-            case 'company':
-                $consulta->orderBy("c.name", $sSortDir_0);
-                break;
             case 'type':
             case 'estimator':
                 $consulta->orderBy("e.name", $sSortDir_0);
@@ -269,13 +219,11 @@ class EstimateRepository extends EntityRepository
      *
      * @return int
      */
-    public function TotalEstimates($sSearch, $company_id = '', $stage_id = '', $proposal_type_id = '',
+    public function TotalEstimates($sSearch, $stage_id = '', $proposal_type_id = '',
                                    $status_id = '', $county_id = '', $district_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('e')
             ->select('COUNT(e.estimateId)')
-            ->leftJoin('e.company', 'c')
-            ->leftJoin('e.contact', 'c_c')
             ->leftJoin('e.proposalType', 'p_t')
             ->leftJoin('e.status', 'pl_s')
             ->leftJoin('e.countyObj', 'c_o')
@@ -284,8 +232,8 @@ class EstimateRepository extends EntityRepository
 
         if ($sSearch != "") {
             $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
-            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR c.name LIKE :search OR c_c.name LIKE :search OR
-            p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search')
+                e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR p_t.description LIKE :search OR pl_s.description LIKE :search OR
+                d.description LIKE :search OR pr_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
@@ -312,11 +260,6 @@ class EstimateRepository extends EntityRepository
         if ($district_id != '') {
             $consulta->andWhere('d.districtId = :district_id')
                 ->setParameter('district_id', $district_id);
-        }
-
-        if ($company_id != '') {
-            $consulta->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
         }
 
         if ($fecha_inicial != "") {

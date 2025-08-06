@@ -38,3 +38,7 @@ eliminarItemEstimateAdmin:
 agregarItemEstimateAdmin:
   path: /estimate/agregarItem
   defaults: { _controller: App\Controller\Admin\EstimateController::agregarItem, _format: json }
+
+eliminarCompanyEstimateAdmin:
+  path: /estimate/eliminarCompany
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarCompany, _format: json }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 05-08-2025 a las 01:52:46
+-- Tiempo de generación: 05-08-2025 a las 23:50:58
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -266,7 +266,7 @@ INSERT INTO `county` (`county_id`, `description`, `status`, `district_id`) VALUE
 (42, 'CLAYTON, HENRY', 1, NULL),
 (43, 'JASPER, MONROE', 1, NULL),
 (44, 'ELBERT', 1, NULL),
-(45, 'AUGUSTA', 1, NULL),
+(45, 'AUGUSTA', 1, 1),
 (46, 'MORGAN', 1, NULL),
 (47, 'CITY OF ROSWELL', 1, NULL),
 (48, 'MADISON', 1, NULL),
@@ -309,7 +309,7 @@ INSERT INTO `county` (`county_id`, `description`, `status`, `district_id`) VALUE
 (85, 'HARRIS', 1, NULL),
 (86, 'CAMPBELLTON', 1, NULL),
 (87, 'GORDON', 1, NULL),
-(88, 'Augusta-Richmond', 1, NULL),
+(88, 'Augusta-Richmond', 1, 1),
 (89, 'EATONTON', 1, NULL),
 (90, 'ROME', 1, NULL),
 (91, 'MORGAN, NEWTON', 1, NULL),
@@ -3201,6 +3201,19 @@ INSERT INTO `estimate_bid_deadline` (`id`, `bid_deadline`, `tag`, `address`, `es
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `estimate_company`
+--
+
+CREATE TABLE `estimate_company` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) DEFAULT NULL,
+  `company_id` int(11) DEFAULT NULL,
+  `contact_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `estimate_estimator`
 --
 
@@ -3215,10 +3228,10 @@ CREATE TABLE `estimate_estimator` (
 --
 
 INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
-(70, 3, 2),
 (71, 2, 1),
 (72, 2, 3),
-(73, 2, 2);
+(73, 2, 2),
+(74, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -3237,10 +3250,10 @@ CREATE TABLE `estimate_project_type` (
 --
 
 INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
-(87, 3, 2),
-(88, 3, 3),
 (89, 2, 1),
-(90, 2, 4);
+(90, 2, 4),
+(91, 3, 2),
+(92, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -4771,7 +4784,11 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3623, 'Delete', 'Schedule', 'The schedule is deleted: Prueba Leads', '::1', '2025-08-03 20:45:54', 1),
 (3624, 'Delete', 'Schedule', 'The schedule is deleted: Prueba Leads', '::1', '2025-08-03 20:45:54', 1),
 (3625, 'Add', 'Schedule', 'The schedule is added: Prueba, Start date: 08/01/2025 Stop date: 08/09/2025', '::1', '2025-08-03 20:46:35', 1),
-(3626, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/10/2025 to 09/01/2025', '::1', '2025-08-03 20:47:04', 1);
+(3626, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/10/2025 to 09/01/2025', '::1', '2025-08-03 20:47:04', 1),
+(3627, 'Update', 'District', 'The district is modified: District 1', '::1', '2025-08-05 02:22:10', 1),
+(3628, 'Update', 'County', 'The county is modified: AUGUSTA', '::1', '2025-08-05 02:43:15', 1),
+(3629, 'Update', 'County', 'The county is modified: Augusta-Richmond', '::1', '2025-08-05 02:43:25', 1),
+(3630, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-08-05 03:00:30', 1);
 
 -- --------------------------------------------------------
 
@@ -8465,6 +8482,15 @@ ALTER TABLE `estimate_bid_deadline`
   ADD KEY `Refestimate_bid_dealine2` (`company_id`);
 
 --
+-- Indices de la tabla `estimate_company`
+--
+ALTER TABLE `estimate_company`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_company1` (`estimate_id`),
+  ADD KEY `Refestimate_company2` (`company_id`),
+  ADD KEY `Refestimate_company3` (`contact_id`);
+
+--
 -- Indices de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
@@ -8831,16 +8857,22 @@ ALTER TABLE `estimate_bid_deadline`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_company`
+--
+ALTER TABLE `estimate_company`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -8888,7 +8920,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3627;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3631;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -9139,6 +9171,14 @@ ALTER TABLE `estimate`
 ALTER TABLE `estimate_bid_deadline`
   ADD CONSTRAINT `Refestimate_bid_dealine1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
   ADD CONSTRAINT `Refestimate_bid_dealine2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`);
+
+--
+-- Filtros para la tabla `estimate_company`
+--
+ALTER TABLE `estimate_company`
+  ADD CONSTRAINT `Refestimate_company1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_company2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
+  ADD CONSTRAINT `Refestimate_company3` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
 
 --
 -- Filtros para la tabla `estimate_estimator`

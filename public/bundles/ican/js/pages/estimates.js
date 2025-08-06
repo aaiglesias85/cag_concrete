@@ -169,9 +169,6 @@ var Estimates = function () {
 
             $('#lista-estimate .m_form_search').val('');
 
-            $('#filtro-company').val('');
-            $('#filtro-company').trigger('change');
-
             $('#filtro-stage').val('');
             $('#filtro-stage').trigger('change');
 
@@ -209,9 +206,6 @@ var Estimates = function () {
 
         var generalSearch = $('#lista-estimate .m_form_search').val();
         query.generalSearch = generalSearch;
-
-        var company_id = $('#filtro-company').val();
-        query.company_id = company_id;
 
         var stage_id = $('#filtro-stage').val();
         query.stage_id = stage_id;
@@ -296,15 +290,6 @@ var Estimates = function () {
         $('#priority').val('');
         $('#priority').trigger('change');
 
-        $('#company').val('');
-        $('#company').trigger('change');
-
-        $('#contact option').each(function (e) {
-            if ($(this).val() !== "")
-                $(this).remove();
-        });
-        $('#contact').select2();
-
         $('#sector').val('');
         $('#sector').trigger('change');
 
@@ -327,6 +312,10 @@ var Estimates = function () {
         // items
         items = [];
         actualizarTableListaItems();
+
+        //companys
+        companys = [];
+        actualizarTableListaCompanysEstimate();
 
         //Mostrar el primer tab
         resetWizard();
@@ -446,8 +435,6 @@ var Estimates = function () {
         var priority = $('#priority').val();
         var bidNo = $('#bidNo').val();
         var workHour = $('#workHour').val();
-        var company_id = $('#company').val();
-        var contact_id = $('#contact').val();
         var phone = $('#phone').val();
         var email = $('#email').val();
 
@@ -487,8 +474,6 @@ var Estimates = function () {
                 'priority': priority,
                 'bidNo': bidNo,
                 'workHour': workHour,
-                'company_id': company_id,
-                'contact_id': contact_id,
                 'phone': phone,
                 'email': email,
                 'jobWalk': jobWalk,
@@ -506,6 +491,7 @@ var Estimates = function () {
                 'quoteReceived': quoteReceived,
                 'plan_downloading_id': plan_downloading_id,
                 'bid_deadlines': JSON.stringify(bid_deadlines),
+                'companys': JSON.stringify(companys),
             },
             success: function (response) {
                 mApp.unblock('#form-estimate');
@@ -651,24 +637,6 @@ var Estimates = function () {
                         $('#email').importTags(response.estimate.email);
                     }
 
-
-                    // company
-                    $(document).off('change', "#company", changeCompany);
-                    $(document).off('change', "#contact", changeContact);
-
-                    $('#company').val(response.estimate.company_id);
-                    $('#company').trigger('change');
-
-                    // contacts
-                    contacts_company = response.estimate.contacts;
-                    actualizarSelectContacts(response.estimate.contacts);
-
-                    $('#contact').val(response.estimate.contact_id);
-                    $('#contact').trigger('change');
-
-                    $(document).on('change', "#company", changeCompany);
-                    $(document).on('change', "#contact", changeContact);
-
                     $('#jobWalk').val(response.estimate.jobWalk);
                     $('#rfiDueDate').val(response.estimate.rfiDueDate);
                     $('#projectStart').val(response.estimate.projectStart);
@@ -697,6 +665,10 @@ var Estimates = function () {
                     // items
                     items = response.estimate.items;
                     actualizarTableListaItems();
+
+                    // companys
+                    companys = response.estimate.companys;
+                    actualizarTableListaCompanysEstimate();
 
 
                     // habilitar tab
@@ -995,9 +967,6 @@ var Estimates = function () {
         $(document).off('change', "#company", changeCompany);
         $(document).on('change', "#company", changeCompany);
 
-        $(document).off('change', "#contact", changeContact);
-        $(document).on('change', "#contact", changeContact);
-
         $(document).off('change', "#county", changeCounty);
         $(document).on('change', "#county", changeCounty);
 
@@ -1165,38 +1134,6 @@ var Estimates = function () {
         $(select).select2();
     }
 
-    // change contact
-    var changeContact = function (e) {
-        var contact_id = $('#contact').val();
-
-        var contact = contacts_company.find(item => Number(item.contact_id) === Number(contact_id));
-        if (contact) {
-            actualizarTagsContact(contact);
-        }
-    }
-    var actualizarTagsContact = function (contact) {
-        // Obtener y dividir los valores actuales
-        var existingPhones = $('#phone').val() ? $('#phone').val().split(',') : [];
-        var existingEmails = $('#email').val() ? $('#email').val().split(',') : [];
-
-        // Limpiar espacios y normalizar
-        existingPhones = existingPhones.map(p => p.trim());
-        existingEmails = existingEmails.map(e => e.trim().toLowerCase());
-
-        // Agregar nuevo teléfono si no existe
-        if (contact.phone && !existingPhones.includes(contact.phone.trim())) {
-            existingPhones.push(contact.phone.trim());
-        }
-
-        // Agregar nuevo email si no existe
-        if (contact.email && !existingEmails.includes(contact.email.trim().toLowerCase())) {
-            existingEmails.push(contact.email.trim());
-        }
-
-        // Importar sin duplicados
-        $('#phone').importTags(existingPhones.join(','));
-        $('#email').importTags(existingEmails.join(','));
-    }
     var changeCounty = function (e) {
         var county_id = $(this).val();
 
@@ -1308,7 +1245,6 @@ var Estimates = function () {
                     break;
                 case 2:
                     $('#tab-bid-details').tab('show');
-                    actualizarTableListaBidDeadLines();
                     break;
                 case 3:
                     $('#tab-quotes').tab('show');
@@ -1410,8 +1346,8 @@ var Estimates = function () {
                 $('#contact').val(contact.contact_id);
                 $('#contact').trigger('change');
 
-                // actualizar tags
-                actualizarTagsContact(contact);
+                // add contact
+                contacts_company.push(contact);
             }
         });
     }
@@ -1688,7 +1624,7 @@ var Estimates = function () {
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
-            eliminarBidDeadline(posicion, '#bid-deadline-table-editable');
+            eliminarBidDeadline(posicion, '#lista-bid-deadline');
         });
 
     };
@@ -2521,6 +2457,257 @@ var Estimates = function () {
         });
     }
 
+    // Companys
+    var companys = [];
+    var nEditingRowCompany = null;
+    var actualizarTableListaCompanysEstimate = function () {
+        var html = '';
+
+        companys.forEach(function (item) {
+            html += `
+            <div class="m-widget4__item" style="width: 300px;">
+                <div class="m-widget4__info">
+                    <span class="m-widget4__title">
+                    ${item.company}  
+                    </span><br>
+                    <span class="m-widget4__sub">
+                        ${item.contact}
+                    </span>
+                </div>
+                <span class="m-widget4__ext d-flex">
+                    <a href="javascript:;" 
+                           class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" 
+                           title="Edit record" 
+                           data-posicion="${item.posicion}">
+                            <i class="la la-edit"></i>
+                    </a>
+                    <a href="javascript:;" 
+                       class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" 
+                       title="Delete record" 
+                       data-posicion="${item.posicion}">
+                        <i class="la la-trash"></i>
+                    </a>
+                </span>
+            </div>
+        `;
+        });
+
+        $('#lista-company').html(html);
+    }
+    var initAccionesCompanysEstimate = function () {
+
+        $(document).off('click', "#btn-agregar-company-estimate");
+        $(document).on('click', "#btn-agregar-company-estimate", function (e) {
+            // reset
+            resetFormCompanyEstimate();
+
+            $('#modal-company-estimate').modal({
+                'show': true
+            });
+        });
+
+        $(document).off('click', "#btn-salvar-company-estimate");
+        $(document).on('click', "#btn-salvar-company-estimate", function (e) {
+            e.preventDefault();
+
+            var company_id = $('#company').val();
+            var contact_id = $('#contact').val();
+
+            if (company_id !== "" && contact_id !== "") {
+
+                var company = $("#company option:selected").text();
+                var contact = $("#contact option:selected").text();
+
+                if (nEditingRowCompany == null) {
+
+                    companys.push({
+                        id: '',
+                        company_id: company_id,
+                        company: company,
+                        contact_id: contact_id,
+                        contact: contact,
+                        contacts: contacts_company,
+                        posicion: bid_deadlines.length
+                    });
+
+                } else {
+                    var posicion = nEditingRowCompany;
+                    if (companys[posicion]) {
+                        companys[posicion].company_id = company_id;
+                        companys[posicion].company = company;
+                        companys[posicion].contact_id = contact_id;
+                        companys[posicion].contact = contact;
+                        companys[posicion].contacts = contacts_company;
+                    }
+                }
+
+                //actualizar lista
+                actualizarTableListaCompanysEstimate();
+                actualizarTagsContact(contact_id);
+
+                // reset
+                resetFormCompanyEstimate();
+                $('#modal-company-estimate').modal('hide');
+
+            } else {
+                if (company_id === "") {
+                    var $element = $('#select-company .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+                if (contact_id === "") {
+                    var $element = $('#select-contact .select2');
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", "This field is required")
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+                }
+            }
+
+        });
+
+        var actualizarTagsContact = function (contact_id) {
+            var contact = contacts_company.find(item => Number(item.contact_id) === Number(contact_id));
+            if (contact) {
+                // Obtener y dividir los valores actuales
+                var existingPhones = $('#phone').val() ? $('#phone').val().split(',') : [];
+                var existingEmails = $('#email').val() ? $('#email').val().split(',') : [];
+
+                // Limpiar espacios y normalizar
+                existingPhones = existingPhones.map(p => p.trim());
+                existingEmails = existingEmails.map(e => e.trim().toLowerCase());
+
+                // Agregar nuevo teléfono si no existe
+                if (contact.phone && !existingPhones.includes(contact.phone.trim())) {
+                    existingPhones.push(contact.phone.trim());
+                }
+
+                // Agregar nuevo email si no existe
+                if (contact.email && !existingEmails.includes(contact.email.trim().toLowerCase())) {
+                    existingEmails.push(contact.email.trim());
+                }
+
+                // Importar sin duplicados
+                $('#phone').importTags(existingPhones.join(','));
+                $('#email').importTags(existingEmails.join(','));
+            }
+
+        }
+
+        $(document).off('click', "#lista-company a.edit");
+        $(document).on('click', "#lista-company a.edit", function () {
+            var posicion = $(this).data('posicion');
+            if (companys[posicion]) {
+
+                // reset
+                resetFormCompanyEstimate();
+
+                nEditingRowCompany = posicion;
+
+                // company
+                $(document).off('change', "#company", changeCompany);
+
+                $('#company').val(companys[posicion].company_id);
+                $('#company').trigger('change');
+
+                // contacts
+                contacts_company = companys[posicion].contacts;
+                actualizarSelectContacts(companys[posicion].contacts);
+
+                $('#contact').val(companys[posicion].contact_id);
+                $('#contact').trigger('change');
+
+                $(document).on('change', "#company", changeCompany);
+
+                // open modal
+                $('#modal-company-estimate').modal('show');
+
+            }
+        });
+
+        $(document).off('click', "#lista-company a.delete");
+        $(document).on('click', "#lista-company a.delete", function (e) {
+
+            e.preventDefault();
+            var posicion = $(this).data('posicion');
+
+            eliminarCompanyEstimate(posicion, '#lista-company');
+        });
+
+    };
+    var eliminarCompanyEstimate = function (posicion, block_element) {
+        if (companys[posicion]) {
+
+            if (companys[posicion].id !== '') {
+                MyApp.block(block_element);
+
+                $.ajax({
+                    type: "POST",
+                    url: "estimate/eliminarCompany",
+                    dataType: "json",
+                    data: {
+                        'id': companys[posicion].id
+                    },
+                    success: function (response) {
+                        mApp.unblock(block_element);
+                        if (response.success) {
+
+                            toastr.success(response.message, "");
+
+                            deleteCompany(posicion);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    },
+                    failure: function (response) {
+                        mApp.unblock(block_element);
+
+                        toastr.error(response.error, "");
+                    }
+                });
+            } else {
+                deleteCompany(posicion);
+            }
+        }
+
+        function deleteCompany(posicion) {
+            //Eliminar
+            companys.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < companys.length; i++) {
+                companys[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaCompanysEstimate();
+        }
+    }
+    var resetFormCompanyEstimate = function () {
+
+        $('#company').val('');
+        $('#company').trigger('change');
+
+        MyApp.limpiarSelect('#contact');
+
+
+        var $element = $('.select2');
+        $element.removeClass('has-error').tooltip("dispose");
+
+        nEditingRowCompany = null;
+    };
+
     return {
         //main function to initiate the module
         init: function () {
@@ -2544,6 +2731,9 @@ var Estimates = function () {
             // bid deadlines
             initFormBidDeadLines();
             initAccionesBidDeadLines();
+
+            // companys
+            initAccionesCompanysEstimate();
 
             // project information
             initAccionesProjectInformation();

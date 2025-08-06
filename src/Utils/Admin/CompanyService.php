@@ -6,6 +6,7 @@ use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\Estimate;
 use App\Entity\EstimateBidDeadline;
+use App\Entity\EstimateCompany;
 use App\Entity\Project;
 use App\Utils\Base;
 
@@ -79,10 +80,10 @@ class CompanyService extends Base
         if ($entity != null) {
 
             // estimates
-            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+            $estimates = $this->getDoctrine()->getRepository(EstimateCompany::class)
                 ->ListarEstimatesDeContact($contact_id);
             foreach ($estimates as $estimate) {
-                $estimate->setContact(NULL);
+                $em->remove($estimate);
             }
 
             $contact_name = $entity->getName();
@@ -302,20 +303,20 @@ class CompanyService extends Base
         foreach ($contacts as $contact) {
 
             // estimates
-            $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+            $estimates = $this->getDoctrine()->getRepository(EstimateCompany::class)
                 ->ListarEstimatesDeContact($contact->getContactId());
             foreach ($estimates as $estimate) {
-                $estimate->setContact(NULL);
+                $em->remove($estimate);
             }
 
             $em->remove($contact);
         }
 
         // estimates
-        $estimates = $this->getDoctrine()->getRepository(Estimate::class)
+        $estimates = $this->getDoctrine()->getRepository(EstimateCompany::class)
             ->ListarEstimatesDeCompany($company_id);
         foreach ($estimates as $estimate) {
-            $estimate->setCompany(NULL);
+            $em->remove($estimate);
         }
 
         // bid deadline estimates

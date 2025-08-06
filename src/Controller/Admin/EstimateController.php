@@ -118,7 +118,6 @@ class EstimateController extends AbstractController
         // search filter by keywords
         $query = !empty($request->get('query')) ? $request->get('query') : array();
         $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $company_id = isset($query['company_id']) && is_string($query['company_id']) ? $query['company_id'] : '';
         $stage_id = isset($query['stage_id']) && is_string($query['stage_id']) ? $query['stage_id'] : '';
         $project_type_id = isset($query['project_type_id']) && is_string($query['project_type_id']) ? $query['project_type_id'] : '';
         $proposal_type_id = isset($query['proposal_type_id']) && is_string($query['proposal_type_id']) ? $query['proposal_type_id'] : '';
@@ -140,7 +139,7 @@ class EstimateController extends AbstractController
 
         try {
             $pages = 1;
-            $total = $this->estimateService->TotalEstimates($sSearch, $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+            $total = $this->estimateService->TotalEstimates($sSearch, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
             if ($limit > 0) {
                 $pages = ceil($total / $limit); // calculate total pages
                 $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
@@ -161,7 +160,7 @@ class EstimateController extends AbstractController
             );
 
             $data = $this->estimateService->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                $company_id, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+                $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson = array(
                 'meta' => $meta,
@@ -215,8 +214,6 @@ class EstimateController extends AbstractController
         $proposal_type_id = $request->get('proposal_type_id');
         $status_id = $request->get('status_id');
         $district_id = $request->get('district_id');
-        $company_id = $request->get('company_id');
-        $contact_id = $request->get('contact_id');
         $plan_downloading_id = $request->get('plan_downloading_id');
 
         // project types
@@ -228,18 +225,23 @@ class EstimateController extends AbstractController
         $bid_deadlines = $request->get('bid_deadlines');
         $bid_deadlines = json_decode($bid_deadlines);
 
+        // companys
+        $companys = $request->get('companys');
+        $companys = json_decode($companys);
+
 
         try {
 
             if ($estimate_id === '') {
                 $resultado = $this->estimateService->SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
-                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
+                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
                     $project_types_id, $estimators_id);
             } else {
                 $resultado = $this->estimateService->ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
-                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id, $company_id, $contact_id,
+                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
                     $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived);
+                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived,
+                    $companys);
             }
 
             if ($resultado['success']) {
@@ -475,5 +477,32 @@ class EstimateController extends AbstractController
             return $this->json($resultadoJson);
         }
 
+    }
+
+    /**
+     * eliminarCompany Acción que elimina un company en la BD
+     *
+     */
+    public function eliminarCompany(Request $request)
+    {
+        $id = $request->get('id');
+
+        try {
+            $resultado = $this->estimateService->EliminarCompany($id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+                return $this->json($resultadoJson);
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+                return $this->json($resultadoJson);
+            }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
     }
 }
