@@ -1437,7 +1437,7 @@ var Estimates = function () {
 
         bid_deadlines.forEach(function (item) {
             html += `
-            <div class="m-widget4__item" style="width: 300px;">
+            <div class="m-widget4__item" style="width: 500px;">
                 <div class="m-widget4__info">
                     <span class="m-widget4__title">
                     ${item.bidDeadline}
@@ -2465,13 +2465,19 @@ var Estimates = function () {
 
         companys.forEach(function (item) {
             html += `
-            <div class="m-widget4__item" style="width: 300px;">
+            <div class="m-widget4__item" style="width: 500px;">
                 <div class="m-widget4__info">
                     <span class="m-widget4__title">
                     ${item.company}  
                     </span><br>
                     <span class="m-widget4__sub">
                         ${item.contact}
+                    </span><br>
+                    <span class="m-widget4__sub">
+                        ${item.email}
+                    </span><br>
+                    <span class="m-widget4__sub">
+                       ${item.phone}
                     </span>
                 </div>
                 <span class="m-widget4__ext d-flex">
@@ -2518,6 +2524,10 @@ var Estimates = function () {
                 var company = $("#company option:selected").text();
                 var contact = $("#contact option:selected").text();
 
+                var contact_obj = contacts_company.find(item => item.contact_id == contact_id);
+                var email = contact_obj ? contact_obj.email : '';
+                var phone = contact_obj ? contact_obj.phone : '';
+
                 if (nEditingRowCompany == null) {
 
                     companys.push({
@@ -2526,6 +2536,8 @@ var Estimates = function () {
                         company: company,
                         contact_id: contact_id,
                         contact: contact,
+                        email: email,
+                        phone: phone,
                         contacts: contacts_company,
                         posicion: bid_deadlines.length
                     });
@@ -2537,6 +2549,8 @@ var Estimates = function () {
                         companys[posicion].company = company;
                         companys[posicion].contact_id = contact_id;
                         companys[posicion].contact = contact;
+                        companys[posicion].email = email;
+                        companys[posicion].phone = phone;
                         companys[posicion].contacts = contacts_company;
                     }
                 }

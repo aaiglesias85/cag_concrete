@@ -372,6 +372,8 @@ class EstimateService extends Base
                 'company' => $estimate_company->getCompany()->getName(),
                 'contact_id' => $estimate_company->getContact()->getContactId(),
                 'contact' => $estimate_company->getContact()->getName(),
+                'email' => $estimate_company->getContact()->getEmail(),
+                'phone' => $estimate_company->getContact()->getPhone(),
                 'contacts' => $contacts,
                 "posicion" => $key
             ];
