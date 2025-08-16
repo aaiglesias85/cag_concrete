@@ -345,7 +345,11 @@ class ProjectService extends Base
             }
 
             $project_item_entity->setYieldCalculation($yield_calculation);
+
+            $price_old = $project_item_entity->getPrice();
             $project_item_entity->setPrice($price);
+
+            $quantity_old = $project_item_entity->getQuantity();
             $project_item_entity->setQuantity($quantity);
 
             $equation_entity = null;
@@ -370,6 +374,7 @@ class ProjectService extends Base
                 $is_new_item = true;
             }
 
+            $item_description = $item_entity->getDescription();
             $project_item_entity->setItem($item_entity);
 
             if ($is_new_project_item) {
@@ -379,11 +384,36 @@ class ProjectService extends Base
 
                 // registrar nota
                 $notas[] = [
-                    'notes' => 'Add new item: ' . $item_entity->getDescription(),
+                    'notes' => "Add New Item: {$item_description}",
                     'date' => new \DateTime()
                 ];
-                $this->SalvarNotesUpdate($project_entity, $notas);
+
+            } else {
+
+                // change price
+                if ($price_old != $price) {
+
+                    $project_item_entity->setPriceOld($price_old);
+
+                    $notas[] = [
+                        'notes' => "Change Price Item: {$item_description}, Previous Price: {$price_old}, New Price: {$price}",
+                        'date' => new \DateTime()
+                    ];
+                }
+
+                // change quantity
+                if ($quantity_old != $quantity) {
+
+                    $project_item_entity->setQuantityOld($quantity_old);
+
+                    $notas[] = [
+                        'notes' => "Change Quantity Item: {$item_description}, Previous Quantity: {$quantity_old}, New Quantity: {$quantity}",
+                        'date' => new \DateTime()
+                    ];
+                }
             }
+
+            $this->SalvarNotesUpdate($project_entity, $notas);
 
             $em->flush();
 
@@ -1042,7 +1072,9 @@ class ProjectService extends Base
             "item" => $value->getItem()->getDescription(),
             "unit" => $value->getItem()->getUnit()->getDescription(),
             "quantity" => $quantity,
+            "quantity_old" => $value->getQuantityOld() ?? '',
             "price" => $price,
+            "price_old" => $value->getPriceOld() ?? '',
             "total" => $total,
             "yield_calculation" => $value->getYieldCalculation(),
             "yield_calculation_name" => $yield_calculation_name,

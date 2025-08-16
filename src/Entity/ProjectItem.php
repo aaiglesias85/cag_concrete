@@ -16,8 +16,14 @@ class ProjectItem
     #[ORM\Column(name: "quantity", type: "float", nullable: true)]
     private ?float $quantity;
 
+    #[ORM\Column(name: "quantity_old", type: "float", nullable: true)]
+    private ?float $quantityOld;
+
     #[ORM\Column(name: "price", type: "float", nullable: true)]
     private ?float $price;
+
+    #[ORM\Column(name: "price_old", type: "float", nullable: true)]
+    private ?float $priceOld;
 
     #[ORM\Column(name: "yield_calculation", type: "string", length: 50, nullable: true)]
     private ?string $yieldCalculation;
@@ -97,5 +103,25 @@ class ProjectItem
     public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    public function getQuantityOld(): ?float
+    {
+        return $this->quantityOld;
+    }
+
+    public function setQuantityOld(?float $quantityOld): void
+    {
+        $this->quantityOld = $quantityOld;
+    }
+
+    public function getPriceOld(): ?float
+    {
+        return $this->priceOld;
+    }
+
+    public function setPriceOld(?float $priceOld): void
+    {
+        $this->priceOld = $priceOld;
     }
 }

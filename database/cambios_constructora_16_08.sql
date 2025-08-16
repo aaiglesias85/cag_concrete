@@ -1,0 +1,1 @@
+ALTER TABLE `project_item` ADD `quantity_old` DECIMAL(18,6) NULL AFTER `yield_calculation`, ADD `price_old` DECIMAL(18,6) NULL AFTER `quantity_old`;

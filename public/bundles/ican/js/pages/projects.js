@@ -1135,6 +1135,24 @@ var Projects = function () {
                 }
             },
             {
+                field: "quantity_old",
+                title: "Previous Quantity",
+                width: 120,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.quantity_old, 2, '.', ',')}</span>`;
+                }
+            },
+            {
+                field: "price_old",
+                title: "Previous Price",
+                width: 100,
+                textAlign: 'center',
+                template: function (row) {
+                    return `<span>${MyApp.formatearNumero(row.price_old, 2, '.', ',')}</span>`;
+                }
+            },
+            {
                 field: "posicion",
                 width: 120,
                 title: "Actions",
