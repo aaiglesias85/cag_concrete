@@ -376,6 +376,13 @@ class ProjectService extends Base
                 $project_item_entity->setProject($project_entity);
 
                 $em->persist($project_item_entity);
+
+                // registrar nota
+                $notas[] = [
+                    'notes' => 'Add new item: ' . $item_entity->getDescription(),
+                    'date' => new \DateTime()
+                ];
+                $this->SalvarNotesUpdate($project_entity, $notas);
             }
 
             $em->flush();
