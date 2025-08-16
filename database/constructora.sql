@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 05-08-2025 a las 23:50:48
+-- Tiempo de generación: 16-08-2025 a las 19:58:52
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -1275,6 +1275,8 @@ CREATE TABLE `project_item` (
   `quantity` decimal(18,6) DEFAULT NULL,
   `price` decimal(18,2) DEFAULT NULL,
   `yield_calculation` varchar(50) DEFAULT NULL,
+  `quantity_old` decimal(18,6) DEFAULT NULL,
+  `price_old` decimal(18,6) DEFAULT NULL,
   `project_id` int(11) DEFAULT NULL,
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL
@@ -1284,20 +1286,20 @@ CREATE TABLE `project_item` (
 -- Volcado de datos para la tabla `project_item`
 --
 
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `project_id`, `item_id`, `equation_id`) VALUES
-(1, 1500.000000, 16.50, 'equation', 3, 6, 2),
-(2, 2000.000000, 63.00, 'same', 3, 15, NULL),
-(4, 1600.000000, 150.00, 'none', 3, 20, NULL),
-(8, 2500.000000, 25.00, 'equation', 3, 3, 2),
-(9, 2500.000000, 16.50, 'equation', 3, 7, 2),
-(10, 5000.000000, 70.00, 'equation', 3, 12, 2),
-(11, 50.000000, 160.00, 'none', 2, 12, NULL),
-(12, 60.000000, 200.00, '', 2, 6, NULL),
-(13, 50.000000, 300.00, '', 2, 7, NULL),
-(15, 10.000000, 100.00, 'same', 3, 21, NULL),
-(16, 0.000000, 100.00, 'same', 2, 11, NULL),
-(17, 100.000000, 100.00, 'equation', 2, 8, 2),
-(18, 10.000000, 100.00, 'none', 1, 11, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `project_id`, `item_id`, `equation_id`) VALUES
+(1, 1500.000000, 16.50, 'equation', NULL, NULL, 3, 6, 2),
+(2, 2000.000000, 63.00, 'same', NULL, NULL, 3, 15, NULL),
+(4, 1600.000000, 150.00, 'none', NULL, NULL, 3, 20, NULL),
+(8, 2500.000000, 25.00, 'equation', NULL, NULL, 3, 3, 2),
+(9, 2500.000000, 16.50, 'equation', NULL, NULL, 3, 7, 2),
+(10, 5000.000000, 70.00, 'equation', NULL, NULL, 3, 12, 2),
+(11, 50.000000, 160.00, 'none', NULL, NULL, 2, 12, NULL),
+(12, 60.000000, 200.00, '', NULL, NULL, 2, 6, NULL),
+(13, 50.000000, 300.00, '', NULL, NULL, 2, 7, NULL),
+(15, 10.000000, 100.00, 'same', NULL, NULL, 3, 21, NULL),
+(16, 0.000000, 100.00, 'same', NULL, NULL, 2, 11, NULL),
+(17, 100.000000, 100.00, 'equation', NULL, NULL, 2, 8, 2),
+(18, 10.000000, 100.00, 'none', NULL, NULL, 1, 11, NULL);
 
 -- --------------------------------------------------------
 
@@ -1355,6 +1357,19 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (37, 'Change contract amount, old value: 0', '2025-03-01', 1),
 (38, 'Change status, old value: In Progress', '2025-03-02', 1),
 (39, 'Change status, old value: In Progress', '2025-03-02', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_price_adjustment`
+--
+
+CREATE TABLE `project_price_adjustment` (
+  `id` int(11) NOT NULL,
+  `day` date DEFAULT NULL,
+  `percent` decimal(8,2) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1998,6 +2013,13 @@ ALTER TABLE `project_notes`
   ADD KEY `Ref6678` (`project_id`);
 
 --
+-- Indices de la tabla `project_price_adjustment`
+--
+ALTER TABLE `project_price_adjustment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refproject_price_adjustment1` (`project_id`);
+
+--
 -- Indices de la tabla `project_stage`
 --
 ALTER TABLE `project_stage`
@@ -2350,6 +2372,12 @@ ALTER TABLE `project_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
+-- AUTO_INCREMENT de la tabla `project_price_adjustment`
+--
+ALTER TABLE `project_price_adjustment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project_stage`
 --
 ALTER TABLE `project_stage`
@@ -2640,6 +2668,12 @@ ALTER TABLE `project_item`
 --
 ALTER TABLE `project_notes`
   ADD CONSTRAINT `Refproject78` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `project_price_adjustment`
+--
+ALTER TABLE `project_price_adjustment`
+  ADD CONSTRAINT `Refproject_price_adjustment1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
 -- Filtros para la tabla `reminder_recipient`
