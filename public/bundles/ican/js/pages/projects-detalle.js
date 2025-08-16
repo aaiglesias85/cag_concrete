@@ -32,6 +32,10 @@ var ProjectsDetalle = function () {
         invoices = [];
         actualizarTableListaInvoices();
 
+        //ajustes precio
+        ajustes_precio = [];
+        actualizarTableListaAjustesPrecio();
+
         //Mostrar el primer tab
         resetWizard();
 
@@ -132,6 +136,10 @@ var ProjectsDetalle = function () {
                     invoices = response.project.invoices;
                     actualizarTableListaInvoices();
 
+                    // ajustes precio
+                    ajustes_precio = response.project.ajustes_precio;
+                    actualizarTableListaAjustesPrecio();
+
                 } else {
                     toastr.error(response.error, "");
                 }
@@ -147,7 +155,7 @@ var ProjectsDetalle = function () {
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 6;
+    var totalTabs = 7;
     var initWizard = function () {
         $(document).off('click', "#form-project-detalle .wizard-tab");
         $(document).on('click', "#form-project-detalle .wizard-tab", function (e) {
@@ -184,6 +192,9 @@ var ProjectsDetalle = function () {
                     break;
                 case 6:
                     btnClickFiltrarDataTracking();
+                    break;
+                case 7:
+                    actualizarTableListaAjustesPrecio();
                     break;
             }
 
@@ -239,13 +250,17 @@ var ProjectsDetalle = function () {
                     $('#tab-data-tracking-detalle').tab('show');
                     btnClickFiltrarDataTracking();
                     break;
+                case 7:
+                    $('#tab-ajustes-precio-detalle').tab('show');
+                    actualizarTableListaAjustesPrecio();
+                    break;
 
             }
         }, 0);
     }
     var resetWizard = function () {
         activeTab = 1;
-        totalTabs = 6;
+        totalTabs = 7;
         mostrarTab();
         $('#btn-wizard-anterior-detalle').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-siguiente-detalle').removeClass('m--hide');
@@ -1041,6 +1056,97 @@ var ProjectsDetalle = function () {
         });
 
     };
+
+    // Ajustes Precio
+    var ajustes_precio = [];
+    var oTableListaAjustesPrecio;
+    var initTableListaAjustesPrecio = function () {
+        MyApp.block('#lista-ajustes-precio-table-editable-detalle');
+
+        var table = $('#lista-ajustes-precio-table-editable-detalle');
+
+        var aoColumns = [
+            {
+                field: "day",
+                title: "Day"
+            },
+            {
+                field: "percent",
+                title: "Percent"
+            },
+        ];
+        oTableListaAjustesPrecio = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: ajustes_precio,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-ajustes-precio-detalle .m_form_search'),
+            },
+        });
+
+        //Events
+        oTableListaAjustesPrecio
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#lista-ajustes-precio-table-editable-detalle');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#lista-ajustes-precio-table-editable-detalle');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#lista-ajustes-precio-table-editable-detalle');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#lista-ajustes-precio-table-editable-detalle');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#lista-ajustes-precio-table-editable-detalle');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+    };
+    var actualizarTableListaAjustesPrecio = function () {
+        if (oTableListaAjustesPrecio) {
+            oTableListaAjustesPrecio.destroy();
+        }
+
+        initTableListaAjustesPrecio();
+    }
 
 
     return {

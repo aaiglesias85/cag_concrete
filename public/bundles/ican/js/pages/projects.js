@@ -271,6 +271,10 @@ var Projects = function () {
         invoices = [];
         actualizarTableListaInvoices();
 
+        //ajustes precio
+        ajustes_precio = [];
+        actualizarTableListaAjustesPrecio();
+
         //Mostrar el primer tab
         if (reset_wizard) {
             resetWizard();
@@ -477,7 +481,8 @@ var Projects = function () {
                 'proposal_number': proposal_number,
                 'project_id_number': project_id_number,
                 'items': JSON.stringify(items),
-                'contacts': JSON.stringify(contacts)
+                'contacts': JSON.stringify(contacts),
+                'ajustes_precio': JSON.stringify(ajustes_precio)
             },
             success: function (response) {
                 mApp.unblock('#form-project');
@@ -680,8 +685,12 @@ var Projects = function () {
                     invoices = response.project.invoices;
                     actualizarTableListaInvoices();
 
+                    // ajustes precio
+                    ajustes_precio = response.project.ajustes_precio;
+                    actualizarTableListaAjustesPrecio();
+
                     // habilitar tab
-                    totalTabs = 5;
+                    totalTabs = 7;
                     $('.nav-item-hide').removeClass('m--hide');
 
                     event_change = false;
@@ -981,6 +990,9 @@ var Projects = function () {
                 case 6:
                     btnClickFiltrarDataTracking();
                     break;
+                case 7:
+                    actualizarTableListaAjustesPrecio();
+                    break;
             }
 
         });
@@ -1041,6 +1053,10 @@ var Projects = function () {
                 case 6:
                     $('#tab-data-tracking').tab('show');
                     btnClickFiltrarDataTracking();
+                    break;
+                case 7:
+                    $('#tab-ajustes-precio').tab('show');
+                    actualizarTableListaAjustesPrecio();
                     break;
 
             }
@@ -2878,6 +2894,305 @@ var Projects = function () {
 
     };
 
+    // Ajustes Precio
+    var ajustes_precio = [];
+    var oTableListaAjustesPrecio;
+    var nEditingRowAjustePrecio = null;
+    var initTableListaAjustesPrecio = function () {
+        MyApp.block('#lista-ajustes-precio-table-editable');
+
+        var table = $('#lista-ajustes-precio-table-editable');
+
+        var aoColumns = [
+            {
+                field: "day",
+                title: "Day"
+            },
+            {
+                field: "percent",
+                title: "Percent"
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record"><i class="la la-edit"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record"><i class="la la-trash"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableListaAjustesPrecio = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: ajustes_precio,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-ajustes-precio .m_form_search'),
+            },
+        });
+
+        //Events
+        oTableListaAjustesPrecio
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#lista-ajustes-precio-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#lista-ajustes-precio-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#lista-ajustes-precio-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#lista-ajustes-precio-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#lista-ajustes-precio-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+    };
+    var actualizarTableListaAjustesPrecio = function () {
+        if (oTableListaAjustesPrecio) {
+            oTableListaAjustesPrecio.destroy();
+        }
+
+        initTableListaAjustesPrecio();
+    }
+    var initFormAjustePrecio = function () {
+        $("#ajuste-precio-form").validate({
+            rules: {
+                day: {
+                    required: true
+                },
+                percent: {
+                    required: true
+                },
+            },
+            showErrors: function (errorMap, errorList) {
+                // Clean up any tooltips for valid elements
+                $.each(this.validElements(), function (index, element) {
+                    var $element = $(element);
+
+                    $element.data("title", "") // Clear the title - there is no error associated anymore
+                        .removeClass("has-error")
+                        .tooltip("dispose");
+
+                    $element
+                        .closest('.form-group')
+                        .removeClass('has-error').addClass('success');
+                });
+
+                // Create new tooltips for invalid elements
+                $.each(errorList, function (index, error) {
+                    var $element = $(error.element);
+
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", error.message)
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+
+                });
+            },
+        });
+    };
+    var initAccionesAjustesPrecio = function () {
+
+        $(document).off('click', "#btn-agregar-ajuste-precio");
+        $(document).on('click', "#btn-agregar-ajuste-precio", function (e) {
+            // reset
+            resetFormAjustePrecio();
+
+            $('#modal-ajuste-precio').modal({
+                'show': true
+            });
+        });
+
+        function ExisteAjustePrecio(day) {
+            const pos = nEditingRowAjustePrecio;
+
+            if (pos == null) {
+                return ajustes_precio.some(item => item.day === day);
+            }
+
+            const excludeId = ajustes_precio[pos]?.id;
+            return ajustes_precio.some(item => item.day === day && item.id !== excludeId);
+        }
+
+        $(document).off('click', "#btn-salvar-ajuste-precio");
+        $(document).on('click', "#btn-salvar-ajuste-precio", function (e) {
+            e.preventDefault();
+
+            if ($('#ajuste-precio-form').valid()) {
+                var day = $('#ajuste_precio_day').val();
+                var percent = $('#ajuste_precio_percent').val();
+
+                if (ExisteAjustePrecio(day)) {
+                    toastr.error("The selected day has already been added", "");
+                    return;
+                }
+
+                if (nEditingRowAjustePrecio == null) {
+
+                    ajustes_precio.push({
+                        id: '',
+                        day: day,
+                        percent: percent,
+                        posicion: ajustes_precio.length
+                    });
+
+                } else {
+                    var posicion = nEditingRowAjustePrecio;
+                    if (ajustes_precio[posicion]) {
+                        ajustes_precio[posicion].day = day;
+                        ajustes_precio[posicion].percent = percent;
+                    }
+                }
+
+                // close modal
+                $('#modal-ajuste-precio').modal('hide');
+
+                //actualizar lista
+                actualizarTableListaAjustesPrecio();
+
+                // reset
+                resetFormAjustePrecio();
+
+            }
+
+        });
+
+        $(document).off('click', "#lista-ajustes-precio-table-editable a.edit");
+        $(document).on('click', "#lista-ajustes-precio-table-editable a.edit", function () {
+            var posicion = $(this).data('posicion');
+            if (ajustes_precio[posicion]) {
+
+                // reset
+                resetFormAjustePrecio();
+
+                nEditingRowAjustePrecio = posicion;
+
+                $('#ajustes_precio').val(ajustes_precio[posicion].id);
+                $('#ajuste_precio_day').val(ajustes_precio[posicion].day);
+                $('#ajuste_precio_percent').val(ajustes_precio[posicion].percent);
+
+                // open modal
+                $('#modal-ajuste-precio').modal('show');
+
+            }
+        });
+
+        $(document).off('click', "#lista-ajustes-precio-table-editable a.delete");
+        $(document).on('click', "#lista-ajustes-precio-table-editable a.delete", function (e) {
+
+            e.preventDefault();
+            var posicion = $(this).data('posicion');
+
+            if (ajustes_precio[posicion]) {
+
+                if (ajustes_precio[posicion].id !== '') {
+                    MyApp.block('#lista-ajustes-precio-table-editable');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "project/eliminarAjustePrecio",
+                        dataType: "json",
+                        data: {
+                            'id': ajustes_precio[posicion].id
+                        },
+                        success: function (response) {
+                            mApp.unblock('#lista-ajustes-precio-table-editable');
+                            if (response.success) {
+
+                                toastr.success(response.message, "");
+
+                                deleteAjustePrecio(posicion);
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        },
+                        failure: function (response) {
+                            mApp.unblock('#lista-ajustes-precio-table-editable');
+
+                            toastr.error(response.error, "");
+                        }
+                    });
+                } else {
+                    deleteAjustePrecio(posicion);
+                }
+            }
+        });
+
+        function deleteAjustePrecio(posicion) {
+            //Eliminar
+            ajustes_precio.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < ajustes_precio.length; i++) {
+                ajustes_precio[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaAjustesPrecio();
+        }
+
+    };
+    var resetFormAjustePrecio = function () {
+        $('#ajuste-precio-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+
+        nEditingRowAjustePrecio = null;
+    };
+
 
     return {
         //main function to initiate the module
@@ -2923,6 +3238,10 @@ var Projects = function () {
             initTableDataTracking();
             initAccionFiltrarDataTracking();
             initAccionesDataTracking();
+
+            // ajustes precio
+            initFormAjustePrecio();
+            initAccionesAjustesPrecio();
 
             initAccionChange();
 

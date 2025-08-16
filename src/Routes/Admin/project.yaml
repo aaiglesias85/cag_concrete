@@ -89,3 +89,7 @@ listarEmployeesDeProjectAdmin:
 listarDataTrackingProjectAdmin:
   path: /project/listarDataTracking
   defaults: { _controller: App\Controller\Admin\ProjectController::listarDataTracking, _format: json }
+
+eliminarAjustePrecioProjectAdmin:
+  path: /project/eliminarAjustePrecio
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarAjustePrecio, _format: json }

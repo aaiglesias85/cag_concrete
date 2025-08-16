@@ -175,6 +175,10 @@ class ProjectController extends AbstractController
         $contacts = $request->get('contacts');
         $contacts = json_decode($contacts);
 
+        // ajustes_precio
+        $ajustes_precio = $request->get('ajustes_precio');
+        $ajustes_precio = json_decode($ajustes_precio);
+
         try {
 
             if ($project_id == "") {
@@ -186,7 +190,7 @@ class ProjectController extends AbstractController
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
                     $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
-                    $proposal_number, $project_id_number, $items, $contacts);
+                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio);
             }
 
             if ($resultado['success']) {
@@ -806,5 +810,34 @@ class ProjectController extends AbstractController
 
             return $this->json($resultadoJson);
         }
+    }
+
+    /**
+     * eliminarAjustePrecio Acción que elimina un ajuste de precio en la BD
+     *
+     */
+    public function eliminarAjustePrecio(Request $request)
+    {
+        $id = $request->get('id');
+
+        try {
+            $resultado = $this->projectService->EliminarAjustePrecio($id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
     }
 }

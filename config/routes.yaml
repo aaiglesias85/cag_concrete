@@ -44,6 +44,10 @@ cronreminders:
   path:  /cron-reminders
   defaults: { _controller: App\Controller\ScriptController::cronreminders }
 
+cronajusteprecio:
+  path:  /cron-price-adjustment
+  defaults: { _controller: App\Controller\ScriptController::cronajusteprecio }
+
 #scripts
 definirpendingdatatracking:
   path:  /definir-pending-datatracking

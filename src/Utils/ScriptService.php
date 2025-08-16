@@ -15,6 +15,7 @@ use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
+use App\Entity\ProjectPriceAdjustment;
 use App\Entity\Reminder;
 use App\Entity\ReminderRecipient;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -22,6 +23,71 @@ use Symfony\Component\Mime\Address;
 
 class ScriptService extends Base
 {
+
+    /**
+     * CronAjustePrecio
+     */
+    public function CronAjustePrecio()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $fechaActual = $this->ObtenerFechaActual();
+
+        // Ajustes activos para hoy
+        $ajustes = $this->getDoctrine()
+            ->getRepository(ProjectPriceAdjustment::class)
+            ->ListarAjustesDeFecha($fechaActual);
+
+        foreach ($ajustes as $ajuste) {
+            $project = $ajuste->getProject();
+            $projectId = $project->getProjectId();
+
+            $percent = $ajuste->getPercent();       // p.ej. 2 => +2%
+            if ($percent === 0.0) {
+                continue; // nada que ajustar
+            }
+
+            // 1 + (2 / 100) = 1.02
+            $factor = 1 + ($percent / 100);
+
+            $items = $this->getDoctrine()
+                ->getRepository(ProjectItem::class)
+                ->ListarItemsDeProject($projectId);
+
+            $notas = []; // acumular notas por proyecto
+
+            foreach ($items as $item) {
+                $precioOld = (float)$item->getPrice();
+                $precioNew = round($precioOld * $factor, 2);  // 2 decimales típico de moneda
+
+                // evitar escribir si no cambia (o si el precio es nulo)
+                if ($precioNew === $precioOld) {
+                    continue;
+                }
+
+                $item->setPrice($precioNew);
+                $item->setPriceOld($precioOld);
+
+                $notas[] = [
+                    'notes' => sprintf(
+                        'Change Price Item: %s, Percent: %s%%, Previous Price: %.2f, New Price: %.2f',
+                        $item->getItem()->getDescription(),
+                        // mostrar 2 decimales como máximo, sin ceros sobrantes
+                        rtrim(rtrim(number_format($percent, 2, '.', ''), '0'), '.'),
+                        $precioOld,
+                        $precioNew
+                    ),
+                    'date' => new \DateTime()
+                ];
+            }
+
+            if (!empty($notas)) {
+                $this->SalvarNotesUpdate($project, $notas); // guardar una sola vez por proyecto
+            }
+        }
+
+        $em->flush();
+    }
+
 
     /**
      * DefinirCompanyEstimate

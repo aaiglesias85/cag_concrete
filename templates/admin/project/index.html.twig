@@ -223,6 +223,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item m--hide nav-item-hide">
+                        <a class="nav-link wizard-tab" data-item="7"
+                           data-toggle="tab" href="#tab-content-ajustes-precio" id="tab-ajustes-precio">
+                            Price Adjustments
+                        </a>
+                    </li>
+
                 </ul>
 
                 <div class="tab-content">
@@ -807,6 +814,45 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane" id="tab-content-ajustes-precio" role="tabpanel">
+                        <div class="row" id="lista-ajustes-precio">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+                                                    {% if permiso.agregar or permiso.editar %}
+                                                        <div class="btn-group">
+                                                            <button id="btn-agregar-ajuste-precio" class="btn btn-success"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                New <i class="la la-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-ajustes-precio-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="m-form">
@@ -891,6 +937,12 @@
                         <a class="nav-link wizard-tab" data-item="6"
                            data-toggle="tab" href="#tab-content-data-tracking-detalle" id="tab-data-tracking-detalle">
                             Daily Tracking
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="7"
+                           data-toggle="tab" href="#tab-content-ajustes-precio-detalle" id="tab-ajustes-precio-detalle">
+                            Price Adjustments
                         </a>
                     </li>
 
@@ -1405,6 +1457,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane" id="tab-content-ajustes-precio-detalle" role="tabpanel">
+                        <div class="row" id="lista-ajustes-precio-detalle">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right mb-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-ajustes-precio-table-editable-detalle"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="m-form">
@@ -1812,6 +1895,66 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" id="btn-salvar-contact">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ajuste precio -->
+    <div class="modal fade" id="modal-ajuste-precio" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Price Adjustment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="ajuste-precio-form" action="#"
+                          enctype="multipart/form-data" method="post">
+
+                        <input type="hidden" id="ajuste_precio_id" name="ajuste_precio_id"/>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                Day
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class='input-group date'>
+                                <input type='text' class="form-control m-input date-picker event-change"
+                                       placeholder="Day" autocomplete="off"
+                                       id="ajuste_precio_day" name="day"/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="la la-calendar glyphicon-th"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">2</span>
+                                Percent
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="input-group m-input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <input type="text" class="form-control just-float" id="ajuste_precio_percent"
+                                       name="percent">
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-ajuste-precio">Save</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                 </div>
             </div>

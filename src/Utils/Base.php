@@ -19,9 +19,11 @@ use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
+use App\Entity\Project;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
+use App\Entity\ProjectPriceAdjustment;
 use App\Entity\ReminderRecipient;
 use App\Entity\Unit;
 use App\Entity\UserQbwcToken;
@@ -1245,6 +1247,31 @@ class Base
         }
 
         return $arreglo_resultado;
+    }
+
+    /**
+     * SalvarNotesUpdate
+     * @param $notas
+     * @param Project $entity
+     * @return void
+     */
+    public function SalvarNotesUpdate($entity, $notas)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //notes
+        foreach ($notas as $value) {
+
+            $project_note = new ProjectNotes();
+
+            $project_note->setNotes($value['notes']);
+            $project_note->setDate($value['date']);
+
+            $project_note->setProject($entity);
+
+            $em->persist($project_note);
+
+        }
     }
 
 }

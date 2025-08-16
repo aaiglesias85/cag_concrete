@@ -20,11 +20,48 @@ use App\Entity\DataTracking;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
+use App\Entity\ProjectPriceAdjustment;
 use App\Entity\Unit;
 use App\Utils\Base;
 
 class ProjectService extends Base
 {
+
+    /**
+     * EliminarAjustePrecio: Elimina un ajuste de precio en la BD
+     * @param int $id Id
+     * @author Marcel
+     */
+    public function EliminarAjustePrecio($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class)
+            ->find($id);
+        /**@var ProjectPriceAdjustment $entity */
+        if ($entity != null) {
+
+            $project = $entity->getProject()->getProjectNumber();
+            $day = $entity->getDay()->format('m/d/Y');
+            $percent = $entity->getPercent();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Project Price Adjustment";
+            $log_descripcion = "The project price adjustment is deleted: Project #: $project, Day: $day, Percent: $percent";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
 
     /**
      * ListarDataTrackings: Listar los items details
@@ -985,6 +1022,10 @@ class ProjectService extends Base
             $contacts = $this->ListarContactsDeProject($project_id);
             $arreglo_resultado['contacts'] = $contacts;
 
+            // ajustes precio
+            $ajustes_precio = $this->ListarAjustesPrecioDeProject($project_id);
+            $arreglo_resultado['ajustes_precio'] = $ajustes_precio;
+
             // invoices
             $invoices = $this->ListarInvoicesDeProject($project_id);
             $arreglo_resultado['invoices'] = $invoices;
@@ -994,6 +1035,29 @@ class ProjectService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarAjustesPrecioDeProject
+     * @param $project_id
+     * @return array
+     */
+    public function ListarAjustesPrecioDeProject($project_id)
+    {
+        $ajustes = [];
+
+        $project_ajustes = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class)
+            ->ListarAjustesDeProject($project_id);
+        foreach ($project_ajustes as $key => $project_ajuste) {
+            $ajustes[] = [
+                'id' => $project_ajuste->getId(),
+                'day' => $project_ajuste->getDay()->format('m/d/Y'),
+                'percent' => $project_ajuste->getPercent(),
+                'posicion' => $key
+            ];
+        }
+
+        return $ajustes;
     }
 
     /**
@@ -1179,6 +1243,13 @@ class ProjectService extends Base
         foreach ($notificaciones as $notificacion) {
             $em->remove($notificacion);
         }
+
+        // prices adjuments
+        $ajustes_precio = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class)
+            ->ListarAjustesDeProject($project_id);
+        foreach ($ajustes_precio as $ajuste_precio) {
+            $em->remove($ajuste_precio);
+        }
     }
 
     /**
@@ -1250,7 +1321,7 @@ class ProjectService extends Base
                                       $po_number, $po_cg, $manager, $status, $owner, $subcontract,
                                       $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                       $certified_payrolls, $start_date, $end_date, $due_date,
-                                      $contract_amount, $proposal_number, $project_id_number, $items, $contacts)
+                                      $contract_amount, $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1511,6 +1582,8 @@ class ProjectService extends Base
             $items_new = $this->SalvarItems($entity, $items);
             // save contacts
             $this->SalvarContacts($entity, $contacts);
+            // save ajustes de precio
+            $this->SalvarAjustesPrecio($entity, $ajustes_precio);
 
             // save notes
             $this->SalvarNotesUpdate($entity, $notas);
@@ -1528,31 +1601,6 @@ class ProjectService extends Base
             $resultado['items'] = $items_new;
 
             return $resultado;
-        }
-    }
-
-    /**
-     * SalvarNotesUpdate
-     * @param $notas
-     * @param Project $entity
-     * @return void
-     */
-    public function SalvarNotesUpdate($entity, $notas)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        //notes
-        foreach ($notas as $value) {
-
-            $project_note = new ProjectNotes();
-
-            $project_note->setNotes($value['notes']);
-            $project_note->setDate($value['date']);
-
-            $project_note->setProject($entity);
-
-            $em->persist($project_note);
-
         }
     }
 
@@ -1654,6 +1702,47 @@ class ProjectService extends Base
         $resultado['items'] = $items_new;
 
         return $resultado;
+    }
+
+    /**
+     * SalvarAjustesPrecio
+     * @param $ajustes_precio
+     * @param Project $entity
+     * @return void
+     */
+    public function SalvarAjustesPrecio($entity, $ajustes_precio)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($ajustes_precio as $value) {
+
+            $ajuste_entity = null;
+
+            if (is_numeric($value->id)) {
+                $ajuste_entity = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class)
+                    ->find($value->id);
+            }
+
+            $is_new_ajuste = false;
+            if ($ajuste_entity == null) {
+                $ajuste_entity = new ProjectPriceAdjustment();
+                $is_new_ajuste = true;
+            }
+
+            $ajuste_entity->setPercent($value->percent);
+
+            if ($value->day != '') {
+                $day = \DateTime::createFromFormat('m/d/Y', $value->day);
+                $ajuste_entity->setDay($day);
+            }
+
+
+            if ($is_new_ajuste) {
+                $ajuste_entity->setProject($entity);
+
+                $em->persist($ajuste_entity);
+            }
+        }
     }
 
     /**
