@@ -310,14 +310,13 @@ class ProjectService extends Base
         // validar si existe
         if ($item_id !== '') {
             $project_item = $this->getDoctrine()->getRepository(ProjectItem::class)
-                ->BuscarItemProject($project_id, $item_id);
+                ->BuscarItemProject($project_id, $item_id, $price);
             if (!empty($project_item) && $project_item_id != $project_item[0]->getId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = "The item already exists in the project";
                 return $resultado;
             }
         } else {
-
             //Verificar description
             $item = $this->getDoctrine()->getRepository(Item::class)
                 ->findOneBy(['description' => $item_name]);

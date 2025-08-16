@@ -14,16 +14,16 @@ class ProjectItem
     private ?int $id;
 
     #[ORM\Column(name: "quantity", type: "float", nullable: true)]
-    private ?float $quantity;
+    private ?float $quantity = null;
 
     #[ORM\Column(name: "quantity_old", type: "float", nullable: true)]
-    private ?float $quantityOld;
+    private ?float $quantityOld = null;
 
     #[ORM\Column(name: "price", type: "float", nullable: true)]
-    private ?float $price;
+    private ?float $price = null;
 
     #[ORM\Column(name: "price_old", type: "float", nullable: true)]
-    private ?float $priceOld;
+    private ?float $priceOld = null;
 
     #[ORM\Column(name: "yield_calculation", type: "string", length: 50, nullable: true)]
     private ?string $yieldCalculation;

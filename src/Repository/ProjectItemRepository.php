@@ -58,7 +58,7 @@ class ProjectItemRepository extends EntityRepository
      *
      * @return ProjectItem[]
      */
-    public function BuscarItemProject($project_id, $item_id)
+    public function BuscarItemProject($project_id, $item_id, $price = '')
     {
         $consulta = $this->createQueryBuilder('p_i')
             ->leftJoin('p_i.project', 'p')
@@ -72,6 +72,11 @@ class ProjectItemRepository extends EntityRepository
         if ($item_id != '') {
             $consulta->andWhere('i.itemId = :item_id')
                 ->setParameter('item_id', $item_id);
+        }
+
+        if($price != ''){
+            $consulta->andWhere('p_i.price = :price')
+                ->setParameter('price', $price);
         }
 
         $consulta->orderBy('p_i.id', "ASC");
