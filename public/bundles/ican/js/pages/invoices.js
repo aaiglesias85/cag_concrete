@@ -1276,6 +1276,13 @@ var Invoices = function () {
             },
             search: {
                 input: $('#lista-items .m_form_search'),
+            },
+            rows: {
+                afterTemplate: function (row, data, index) {
+                    if (!data.principal) {
+                        $(row).addClass('row-secondary');
+                    }
+                }
             }
         });
 

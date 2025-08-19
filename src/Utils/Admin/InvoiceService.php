@@ -385,6 +385,7 @@ class InvoiceService extends Base
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,
                 "total_amount" => $total_amount,
+                "principal" => $value->getProjectItem()->getPrincipal(),
                 "posicion" => $key
             ];
         }

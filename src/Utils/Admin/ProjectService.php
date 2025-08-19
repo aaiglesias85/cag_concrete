@@ -931,7 +931,8 @@ class ProjectService extends Base
                 "quantity_completed" => $quantity_completed,
                 "amount" => $amount,
                 "total_amount" => $total_amount,
-                "paid_amount_total" => $paid_amount_total
+                "paid_amount_total" => $paid_amount_total,
+                "principal" => $value->getPrincipal()
             ];
         }
 
