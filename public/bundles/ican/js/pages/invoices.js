@@ -832,6 +832,7 @@ var Invoices = function () {
                                 quantity_completed: item.quantity_completed,
                                 amount: item.amount,
                                 total_amount: item.total_amount,
+                                principal: item.principal,
                                 posicion: posicion
                             });
 
@@ -854,6 +855,7 @@ var Invoices = function () {
                                 unpaid_qty: 0,
                                 paid_amount: 0,
                                 paid_amount_total: item.paid_amount_total,
+                                principal: item.principal,
                                 posicion: posicion
                             });
                         }
