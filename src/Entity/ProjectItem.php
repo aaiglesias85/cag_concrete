@@ -28,6 +28,9 @@ class ProjectItem
     #[ORM\Column(name: "yield_calculation", type: "string", length: 50, nullable: true)]
     private ?string $yieldCalculation;
 
+    #[ORM\Column(name: "principal", type: "boolean", nullable: true)]
+    private ?bool $principal = null;
+
     #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
     #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
     private ?Project $project;
@@ -123,5 +126,15 @@ class ProjectItem
     public function setPriceOld(?float $priceOld): void
     {
         $this->priceOld = $priceOld;
+    }
+
+    public function getPrincipal(): ?bool
+    {
+        return $this->principal;
+    }
+
+    public function setPrincipal(?bool $principal): void
+    {
+        $this->principal = $principal;
     }
 }

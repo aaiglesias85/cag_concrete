@@ -557,7 +557,7 @@ var DataTracking = function () {
         });
     };
 
-    var editRow = function(data_tracking_id) {
+    var editRow = function (data_tracking_id) {
 
         MyApp.block('#modal-data-tracking .modal-content');
 
@@ -674,7 +674,11 @@ var DataTracking = function () {
         $('.items-project').select2();
 
         for (var i = 0; i < items.length; i++) {
-            $('.items-project').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
+            var descripcion = `${items[i].item} - ${items[i].unit} - $${items[i].price}`;
+            if (items[i].principal) {
+                descripcion += ` (Principal)`;
+            }
+            $('.items-project').append(new Option(descripcion, items[i].project_item_id, false, false));
         }
         $('.items-project').select2();
     }
@@ -1129,7 +1133,12 @@ var DataTracking = function () {
             if (item != null) {
                 //add items to select
                 items.push(item);
-                $('.items-project').append(new Option(`${item.item} - ${item.unit}`, item.project_item_id, false, false));
+
+                var descripcion = `${item.item} - ${item.unit} - $${item.price}`;
+                if (item.principal) {
+                    descripcion += ` (Principal)`;
+                }
+                $('.items-project').append(new Option(descripcion, item.project_item_id, false, false));
                 $('.items-project').select2();
 
                 $('#item-data-tracking').val(item.project_item_id);
@@ -2999,7 +3008,7 @@ var DataTracking = function () {
                     return;
                 }
 
-                var vendor =  $("#concrete-vendor option:selected").text();
+                var vendor = $("#concrete-vendor option:selected").text();
                 var total_conc_used = $('#total_conc_used').val();
                 var conc_price = $('#conc_price').val();
 
@@ -3038,7 +3047,7 @@ var DataTracking = function () {
                 // reset
                 resetFormConcVendor();
 
-            }else{
+            } else {
                 if (vendor_id === '') {
                     var $element = $('#select-concrete-vendor .select2');
                     $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content

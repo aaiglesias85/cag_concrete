@@ -80,4 +80,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function definiritemprincipal()
+    {
+        $this->scriptService->DefinirItemPrincipal();
+
+        return new Response('OK', 200);
+    }
 }

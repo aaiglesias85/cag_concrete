@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 16-08-2025 a las 19:58:52
+-- Tiempo de generación: 19-08-2025 a las 00:18:02
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -1277,6 +1277,7 @@ CREATE TABLE `project_item` (
   `yield_calculation` varchar(50) DEFAULT NULL,
   `quantity_old` decimal(18,6) DEFAULT NULL,
   `price_old` decimal(18,6) DEFAULT NULL,
+  `principal` tinyint(1) DEFAULT NULL,
   `project_id` int(11) DEFAULT NULL,
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL
@@ -1286,20 +1287,20 @@ CREATE TABLE `project_item` (
 -- Volcado de datos para la tabla `project_item`
 --
 
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `project_id`, `item_id`, `equation_id`) VALUES
-(1, 1500.000000, 16.50, 'equation', NULL, NULL, 3, 6, 2),
-(2, 2000.000000, 63.00, 'same', NULL, NULL, 3, 15, NULL),
-(4, 1600.000000, 150.00, 'none', NULL, NULL, 3, 20, NULL),
-(8, 2500.000000, 25.00, 'equation', NULL, NULL, 3, 3, 2),
-(9, 2500.000000, 16.50, 'equation', NULL, NULL, 3, 7, 2),
-(10, 5000.000000, 70.00, 'equation', NULL, NULL, 3, 12, 2),
-(11, 50.000000, 160.00, 'none', NULL, NULL, 2, 12, NULL),
-(12, 60.000000, 200.00, '', NULL, NULL, 2, 6, NULL),
-(13, 50.000000, 300.00, '', NULL, NULL, 2, 7, NULL),
-(15, 10.000000, 100.00, 'same', NULL, NULL, 3, 21, NULL),
-(16, 0.000000, 100.00, 'same', NULL, NULL, 2, 11, NULL),
-(17, 100.000000, 100.00, 'equation', NULL, NULL, 2, 8, 2),
-(18, 10.000000, 100.00, 'none', NULL, NULL, 1, 11, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `project_id`, `item_id`, `equation_id`) VALUES
+(1, 1500.000000, 16.50, 'equation', NULL, NULL, 1, 3, 6, 2),
+(2, 2000.000000, 63.00, 'same', NULL, NULL, 1, 3, 15, NULL),
+(4, 1600.000000, 150.00, 'none', NULL, NULL, 1, 3, 20, NULL),
+(8, 2500.000000, 25.00, 'equation', NULL, NULL, 1, 3, 3, 2),
+(9, 2500.000000, 16.50, 'equation', NULL, NULL, 1, 3, 7, 2),
+(10, 5000.000000, 70.00, 'equation', NULL, NULL, 1, 3, 12, 2),
+(11, 50.000000, 160.00, 'none', NULL, NULL, 1, 2, 12, NULL),
+(12, 60.000000, 200.00, '', NULL, NULL, 1, 2, 6, NULL),
+(13, 50.000000, 300.00, '', NULL, NULL, 1, 2, 7, NULL),
+(15, 10.000000, 100.00, 'same', NULL, NULL, 1, 3, 21, NULL),
+(16, 0.000000, 100.00, 'same', NULL, NULL, 1, 2, 11, NULL),
+(17, 100.000000, 100.00, 'equation', NULL, NULL, 1, 2, 8, 2),
+(18, 10.000000, 100.00, 'none', NULL, NULL, 1, 1, 11, NULL);
 
 -- --------------------------------------------------------
 

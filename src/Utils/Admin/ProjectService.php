@@ -414,6 +414,13 @@ class ProjectService extends Base
             $project_item_entity->setItem($item_entity);
 
             if ($is_new_project_item) {
+
+                // marcar principal
+                $project_items = $this->getDoctrine()->getRepository(ProjectItem::class)
+                    ->BuscarItemProject($project_id, $item_id);
+                $principal = empty($project_items) ? true : false;
+                $project_item_entity->setPrincipal($principal);
+
                 $project_item_entity->setProject($project_entity);
 
                 $em->persist($project_item_entity);
@@ -1142,6 +1149,7 @@ class ProjectService extends Base
             "yield_calculation" => $value->getYieldCalculation(),
             "yield_calculation_name" => $yield_calculation_name,
             "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
+            "principal" => $value->getPrincipal(),
             "posicion" => $key
         ];
     }

@@ -73,6 +73,10 @@ definircompanyestimate:
   path:  /definir-company-estimate
   defaults: { _controller: App\Controller\ScriptController::definircompanyestimate }
 
+definiritemprincipal:
+  path:  /definir-item-principal
+  defaults: { _controller: App\Controller\ScriptController::definiritemprincipal }
+
 
 #qbwc
 qbwcconfig:

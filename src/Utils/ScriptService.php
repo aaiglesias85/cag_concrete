@@ -25,6 +25,38 @@ class ScriptService extends Base
 {
 
     /**
+     * DefinirItemPrincipal
+     */
+    public function DefinirItemPrincipal()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $projects = $this->getDoctrine()->getRepository(Project::class)->findAll();
+        foreach ($projects as $project) {
+
+            $items = $this->getDoctrine()->getRepository(ProjectItem::class)
+                ->ListarItemsDeProject($project->getProjectId());
+
+            // itemId => ya tiene principal
+            $seenByItem = [];
+            foreach ($items as $pi) {
+                $itemId = $pi->getItem()->getItemId();
+                if (!isset($seenByItem[$itemId])) {
+                    $pi->setPrincipal(true);
+                    $seenByItem[$itemId] = true;
+                } else {
+                    $pi->setPrincipal(false);
+                }
+            }
+
+        }
+
+        $em->flush();
+
+
+    }
+
+    /**
      * CronAjustePrecio
      */
     public function CronAjustePrecio()
