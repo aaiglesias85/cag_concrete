@@ -732,7 +732,7 @@ class ScheduleService extends Base
                 $originalWeekday = $entity->getDay()->format('w');
 
                 foreach ($periodo as $dia) {
-                    if ($dia->format('w') != $originalWeekday) {
+                    if ($dia->format('w') != $originalWeekday && count($schedules_id) > 1) {
                         continue; // Solo clonar si coincide el día de la semana
                     }
 
