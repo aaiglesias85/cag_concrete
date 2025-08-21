@@ -187,6 +187,19 @@ class ScheduleService extends Base
             $verdeClaro = 'CCFFCC';
             $alternar = true;
 
+            // Ordenar filas por el texto mostrado en la columna PROJECT (alfabético, case-insensitive)
+            // Con desempates por WORK y CONCRETE (opcional, para orden estable)
+            uasort($agregado, static function (array $a, array $b) {
+                $cmp = strcasecmp($a['project'], $b['project']);
+                if ($cmp !== 0) return $cmp;
+
+                // desempates opcionales para estabilidad
+                $cmp = strcasecmp($a['work'], $b['work']);
+                if ($cmp !== 0) return $cmp;
+
+                return strcasecmp($a['vendor'], $b['vendor']);
+            });
+
             foreach ($agregado as $clave => $datos) {
                 $filaDatos = array_merge(
                     [$datos['project'], $datos['work'], $datos['vendor']],

@@ -307,23 +307,22 @@ class ScheduleRepository extends EntityRepository
         }
 
         if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
-            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
 
             $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
-            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
 
             $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy("s.day", 'ASC')
-            ->addOrderBy("p.projectNumber", 'ASC');
+        $consulta->orderBy("p.projectNumber", 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
