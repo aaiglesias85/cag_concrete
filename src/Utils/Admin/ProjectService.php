@@ -367,6 +367,9 @@ class ProjectService extends Base
 
         $project_entity = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
         if ($project_entity != null) {
+            // para las notas
+            $notas = [];
+
             $project_item_entity = null;
 
             if (is_numeric($project_item_id)) {
