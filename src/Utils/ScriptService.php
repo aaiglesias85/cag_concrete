@@ -64,6 +64,8 @@ class ScriptService extends Base
         $em = $this->getDoctrine()->getManager();
         $fechaActual = $this->ObtenerFechaActual();
 
+        $this->writelog("CronAjustePrecio: " . $fechaActual);
+
         // Ajustes activos para hoy
         $ajustes = $this->getDoctrine()
             ->getRepository(ProjectPriceAdjustment::class)
