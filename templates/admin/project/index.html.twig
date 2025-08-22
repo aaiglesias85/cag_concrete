@@ -3,6 +3,9 @@
 {% block subtitle %} - Projects{% endblock %}
 
 {% block stylesheetspecific %}
+
+    <link href="{{ asset('bundles/ican/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css"/>
+
     <style>
         .m-datatable.m-datatable--default > .m-datatable__table > .m-datatable__body .m-datatable__row.row-pending > .m-datatable__cell {
             background: #FFB38C;
@@ -231,6 +234,13 @@
                         <a class="nav-link wizard-tab" data-item="7"
                            data-toggle="tab" href="#tab-content-ajustes-precio" id="tab-ajustes-precio">
                             Price Adjustments
+                        </a>
+                    </li>
+
+                    <li class="nav-item m--hide nav-item-hide">
+                        <a class="nav-link wizard-tab" data-item="8"
+                           data-toggle="tab" href="#tab-content-archivo" id="tab-archivo">
+                            Attachments
                         </a>
                     </li>
 
@@ -829,7 +839,8 @@
                                                 <div class="col-md-8">
                                                     {% if permiso.agregar or permiso.editar %}
                                                         <div class="btn-group">
-                                                            <button id="btn-agregar-ajuste-precio" class="btn btn-success"
+                                                            <button id="btn-agregar-ajuste-precio"
+                                                                    class="btn btn-success"
                                                                     style="margin-bottom: 20px; margin-top: 10px;">
                                                                 New <i class="la la-plus"></i>
                                                             </button>
@@ -853,6 +864,46 @@
                                 <!--end: Search Form -->
                                 <!--begin: Datatable -->
                                 <div class="m_datatable" id="lista-ajustes-precio-table-editable"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-content-archivo" role="tabpanel">
+                        <div class="row" id="lista-archivo">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+                                                    {% if permiso.agregar or permiso.editar %}
+                                                        <div class="btn-group">
+                                                            <button id="btn-agregar-archivo"
+                                                                    class="btn btn-success"
+                                                                    style="margin-bottom: 20px; margin-top: 10px;">
+                                                                New <i class="la la-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-archivo-table-editable"></div>
                                 <!--end: Datatable -->
                             </div>
                         </div>
@@ -947,6 +998,12 @@
                         <a class="nav-link wizard-tab" data-item="7"
                            data-toggle="tab" href="#tab-content-ajustes-precio-detalle" id="tab-ajustes-precio-detalle">
                             Price Adjustments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link wizard-tab" data-item="8"
+                           data-toggle="tab" href="#tab-content-archivo-detalle" id="tab-archivo-detalle">
+                            Attachments
                         </a>
                     </li>
 
@@ -1492,6 +1549,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane" id="tab-content-archivo-detalle" role="tabpanel">
+                        <div class="row" id="lista-archivo-detalle">
+                            <div class="col-lg-12">
+                                <!--begin: Search Form -->
+                                <div class="m-form m-form--label-align-right mb-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-xl-12 order-1">
+                                            <div class="form-group m-form__group row align-items-center">
+                                                <div class="col-md-8">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="m-input-icon m-input-icon--left">
+                                                        <input type="text" class="form-control m-input m_form_search"
+                                                               placeholder="Search...">
+                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                        <span><i class="la la-search"></i></span>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--end: Search Form -->
+                                <!--begin: Datatable -->
+                                <div class="m_datatable" id="lista-archivo-table-editable-detalle"></div>
+                                <!--end: Datatable -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="m-form">
@@ -1965,6 +2053,74 @@
         </div>
     </div>
 
+    <!-- archivo -->
+    <div class="modal fade" id="modal-archivo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Attachment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="m-form" id="archivo-form" action="#" enctype="multipart/form-data" method="post">
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">1</span>
+                                Name
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <input type="text" class="form-control form-control-text event-change"
+                                   id="archivo-name" name="name"/>
+                        </div>
+
+                        <div class="form-group m-form__group ic-form-group">
+                            <label>
+                                <span class="ic-step-number">2</span>
+                                Attachment
+                                <span class="ic-small italic">(required)</span>
+                            </label>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="fileinput-archivo" class="fileinput fileinput-new" data-provides="fileinput" style="width: 100%;">
+                                        <div class="input-group">
+                                            <div class="form-control uneditable-input input-fixed"
+                                                 data-trigger="fileinput">
+                                                <span class="fileinput-filename"> </span>
+                                            </div>
+                                            <span class="btn btn-default btn-file">
+                                            <span class="fileinput-new">
+                                                Select
+                                            </span>
+                                            <span class="fileinput-exists">
+                                                Change
+                                            </span>
+                                            <input type="file" name="file" id="fileinput">
+                                            </span>
+                                            <a href="javascript:;" class="btn btn-danger fileinput-exists"
+                                               data-dismiss="fileinput">
+                                                <i class="la la-trash-o kt-hidden-desktop"></i>
+                                                <span class="kt-hidden-mobile">Delete</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-salvar-archivo">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- components -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
@@ -1979,6 +2135,8 @@
     -->
     <!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.web.js"></script> -->
     <!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/23.2.5/js/dx.viz.js"></script> -->
+
+    <script src="{{ asset('bundles/ican/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
 
     <!-- init components -->
     <script>
@@ -2000,6 +2158,7 @@
 
         var url_invoice = "{{ url('invoice') }}";
         var url_datatracking = "{{ url('data_tracking') }}";
+        var direccion_url = "{{ direccion_url }}";
 
         jQuery(document).ready(function () {
             Projects.init();

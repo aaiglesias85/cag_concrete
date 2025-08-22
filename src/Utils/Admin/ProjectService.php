@@ -17,6 +17,7 @@ use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\Project;
 use App\Entity\DataTracking;
+use App\Entity\ProjectAttachment;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
@@ -26,6 +27,36 @@ use App\Utils\Base;
 
 class ProjectService extends Base
 {
+
+    /**
+     * EliminarArchivo: Elimina un archivo en la BD
+     *
+     * @param $archivo
+     * @return array
+     */
+    public function EliminarArchivo($archivo)
+    {
+        $resultado = array();
+
+        //Eliminar archivo
+        $dir = 'uploads/project/';
+        if (is_file($dir . $archivo)) {
+            unlink($dir . $archivo);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $archivo_entity = $this->getDoctrine()->getRepository(ProjectAttachment::class)
+            ->findOneBy(array('file' => $archivo));
+        if ($archivo_entity != null) {
+            $em->remove($archivo_entity);
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+        return $resultado;
+    }
 
     /**
      * EliminarAjustePrecio: Elimina un ajuste de precio en la BD
@@ -1041,11 +1072,38 @@ class ProjectService extends Base
             $invoices = $this->ListarInvoicesDeProject($project_id);
             $arreglo_resultado['invoices'] = $invoices;
 
+            // archivos
+            $archivos = $this->ListarArchivosDeProject($project_id);
+            $arreglo_resultado['archivos'] = $archivos;
+
             $resultado['success'] = true;
             $resultado['project'] = $arreglo_resultado;
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarArchivosDeProject
+     * @param $project_id
+     * @return array
+     */
+    public function ListarArchivosDeProject($project_id)
+    {
+        $archivos = [];
+
+        $project_archivos = $this->getDoctrine()->getRepository(ProjectAttachment::class)
+            ->ListarAttachmentsDeProject($project_id);
+        foreach ($project_archivos as $key => $project_archivo) {
+            $archivos[] = [
+                'id' => $project_archivo->getId(),
+                'name' => $project_archivo->getName(),
+                'file' => $project_archivo->getFile(),
+                'posicion' => $key
+            ];
+        }
+
+        return $archivos;
     }
 
     /**
@@ -1262,6 +1320,21 @@ class ProjectService extends Base
         foreach ($ajustes_precio as $ajuste_precio) {
             $em->remove($ajuste_precio);
         }
+
+        // attachments
+        $dir = 'uploads/project/';
+        $attachments = $this->getDoctrine()->getRepository(ProjectAttachment::class)
+            ->ListarAttachmentsDeProject($project_id);
+        foreach ($attachments as $attachment) {
+
+            //eliminar archivo
+            $file_eliminar = $attachment->getFile();
+            if ($file_eliminar != "" && is_file($dir . $file_eliminar)) {
+                unlink($dir . $file_eliminar);
+            }
+
+            $em->remove($attachment);
+        }
     }
 
     /**
@@ -1333,7 +1406,8 @@ class ProjectService extends Base
                                       $po_number, $po_cg, $manager, $status, $owner, $subcontract,
                                       $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                       $certified_payrolls, $start_date, $end_date, $due_date,
-                                      $contract_amount, $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio)
+                                      $contract_amount, $proposal_number, $project_id_number,
+                                      $items, $contacts, $ajustes_precio, $archivos)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1596,6 +1670,8 @@ class ProjectService extends Base
             $this->SalvarContacts($entity, $contacts);
             // save ajustes de precio
             $this->SalvarAjustesPrecio($entity, $ajustes_precio);
+            // save archivos
+            $this->SalvarArchivos($entity, $archivos);
 
             // save notes
             $this->SalvarNotesUpdate($entity, $notas);
@@ -1714,6 +1790,42 @@ class ProjectService extends Base
         $resultado['items'] = $items_new;
 
         return $resultado;
+    }
+
+    /**
+     * SalvarArchivos
+     * @param $archivos
+     * @param Project $entity
+     * @return void
+     */
+    public function SalvarArchivos($entity, $archivos)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($archivos as $value) {
+
+            $archivo_entity = null;
+
+            if (is_numeric($value->id)) {
+                $archivo_entity = $this->getDoctrine()->getRepository(ProjectAttachment::class)
+                    ->find($value->id);
+            }
+
+            $is_new_archivo = false;
+            if ($archivo_entity == null) {
+                $archivo_entity = new ProjectAttachment();
+                $is_new_archivo = true;
+            }
+
+            $archivo_entity->setName($value->name);
+            $archivo_entity->setFile($value->file);
+
+            if ($is_new_archivo) {
+                $archivo_entity->setProject($entity);
+
+                $em->persist($archivo_entity);
+            }
+        }
     }
 
     /**

@@ -36,6 +36,10 @@ var ProjectsDetalle = function () {
         ajustes_precio = [];
         actualizarTableListaAjustesPrecio();
 
+        //archivos
+        archivos = [];
+        actualizarTableListaArchivos();
+
         //Mostrar el primer tab
         resetWizard();
 
@@ -140,6 +144,10 @@ var ProjectsDetalle = function () {
                     ajustes_precio = response.project.ajustes_precio;
                     actualizarTableListaAjustesPrecio();
 
+                    // archivos
+                    archivos = response.project.archivos;
+                    actualizarTableListaArchivos();
+
                 } else {
                     toastr.error(response.error, "");
                 }
@@ -155,7 +163,7 @@ var ProjectsDetalle = function () {
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 7;
+    var totalTabs = 8;
     var initWizard = function () {
         $(document).off('click', "#form-project-detalle .wizard-tab");
         $(document).on('click', "#form-project-detalle .wizard-tab", function (e) {
@@ -195,6 +203,9 @@ var ProjectsDetalle = function () {
                     break;
                 case 7:
                     actualizarTableListaAjustesPrecio();
+                    break;
+                case 8:
+                    actualizarTableListaArchivos();
                     break;
             }
 
@@ -254,13 +265,17 @@ var ProjectsDetalle = function () {
                     $('#tab-ajustes-precio-detalle').tab('show');
                     actualizarTableListaAjustesPrecio();
                     break;
+                case 8:
+                    $('#tab-archivo-detalle').tab('show');
+                    actualizarTableListaArchivos();
+                    break;
 
             }
         }, 0);
     }
     var resetWizard = function () {
         activeTab = 1;
-        totalTabs = 7;
+        totalTabs = 8;
         mostrarTab();
         $('#btn-wizard-anterior-detalle').removeClass('m--hide').addClass('m--hide');
         $('#btn-wizard-siguiente-detalle').removeClass('m--hide');
@@ -1155,6 +1170,141 @@ var ProjectsDetalle = function () {
         initTableListaAjustesPrecio();
     }
 
+    // Archivos
+    var archivos = [];
+    var oTableListaArchivos;
+    var initTableListaArchivos = function () {
+        MyApp.block('#lista-archivo-table-editable-detalle');
+
+        var table = $('#lista-archivo-table-editable-detalle');
+
+        var aoColumns = [
+            {
+                field: "name",
+                title: "Name"
+            },
+            {
+                field: "file",
+                title: "File"
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableListaArchivos = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: archivos,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-archivo-detalle .m_form_search'),
+            },
+        });
+
+        //Events
+        oTableListaArchivos
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#lista-archivo-table-editable-detalle');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#lista-archivo-table-editable-detalle');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#lista-archivo-table-editable-detalle');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#lista-archivo-table-editable-detalle');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#lista-archivo-table-editable-detalle');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+    };
+    var actualizarTableListaArchivos = function () {
+        if (oTableListaArchivos) {
+            oTableListaArchivos.destroy();
+        }
+
+        initTableListaArchivos();
+    }
+    var initAccionesArchivo = function () {
+
+        $(document).off('click', "#lista-archivo-table-editable-detalle a.download");
+        $(document).on('click', "#lista-archivo-table-editable-detalle a.download", function () {
+            var posicion = $(this).data('posicion');
+            if (archivos[posicion]) {
+
+                var archivo = archivos[posicion].file;
+                var url = direccion_url + '/uploads/project/' + archivo;
+
+                // crear link para que se descargue el archivo
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+        function deleteArchivo(posicion) {
+            //Eliminar
+            archivos.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < archivos.length; i++) {
+                archivos[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaArchivos();
+        }
+
+    };
 
     return {
         //main function to initiate the module
@@ -1180,6 +1330,9 @@ var ProjectsDetalle = function () {
             initTableDataTracking();
             initAccionFiltrarDataTracking();
             initAccionesDataTracking();
+
+            // archivos
+            initAccionesArchivo();
         }
 
     };

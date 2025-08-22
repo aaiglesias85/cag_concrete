@@ -275,6 +275,10 @@ var Projects = function () {
         ajustes_precio = [];
         actualizarTableListaAjustesPrecio();
 
+        //archivos
+        archivos = [];
+        actualizarTableListaArchivos();
+
         //Mostrar el primer tab
         if (reset_wizard) {
             resetWizard();
@@ -482,7 +486,8 @@ var Projects = function () {
                 'project_id_number': project_id_number,
                 'items': JSON.stringify(items),
                 'contacts': JSON.stringify(contacts),
-                'ajustes_precio': JSON.stringify(ajustes_precio)
+                'ajustes_precio': JSON.stringify(ajustes_precio),
+                'archivos': JSON.stringify(archivos),
             },
             success: function (response) {
                 mApp.unblock('#form-project');
@@ -689,8 +694,12 @@ var Projects = function () {
                     ajustes_precio = response.project.ajustes_precio;
                     actualizarTableListaAjustesPrecio();
 
+                    // archivos
+                    archivos = response.project.archivos;
+                    actualizarTableListaArchivos();
+
                     // habilitar tab
-                    totalTabs = 7;
+                    totalTabs = 8;
                     $('.nav-item-hide').removeClass('m--hide');
 
                     event_change = false;
@@ -993,6 +1002,9 @@ var Projects = function () {
                 case 7:
                     actualizarTableListaAjustesPrecio();
                     break;
+                case 7:
+                    actualizarTableListaArchivos();
+                    break;
             }
 
         });
@@ -1057,6 +1069,10 @@ var Projects = function () {
                 case 7:
                     $('#tab-ajustes-precio').tab('show');
                     actualizarTableListaAjustesPrecio();
+                    break;
+                case 8:
+                    $('#tab-archivo').tab('show');
+                    actualizarTableListaArchivos();
                     break;
 
             }
@@ -3200,6 +3216,372 @@ var Projects = function () {
         nEditingRowAjustePrecio = null;
     };
 
+    // Archivos
+    var archivos = [];
+    var oTableListaArchivos;
+    var nEditingRowArchivo = null;
+    var initTableListaArchivos = function () {
+        MyApp.block('#lista-archivo-table-editable');
+
+        var table = $('#lista-archivo-table-editable');
+
+        var aoColumns = [
+            {
+                field: "name",
+                title: "Name"
+            },
+            {
+                field: "file",
+                title: "File"
+            },
+            {
+                field: "posicion",
+                width: 120,
+                title: "Actions",
+                sortable: false,
+                overflow: 'visible',
+                textAlign: 'center',
+                template: function (row) {
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record"><i class="la la-edit"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record"><i class="la la-trash"></i></a>
+                    <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
+                    `;
+                }
+            }
+        ];
+        oTableListaArchivos = table.mDatatable({
+            // datasource definition
+            data: {
+                type: 'local',
+                source: archivos,
+                pageSize: 25,
+                saveState: {
+                    cookie: false,
+                    webstorage: false
+                }
+            },
+            // layout definition
+            layout: {
+                theme: 'default', // datatable theme
+                class: '', // custom wrapper class
+                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
+                //height: 550, // datatable's body's fixed height
+                footer: false // display/hide footer
+            },
+            // column sorting
+            sortable: true,
+            pagination: true,
+            // columns definition
+            columns: aoColumns,
+            // toolbar
+            toolbar: {
+                // toolbar items
+                items: {
+                    // pagination
+                    pagination: {
+                        // page size select
+                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                    }
+                }
+            },
+            search: {
+                input: $('#lista-archivo .m_form_search'),
+            },
+        });
+
+        //Events
+        oTableListaArchivos
+            .on('m-datatable--on-ajax-done', function () {
+                mApp.unblock('#lista-archivo-table-editable');
+            })
+            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
+                mApp.unblock('#lista-archivo-table-editable');
+            })
+            .on('m-datatable--on-goto-page', function (e, args) {
+                MyApp.block('#lista-archivo-table-editable');
+            })
+            .on('m-datatable--on-reloaded', function (e) {
+                MyApp.block('#lista-archivo-table-editable');
+            })
+            .on('m-datatable--on-sort', function (e, args) {
+                MyApp.block('#lista-archivo-table-editable');
+            })
+            .on('m-datatable--on-check', function (e, args) {
+                //eventsWriter('Checkbox active: ' + args.toString());
+            })
+            .on('m-datatable--on-uncheck', function (e, args) {
+                //eventsWriter('Checkbox inactive: ' + args.toString());
+            });
+
+    };
+    var actualizarTableListaArchivos = function () {
+        if (oTableListaArchivos) {
+            oTableListaArchivos.destroy();
+        }
+
+        initTableListaArchivos();
+    }
+    var initFormArchivo = function () {
+        $("#archivo-form").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+            },
+            showErrors: function (errorMap, errorList) {
+                // Clean up any tooltips for valid elements
+                $.each(this.validElements(), function (index, element) {
+                    var $element = $(element);
+
+                    $element.data("title", "") // Clear the title - there is no error associated anymore
+                        .removeClass("has-error")
+                        .tooltip("dispose");
+
+                    $element
+                        .closest('.form-group')
+                        .removeClass('has-error').addClass('success');
+                });
+
+                // Create new tooltips for invalid elements
+                $.each(errorList, function (index, error) {
+                    var $element = $(error.element);
+
+                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                        .data("title", error.message)
+                        .addClass("has-error")
+                        .tooltip({
+                            placement: 'bottom'
+                        }); // Create a new tooltip based on the error messsage we just set in the title
+
+                    $element.closest('.form-group')
+                        .removeClass('has-success').addClass('has-error');
+
+                });
+            },
+        });
+    };
+    var initAccionesArchivo = function () {
+
+        $(document).off('click', "#btn-agregar-archivo");
+        $(document).on('click', "#btn-agregar-archivo", function (e) {
+            // reset
+            resetFormArchivo();
+
+            $('#modal-archivo').modal({
+                'show': true
+            });
+        });
+
+        $(document).off('click', "#btn-salvar-archivo");
+        $(document).on('click', "#btn-salvar-archivo", function (e) {
+            e.preventDefault();
+
+            if ($('#archivo-form').valid() && $('#fileinput-archivo').hasClass('fileinput-exists')) {
+
+
+                // validar
+                var nombre = $('#archivo-name').val();
+                if (ExisteArchivo(nombre)) {
+                    toastr.error('The attachment has already been added', "Error !!!");
+                    return;
+                }
+
+                var fileinput_archivo = document.getElementById('fileinput');
+                var file = fileinput_archivo.files[0];
+
+                if (file) {
+                    var formData = new FormData();
+                    formData.set('file', file);
+
+                    MyApp.block('#modal-archivo .modal-content');
+                    // axios
+                    axios
+                        .post("project/salvarArchivo", formData, {
+                            responseType: "json",
+                        })
+                        .then(function (res) {
+                            if (res.status == 200) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "Exito !!!");
+
+                                    salvarArchivo(nombre, response.name);
+
+                                } else {
+                                    toastr.error(response.error, "Error !!!");
+                                }
+                            } else {
+                                toastr.error("Ha ocurrido un error interno, por favor intente de nuevo", "Error !!!");
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                            toastr.error(err, "Error !!!");
+                        })
+                        .then(function () {
+                            mApp.unblock('#modal-archivo .modal-content');
+                        });
+                } else {
+                    //actualizar solo nombre
+                    archivos[nEditingRowArchivo].name = nombre;
+
+                    actualizarTableListaArchivos();
+                    resetFormArchivo();
+                    $('#modal-archivo').modal('hide');
+                }
+
+            } else {
+                if (!$('#fileinput-archivo').hasClass('fileinput-exists')) {
+                    toastr.error('Select the file', "");
+                }
+            }
+
+        });
+
+        function ExisteArchivo(name) {
+            const pos = nEditingRowArchivo;
+
+            if (pos == null) {
+                return archivos.some(item => item.name === name);
+            }
+
+            const excludeId = archivos[pos]?.id;
+            return archivos.some(item => item.name === name && item.id !== excludeId);
+        }
+
+        function salvarArchivo(nombre, archivo) {
+
+            if (nEditingRowArchivo == null) {
+                archivos.push({
+                    id: '',
+                    name: nombre,
+                    file: archivo,
+                    posicion: archivos.length
+                });
+            } else {
+                archivos[nEditingRowArchivo].name = nombre;
+                archivos[nEditingRowArchivo].file = archivo;
+            }
+
+            // close modal
+            $('#modal-archivo').modal('hide');
+
+            // actualizar lista
+            actualizarTableListaArchivos();
+
+            // reset
+            resetFormArchivo();
+
+        }
+
+        $(document).off('click', "#lista-archivo-table-editable a.edit");
+        $(document).on('click', "#lista-archivo-table-editable a.edit", function () {
+            var posicion = $(this).data('posicion');
+            if (archivos[posicion]) {
+
+                // reset
+                resetFormArchivo();
+
+                nEditingRowArchivo = posicion;
+
+                $('#archivo-name').val(archivos[posicion].name);
+
+                $('#fileinput-archivo .fileinput-filename').html(archivos[nEditingRowArchivo].file);
+                $('#fileinput-archivo').fileinput().removeClass("fileinput-new").addClass("fileinput-exists");
+
+                // open modal
+                $('#modal-archivo').modal('show');
+
+            }
+        });
+
+        $(document).off('click', "#lista-archivo-table-editable a.delete");
+        $(document).on('click', "#lista-archivo-table-editable a.delete", function (e) {
+
+            e.preventDefault();
+            var posicion = $(this).data('posicion');
+
+            if (archivos[posicion]) {
+                MyApp.block('#lista-archivo-table-editable');
+
+                $.ajax({
+                    type: "POST",
+                    url: "project/eliminarArchivo",
+                    dataType: "json",
+                    data: {
+                        'archivo': archivos[posicion].file
+                    },
+                    success: function (response) {
+                        mApp.unblock('#lista-archivo-table-editable');
+                        if (response.success) {
+
+                            toastr.success(response.message, "");
+
+                            deleteArchivo(posicion);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    },
+                    failure: function (response) {
+                        mApp.unblock('#lista-archivo-table-editable');
+
+                        toastr.error(response.error, "");
+                    }
+                });
+            }
+        });
+
+        $(document).off('click', "#lista-archivo-table-editable a.download");
+        $(document).on('click', "#lista-archivo-table-editable a.download", function () {
+            var posicion = $(this).data('posicion');
+            if (archivos[posicion]) {
+
+                var archivo = archivos[posicion].file;
+                var url = direccion_url + '/uploads/project/' + archivo;
+
+                // crear link para que se descargue el archivo
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+        function deleteArchivo(posicion) {
+            //Eliminar
+            archivos.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < archivos.length; i++) {
+                archivos[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaArchivos();
+        }
+
+    };
+    var resetFormArchivo = function () {
+        $('#archivo-form input').each(function (e) {
+            $element = $(this);
+            $element.val('');
+
+            $element.data("title", "").removeClass("has-error").tooltip("dispose");
+            $element.closest('.form-group').removeClass('has-error').addClass('success');
+        });
+
+        // reset
+        $('#fileinput').val('');
+        $('#fileinput-archivo .fileinput-filename').html('');
+        $('#fileinput-archivo').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+
+        nEditingRowArchivo = null;
+
+
+    };
+
 
     return {
         //main function to initiate the module
@@ -3250,6 +3632,10 @@ var Projects = function () {
             initFormAjustePrecio();
             initAccionesAjustesPrecio();
 
+            // archivos
+            initFormArchivo();
+            initAccionesArchivo();
+
             initAccionChange();
 
             // editar
@@ -3269,12 +3655,12 @@ var Projects = function () {
 
             // filtrar
             var fechaInicial = localStorage.getItem('dashboard_fecha_inicial');
-            if(fechaInicial) {
+            if (fechaInicial) {
                 $('#fechaInicial').val(fechaInicial);
             }
 
             var fechaFin = localStorage.getItem('dashboard_fecha_fin');
-            if(fechaFin) {
+            if (fechaFin) {
                 $('#fechaFin').val(fechaFin);
             }
 

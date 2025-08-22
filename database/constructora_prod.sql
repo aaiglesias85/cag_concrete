@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-08-2025 a las 00:17:54
+-- Tiempo de generación: 22-08-2025 a las 19:19:05
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -732,6 +732,19 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (384, '2025-02-28', '', '', NULL, NULL, 'FRANCISCO(27): POURED CLASS B WIDEN, C&G, SW', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:48:32', NULL, 87, NULL, NULL),
 (385, '2025-02-28', '', '', NULL, NULL, 'GERARDO(21): POURED C&G, FLUME, RAMPS', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:50:02', NULL, 257, NULL, NULL),
 (386, '2025-07-01', 'fdgdsfgdfg', 'Marcel', NULL, NULL, '', NULL, NULL, NULL, 0.00, 1.00, 286.00, 5.00, 5.00, 0, '2025-07-19 15:26:15', NULL, 256, 11, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `data_tracking_attachment`
+--
+
+CREATE TABLE `data_tracking_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `data_tracking_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -4812,7 +4825,146 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (3644, 'Delete', 'Bid Deadline Estimate', 'The bid deadline estimate is deleted: Test bid deadline Bid Deadline: 18/06/2025 17:05', '::1', '2025-08-12 00:14:35', 1),
 (3645, 'Update', 'Estimate', 'The estimate is modified: Test bid deadline', '::1', '2025-08-12 00:14:57', 1),
 (3646, 'Update', 'Project', 'The project is modified: BUFORD HWY PED IMPROVEMENTS', '::1', '2025-08-16 16:43:52', 1),
-(3647, 'Update', 'Project', 'The project is modified: BUFORD HWY PED IMPROVEMENTS', '::1', '2025-08-16 19:39:30', 1);
+(3647, 'Update', 'Project', 'The project is modified: BUFORD HWY PED IMPROVEMENTS', '::1', '2025-08-16 19:39:30', 1),
+(3648, 'Update', 'Project', 'The project is modified: PULASKI', '::1', '2025-08-19 00:19:07', 1),
+(3649, 'Update', 'Project', 'The project is modified: PULASKI', '::1', '2025-08-19 00:20:27', 1),
+(3650, 'Update', 'Project', 'The project is modified: BEN EPPS TAXIWAY', '::1', '2025-08-21 00:58:27', 1),
+(3651, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/10/2025 to 08/12/2025', '::1', '2025-08-21 01:04:27', 1),
+(3652, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/17/2025 to 08/19/2025', '::1', '2025-08-21 01:04:54', 1),
+(3653, 'Add', 'Schedule', 'The schedule is added: Prueba, Start date: 08/03/2025 Stop date: 08/10/2025', '::1', '2025-08-21 01:10:49', 1),
+(3654, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 09/07/2025', '::1', '2025-08-21 01:22:11', 1),
+(3655, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 09/07/2025', '::1', '2025-08-21 01:22:11', 1),
+(3656, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 09/07/2025', '::1', '2025-08-21 01:22:11', 1),
+(3657, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 09/07/2025', '::1', '2025-08-21 01:22:11', 1),
+(3658, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 09/07/2025', '::1', '2025-08-21 01:22:11', 1),
+(3659, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 09/07/2025', '::1', '2025-08-21 01:22:11', 1),
+(3660, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3661, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3662, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3663, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3664, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3665, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3666, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3667, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3668, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3669, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3670, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3671, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3672, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:28:42', 1),
+(3673, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3674, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3675, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3676, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3677, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3678, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3679, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3680, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3681, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3682, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3683, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3684, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3685, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3686, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3687, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3688, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3689, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3690, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3691, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3692, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3693, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3694, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3695, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3696, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3697, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:32', 1),
+(3698, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3699, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3700, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3701, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3702, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3703, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3704, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3705, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3706, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3707, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3708, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3709, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3710, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3711, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3712, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3713, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3714, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3715, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:44', 1),
+(3716, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3717, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3718, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3719, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3720, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3721, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3722, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3723, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3724, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3725, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3726, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3727, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3728, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3729, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3730, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3731, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3732, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3733, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3734, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3735, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3736, 'Delete', 'Schedule', 'The schedule is deleted: Prueba', '::1', '2025-08-21 01:29:45', 1),
+(3737, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3738, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3739, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3740, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3741, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3742, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3743, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3744, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3745, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3746, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3747, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3748, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3749, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3750, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3751, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3752, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3753, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3754, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3755, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3756, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3757, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3758, 'Add', 'Schedule', 'The schedule was cloned: Prueba, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3759, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3760, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3761, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3762, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3763, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3764, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3765, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3766, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3767, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3768, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3769, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3770, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3771, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3772, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3773, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3774, 'Add', 'Schedule', 'The schedule was cloned: test, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3775, 'Add', 'Schedule', 'The schedule was cloned: Deploy, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3776, 'Add', 'Schedule', 'The schedule was cloned: Jenkis, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3777, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3778, 'Add', 'Schedule', 'The schedule was cloned: test, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3779, 'Add', 'Schedule', 'The schedule was cloned: Deploy, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3780, 'Add', 'Schedule', 'The schedule was cloned: Jenkis, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:06', 1),
+(3781, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:07', 1),
+(3782, 'Add', 'Schedule', 'The schedule was cloned: test, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:07', 1),
+(3783, 'Add', 'Schedule', 'The schedule was cloned: Deploy, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:07', 1),
+(3784, 'Add', 'Schedule', 'The schedule was cloned: Jenkis, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:07', 1),
+(3785, 'Add', 'Schedule', 'The schedule was cloned: Prueba Lead, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:07', 1),
+(3786, 'Add', 'Schedule', 'The schedule was cloned: Test, From 08/31/2025 to 10/01/2025', '::1', '2025-08-21 01:30:07', 1);
 
 -- --------------------------------------------------------
 
@@ -4999,7 +5151,7 @@ CREATE TABLE `project` (
 
 INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
 (6, 'N/A', 'ERS05039', 'N/A', 'BUFORD HWY PED IMPROVEMENTS', 'BUFORD HWY PED IMPROVEMENTS', NULL, 'DOT', '60294-9754', 1483750.00, 1, 'DeKalb', 0, '', 1, '2023-05-10', '2025-03-31', '2024-07-25', '', 1, NULL, NULL, '2024-07-08 14:37:28', '2025-08-16 19:39:30', 5, NULL, 2),
-(7, 'N/A', 'ERS05066', 'N/A', NULL, 'BEN EPPS TAXIWAY', NULL, 'UNIFIED GOV. OF ATHENS-CLARKE', '50429-9754', 77691.00, 1, 'CLARKE', 0, '', 0, '2024-06-24', '2024-10-31', '2024-07-31', '', 1, NULL, NULL, '2024-07-08 15:12:55', '2024-11-25 17:56:33', 5, NULL, 3),
+(7, 'N/A', 'ERS05066', 'N/A', 'BEN EPPS TAXIWAY', 'BEN EPPS TAXIWAY', NULL, 'UNIFIED GOV. OF ATHENS-CLARKE', '50429-9754', 77691.00, 1, 'CLARKE', 0, '', 0, '2024-06-24', '2024-10-31', '2024-07-31', '', 1, NULL, NULL, '2024-07-08 15:12:55', '2025-08-21 00:58:27', 5, NULL, 3),
 (8, NULL, 'PO-0195-GRW', NULL, NULL, 'WOODLANDS TRINITY', 'WOODLANDS TRINITY', 'WOODLANDS SUBDIVISION', '', NULL, 0, 'HOUSTON', 0, '', 0, '2020-09-07', NULL, '2024-07-31', 'Cliff Gradwell', 1, '', '', '2024-07-08 15:27:25', '2024-07-09 14:38:27', 6, NULL, 4),
 (9, 'N/A', 'CWM04099', 'N/A', NULL, 'HIDDEN ACRES DRIVE', NULL, 'N/A', 'N/A', 99.76, 0, 'DEKALB', 0, '', 0, '2024-07-02', '2024-07-02', '2024-07-31', 'Mike Lunsford', 0, NULL, NULL, '2024-07-08 16:06:19', '2025-02-17 17:56:54', 7, NULL, 2),
 (10, NULL, 'WEB56001', NULL, NULL, 'BIBB', 'BIBB', 'GDOT', '2021CW1K00026', NULL, 1, 'BIBB', 0, '', 0, '2022-03-29', NULL, '2024-07-31', '', 1, '', '', '2024-07-08 16:21:32', '2024-07-09 15:38:45', 8, NULL, 5),
@@ -5184,9 +5336,9 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (195, 'S015357', 'BBH26009', '', NULL, 'SR 49 @ SR 29 HAWK SIGNAL', NULL, 'GDOT', '14116.010354', 41353.00, 1, 'BALDWIN', 0, '', 0, '2020-07-07', '2021-07-07', NULL, '', 2, NULL, NULL, '2025-01-16 00:47:02', '2025-01-16 00:58:32', 23, NULL, 59),
 (196, '14116', 'BBH26005', '', NULL, '14116 ATLANTA', NULL, 'GDOT', '14116.010354', 41353.00, 1, 'BALDWIN', 0, '', 0, '2020-07-31', '2021-07-31', NULL, '', 2, NULL, NULL, '2025-01-16 13:39:17', '2025-01-16 13:48:58', 23, NULL, 59),
 (197, '0012825', 'BBH26004', 'B1CBA1901323-0', NULL, '0012825 FULTON TRAFFIC SIGNALS', NULL, 'GDOT', '0012825', 274925.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-07', NULL, '', 2, NULL, NULL, '2025-01-16 13:55:14', '2025-01-16 13:59:35', 23, NULL, 8),
-(198, '0013214', 'BBH26003', 'B1CBA1900832-0', NULL, 'FULTON INTERSECTIONS', NULL, 'GDOT', '0013214', 10400.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-01-16 14:04:48', '2025-01-16 14:06:32', 23, NULL, 8),
-(199, '0013198', 'BBH26002', 'B1CBA1801391-0', NULL, '0013198 MORGAN, NEWTON', NULL, 'GDOT', '0013198', 233960.00, 1, 'MORGAN, NEWTON', 0, '', 0, '2019-05-21', '2019-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 14:08:17', '2025-01-16 14:10:26', 23, NULL, 91);
+(198, '0013214', 'BBH26003', 'B1CBA1900832-0', NULL, 'FULTON INTERSECTIONS', NULL, 'GDOT', '0013214', 10400.00, 1, 'FULTON', 0, '', 0, '2019-08-07', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-01-16 14:04:48', '2025-01-16 14:06:32', 23, NULL, 8);
 INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
+(199, '0013198', 'BBH26002', 'B1CBA1801391-0', NULL, '0013198 MORGAN, NEWTON', NULL, 'GDOT', '0013198', 233960.00, 1, 'MORGAN, NEWTON', 0, '', 0, '2019-05-21', '2019-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 14:08:17', '2025-01-16 14:10:26', 23, NULL, 91),
 (200, '0012678', 'BBH26000', 'B1CBA1701307-0', NULL, '0012678 ROCKDALE', NULL, 'GDOT', '0012678', 113910.00, 1, 'ROCKDALE', 0, '', 0, '2018-07-16', '2019-07-16', NULL, '', 2, NULL, NULL, '2025-01-16 14:37:15', '2025-01-16 14:48:27', 23, NULL, 9),
 (201, '222150', 'CHP03009', 'B3TIA1902031-0', NULL, 'US 221 / US 1 / SR 4', NULL, 'GDOT', 'A. 401', 1254551.00, 1, 'JEFFERSON', 0, '', 1, '2020-02-12', '2022-09-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:15:06', '2025-02-14 16:38:03', 24, NULL, 7),
 (202, '0011377', 'CHP03010', 'B3TIA2002302-0', NULL, '0011377 LINCOLN', NULL, 'GDOT', '0011377', 22050.00, 1, 'LINCOLN', 0, '', 0, '2020-10-16', '0022-04-30', NULL, '', 2, NULL, NULL, '2025-01-16 15:37:29', '2025-01-16 15:38:12', 24, NULL, 92),
@@ -5245,7 +5397,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (259, '0012757 & 0012758', 'SAV57000', '', 'MMIP PROJECT', 'I-16 & I-95 MMIP PROJECT', NULL, 'GDOT', 'SMC-056-S', 1435095.12, 1, 'CHATHAM', 0, '', 0, '2020-10-02', '2025-10-31', NULL, '', 3, NULL, NULL, '2025-02-11 21:19:30', '2025-06-06 22:44:03', 47, NULL, 28),
 (260, '24112201', 'PC25032', 'B1CBA2402749-0', 'SR 15', 'SR 15 ', NULL, 'GDOT', '1886', 6050.00, 1, 'GREENE', 0, '', 1, '2025-01-31', '2025-10-31', NULL, '', 1, NULL, NULL, '2025-02-13 14:10:07', '2025-08-02 00:01:38', 12, NULL, 111),
 (261, '0015759', 'EDG45000', 'B3CBA1901689-1', 'LAURENS', 'LAURENS ', NULL, 'GDOT', '0015759', 208017.00, 1, 'LAURENS', 0, '', 0, '2019-01-05', '2020-08-31', NULL, '', 2, NULL, NULL, '2025-02-13 15:03:16', '2025-08-02 00:02:17', 34, NULL, 76),
-(262, 'CSBRG-0007-00(050)', 'GAB', 'B3CBA1601188-0', NULL, 'PULASKI', NULL, 'GDOT', 'CSBRG-0007-00(050)', 23160.00, 1, 'PULASKI', 0, '', 0, '2016-07-20', '2017-07-20', NULL, '', 2, NULL, NULL, '2025-02-13 15:39:03', '2025-02-13 15:49:40', 48, NULL, 112),
+(262, 'CSBRG-0007-00(050)', 'GAB', 'B3CBA1601188-0', 'PULASKI', 'PULASKI', NULL, 'GDOT', 'CSBRG-0007-00(050)', 24160.00, 1, 'PULASKI', 0, '', 0, '2016-07-20', '2017-07-20', NULL, '', 2, NULL, NULL, '2025-02-13 15:39:03', '2025-08-19 00:20:27', 48, NULL, 112),
 (263, 'M006213', 'CWM04067', 'B1CBA2201852-0', NULL, 'SR 26 MILL/INLAY/RESURF', NULL, 'GDOT', '32818', 55425.00, 1, 'CHATHAM', 1, '', 0, '2022-07-25', '2023-04-30', NULL, '', 2, NULL, NULL, '2025-02-13 19:20:46', '2025-02-13 19:27:26', 7, NULL, 28),
 (264, 'IFB-C-1220225', 'CWM04065', '', NULL, 'AIRFIELD SEWERS ENHANCEMENTS GRADES 4&5', NULL, 'CITY OF ATLANTA', '278520', 0.00, 0, 'CLAYTON', 0, '', 0, '2022-08-08', '2023-08-08', NULL, '', 2, NULL, NULL, '2025-02-13 19:52:19', '2025-02-13 19:53:06', 7, NULL, 22),
 (265, '001757', 'CWM04064', '', NULL, 'SR 400 PHASE 1 DESIGN BUILD PROJECT', NULL, 'GDOT', '162816', 1296162.00, 1, 'FULTON', 0, '', 0, '2022-08-22', '2025-08-07', NULL, '', 1, NULL, NULL, '2025-02-13 20:41:56', '2025-02-13 21:25:14', 7, NULL, 8),
@@ -5284,6 +5436,19 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (299, '0013614', 'ERS05029', 'B3CBA2002348-0', NULL, 'US 441 WIDENING', NULL, 'GDOT', '60256', 643843.25, 1, 'MORGAN', 0, '', 1, '2021-03-09', '2022-03-10', NULL, '', 2, NULL, NULL, '2025-03-03 20:59:26', '2025-03-03 21:11:29', 5, NULL, 46),
 (300, 'ITB #20-30', 'ERS05025', '', NULL, '2020 SPLOST MILLING & RESURF', NULL, 'E. R. SNELL', 'ITB #20-30', 137500.00, 0, 'CLAYTON', 0, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, '2025-03-03 21:42:27', '2025-03-03 22:04:56', 5, NULL, 22),
 (301, 'ITB #20-03', 'ERS05026', '', NULL, '2020 SPLOST MILLING & RESURFACING', NULL, 'E. R. SNELL', 'ITB #20-03', 229710.00, 0, 'CLAYTON', 1, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, '2025-03-03 22:13:17', '2025-03-03 22:20:19', 5, NULL, 22);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_attachment`
+--
+
+CREATE TABLE `project_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -5339,7 +5504,7 @@ CREATE TABLE `project_item` (
 
 INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `project_id`, `item_id`, `equation_id`) VALUES
 (36, 2110.000000, 663.00, 'same', NULL, 650.000000, 1, 6, 25, NULL),
-(37, 870.000000, 89.30, 'equation', NULL, NULL, 1, 7, 33, 13),
+(37, 870.000000, 89.30, '', NULL, NULL, 1, 7, 169, 13),
 (38, 0.010000, 4900.00, 'none', NULL, NULL, 1, 9, 34, NULL),
 (39, 450.000000, 88.00, 'equation', NULL, NULL, 1, 11, 39, 12),
 (40, 28.000000, 174.00, 'equation', NULL, NULL, 1, 11, 40, 18),
@@ -6130,9 +6295,9 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (906, 1.000000, 5000.00, '', NULL, NULL, 1, 139, 183, NULL),
 (907, 40.000000, 103.00, 'none', NULL, NULL, 1, 140, 133, NULL),
 (908, 274.000000, 246.00, 'equation', NULL, NULL, 1, 141, 106, 31),
-(909, 553.000000, 68.00, 'equation', NULL, NULL, 1, 141, 74, 22);
+(909, 553.000000, 68.00, 'equation', NULL, NULL, 1, 141, 74, 22),
+(910, 1.000000, 2500.00, 'equation', NULL, NULL, 1, 141, 41, 20);
 INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `project_id`, `item_id`, `equation_id`) VALUES
-(910, 1.000000, 2500.00, 'equation', NULL, NULL, 1, 141, 41, 20),
 (911, 92.000000, 325.00, 'same', NULL, NULL, 1, 141, 52, NULL),
 (912, 1.000000, 3000.00, '', NULL, NULL, 1, 141, 140, NULL),
 (913, 898.000000, 50.00, '', NULL, NULL, 1, 142, 184, NULL),
@@ -6906,9 +7071,9 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1713, 0.000000, 2100.00, 'equation', NULL, NULL, 1, 39, 104, 20),
 (1714, 0.000000, 36.00, 'equation', NULL, NULL, 1, 39, 78, 30),
 (1715, 606.000000, 52.50, '', NULL, NULL, 1, 283, 283, NULL),
-(1716, 881.000000, 22.00, 'equation', NULL, NULL, 1, 283, 84, 23);
+(1716, 881.000000, 22.00, 'equation', NULL, NULL, 1, 283, 84, 23),
+(1717, 1839.000000, 20.50, 'equation', NULL, NULL, 1, 283, 35, 14);
 INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `project_id`, `item_id`, `equation_id`) VALUES
-(1717, 1839.000000, 20.50, 'equation', NULL, NULL, 1, 283, 35, 14),
 (1718, 2.000000, 800.00, 'none', NULL, NULL, 1, 283, 284, NULL),
 (1719, 1.000000, 1000.00, 'equation', NULL, NULL, 1, 283, 48, 25),
 (1720, 3343.000000, 77.00, '', NULL, NULL, 1, 283, 285, NULL),
@@ -6993,7 +7158,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1799, 0.000000, 1722.83, 'none', NULL, NULL, 1, 301, 60, NULL),
 (1800, 1000.000000, 102.00, 'none', 100.000000, 100.000000, 1, 6, 194, NULL),
 (1801, 15.000000, 153.00, 'none', NULL, 150.000000, 0, 6, 194, NULL),
-(1802, 50.000000, 204.00, 'none', NULL, 200.000000, 0, 6, 25, NULL);
+(1802, 50.000000, 204.00, 'none', NULL, 200.000000, 0, 6, 25, NULL),
+(1803, 10.000000, 100.00, 'equation', NULL, NULL, 0, 262, 68, 22);
 
 -- --------------------------------------------------------
 
@@ -7648,7 +7814,11 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (690, 'Change Price Item: CLASS B CONCRETE RETAINING WALL, Percent: 2%, Previous Price: 650.00, New Price: 663.00', '2025-08-16', 6),
 (691, 'Change Price Item: 8 IN PORTLAND CEMENT CONCRETE COLOR STAMPED, Percent: 2%, Previous Price: 100.00, New Price: 102.00', '2025-08-16', 6),
 (692, 'Change Price Item: 8 IN PORTLAND CEMENT CONCRETE COLOR STAMPED, Percent: 2%, Previous Price: 150.00, New Price: 153.00', '2025-08-16', 6),
-(693, 'Change Price Item: CLASS B CONCRETE RETAINING WALL, Percent: 2%, Previous Price: 200.00, New Price: 204.00', '2025-08-16', 6);
+(693, 'Change Price Item: CLASS B CONCRETE RETAINING WALL, Percent: 2%, Previous Price: 200.00, New Price: 204.00', '2025-08-16', 6),
+(694, 'Change name, old value: ', '2025-08-19', 262),
+(695, 'Add New Item: CONC SIDEWALK, 6 IN', '2025-08-19', 262),
+(696, 'Change contract amount, old value: 23160', '2025-08-19', 262),
+(697, 'Change name, old value: ', '2025-08-21', 7);
 
 -- --------------------------------------------------------
 
@@ -8061,7 +8231,238 @@ INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `lo
 (270, 'Prueba', '123 Street', '', '', '2025-08-08', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
 (271, 'Prueba', '123 Street', '', '', '2025-08-15', '01:00', 10.000000, '', 1, 260, NULL, 13, NULL),
 (272, 'Prueba', '123 Street', '', '', '2025-08-22', '01:00', 10.000000, '', 1, 260, NULL, 13, NULL),
-(273, 'Prueba', '123 Street', '', '', '2025-08-29', '01:00', 10.000000, '', 1, 260, NULL, 13, NULL);
+(273, 'Prueba', '123 Street', '', '', '2025-08-29', '01:00', 10.000000, '', 1, 260, NULL, 13, NULL),
+(274, 'Prueba', '123 Street', '', '', '2025-08-10', '01:00', 10.000000, '', 1, 260, NULL, 13, NULL),
+(275, 'Prueba', '123 Street', '', '', '2025-08-11', '01:00', 10.000000, '', 1, 260, NULL, 13, NULL),
+(276, 'Prueba', '123 Street', '', '', '2025-08-17', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(277, 'Prueba', '123 Street', '', '', '2025-08-18', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(278, 'Prueba', '', '', '', '2025-08-03', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(279, 'Prueba', '', '', '', '2025-08-04', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(280, 'Prueba', '', '', '', '2025-08-05', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(281, 'Prueba', '', '', '', '2025-08-06', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(282, 'Prueba', '', '', '', '2025-08-07', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(283, 'Prueba', '', '', '', '2025-08-08', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(284, 'Prueba', '', '', '', '2025-08-09', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(349, 'Prueba', '123 Street', '', '', '2025-09-05', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(350, 'Prueba', '123 Street', '', '', '2025-09-12', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(351, 'Prueba', '123 Street', '', '', '2025-09-19', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(352, 'Prueba', '123 Street', '', '', '2025-09-26', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(353, 'Prueba', '123 Street', '', '', '2025-09-05', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(354, 'Prueba', '123 Street', '', '', '2025-09-12', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(355, 'Prueba', '123 Street', '', '', '2025-09-19', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(356, 'Prueba', '123 Street', '', '', '2025-09-26', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(357, 'Prueba', '123 Street', '', '', '2025-09-01', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(358, 'Prueba', '123 Street', '', '', '2025-09-08', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(359, 'Prueba', '123 Street', '', '', '2025-09-15', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(360, 'Prueba', '123 Street', '', '', '2025-09-22', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(361, 'Prueba', '123 Street', '', '', '2025-09-29', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(362, 'Prueba', '123 Street', '', '', '2025-08-31', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(363, 'Prueba', '123 Street', '', '', '2025-09-07', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(364, 'Prueba', '123 Street', '', '', '2025-09-14', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(365, 'Prueba', '123 Street', '', '', '2025-09-21', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(366, 'Prueba', '123 Street', '', '', '2025-09-28', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(367, 'Prueba', '123 Street', '', '', '2025-09-05', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(368, 'Prueba', '123 Street', '', '', '2025-09-12', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(369, 'Prueba', '123 Street', '', '', '2025-09-19', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(370, 'Prueba', '123 Street', '', '', '2025-09-26', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(371, 'Prueba', '123 Street', '', '', '2025-09-01', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(372, 'Prueba', '123 Street', '', '', '2025-09-08', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(373, 'Prueba', '123 Street', '', '', '2025-09-15', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(374, 'Prueba', '123 Street', '', '', '2025-09-22', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(375, 'Prueba', '123 Street', '', '', '2025-09-29', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(376, 'Prueba', '123 Street', '', '', '2025-08-31', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(377, 'Prueba', '123 Street', '', '', '2025-09-07', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(378, 'Prueba', '123 Street', '', '', '2025-09-14', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(379, 'Prueba', '123 Street', '', '', '2025-09-21', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(380, 'Prueba', '123 Street', '', '', '2025-09-28', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(381, 'Prueba', '', '', '', '2025-09-06', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(382, 'Prueba', '', '', '', '2025-09-13', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(383, 'Prueba', '', '', '', '2025-09-20', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(384, 'Prueba', '', '', '', '2025-09-27', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(385, 'Prueba', '123 Street', '', '', '2025-09-05', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(386, 'Prueba', '123 Street', '', '', '2025-09-12', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(387, 'Prueba', '123 Street', '', '', '2025-09-19', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(388, 'Prueba', '123 Street', '', '', '2025-09-26', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(389, 'Prueba', '', '', '', '2025-09-05', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(390, 'Prueba', '', '', '', '2025-09-12', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(391, 'Prueba', '', '', '', '2025-09-19', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(392, 'Prueba', '', '', '', '2025-09-26', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(393, 'Prueba', '123 Street', '', '', '2025-09-04', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(394, 'Prueba', '123 Street', '', '', '2025-09-11', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(395, 'Prueba', '123 Street', '', '', '2025-09-18', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(396, 'Prueba', '123 Street', '', '', '2025-09-25', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(397, 'Prueba', '', '', '', '2025-09-04', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(398, 'Prueba', '', '', '', '2025-09-11', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(399, 'Prueba', '', '', '', '2025-09-18', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(400, 'Prueba', '', '', '', '2025-09-25', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(401, 'Prueba', '123 Street', '', '', '2025-09-03', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(402, 'Prueba', '123 Street', '', '', '2025-09-10', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(403, 'Prueba', '123 Street', '', '', '2025-09-17', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(404, 'Prueba', '123 Street', '', '', '2025-09-24', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(405, 'Prueba', '', '', '', '2025-09-03', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(406, 'Prueba', '', '', '', '2025-09-10', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(407, 'Prueba', '', '', '', '2025-09-17', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(408, 'Prueba', '', '', '', '2025-09-24', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(409, 'Prueba', '123 Street', '', '', '2025-09-02', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(410, 'Prueba', '123 Street', '', '', '2025-09-09', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(411, 'Prueba', '123 Street', '', '', '2025-09-16', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(412, 'Prueba', '123 Street', '', '', '2025-09-23', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(413, 'Prueba', '123 Street', '', '', '2025-09-30', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(414, 'Prueba', '', '', '', '2025-09-02', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(415, 'Prueba', '', '', '', '2025-09-09', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(416, 'Prueba', '', '', '', '2025-09-16', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(417, 'Prueba', '', '', '', '2025-09-23', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(418, 'Prueba', '', '', '', '2025-09-30', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(419, 'Prueba', '123 Street', '', '', '2025-09-01', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(420, 'Prueba', '123 Street', '', '', '2025-09-08', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(421, 'Prueba', '123 Street', '', '', '2025-09-15', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(422, 'Prueba', '123 Street', '', '', '2025-09-22', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(423, 'Prueba', '123 Street', '', '', '2025-09-29', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(424, 'Prueba', '', '', '', '2025-09-01', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(425, 'Prueba', '', '', '', '2025-09-08', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(426, 'Prueba', '', '', '', '2025-09-15', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(427, 'Prueba', '', '', '', '2025-09-22', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(428, 'Prueba', '', '', '', '2025-09-29', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(429, 'Prueba', '123 Street', '', '', '2025-08-31', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(430, 'Prueba', '123 Street', '', '', '2025-09-07', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(431, 'Prueba', '123 Street', '', '', '2025-09-14', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(432, 'Prueba', '123 Street', '', '', '2025-09-21', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(433, 'Prueba', '123 Street', '', '', '2025-09-28', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(434, 'Prueba', '', '', '', '2025-08-31', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(435, 'Prueba', '', '', '', '2025-09-07', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(436, 'Prueba', '', '', '', '2025-09-14', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(437, 'Prueba', '', '', '', '2025-09-21', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(438, 'Prueba', '', '', '', '2025-09-28', '00:30', 10.000000, '', 0, 261, NULL, 13, NULL),
+(439, 'Prueba', '123 Street', '', '', '2025-09-06', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(440, 'Prueba', '123 Street', '', '', '2025-09-13', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(441, 'Prueba', '123 Street', '', '', '2025-09-20', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(442, 'Prueba', '123 Street', '', '', '2025-09-27', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(443, 'Prueba', '123 Street', '', '', '2025-09-05', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(444, 'Prueba', '123 Street', '', '', '2025-09-12', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(445, 'Prueba', '123 Street', '', '', '2025-09-19', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(446, 'Prueba', '123 Street', '', '', '2025-09-26', '01:00', 10.000000, '', 0, 260, NULL, 13, NULL),
+(447, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-06', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(448, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-13', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(449, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-20', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(450, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-27', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(451, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-05', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(452, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-12', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(453, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-19', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(454, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-26', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(455, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-04', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(456, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-11', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(457, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-18', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(458, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-25', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(459, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-03', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(460, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-10', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(461, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-17', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(462, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-24', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(463, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-02', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(464, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-09', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(465, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-16', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(466, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-23', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(467, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-30', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(468, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-01', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(469, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-08', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(470, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-15', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(471, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-22', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(472, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-29', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(473, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-08-31', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(474, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-07', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(475, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-14', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(476, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-21', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(477, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-28', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(478, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-06', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(479, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-13', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(480, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-20', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(481, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-27', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(482, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-05', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(483, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-12', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(484, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-19', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(485, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-26', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(486, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-04', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(487, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-11', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(488, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-18', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(489, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-25', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(490, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-03', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(491, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-10', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(492, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-17', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(493, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-24', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(494, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-02', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(495, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-09', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(496, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-16', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(497, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-23', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(498, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-30', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(499, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-01', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(500, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-08', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(501, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-15', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(502, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-22', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(503, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-29', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(504, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-08-31', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(505, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-07', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(506, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-14', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(507, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-21', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(508, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-28', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(509, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-06', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(510, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-13', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(511, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-20', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(512, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-27', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(513, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-04', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(514, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-11', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(515, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-18', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(516, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-25', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(517, 'Deploy', '', '', '', '2025-09-04', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(518, 'Deploy', '', '', '', '2025-09-11', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(519, 'Deploy', '', '', '', '2025-09-18', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(520, 'Deploy', '', '', '', '2025-09-25', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(521, 'Jenkis', '', '', '', '2025-09-04', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(522, 'Jenkis', '', '', '', '2025-09-11', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(523, 'Jenkis', '', '', '', '2025-09-18', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(524, 'Jenkis', '', '', '', '2025-09-25', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(525, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-04', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(526, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-11', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(527, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-18', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(528, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-25', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(529, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-03', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(530, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-10', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(531, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-17', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(532, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-24', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(533, 'Deploy', '', '', '', '2025-09-03', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(534, 'Deploy', '', '', '', '2025-09-10', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(535, 'Deploy', '', '', '', '2025-09-17', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(536, 'Deploy', '', '', '', '2025-09-24', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(537, 'Jenkis', '', '', '', '2025-09-03', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(538, 'Jenkis', '', '', '', '2025-09-10', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(539, 'Jenkis', '', '', '', '2025-09-17', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(540, 'Jenkis', '', '', '', '2025-09-24', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(541, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-03', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(542, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-10', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(543, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-17', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(544, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-24', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(545, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-02', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(546, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-09', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(547, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-16', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(548, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-23', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(549, 'test', 'Cabana Bay, Orlando, Florida, EE. UU.', '28.4657683', '-81.47290339999999', '2025-09-30', '10:30', 10.000000, 'test', 0, 257, NULL, 20, NULL),
+(550, 'Deploy', '', '', '', '2025-09-02', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(551, 'Deploy', '', '', '', '2025-09-09', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(552, 'Deploy', '', '', '', '2025-09-16', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(553, 'Deploy', '', '', '', '2025-09-23', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(554, 'Deploy', '', '', '', '2025-09-30', '', 0.000000, '', 0, 260, NULL, 15, NULL),
+(555, 'Jenkis', '', '', '', '2025-09-02', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(556, 'Jenkis', '', '', '', '2025-09-09', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(557, 'Jenkis', '', '', '', '2025-09-16', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(558, 'Jenkis', '', '', '', '2025-09-23', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(559, 'Jenkis', '', '', '', '2025-09-30', '', 0.000000, '', 0, 23, NULL, 14, NULL),
+(560, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-02', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(561, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-09', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(562, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-16', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(563, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-23', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(564, 'Prueba Lead', '123 William Street, Nueva York, EE. UU.', '40.7091708', '-74.0069522', '2025-09-30', '10:00', 5.000000, '', 0, 256, NULL, 1, NULL),
+(565, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-09-06', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(566, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-09-13', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(567, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-09-20', '', 0.000000, '', 0, 292, NULL, 2, NULL),
+(568, 'Test', 'Cornelia Street, Nueva York, EE. UU.', '40.73147', '-74.00200989999999', '2025-09-27', '', 0.000000, '', 0, 292, NULL, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -8149,7 +8550,197 @@ INSERT INTO `schedule_employee` (`id`, `schedule_id`, `employee_id`) VALUES
 (384, 272, 49),
 (385, 272, 47),
 (386, 273, 49),
-(387, 273, 47);
+(387, 273, 47),
+(388, 274, 49),
+(389, 274, 47),
+(390, 275, 49),
+(391, 275, 47),
+(392, 276, 49),
+(393, 276, 47),
+(394, 277, 49),
+(395, 277, 47),
+(396, 278, 49),
+(397, 279, 49),
+(398, 280, 49),
+(399, 281, 49),
+(400, 282, 49),
+(401, 283, 49),
+(402, 284, 49),
+(497, 349, 49),
+(498, 349, 47),
+(499, 350, 49),
+(500, 350, 47),
+(501, 351, 49),
+(502, 351, 47),
+(503, 352, 49),
+(504, 352, 47),
+(505, 353, 49),
+(506, 353, 47),
+(507, 354, 49),
+(508, 354, 47),
+(509, 355, 49),
+(510, 355, 47),
+(511, 356, 49),
+(512, 356, 47),
+(513, 357, 49),
+(514, 357, 47),
+(515, 358, 49),
+(516, 358, 47),
+(517, 359, 49),
+(518, 359, 47),
+(519, 360, 49),
+(520, 360, 47),
+(521, 361, 49),
+(522, 361, 47),
+(523, 362, 49),
+(524, 362, 47),
+(525, 363, 49),
+(526, 363, 47),
+(527, 364, 49),
+(528, 364, 47),
+(529, 365, 49),
+(530, 365, 47),
+(531, 366, 49),
+(532, 366, 47),
+(533, 367, 49),
+(534, 367, 47),
+(535, 368, 49),
+(536, 368, 47),
+(537, 369, 49),
+(538, 369, 47),
+(539, 370, 49),
+(540, 370, 47),
+(541, 371, 49),
+(542, 371, 47),
+(543, 372, 49),
+(544, 372, 47),
+(545, 373, 49),
+(546, 373, 47),
+(547, 374, 49),
+(548, 374, 47),
+(549, 375, 49),
+(550, 375, 47),
+(551, 376, 49),
+(552, 376, 47),
+(553, 377, 49),
+(554, 377, 47),
+(555, 378, 49),
+(556, 378, 47),
+(557, 379, 49),
+(558, 379, 47),
+(559, 380, 49),
+(560, 380, 47),
+(561, 381, 49),
+(562, 382, 49),
+(563, 383, 49),
+(564, 384, 49),
+(565, 385, 49),
+(566, 385, 47),
+(567, 386, 49),
+(568, 386, 47),
+(569, 387, 49),
+(570, 387, 47),
+(571, 388, 49),
+(572, 388, 47),
+(573, 389, 49),
+(574, 390, 49),
+(575, 391, 49),
+(576, 392, 49),
+(577, 393, 49),
+(578, 393, 47),
+(579, 394, 49),
+(580, 394, 47),
+(581, 395, 49),
+(582, 395, 47),
+(583, 396, 49),
+(584, 396, 47),
+(585, 397, 49),
+(586, 398, 49),
+(587, 399, 49),
+(588, 400, 49),
+(589, 401, 49),
+(590, 401, 47),
+(591, 402, 49),
+(592, 402, 47),
+(593, 403, 49),
+(594, 403, 47),
+(595, 404, 49),
+(596, 404, 47),
+(597, 405, 49),
+(598, 406, 49),
+(599, 407, 49),
+(600, 408, 49),
+(601, 409, 49),
+(602, 409, 47),
+(603, 410, 49),
+(604, 410, 47),
+(605, 411, 49),
+(606, 411, 47),
+(607, 412, 49),
+(608, 412, 47),
+(609, 413, 49),
+(610, 413, 47),
+(611, 414, 49),
+(612, 415, 49),
+(613, 416, 49),
+(614, 417, 49),
+(615, 418, 49),
+(616, 419, 49),
+(617, 419, 47),
+(618, 420, 49),
+(619, 420, 47),
+(620, 421, 49),
+(621, 421, 47),
+(622, 422, 49),
+(623, 422, 47),
+(624, 423, 49),
+(625, 423, 47),
+(626, 424, 49),
+(627, 425, 49),
+(628, 426, 49),
+(629, 427, 49),
+(630, 428, 49),
+(631, 429, 49),
+(632, 429, 47),
+(633, 430, 49),
+(634, 430, 47),
+(635, 431, 49),
+(636, 431, 47),
+(637, 432, 49),
+(638, 432, 47),
+(639, 433, 49),
+(640, 433, 47),
+(641, 434, 49),
+(642, 435, 49),
+(643, 436, 49),
+(644, 437, 49),
+(645, 438, 49),
+(646, 439, 49),
+(647, 439, 47),
+(648, 440, 49),
+(649, 440, 47),
+(650, 441, 49),
+(651, 441, 47),
+(652, 442, 49),
+(653, 442, 47),
+(654, 443, 49),
+(655, 443, 47),
+(656, 444, 49),
+(657, 444, 47),
+(658, 445, 49),
+(659, 445, 47),
+(660, 446, 49),
+(661, 446, 47),
+(662, 545, 49),
+(663, 545, 47),
+(664, 546, 49),
+(665, 546, 47),
+(666, 547, 49),
+(667, 547, 47),
+(668, 548, 49),
+(669, 548, 47),
+(670, 549, 49),
+(671, 549, 47);
 
 -- --------------------------------------------------------
 
@@ -8466,6 +9057,13 @@ ALTER TABLE `data_tracking`
   ADD KEY `overhead_price_id` (`overhead_price_id`);
 
 --
+-- Indices de la tabla `data_tracking_attachment`
+--
+ALTER TABLE `data_tracking_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refdata_tracking_attachment1` (`data_tracking_id`);
+
+--
 -- Indices de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
@@ -8667,6 +9265,13 @@ ALTER TABLE `project`
   ADD KEY `Ref6467` (`company_id`),
   ADD KEY `Ref6573` (`inspector_id`),
   ADD KEY `county_id` (`county_id`);
+
+--
+-- Indices de la tabla `project_attachment`
+--
+ALTER TABLE `project_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refproject_attachment1` (`project_id`);
 
 --
 -- Indices de la tabla `project_contact`
@@ -8871,6 +9476,12 @@ ALTER TABLE `data_tracking`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=387;
 
 --
+-- AUTO_INCREMENT de la tabla `data_tracking_attachment`
+--
+ALTER TABLE `data_tracking_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
@@ -8994,7 +9605,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3648;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3787;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -9033,6 +9644,12 @@ ALTER TABLE `project`
   MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
 
 --
+-- AUTO_INCREMENT de la tabla `project_attachment`
+--
+ALTER TABLE `project_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
@@ -9042,13 +9659,13 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_item`
 --
 ALTER TABLE `project_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1803;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1804;
 
 --
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=694;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=698;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
@@ -9102,7 +9719,7 @@ ALTER TABLE `rol_permission`
 -- AUTO_INCREMENT de la tabla `schedule`
 --
 ALTER TABLE `schedule`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=274;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=569;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule_concrete_vendor_contact`
@@ -9114,7 +9731,7 @@ ALTER TABLE `schedule_concrete_vendor_contact`
 -- AUTO_INCREMENT de la tabla `schedule_employee`
 --
 ALTER TABLE `schedule_employee`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=388;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=672;
 
 --
 -- AUTO_INCREMENT de la tabla `subcontractor`
@@ -9193,6 +9810,12 @@ ALTER TABLE `data_tracking`
   ADD CONSTRAINT `Refinspector158` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),
   ADD CONSTRAINT `Refoverheadprice25` FOREIGN KEY (`overhead_price_id`) REFERENCES `overhead_price` (`overhead_id`),
   ADD CONSTRAINT `Refproject25` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `data_tracking_attachment`
+--
+ALTER TABLE `data_tracking_attachment`
+  ADD CONSTRAINT `Refdata_tracking_attachment1` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`);
 
 --
 -- Filtros para la tabla `data_tracking_conc_vendor`
@@ -9314,6 +9937,12 @@ ALTER TABLE `project`
   ADD CONSTRAINT `Refcontractor67` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),
   ADD CONSTRAINT `Refprojectcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
+
+--
+-- Filtros para la tabla `project_attachment`
+--
+ALTER TABLE `project_attachment`
+  ADD CONSTRAINT `Refproject_attachment1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
 -- Filtros para la tabla `project_contact`

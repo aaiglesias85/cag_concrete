@@ -61,7 +61,8 @@ class ProjectController extends AbstractController
                     'equations' => $equations,
                     'yields_calculation' => $yields_calculation,
                     'units' => $units,
-                    'countys' => $countys
+                    'countys' => $countys,
+                    'direccion_url' => $this->projectService->ObtenerURL()
                 ));
             }
         } else {
@@ -179,6 +180,10 @@ class ProjectController extends AbstractController
         $ajustes_precio = $request->get('ajustes_precio');
         $ajustes_precio = json_decode($ajustes_precio);
 
+        // archivos
+        $archivos = $request->get('archivos');
+        $archivos = json_decode($archivos);
+
         try {
 
             if ($project_id == "") {
@@ -190,7 +195,7 @@ class ProjectController extends AbstractController
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
                     $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
-                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio);
+                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio, $archivos);
             }
 
             if ($resultado['success']) {
@@ -839,5 +844,72 @@ class ProjectController extends AbstractController
             return $this->json($resultadoJson);
         }
 
+    }
+
+
+    /**
+     * salvarArchivo Accion que salva un archivo en la BD
+     */
+    public function salvarArchivo(Request $request)
+    {
+        $resultadoJson = array();
+
+        try {
+
+            $file = $request->files->get('file');
+
+            //Manejar el archivo
+            $dir = 'uploads/project/';
+            $file_name = $this->projectService->upload($file, $dir);
+
+            if ($file_name != '') {
+                $resultadoJson['success'] = true;
+                $resultadoJson['message'] = "The operation was successful";
+
+                $resultadoJson['name'] = $file_name;
+                $resultadoJson['size'] = filesize($dir . $file_name);
+            } else {
+                $resultadoJson['success'] = false;
+                $resultadoJson['error'] = 'No se pudo subir el archivo';
+            }
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarArchivo Acción que elimina un archivo en la BD
+     *
+     */
+    public function eliminarArchivo(Request $request)
+    {
+        $archivo = $request->get('archivo');
+
+        try {
+            $resultado = $this->projectService->EliminarArchivo($archivo);
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
     }
 }

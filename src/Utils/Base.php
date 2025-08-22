@@ -6,6 +6,7 @@ use App\Entity\CompanyContact;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\County;
 use App\Entity\DataTracking;
+use App\Entity\DataTrackingAttachment;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
@@ -33,6 +34,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -975,6 +977,21 @@ class Base
             ->ListarSubcontracts($data_tracking_id);
         foreach ($subcontract_items as $subcontract_item) {
             $em->remove($subcontract_item);
+        }
+
+        // attachments
+        $dir = 'uploads/datatracking/';
+        $attachments = $this->getDoctrine()->getRepository(DataTrackingAttachment::class)
+            ->ListarAttachmentsDeDataTracking($data_tracking_id);
+        foreach ($attachments as $attachment) {
+
+            //eliminar archivo
+            $file_eliminar = $attachment->getFile();
+            if ($file_eliminar != "" && is_file($dir . $file_eliminar)) {
+                unlink($dir . $file_eliminar);
+            }
+
+            $em->remove($attachment);
         }
     }
 

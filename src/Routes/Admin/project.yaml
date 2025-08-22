@@ -93,3 +93,12 @@ listarDataTrackingProjectAdmin:
 eliminarAjustePrecioProjectAdmin:
   path: /project/eliminarAjustePrecio
   defaults: { _controller: App\Controller\Admin\ProjectController::eliminarAjustePrecio, _format: json }
+
+#attachments
+salvarArchivoProjectAdmin:
+  path: /project/salvarArchivo
+  defaults: { _controller: App\Controller\Admin\ProjectController::salvarArchivo, _format: json }
+
+eliminarArchivoProjectAdmin:
+  path: /project/eliminarArchivo
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarArchivo, _format: json}

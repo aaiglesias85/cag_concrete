@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-08-2025 a las 00:18:02
+-- Tiempo de generación: 22-08-2025 a las 19:19:12
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -169,6 +169,19 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (6, '2025-03-01', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:25:07', NULL, 1, NULL, NULL),
 (7, '2025-03-02', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-01 13:43:40', NULL, 1, NULL, NULL),
 (11, '2025-02-28', '', '', NULL, NULL, '', NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-03-02 14:15:40', NULL, 1, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `data_tracking_attachment`
+--
+
+CREATE TABLE `data_tracking_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `data_tracking_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1244,6 +1257,19 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `project_attachment`
+--
+
+CREATE TABLE `project_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `project_contact`
 --
 
@@ -1785,6 +1811,13 @@ ALTER TABLE `data_tracking`
   ADD KEY `overhead_price_id` (`overhead_price_id`);
 
 --
+-- Indices de la tabla `data_tracking_attachment`
+--
+ALTER TABLE `data_tracking_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refdata_tracking_attachment1` (`data_tracking_id`);
+
+--
 -- Indices de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
@@ -1991,6 +2024,13 @@ ALTER TABLE `project`
   ADD KEY `county_id` (`county_id`);
 
 --
+-- Indices de la tabla `project_attachment`
+--
+ALTER TABLE `project_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refproject_attachment1` (`project_id`);
+
+--
 -- Indices de la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
@@ -2193,6 +2233,12 @@ ALTER TABLE `data_tracking`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
+-- AUTO_INCREMENT de la tabla `data_tracking_attachment`
+--
+ALTER TABLE `data_tracking_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
@@ -2353,6 +2399,12 @@ ALTER TABLE `plan_status`
 --
 ALTER TABLE `project`
   MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `project_attachment`
+--
+ALTER TABLE `project_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `project_contact`
@@ -2517,6 +2569,12 @@ ALTER TABLE `data_tracking`
   ADD CONSTRAINT `Refproject25` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
+-- Filtros para la tabla `data_tracking_attachment`
+--
+ALTER TABLE `data_tracking_attachment`
+  ADD CONSTRAINT `Refdata_tracking_attachment1` FOREIGN KEY (`data_tracking_id`) REFERENCES `data_tracking` (`id`);
+
+--
 -- Filtros para la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
@@ -2649,6 +2707,12 @@ ALTER TABLE `project`
   ADD CONSTRAINT `Refcontractor67` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),
   ADD CONSTRAINT `Refprojectcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
+
+--
+-- Filtros para la tabla `project_attachment`
+--
+ALTER TABLE `project_attachment`
+  ADD CONSTRAINT `Refproject_attachment1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
 -- Filtros para la tabla `project_contact`
