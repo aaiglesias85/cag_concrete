@@ -364,16 +364,30 @@ class EstimateService extends Base
             ->ListarCompanysDeEstimate($estimate_id);
         foreach ($estimate_companys as $key => $estimate_company) {
 
+
+            $contact_id = "";
+            $contact = "";
+            $email = "";
+            $phone = "";
+            if($estimate_company->getContact()){
+                $contact_id = $estimate_company->getContact()->getContactId();
+                $contact = $estimate_company->getContact()->getName();
+                $email = $estimate_company->getContact()->getEmail();
+                $phone = $estimate_company->getContact()->getPhone();
+            }
+
+            // contacts
             $contacts = $this->ListarContactsDeCompany($estimate_company->getCompany()->getCompanyId());
+
 
             $companys[] = [
                 'id' => $estimate_company->getId(),
                 'company_id' => $estimate_company->getCompany()->getCompanyId(),
                 'company' => $estimate_company->getCompany()->getName(),
-                'contact_id' => $estimate_company->getContact()->getContactId(),
-                'contact' => $estimate_company->getContact()->getName(),
-                'email' => $estimate_company->getContact()->getEmail(),
-                'phone' => $estimate_company->getContact()->getPhone(),
+                'contact_id' => $contact_id,
+                'contact' => $contact,
+                'email' => $email,
+                'phone' => $phone,
                 'contacts' => $contacts,
                 "posicion" => $key
             ];
