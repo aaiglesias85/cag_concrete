@@ -79,7 +79,8 @@ class DataTrackingController extends AbstractController
                     'materials' => $materials,
                     'overheads' => $overheads,
                     'subcontractors' => $subcontractors,
-                    'concrete_vendors' => $concrete_vendors
+                    'concrete_vendors' => $concrete_vendors,
+                    'direccion_url' => $this->projectService->ObtenerURL()
                 ));
             }
         } else {
@@ -197,12 +198,16 @@ class DataTrackingController extends AbstractController
         $subcontracts = $request->get('subcontracts');
         $subcontracts = json_decode($subcontracts);
 
+        // archivos
+        $archivos = $request->get('archivos');
+        $archivos = json_decode($archivos);
+
         try {
 
             $resultado = $this->dataTrackingService->SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                 $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
                 $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials,
-                $conc_vendors, $color_used, $color_price, $subcontracts);
+                $conc_vendors, $color_used, $color_price, $subcontracts, $archivos);
 
             if ($resultado['success']) {
 
@@ -472,6 +477,72 @@ class DataTrackingController extends AbstractController
 
             $resultadoJson['success'] = true;
             $resultadoJson['existe'] = $existe;
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * salvarArchivo Accion que salva un archivo en la BD
+     */
+    public function salvarArchivo(Request $request)
+    {
+        $resultadoJson = array();
+
+        try {
+
+            $file = $request->files->get('file');
+
+            //Manejar el archivo
+            $dir = 'uploads/datatracking/';
+            $file_name = $this->dataTrackingService->upload($file, $dir);
+
+            if ($file_name != '') {
+                $resultadoJson['success'] = true;
+                $resultadoJson['message'] = "The operation was successful";
+
+                $resultadoJson['name'] = $file_name;
+                $resultadoJson['size'] = filesize($dir . $file_name);
+            } else {
+                $resultadoJson['success'] = false;
+                $resultadoJson['error'] = 'No se pudo subir el archivo';
+            }
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarArchivo Acción que elimina un archivo en la BD
+     *
+     */
+    public function eliminarArchivo(Request $request)
+    {
+        $archivo = $request->get('archivo');
+
+        try {
+            $resultado = $this->dataTrackingService->EliminarArchivo($archivo);
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
 
             return $this->json($resultadoJson);
 

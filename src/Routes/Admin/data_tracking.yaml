@@ -45,3 +45,12 @@ eliminarConcVendorDataTrackingAdmin:
 validarSiExisteDataTrackingAdmin:
   path: /data-tracking/validarSiExiste
   defaults: { _controller: App\Controller\Admin\DataTrackingController::validarSiExiste, _format: json }
+  
+#attachments
+salvarArchivoDataTrackingAdmin:
+  path: /data-tracking/salvarArchivo
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::salvarArchivo, _format: json }
+
+eliminarArchivoDataTrackingAdmin:
+  path: /data-tracking/eliminarArchivo
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarArchivo, _format: json}

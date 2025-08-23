@@ -4,6 +4,7 @@ namespace App\Utils\Admin;
 
 use App\Entity\ConcreteVendor;
 use App\Entity\DataTracking;
+use App\Entity\DataTrackingAttachment;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingLabor;
@@ -23,6 +24,36 @@ use App\Utils\Base;
 
 class DataTrackingService extends Base
 {
+
+    /**
+     * EliminarArchivo: Elimina un archivo en la BD
+     *
+     * @param $archivo
+     * @return array
+     */
+    public function EliminarArchivo($archivo)
+    {
+        $resultado = array();
+
+        //Eliminar archivo
+        $dir = 'uploads/datatracking/';
+        if (is_file($dir . $archivo)) {
+            unlink($dir . $archivo);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $archivo_entity = $this->getDoctrine()->getRepository(DataTrackingAttachment::class)
+            ->findOneBy(array('file' => $archivo));
+        if ($archivo_entity != null) {
+            $em->remove($archivo_entity);
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+        return $resultado;
+    }
 
 
     /**
@@ -295,6 +326,10 @@ class DataTrackingService extends Base
             $materials = $this->ListarMaterialsDeDataTracking($data_tracking_id);
             $arreglo_resultado['materials'] = $materials;
 
+            // archivos
+            $archivos = $this->ListarArchivosDeDataTracking($data_tracking_id);
+            $arreglo_resultado['archivos'] = $archivos;
+
 
             // totales
             $lost_concrete = $this->CalcularLostConcrete($entity);
@@ -343,6 +378,29 @@ class DataTrackingService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * ListarArchivosDeDataTracking
+     * @param $data_tracking_id
+     * @return array
+     */
+    public function ListarArchivosDeDataTracking($data_tracking_id)
+    {
+        $archivos = [];
+
+        $data_tracking_archivos = $this->getDoctrine()->getRepository(DataTrackingAttachment::class)
+            ->ListarAttachmentsDeDataTracking($data_tracking_id);
+        foreach ($data_tracking_archivos as $key => $data_tracking_archivo) {
+            $archivos[] = [
+                'id' => $data_tracking_archivo->getId(),
+                'name' => $data_tracking_archivo->getName(),
+                'file' => $data_tracking_archivo->getFile(),
+                'posicion' => $key
+            ];
+        }
+
+        return $archivos;
     }
 
     /**
@@ -633,7 +691,7 @@ class DataTrackingService extends Base
     public function SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
                                        $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
                                        $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials, $conc_vendors,
-                                       $color_used, $color_price, $subcontracts)
+                                       $color_used, $color_price, $subcontracts, $archivos)
     {
 
         $em = $this->getDoctrine()->getManager();
@@ -755,6 +813,8 @@ class DataTrackingService extends Base
         $this->SalvarMaterials($entity, $materials);
         // subcontracts
         $this->SalvarSubcontracts($entity, $subcontracts);
+        // save archivos
+        $this->SalvarArchivos($entity, $archivos);
 
         $em->flush();
 
@@ -766,6 +826,42 @@ class DataTrackingService extends Base
 
         return $resultado;
 
+    }
+
+    /**
+     * SalvarArchivos
+     * @param $archivos
+     * @param DataTracking $entity
+     * @return void
+     */
+    public function SalvarArchivos($entity, $archivos)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($archivos as $value) {
+
+            $archivo_entity = null;
+
+            if (is_numeric($value->id)) {
+                $archivo_entity = $this->getDoctrine()->getRepository(DataTrackingAttachment::class)
+                    ->find($value->id);
+            }
+
+            $is_new_archivo = false;
+            if ($archivo_entity == null) {
+                $archivo_entity = new DataTrackingAttachment();
+                $is_new_archivo = true;
+            }
+
+            $archivo_entity->setName($value->name);
+            $archivo_entity->setFile($value->file);
+
+            if ($is_new_archivo) {
+                $archivo_entity->setDataTracking($entity);
+
+                $em->persist($archivo_entity);
+            }
+        }
     }
 
     /**
