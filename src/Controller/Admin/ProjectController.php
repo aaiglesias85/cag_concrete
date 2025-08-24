@@ -860,7 +860,7 @@ class ProjectController extends AbstractController
 
             //Manejar el archivo
             $dir = 'uploads/project/';
-            $file_name = $this->projectService->upload($file, $dir);
+            $file_name = $this->projectService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
 
             if ($file_name != '') {
                 $resultadoJson['success'] = true;
@@ -870,12 +870,13 @@ class ProjectController extends AbstractController
                 $resultadoJson['size'] = filesize($dir . $file_name);
             } else {
                 $resultadoJson['success'] = false;
-                $resultadoJson['error'] = 'No se pudo subir el archivo';
+                $resultadoJson['error'] = 'Invalid file';
             }
 
             return $this->json($resultadoJson);
 
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 

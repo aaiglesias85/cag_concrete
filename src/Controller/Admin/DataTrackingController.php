@@ -501,7 +501,7 @@ class DataTrackingController extends AbstractController
 
             //Manejar el archivo
             $dir = 'uploads/datatracking/';
-            $file_name = $this->dataTrackingService->upload($file, $dir);
+            $file_name = $this->dataTrackingService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
 
             if ($file_name != '') {
                 $resultadoJson['success'] = true;
