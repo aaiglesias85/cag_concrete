@@ -860,7 +860,7 @@ var DataTracking = function () {
     }
 
     var changeFile = function () {
-        const allowed = ['png','jpg','jpeg','pdf','doc','docx','xls','xlsx'];
+        const allowed = ['png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'xls', 'xlsx'];
 
         const $input = $(this);
         const fileObj = this.files && this.files[0];
@@ -3905,45 +3905,6 @@ var DataTracking = function () {
 
         initTableListaArchivos();
     }
-    var initFormArchivo = function () {
-        $("#archivo-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
-    };
     var initAccionesArchivo = function () {
 
         $(document).off('click', "#btn-agregar-archivo");
@@ -3960,11 +3921,12 @@ var DataTracking = function () {
         $(document).on('click', "#btn-salvar-archivo", function (e) {
             e.preventDefault();
 
-            if ($('#archivo-form').valid() && $('#fileinput-archivo').hasClass('fileinput-exists')) {
+            var nombre = $('#archivo-name').val();
+
+            if (nombre !== '' && $('#fileinput-archivo').hasClass('fileinput-exists')) {
 
 
                 // validar
-                var nombre = $('#archivo-name').val();
                 if (ExisteArchivo(nombre)) {
                     toastr.error('The attachment has already been added', "Error");
                     return;
@@ -4015,6 +3977,9 @@ var DataTracking = function () {
                 }
 
             } else {
+                if (nombre === '') {
+                    toastr.error('Enter the name', "");
+                }
                 if (!$('#fileinput-archivo').hasClass('fileinput-exists')) {
                     toastr.error('Select the file', "");
                 }
@@ -4213,7 +4178,6 @@ var DataTracking = function () {
             initAccionesSubcontracts();
 
             // archivos
-            initFormArchivo();
             initAccionesArchivo();
 
             // editar
