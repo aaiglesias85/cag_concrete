@@ -3966,7 +3966,7 @@ var DataTracking = function () {
                 // validar
                 var nombre = $('#archivo-name').val();
                 if (ExisteArchivo(nombre)) {
-                    toastr.error('The attachment has already been added', "Error !!!");
+                    toastr.error('The attachment has already been added', "Error");
                     return;
                 }
 
@@ -3987,20 +3987,20 @@ var DataTracking = function () {
                             if (res.status == 200) {
                                 var response = res.data;
                                 if (response.success) {
-                                    toastr.success(response.message, "Exito !!!");
+                                    toastr.success(response.message, "Done");
 
                                     salvarArchivo(nombre, response.name);
 
                                 } else {
-                                    toastr.error(response.error, "Error !!!");
+                                    toastr.error(response.error, "Error");
                                 }
                             } else {
-                                toastr.error("Ha ocurrido un error interno, por favor intente de nuevo", "Error !!!");
+                                toastr.error("Ha ocurrido un error interno, por favor intente de nuevo", "Error");
                             }
                         })
                         .catch(function (err) {
                             console.log(err);
-                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error !!!");
+                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error");
                         })
                         .then(function () {
                             mApp.unblock('#modal-archivo .modal-content');
