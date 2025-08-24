@@ -4,7 +4,8 @@
 
 {% block stylesheetspecific %}
 
-    <link href="{{ asset('bundles/ican/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('bundles/ican/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet"
+          type="text/css"/>
 
     <style>
         .m-datatable.m-datatable--default > .m-datatable__table > .m-datatable__body .m-datatable__row.row-pending > .m-datatable__cell {
@@ -2084,20 +2085,22 @@
                             </label>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div id="fileinput-archivo" class="fileinput fileinput-new" data-provides="fileinput" style="width: 100%;">
+                                    <div id="fileinput-archivo" class="fileinput fileinput-new"
+                                         data-provides="fileinput" style="width: 100%;">
                                         <div class="input-group">
                                             <div class="form-control uneditable-input input-fixed"
                                                  data-trigger="fileinput">
                                                 <span class="fileinput-filename"> </span>
                                             </div>
                                             <span class="btn btn-default btn-file">
-                                            <span class="fileinput-new">
-                                                Select
-                                            </span>
-                                            <span class="fileinput-exists">
-                                                Change
-                                            </span>
-                                            <input type="file" name="file" id="fileinput">
+                                                <span class="fileinput-new">
+                                                    Select
+                                                </span>
+                                                <span class="fileinput-exists">
+                                                    Change
+                                                </span>
+                                                <input type="file" name="file" id="fileinput"
+                                                       accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx">
                                             </span>
                                             <a href="javascript:;" class="btn btn-danger fileinput-exists"
                                                data-dismiss="fileinput">
@@ -2105,6 +2108,9 @@
                                                 <span class="kt-hidden-mobile">Delete</span>
                                             </a>
                                         </div>
+                                    </div>
+                                    <div>
+                                        <small id="file-error" class="text-danger d-none mt-1"></small>
                                     </div>
                                 </div>
                             </div>

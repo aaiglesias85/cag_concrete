@@ -518,7 +518,7 @@ class DataTrackingController extends AbstractController
 
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+            $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
 
             return $this->json($resultadoJson);
         }

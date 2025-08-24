@@ -854,6 +854,46 @@ var DataTracking = function () {
 
         $('#color_used').change(calcularTotalColorPrice);
         $('#color_price').change(calcularTotalColorPrice);
+
+        // change file
+        $('#fileinput').on('change', changeFile);
+    }
+
+    var changeFile = function () {
+        const allowed = ['png','jpg','jpeg','pdf','doc','docx','xls','xlsx'];
+
+        const $input = $(this);
+        const fileObj = this.files && this.files[0];
+        const rawName = fileObj ? fileObj.name : ($input.val().split('\\').pop() || '');
+        const name = (rawName || '').trim();
+        const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+
+        const $error = $('#file-error');
+
+        if (!name) {
+            // Nada seleccionado
+            $error.addClass('d-none').text('');
+            return;
+        }
+
+        if (!allowed.includes(ext)) {
+            // Mensaje para el usuario
+            $error
+                .removeClass('d-none')
+                .text('Invalid file type. Allowed: ' + allowed.join(', ') + '.');
+
+            // Limpiar selección
+            $input.val('');
+
+            // Resetear la UI de Jasny Bootstrap Fileinput
+            $('#fileinput-archivo .fileinput-filename').text('');
+            $('#fileinput-archivo')
+                .removeClass('fileinput-exists')
+                .addClass('fileinput-new');
+        } else {
+            // OK
+            $error.addClass('d-none').text('');
+        }
     }
 
     var initSelectProject = function () {
@@ -3960,7 +4000,7 @@ var DataTracking = function () {
                         })
                         .catch(function (err) {
                             console.log(err);
-                            toastr.error(err, "Error !!!");
+                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error !!!");
                         })
                         .then(function () {
                             mApp.unblock('#modal-archivo .modal-content');
