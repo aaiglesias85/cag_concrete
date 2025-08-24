@@ -3413,7 +3413,7 @@ var Projects = function () {
                                     toastr.error(response.error, "Error");
                                 }
                             } else {
-                                toastr.error("Ha ocurrido un error interno, por favor intente de nuevo", "Error");
+                                toastr.error("Upload failed", "Error");
                             }
                         })
                         .catch(function (err) {
