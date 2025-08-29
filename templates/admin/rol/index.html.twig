@@ -2,7 +2,16 @@
 
 {% block subtitle %} - Rols{% endblock %}
 
-{% block stylesheetspecific %}{% endblock %}
+{% block stylesheetspecific %}
+<style>
+    #table-permisos td .form-check {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
@@ -48,14 +57,15 @@
         <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-fluid">
 
+            <!-- lista -->
             <div id="lista-perfil" class="card card-sticky">
                 <div class="card-header border-0 pt-6"
                      data-kt-sticky="true"
                      data-kt-sticky-name="lista-perfil"
-                     data-kt-sticky-offset="{default: '50px', xl: '80px'}"
-                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '80%'}"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
                      data-kt-sticky-left="auto"
-                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '70px', xl: '70px'}"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
                      data-kt-sticky-animation="false"
                      data-kt-sticky-zindex="95">
                     <div class="card-title">
@@ -89,7 +99,7 @@
                             <button
                                     type="button"
                                     id="btn-eliminar-perfil"
-                                    class="btn btn-danger me-2"
+                                    class="btn btn-danger me-2 hide"
                             >
                                 <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span
                                             class="path3"></span><span class="path4"></span></i>
@@ -168,7 +178,6 @@
                             </th>
                             {% endif %}
                             <th>Nombre</th>
-                            <th>Descripción</th>
                             <th class="text-end min-w-100px">Acciones</th>
                         </tr>
                         </thead>
@@ -179,235 +188,140 @@
                 </div>
             </div>
 
+            <!-- form -->
+            <div id="form-perfil" class="card card-sticky hide">
+                <div class="card-header"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="form-perfil"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '60px', xl: '60px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+                        <h3 class="card-label">New profile:</h3>
+                    </div>
+                    <div class="card-toolbar">
+                        <a href="javascript:;" class="btn btn-secondary cerrar-form-perfil me-2">
+
+                            <i class="ki-duotone ki-arrow-left fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+
+                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
+                        </a>
+
+                        {% if permiso.agregar or permiso.editar %}
+                            <button
+                                    type="button"
+                                    id="btn-salvar-perfil"
+                                    class="btn btn-success"
+                            >
+                                <i class="ki-duotone ki-double-check fs-1 me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <form
+                        class="form"
+                        id="perfil-form"
+                        action="javascript:;"
+                        enctype="multipart/form-data"
+                        method="post"
+                >
+                    <input type="hidden" id="perfil_id" name="perfil_id"/>
+
+                    <div class="card-body">
+
+                        <div class="form-group ic-form-group">
+                            <label class="form-label required">
+                                <span class="ic-step-number">1</span>
+                                Nombre
+                            </label>
+                            <input
+                                    type="text"
+                                    class="form-control form-control-validate form-control-solid"
+                                    id="descripcion" name="descripcion"
+                            />
+                        </div>
+
+                        <div class="form-group ic-form-group">
+                            <label class="form-label required">
+                                <span class="ic-step-number">2</span>
+                                Profile permissions
+                            </label>
+
+                            <div class="table-responsive">
+                                <table id="table-permisos" class="table table-striped">
+                                    <thead>
+                                    <tr class="fw-bold fs-6 text-gray-800">
+                                        <th>Description</th>
+                                        <th class="text-center w-100px">View</th>
+                                        <th class="text-center w-100px">Add</th>
+                                        <th class="text-center w-100px">Edit</th>
+                                        <th class="text-center w-100px">Delete</th>
+                                        <th class="text-center w-100px">All</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in funciones %}
+                                        <tr class="tr-permiso" data-id="{{ item.funcionId }}">
+                                            <td>{{ item.descripcion }}</td>
+                                            <td class="text-center w-100px">
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid ">
+                                                    <input class="form-check-input checkbox-permiso checkbox-permiso-ver" type="checkbox" data-id="{{ item.funcionId }}" />
+                                                </div>
+                                            </td>
+                                            <td class="text-center w-100px">
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid ">
+                                                    <input class="form-check-input checkbox-permiso checkbox-permiso-agregar" type="checkbox" data-id="{{ item.funcionId }}" />
+                                                </div>
+                                            </td>
+                                            <td class="text-center w-100px">
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid ">
+                                                    <input class="form-check-input checkbox-permiso checkbox-permiso-editar" type="checkbox" data-id="{{ item.funcionId }}" />
+                                                </div>
+                                            </td>
+                                            <td class="text-center w-100px">
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid ">
+                                                    <input class="form-check-input checkbox-permiso checkbox-permiso-eliminar" type="checkbox" data-id="{{ item.funcionId }}" />
+                                                </div>
+                                            </td>
+                                            <td class="text-center w-100px">
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid ">
+                                                    <input class="form-check-input checkbox-permiso checkbox-permiso-todos" type="checkbox" data-id="{{ item.funcionId }}" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+
         </div>
         <!--end::Content container-->
     </div>
     <!--end::Content-->
 
-    {#
-    <!-- BEGIN: Subheader -->
-    <div class="m-subheader ">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <h3 class="m-subheader__title m-subheader__title--separator">Rols</h3>
-                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-                    <li class="m-nav__item m-nav__item--home">
-                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
-                            <i class="m-nav__link-icon la la-home"></i>
-                        </a>
-                    </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Rols</span>
-                        </a>
-                    </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Manage rols</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <!-- END: Subheader -->
-
-    <div class="m-content">
-        <div id="lista-perfil" class="m-portlet m-portlet--mobile" m-portlet="true">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text">
-                            Rols
-                        </h3>
-                    </div>
-                </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        {% if permiso.agregar %}
-                            <li class="m-portlet__nav-item">
-                                <a id="btn-nuevo-perfil"
-                                   class="btn btn-success btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-plus"></i>
-                                        <span class="m--hidden-mobile">New</span>
-                                    </span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if permiso.eliminar %}
-                            <li class="m-portlet__nav-item">
-                                <a id="btn-eliminar-perfil"
-                                   class="btn btn-danger btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-trash-o"></i>
-                                        <span class="m--hidden-mobile">Delete</span>
-                                    </span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;" m-portlet-tool="fullscreen"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon">
-                                <i class="la la-expand"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="m-portlet__body">
-                <!--begin: Search Form -->
-                <div class="form-group m-form__group row align-items-center mb-2">
-                    <div class="col-md-4">
-                        <div class="m-input-icon m-input-icon--left">
-                            <input type="text" class="form-control m-input m_form_search"
-                                   placeholder="Search...">
-                            <span class="m-input-icon__icon m-input-icon__icon--left">
-									<span><i class="la la-search"></i></span>
-								</span>
-                        </div>
-                    </div>
-                </div>
-                <!--end: Search Form -->
-                <!--begin: Datatable -->
-                <div class="m_datatable" id="perfil-table-editable"></div>
-                <!--end: Datatable -->
-            </div>
-        </div>
-
-        <div id="form-perfil" class="m-portlet m--hide">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text" id="form-perfil-title">
-                            Do you want to create a new profile? Follow the next steps:
-                        </h3>
-                    </div>
-                </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-perfil"><i
-                                        class="la la-close"></i></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <form class="m-form" id="perfil-form" action="#"
-                  enctype="multipart/form-data" method="post">
-
-                <input type="hidden" id="perfil_id" name="perfil_id"/>
-
-                <div class="m-portlet__body">
-                    <div class="m-form__section m-form__section--first">
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
-                                <span class="ic-step-number">1</span>
-                                Name
-                                <span class="ic-small italic">(required)</span>
-                            </label>
-
-                            <input type="text" class="form-control form-control-text"
-                                   id="descripcion" name="descripcion"/>
-                        </div>
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
-                                <span class="ic-step-number">2</span>
-                                Profile permissions
-                                <span class="ic-small italic">(required)</span>
-                            </label>
-                            <p class="m-form__help">Select the options to which the profile will have access</p>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <table class="table table-sm table-striped m-table m-table--head-bg-brand"
-                                           id="table-permisos">
-                                        <thead>
-                                        <tr>
-                                            <th>Description</th>
-                                            <th class="text-center" width="50">View</th>
-                                            <th class="text-center" width="50">Add</th>
-                                            <th class="text-center" width="50">Edit</th>
-                                            <th class="text-center" width="50">Delete</th>
-                                            <th class="text-center" width="50">All</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {% for item in funciones %}
-                                            <tr class="tr-permiso" data-id="{{ item.funcionId }}">
-                                                <td>{{ item.descripcion }}</td>
-                                                <td class="text-center">
-                                                    <label class="m-checkbox">
-                                                        <input type="checkbox"
-                                                               class="checkbox-permiso checkbox-permiso-ver"
-                                                               data-id="{{ item.funcionId }}">
-                                                        <span></span>
-                                                    </label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <label class="m-checkbox">
-                                                        <input type="checkbox"
-                                                               class="checkbox-permiso checkbox-permiso-agregar"
-                                                               data-id="{{ item.funcionId }}">
-                                                        <span></span>
-                                                    </label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <label class="m-checkbox">
-                                                        <input type="checkbox"
-                                                               class="checkbox-permiso checkbox-permiso-editar"
-                                                               data-id="{{ item.funcionId }}">
-                                                        <span></span>
-                                                    </label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <label class="m-checkbox">
-                                                        <input type="checkbox"
-                                                               class="checkbox-permiso checkbox-permiso-eliminar"
-                                                               data-id="{{ item.funcionId }}">
-                                                        <span></span>
-                                                    </label>
-                                                </td>
-                                                <td class="text-center">
-                                                    <label class="m-checkbox">
-                                                        <input type="checkbox"
-                                                               class="checkbox-permiso checkbox-permiso-todos"
-                                                               data-id="{{ item.funcionId }}">
-                                                        <span></span>
-                                                    </label>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="m-form__actions">
-                        {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-salvar-perfil" class="btn btn-success" type="button">
-                                Save
-                            </button>
-                        {% endif %}
-                        <button class="btn btn-danger cerrar-form-perfil" type="button">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-    </div>
-    #}
-
 {% endblock %}
 
 {% block javascriptsspecific %}
+
+    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+
     <script src="{{ asset('bundles/metronic8/js/pages/perfiles.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 

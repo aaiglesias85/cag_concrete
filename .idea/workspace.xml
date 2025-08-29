@@ -5,10 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/Http/DataTablesHelper.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/assets/css/style.bundle.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/assets/css/style.bundle.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/my-components.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/my-components.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-reminder.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-reminder.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/perfiles.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/perfiles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/modal-util.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/modal-util.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/PerfilController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/PerfilController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/RolRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/RolRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/perfil.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/perfil.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/PerfilService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/PerfilService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/block/modal-reminder.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/block/modal-reminder.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/block/modals.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/block/modals.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/layout.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/layout.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/layout/menu.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/layout/menu.html.twig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin/rol/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/rol/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -207,6 +219,9 @@
   "associatedIndex": 3
 }]]></component>
   <component name="ProjectId" id="31wn4ArUGZiRruIeJo3Ds13fgCK" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -251,7 +266,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1756443808180</updated>
-      <workItem from="1756443809293" duration="1673000" />
+      <workItem from="1756443809293" duration="12626000" />
     </task>
     <servers />
   </component>

@@ -12,14 +12,33 @@ var ModalUtil = (function () {
         }
     }
 
-    function _resolveElement(target) {
-        if (!target) throw new Error('Se requiere un id o elemento del modal');
-        if (typeof target === 'string') {
-            var el = document.getElementById(target.startsWith('#') ? target.slice(1) : target);
-            if (!el) throw new Error('No se encontró el elemento modal con id: ' + target);
-            return el;
+    function _isJQuery(obj) {
+        return !!(obj && obj.jquery && obj[0]);
+    }
+
+    // Cuando silent=true, retorna null si no lo encuentra (no lanza)
+    function _resolveElement(target, opts) {
+        var silent = opts && opts.silent;
+        if (!target) {
+            if (silent) return null;
+            throw new Error('Se requiere un id, selector o elemento del modal');
         }
-        return target; // asume HTMLElement
+
+        var el = null;
+
+        if (_isJQuery(target)) {
+            el = target[0];
+        } else if (target instanceof Element) {
+            el = target;
+        } else if (typeof target === 'string') {
+            // Acepta cualquier selector CSS (incluye '#id')
+            el = document.querySelector(target) || document.getElementById(target);
+        }
+
+        if (!el && !silent) {
+            throw new Error('No se encontró el elemento modal: ' + target);
+        }
+        return el || null;
     }
 
     function _getOrCreateInstance(el, options) {
@@ -29,7 +48,7 @@ var ModalUtil = (function () {
             inst = new bootstrap.Modal(el, options || {});
             _instances.set(el, inst);
         } else if (options && Object.keys(options).length > 0) {
-            // Re-crear si hay cambio de opciones "críticas" (backdrop/keyboard)
+            // Re-crear si hay cambio de opciones críticas (backdrop/keyboard)
             var needsRecreate = (typeof options.backdrop !== 'undefined') || (typeof options.keyboard !== 'undefined');
             if (needsRecreate) {
                 try { inst.dispose(); } catch (e) {}
@@ -40,15 +59,65 @@ var ModalUtil = (function () {
         return inst;
     }
 
+    // Intenta mostrar cuando el DOM esté listo
+    function _showOnDomReady(target, options) {
+        document.addEventListener('DOMContentLoaded', function onReady() {
+            document.removeEventListener('DOMContentLoaded', onReady);
+            show(target, options);
+        });
+    }
+
+    // Polling opcional para esperar a que el elemento aparezca (si se inyecta luego)
+    function _waitForElementAndShow(target, options, waitForMs) {
+        var start = performance.now();
+        var timer = setInterval(function () {
+            var el = _resolveElement(target, { silent: true });
+            if (el) {
+                clearInterval(timer);
+                var bsOpts = _sanitizeBsOptions(options);
+                var inst = _getOrCreateInstance(el, bsOpts);
+                inst.show();
+            } else if (performance.now() - start >= waitForMs) {
+                clearInterval(timer);
+                console.warn('ModalUtil.show: elemento no apareció dentro de waitFor=', waitForMs, ' -> ', target);
+            }
+        }, 50);
+    }
+
+    // Remueve claves no válidas para bootstrap.Modal de las options
+    function _sanitizeBsOptions(options) {
+        if (!options) return {};
+        var clone = Object.assign({}, options);
+        delete clone.waitFor; // uso interno
+        return clone;
+    }
+
     // ---------- API pública ----------
     function init(target, options) {
         var el = _resolveElement(target);
-        return _getOrCreateInstance(el, options);
+        return _getOrCreateInstance(el, _sanitizeBsOptions(options));
     }
 
     function show(target, options) {
-        var el = _resolveElement(target);
-        var inst = _getOrCreateInstance(el, options);
+        // Permite llamar show() sin init()
+        var el = _resolveElement(target, { silent: true });
+        var waitFor = options && typeof options.waitFor === 'number' ? options.waitFor : 0;
+
+        if (!el) {
+            // Si el DOM aún no está listo, difiere hasta DOMContentLoaded
+            if (document.readyState === 'loading') {
+                _showOnDomReady(target, options);
+                return null;
+            }
+            // Si pidieron esperar, poll hasta que aparezca
+            if (waitFor > 0) {
+                _waitForElementAndShow(target, options, waitFor);
+                return null;
+            }
+            throw new Error('ModalUtil.show: no se encontró el elemento modal: ' + target);
+        }
+
+        var inst = _getOrCreateInstance(el, _sanitizeBsOptions(options));
         inst.show();
         return inst;
     }
@@ -62,8 +131,7 @@ var ModalUtil = (function () {
 
     function toggle(target, options) {
         var el = _resolveElement(target);
-        var inst = _getOrCreateInstance(el, options);
-        // Si está visible, oculta; si no, muestra
+        var inst = _getOrCreateInstance(el, _sanitizeBsOptions(options));
         if (el.classList.contains('show')) inst.hide();
         else inst.show();
         return inst;
@@ -84,13 +152,13 @@ var ModalUtil = (function () {
     }
 
     function hideAll() {
-        _instances.forEach(function (inst, el) {
+        _instances.forEach(function (inst) {
             try { inst.hide(); } catch (e) {}
         });
     }
 
     // ---------- Eventos ----------
-    // eventName: 'show.bs.modal' | 'shown.bs.modal' | 'hide.bs.modal' | 'hidden.bs.modal' | 'hidePrevented.bs.modal'
+    // 'show.bs.modal' | 'shown.bs.modal' | 'hide.bs.modal' | 'hidden.bs.modal' | 'hidePrevented.bs.modal'
     function on(target, eventName, handler, opts) {
         var el = _resolveElement(target);
         el.addEventListener(eventName, handler, opts || false);
@@ -147,7 +215,6 @@ var ModalUtil = (function () {
     // bloquea el fondo (no cierra con click fuera) y desactiva teclado si true
     function setStaticBackdrop(target, isStatic) {
         var el = _resolveElement(target);
-        // Re-crear instancia con nuevas opciones
         _getOrCreateInstance(el, {
             backdrop: isStatic ? 'static' : true,
             keyboard: !isStatic

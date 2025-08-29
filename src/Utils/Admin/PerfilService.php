@@ -346,75 +346,36 @@ class PerfilService extends Base
     }
 
     /**
-     * ListarPerfiles: Listar los perfiles
+     * ListarPerfiles con total y acciones
      *
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * @param int    $start      Inicio (offset)
+     * @param int    $limit      Límite de registros
+     * @param string $sSearch    Filtro de búsqueda
+     * @param string $iSortCol_0 Columna de orden
+     * @param string $sSortDir_0 Dirección de orden (ASC/DESC)
      *
      * @author Marcel
      */
-    public function ListarPerfiles($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
-    {
-        $arreglo_resultado = array();
-        $cont = 0;
+    public function ListarPerfiles(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array {
 
-        $lista = $this->getDoctrine()->getRepository(Rol::class)
-            ->ListarRoles($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        foreach ($lista as $value) {
-            $perfil_id = $value->getRolId();
+        $resultado = $this->getDoctrine()->getRepository(Rol::class)
+            ->ListarRolesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-            $acciones = $this->ListarAcciones($perfil_id);
+        $data = [];
 
-            $arreglo_resultado[$cont] = array(
-                "id" => $perfil_id,
-                "nombre" => $value->getNombre(),
-                "acciones" => $acciones
-            );
+        foreach ($resultado['data'] as $rol) {
+            $perfil_id = $rol->getRolId();
 
-            $cont++;
+            $data[] = [
+                "id"       => $perfil_id,
+                "nombre"   => $rol->getNombre(),
+            ];
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalPerfiles: Total de perfiles
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalPerfiles($sSearch)
-    {
-        $total = $this->getDoctrine()->getRepository(Rol::class)
-            ->TotalRoles($sSearch);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 2);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            }else{
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data'  => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }

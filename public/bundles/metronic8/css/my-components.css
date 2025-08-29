@@ -47,6 +47,36 @@ input.has-error, .required.has-error, span.has-error {
     border: 1px solid #cb5a5e !important;
 }
 
+.is-invalid .form-control {
+    border-color: #fd397a;
+    box-shadow: none;
+}
+
+.is-invalid .note-editor {
+    border-color: #fd397a;
+    box-shadow: none;
+}
+
+.note-editor.has-error {
+    border-color: #cb5a5e !important;
+}
+
+textarea.form-control.is-invalid {
+    border-color: #fd397a;
+}
+
+input.is-invalid, .required.is-invalid, span.is-invalid {
+    border: 1px solid #fd397a !important;
+}
+
+.is-invalid > .dropzone {
+    border-color: #fd397a !important;
+}
+
+.form-group {
+    margin-bottom: 1.5rem !important;
+}
+
 .italic {
     font-style: italic
 }
@@ -438,4 +468,8 @@ div.tagsinput.has-error {
 
 .box-filters label {
     font-weight: 500;
+}
+
+.hide{
+    display: none !important;
 }

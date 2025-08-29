@@ -3,14 +3,8 @@ var DatatableUtil = function () {
   // datatable config
   var getDataTableDatasource = function (url) {
 
-    // usuario actual
-    var currentUser = MyApp.getUser();
-
     return {
       url: url,
-      headers: {
-        "Authorization": "Bearer " + currentUser.token
-      },
       method: "post",
       dataType: "json",
       error: errorDataTable
@@ -21,7 +15,7 @@ var DatatableUtil = function () {
     // Manejo del error
     console.error('Error en la solicitud AJAX:', textStatus, errorThrown);
     // Puedes mostrar un mensaje al usuario
-    toastr.error("Ha ocurrido un error interno, por favor intente de nuevo", "Error !!!");
+    toastr.error("An internal error has occurred, please try again.", "Error !!!");
   }
 
   // datatable lenguaje
@@ -29,20 +23,20 @@ var DatatableUtil = function () {
     return {
       select: {
         rows: {
-          _: '%d registros seleccionados',
-          1: '1 registro seleccionado'
+          _: '%d selected records',
+          1: '1 selected record'
         }
       },
-      processing: "Procesando..",
-      search: "Buscar:",
-      lengthMenu: "Seleccione _MENU_",
-      info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-      infoEmpty: "Mostrando elemento 0 a 0 de 0 elemento",
-      infoFiltered: "filtrado por _MAX_ elementos en total)",
+      processing: "Processing..",
+      search: "Search:",
+      lengthMenu: "Select _MENU_",
+      info: "Showing _START_ a _END_ of _TOTAL_ records",
+      infoEmpty: "Showing element 0 to 0 of 0 element",
+      infoFiltered: "filtered by _MAX_ total elements",
       infoPostFix: "",
-      loadingRecords: "Por favor espere...",
-      zeroRecords: "No hay elementos para mostrar",
-      emptyTable: "No hay datos disponibles en la tabla",
+      loadingRecords: "Please wait...",
+      zeroRecords: "There are no items to display",
+      emptyTable: "No data available in the table",
       /*paginate: {
         first:      "Primero",
         previous:   "Anterior",
@@ -50,8 +44,8 @@ var DatatableUtil = function () {
         last:       "Último"
       },*/
       aria: {
-        sortAscending: ": Ordenar ascendente",
-        sortDescending: ": Ordenar descendente"
+        sortAscending: ": Sort ascending",
+        sortDescending: ": Sort descending"
       }
     };
   }
@@ -99,7 +93,7 @@ var DatatableUtil = function () {
 
   // render acciones
   var getRenderAcciones = function (data, type, row, permiso, acciones, witdh = 50) {
-    var html = `<div class="div-acciones" style="width: ${acciones.length * witdh}px;">`;
+    var html =`<div class="div-acciones" style="width: ${acciones.length * witdh}px;">`;
 
     // editar
     if (acciones.includes('edit')) {
@@ -121,11 +115,6 @@ var DatatableUtil = function () {
       html += _getRenderAccionEstado(row);
     }
 
-    // implementar
-    if (acciones.includes('implementar')) {
-      html += _getRenderAccionImplementar(row);
-    }
-
     html += '</div>';
 
     return html;
@@ -137,13 +126,13 @@ var DatatableUtil = function () {
 
     // editar
     if (acciones.includes('edit')) {
-      var title = permiso.editar ? 'Editar' : 'Detalles';
+      var title = permiso.editar ? 'Edit' : 'View';
       menu_actions += _getRenderMenuItem(row, title, 'edit');
     }
 
     // eliminar
     if (acciones.includes('delete') && permiso.eliminar) {
-      menu_actions += _getRenderMenuItem(row, 'Eliminar', 'delete');
+      menu_actions += _getRenderMenuItem(row, 'Delete', 'delete');
     }
 
     // crear implementacion
@@ -179,16 +168,16 @@ var DatatableUtil = function () {
 
   var _getRenderAccionEditar = function (row, permiso) {
     var edit_icon = permiso.editar ? 'notepad-edit' : 'eye';
-    var title = permiso.editar ? 'Editar' : 'Detalles';
+    var title = permiso.editar ? 'Edit' : 'View';
 
-    return `<a href="javascript:" data-id="${row.id}" title="${title} registro" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success ">
+    return `<a href="javascript:" data-id="${row.id}" title="${title} registro" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
               <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`
   }
 
   var _getRenderAccionDetalle = function (row) {
     var edit_icon = 'eye';
-    var title = 'Detalles';
+    var title = 'View';
 
     return `<a href="javascript:" data-id="${row.id}" title="${title} registro" class="detalle btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success ">
               <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
@@ -196,22 +185,16 @@ var DatatableUtil = function () {
   }
 
   var _getRenderAccionEliminar = function (row) {
-    return `<a href="javascript:" data-id="${row.id}" title="Eliminar registro" class="delete btn btn-sm btn-icon btn-outline btn-outline-danger btn-active-light-danger ">
+    return `<a href="javascript:" data-id="${row.id}" title="Eliminar registro" class="delete btn btn-sm btn-icon btn-outline btn-outline-danger btn-active-light-danger">
               <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-            </a>`
-  }
-
-  var _getRenderAccionImplementar = function (row) {
-    return `<a href="javascript:" data-id="${row.id}" data-pipeline="${row.pipeline}" data-project="${row.project}" data-canal="${row.canal_id}" data-version="${row.version_new}" title="Implementar" class="implementar btn btn-sm btn-icon btn-outline btn-outline-info btn-active-light-info ">
-              <i class="ki-duotone ki-abstract-6 fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`
   }
 
   var _getRenderAccionEstado = function (row) {
 
-    const title = row.estado === 1 ? 'Deshabilitar' : 'Habilitar';
+    const title = row.estado === 1 ? 'Disable' : 'Enable';
 
-    return `<a href="javascript:" data-id="${row.id}" data-estado="${row.estado}" title="${title} registro" class="estado btn btn-sm btn-icon btn-outline btn-outline-info btn-active-light-info ">
+    return `<a href="javascript:" data-id="${row.id}" data-estado="${row.estado}" title="${title} registro" class="estado btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
               <i class="ki-duotone ki-lock-3 fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
              </a>`
   }
@@ -224,8 +207,8 @@ var DatatableUtil = function () {
   // render column estado
   var getRenderColumnEstado = function (data) {
     var status = {
-      1: {title: "Activo", class: "badge-success"},
-      0: {title: "Inactivo", class: "badge-danger"}
+      1: {title: "Active", class: "badge-success"},
+      0: {title: "Inactive", class: "badge-danger"}
     };
     var value = data ? 1 : 0;
     var html =
@@ -241,8 +224,8 @@ var DatatableUtil = function () {
   // render column si/no
   var getRenderColumnSiNo = function (data) {
     var status = {
-      1: {title: "Si", class: "badge-success"},
-      0: {title: "No", class: "badge-danger"}
+      1: {title: "Yes", class: "badge-success"},
+      0: {title: "Not", class: "badge-danger"}
     };
     var value = data ? 1 : 0;
     var html =
@@ -262,7 +245,7 @@ var DatatableUtil = function () {
     // editar
     if (acciones.includes('edit')) {
       html += `
-      <a href="javascript:" data-posicion="${row.posicion}" title="Editar registro" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success ">
+      <a href="javascript:" data-posicion="${row.posicion}" title="Editar registro" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
               <i class="ki-duotone ki-notepad-edit fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>
       `;
@@ -271,7 +254,7 @@ var DatatableUtil = function () {
     // detalles
     if (acciones.includes('detalle')) {
       html += `
-      <a href="javascript:" data-posicion="${row.posicion}" title="Detalles registro" class="detalle btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success ">
+      <a href="javascript:" data-posicion="${row.posicion}" title="Detalles registro" class="detalle btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
               <i class="ki-duotone ki-eye fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>
       `;
@@ -279,14 +262,14 @@ var DatatableUtil = function () {
 
     // download
     if (acciones.includes('download')) {
-      html += `<a href="javascript:" data-posicion="${row.posicion}" target="_blank" title="Descargar" class="download btn btn-sm btn-icon btn-outline btn-outline-info btn-active-light-info ">
+      html += `<a href="javascript:" data-posicion="${row.posicion}" target="_blank" title="Descargar" class="download btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
               <i class="ki-duotone ki-cloud-download fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
     }
 
     // eliminar
     if (acciones.includes('delete')) {
-      html += `<a href="javascript:" data-posicion="${row.posicion}" title="Eliminar registro" class="delete btn btn-sm btn-icon btn-outline btn-outline-danger btn-active-light-danger ">
+      html += `<a href="javascript:" data-posicion="${row.posicion}" title="Eliminar registro" class="delete btn btn-sm btn-icon btn-outline btn-outline-danger btn-active-light-danger">
               <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
     }
@@ -294,7 +277,7 @@ var DatatableUtil = function () {
     // clonar
     if (acciones.includes('clonar')) {
       html += `
-      <a href="javascript:" data-posicion="${row.posicion}" title="Clonar registro" class="clonar btn btn-sm btn-icon btn-outline btn-outline-info btn-active-light-info ">
+      <a href="javascript:" data-posicion="${row.posicion}" title="Clonar registro" class="clonar btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
               <i class="ki-duotone ki-copy fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>
       `;
