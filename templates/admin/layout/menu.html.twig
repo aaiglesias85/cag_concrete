@@ -1,458 +1,681 @@
-<button class="m-aside-left-close  m-aside-left-close--skin-light " id="m_aside_left_close_btn"><i
-            class="la la-close"></i></button>
-<div id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-light ">
-
-    <!-- BEGIN: Brand -->
-    <div class="m-brand  m-brand--skin-light ">
-        <a href="{{ url('home') }}" class="m-brand__logo">
-            <img alt="" src="{{ asset('bundles/ican/img/logo.jpg') }}"/>
+<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar"
+     data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px"
+     data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+    <!--begin::Logo-->
+    <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+        <!--begin::Logo image-->
+        <a href="{{ url('home') }}">
+            <img alt="Logo" src="{{ asset('bundles/metronic8/assets/media/logos/default-dark.svg') }}"
+                 class="h-25px app-sidebar-logo-default"/>
+            <img alt="Logo" src="{{ asset('bundles/metronic8/assets/media/logos/default-small.svg') }}"
+                 class="h-20px app-sidebar-logo-minimize"/>
         </a>
+        <div id="kt_app_sidebar_toggle"
+             class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary h-30px w-30px position-absolute top-50 start-100 translate-middle rotate"
+             data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body"
+             data-kt-toggle-name="app-sidebar-minimize">
+            <i class="ki-duotone ki-black-left-line fs-3 rotate-180">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </i>
+        </div>
+        <!--end::Sidebar toggle-->
     </div>
+    <!--end::Logo-->
+    <!--begin::sidebar menu-->
+    <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+        <!--begin::Menu wrapper-->
+        <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper">
+            <!--begin::Scroll wrapper-->
+            <div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true"
+                 data-kt-scroll-activate="true" data-kt-scroll-height="auto"
+                 data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
+                 data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px"
+                 data-kt-scroll-save-state="true">
+                <!--begin::Menu-->
+                <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu"
+                     data-kt-menu="true" data-kt-menu-expand="false">
 
-    <!-- END: Brand -->
+                    <!-- menu inicio -->
+                    {% if menu.menuInicio %}
+                        <div class="menu-item">
+                            <a class="menu-link {{ activeRoute == 'home' ? 'active' }}" href="{{ url('home') }}">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-element-11 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Home</span>
+                            </a>
+                        </div>
+                    {% endif %}
 
-    <!-- BEGIN: Aside Menu -->
-    <div id="m_ver_menu" class="m-aside-menu  m-aside-menu--skin-light m-aside-menu--submenu-skin-light "
-         data-menu-vertical="true" m-menu-scrollable="true" m-menu-dropdown-timeout="500">
-        <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
+                    <!-- menu projects -->
+                    {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor or
+                        menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
+                        menu.menuEstimate or menu.menuCounty %}
 
-            <!-- menu inicio -->
-            {% if menu.menuInicio %}
-                <li class="m-menu__item  m-menu__item--submenu mb-3" aria-haspopup="true">
-                    <a href="{{ url('home') }}" class="m-menu__link menu-tooltip" data-title="Home">
-                        <i class="m-menu__link-icon flaticon-line-graph"></i>
-                        <span class="m-menu__link-text">Home</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                </li>
-            {% endif %}
+                        <!--begin:Menu item-->
+                        <div class="menu-item pt-5">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-7">Projects and Estimates</span>
+                            </div>
+                        </div>
+                        <!--end:Menu item-->
 
-            <!-- menu projects -->
-            {% if menu.menuCompany or menu.menuProject or menu.menuSubcontractor or menu.menuConcreteVendor or
-                menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
-                menu.menuEstimate or menu.menuCounty %}
-
-                <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true" m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Projects">
-                        <i class="m-menu__link-icon flaticon-suitcase"></i>
-                        <span class="m-menu__link-text">Projects</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up" style="top: 0px;">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Projects</span></span>
-                            </li>
-
-                            {% if menu.menuCompany %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('company') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Companies</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuProject %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('project') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Projects</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuSubcontractor %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('subcontractor') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Subcontractors</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuConcreteVendor %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('conc_vendor') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Concrete Vendors</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            <!-- menu estimates -->
-                            {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
-                                menu.menuEstimate or menu.menuPlanDownloading or menu.menuCounty %}
-
-                                <li class="m-menu__item  m-menu__item--parent" aria-haspopup="true">
-                                    <span class="m-menu__link"><span class="m-menu__link-text">Estimates</span></span>
-                                </li>
-
-                                {% if menu.menuEstimate %}
-                                    <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                        <a href="{{ url('estimate') }}" class="m-menu__link ">
-                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                            <span class="m-menu__link-text">Project Estimates</span>
+                        <!--begin:Menu item-->
+                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+                            {{ activeRoute == 'company' or activeRoute == 'project' or
+                        activeRoute == 'subcontractor' or activeRoute == 'conc_vendor' ? 'here show' }}
+                        ">
+                            <!--begin:Menu link-->
+                            <span class="menu-link">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-abstract-41 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Projects</span>
+                                <span class="menu-arrow"></span>
+                            </span>
+                            <!--end:Menu link-->
+                            <!--begin:Menu sub-->
+                            <div class="menu-sub menu-sub-accordion">
+                                <!--begin:Menu item-->
+                                {% if menu.menuCompany %}
+                                    <div class="menu-item">
+                                        <a class="menu-link {{ activeRoute == 'company' ? 'active' }}"
+                                           href="{{ url('company') }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                            <span class="menu-title">Companies</span>
                                         </a>
-                                    </li>
+                                    </div>
                                 {% endif %}
+                                <!--end:Menu item-->
+                                <!--begin:Menu item-->
+                                {% if menu.menuProject %}
+                                    <div class="menu-item">
+                                        <a class="menu-link {{ activeRoute == 'project' ? 'active' }}"
+                                           href="{{ url('project') }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                            <span class="menu-title">Projects</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <!--end:Menu item-->
+                                <!--begin:Menu item-->
+                                {% if menu.menuSubcontractor %}
+                                    <div class="menu-item">
+                                        <a class="menu-link {{ activeRoute == 'subcontractor' ? 'active' }}"
+                                           href="{{ url('subcontractor') }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                            <span class="menu-title">Subcontractors</span>
+                                        </a>
+                                    </div>
+                                    <!--end:Menu item-->
+                                {% endif %}
+                                <!--begin:Menu item-->
+                                {% if menu.menuConcreteVendor %}
+                                    <div class="menu-item">
+                                        <a class="menu-link {{ activeRoute == 'conc_vendor' ? 'active' }}"
+                                           href="{{ url('conc_vendor') }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                            <span class="menu-title">Concrete Vendors</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <!--end:Menu item-->
+                            </div>
+                            <!--end:Menu sub-->
+                        </div>
+                        <!--end:Menu item-->
 
-                                {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or menu.menuPlanDownloading %}
-                                    <li class="m-menu__item m-menu__item--submenu" m-menu-submenu-toggle="hover"
-                                        m-menu-link-redirect="1" aria-haspopup="true">
-                                        <a href="javascript:;" class="m-menu__link m-menu__toggle">
-                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                            <span class="m-menu__link-text">Libraries</span><i
-                                                    class="m-menu__hor-arrow la la-angle-right"></i><i
-                                                    class="m-menu__ver-arrow la la-angle-right"></i></a>
-                                        <div class="m-menu__submenu m-menu__submenu--classic m-menu__submenu--right"><span
-                                                    class="m-menu__arrow "></span>
-                                            <ul class="m-menu__subnav">
-                                                {% if menu.menuProjectStage %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('project_stage') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Project Stages</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
-                                                {% if menu.menuProjectType %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('project_type') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Project Types</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
-                                                {% if menu.menuProposalType %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('proposal_type') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Proposal Types</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
-                                                {% if menu.menuPlanStatus %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('plan_status') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Plan Status</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
-                                                {% if menu.menuDistrict %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('district') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Districts</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
-                                                {% if menu.menuCounty %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('county') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Counties</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-
-                                                {% if menu.menuPlanDownloading %}
-                                                    <li class="m-menu__item " aria-haspopup="true"
-                                                        m-menu-link-redirect="1">
-                                                        <a href="{{ url('plan_downloading') }}" class="m-menu__link ">
-                                                            <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                                            <span class="m-menu__link-text">Plans Downloading</span>
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-                                            </ul>
+                        <!-- menu estimates -->
+                        {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
+                            menu.menuEstimate or menu.menuPlanDownloading or menu.menuCounty %}
+                            <!--begin:Menu item-->
+                            <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+                            {{ activeRoute == 'estimate' or activeRoute == 'project_stage' or activeRoute == 'project_type' or
+                            activeRoute == 'proposal_type' or activeRoute == 'plan_status' or
+                            activeRoute == 'district' or activeRoute == 'county' or activeRoute == 'plan_downloading' ? 'here show' }}
+                            ">
+                                <!--begin:Menu link-->
+                                <span class="menu-link">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-abstract-25 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Estimates</span>
+                                <span class="menu-arrow"></span>
+                            </span>
+                                <!--end:Menu link-->
+                                <!--begin:Menu sub-->
+                                <div class="menu-sub menu-sub-accordion">
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuEstimate %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'estimate' ? 'active' }}"
+                                               href="{{ url('estimate') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Project Estimates</span>
+                                            </a>
                                         </div>
-                                    </li>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+
+                                    {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or menu.menuPlanDownloading %}
+
+                                        <!--begin:Menu item-->
+                                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+                                            {{ activeRoute == 'project_stage' or activeRoute == 'project_type' or
+                                        activeRoute == 'proposal_type' or activeRoute == 'plan_status' or
+                                        activeRoute == 'district' or activeRoute == 'county' or activeRoute == 'plan_downloading' ? 'here show' }}
+                                        ">
+                                            <!--begin:Menu link-->
+                                            <span class="menu-link">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Libraries</span>
+                                                <span class="menu-arrow"></span>
+                                            </span>
+                                            <!--end:Menu link-->
+                                            <!--begin:Menu sub-->
+                                            <div class="menu-sub menu-sub-accordion menu-active-bg">
+                                                {% if menu.menuProjectStage %}
+                                                    <div class="menu-item">
+                                                        <!--begin:Menu link-->
+                                                        <a class="menu-link {{ activeRoute == 'project_stage' ? 'active' }}"
+                                                           href="{{ url('project_stage') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Project Stages</span>
+                                                        </a>
+                                                        <!--end:Menu link-->
+                                                    </div>
+                                                {% endif %}
+                                                {% if menu.menuProjectType %}
+                                                    <div class="menu-item">
+                                                        <a class="menu-link {{ activeRoute == 'project_type' ? 'active' }}"
+                                                           href="{{ url('project_type') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Project Types</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                                {% if menu.menuProposalType %}
+                                                    <div class="menu-item">
+                                                        <a class="menu-link {{ activeRoute == 'proposal_type' ? 'active' }}"
+                                                           href="{{ url('proposal_type') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Proposal Types</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                                {% if menu.menuPlanStatus %}
+                                                    <div class="menu-item">
+                                                        <a class="menu-link {{ activeRoute == 'plan_status' ? 'active' }}"
+                                                           href="{{ url('plan_status') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Plan Status</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                                {% if menu.menuDistrict %}
+                                                    <div class="menu-item">
+                                                        <a class="menu-link {{ activeRoute == 'district' ? 'active' }}"
+                                                           href="{{ url('district') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Districts</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                                {% if menu.menuCounty %}
+                                                    <div class="menu-item">
+                                                        <a class="menu-link {{ activeRoute == 'county' ? 'active' }}"
+                                                           href="{{ url('county') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Counties</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                                {% if menu.menuPlanDownloading %}
+                                                    <div class="menu-item">
+                                                        <a class="menu-link {{ activeRoute == 'plan_downloading' ? 'active' }}"
+                                                           href="{{ url('plan_downloading') }}">
+                                                        <span class="menu-bullet">
+                                                            <span class="bullet bullet-dot"></span>
+                                                        </span>
+                                                            <span class="menu-title">Plans Downloading</span>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <!--end:Menu sub-->
+                                        </div>
+                                        <!--end:Menu item-->
+
+                                    {% endif %}
+
+                                </div>
+                                <!--end:Menu sub-->
+                            </div>
+                            <!--end:Menu item-->
+                        {% endif %}
+
+                    {% endif %}
+
+
+                    <!-- menu schedule -->
+                    {% if menu.menuSchedule or menu.menuDataTracking %}
+                        <div class="menu-item pt-5">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-7">Data Tracking</span>
+                            </div>
+                        </div>
+
+                        {% if menu.menuSchedule %}
+                            <div class="menu-item">
+                                <a class="menu-link {{ activeRoute == 'schedule' ? 'active' }}"
+                                   href="{{ url('schedule') }}">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-calendar-8 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                        <span class="path5"></span>
+                                        <span class="path6"></span>
+                                    </i>
+                                </span>
+                                    <span class="menu-title">Schedule</span>
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        {% if menu.menuDataTracking %}
+                            <div class="menu-item">
+                                <a class="menu-link {{ activeRoute == 'data_tracking' ? 'active' }}"
+                                   href="{{ url('data_tracking') }}">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-design-frame fs-2">
+                                     <span class="path1"></span>
+                                     <span class="path2"></span>
+                                    </i>
+                                </span>
+                                    <span class="menu-title">Data Tracking</span>
+                                </a>
+                            </div>
+                        {% endif %}
+
+                    {% endif %}
+
+                    <!-- menu invoice -->
+                    {% if menu.menuInvoice %}
+                        <div class="menu-item pt-5">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-7">Accounting</span>
+                            </div>
+                        </div>
+
+                        <div class="menu-item">
+                            <a class="menu-link {{ activeRoute == 'invoice' ? 'active' }}" href="{{ url('invoice') }}">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-bank fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Invoices and Payments</span>
+                            </a>
+                        </div>
+
+                    {% endif %}
+
+                    <!-- menu reportes -->
+                    {% if menu.menuReporteSubcontractor or menu.menuReporteEmployee %}
+
+                        <!--begin:Menu item-->
+                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+                            {{ activeRoute == 'reporte_subcontractor' or activeRoute == 'reporte_employee' ? 'here show' }}
+                        ">
+                            <!--begin:Menu link-->
+                            <span class="menu-link">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-book-open fs-2">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                         <span class="path3"></span>
+                                         <span class="path4"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Reports</span>
+                                <span class="menu-arrow"></span>
+                            </span>
+                            <!--end:Menu link-->
+                            <!--begin:Menu sub-->
+                            <div class="menu-sub menu-sub-accordion">
+                                <!--begin:Menu item-->
+                                {% if menu.menuReporteSubcontractor %}
+                                    <div class="menu-item">
+                                        <a class="menu-link {{ activeRoute == 'reporte_subcontractor' ? 'active' }}"
+                                           href="{{ url('reporte_subcontractor') }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                            <span class="menu-title">Subcontractors</span>
+                                        </a>
+                                    </div>
                                 {% endif %}
+                                <!--end:Menu item-->
+                                <!--begin:Menu item-->
+                                {% if menu.menuReporteEmployee %}
+                                    <div class="menu-item">
+                                        <a class="menu-link {{ activeRoute == 'reporte_employee' ? 'active' }}"
+                                           href="{{ url('project') }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                            <span class="menu-title">Employees</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <!--end:Menu item-->
+                            </div>
+                            <!--end:Menu sub-->
+                        </div>
+                        <!--end:Menu item-->
 
-                            {% endif %}
+                    {% endif %}
 
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
+                    <!-- menu Libraries and Settings -->
+                    {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuHoliday or
+                        menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement or menu.menuReminder or
+                        menu.menuRol or menu.menuUsuario or menu.menuLog or menu.menuNotification %}
 
-            <!-- menu schedule -->
-            {% if menu.menuSchedule %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
-                    <a href="{{ url('schedule') }}" class="m-menu__link menu-tooltip" data-title="Schedule">
-                        <i class="m-menu__link-icon flaticon-calendar"></i>
-                        <span class="m-menu__link-text">Schedule</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                </li>
-            {% endif %}
+                        <div class="menu-item pt-5">
+                            <div class="menu-content">
+                                <span class="menu-heading fw-bold text-uppercase fs-7">Settings</span>
+                            </div>
+                        </div>
 
-            <!-- menu datatracking -->
-            {% if menu.menuDataTracking %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true">
-                    <a href="{{ url('data_tracking') }}" class="m-menu__link menu-tooltip" data-title="Data Tracking">
-                        <i class="m-menu__link-icon flaticon-diagram"></i>
-                        <span class="m-menu__link-text">Data Tracking</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                </li>
-            {% endif %}
+                        <!-- menu libraries -->
+                        {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuHoliday or
+                            menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement or menu.menuReminder %}
 
-            <!-- menu invoice -->
-            {% if menu.menuInvoice %}
-                <li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"
-                    m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Accounting">
-                        <i class="m-menu__link-icon flaticon-piggy-bank"></i>
-                        <span class="m-menu__link-text">Accounting</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Accounting</span></span>
-                            </li>
+                            <!--begin:Menu item-->
+                            <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+                                {{ activeRoute == 'unit' or activeRoute == 'equation' or activeRoute == 'item' or
+                                activeRoute == 'inspectors' or activeRoute == 'employee' or activeRoute == 'material' or
+                                activeRoute == 'overheadprice' or activeRoute == 'advertisement' or activeRoute == 'reminder' or
+                                activeRoute == 'holiday' ? 'here show' }}
+                            ">
+                                <!--begin:Menu link-->
+                                <span class="menu-link">
+                                    <span class="menu-icon">
+                                        <i class="ki-duotone ki-abstract-26 fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <span class="menu-title">Libraries</span>
+                                    <span class="menu-arrow"></span>
+                                </span>
+                                <!--end:Menu link-->
+                                <!--begin:Menu sub-->
+                                <div class="menu-sub menu-sub-accordion">
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuUnit %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'unit' ? 'active' }}"
+                                               href="{{ url('unit') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Unit of Measurement</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuEquation %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'equation' ? 'active' }}"
+                                               href="{{ url('equation') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Equations</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuItem %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'item' ? 'active' }}"
+                                               href="{{ url('item') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Items</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuInspector %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'inspectors' ? 'active' }}"
+                                               href="{{ url('inspectors') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Inspectors</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuEmployee %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'employee' ? 'active' }}"
+                                               href="{{ url('employee') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Employees</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuMaterial %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'material' ? 'active' }}"
+                                               href="{{ url('material') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Materials</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuOverhead %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'overheadprice' ? 'active' }}"
+                                               href="{{ url('overheadprice') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Overhead Price</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuAdvertisement %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'advertisement' ? 'active' }}"
+                                               href="{{ url('advertisement') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Advertisements</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuReminder %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'reminder' ? 'active' }}"
+                                               href="{{ url('reminder') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Reminders</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuHoliday %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'holiday' ? 'active' }}"
+                                               href="{{ url('holiday') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Holidays</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                </div>
+                                <!--end:Menu sub-->
+                            </div>
+                            <!--end:Menu item-->
 
-                            {% if menu.menuInvoice %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('invoice') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Invoices and Payments</span>
-                                    </a>
-                                </li>
-                            {% endif %}
+                        {% endif %}
 
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
+                        <!-- menu administrar -->
+                        {% if menu.menuRol or menu.menuUsuario or menu.menuLog or menu.menuNotification %}
 
-            <!-- menu libraries -->
-            {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuHoliday or
-                menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or menu.menuAdvertisement or menu.menuReminder %}
-                <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true"
-                    m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Libraries">
-                        <i class="m-menu__link-icon flaticon-list"></i>
-                        <span class="m-menu__link-text">Libraries</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Libraries</span></span>
-                            </li>
+                            <!--begin:Menu item-->
+                            <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+                                {{ activeRoute == 'rol' or activeRoute == 'users' or activeRoute == 'notification' or activeRoute == 'log' ? 'here show' }}
+                            ">
+                                <!--begin:Menu link-->
+                                <span class="menu-link">
+                                    <span class="menu-icon">
+                                        <i class="ki-duotone ki-setting-2 fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <span class="menu-title">Settings</span>
+                                    <span class="menu-arrow"></span>
+                                </span>
+                                <!--end:Menu link-->
+                                <!--begin:Menu sub-->
+                                <div class="menu-sub menu-sub-accordion">
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuRol %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'rol' ? 'active' }}"
+                                               href="{{ url('rol') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Profiles</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuUsuario %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'users' ? 'active' }}"
+                                               href="{{ url('users') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Users</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuNotification %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'notification' ? 'active' }}"
+                                               href="{{ url('notification') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Notifications</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                    <!--begin:Menu item-->
+                                    {% if menu.menuLog %}
+                                        <div class="menu-item">
+                                            <a class="menu-link {{ activeRoute == 'log' ? 'active' }}"
+                                               href="{{ url('log') }}">
+                                                <span class="menu-bullet">
+                                                    <span class="bullet bullet-dot"></span>
+                                                </span>
+                                                <span class="menu-title">Logs</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    <!--end:Menu item-->
+                                </div>
+                                <!--end:Menu sub-->
+                            </div>
+                            <!--end:Menu item-->
 
-                            {% if menu.menuUnit %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('unit') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Unit of Measurement</span>
-                                    </a>
-                                </li>
-                            {% endif %}
+                        {% endif %}
 
-                            {% if menu.menuEquation %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('equation') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Equations</span>
-                                    </a>
-                                </li>
-                            {% endif %}
+                    {% endif %}
 
-                            {% if menu.menuItem %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('item') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Items</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuInspector %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('inspectors') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Inspectors</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuEmployee %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('employee') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Employees</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuMaterial %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('material') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Materials</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuOverhead %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('overheadprice') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Overhead Price</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuAdvertisement %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('advertisement') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Advertisements</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuReminder %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('reminder') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Reminders</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuHoliday %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('holiday') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Holidays</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
-
-            <!-- menu reportes -->
-            {% if menu.menuReporteSubcontractor or menu.menuReporteEmployee %}
-                <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true" m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Reports">
-                        <i class="m-menu__link-icon flaticon-book"></i>
-                        <span class="m-menu__link-text">Reports</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Reports</span></span>
-                            </li>
-
-                            {% if menu.menuReporteSubcontractor %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('reporte_subcontractor') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Subcontractors</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuReporteEmployee %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('reporte_employee') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Employees</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
-
-
-            <!-- menu administrar -->
-            {% if menu.menuRol or menu.menuUsuario or menu.menuLog or menu.menuNotification %}
-                <li class="m-menu__item  m-menu__item--submenu " aria-haspopup="true"
-                    m-menu-submenu-toggle="click">
-                    <a href="javascript:;" class="m-menu__link m-menu__toggle menu-tooltip" data-title="Settings">
-                        <i class="m-menu__link-icon flaticon-settings"></i>
-                        <span class="m-menu__link-text">Settings</span>
-                        <i class="m-menu__ver-arrow la la-angle-right"></i>
-                    </a>
-                    <div class="m-menu__submenu m-menu__submenu--up">
-                        <span class="m-menu__arrow"></span>
-                        <ul class="m-menu__subnav">
-                            <li class="m-menu__item  m-menu__item--parent m-menu__item--bottom-2" aria-haspopup="true">
-                                <span class="m-menu__link"><span class="m-menu__link-text">Settings</span></span>
-                            </li>
-
-                            {% if menu.menuRol %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('rol') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Profiles</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuUsuario %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('users') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Users</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuNotification %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('notification') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Notifications</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                            {% if menu.menuLog %}
-                                <li class="m-menu__item " aria-haspopup="true" m-menu-link-redirect="1">
-                                    <a href="{{ url('log') }}" class="m-menu__link ">
-                                        <i class="m-menu__link-bullet m-menu__link-bullet--line"><span></span></i>
-                                        <span class="m-menu__link-text">Logs</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                        </ul>
-                    </div>
-                </li>
-            {% endif %}
-
-
-        </ul>
+                </div>
+                <!--end::Menu-->
+            </div>
+            <!--end::Scroll wrapper-->
+        </div>
+        <!--end::Menu wrapper-->
     </div>
-
-    <!-- END: Aside Menu -->
+    <!--end::sidebar menu-->
 </div>
-<div class="m-aside-menu-overlay"></div>

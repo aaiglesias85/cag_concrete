@@ -1,73 +1,71 @@
-<div class="modal fade" id="modal-reminder" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-xl" role="document">
+
+<div class="modal fade" tabindex="-1" id="modal-reminder">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">New Reminder</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <h3 class="modal-title">New Reminder</h3>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                     aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
             </div>
+
             <div class="modal-body">
-                <form class="m-form" id="reminder-modal-form" action="#"
+                <form class="form" id="reminder-modal-form" action="#"
                       enctype="multipart/form-data" method="post">
 
-                    <div class="form-group m-form__group ic-form-group">
-                        <label>
+                    <div class="form-group ic-form-group mb-5">
+                        <label class="form-label required">
                             <span class="ic-step-number">1</span>
                             Recipients
-                            <span class="ic-small italic">(required)</span>
                         </label>
                         <div class="row">
                             <div class="col-md-12" id="select-usuario-reminder-modal">
-                                <select class="form-control m-select2 event-change" id="usuario-reminder-modal" multiple>
+                                <select class="form-control form-select select-validate form-select-solid event-change" id="usuario-reminder-modal" multiple>
                                     <option></option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group m-form__group ic-form-group">
-                        <label>
+                    <div class="form-group ic-form-group mb-5">
+                        <label class="form-label required">
                             <span class="ic-step-number">2</span>
                             Subject
-                            <span class="ic-small italic">(required)</span>
                         </label>
 
-                        <input type="text" class="form-control form-control-text event-change"
+                        <input type="text" class="form-control form-control-solid form-control-validate event-change"
                                id="subject-reminder-modal" name="subject"/>
                     </div>
 
-                    <div class="form-group m-form__group ic-form-group">
-                        <label>
+                    <div class="form-group ic-form-group mb-5">
+                        <label class="form-label required">
                             <span class="ic-step-number">3</span>
                             Content
-                            <span class="ic-small italic">(required)</span>
                         </label>
 
                         <div class="row">
                             <div class="col-md-12">
-                                <div id="body-reminder-modal" class="summernote"></div>
+                                <div id="body-reminder-modal" class="h-150px"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group m-form__group ic-form-group">
+                    <div class="form-group ic-form-group mb-5">
                         <div class="row">
                             <div class="col-md-3">
-                                <label>
+                                <label class="form-label required">
                                     <span class="ic-step-number">4</span>
                                     Date
-                                    <span class="ic-small italic">(optional)</span>
                                 </label>
-                                <div class='input-group date'>
-                                    <input type='text' class="form-control m-input date-picker event-change"
-                                           placeholder="Select a date" autocomplete="off"
-                                           id="day-reminder-modal" name="day"/>
-                                    <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="la la-calendar glyphicon-th"></i>
-                                            </span>
-                                    </div>
+
+                                <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-day-reminder-modal" data-td-target-input="nearest"
+                                     data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control filter-date" placeholder="Select a date" id="day-reminder-modal"
+                                           data-td-target="#datetimepicker-day-reminder-modal" autocomplete="off" name="day"/>
+                                    <span class="input-group-text" data-td-target="#datetimepicker-day-reminder-modal" data-td-toggle="datetimepicker">
+                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
                                 </div>
                             </div>
 
@@ -76,9 +74,10 @@
 
                 </form>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" id="btn-salvar-reminder-modal">Save</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -1,16 +1,25 @@
 var ModalReminder = function () {
 
-    // para guardar el reminder
     var reminder_new = null;
+    var getReminder = function () { return reminder_new; };
 
-    // getter y setters
-    var getReminder = function () {
-        return reminder_new;
-    }
-
+    // init widgets
     var initWidgets = function () {
         initSelectUsuario();
-    }
+
+        // Tempus Dominus
+        TempusUtil.initDate('datetimepicker-day-reminder-modal');
+        TempusUtil.setDate('datetimepicker-day-reminder-modal', new Date());
+
+        // Quill SIN variables: se gestiona por selector
+        QuillUtil.init('#body-reminder-modal');
+
+        // Modal con ModalUtil y foco al abrir
+        ModalUtil.init('modal-reminder', { backdrop: 'static', keyboard: true });
+        ModalUtil.on('modal-reminder', 'shown.bs.modal', function () {
+            QuillUtil.focus('#body-reminder-modal');
+        });
+    };
 
     var initSelectUsuario = function () {
         $("#usuario-reminder-modal").select2({
@@ -21,18 +30,12 @@ var ModalReminder = function () {
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                    return {
-                        search: params.term  // El término de búsqueda ingresado por el usuario
-                    };
+                    return { search: params.term };
                 },
                 processResults: function (data) {
-                    // Convierte los resultados de la API en el formato que Select2 espera
                     return {
                         results: $.map(data.usuarios, function (item) {
-                            return {
-                                id: item.usuario_id,  // ID del elemento
-                                text: `${item.nombre}<${item.email}>` // El nombre que se mostrará
-                            };
+                            return { id: item.usuario_id, text: `${item.nombre}<${item.email}>` };
                         })
                     };
                 },
@@ -40,168 +43,144 @@ var ModalReminder = function () {
             },
             minimumInputLength: 3
         });
-    }
-
-    var initFormReminder = function () {
-        //Validacion
-        $("#reminder-modal-form").validate({
-            rules: {
-                subject: {
-                    required: true
-                },
-                day: {
-                    required: true
-                }
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
     };
 
-    var mostrarModal = function () {
+    // validacion
+    var validateForm = function () {
+        var result = false;
+        var form = KTUtil.get('reminder-modal-form');
 
-        // reset form
+        var constraints = {
+            subject: { presence: { message: "This field is required" } },
+            day:     { presence: { message: "This field is required" } },
+        };
+
+        var errors = validate(form, constraints);
+        if (!errors) result = true;
+        else MyApp.showErrorsValidateForm(form, errors);
+
+        MyUtil.attachChangeValidacion(form, constraints);
+        return result;
+    };
+    
+    // mostrar modal
+    var mostrarModal = function () {
         resetFormReminder();
 
-        $('#modal-reminder').modal({
-            'show': true
-        });
-    }
-    var initAccionesReminder = function () {
+        ModalUtil.setStaticBackdrop('modal-reminder', true);
+        ModalUtil.show('modal-reminder');
+    };
 
+    // init acciones
+    var initAcciones = function () {
         $(document).off('click', "#btn-header-add-reminder");
-        $(document).on('click', "#btn-header-add-reminder", function (e) {
+        $(document).on('click', "#btn-header-add-reminder", function () {
             mostrarModal();
         });
 
         $(document).off('click', "#btn-salvar-reminder-modal");
-        $(document).on('click', "#btn-salvar-reminder-modal", function (e) {
+        $(document).on('click', "#btn-salvar-reminder-modal", function () {
             btnClickSalvarFormReminder();
         });
 
         function btnClickSalvarFormReminder() {
 
             var usuarios_id = $('#usuario-reminder-modal').val();
-            var body = $('#body-reminder-modal').summernote('code');
 
-            if ($('#reminder-modal-form').valid() && usuarios_id.length > 0 && body !== '') {
+            var body = QuillUtil.getHtml('#body-reminder-modal');
+            var bodyIsEmpty = !body || body.trim() === '' || body === '<p><br></p>';
+
+            if (validateForm() && usuarios_id.length > 0 && !bodyIsEmpty) {
+
+                var formData = new URLSearchParams();
+
+                formData.set("reminder_id", '');
 
                 var subject = $('#subject-reminder-modal').val();
-                var day = $('#day-reminder-modal').val();
+                formData.set("subject", subject);
 
-                MyApp.block('#modal-reminder .modal-content');
+                var day = TempusUtil.getString('datetimepicker-day-reminder-modal');
+                formData.set("day", day);
 
-                $.ajax({
-                    type: "POST",
-                    url: "reminder/salvar",
-                    dataType: "json",
-                    data: {
-                        'reminder_id': '',
-                        'subject': subject,
-                        'body': body,
-                        'day': day,
-                        'usuarios_id': usuarios_id,
-                        'status': 1
-                    },
-                    success: function (response) {
-                        mApp.unblock('#modal-reminder .modal-content');
-                        if (response.success) {
+                formData.set("body", body);
+                formData.set("usuarios_id", usuarios_id.join(','));
+                formData.set("status", 1);
 
-                            toastr.success(response.message, "");
+                BlockUtil.block('#modal-reminder .modal-content');
 
-                            reminder_new = {reminder_id: response.reminder_id, subject, body: body, day: day, usuarios_id: usuarios_id};
+                axios.post("reminder/salvar", formData, { responseType: "json" })
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+                                reminder_new = {
+                                    reminder_id: response.reminder_id,
+                                    subject,
+                                    body: body,
+                                    day: day,
+                                    usuarios_id: usuarios_id
+                                };
 
-                            // close modal
-                            $('#modal-reminder').modal('hide');
+                                // Cerrar modal
+                                ModalUtil.hide('modal-reminder');
 
-                            // actualizar lista
-                            if(typeof Reminders !== 'undefined') {
-                                Reminders.btnClickFiltrar();
+                                // actualizar lista
+                                if (typeof Reminders !== 'undefined') {
+                                    Reminders.btnClickFiltrar();
+                                }
+                            } else {
+                                toastr.error(response.error, "");
                             }
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#modal-reminder .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-reminder .modal-content");
+                    });
+            } else {
+                if (usuarios_id.length === 0) {
+                    toastr.warning("Debe seleccionar al menos un usuario.", "");
+                }
+                if (bodyIsEmpty) {
+                    toastr.warning("El cuerpo del recordatorio no puede estar vacío.", "");
+                }
             }
-        };
+        }
     };
+
+    // reset
     var resetFormReminder = function () {
-        $('#reminder-modal-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("reminder-modal-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset fecha
+        TempusUtil.clear('datetimepicker-day-reminder-modal');
+        TempusUtil.setDate('datetimepicker-day-reminder-modal', new Date());
 
-        var fecha_actual = new Date();
-        $('#day-reminder-modal').val(fecha_actual.format('m/d/Y'));
-
-        // select usuario
-        $('#usuario-reminder-modal option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
+        // limpiar select usuario
+        MyUtil.limpiarSelect('#usuario-reminder-modal');
         initSelectUsuario();
 
-        $('#body-reminder-modal').summernote('code', '');
+        // limpiar Quill por selector
+        QuillUtil.setHtml('#body-reminder-modal', '');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("reminder-modal-form"));
 
         // reset reminder
         reminder_new = null;
     };
-
+    
     return {
-        //main function to initiate the module
         init: function () {
-
             initWidgets();
-
-            // items
-            initFormReminder();
-            initAccionesReminder();
+            initAcciones();
         },
         mostrarModal: mostrarModal,
         getReminder: getReminder
-
     };
 
 }();

@@ -38,6 +38,15 @@ class UsuarioController extends AbstractController
     }
 
     /**
+     * forgotpass Acción para mostrar el formulario de login
+     *
+     */
+    public function forgotpass()
+    {
+        return $this->render('admin/usuario/forgot-pass.html.twig', array());
+    }
+
+    /**
      * autenticar Acción para el chequear el login
      *
      */
@@ -45,20 +54,14 @@ class UsuarioController extends AbstractController
     {
         $email = $request->get('email');
         $pass = $request->get('password');
-        $remember_me = $request->get('remember');
         $target_path = 'home';
         try {
             $resultado = $this->usuarioService->AutenticarLogin($email, $pass);
             if ($resultado['success']) {
                 $entity = $resultado['usuario'];
 
-                if ($remember_me == "on") {
-                    $token = new RememberMeToken($entity, 'main', "21c48f7d24c39c9137bb0b14b4060a0c");
-                    $this->container->get('security.token_storage')->setToken($token);
-                } else {
-                    $token = new UsernamePasswordToken($entity,  'main', $entity->getRoles());
-                    $this->container->get('security.token_storage')->setToken($token);
-                }
+                $token = new RememberMeToken($entity, 'main', "21c48f7d24c39c9137bb0b14b4060a0c");
+                $this->container->get('security.token_storage')->setToken($token);
 
                 //$session->set('_security_main', serialize($token));
 
@@ -305,16 +308,11 @@ class UsuarioController extends AbstractController
         $email = $request->get('email');
         try {
             $resultado = $this->usuarioService->RecuperarContrasenna($email);
-            if ($resultado['success']) {
 
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The password recovery process has been started successfully, in a few moments you will receive an email to the address entered";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                return $this->json($resultadoJson);
-            }
+            $resultadoJson['success'] = true;
+            $resultadoJson['message'] = "The password recovery process has been started successfully, in a few moments you will receive an email to the address entered";
+            return $this->json($resultadoJson);
+
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

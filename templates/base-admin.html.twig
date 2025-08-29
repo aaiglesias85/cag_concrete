@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title>{% block title %}Concrete Construction {% endblock %} {% block subtitle %}{% endblock %} </title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     {% block meta %}
         <meta name="description" content="Concrete Construction"/>
@@ -12,9 +11,17 @@
 
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('bundles/ican/img/favicon.ico') }}">
+
     {% block stylesheets %}{% endblock %}
 </head>
-<body class="{% block bodyclass %}{% endblock bodyclass%}">
+
+{% block bodytag %}{% endblock bodytag%}
+
+
+<!--begin::Theme mode setup on page load-->
+<script>var defaultThemeMode = "light"; var themeMode; if ( document.documentElement ) { if ( document.documentElement.hasAttribute("data-bs-theme-mode")) { themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); } else { if ( localStorage.getItem("data-bs-theme") !== null ) { themeMode = localStorage.getItem("data-bs-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-bs-theme", themeMode); }</script>
+<!--end::Theme mode setup on page load-->
+
 {% block body %}
 
 {% endblock body %}

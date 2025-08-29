@@ -261,6 +261,8 @@ class ReminderService extends Base
             }
         }
 
+        $usuarios_id = $usuarios_id !== '' ? explode(',', $usuarios_id) : [];
+
         if (!empty($usuarios_id)) {
             foreach ($usuarios_id as $usuario_id) {
                 $usuario_entity = $this->getDoctrine()->getRepository(Usuario::class)

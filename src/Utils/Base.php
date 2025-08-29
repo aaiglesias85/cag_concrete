@@ -345,7 +345,7 @@ class Base
     }
 
     //Devolver menu de ican
-    public function DevolverMenuIcan($usuario_id)
+    public function DevolverMenu($usuario_id)
     {
         $menu = array();
 

@@ -137,16 +137,16 @@ class DefaultController extends AbstractController
         ));
     }
 
-    public function renderMenu()
+    public function renderMenu(?string $activeRoute = null): Response
     {
         $usuario = $this->getUser();
+        $menu = $this->defaultService->DevolverMenu($usuario->getUsuarioId());
 
-        $menu = $this->defaultService->DevolverMenuIcan($usuario->getUsuarioId());
-
-        return $this->render('admin/layout/menu.html.twig', array(
+        return $this->render('admin/layout/menu.html.twig', [
             'usuario' => $usuario,
-            'menu' => $menu
-        ));
+            'menu' => $menu,
+            'activeRoute' => $activeRoute,
+        ]);
     }
 
     public function renderModalItemProject()

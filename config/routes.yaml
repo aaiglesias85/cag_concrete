@@ -20,6 +20,10 @@ login:
   path:  /login
   defaults: { _controller: App\Controller\Admin\UsuarioController::login }
 
+forgotpass:
+  path:  /forgot-password
+  defaults: { _controller: App\Controller\Admin\UsuarioController::forgotpass }
+
 login_check:
   path: /check
 

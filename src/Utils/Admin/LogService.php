@@ -92,14 +92,14 @@ class LogService extends Base
             $operacion = $value->getOperacion();
             $arreglo_resultado[$cont]['operacion'] = $operacion;
 
-            $arreglo_resultado[$cont]['class'] = 'm-badge--success';
+            $arreglo_resultado[$cont]['class'] = 'badge-light-success';
             $arreglo_resultado[$cont]['class2'] = 'm-widget2__item--success';
             if ($operacion == "Update") {
-                $arreglo_resultado[$cont]['class'] = 'm-badge--info';
+                $arreglo_resultado[$cont]['class'] = 'badge-light-primary';
                 $arreglo_resultado[$cont]['class2'] = 'm-widget2__item--info';
             }
             if ($operacion == "Delete") {
-                $arreglo_resultado[$cont]['class'] = 'm-badge--danger';
+                $arreglo_resultado[$cont]['class'] = 'badge-light-danger';
                 $arreglo_resultado[$cont]['class2'] = 'm-widget2__item--danger';
             }
 
