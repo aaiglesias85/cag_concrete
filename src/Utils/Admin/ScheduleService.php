@@ -40,7 +40,7 @@ class ScheduleService extends Base
         $styleArray = ['borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN]]];
 
         $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load("bundles/ican/excel/schedule.xlsx");
+        $spreadsheet = $reader->load("bundles/metronic8/excel/schedule.xlsx");
         $sheet = $spreadsheet->setActiveSheetIndex(0);
 
         $fila = 1;

@@ -55,7 +55,7 @@ class ReporteSubcontractorService extends Base
 
         // reader
         $reader = IOFactory::createReader('Xlsx');
-        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'report-subcontractor.xlsx');
+        $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'report-subcontractor.xlsx');
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
         $fila = 10;

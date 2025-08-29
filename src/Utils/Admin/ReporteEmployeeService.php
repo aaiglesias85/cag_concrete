@@ -50,7 +50,7 @@ class ReporteEmployeeService extends Base
         $styleArray = ['borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN]]];
 
         $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load("bundles/ican/excel/report-employee.xlsx");
+        $spreadsheet = $reader->load("bundles/metronic8/excel/report-employee.xlsx");
         $sheet = $spreadsheet->setActiveSheetIndex(0);
 
         $fila = 10;

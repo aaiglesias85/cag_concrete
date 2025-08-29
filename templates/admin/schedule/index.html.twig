@@ -3,7 +3,7 @@
 {% block subtitle %} - Schedules{% endblock %}
 
 {% block stylesheetspecific %}
-    <link href="{{ asset('bundles/ican/plugins/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/metronic8/plugins/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet">
     <style>
 
         .fc-slats tr,
@@ -589,11 +589,11 @@
         ({key: "{{ google_maps_api_key }}", v: "weekly"});</script>
 
     <!-- calendario -->
-    <script src="{{ asset('bundles/ican/plugins/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('bundles/ican/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
-    <script src="{{ asset('bundles/ican/plugins/fullcalendar/fullcalendar.bundle.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/plugins/moment/moment.min.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/plugins/fullcalendar/fullcalendar.bundle.js') }}"></script>
 
-    <script src="{{ asset('bundles/ican/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('bundles/metronic8/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {

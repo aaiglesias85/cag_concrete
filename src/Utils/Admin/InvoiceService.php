@@ -107,7 +107,7 @@ class InvoiceService extends Base
 
         // reader
         $reader = IOFactory::createReader('Xlsx');
-        $objPHPExcel = $reader->load("bundles/ican/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
+        $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
         // datos generales del invoice
