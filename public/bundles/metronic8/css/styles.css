@@ -1,0 +1,48 @@
+/** tema */
+body {
+    background-color: #F4F7FA !important;
+}
+
+/*
+[data-kt-app-layout=dark-sidebar] .app-sidebar {
+    background-color: #0e2536;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .app-sidebar-logo {
+    border-bottom: 1px dashed #1a3a50;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active {
+    background-color: #16405b;
+}
+
+.btn-color-cat{
+    background-color: #0e2536 !important;
+    border: 1px solid #1c3b4d !important;
+}
+
+ */
+
+#kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-duotone,
+#kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-outline,
+#kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-solid {
+    color: #446177;
+}
+
+#kt_app_sidebar_toggle.btn.btn-active-color-primary.active .ki-duotone,
+#kt_app_sidebar_toggle.btn.btn-active-color-primary.active .ki-outline,
+#kt_app_sidebar_toggle.btn.btn-active-color-primary.active .ki-solid {
+    color: #446177;
+}
+
+#kt_app_sidebar_toggle.active .ki-duotone.rotate-180,
+#kt_app_sidebar_toggle.active .ki-outline.rotate-180,
+#kt_app_sidebar_toggle.active .ki-solid.rotate-180 {
+    transform: rotateZ(180deg);
+    transition: transform 0.3s ease;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .app-sidebar-toggle {
+    border-radius: 50%;
+    box-shadow: none !important;
+}

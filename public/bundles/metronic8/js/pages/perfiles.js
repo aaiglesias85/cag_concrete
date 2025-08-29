@@ -718,7 +718,7 @@ var Perfiles = function () {
         //main function to initiate the module
         init: function () {
 
-            initTable();
+            // initTable();
             initForm();
 
             initAccionNuevo();
