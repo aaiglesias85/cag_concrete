@@ -1,64 +1,63 @@
 var Profile = function () {
 
-    var initNuevoForm = function () {
-        $("#usuario-form").validate({
-            rules: {
-                repetirpassword: {
-                    //required: true,
-                    equalTo: '#password'
-                },
-                nombre: {
-                    required: true
-                },
-                apellidos: {
-                    required: true
-                },
+    //Validacion
+    var getConstraints = function () {
+        var constraints = {
+            nombre: {
+                presence: {message: "This field is required"}
+            },
+            apellidos: {
+                presence: {message: "This field is required"}
+            },
+            email: {
+                presence: {message: "This field is required"},
                 email: {
-                    required: true,
-                    email: true
+                    message: "El email debe ser válido"
                 }
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            password: {
+                format: {
+                    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                    message: "Must have at least 8 characters, including one uppercase, one lowercase, one number, and one special character"
+                }
             },
-        });
-        $("#passwordactual").rules("add", {
-            required: true
-        });
-        $("#repetirpassword").rules("add", {
-            required: true
-        });
+        };
+
+        //agregar repetir password
+        var password = KTUtil.get("password").value;
+        if (password != "") {
+            constraints = Object.assign(constraints, {
+                repetirpassword: {
+                    presence: {message: "This field is required"},
+                    equality: {
+                        attribute: "password",
+                        message: "Write the same value again"
+                    }
+                }
+            });
+        }
+
+        return constraints;
     };
-    var initEditarForm = function () {
-        $("#passwordactual").rules("remove", "required");
-        $("#repetirpassword").rules("remove", "required");
+    var validateForm = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get("usuario-form");
+
+        var constraints = getConstraints();
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
 
     var initAcciones = function () {
@@ -68,70 +67,122 @@ var Profile = function () {
         });
 
         function salvarForm() {
-            mUtil.scrollTo();
-            //Validacion
-            initNuevoForm();
+             KTUtil.scrollTop();
 
             var password = $('#password').val();
             var password_actual = $('#password-actual').val();
-            if (password == "") {
-                initEditarForm();
-            }
 
-            if ($('#usuario-form').valid()) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
 
                 var usuario_id = $('#usuario_id').val();
+                formData.set("usuario_id", usuario_id);
 
                 var nombre = $('#nombre').val();
-                var apellidos = $('#apellidos').val();
-                var email = $('#email').val();
-                var telefono = $('#telefono').val();
+                formData.set("nombre", nombre);
 
-                salvarUsuario(usuario_id, password, password_actual, nombre, apellidos, email, telefono);
+                var apellidos = $('#apellidos').val();
+                formData.set("apellidos", apellidos);
+
+                var email = $('#email').val();
+                formData.set("email", email);
+
+                var telefono = $('#telefono').val();
+                formData.set("telefono", telefono);
+
+                formData.set("telefono", telefono);
+
+                formData.set("password_actual", password_actual);
+                formData.set("password", password);
+
+                BlockUtil.block('#form-profile');
+
+                axios.post("usuario/actualizarMisDatos", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+                                document.location = "";
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
+                        }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-profile");
+                    });
             }
         };
 
-        function salvarUsuario(usuario_id, password, password_actual, nombre, apellidos, email, telefono) {
-            BlockUtil.block('#m_user_profile_tab_1');
+        var isValidPassword = function () {
+            var valid = true;
 
-            $.ajax({
-                type: "POST",
-                url: $('#usuario-form').data('url'),
-                dataType: "json",
-                data: {
-                    'usuario_id': usuario_id,
-                    'password_actual': password_actual,
-                    'password': password,
-                    'nombre': nombre,
-                    'apellidos': apellidos,
-                    'email': email,
-                    'telefono': telefono
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#m_user_profile_tab_1');
-                    if (response.success) {
+            if (KTUtil.get("password-actual").value == "" && KTUtil.get("password").value != "") {
+                valid = false;
 
-                        toastr.success(response.message, "");
-                        document.location = "";
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#m_user_profile_tab_1');
+                let element = KTUtil.get("password-actual");
+                MyApp.showErrorMessageValidateInput(element, "Este campo es obligatorio");
+            }
 
-                    toastr.error(response.error, "");
-                }
-            });
-        }
+            return valid;
+        };
     }
 
     //Init select
     var initWidgets = function () {
-        $('#telefono').inputmask("mask", {
-            "mask": "(999)999-9999"
-        });
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask("#telefono");
     }
+
+    // init acciones tab
+    var initAccionesTab = function () {
+        // tab general
+        KTUtil.on(
+            KTUtil.get("kt_profile_aside"),
+            "#tab-link-general",
+            "click",
+            function () {
+                //reset
+                resetTabs();
+
+                //activar
+                KTUtil.addClass(this, "active");
+                KTUtil.removeClass(KTUtil.get("tab-content-general"), "hide");
+            }
+        );
+        // tab pass
+        KTUtil.on(
+            KTUtil.get("kt_profile_aside"),
+            "#tab-link-pass",
+            "click",
+            function () {
+                //reset
+                resetTabs();
+
+                //activar
+                KTUtil.addClass(this, "active");
+                KTUtil.removeClass(KTUtil.get("tab-content-pass"), "hide");
+            }
+        );
+
+        //reset tabs
+        function resetTabs() {
+            KTUtil.addClass(KTUtil.get("tab-content-general"), "hide");
+            KTUtil.addClass(KTUtil.get("tab-content-pass"), "hide");
+
+            KTUtil.findAll(KTUtil.get("kt_profile_aside"), ".active").forEach(
+                function (element) {
+                    KTUtil.removeClass(element, "active");
+                }
+            );
+        }
+    };
 
 
     return {
@@ -139,6 +190,7 @@ var Profile = function () {
         init: function () {
             initWidgets();
             initAcciones();
+            initAccionesTab();
         }
     };
 

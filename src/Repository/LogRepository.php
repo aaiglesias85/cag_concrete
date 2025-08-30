@@ -125,6 +125,79 @@ class LogRepository extends EntityRepository
     }
 
     /**
+     * ListarLogsConTotal: Lista y cuenta notificaciones aplicando los mismos filtros.
+     *
+     */
+    public function ListarLogsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'createdAt',
+                                                 string $sortDir = 'DESC', ?string $fecha_inicial = '', ?string $fecha_fin = '',
+                                                 ?string $usuario_id = null): array {
+
+        // Whitelist de campos ordenables
+        $sortable = [
+            'id' => 'n.id',
+            'fecha' => 'l.fecha',
+            'operacion' => 'l.operacion',
+            'categoria' => 'l.categoria',
+            'descripcion' => 'l.descripcion',
+            'ip' => 'l.ip',
+            'usuario' => 'u.nombre',   // map 'usuario' -> nombre del usuario
+        ];
+        $orderBy = $sortable[$sortField] ?? 'l.fecha';
+        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con JOIN y filtros
+        $baseQb = $this->createQueryBuilder('l')
+            ->leftJoin('l.usuario', 'u');
+
+        // Agrupar el WHERE de búsqueda
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('u.nombre LIKE :search OR l.operacion LIKE :search OR l.categoria LIKE :search OR l.descripcion LIKE :search OR l.ip LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        // Filtros adicionales
+        if (!empty($usuario_id)) {
+            $baseQb->andWhere('u.usuarioId = :usuario_id')
+                ->setParameter('usuario_id', $usuario_id);
+        }
+
+        if (!empty($fecha_inicial)) {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00")->format("Y-m-d H:i:s");
+            $baseQb->andWhere('l.fecha >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if (!empty($fecha_fin)) {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59")->format("Y-m-d H:i:s");
+            $baseQb->andWhere('l.fecha <= :fecha_fin')
+                ->setParameter('fecha_fin', $fecha_fin);
+        }
+
+        // ---- Datos (con paginación y orden) ----
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start);
+
+        if ($limit > 0) {
+            $dataQb->setMaxResults($limit);
+        }
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(l.logId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,
+            'total' => $total, // total con el MISMO filtro aplicado
+        ];
+    }
+
+    /**
      * ListarLogsRangoFecha: Lista los logs por un rango de fecha
      *
      * @param string $fecha_inicial Fecha inicial

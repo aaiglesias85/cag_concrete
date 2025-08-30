@@ -3,7 +3,7 @@ log:
   defaults: { _controller: App\Controller\Admin\LogController::index }
 
 listarLogAdmin:
-  path:  /log/listarLog
+  path:  /log/listar
   defaults: { _controller: App\Controller\Admin\LogController::listar, _format: json }
 
 eliminarLogAdmin:

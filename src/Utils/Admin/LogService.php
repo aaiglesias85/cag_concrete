@@ -120,33 +120,29 @@ class LogService extends Base
      */
     public function ListarLogs($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Log::class)
+            ->ListarLogsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id);
 
-        $lista = $this->getDoctrine()->getRepository(Log::class)
-            ->ListarLogs($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $log_id = $value->getLogId();
 
-            $acciones = $this->ListarAcciones($log_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = [
                 "id" => $log_id,
                 "fecha" => $value->getFecha()->format("m/d/Y H:i:s"),
-                "nombre" => $value->getUsuario()->getNombre(),
+                "usuario" => $value->getUsuario()->getNombre(),
                 "operacion" => $value->getOperacion(),
                 "categoria" => $value->getCategoria(),
                 "descripcion" => $value->getDescripcion(),
                 "ip" => $value->getIp(),
-                "acciones" => $acciones
-            );
-
-
-            $cont++;
+            ];
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

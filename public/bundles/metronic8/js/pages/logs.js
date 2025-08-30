@@ -1,179 +1,245 @@
 var Logs = function () {
-
-    var oTable;
+    
     var rowDelete = null;
 
-    //Inicializa la tabla
+    //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#log-table-editable');
+        const table = "#log-table-editable";
 
-        var table = $('#log-table-editable');
+        // datasource
+        const datasource = {
+            url: `log/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [
-            {
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
+        // columns
+        const columns = getColumnsTable();
+
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'desc']] : [[0, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
+
+            // init acciones
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+
+        columns.push(
+            {data: 'fecha'},
+            {data: 'usuario'},
+            {data: 'operacion'},
+            {data: 'categoria'},
+            {data: 'descripcion'},
+            {data: 'ip'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
             {
-                field: "fecha",
-                title: "Date",
-                sortable: true, // disable sort for this column
-                width: 130,
-                textAlign: 'center'
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
             },
-            {
-                field: "nombre",
-                title: "User",
-                width: 150,
-            },
-            {
-                field: "operacion",
-                title: "Operation",
-                width: 100,
-                responsive: {visible: 'lg'}
-            },
-            {
-                field: "categoria",
-                title: "Category",
-                width: 100,
-                responsive: {visible: 'lg'}
-            },
-            {
-                field: "descripcion",
-                title: "Description",
-            },
-            {
-                field: "ip",
-                title: "IP",
-                responsive: {visible: 'lg'},
-                width: 120,
-            },
-            {
-                field: "acciones",
-                width: 110,
-                title: "Acciones",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
         ];
-        if(!permiso.eliminar){
-            aoColumns = [
-                {
-                    field: "fecha",
-                    title: "Date",
-                    sortable: true, // disable sort for this column
-                    width: 130,
-                    textAlign: 'center'
-                },
-                {
-                    field: "nombre",
-                    title: "User",
-                    width: 150,
-                },
-                {
-                    field: "operacion",
-                    title: "Operation",
-                    width: 100,
-                    responsive: {visible: 'lg'}
-                },
-                {
-                    field: "categoria",
-                    title: "Category",
-                    width: 100,
-                    responsive: {visible: 'lg'}
-                },
-                {
-                    field: "descripcion",
-                    title: "Description",
-                },
-                {
-                    field: "ip",
-                    title: "IP",
-                    responsive: {visible: 'lg'},
-                    width: 120,
-                }
+
+        if (!permiso.eliminar) {
+            columnDefs = [
             ];
         }
 
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'log/listarLog',
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-log [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-log [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Logs';
+        var table = document.querySelector('#log-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
                 },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 }
-            },
+            ]
+        }).container().appendTo($('#log-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#usuario_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#log-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#log-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#log-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#log-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#log-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-log .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-log').removeClass('hide');
+        } else {
+            $('#btn-eliminar-log').addClass('hide');
+        }
+    }
+
     //Filtrar
     var initAccionFiltrar = function () {
 
@@ -182,23 +248,27 @@ var Logs = function () {
             btnClickFiltrar();
         });
 
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+            btnClickResetFilters();
+        });
+
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-log .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-log [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-log [data-table-filter="search"]').val('');
 
-        var fechaInicial = $('#fechaInicial').val();
-        var fechaFin = $('#fechaFin').val();
+        TempusUtil.clear('datetimepicker-desde');
+        TempusUtil.clear('datetimepicker-hasta');
 
-        query.fechaInicial = fechaInicial;
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        oTable.search('').draw();
     }
-    
+
     //Eliminar
     var initAccionEliminar = function () {
         $(document).off('click', "#log-table-editable a.delete");
@@ -206,9 +276,9 @@ var Logs = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-eliminar-log");
@@ -227,20 +297,10 @@ var Logs = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#log-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
                 toastr.error('Select items to delete', "");
             }
@@ -249,87 +309,78 @@ var Logs = function () {
         function btnClickModalEliminar() {
             var log_id = rowDelete;
 
-            BlockUtil.block('#log-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "log/eliminarLog",
-                dataType: "json",
-                data: {
-                    'log_id': log_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#log-table-editable');
-                    if (response.success) {
-                        oTable.load();
+            formData.set("log_id", log_id);
 
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-log');
 
+            axios.post("log/eliminarLog", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#log-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-log");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#log-table-editable').join(',');
 
-            BlockUtil.block('#log-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "log/eliminarLogs",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#log-table-editable');
-                    if (response.success) {
-                        oTable.load();
+            formData.set("ids", ids);
 
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-log');
 
+            axios.post("log/eliminarLogs", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#log-table-editable');
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-log");
+                });
         };
     };
 
-    //initPortlets
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-log');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
     var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
 
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        TempusUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        TempusUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
     }
 
     return {
@@ -343,8 +394,6 @@ var Logs = function () {
             initAccionFiltrar();
 
             initAccionEliminar();
-
-            initPortlets();
         }
 
     };

@@ -3,7 +3,7 @@ notification:
   defaults: { _controller: App\Controller\Admin\NotificationController::index }
 
 listarNotificationAdmin:
-  path:  /notification/listarNotification
+  path:  /notification/listar
   defaults: { _controller: App\Controller\Admin\NotificationController::listar, _format: json }
 
 eliminarNotificationAdmin:

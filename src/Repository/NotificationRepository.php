@@ -68,7 +68,8 @@ class NotificationRepository extends EntityRepository
      *
      * @return Notification[]
      */
-    public function ListarNotifications(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0, ?string $fecha_inicial, ?string $fecha_fin, ?string $usuario_id = null): array
+    public function ListarNotifications(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0,
+                                        ?string $fecha_inicial, ?string $fecha_fin, ?string $usuario_id = null): array
     {
         $qb = $this->createQueryBuilder('n')
             ->leftJoin('n.usuario', 'u');
@@ -154,6 +155,82 @@ class NotificationRepository extends EntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * ListarNotificacionesConTotal: Lista y cuenta notificaciones aplicando los mismos filtros.
+     *
+     */
+    public function ListarNotificacionesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'createdAt',
+                                           string $sortDir = 'DESC', ?string $fecha_inicial = '', ?string $fecha_fin = '',
+                                                 ?string $usuario_id = null, ?string $leida = ''): array {
+
+        // Whitelist de campos ordenables
+        $sortable = [
+            'id' => 'n.id',
+            'createdAt' => 'n.createdAt',
+            'content' => 'n.content',
+            'readed' => 'n.readed',
+            'usuario' => 'u.nombre',   // map 'usuario' -> nombre del usuario
+        ];
+        $orderBy = $sortable[$sortField] ?? 'n.createdAt';
+        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con JOIN y filtros
+        $baseQb = $this->createQueryBuilder('n')
+            ->leftJoin('n.usuario', 'u');
+
+        // Agrupar condiciones de búsqueda
+        if ($sSearch) {
+            $baseQb->andWhere('u.nombre LIKE :search OR n.content LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($usuario_id) {
+            $baseQb->andWhere('u.usuarioId = :usuario_id')
+                ->setParameter('usuario_id', $usuario_id);
+        }
+
+        // Filtrar por fechas
+        if ($fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00")->format("Y-m-d H:i:s");
+            $baseQb->andWhere('n.createdAt >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59")->format("Y-m-d H:i:s");
+            $baseQb->andWhere('n.createdAt <= :fecha_fin')
+                ->setParameter('fecha_fin', $fecha_fin);
+        }
+
+        if ($leida !== '') {
+            $baseQb->andWhere('n.readed = :leida')
+                ->setParameter('leida', $leida);
+        }
+
+        // ---- Datos (con paginación y orden) ----
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start);
+
+        if ($limit > 0) {
+            $dataQb->setMaxResults($limit);
+        }
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(n.id)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,
+            'total' => $total, // total con el MISMO filtro aplicado
+        ];
     }
 
     /**

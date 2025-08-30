@@ -170,7 +170,7 @@ class UsuarioRepository extends ServiceEntityRepository
 
         // Whitelist de campos ordenables
         $sortable = [
-            'usuarioId' => 'u.usuarioId',
+            'id' => 'u.usuarioId',
             'nombre'    => 'u.nombre',
             'apellidos' => 'u.apellidos',
             'email'     => 'u.email',

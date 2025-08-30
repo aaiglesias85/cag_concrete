@@ -129,66 +129,30 @@ class NotificationService extends Base
      *
      * @author Marcel
      */
-    public function ListarNotifications($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id)
+    public function ListarNotifications($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id, $leida)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
 
-        $lista = $this->getDoctrine()->getRepository(Notification::class)
-            ->ListarNotifications($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id);
+        $resultado = $this->getDoctrine()->getRepository(Notification::class)
+            ->ListarNotificacionesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id, $leida);
 
-        foreach ($lista as $value) {
+        $data = [];
+
+        foreach ($resultado['data'] as $value) {
             $notification_id = $value->getId();
 
-            $acciones = $this->ListarAcciones($notification_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = [
                 "id" => $notification_id,
                 "createdAt" => $value->getCreatedAt()->format("m/d/Y H:i:s"),
                 "usuario" => $value->getUsuario()->getNombre(),
                 "content" => $value->getContent(),
                 "readed" => $value->getReaded() ? 1 : 0,
-                "acciones" => $acciones
-            );
+            ];
 
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalNotifications: Total de notifications
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalNotifications($sSearch, $fecha_inicial, $fecha_fin, $usuario_id)
-    {
-        $total = $this->getDoctrine()->getRepository(Notification::class)
-            ->TotalNotifications($sSearch, $fecha_inicial, $fecha_fin, $usuario_id);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 12);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }
