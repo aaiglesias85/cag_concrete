@@ -270,7 +270,7 @@ textarea.form-control.is-invalid {
     border-color: #fd397a;
 }
 
-input.is-invalid, .required.is-invalid, span.is-invalid, .is-invalid .select2-container {
+input.is-invalid, .required.is-invalid, span.is-invalid {
     border: 1px solid #fd397a !important;
 }
 

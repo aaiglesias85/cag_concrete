@@ -77,14 +77,26 @@
             </div>
             <div class="modal-body">
 
-                <div class="m-alert m-alert--icon m-alert--outline alert alert-danger alert-dismissible fade show" role="alert">
-                    <div class="m-alert__icon">
-                        <i class="la la-warning"></i>
+                <!--begin::Alert-->
+                <div class="alert alert-danger d-flex align-items-center p-5">
+                    <!--begin::Icon-->
+                    <i class="ki-duotone ki-shield-tick fs-2hx text-danger me-4"><span class="path1"></span><span class="path2"></span></i>
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div class="d-flex flex-column">
+                        <!--begin::Title-->
+                        <h4 class="mb-1 text-danger">Warning</h4>
+                        <!--end::Title-->
+
+                        <!--begin::Content-->
+                        <span>Unsaved changes</span>
+                        <!--end::Content-->
                     </div>
-                    <div class="m-alert__text">
-                        <strong>Warning!</strong> Unsaved changes
-                    </div>
+                    <!--end::Wrapper-->
                 </div>
+                <!--end::Alert-->
+
                 <p>
                     Changes have been generated in the information on the form.
                 </p>

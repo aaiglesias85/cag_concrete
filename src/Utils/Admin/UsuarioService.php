@@ -569,70 +569,29 @@ class UsuarioService extends Base
      *
      * @author Marcel
      */
-    public function ListarUsuarios($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $perfil_id)
+    public function ListarUsuarios(int $start, int $limit, ?string $sSearch, ?string $iSortCol_0, ?string $sSortDir_0, ?string $perfil_id, ?string $estado)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Usuario::class)
+            ->ListarUsuariosConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $perfil_id, $estado);
 
-        $lista = $this->getDoctrine()->getRepository(Usuario::class)
-            ->ListarUsuarios($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $perfil_id);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $usuario_id = $value->getUsuarioId();
 
-            $acciones = $this->ListarAcciones($usuario_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $usuario_id,
                 'email' => $value->getEmail(),
                 'nombre' => $value->getNombre(),
                 'apellidos' => $value->getApellidos(),
-                'habilitado' => ($value->getHabilitado()) ? 1 : 0,
+                'estado' => ($value->getHabilitado()) ? 1 : 0,
                 'perfil' => $value->getRol()->getNombre(),
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalUsuarios: Total de usuarios
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalUsuarios($sSearch, $perfil_id)
-    {
-        $total = $this->getDoctrine()->getRepository(Usuario::class)
-            ->TotalUsuarios($sSearch, $perfil_id);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista las acciones de un usuario en la tabla
-     * @param string $nick Usuario
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 3);
-
-        $acciones = "";
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-                $acciones .= '<a href="javascript:;" class="block m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill" title="Activate/Deactivate record" data-id="' . $id . '"> <i class="la la-lock"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-        return $acciones;
+        return [
+            'data'  => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }

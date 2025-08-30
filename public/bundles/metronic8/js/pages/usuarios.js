@@ -3,150 +3,262 @@ var Usuarios = function () {
     var oTable;
     var rowDelete = null;
 
-    //Inicializa la tabla
+    //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#usuario-table-editable');
+        const table = "#usuario-table-editable";
 
-        var table = $('#usuario-table-editable');
+        // datasource
+        const datasource = {
+            url: `usuario/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    perfil_id: $('#filtro-perfil').val(),
+                    estado: $('#filtro-estado-usuario').val(),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
+
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
+            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
+
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+            initAccionCambiarEstado();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
 
         if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
+            columns.push({data: 'id'});
         }
 
-        aoColumns.push(
+        columns.push(
+            {data: 'email'},
+            {data: 'nombre'},
+            {data: 'apellidos'},
+            {data: 'perfil'},
+            {data: 'estado'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
             {
-                field: "email",
-                title: "Email",
-                width: 200,
-                template: function (row) {
-                    return '<a class="m-link" href="mailto:' + row.email + '">' + row.email + '</a>';
-                }
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
             },
             {
-                field: "nombre",
-                title: "Name",
-                responsive: {visible: 'lg'},
-                width: 100,
+                targets: 1,
+                render: DatatableUtil.getRenderColumnEmail
             },
             {
-                field: "apellidos",
-                title: "Surname",
-                responsive: {visible: 'lg'},
-                width: 100,
+                targets: 5,
+                className: 'text-center',
+                render: DatatableUtil.getRenderColumnEstado
             },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 0,
+                    render: DatatableUtil.getRenderColumnEmail
+                },
+                {
+                    targets: 4,
+                    className: 'text-center',
+                    render: DatatableUtil.getRenderColumnEstado
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
             {
-                field: "perfil",
-                title: "Profile",
-                responsive: {visible: 'lg'},
-                width: 120,
-            },
-            {
-                field: "habilitado",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'Active', 'class': ' m-badge--success'},
-                        0: {'title': 'Inactive', 'class': ' m-badge--danger'}
-                    };
-                    return '<span class="m-badge ' + status[row.habilitado].class + ' m-badge--wide">' + status[row.habilitado].title + '</span>';
-                }
-            },
-            {
-                field: "acciones",
-                width: 110,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete', 'status']);
+                },
             }
         );
 
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'usuario/listarUsuario',
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-usuario [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-usuario [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Users';
+        var table = document.querySelector('#usuario-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
                 },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 }
+            ]
+        }).container().appendTo($('#usuario-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#usuario_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
             }
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#usuario-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#usuario-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#usuario-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#usuario-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#usuario-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-usuario .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-usuario').removeClass('hide');
+        } else {
+            $('#btn-eliminar-usuario').addClass('hide');
+        }
+    }
 
     //Filtrar
     var initAccionFiltrar = function () {
@@ -156,41 +268,47 @@ var Usuarios = function () {
             btnClickFiltrar();
         });
 
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+            btnClickResetFilters();
+        });
+
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-usuario .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-usuario [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-usuario [data-table-filter="search"]').val('');
 
-        var perfil_id = $('#filtro-perfil').val();
-        query.perfil_id = perfil_id;
+        KTUtil.get('filtro-perfil').value = '';
+        KTUtil.triggerEvent(KTUtil.get("filtro-perfil"), "change");
 
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        KTUtil.get('filtro-estado-usuario').value = '';
+        KTUtil.triggerEvent(KTUtil.get("filtro-estado-usuario"), "change");
+
+        oTable.search('').draw();
     }
 
     //Reset forms
     var resetForms = function () {
-        $('#usuario-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("usuario-form");
 
-        $('#perfil').val('');
-        $('#perfil').trigger('change');
+        KTUtil.get("perfil").value = "";
+        KTUtil.triggerEvent(KTUtil.get("perfil"), "change");
 
-        $('#estadoactivo').prop('checked', true);
+        KTUtil.get("estadoactivo").checked = true;
 
         //Permisos
         permisos = [];
         marcarPermisos();
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
 
         event_change = false;
 
@@ -198,70 +316,218 @@ var Usuarios = function () {
         resetWizard();
     };
 
-    //Validacion y Inicializacion de ajax form
-    var initNuevoForm = function () {
-        $("#usuario-form").validate({
-            rules: {
-                perfil: {
-                    required: true
-                },
-                repetirpassword: {
-                    //required: true,
-                    equalTo: '#password'
-                },
-                nombre: {
-                    required: true
-                },
-                apellidos: {
-                    required: true
-                },
-                email: {
-                    required: true,
-                    email: true
+    //Validacion
+    var getConstraints = function () {
+        var constraints = {
+            nombre: {
+                presence: {message: "This field is required"}
+            },
+            apellidos: {
+                presence: {message: "This field is required"}
+            },
+            email: {
+                presence: {message: "This field is required"},
+                email: {message: "The email must be valid"}
+            },
+            password: {
+                presence: {message: "This field is required"},
+                format: {
+                    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                    message: "Must have at least 8 characters, including one uppercase, one lowercase, one number, and one special character"
                 }
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            repetirpassword: {
+                presence: {message: "This field is required"},
+                equality: {
+                    attribute: "password",
+                    message: "Write the same value again"
+                }
+            }
+        };
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
+        //editar
+        var usuario_id = KTUtil.get("usuario_id").value;
+        if (usuario_id != "") {
+            constraints = {
+                nombre: {
+                    presence: {message: "This field is required"}
+                },
+                apellidos: {
+                    presence: {message: "This field is required"}
+                },
+                email: {
+                    email: {
+                        message: "El email debe ser válido"
+                    }
+                },
+                password: {
+                    format: {
+                        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                        message: "Must have at least 8 characters, including one uppercase, one lowercase, one number, and one special character"
+                    }
+                },
+            };
+            //agregar repetir password
+            var password = KTUtil.get("password").value;
+            if (password != "") {
+                constraints = Object.assign(constraints, {
+                    repetirpassword: {
+                        presence: {message: "This field is required"},
+                        equality: {
+                            attribute: "password",
+                            message: "Write the same value again"
+                        }
+                    }
                 });
+            }
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
-
-        $("#password").rules("add", {
-            required: true
-        });
-        $("#repetirpassword").rules("add", {
-            required: true
-        });
+        return constraints;
     };
-    var initEditarForm = function () {
-        $("#password").rules("remove");
-        $("#repetirpassword").rules("remove", "required");
+    var validateForm = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get("usuario-form");
+
+        var constraints = getConstraints();
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
+    };
+
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 2;
+    var initWizard = function () {
+        $(document).off('click', "#form-usuario .wizard-tab");
+        $(document).on('click', "#form-usuario .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
+
+            // validar
+            if (item > activeTab && !validWizard(activeTab)) {
+                mostrarTab();
+                return;
+            }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
+        });
+
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard(activeTab)) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-permisos').tab('show');
+                    break;
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        mostrarTab();
+        $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide');
+        $('#nav-item-calificaciones').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("usuario-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function (tab) {
+        var result = true;
+        if (tab == 1) {
+
+            var rol_id = $('#perfil').val();
+            if (!validateForm() || rol_id == "") {
+                result = false;
+
+                if (rol_id == "") {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-perfil"), "This field is required");
+                }
+            }
+
+        }
+
+        return result;
+    }
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("usuario-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("usuario-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
     };
 
     //Nuevo
@@ -270,15 +536,35 @@ var Usuarios = function () {
         $(document).on('click', "#btn-nuevo-usuario", function (e) {
             btnClickNuevo();
         });
-
-        function btnClickNuevo() {
-            resetForms();
-            var formTitle = "Do you want to create a new user? Follow the next steps:";
-            $('#form-usuario-title').html(formTitle);
-            $('#form-usuario').removeClass('m--hide');
-            $('#lista-usuario').addClass('m--hide');
-        };
     };
+    var btnClickNuevo = function () {
+        resetForms();
+
+        KTUtil.find(KTUtil.get('form-usuario'), '.card-label').innerHTML = "New User:";
+
+        mostrarForm();
+    };
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-usuario'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-usuario'), 'hide');
+    };
+
+    //Cerrar form
+    var initAccionCerrar = function () {
+        $(document).off('click', ".cerrar-form-usuario");
+        $(document).on('click', ".cerrar-form-usuario", function (e) {
+            cerrarForms();
+        });
+    }
+    var cerrarForms = function () {
+        if (!event_change) {
+            cerrarFormsConfirmated();
+        } else {
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
+        }
+    };
+
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
@@ -287,214 +573,205 @@ var Usuarios = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
+
             event_change = false;
-
-            //Validacion
-            initNuevoForm();
-
-            var usuario_id = $('#usuario_id').val();
 
             devolverPermisos();
 
-            if (usuario_id != "") {
-                initEditarForm();
-            }
-
             var rol_id = $('#perfil').val();
 
-            if ($('#usuario-form').valid() && rol_id != "" && permisos.length > 0) {
+            if (validateForm() && rol_id != "" && permisos.length > 0) {
+
+                var formData = new URLSearchParams();
+
+                var usuario_id = $('#usuario_id').val();
+                formData.set("usuario_id", usuario_id);
+
+                formData.set("rol", rol_id);
 
                 var nombre = $('#nombre').val();
-                var apellidos = $('#apellidos').val();
-                var email = $('#email').val();
-                var estado = ($('#estadoactivo').prop('checked')) ? 1 : 0;
-                var telefono = $('#telefono').val();
-                var password = $('#password').val();
+                formData.set("nombre", nombre);
 
-                salvarUsuario(usuario_id, rol_id, estado, password, nombre, apellidos, email, telefono);
+                var apellidos = $('#apellidos').val();
+                formData.set("apellidos", apellidos);
+
+                var email = $('#email').val();
+                formData.set("email", email);
+
+                var estado = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+                formData.set("habilitado", estado);
+
+                var telefono = $('#telefono').val();
+                formData.set("telefono", telefono);
+
+                var password = $('#password').val();
+                formData.set("password", password);
+
+                formData.set("permisos", JSON.stringify(permisos));
+
+                BlockUtil.block('#form-usuario');
+
+                axios.post("usuario/salvarUsuario", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+
+                                cerrarForms();
+
+                                oTable.draw();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
+                        }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-usuario");
+                    });
 
             } else {
                 if (rol_id == "") {
-                    var $element = $('#select-perfil .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-perfil"), "This field is required");
                 }
                 if (permisos.length == 0) {
                     toastr.error("You must select the user's permissions", "");
                 }
             }
         };
-
-        function salvarUsuario(usuario_id, rol_id, estado, password, nombre, apellidos, email, telefono) {
-            BlockUtil.block('#form-usuario');
-
-            $.ajax({
-                type: "POST",
-                url: "usuario/salvarUsuario",
-                dataType: "json",
-                data: {
-                    'usuario_id': usuario_id,
-                    'rol': rol_id,
-                    'habilitado': estado,
-                    'password': password,
-                    'nombre': nombre,
-                    'apellidos': apellidos,
-                    'email': email,
-                    'telefono': telefono,
-                    'permisos': JSON.stringify(permisos)
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-usuario');
-                    if (response.success) {
-
-                        toastr.success(response.message, "");
-                        cerrarForms();
-                        oTable.load();
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-usuario');
-
-                    toastr.error(response.error, "");
-                }
-            });
-        }
     }
-    //Cerrar form
-    var initAccionCerrar = function () {
-        $(document).off('click', ".cerrar-form-usuario");
-        $(document).on('click', ".cerrar-form-usuario", function (e) {
-            cerrarForms();
-        });
-    }
-    //Cerrar forms
-    var cerrarForms = function () {
-        if (!event_change) {
-            cerrarFormsConfirmated();
-        } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
-        }
-    };
+
     //Editar
     var initAccionEditar = function () {
         $(document).off('click', "#usuario-table-editable a.edit");
         $(document).on('click', "#usuario-table-editable a.edit", function (e) {
             e.preventDefault();
-            resetForms();
 
+            resetForms();
 
             var usuario_id = $(this).data('id');
             $('#usuario_id').val(usuario_id);
 
-            $('#form-usuario').removeClass('m--hide');
-            $('#lista-usuario').addClass('m--hide');
+            mostrarForm();
 
             editRow(usuario_id);
         });
 
         function editRow(usuario_id) {
 
-            BlockUtil.block('#usuario-form');
+            var formData = new URLSearchParams();
+            formData.set("usuario_id", usuario_id);
 
-            $.ajax({
-                type: "POST",
-                url: "usuario/cargarDatos",
-                dataType: "json",
-                data: {
-                    'usuario_id': usuario_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#usuario-form');
-                    if (response.success) {
-                        //Datos usuario
+            BlockUtil.block('#form-usuario');
 
-                        var formTitle = "You want to update the user \"" + response.usuario.nombre + "\" ? Follow the next steps:";
-                        $('#form-usuario-title').html(formTitle);
+            axios.post("usuario/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        $('#perfil').off('change', cambiarPerfil);
+                            //cargar datos
+                            cargarDatos(response.usuario);
 
-                        $('#perfil').val(response.usuario.rol);
-                        $('#perfil').trigger('change');
-
-                        $('#perfil').on('change', cambiarPerfil);
-
-                        $('#nombre').val(response.usuario.nombre);
-                        $('#apellidos').val(response.usuario.apellidos);
-                        $('#email').val(response.usuario.email);
-                        $('#telefono').val(response.usuario.telefono);
-
-                        if (!response.usuario.habilitado) {
-                            $('#estadoactivo').prop('checked', false);
-                            $('#estadoinactivo').prop('checked', true);
+                        } else {
+                            toastr.error(response.error, "");
                         }
-
-                        permisos = response.usuario.permisos;
-                        marcarPermisos();
-
-                        event_change = false;
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#usuario-form');
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-usuario");
+                });
+
+            function cargarDatos(usuario) {
+
+                KTUtil.find(KTUtil.get("form-usuario"), ".card-label").innerHTML = "Update user: " + usuario.nombre;
+
+                $('#perfil').off('change', cambiarPerfil);
+
+                $('#perfil').val(usuario.rol);
+                $('#perfil').trigger('change');
+
+                $('#perfil').on('change', cambiarPerfil);
+
+                $('#nombre').val(usuario.nombre);
+                $('#apellidos').val(usuario.apellidos);
+                $('#email').val(usuario.email);
+                $('#telefono').val(usuario.telefono);
+
+                $('#estadoactivo').prop('checked', usuario.habilitado);
+
+                permisos = usuario.permisos;
+                marcarPermisos();
+
+                event_change = false;
+            }
 
         }
     };
     //Activar
-    var initAccionActivar = function () {
-        //Activar usuario
-        $(document).off('click', "#usuario-table-editable a.block");
-        $(document).on('click', "#usuario-table-editable a.block", function (e) {
+    var initAccionCambiarEstado = function () {
+
+        $(document).off('click', "#usuario-table-editable a.estado");
+        $(document).on('click', "#usuario-table-editable a.estado", function (e) {
             e.preventDefault();
             /* Get the row as a parent of the link that was clicked on */
             var usuario_id = $(this).data('id');
-            cambiarEstadoUsuario(usuario_id);
+
+            Swal.fire({
+                text: "Are you sure you want to change the user status?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    cambiarEstadoUsuario(usuario_id);
+                }
+            });
+
+
         });
 
         function cambiarEstadoUsuario(usuario_id) {
 
-            BlockUtil.block('#usuario-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("usuario_id", usuario_id);
 
-            $.ajax({
-                type: "POST",
-                url: "usuario/activarUsuario",
-                dataType: "json",
-                data: {
-                    'usuario_id': usuario_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#usuario-table-editable');
+            BlockUtil.block('#lista-usuario');
 
-                    if (response.success) {
-                        toastr.success("The operation was successful", "");
-                        oTable.load();
+            axios.post("usuario/activarUsuario", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
+                            toastr.success("The operation was successful", "");
+                            btnClickFiltrar();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#usuario-table-editable');
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-usuario");
+                });
         }
     };
     //Eliminar
@@ -504,9 +781,10 @@ var Usuarios = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
+
         });
 
         $(document).off('click', "#btn-eliminar-usuario");
@@ -525,20 +803,10 @@ var Usuarios = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#usuario-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
                 toastr.error('Select items to delete', "");
             }
@@ -547,83 +815,75 @@ var Usuarios = function () {
         function btnClickModalEliminar() {
             var usuario_id = rowDelete;
 
-            BlockUtil.block('#usuario-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "usuario/eliminarUsuario",
-                dataType: "json",
-                data: {
-                    'usuario_id': usuario_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#usuario-table-editable');
-                    if (response.success) {
-                        oTable.load();
+            formData.set("usuario_id", usuario_id);
 
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-usuario');
 
+            axios.post("usuario/eliminarUsuario", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#usuario-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-usuario");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#usuario-table-editable').join(',');
 
-            BlockUtil.block('#usuario-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "usuario/eliminarUsuarios",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#usuario-table-editable');
-                    if (response.success) {
-                        oTable.load();
+            formData.set("ids", ids);
 
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-usuario');
 
+            axios.post("usuario/eliminarUsuarios", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#usuario-table-editable');
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-usuario");
+                });
         };
     };
 
     //Init select
     var initWidgets = function () {
 
-        $('.m-select2').select2();
+        // init widgets generales
+        MyApp.initWidgets();
+
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask("#telefono");
 
         $('#perfil').change(cambiarPerfil);
-
-        $('#telefono').inputmask("mask", {
-            "mask": "(999)999-9999"
-        });
     }
     var cambiarPerfil = function () {
         var perfil_id = $(this).val();
@@ -633,28 +893,27 @@ var Usuarios = function () {
         marcarPermisos();
         if (perfil_id != "") {
 
-            //listar permisos
-            $.ajax({
-                type: "POST",
-                url: "perfil/listarPermisos",
-                dataType: "json",
-                data: {
-                    'perfil_id': perfil_id
-                },
-                success: function (response) {
-                    if (response.success) {
+            var formData = new URLSearchParams();
 
-                        permisos = response.permisos;
-                        marcarPermisos();
+            formData.set("perfil_id", perfil_id);
 
+            axios.post("perfil/listarPermisos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            permisos = response.permisos;
+                            marcarPermisos();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                });
         }
 
     }
@@ -674,20 +933,8 @@ var Usuarios = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-usuario').addClass('m--hide');
-        $('#lista-usuario').removeClass('m--hide');
-    }
-
-    //initPortlets
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-usuario');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
+        $('#form-usuario').addClass('hide');
+        $('#lista-usuario').removeClass('hide');
     }
 
     //Permisos
@@ -966,134 +1213,14 @@ var Usuarios = function () {
         });
     }
 
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 2;
-    var initWizard = function () {
-        $(document).off('click', "#form-usuario .wizard-tab");
-        $(document).on('click', "#form-usuario .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab == totalTabs) {
-                $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab == totalTabs) {
-                    $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-permisos').tab('show');
-                    break;
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        mostrarTab();
-        $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide');
-        $('#nav-item-calificaciones').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab == 1) {
-
-            //Validacion
-            initNuevoForm();
-
-            var usuario_id = $('#usuario_id').val();
-            if (usuario_id != "") {
-                initEditarForm();
-            }
-
-            var rol_id = $('#perfil').val();
-            if (!$('#usuario-form').valid() || rol_id == "") {
-                result = false;
-
-                if (rol_id == "") {
-
-                    var $element = $('#select-perfil .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-            }
-
-        }
-
-        return result;
-    }
-
 
     return {
         //main function to initiate the module
         init: function () {
 
-            initTable();
             initWidgets();
-            initNuevoForm();
+
+            initTable();
 
             initWizard();
 
@@ -1103,15 +1230,9 @@ var Usuarios = function () {
             initAccionSalvar();
             initAccionCerrar();
 
-            initAccionEditar();
-            initAccionActivar();
-            initAccionEliminar();
-
             initAccionChange();
 
             initAccionPermiso();
-
-            initPortlets();
         }
 
     };

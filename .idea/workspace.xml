@@ -5,23 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Http/DataTablesHelper.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/my-components.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/my-components.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-reminder.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-reminder.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/perfiles.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/perfiles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/usuarios.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/usuarios.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/modal-util.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/modal-util.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/PerfilController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/PerfilController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/RolRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/RolRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/perfil.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/perfil.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/PerfilService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/PerfilService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/block/modal-reminder.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/block/modal-reminder.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/UsuarioController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/UsuarioController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/UsuarioRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/UsuarioRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/usuario.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/usuario.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/UsuarioService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/UsuarioService.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin/block/modals.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/block/modals.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/layout.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/layout.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/layout/menu.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/layout/menu.html.twig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin/rol/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/rol/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/usuario/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/usuario/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/usuario/login.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/usuario/login.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,7 +263,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1756443808180</updated>
-      <workItem from="1756443809293" duration="12626000" />
+      <workItem from="1756443809293" duration="24197000" />
     </task>
     <servers />
   </component>

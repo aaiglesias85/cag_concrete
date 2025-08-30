@@ -3,7 +3,7 @@ users:
   defaults: { _controller: App\Controller\Admin\UsuarioController::index }
 
 listUsersAdmin:
-  path:  /usuario/listarUsuario
+  path:  /usuario/listar
   defaults: { _controller: App\Controller\Admin\UsuarioController::listar, _format: json}
 
 saveUserAdmin:

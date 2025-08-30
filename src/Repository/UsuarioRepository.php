@@ -160,4 +160,77 @@ class UsuarioRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    // src/Repository/UsuarioRepository.php
+
+    /**
+     * ListarUsuariosConTotal: Lista y cuenta usuarios aplicando los mismos filtros.
+     *
+     * @param int         $start        Offset (0-based)
+     * @param int         $limit        Límite de filas (<=0 = sin límite)
+     * @param string|null $search       Texto de búsqueda (email/nombre/apellidos)
+     * @param string      $sortField    Campo a ordenar: usuarioId|nombre|apellidos|email|perfil
+     * @param string      $sortDir      ASC|DESC
+     * @param string|null $perfilId     Filtro por rolId
+     *
+     * @return array{data: array<int, \App\Entity\Usuario>, total: int}
+     */
+    public function ListarUsuariosConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'nombre',
+        string $sortDir = 'ASC', ?string $perfilId = null, ?string $estado = ''): array {
+
+        // Whitelist de campos ordenables
+        $sortable = [
+            'usuarioId' => 'u.usuarioId',
+            'nombre'    => 'u.nombre',
+            'apellidos' => 'u.apellidos',
+            'email'     => 'u.email',
+            'habilitado'=> 'u.habilitado',
+            'perfil'    => 'r.nombre',   // map 'perfil' -> nombre del rol
+        ];
+        $orderBy = $sortable[$sortField] ?? 'u.nombre';
+        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con JOIN y filtros
+        $baseQb = $this->createQueryBuilder('u')
+            ->leftJoin('u.rol', 'r');
+
+        if ($sSearch) {
+            $baseQb->andWhere('u.email LIKE :search OR u.nombre LIKE :search OR u.apellidos LIKE :search')
+                ->setParameter('search', "%$sSearch%");
+        }
+
+        if ($perfilId) {
+            $baseQb->andWhere('r.rolId = :perfil_id')
+                ->setParameter('perfil_id', $perfilId);
+        }
+
+        if ($estado !== '') {
+            $baseQb->andWhere('u.habilitado = :estado')
+                ->setParameter('estado', $estado);
+        }
+
+        // ---- Datos (con paginación y orden) ----
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start);
+
+        if ($limit > 0) {
+            $dataQb->setMaxResults($limit);
+        }
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(u.usuarioId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,
+            'total' => $total, // total con el MISMO filtro aplicado
+        ];
+    }
+
 }

@@ -270,7 +270,7 @@ var Perfiles = function () {
     var btnClickNuevo = function () {
         resetForms();
 
-        KTUtil.find(KTUtil.get('form-perfil'), '.card-label').innerHTML = "Nuevo perfil:";
+        KTUtil.find(KTUtil.get('form-perfil'), '.card-label').innerHTML = "New profile:";
 
         mostrarForm();
     };
@@ -782,9 +782,16 @@ var Perfiles = function () {
         });
     }
 
+    var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
+    }
+
     return {
         //main function to initiate the module
         init: function () {
+
+            initWidgets();
 
             initTable();
 

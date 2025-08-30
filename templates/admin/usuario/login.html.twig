@@ -75,8 +75,18 @@
                                 <!--end::Input group=-->
                                 <div class="fv-row mb-3">
                                     <!--begin::Password-->
-                                    <input id="password" type="password" placeholder="Password" name="password" autocomplete="off"
-                                           class="form-control bg-transparent"/>
+                                    <div class="input-group">
+                                        <input type="password"
+                                               class="form-control bg-transparent" placeholder="Password"
+                                               id="password" name="password" autocomplete="new-password">
+                                        <span class="input-group-text toggle-password" >
+                                          <i class="ki-duotone ki-eye fs-2 show-icon"><span class="path1"></span><span
+                                                      class="path2"></span><span class="path3"></span></i>
+                                          <i class="ki-duotone ki-eye-slash fs-2 hide-icon hide"><span
+                                                      class="path1"></span><span class="path2"></span><span
+                                                      class="path3"></span></i>
+                                        </span>
+                                    </div>
                                     <!--end::Password-->
                                 </div>
                                 <!--end::Input group=-->

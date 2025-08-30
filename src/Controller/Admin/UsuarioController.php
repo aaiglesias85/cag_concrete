@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Funcion;
 use App\Entity\Rol;
 
+use App\Http\DataTablesHelper;
 use App\Utils\Admin\UsuarioService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -135,50 +136,36 @@ class UsuarioController extends AbstractController
      */
     public function listar(Request $request)
     {
-        // search filter by keywords
-        $query = !empty($request->get('query')) ? $request->get('query') : array();
-        $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $empresa_id = isset($query['empresa_id']) && is_string($query['empresa_id']) ? $query['empresa_id'] : '';
-        $perfil_id = isset($query['perfil_id']) && is_string($query['perfil_id']) ? $query['perfil_id'] : '';
-        //Sort
-        $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
-        $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'asc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'nombre';
-        //$start and $limit
-        $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
-        $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
-        $limit = !empty($pagination['perpage']) ? (int)$pagination['perpage'] : -1;
-        $start = 0;
-
         try {
 
-            $pages = 1;
-            $total = $this->usuarioService->TotalUsuarios($sSearch, $perfil_id);
-            if ($limit > 0) {
-                $pages = ceil($total / $limit); // calculate total pages
-                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-                $start = ($page - 1) * $limit;
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
-
-            $meta = array(
-                'page' => $page,
-                'pages' => $pages,
-                'perpage' => $limit,
-                'total' => $total,
-                'field' => $iSortCol_0,
-                'sort' => $sSortDir_0
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'email', 'nombre', 'apellidos', 'perfil', 'habilitado' ],
+                defaultOrderField: 'nombre'
             );
 
-            $data = $this->usuarioService->ListarUsuarios($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $perfil_id);
+            // filtros
+            $perfil_id = $request->get('perfil_id');
+            $estado = $request->get('estado');
 
-            $resultadoJson = array(
-                'meta' => $meta,
-                'data' => $data
+            // total + data en una sola llamada a tu servicio
+            $result = $this->usuarioService->ListarUsuarios(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $perfil_id,
+                $estado
             );
+
+            $resultadoJson = [
+                'draw'            => $dt['draw'],
+                'data'            => $result['data'],
+                'recordsTotal'    => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
 
             return $this->json($resultadoJson);
 
