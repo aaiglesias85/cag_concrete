@@ -161,19 +161,9 @@ class UsuarioRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    // src/Repository/UsuarioRepository.php
-
     /**
      * ListarUsuariosConTotal: Lista y cuenta usuarios aplicando los mismos filtros.
      *
-     * @param int         $start        Offset (0-based)
-     * @param int         $limit        Límite de filas (<=0 = sin límite)
-     * @param string|null $search       Texto de búsqueda (email/nombre/apellidos)
-     * @param string      $sortField    Campo a ordenar: usuarioId|nombre|apellidos|email|perfil
-     * @param string      $sortDir      ASC|DESC
-     * @param string|null $perfilId     Filtro por rolId
-     *
-     * @return array{data: array<int, \App\Entity\Usuario>, total: int}
      */
     public function ListarUsuariosConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'nombre',
         string $sortDir = 'ASC', ?string $perfilId = null, ?string $estado = ''): array {
