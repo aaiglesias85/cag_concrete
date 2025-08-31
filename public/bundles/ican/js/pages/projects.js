@@ -610,7 +610,11 @@ var Projects = function () {
             $('#name').val($(this).data('projectnumber'));
             $('#number').val($(this).data('projectname'));
 
-            editRowNote(notes_id);
+            rowEditNote = notes_id;
+
+            $('#modal-notes').modal({
+                'show': true
+            });
         });
     };
 
@@ -711,7 +715,7 @@ var Projects = function () {
 
                     // ir al tab de notas
                     if (editar_notas) {
-                        activeTab = 5;
+                        activeTab = 4;
                         mostrarTab();
                     }
 
