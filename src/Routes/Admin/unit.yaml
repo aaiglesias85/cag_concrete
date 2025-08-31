@@ -3,7 +3,7 @@ unit:
   defaults: { _controller: App\Controller\Admin\UnitController::index }
 
 listarUnitAdmin:
-  path:  /unit/listarUnit
+  path:  /unit/listar
   defaults: { _controller: App\Controller\Admin\UnitController::listar, _format: json }
 
 eliminarUnitAdmin:

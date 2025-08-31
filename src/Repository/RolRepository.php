@@ -87,15 +87,12 @@ class RolRepository extends ServiceEntityRepository
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
-    // src/Repository/RolRepository.php
-
-    public function ListarRolesConTotal(
-        int     $start,
-        int     $limit,
-        ?string $sSearch = null,
-        string  $sortColumn = 'nombre',
-        string  $sortDirection = 'ASC'
-    ): array {
+    /**
+     * ListarRolesConTotal Lista los roles con total
+     *
+     * @return []
+     */
+    public function ListarRolesConTotal(int     $start, int     $limit, ?string $sSearch = null, string  $sortColumn = 'nombre', string  $sortDirection = 'ASC'): array {
 
         // Whitelist de columnas ordenables
         $sortable = [

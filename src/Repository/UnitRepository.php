@@ -66,4 +66,50 @@ class UnitRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * ListarUnitsConTotal Lista los units con total
+     *
+     * @return []
+     */
+    public function ListarUnitsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'unitId'  => 'u.unitId',
+            'description' => 'u.description',
+            'status' => 'u.status',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'u.description';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('u');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('u.description LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(u.unitId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
 }
