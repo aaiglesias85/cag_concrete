@@ -1,150 +1,247 @@
 var Equations = function () {
-
-    var oTable;
+    
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#equation-table-editable');
+        const table = "#equation-table-editable";
+        // datasource
+        const datasource = DatatableUtil.getDataTableDatasource(`equation/listar`);
 
-        var table = $('#equation-table-editable');
+        // columns
+        const columns = getColumnsTable();
 
-        var aoColumns = [];
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
 
-        aoColumns.push(
-            {
-                field: "description",
-                title: "Name"
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "equation",
-                title: "Equation"
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'Active', 'class': ' m-badge--success'},
-                        0: {'title': 'Inactive', 'class': ' m-badge--danger'}
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
-                }
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'equation/listarEquation',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#equation-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#equation-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#equation-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#equation-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#equation-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-equation .m_form_search').on('keyup', function (e) {
-            // shortcode to datatable.getDataSourceParam('query');
-            var query = oTable.getDataSourceQuery();
-            query.generalSearch = $(this).val().toLowerCase();
-            // shortcode to datatable.setDataSourceParam('query', query);
-            oTable.setDataSourceQuery(query);
-            oTable.load();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        // columns
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+        columns.push(
+            {data: 'description'},
+            {data: 'equation'},
+            {data: 'status'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            {
+                targets: 3,
+                className: 'text-center',
+                render: DatatableUtil.getRenderColumnEstado
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 2,
+                    className: 'text-center',
+                    render: DatatableUtil.getRenderColumnEstado
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        const filterSearch = document.querySelector('#lista-equation [data-table-filter="search"]');
+        let debounceTimeout;
+
+        filterSearch.addEventListener('keyup', function (e) {
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Equations';
+        var table = document.querySelector('#equation-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#equation-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#unit_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-equation').removeClass('hide');
+        } else {
+            $('#btn-eliminar-equation').addClass('hide');
+        }
+    }
 
     //Reset forms
     var resetForms = function () {
-        $('#equation-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("equation-form");
 
-        $('#estadoactivo').prop('checked', true);
+        KTUtil.get("estadoactivo").checked = true;
 
         // items
         items = [];
@@ -157,49 +254,160 @@ var Equations = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#equation-form").validate({
-            rules: {
-                descripcion: {
-                    required: true
-                },
-                equation: {
-                    required: true
-                }
+        var form = KTUtil.get('equation-form');
+
+        var constraints = {
+            descripcion: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            equation: {
+                presence: {message: "This field is required"},
+                format: {
+                    pattern: /^[0-9+\-*\/\s\(\)xX.]+$/,
+                    message: "Only numbers, operators (+ - * /), spaces, parentheses and x are allowed"
+                }
             }
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
+    };
+
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 1;
+    var initWizard = function () {
+        $(document).off('click', "#form-equation .wizard-tab");
+        $(document).on('click', "#form-equation .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
+
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
+            }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
         });
 
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    // $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-items').tab('show');
+                    actualizarTableListaItems();
+                    break;
+
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 1;
+        mostrarTab();
+        $('#btn-wizard-finalizar').removeClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+        $('#nav-tabs-equation').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("equation-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function () {
+        var result = true;
+        if (activeTab == 1) {
+
+            if (!validateForm()) {
+                result = false;
+            }
+
+        }
+
+        return result;
+    }
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("equation-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("equation-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
     };
 
     //Nuevo
@@ -211,12 +419,18 @@ var Equations = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new equation? Follow the next steps:";
-            $('#form-equation-title').html(formTitle);
-            $('#form-equation').removeClass('m--hide');
-            $('#lista-equation').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-equation'), '.card-label').innerHTML = "New Equation:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-equation'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-equation'), 'hide');
+    }
+
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
@@ -225,52 +439,50 @@ var Equations = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
-            var equation = $('#equation').val();
+            if (validateForm()) {
 
-            if ($('#equation-form').valid() && /^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
+                var formData = new URLSearchParams();
 
                 var equation_id = $('#equation_id').val();
+                formData.set("equation_id", equation_id);
 
                 var descripcion = $('#descripcion').val();
+                formData.set("description", descripcion);
+
+                var equation = $('#equation').val();
+                formData.set("equation", equation);
+
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+                formData.set("status", status);
 
                 BlockUtil.block('#form-equation');
 
-                $.ajax({
-                    type: "POST",
-                    url: "equation/salvarEquation",
-                    dataType: "json",
-                    data: {
-                        'equation_id': equation_id,
-                        'description': descripcion,
-                        'equation': equation,
-                        'status': status
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-equation');
-                        if (response.success) {
+                axios.post("equation/salvarEquation", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-                            cerrarForms();
-                            oTable.load();
+                                cerrarForms();
+
+                                oTable.draw();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-equation');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-            } else {
-                if (!/^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
-                    toastr.error('The equation expression is not valid', "");
-                }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-equation");
+                    });
             }
         };
     }
@@ -286,9 +498,8 @@ var Equations = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -302,60 +513,58 @@ var Equations = function () {
             var equation_id = $(this).data('id');
             $('#equation_id').val(equation_id);
 
-            $('#form-equation').removeClass('m--hide');
-            $('#lista-equation').addClass('m--hide');
+            mostrarForm();
 
             editRow(equation_id);
         });
 
         function editRow(equation_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("equation_id", equation_id);
+
             BlockUtil.block('#form-equation');
 
-            $.ajax({
-                type: "POST",
-                url: "equation/cargarDatos",
-                dataType: "json",
-                data: {
-                    'equation_id': equation_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-equation');
-                    if (response.success) {
-                        //Datos equation
+            axios.post("equation/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        var formTitle = "You want to update the equation? Follow the next steps:";
-                        $('#form-equation-title').html(formTitle);
+                            //Datos unit
+                            cargarDatos(response.equation);
 
-                        $('#descripcion').val(response.equation.descripcion);
-                        $('#equation').val(response.equation.equation);
-
-                        if (!response.equation.status) {
-                            $('#estadoactivo').prop('checked', false);
-                            $('#estadoinactivo').prop('checked', true);
+                        } else {
+                            toastr.error(response.error, "");
                         }
-
-                        // items
-                        items = response.equation.items;
-                        actualizarTableListaItems();
-
-                        // habilitar tab
-                        totalTabs = 2;
-                        $('#nav-tabs-equation').removeClass('m--hide');
-                        $('#btn-wizard-siguiente').removeClass('m--hide');
-
-                        event_change = false;
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-equation');
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-equation");
+                });
 
-                    toastr.error(response.error, "");
-                }
-            });
+            function cargarDatos(equation) {
+
+                KTUtil.find(KTUtil.get("form-equation"), ".card-label").innerHTML = "Update Equation: " + equation.descripcion;
+
+                $('#descripcion').val(equation.descripcion);
+                $('#equation').val(equation.equation);
+                $('#estadoactivo').prop('checked', equation.status);
+
+                // items
+                items = equation.items;
+                actualizarTableListaItems();
+
+                // habilitar tab
+                totalTabs = 2;
+                $('#nav-tabs-equation').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+
+                event_change = false;
+            }
 
         }
     };
@@ -366,9 +575,9 @@ var Equations = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+
+            // mostar modal
+            ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
         });
 
         $(document).off('click', "#btn-eliminar-equation");
@@ -387,22 +596,11 @@ var Equations = function () {
         });
 
         function btnClickEliminar() {
-            var ids = [];
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids.push(value);
-                    }
-                }
-            });
-
-            rowDelete = ids.join(',');
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#equation-table-editable').join(',');
+            rowDelete = ids;
             if (rowDelete != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
             } else {
                 toastr.error('Select items to delete', "");
             }
@@ -411,75 +609,71 @@ var Equations = function () {
         function btnClickModalEliminar() {
             var equation_id = rowDelete;
 
-            BlockUtil.block('#equation-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("equation_id", equation_id);
 
-            $.ajax({
-                type: "POST",
-                url: "equation/eliminarEquation",
-                dataType: "json",
-                data: {
-                    'equation_id': equation_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#equation-table-editable');
+            BlockUtil.block('#lista-equation');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("equation/eliminarEquation", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
 
-                    } else {
-                        toastr.error(response.error, "");
-
-                        // change pay items
-                        equation_ids_con_items = response.equation_ids_con_items;
-                        if (equation_ids_con_items.length > 0) {
-                            mostrarModalPayItems();
+                            // change pay items
+                            equation_ids_con_items = response.equation_ids_con_items;
+                            if (equation_ids_con_items.length > 0) {
+                                mostrarModalPayItems();
+                            }
                         }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#equation-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-equation");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
 
-            BlockUtil.block('#equation-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "equation/eliminarEquations",
-                dataType: "json",
-                data: {
-                    'ids': rowDelete
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#equation-table-editable');
-                    if (response.success) {
+            formData.set("ids", rowDelete);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-equation');
 
-                    } else {
-                        toastr.error(response.error, "");
+            axios.post("equation/eliminarEquations", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        // change pay items
-                        equation_ids_con_items = response.equation_ids_con_items;
-                        if (equation_ids_con_items.length > 0) {
-                            mostrarModalPayItems();
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+
+                            // change pay items
+                            equation_ids_con_items = response.equation_ids_con_items;
+                            if (equation_ids_con_items.length > 0) {
+                                mostrarModalPayItems();
+                            }
                         }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#equation-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-equation");
+                });
         };
     };
 
@@ -493,9 +687,8 @@ var Equations = function () {
         // reset
         pay_items = [];
 
-        // open modal
-        $('#modal-pay-items').modal('show');
-
+        // mostar modal
+        ModalUtil.show('modal-pay-items', { backdrop: 'static', keyboard: true });
 
         // listar items
         setTimeout(function () {
@@ -504,59 +697,53 @@ var Equations = function () {
 
     }
     var listarPayItems = function () {
+
+        var formData = new URLSearchParams();
+
+        formData.set("ids", equation_ids_con_items.join(','));
+
         BlockUtil.block('#modal-pay-items .modal-content');
 
-        $.ajax({
-            type: "POST",
-            url: "equation/listarPayItems",
-            dataType: "json",
-            data: {
-                'ids': equation_ids_con_items.join(',')
-            },
-            success: function (response) {
-                BlockUtil.unblock('#modal-pay-items .modal-content');
-                if (response.success) {
-                    //Datos equation
+        axios.post("equation/listarPayItems", formData, { responseType: "json" })
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    // todas equations
-                    equations = response.equations;
+                        // todas equations
+                        equations = response.equations;
 
-                    // items
-                    pay_items = response.items;
-                    actualizarTableListaPayItems();
+                        // items
+                        pay_items = response.items;
+                        actualizarTableListaPayItems();
 
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#modal-pay-items .modal-content');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#modal-pay-items .modal-content");
+            });
     }
     var initTablePayItems = function () {
-        BlockUtil.block('#pay-items-table-editable');
+        const table = "#pay-items-table-editable";
 
-        var table = $('#pay-items-table-editable');
+        // columns
+        const columns = [
+            {data: 'project'},
+            {data: 'item'},
+            {data: 'equation_id'},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "project",
-                title: "Project",
-            },
-            {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "equation_id",
-                title: "Equation",
-                width: 150,
-                textAlign: 'center',
-                template: function (row) {
-
+                targets: 2,
+                render: function (data, type, row) {
                     var options = '<option value="">Select equation</option>';
                     for (let item of equations) {
                         var equation = equation_ids_con_items.find(v => v == item.equationId);
@@ -566,85 +753,40 @@ var Equations = function () {
                     }
 
                     var select = `
-                    <select class="form-control select-equation-pay-item" data-id="${row.project_item_id}">
+                    <select class="form-select form-select2 form-select-solid fw-bold select-equation-pay-item" data-id="${row.project_item_id}">
                         ${options}
                     </select>
                     `;
 
                     return `<div>${select}</div>`;
                 }
-            }
+            },
         ];
-        oTablePayItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: pay_items,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-pay-items .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTablePayItems = DatatableUtil.initSafeDataTable(table, {
+            data: pay_items,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTablePayItems
-            .on('m-datatable--on-init', function () {
-                console.log('Datatable init');
-            })
-            .on('m-datatable--on-layout-updated', function () {
-                console.log('Layout render updated');
-            })
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatablePayItems();
     };
+    var handleSearchDatatablePayItems = function () {
+        $(document).off('keyup', '#lista-pay-items [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-pay-items [data-table-filter="search"]', function (e) {
+            oTablePayItems.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaPayItems = function () {
         if (oTablePayItems) {
             oTablePayItems.destroy();
@@ -658,37 +800,36 @@ var Equations = function () {
 
             if (isValidPayItems()) {
 
+                var formData = new URLSearchParams();
+
                 var pay_items_data = devolverPayItems();
+                formData.set("pay_items_data", JSON.stringify(pay_items_data));
 
                 BlockUtil.block('#modal-pay-items .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "equation/salvarPayItems",
-                    dataType: "json",
-                    data: {
-                        'pay_items': JSON.stringify(pay_items_data)
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-pay-items .modal-content');
-                        if (response.success) {
+                axios.post("equation/salvarPayItems", formData, { responseType: "json" })
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                oTable.draw();
 
-                            // close modal
-                            $('#modal-pay-items').modal('hide');
+                                // close modal
+                                ModalUtil.hide('modal-pay-items');
 
-                            oTable.load();
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-pay-items .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-pay-items .modal-content");
+                    });
 
             } else {
                 toastr.error('Select the equation for all pay items', "");
@@ -724,18 +865,6 @@ var Equations = function () {
         }
     }
 
-    //initPortlets
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-equation');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
     //Eventos change
     var event_change = false;
     var initAccionChange = function () {
@@ -751,258 +880,98 @@ var Equations = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-equation').addClass('m--hide');
-        $('#lista-equation').removeClass('m--hide');
+        $('#form-equation').addClass('hide');
+        $('#lista-equation').removeClass('hide');
     }
 
     // items
     var oTableItems;
     var items = [];
     var initTableItems = function () {
-        BlockUtil.block('#items-table-editable');
+        const table = "#items-table-editable";
 
-        var table = $('#items-table-editable');
-
-        var aoColumns = [
-            {
-                field: "project",
-                title: "Project",
-            },
-            {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "yield_calculation_name",
-                title: "Yield Calculation",
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            }
+        // columns
+        const columns = [
+            {data: 'project'},
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'yield_calculation_name'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'}
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
+
+        // column defs
+        let columnDefs = [
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
                 }
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
                 }
             },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            }
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                }
+            },
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
     };
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
         }
-
         initTableItems();
     }
 
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 1;
-    var initWizard = function () {
-        $(document).off('click', "#form-equation .wizard-tab");
-        $(document).on('click', "#form-equation .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab == totalTabs) {
-                    // $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-items').tab('show');
-                    actualizarTableListaItems();
-                    break;
-
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 2;
-        mostrarTab();
-        $('#btn-wizard-finalizar').removeClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-        $('#nav-tabs-equation').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab == 1) {
-
-            var equation = $('#equation').val();
-            var test_expr = /^[0-9+\-*\/\s\(\)xX.]+$/.test(equation);
-
-            if (!$('#equation-form').valid() || !test_expr) {
-
-                result = false;
-
-                if (!test_expr) {
-                    toastr.error('The equation expression is not valid', "");
-                }
-            }
-
-        }
-
-        return result;
+    var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
     }
 
     return {
         //main function to initiate the module
         init: function () {
 
-            initPortlets();
+            initWidgets();
+            
             initTable();
-            initForm();
+        
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             initAccionChange();
 

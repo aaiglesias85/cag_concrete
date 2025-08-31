@@ -248,15 +248,15 @@ class UnitService extends Base
         foreach ($resultado['data'] as $value) {
             $unit_id = $value->getUnitId();
 
-            $data[] = array(
+            $data[] = [
                 "id" => $unit_id,
                 "description" => $value->getDescription(),
                 "status" => $value->getStatus() ? 1 : 0,
-            );
+            ];
         }
 
         return [
-            'data'  => $data,
+            'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
     }

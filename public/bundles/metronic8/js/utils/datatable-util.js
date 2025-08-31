@@ -309,6 +309,83 @@ var DatatableUtil = function () {
     return `<div style="width: ${width}px;">${data}</div>`;
   }
 
+  // render column estado personalizado
+  var getRenderColumnEstadoPersonalizado = function (data) {
+    // color mas claro
+    let lighten_color = lightenColor(data.color);
+
+    return `<div style="width: 180px;"><span class="badge" style="background-color: ${lighten_color}; color:${data.color};">${data.nombre}</span></div>`;
+  }
+
+  // toma un color en formato hexadecimal y devuelve una versión más clara del mismo
+  var lightenColor = function(hex, percent = 80) {
+    // Eliminar el carácter # si está presente
+    hex = hex.replace(/^#/, "");
+
+    // Convertir el color a valores RGB
+    let r = parseInt(hex.substring(0, 2), 16);
+    let g = parseInt(hex.substring(2, 4), 16);
+    let b = parseInt(hex.substring(4, 6), 16);
+
+    // Aumentar la luminosidad
+    r = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
+    g = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
+    b = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
+
+    // Convertir de nuevo a hexadecimal y devolver el color
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  }
+
+  // escapar el contenido
+  var escapeHtml = function (text) {
+    return typeof text === 'string'
+        ? text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+        : text;
+  }
+
+  // escapar el contenido de la tabla
+  var initSafeDataTable = function (selector, options = {}) {
+
+    // Procesamos columnDefs
+    const safeColumnDefs = (options.columnDefs || []).map((def) => {
+      if (typeof def.render === 'function') {
+        // Si ya tiene render, lo dejamos tal cual
+        return def;
+      }
+
+      return {
+        ...def,
+        render: function (data, type, row, meta) {
+          return escapeHtml(data);
+        }
+      };
+    });
+
+    // Además, si alguna columna no tiene definición en columnDefs, se escapa por defecto
+    const usedTargets = new Set(safeColumnDefs.map(d => d.targets).flat());
+    const autoEscapedDefs = (options.columns || []).map((col, i) => {
+      if (usedTargets.has(i)) return null; // Ya definido
+      return {
+        targets: i,
+        render: function (data, type, row, meta) {
+          return escapeHtml(data);
+        }
+      };
+    }).filter(Boolean);
+
+    const finalOptions = {
+      ...options,
+      columnDefs: [...safeColumnDefs, ...autoEscapedDefs]
+    };
+
+    return $(selector).DataTable(finalOptions);
+  };
+
   return {
     getDataTableDatasource: getDataTableDatasource,
     errorDataTable: errorDataTable,
@@ -323,7 +400,11 @@ var DatatableUtil = function () {
     getRenderColumnEmail: getRenderColumnEmail,
     getRenderColumnEstado: getRenderColumnEstado,
     getRenderColumnSiNo: getRenderColumnSiNo,
-    getRenderColumnDiv: getRenderColumnDiv
+    getRenderColumnDiv: getRenderColumnDiv,
+    getRenderColumnEstadoPersonalizado: getRenderColumnEstadoPersonalizado,
+    lightenColor: lightenColor,
+    escapeHtml: escapeHtml,
+    initSafeDataTable: initSafeDataTable,
   }
 
 }();

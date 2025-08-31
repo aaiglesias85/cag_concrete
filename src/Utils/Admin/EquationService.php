@@ -26,7 +26,7 @@ class EquationService extends Base
 
             $equation_entity = $this->getDoctrine()->getRepository(Equation::class)->find($pay_item->equation_id);
 
-            if($project_item_entity != null && $equation_entity != null){
+            if ($project_item_entity != null && $equation_entity != null) {
                 $project_item_entity->setEquation($equation_entity);
             }
         }
@@ -119,7 +119,7 @@ class EquationService extends Base
                 "yield_calculation_name" => $yield_calculation_name,
                 "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
                 "project_id" => $value->getProject()->getProjectId(),
-                "project" => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getName(),
+                "project" => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
                 "posicion" => $key
             ];
         }
@@ -356,29 +356,29 @@ class EquationService extends Base
      */
     public function ListarEquations($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Equation::class)
+            ->ListarEquationsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        $lista = $this->getDoctrine()->getRepository(Equation::class)
-            ->ListarEquations($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $equation_id = $value->getEquationId();
 
             $acciones = $this->ListarAcciones($equation_id);
 
-            $arreglo_resultado[$cont] = array(
+            $data[] = [
                 "id" => $equation_id,
                 "description" => $value->getDescription(),
                 "equation" => $value->getEquation(),
                 "status" => $value->getStatus() ? 1 : 0,
                 "acciones" => $acciones
-            );
-
-            $cont++;
+            ];
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

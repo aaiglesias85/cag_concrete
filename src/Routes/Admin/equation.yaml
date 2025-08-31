@@ -3,7 +3,7 @@ equation:
   defaults: { _controller: App\Controller\Admin\EquationController::index }
 
 listarEquationAdmin:
-  path:  /equation/listarEquation
+  path:  /equation/listar
   defaults: { _controller: App\Controller\Admin\EquationController::listar, _format: json }
 
 eliminarEquationAdmin:

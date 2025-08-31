@@ -549,8 +549,6 @@ var Units = function () {
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             initAccionChange();
 
