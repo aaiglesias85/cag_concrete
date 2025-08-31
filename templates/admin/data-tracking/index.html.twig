@@ -914,15 +914,22 @@
                                             <div class="col-xl-12 order-1">
                                                 <div class="form-group m-form__group row align-items-center">
                                                     <div class="col-md-8">
-                                                        {% if permiso.agregar or permiso.editar %}
-                                                            <div class="btn-group">
+                                                        <div class="btn-group">
+                                                            {% if permiso.agregar or permiso.editar %}
                                                                 <button id="btn-agregar-archivo"
-                                                                        class="btn btn-success"
+                                                                        class="btn btn-success mr-2"
                                                                         style="margin-bottom: 20px; margin-top: 10px;">
                                                                     New <i class="la la-plus"></i>
                                                                 </button>
-                                                            </div>
-                                                        {% endif %}
+                                                            {% endif %}
+                                                            {% if permiso.eliminar %}
+                                                                <button id="btn-eliminar-archivos"
+                                                                        class="btn btn-danger"
+                                                                        style="margin-bottom: 20px; margin-top: 10px;">
+                                                                    Delete <i class="la la-trash"></i>
+                                                                </button>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="m-input-icon m-input-icon--left">

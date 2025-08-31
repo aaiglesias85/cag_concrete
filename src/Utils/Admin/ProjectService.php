@@ -29,6 +29,39 @@ class ProjectService extends Base
 {
 
     /**
+     * EliminarArchivos: Elimina varios archivos en la BD
+     *
+     * @param $archivos
+     * @return array
+     */
+    public function EliminarArchivos($archivos)
+    {
+        $resultado = array();
+
+        $archivos = explode(',', $archivos);
+        foreach ($archivos as $archivo) {
+            //Eliminar archivo
+            $dir = 'uploads/project/';
+            if (is_file($dir . $archivo)) {
+                unlink($dir . $archivo);
+            }
+
+            $em = $this->getDoctrine()->getManager();
+
+            $archivo_entity = $this->getDoctrine()->getRepository(ProjectAttachment::class)
+                ->findOneBy(array('file' => $archivo));
+            if ($archivo_entity != null) {
+                $em->remove($archivo_entity);
+            }
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+        return $resultado;
+    }
+
+    /**
      * EliminarArchivo: Elimina un archivo en la BD
      *
      * @param $archivo

@@ -3808,8 +3808,20 @@ var DataTracking = function () {
 
         var table = $('#lista-archivo-table-editable');
 
-        var aoColumns = [
-            {
+        var aoColumns = [];
+
+        if (permiso.eliminar) {
+            aoColumns.push({
+                field: "id",
+                title: "#",
+                sortable: false, // disable sort for this column
+                width: 40,
+                textAlign: 'center',
+                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
+            });
+        }
+
+        aoColumns.push({
                 field: "name",
                 title: "Name"
             },
@@ -3831,8 +3843,8 @@ var DataTracking = function () {
                     <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
                     `;
                 }
-            }
-        ];
+            });
+
         oTableListaArchivos = table.mDatatable({
             // datasource definition
             data: {
@@ -4002,7 +4014,7 @@ var DataTracking = function () {
 
             if (nEditingRowArchivo == null) {
                 archivos.push({
-                    id: '',
+                    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
                     name: nombre,
                     file: archivo,
                     posicion: archivos.length
@@ -4099,9 +4111,99 @@ var DataTracking = function () {
             }
         });
 
+        $(document).off('click', "#btn-eliminar-archivos");
+        $(document).on('click', "#btn-eliminar-archivos", function (e) {
+
+            var ids = [];
+            $('#lista-archivo-table-editable .m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
+                if ($(this).prop('checked')) {
+                    var value = $(this).attr('value');
+                    if (value != undefined) {
+                        ids.push(value);
+                    }
+                }
+            });
+
+            var archivos_name = [];
+            for (var i = 0; i < ids.length; i++) {
+                var archivo = archivos.find(item => item.id == ids[i]);
+                if (archivo) {
+                    archivos_name.push(archivo.file);
+                }
+            }
+
+            if (archivos_name.length > 0) {
+
+                swal.fire({
+                    buttonsStyling: false,
+                    html: "Are you sure you want to delete the selected atachments?",
+                    type: "warning",
+                    confirmButtonText: "Yes, delete it!",
+                    confirmButtonClass: "btn btn-sm btn-bold btn-success",
+                    showCancelButton: true,
+                    cancelButtonText: "No, cancel",
+                    cancelButtonClass: "btn btn-sm btn-bold btn-danger"
+                }).then(function (result) {
+                    if (result.value) {
+                        EliminarArchivos(ids, archivos_name.join(','));
+                    }
+                });
+
+            } else {
+                toastr.error('Select attachments to delete', "");
+            }
+
+            function EliminarArchivos(ids, archivos_name) {
+                MyApp.block('#lista-archivo-table-editable');
+
+                $.ajax({
+                    type: "POST",
+                    url: "data-tracking/eliminarArchivos",
+                    dataType: "json",
+                    data: {
+                        'archivos': archivos_name
+                    },
+                    success: function (response) {
+                        mApp.unblock('#lista-archivo-table-editable');
+                        if (response.success) {
+
+                            toastr.success(response.message, "");
+
+                            deleteArchivos(ids);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    },
+                    failure: function (response) {
+                        mApp.unblock('#lista-archivo-table-editable');
+
+                        toastr.error(response.error, "");
+                    }
+                });
+            }
+
+        });
+
         function deleteArchivo(posicion) {
             //Eliminar
             archivos.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < archivos.length; i++) {
+                archivos[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaArchivos();
+        }
+
+        function deleteArchivos(ids) {
+
+            for (var i = 0; i < ids.length; i++) {
+                var posicion = archivos.findIndex(item => item.id == ids[i]);
+                //Eliminar
+                archivos.splice(posicion, 1);
+            }
+
             //actualizar posiciones
             for (var i = 0; i < archivos.length; i++) {
                 archivos[i].posicion = i;
