@@ -1076,8 +1076,7 @@ var MyApp = function () {
 
     function getFirstDayOfMonth() {
         const today = new Date();
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        return `${firstDay.getMonth() + 1}/${firstDay.getDate()}/${firstDay.getFullYear()}`;
+        return new Date(today.getFullYear(), today.getMonth(), 1);
     }
 
     var evaluateExpression = function (expression, variableValue) {
@@ -1149,6 +1148,48 @@ var MyApp = function () {
             }
         });
     }
+
+    var formatearNumero = function (number, decimals, dec_point, thousands_sep) {
+        // Set the default values here, instead so we can use them in the replace below.
+        thousands_sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep;
+        dec_point = (typeof dec_point === 'undefined') ? '.' : dec_point;
+        decimals = !isFinite(+decimals) ? 0 : Math.abs(decimals);
+
+        // Work out the unicode representation for the decimal place and thousand sep.
+        var u_dec = ('\\u' + ('0000' + (dec_point.charCodeAt(0).toString(16))).slice(-4));
+        var u_sep = ('\\u' + ('0000' + (thousands_sep.charCodeAt(0).toString(16))).slice(-4));
+
+        // Fix the number, so that it's an actual number.
+        number = (number + '')
+            .replace('\.', dec_point) // because the number if passed in as a float (having . as decimal point per definition) we need to replace this with the passed in decimal point character
+            .replace(new RegExp(u_sep, 'g'), '')
+            .replace(new RegExp(u_dec, 'g'), '.')
+            .replace(new RegExp('[^0-9+\-Ee.]', 'g'), '');
+
+        var n = !isFinite(+number) ? 0 : +number,
+            s = '',
+            toFixedFix = function (n, decimals) {
+                var k = Math.pow(10, decimals);
+                return '' + Math.round(n * k) / k;
+            };
+
+        // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+        s = (decimals ? toFixedFix(n, decimals) : '' + Math.round(n)).split('.');
+        if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, thousands_sep);
+        }
+        if ((s[1] || '').length < decimals) {
+            s[1] = s[1] || '';
+            s[1] += new Array(decimals - s[1].length + 1).join('0');
+        }
+        return s.join(dec_point);
+    }
+
+    const formatMoney = (n) => {
+        const sign = n < 0 ? '-' : '';
+        const abs = Math.abs(Number(n) || 0);
+        return `${sign}$${abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
 
 
     return {
@@ -1235,6 +1276,8 @@ var MyApp = function () {
         stopSessionTimer: stopSessionTimer,
         getFirstDayOfMonth: getFirstDayOfMonth,
         evaluateExpression: evaluateExpression,
+        formatearNumero: formatearNumero,
+        formatMoney: formatMoney,
     };
 
 }();

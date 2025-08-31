@@ -83,28 +83,25 @@ class DefaultService extends Base
      */
     public function ListarStats($from = '', $to = '')
     {
-        // total de proyectos In Progress
-        $total_proyectos_activos = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 1, $from, $to);
+        $stats = $this->getDoctrine()
+            ->getRepository(Project::class)
+            ->ListarStats('', null, null, $from, $to);
 
-        // total de proyectos Not Started
-        $total_proyectos_inactivos = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 0, $from, $to);
+        $total = (int)$stats['total'];
 
-        // total de proyectos Completed
-        $total_proyectos_completed = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 2, $from, $to);
+        $stats['porcentaje_proyectos_activos']   = 0;
+        $stats['porcentaje_proyectos_inactivos'] = 0;
+        $stats['porcentaje_proyectos_completed'] = 0;
+        $stats['porcentaje_proyectos_canceled']  = 0;
 
-        // total de proyectos Canceled
-        $total_proyectos_canceled = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects('', '', '', 3, $from, $to);
+        if ($total > 0) {
+            $stats['porcentaje_proyectos_activos']   = round(($stats['total_proyectos_activos']   / $total) * 100, 2);
+            $stats['porcentaje_proyectos_inactivos'] = round(($stats['total_proyectos_inactivos'] / $total) * 100, 2);
+            $stats['porcentaje_proyectos_completed'] = round(($stats['total_proyectos_completed'] / $total) * 100, 2);
+            $stats['porcentaje_proyectos_canceled']  = round(($stats['total_proyectos_canceled']  / $total) * 100, 2);
+        }
 
-        return [
-            'total_proyectos_activos' => $total_proyectos_activos,
-            'total_proyectos_inactivos' => $total_proyectos_inactivos,
-            'total_proyectos_completed' => $total_proyectos_completed,
-            'total_proyectos_canceled' => $total_proyectos_canceled,
-        ];
+        return $stats;
     }
 
     /**
@@ -249,7 +246,8 @@ class DefaultService extends Base
         $data[] = [
             'name' => 'Invoiced',
             'amount' => $amount_daily,
-            'porciento' => $porciento_daily
+            'porciento' => $porciento_daily,
+            'color' => '#17C653'
         ];
 
         // profit
@@ -259,7 +257,8 @@ class DefaultService extends Base
         $data[] = [
             'name' => 'Profit',
             'amount' => $amount_profit,
-            'porciento' => $porciento_profit
+            'porciento' => $porciento_profit,
+            'color' => '#F6C000'
         ];
 
         return [
@@ -343,7 +342,8 @@ class DefaultService extends Base
         $data[] = [
             'name' => 'Concrete',
             'amount' => $total_concrete,
-            'porciento' => $porciento_concrete
+            'porciento' => $porciento_concrete,
+            'color' => '#17C653'
         ];
 
         // labor
@@ -352,7 +352,8 @@ class DefaultService extends Base
         $data[] = [
             'name' => 'Labor',
             'amount' => $total_labor,
-            'porciento' => $porciento_labor
+            'porciento' => $porciento_labor,
+            'color' => '#F6C000'
         ];
 
         // material
@@ -361,7 +362,8 @@ class DefaultService extends Base
         $data[] = [
             'name' => 'Materials',
             'amount' => $total_material,
-            'porciento' => $porciento_material
+            'porciento' => $porciento_material,
+            'color' => '#1B84FF'
         ];
 
         return [

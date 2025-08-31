@@ -15,7 +15,8 @@
             <!--begin::Page title-->
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                 <!--begin::Title-->
-                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Home</h1>
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    Home</h1>
                 <!--end::Title-->
                 <!--begin::Breadcrumb-->
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -50,6 +51,380 @@
         <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-fluid">
 
+            <div id="card-dashboard" class="card card-sticky card-border-0 card-reset">
+                <div class="card-header rounded"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="card-dashboard"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '70px', xl: '70px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+
+                        <!-- filtro status -->
+                        <div class="w-150px me-5">
+                            <select id="filtro-status"
+                                    class="form-select form-select2 form-select-solid fw-bold">
+                                <option value="">Status</option>
+                                <option value="1">In Progress</option>
+                                <option value="2">Completed</option>
+                                <option value="3">Canceled</option>
+                            </select>
+                        </div>
+                        <!-- filtro project -->
+                        <div class="input-group input-group-solid flex-nowrap w-400px">
+                            <div class="overflow-hidden flex-grow-1">
+                                <select class="form-select form-select-solid rounded-end-0 border-end"
+                                        id="filtro-project">
+                                    <option></option>
+                                </select>
+                            </div>
+                            <span class="input-group-text hide" id="view-project">
+                                  <i style="cursor: pointer;"
+                                     class="ki-duotone ki-eye fs-3"><span class="path1"></span><span
+                                              class="path2"></span><span
+                                              class="path3"></span><span class="path4"></span></i>
+                            </span>
+                        </div>
+
+                    </div>
+                    <div class="card-toolbar">
+                        <div class="d-flex justify-content-end">
+
+                            <!--filter-->
+                            <div>
+                                <button type="button" class="btn btn-primary me-3"
+                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-filter fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Filter</span>
+                                </button>
+                                <div id="filter-menu" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px"
+                                     data-kt-menu="true">
+                                    <!--begin::Header-->
+                                    <div class="px-7 py-5">
+                                        <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Separator-->
+                                    <div class="separator border-gray-200"></div>
+                                    <!--end::Separator-->
+                                    <!--begin::Content-->
+                                    <div class="px-7 py-5">
+
+                                        <div class="mb-3">
+                                            <div class="input-group input-group-solid date-picker-filter"
+                                                 id="datetimepicker-desde" data-td-target-input="nearest"
+                                                 data-td-target-toggle="nearest">
+                                                <input type="text" class="form-control filter-date" placeholder="Desde"
+                                                       data-td-target="#datetimepicker-desde" autocomplete="off"/>
+                                                <span class="input-group-text" data-td-target="#datetimepicker-desde"
+                                                      data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="input-group input-group-solid date-picker-filter"
+                                                 id="datetimepicker-hasta" data-td-target-input="nearest"
+                                                 data-td-target-toggle="nearest">
+                                                <input type="text" class="form-control filter-date" placeholder="Hasta"
+                                                       data-td-target="#datetimepicker-hasta" autocomplete="off"/>
+                                                <span class="input-group-text" data-td-target="#datetimepicker-hasta"
+                                                      data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!--begin::Actions-->
+                                        <div class="d-flex justify-content-end mt-10">
+                                            <button type="reset"
+                                                    class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                                    data-kt-menu-dismiss="true"
+                                                    id="btn-reset-filtrar">Reset filters
+                                            </button>
+                                            <button type="submit" class="btn btn-primary fw-semibold px-6"
+                                                    data-kt-menu-dismiss="true" id="btn-filtrar">
+                                                Apply
+                                            </button>
+                                        </div>
+                                        <!--end::Actions-->
+                                    </div>
+                                    <!--end::Content-->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-5 ps-0 pe-0">
+
+                    <!-- sin informacion -->
+                    <div id="div-sin-stats" class="row g-5 gx-xl-10 mb-5 mb-xl-10 {{ stats.total > 0 ? 'hide' }}">
+                        <div class="col-md-12 mb-10">
+                            <div class="card card-flush h-md-100">
+                                <div style="background-position: 100% 70%; background-image:url('{{ asset('bundles/metronic8/assets/media/stock/900x600/42.png') }}')"
+                                     class="card-body d-flex flex-column justify-content-between mt-9 bgi-no-repeat bgi-size-cover bgi-position-x-center pb-0">
+                                    <div class="mb-10">
+                                        <div class="fs-2 fw-bold text-gray-800 text-center mb-13">
+                                            <span>There are no statistics</span>
+                                        </div>
+                                    </div>
+                                    <img class="mx-auto h-150px h-lg-200px theme-light-show"
+                                         src="{{ asset('bundles/metronic8/assets/media/illustrations/dozzy-1/4.png') }}"
+                                         alt="">
+                                    <img class="mx-auto h-150px h-lg-200px theme-dark-show"
+                                         src="{{ asset('bundles/metronic8/assets/media/illustrations/dozzy-1/4-dark.png') }}"
+                                         alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- con informacion -->
+                    <div id="div-con-stats" class="{{ stats.total == 0 ? 'hide' }}">
+                        <div class="row gx-5 gx-xl-10 mb-5">
+                            <!--begin::Col-->
+                            <div class="col-md-3 col-lg-6 col-xl-6 col-xxl-3">
+                                <div class="card card-flush">
+                                    <div class="card-header pt-5">
+                                        <div class="card-title d-flex flex-column">
+                                            <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold me-2 lh-1 ls-n2" id="total_projects">
+                                          {{ stats.total }}
+                                        </span>
+                                            </div>
+                                            <span class="pt-1 fw-semibold fs-6">Projects</span>
+                                        </div>
+                                        <div class="card-toolbar">
+                                            <a href="{{ url('project') }}" title="View all projects"
+                                               class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
+                                                <i class="ki-duotone ki-exit-right-corner fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div id="chart_estados" class="min-h-auto" style="height: 220px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-md-3 col-lg-6 col-xl-6 col-xxl-3">
+                                <div class="card card-flush">
+                                    <div class="card-header pt-5">
+                                        <div class="card-title d-flex flex-column">
+                                            <div class="d-flex align-items-center">
+                                                <span class="fs-2hx fw-bold me-2 lh-1 ls-n2" id="total_cost">
+                                                  ${{ chart1.total | number_format(2, '.', ',') }}
+                                                </span>
+                                            </div>
+                                            <span class="pt-1 fw-semibold fs-6">Cost Breakdown</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div id="chart_costs" class="min-h-auto" style="height: 220px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-md-3 col-lg-6 col-xl-6 col-xxl-3">
+                                <div class="card card-flush">
+                                    <div class="card-header pt-5">
+                                        <div class="card-title d-flex flex-column">
+                                            <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold me-2 lh-1 ls-n2" id="total_profit">
+                                          ${{ chart2.total | number_format(2, '.', ',') }}
+                                        </span>
+                                            </div>
+                                            <span class="pt-1 fw-semibold fs-6">Invoice/Profit Share</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div id="chart_profit" class="min-h-auto" style="height: 220px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-md-3 col-lg-6 col-xl-6 col-xxl-3">
+                                <div class="card card-flush">
+                                    <div class="card-header pt-5">
+                                        <div class="card-title d-flex flex-column">
+                                            <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold me-2 lh-1 ls-n2" id="total_invoices">
+                                          ${{ chart2.total | number_format(2, '.', ',') }}
+                                        </span>
+                                            </div>
+                                            <span class="pt-1 fw-semibold fs-6">Sales Stats</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body p-2">
+                                        <div id="chart_invoices" class="min-h-auto" style="height: 220px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                        <div class="row gx-5 gx-xl-10 mb-5">
+                            <!--begin::Col-->
+                            <div class="col-md-4 col-lg-6 col-xl-6 col-xxl-4">
+                                <div class="card h-md-100">
+                                    <div class="card-header align-items-center border-0">
+                                        <h3 class="fw-bold text-gray-900 m-0">Projects</h3>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <div class="scroll-y h-350px">
+                                            <div class="table-responsive">
+                                                <!--begin::Table-->
+                                                <table id="table-projects"
+                                                       class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+                                                    <thead>
+                                                    <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+                                                        <th class="min-w-125px">PROJECT</th>
+                                                        <th class="pe-0 text-end min-w-100px">DUE DATE</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for item in projects %}
+                                                        <tr class="project-item" data-id="{{ item.project_id }}"
+                                                            style="cursor: pointer;">
+                                                            <td class="ps-0">
+                                                                <a href="javascript:;"
+                                                                   class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">
+                                                                    {{ item.description }}
+                                                                </a>
+                                                                <span class="text-gray-500 fw-semibold fs-7 d-block text-start ps-0"># {{ item.number }}</span>
+                                                            </td>
+                                                            <td class="text-end pe-0">
+                                                                <span class="text-gray-800 fw-bold d-block fs-6">{{ item.dueDate }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                                <!--end::Table-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-md-4 col-lg-6 col-xl-6 col-xxl-4">
+                                <div class="card h-md-100">
+                                    <div class="card-header border-0 py-5">
+                                        <h3 class="card-title align-items-start flex-column">
+                                            <span class="card-label fw-bold text-gray-900">Pay Items Totals</span>
+                                            <span class="text-gray-500 mt-1 fw-semibold fs-6 project-name"></span>
+                                        </h3>
+                                    </div>
+
+                                    <div class="card-body pt-2">
+                                        <div class="scroll-y h-350px">
+                                            <div class="table-responsive">
+                                                <!--begin::Table-->
+                                                <table id="table-items"
+                                                       class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+                                                    <thead>
+                                                    <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+                                                        <th class="min-w-125px">ITEM</th>
+                                                        <th class="pe-0 text-end min-w-100px">QUANTITY</th>
+                                                        <th class="pe-0 text-end min-w-100px">AMOUNT</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for item in items %}
+                                                        <tr>
+                                                            <td class="ps-0">
+                                                                <a href="javascript:;"
+                                                                   class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">
+                                                                    {{ item.name }}
+                                                                </a>
+                                                                <span class="text-gray-500 fw-semibold fs-7 d-block text-start ps-0"> {{ item.unit }}</span>
+                                                            </td>
+                                                            <td class="text-end pe-0">
+                                                                <span class="text-gray-800 fw-bold d-block fs-6">{{ item.quantity }}</span>
+                                                            </td>
+                                                            <td class="text-end pe-0">
+                                                                <span class="text-success fw-bold d-block fs-6">${{ item.amount | number_format(2,'.', ',') }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                                <!--end::Table-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-md-4 col-lg-6 col-xl-6 col-xxl-4">
+                                <div class="card h-md-100">
+                                    <div class="card-header border-0 py-5">
+                                        <h3 class="card-title align-items-start flex-column">
+                                            <span class="card-label fw-bold text-gray-900">Materials Totals</span>
+                                            <span class="text-gray-500 mt-1 fw-semibold fs-6 project-name"></span>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <div class="scroll-y h-350px">
+                                            <div class="table-responsive">
+                                                <!--begin::Table-->
+                                                <table id="table-materials"
+                                                       class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+                                                    <thead>
+                                                    <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+                                                        <th class="min-w-125px">MATERIAL</th>
+                                                        <th class="pe-0 text-end min-w-100px">QUANTITY</th>
+                                                        <th class="pe-0 text-end min-w-100px">AMOUNT</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for item in materials %}
+                                                        <tr>
+                                                            <td class="ps-0">
+                                                                <a href="javascript:;"
+                                                                   class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">
+                                                                    {{ item.name }}
+                                                                </a>
+                                                                <span class="text-gray-500 fw-semibold fs-7 d-block text-start ps-0"> {{ item.unit }}</span>
+                                                            </td>
+                                                            <td class="text-end pe-0">
+                                                                <span class="text-gray-800 fw-bold d-block fs-6">{{ item.quantity }}</span>
+                                                            </td>
+                                                            <td class="text-end pe-0">
+                                                                <span class="text-success fw-bold d-block fs-6">${{ item.amount | number_format(2,'.', ',') }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                                <!--end::Table-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
         <!--end::Content container-->
     </div>
@@ -61,11 +436,13 @@
     <script src="{{ asset('bundles/metronic8/js/pages/index.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
-        var chart1_data = {{ chart1|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+        var chart_estados_data = {{ stats|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
 
-        var chart2_data = {{ chart2|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+        var chart_costs_data = {{ chart1|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
 
-        var chart3_data = {{ chart3|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+        var chart_profit_data = {{ chart2|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
+
+        var chart_invoices_data = {{ chart3|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
 
         jQuery(document).ready(function () {
             Index.init();

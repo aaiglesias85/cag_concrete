@@ -6,21 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/logs.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/logs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/notifications.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/profile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/LogController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/LogController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/NotificationController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/NotificationController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/LogRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/LogRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/NotificationRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/NotificationRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/UsuarioRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/UsuarioRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/log.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/log.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/notification.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/notification.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/LogService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/LogService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/NotificationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/NotificationService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/log/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/log/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/notification/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/notification/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/usuario/perfil.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/usuario/perfil.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProjectRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProjectRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/DefaultService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/DefaultService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/default/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/default/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -265,7 +255,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1756443808180</updated>
-      <workItem from="1756443809293" duration="31565000" />
+      <workItem from="1756443809293" duration="52098000" />
     </task>
     <servers />
   </component>

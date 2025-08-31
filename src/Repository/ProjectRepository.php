@@ -349,4 +349,89 @@ class ProjectRepository extends EntityRepository
 
         return $consulta->getQuery()->getResult();
     }
+
+
+    /**
+     * ListarStats: Lista para las stats
+     *
+     *
+     */
+    public function ListarStats(
+        string $sSearch = '',
+        ?int $company_id = null,
+        ?int $inspector_id = null,
+        ?string $from = '',
+        ?string $to = ''
+    ): array {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.company', 'c')
+            ->leftJoin('p.inspector', 'i')
+            ->leftJoin('p.countyObj', 'co')
+            ->select([
+                'COUNT(p.projectId) AS total',
+                // In Progress = 1
+                'SUM(CASE WHEN p.status = 1 THEN 1 ELSE 0 END) AS total_proyectos_activos',
+                // Not Started = 0
+                'SUM(CASE WHEN p.status = 0 THEN 1 ELSE 0 END) AS total_proyectos_inactivos',
+                // Completed = 2
+                'SUM(CASE WHEN p.status = 2 THEN 1 ELSE 0 END) AS total_proyectos_completed',
+                // Canceled = 3
+                'SUM(CASE WHEN p.status = 3 THEN 1 ELSE 0 END) AS total_proyectos_canceled',
+            ]);
+
+        // Búsqueda libre
+        if ($sSearch !== '') {
+            $qb->andWhere('
+            p.invoiceContact LIKE :search OR
+            p.owner          LIKE :search OR
+            p.manager        LIKE :search OR
+            p.county         LIKE :search OR
+            p.projectNumber  LIKE :search OR
+            p.name           LIKE :search OR
+            p.description    LIKE :search OR
+            p.poNumber       LIKE :search OR
+            p.poCG           LIKE :search OR
+            co.description   LIKE :search
+        ')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        // Filtro compañía
+        if ($company_id !== null) {
+            $qb->andWhere('c.companyId = :company_id')
+                ->setParameter('company_id', $company_id);
+        }
+
+        // Filtro inspector
+        if ($inspector_id !== null) {
+            $qb->andWhere('i.inspectorId = :inspector_id')
+                ->setParameter('inspector_id', $inspector_id);
+        }
+
+        // Fechas (normaliza a día completo)
+        if ($from !== '') {
+            $fromDt = \DateTimeImmutable::createFromFormat('m/d/Y', $from)?->setTime(0, 0, 0);
+            if ($fromDt) {
+                $qb->andWhere('p.startDate >= :from')->setParameter('from', $fromDt->format('Y-m-d H:i:s'));
+            }
+        }
+        if ($to !== '') {
+            $toDt = \DateTimeImmutable::createFromFormat('m/d/Y', $to)?->setTime(23, 59, 59);
+            if ($toDt) {
+                $qb->andWhere('p.endDate <= :to')->setParameter('to', $toDt->format('Y-m-d H:i:s'));
+            }
+        }
+
+        // Ejecuta y castea a int
+        $row = $qb->getQuery()->getSingleResult(); // devuelve un array escalar
+
+        return [
+            'total'                         => (int)$row['total'],
+            'total_proyectos_activos'       => (int)$row['total_proyectos_activos'],
+            'total_proyectos_inactivos'     => (int)$row['total_proyectos_inactivos'],
+            'total_proyectos_completed'     => (int)$row['total_proyectos_completed'],
+            'total_proyectos_canceled'      => (int)$row['total_proyectos_canceled'],
+        ];
+    }
+
 }
