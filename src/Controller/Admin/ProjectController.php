@@ -913,4 +913,34 @@ class ProjectController extends AbstractController
             return $this->json($resultadoJson);
         }
     }
+
+    /**
+     * eliminarArchivos Acción que elimina varios archivos en la BD
+     *
+     */
+    public function eliminarArchivos(Request $request)
+    {
+        $archivos = $request->get('archivos');
+
+        try {
+            $resultado = $this->projectService->EliminarArchivos($archivos);
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

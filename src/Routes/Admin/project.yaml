@@ -102,3 +102,7 @@ salvarArchivoProjectAdmin:
 eliminarArchivoProjectAdmin:
   path: /project/eliminarArchivo
   defaults: { _controller: App\Controller\Admin\ProjectController::eliminarArchivo, _format: json}
+
+eliminarArchivosProjectAdmin:
+  path: /project/eliminarArchivos
+  defaults: { _controller: App\Controller\Admin\ProjectController::eliminarArchivos, _format: json}

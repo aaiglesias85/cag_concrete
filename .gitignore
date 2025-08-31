@@ -22,6 +22,9 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 
+.idea
+.idea/
+
 ###> symfony/asset-mapper ###
 #/public/assets/
 #/assets/vendor/

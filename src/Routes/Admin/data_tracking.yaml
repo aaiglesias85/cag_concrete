@@ -54,3 +54,7 @@ salvarArchivoDataTrackingAdmin:
 eliminarArchivoDataTrackingAdmin:
   path: /data-tracking/eliminarArchivo
   defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarArchivo, _format: json}
+
+eliminarArchivosDataTrackingAdmin:
+  path: /data-tracking/eliminarArchivos
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarArchivos, _format: json}
