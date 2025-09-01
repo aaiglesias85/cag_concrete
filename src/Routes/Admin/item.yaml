@@ -3,7 +3,7 @@ item:
   defaults: { _controller: App\Controller\Admin\ItemController::index }
 
 listarItemAdmin:
-  path:  /item/listarItem
+  path:  /item/listar
   defaults: { _controller: App\Controller\Admin\ItemController::listar, _format: json }
 
 eliminarItemAdmin:

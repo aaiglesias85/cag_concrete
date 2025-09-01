@@ -1,159 +1,248 @@
 var Items = function () {
-
-    var oTable;
+    
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#item-table-editable');
+        const table = "#item-table-editable";
+        // datasource
+        const datasource = DatatableUtil.getDataTableDatasource(`item/listar`);
 
-        var table = $('#item-table-editable');
+        // columns
+        const columns = getColumnsTable();
 
-        var aoColumns = [];
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
 
-        aoColumns.push(
-            {
-                field: "description",
-                title: "Name"
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 120,
-            },
-            /*{
-                field: "price",
-                title: "Price",
-                width: 150,
-                textAlign: 'center',
-            },*/
-            {
-                field: "yieldCalculation",
-                title: "Yield Calculation",
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'Active', 'class': ' m-badge--success'},
-                        0: {'title': 'Inactive', 'class': ' m-badge--danger'}
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
-                }
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'item/listarItem',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#item-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#item-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#item-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#item-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#item-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-item .m_form_search').on('keyup', function (e) {
-            // shortcode to datatable.getDataSourceParam('query');
-            var query = oTable.getDataSourceQuery();
-            query.generalSearch = $(this).val().toLowerCase();
-            // shortcode to datatable.setDataSourceParam('query', query);
-            oTable.setDataSourceQuery(query);
-            oTable.load();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        // columns
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+        columns.push(
+            {data: 'description'},
+            {data: 'unit'},
+            {data: 'yieldCalculation'},
+            {data: 'status'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            {
+                targets: 4,
+                className: 'text-center',
+                render: DatatableUtil.getRenderColumnEstado
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 3,
+                    className: 'text-center',
+                    render: DatatableUtil.getRenderColumnEstado
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        const filterSearch = document.querySelector('#lista-item [data-table-filter="search"]');
+        let debounceTimeout;
+
+        filterSearch.addEventListener('keyup', function (e) {
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Items';
+        var table = document.querySelector('#item-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#item-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#item_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-item').removeClass('hide');
+        } else {
+            $('#btn-eliminar-item').addClass('hide');
+        }
+    }
 
     //Reset forms
     var resetForms = function () {
-        $('#item-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("item-form");
+
+        KTUtil.get("estadoactivo").checked = true;
 
         $('#unit').val('');
         $('#unit').trigger('change');
@@ -163,12 +252,10 @@ var Items = function () {
 
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
-        $('#estadoactivo').prop('checked', true);
-
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
 
         // projects
         projects = [];
@@ -180,46 +267,160 @@ var Items = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#item-form").validate({
-            rules: {
-                descripcion: {
-                    required: true
-                }
+        var form = KTUtil.get('item-form');
+
+        var constraints = {
+            descripcion: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+        return result;
+    };
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 1;
+    var initWizard = function () {
+        $(document).off('click', "#form-item .wizard-tab");
+        $(document).on('click', "#form-item .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
 
-                });
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
             }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
+            //bug visual de la tabla que muestra las cols corridas
+            switch (activeTab) {
+                case 2:
+                    actualizarTableListaProjects()
+                    break;
+            }
+
         });
 
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    // $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-projects').tab('show');
+                    actualizarTableListaProjects();
+                    break;
+
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 1;
+        mostrarTab();
+        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+        $('#nav-tabs-item').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("item-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function () {
+        var result = true;
+        if (activeTab == 1) {
+
+            if (!validateForm()) {
+                result = false;
+            }
+
+        }
+
+        return result;
+    }
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("item-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("item-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
     };
 
     //Nuevo
@@ -231,12 +432,18 @@ var Items = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new item? Follow the next steps:";
-            $('#form-item-title').html(formTitle);
-            $('#form-item').removeClass('m--hide');
-            $('#lista-item').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-item'), '.card-label').innerHTML = "New Item:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-item'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-item'), 'hide');
+    }
+
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
@@ -245,78 +452,63 @@ var Items = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
             var unit_id = $('#unit').val();
 
-            if ($('#item-form').valid() && unit_id != "" && isValidYield()) {
+            if (validateForm() && unit_id != "" && isValidYield()) {
+
+                var formData = new URLSearchParams();
 
                 var item_id = $('#item_id').val();
+                formData.set("item_id", item_id);
+
+                formData.set("unit_id", unit_id);
 
                 var descripcion = $('#descripcion').val();
-                // var price = $('#price').val();
+                formData.set("description", descripcion);
+
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+                formData.set("status", status);
+
                 var yield_calculation = $('#yield-calculation').val();
+                formData.set("yield_calculation", yield_calculation);
+
                 var equation_id = $('#equation').val();
+                formData.set("equation_id", equation_id);
 
                 BlockUtil.block('#form-item');
 
-                $.ajax({
-                    type: "POST",
-                    url: "item/salvarItem",
-                    dataType: "json",
-                    data: {
-                        'item_id': item_id,
-                        'description': descripcion,
-                        // 'price': price,
-                        'unit_id': unit_id,
-                        'status': status,
-                        'yield_calculation': yield_calculation,
-                        'equation_id': equation_id
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-item');
-                        if (response.success) {
+                axios.post("item/salvarItem", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-                            cerrarForms();
-                            oTable.load();
+                                cerrarForms();
+
+                                oTable.draw();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-item');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-item");
+                    });
             } else {
                 if (unit_id == "") {
-                    var $element = $('#select-unit .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-unit"), "This field is required");
                 }
                 if (!isValidYield()) {
-                    var $element = $('#select-equation .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-equation"), "This field is required");
                 }
             }
         };
@@ -330,7 +522,6 @@ var Items = function () {
         if (yield_calculation == 'equation' && equation_id == '') {
             valid = false;
         }
-
 
         return valid;
     }
@@ -347,9 +538,8 @@ var Items = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -368,8 +558,8 @@ var Items = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-item').addClass('m--hide');
-        $('#lista-item').removeClass('m--hide');
+        $('#form-item').addClass('hide');
+        $('#lista-item').removeClass('hide');
     };
     //Editar
     var initAccionEditar = function () {
@@ -381,79 +571,76 @@ var Items = function () {
             var item_id = $(this).data('id');
             $('#item_id').val(item_id);
 
-            $('#form-item').removeClass('m--hide');
-            $('#lista-item').addClass('m--hide');
+            mostrarForm();
 
             editRow(item_id);
         });
 
         function editRow(item_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("item_id", item_id);
+
             BlockUtil.block('#form-item');
 
-            $.ajax({
-                type: "POST",
-                url: "item/cargarDatos",
-                dataType: "json",
-                data: {
-                    'item_id': item_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-item');
-                    if (response.success) {
-                        //Datos item
+            axios.post("item/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        var formTitle = "You want to update the item? Follow the next steps:";
-                        $('#form-item-title').html(formTitle);
+                            //cargar datos
+                            cargarDatos(response.item);
 
-                        $('#descripcion').val(response.item.descripcion);
-                        // $('#price').val(response.item.price);
-
-                        $('#unit').val(response.item.unit_id);
-                        $('#unit').trigger('change');
-
-                        if (!response.item.status) {
-                            $('#estadoactivo').prop('checked', false);
-                            $('#estadoinactivo').prop('checked', true);
+                        } else {
+                            toastr.error(response.error, "");
                         }
-
-                        // yield
-                        $('#yield-calculation').off('change', changeYield);
-
-                        $('#yield-calculation').val(response.item.yield_calculation);
-                        $('#yield-calculation').trigger('change');
-
-                        $('#equation').val(response.item.equation_id);
-                        $('#equation').trigger('change');
-
-                        if (response.item.yield_calculation === 'equation') {
-                            $('#select-equation').removeClass('m--hide');
-                        }
-
-
-                        $('#yield-calculation').on('change', changeYield);
-
-                        // projects
-                        totalTabs = 2;
-                        $('#btn-wizard-siguiente').removeClass('m--hide');
-                        $('#nav-tabs-item').removeClass('m--hide');
-
-                        projects = response.item.projects;
-                        actualizarTableListaProjects();
-
-                        event_change = false;
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-item');
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-item");
+                });
 
-                    toastr.error(response.error, "");
+            function cargarDatos(item) {
+
+                KTUtil.find(KTUtil.get("form-item"), ".card-label").innerHTML = "Update Item: " + item.descripcion;
+
+                $('#descripcion').val(item.descripcion);
+
+                $('#unit').val(item.unit_id);
+                $('#unit').trigger('change');
+                
+              
+                $('#estadoactivo').prop('checked', item.status);
+
+                // yield
+                $('#yield-calculation').off('change', changeYield);
+
+                $('#yield-calculation').val(item.yield_calculation);
+                $('#yield-calculation').trigger('change');
+
+                $('#equation').val(item.equation_id);
+                $('#equation').trigger('change');
+
+                if (item.yield_calculation === 'equation') {
+                    $('#select-equation').removeClass('hide');
                 }
-            });
+                
+                $('#yield-calculation').on('change', changeYield);
 
+                // projects
+                totalTabs = 2;
+                $('#btn-wizard-siguiente').removeClass('hide');
+                $('#nav-tabs-item').removeClass('hide');
+
+                projects = item.projects;
+                actualizarTableListaProjects();
+
+                event_change = false;
+            }
         }
     };
     //Eliminar
@@ -463,9 +650,8 @@ var Items = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
         });
 
         $(document).off('click', "#btn-eliminar-item");
@@ -484,20 +670,10 @@ var Items = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#item-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
             } else {
                 toastr.error('Select items to delete', "");
             }
@@ -506,81 +682,67 @@ var Items = function () {
         function btnClickModalEliminar() {
             var item_id = rowDelete;
 
-            BlockUtil.block('#item-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("item_id", item_id);
 
-            $.ajax({
-                type: "POST",
-                url: "item/eliminarItem",
-                dataType: "json",
-                data: {
-                    'item_id': item_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#item-table-editable');
+            BlockUtil.block('#lista-item');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("item/eliminarItem", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
-
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#item-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-item");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#item-table-editable').join(',');
 
-            BlockUtil.block('#item-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "item/eliminarItems",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#item-table-editable');
-                    if (response.success) {
+            formData.set("ids", rowDelete);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-item');
 
+            axios.post("item/eliminarItems", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#item-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-item");
+                });
         };
     };
 
 
     var initWidgets = function () {
-
-        initPortlets();
-
-        $('.m-select2').select2();
+        // init widgets generales
+        MyApp.initWidgets();
 
         // change
         $('#yield-calculation').change(changeYield);
@@ -592,24 +754,12 @@ var Items = function () {
         // reset
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
         if (yield_calculation == 'equation') {
-            $('#select-equation').removeClass('m--hide');
+            $('#select-equation').removeClass('hide');
         }
     }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-item');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
     // unit
     var initAccionesUnit = function () {
         $(document).off('click', "#btn-add-unit");
@@ -652,106 +802,54 @@ var Items = function () {
     var oTableProjects;
     var projects = [];
     var initTableProjects = function () {
-        BlockUtil.block('#projects-table-editable');
+        const table = "#projects-table-editable";
 
-        var table = $('#projects-table-editable');
+        // columns
+        const columns = [
+            {data: 'number'},
+            {data: 'county'},
+            {data: 'name'},
+            {data: 'description'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "number",
-                title: "C & G Project #",
-                width: 120,
-            },
-            {
-                field: "county",
-                title: "County"
-            },
-            {
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "description",
-                title: "Description"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit project"><i class="la la-edit"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row,  ['edit']);
+                },
             }
         ];
-        oTableProjects = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: projects,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-projects .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableProjects = DatatableUtil.initSafeDataTable(table, {
+            data: projects,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableProjects
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#projects-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#projects-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#projects-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#projects-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#projects-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableProjects();
     };
+    var handleSearchDatatableProjects = function () {
+        $(document).off('keyup', '#lista-projects [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-projects [data-table-filter="search"]', function (e) {
+            oTableProjects.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaProjects = function () {
         if (oTableProjects) {
             oTableProjects.destroy();
@@ -777,118 +875,19 @@ var Items = function () {
 
     };
 
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 1;
-    var initWizard = function () {
-        $(document).off('click', "#form-item .wizard-tab");
-        $(document).on('click', "#form-item .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    actualizarTableListaProjects()
-                    break;
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab == totalTabs) {
-                    // $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-projects').tab('show');
-                    actualizarTableListaProjects();
-                    break;
-
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 1;
-        mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-        $('#nav-tabs-item').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        return true;
-    }
-
     return {
         //main function to initiate the module
         init: function () {
 
             initWidgets();
+
             initTable();
-            initForm();
+
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             initAccionChange();
 

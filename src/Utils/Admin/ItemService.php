@@ -444,33 +444,30 @@ class ItemService extends Base
      */
     public function ListarItems($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Item::class)
+            ->ListarItemsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        $lista = $this->getDoctrine()->getRepository(Item::class)
-            ->ListarItems($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $item_id = $value->getItemId();
-
-            $acciones = $this->ListarAcciones($item_id);
 
             $yield_calculation = $this->DevolverYieldCalculationDeItem($value);
 
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $item_id,
                 "description" => $value->getDescription(),
                 // "price" => number_format($value->getPrice(), 2, '.', ','),
                 "status" => $value->getStatus() ? 1 : 0,
                 "unit" => $value->getUnit()->getDescription(),
                 "yieldCalculation" => $yield_calculation,
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

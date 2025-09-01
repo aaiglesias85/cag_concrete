@@ -9,51 +9,41 @@ var ModalEquation = function () {
     }
 
     var initWidgets = function () {
-
+        // init widgets generales
+        MyApp.initWidgets();
     }
 
-    var initFormEquation = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#equation-form").validate({
-            rules: {
-                descripcion: {
-                    required: true
-                },
-                equation: {
-                    required: true
-                }
+        var form = KTUtil.get('equation-form');
+
+        var constraints = {
+            descripcion: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            equation: {
+                presence: {message: "This field is required"},
+                format: {
+                    pattern: /^[0-9+\-*\/\s\(\)xX.]+$/,
+                    message: "Only numbers, operators (+ - * /), spaces, parentheses and x are allowed"
+                }
             }
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
 
     var mostrarModal = function () {
@@ -61,9 +51,8 @@ var ModalEquation = function () {
         // reset form
         resetFormEquation();
 
-        $('#modal-equation').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-equation', {backdrop: 'static', keyboard: true});
     }
     var initAccionesEquation = function () {
 
@@ -73,62 +62,52 @@ var ModalEquation = function () {
         });
 
         function btnClickSalvarFormEquation() {
+            
+            if (validateForm()) {
 
-            var equation = $('#equation-equation').val();
+                var formData = new URLSearchParams();
 
-            if ($('#equation-form').valid() && /^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
-
+                formData.set("equation_id", '');
+                
                 var descripcion = $('#equation-descripcion').val();
+                formData.set("description", descripcion);
+                
+                var equation = $('#equation-equation').val();
+                formData.set("equation", equation);
+
+                formData.set("status", 1);
 
                 BlockUtil.block('#modal-equation .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "equation/salvarEquation",
-                    dataType: "json",
-                    data: {
-                        'equation_id': '',
-                        'description': descripcion,
-                        'equation': equation,
-                        'status': 1
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-equation .modal-content');
-                        if (response.success) {
+                axios.post("equation/salvarEquation", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                equation_new = {equation_id: response.equation_id, description: descripcion, equation: equation};
 
-                            equation_new = {equation_id: response.equation_id, description: descripcion, equation: equation};
+                                // close modal
+                                ModalUtil.hide('modal-equation');
 
-                            // close modal
-                            $('#modal-equation').modal('hide');
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-equation .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-            }
-            else {
-                if (!/^[0-9+\-*\/\s\(\)xX.]+$/.test(equation)) {
-                    toastr.error('The equation expression is not valid', "");
-                }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-equation .modal-content");
+                    });
             }
         };
     };
     var resetFormEquation = function () {
-        $('#equation-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("equation-form");
 
         // reset equation
         equation_new = null;
@@ -140,8 +119,6 @@ var ModalEquation = function () {
 
             initWidgets();
 
-            // items
-            initFormEquation();
             initAccionesEquation();
         },
         mostrarModal: mostrarModal,

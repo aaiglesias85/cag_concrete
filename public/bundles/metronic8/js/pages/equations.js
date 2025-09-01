@@ -173,7 +173,7 @@ var Equations = function () {
         }).container().appendTo($('#equation-table-editable-buttons'));
 
         // Hook dropdown menu click event to datatable export buttons
-        const exportButtons = document.querySelectorAll('#unit_export_menu [data-kt-export]');
+        const exportButtons = document.querySelectorAll('#equation_export_menu [data-kt-export]');
         exportButtons.forEach(exportButton => {
             exportButton.addEventListener('click', e => {
                 e.preventDefault();

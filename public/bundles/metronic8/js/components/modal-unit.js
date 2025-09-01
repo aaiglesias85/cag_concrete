@@ -9,48 +9,34 @@ var ModalUnit = function () {
     }
 
     var initWidgets = function () {
-
+        // init widgets generales
+        MyApp.initWidgets();
     }
 
-    var initFormUnit = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#unit-form").validate({
-            rules: {
-                descripcion: {
-                    required: true
-                }
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        var form = KTUtil.get('unit-form');
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+        var constraints = {
+            descripcion: {
+                presence: {message: "This field is required"},
             }
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
 
     var mostrarModal = function () {
@@ -58,9 +44,8 @@ var ModalUnit = function () {
         // reset form
         resetFormUnit();
 
-        $('#modal-unit').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-unit', {backdrop: 'static', keyboard: true});
     }
     var initAccionesUnit = function () {
 
@@ -71,53 +56,48 @@ var ModalUnit = function () {
 
         function btnClickSalvarFormUnit() {
 
-            if ($('#unit-form').valid() ) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
+                
+                formData.set("unit_id", '');
 
                 var descripcion = $('#unit-descripcion').val();
+                formData.set("description", descripcion);
+                
+                formData.set("status", 1);
 
                 BlockUtil.block('#modal-unit .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "unit/salvarUnit",
-                    dataType: "json",
-                    data: {
-                        'unit_id': '',
-                        'description': descripcion,
-                        'status': 1
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-unit .modal-content');
-                        if (response.success) {
+                axios.post("unit/salvarUnit", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                unit_new = {unit_id: response.unit_id, description: descripcion};
 
-                            unit_new = {unit_id: response.unit_id, description: descripcion};
+                                // close modal
+                                ModalUtil.hide('modal-unit');
 
-                            // close modal
-                            $('#modal-unit').modal('hide');
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-unit .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-unit .modal-content");
+                    });
             }
         };
     };
     var resetFormUnit = function () {
-        $('#unit-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("unit-form");
 
         // reset unit
         unit_new = null;
@@ -128,9 +108,7 @@ var ModalUnit = function () {
         init: function () {
 
             initWidgets();
-
-            // items
-            initFormUnit();
+            
             initAccionesUnit();
         },
         mostrarModal: mostrarModal,
