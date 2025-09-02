@@ -6,17 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-equation.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-equation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-unit.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-unit.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/equations.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/equations.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/my-components.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/my-components.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/inspectors.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/inspectors.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/items.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/items.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ItemController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/ItemRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ItemRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/item.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/item.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/ItemService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/ItemService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/block/modal-equation.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/block/modal-equation.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/block/modal-unit.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/block/modal-unit.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/item/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/item/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/InspectorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/InspectorController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/InspectorRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/InspectorRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/inspector.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/inspector.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/InspectorService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/InspectorService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/inspector/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/inspector/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -271,7 +269,7 @@
       <updated>1756443808180</updated>
       <workItem from="1756443809293" duration="52098000" />
       <workItem from="1756661702269" duration="598000" />
-      <workItem from="1756662307510" duration="16519000" />
+      <workItem from="1756662307510" duration="22846000" />
     </task>
     <servers />
   </component>

@@ -300,30 +300,28 @@ class InspectorService extends Base
      */
     public function ListarInspectors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
 
-        $lista = $this->getDoctrine()->getRepository(Inspector::class)
-            ->ListarInspectors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $this->getDoctrine()->getRepository(Inspector::class)
+            ->ListarInspectorsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        foreach ($lista as $value) {
+        $data = [];
+
+        foreach ($resultado['data'] as $value) {
             $inspector_id = $value->getInspectorId();
 
-            $acciones = $this->ListarAcciones($inspector_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $inspector_id,
                 "name" => $value->getName(),
                 "email" => $value->getEmail(),
                 "phone" => $value->getPhone(),
                 "status" => $value->getStatus() ? 1 : 0,
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

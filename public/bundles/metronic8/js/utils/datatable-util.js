@@ -204,6 +204,11 @@ var DatatableUtil = function () {
     return `<a href="mailto:${data}" class="link">${data}</a>`;
   }
 
+  // render column phone
+  var getRenderColumnPhone = function (data) {
+    return `<a href="tel:${data}" class="link">${data}</a>`;
+  }
+
   // render column estado
   var getRenderColumnEstado = function (data) {
     var status = {
@@ -398,6 +403,7 @@ var DatatableUtil = function () {
     getRenderAccionesDataSourceLocal: getRenderAccionesDataSourceLocal,
     getAccionesDataSourceLocal: getAccionesDataSourceLocal,
     getRenderColumnEmail: getRenderColumnEmail,
+    getRenderColumnPhone: getRenderColumnPhone,
     getRenderColumnEstado: getRenderColumnEstado,
     getRenderColumnSiNo: getRenderColumnSiNo,
     getRenderColumnDiv: getRenderColumnDiv,

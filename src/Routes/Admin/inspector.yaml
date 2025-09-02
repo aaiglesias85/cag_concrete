@@ -3,7 +3,7 @@ inspectors:
   defaults: { _controller: App\Controller\Admin\InspectorController::index }
 
 listarInspectorAdmin:
-  path:  /inspector/listarInspector
+  path:  /inspector/listar
   defaults: { _controller: App\Controller\Admin\InspectorController::listar, _format: json }
 
 eliminarInspectorAdmin:

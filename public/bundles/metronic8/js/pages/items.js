@@ -821,7 +821,7 @@ var Items = function () {
                 orderable: false,
                 className: 'text-center',
                 render: function (data, type, row) {
-                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row,  ['edit']);
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row,  ['detalle']);
                 },
             }
         ];
@@ -860,8 +860,8 @@ var Items = function () {
 
     var initAccionesProjects = function () {
 
-        $(document).off('click', "#projects-table-editable a.edit");
-        $(document).on('click', "#projects-table-editable a.edit", function (e) {
+        $(document).off('click', "#projects-table-editable a.detalle");
+        $(document).on('click', "#projects-table-editable a.detalle", function (e) {
             var posicion = $(this).data('posicion');
             if (projects[posicion]) {
 
