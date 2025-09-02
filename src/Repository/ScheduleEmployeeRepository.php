@@ -45,7 +45,7 @@ class ScheduleEmployeeRepository extends EntityRepository
                 ->setParameter('employee_id', $employee_id);
         }
 
-        $consulta->orderBy('s.dateStart', "ASC");
+        $consulta->orderBy('s.day', "ASC");
 
         return $consulta->getQuery()->getResult();
     }

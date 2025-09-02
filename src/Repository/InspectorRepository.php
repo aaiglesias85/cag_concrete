@@ -80,7 +80,7 @@ class InspectorRepository extends EntityRepository
      *
      * @return []
      */
-    public function ListarInspectorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
+    public function ListarInspectorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
 
         // Whitelist de columnas ordenables
         $sortable = [

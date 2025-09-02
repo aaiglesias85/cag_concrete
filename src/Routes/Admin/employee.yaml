@@ -3,7 +3,7 @@ employee:
   defaults: { _controller: App\Controller\Admin\EmployeeController::index }
 
 listarEmployeeAdmin:
-  path:  /employee/listarEmployee
+  path:  /employee/listar
   defaults: { _controller: App\Controller\Admin\EmployeeController::listar, _format: json }
 
 eliminarEmployeeAdmin:

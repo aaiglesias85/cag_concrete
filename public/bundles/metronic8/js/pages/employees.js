@@ -1,188 +1,299 @@
 var Employees = function () {
-
-    var oTable;
+    
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#employee-table-editable');
+        const table = "#employee-table-editable";
+        // datasource
+        const datasource = DatatableUtil.getDataTableDatasource(`employee/listar`);
 
-        var table = $('#employee-table-editable');
+        // columns
+        const columns = getColumnsTable();
 
-        var aoColumns = [];
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
 
-        aoColumns.push(
-            {
-                field: "name",
-                title: "Name"
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "hourlyRate",
-                title: "Hourly Rate"
-            },
-            {
-                field: "position",
-                title: "Position"
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'employee/listarEmployee',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar employees
-                employees: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#employee-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#employee-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#employee-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#employee-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#employee-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-employee .m_form_search').on('keyup', function (e) {
-            // shortcode to datatable.getDataSourceParam('query');
-            var query = oTable.getDataSourceQuery();
-            query.generalSearch = $(this).val().toLowerCase();
-            // shortcode to datatable.setDataSourceParam('query', query);
-            oTable.setDataSourceQuery(query);
-            oTable.load();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        // columns
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+        columns.push(
+            {data: 'name'},
+            {data: 'hourlyRate'},
+            {data: 'position'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    if (type !== 'display') return data; // mantiene orden/búsqueda por texto
+
+                    if (!row.color) return data;
+
+                    return `
+                          <span class="d-inline-flex align-items-center">
+                            <span class="dt-color-dot" style="background:${row.color}"></span>
+                            <span>${data}</span>
+                          </span>
+                        `;
+                },
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        if (type !== 'display') return data; // mantiene orden/búsqueda por texto
+
+                        if (!color) return data;
+
+                        return `
+                          <span class="d-inline-flex align-items-center">
+                            <span class="dt-color-dot" style="background:${color}"></span>
+                            <span>${data}</span>
+                          </span>
+                        `;
+                    },
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        const filterSearch = document.querySelector('#lista-employee [data-table-filter="search"]');
+        let debounceTimeout;
+
+        filterSearch.addEventListener('keyup', function (e) {
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Employees';
+        var table = document.querySelector('#employee-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#employee-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#employee_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-employee').removeClass('hide');
+        } else {
+            $('#btn-eliminar-employee').addClass('hide');
+        }
+    }
 
     //Reset forms
     var resetForms = function () {
-        $('#employee-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#color').minicolors('value', '#34bfa3');
+        // reset form
+        MyUtil.resetForm("employee-form");
+        
+        $('#color').minicolors('value', '#17C653');
 
         event_change = false;
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#employee-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-                hourly_rate: {
-                    required: true
-                }
+        var form = KTUtil.get('employee-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            hourlyrate: {
+                presence: {message: "This field is required"},
+            },
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
+        return result;
     };
 
     //Nuevo
@@ -194,12 +305,18 @@ var Employees = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new employee? Follow the next steps:";
-            $('#form-employee-title').html(formTitle);
-            $('#form-employee').removeClass('m--hide');
-            $('#lista-employee').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-employee'), '.card-label').innerHTML = "New Employee:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-employee'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-employee'), 'hide');
+    }
+    
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-salvar-employee");
@@ -208,49 +325,53 @@ var Employees = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
-            if ($('#employee-form').valid()) {
-
+            if (validateForm()) {
+                
+                var formData = new URLSearchParams();
+                
                 var employee_id = $('#employee_id').val();
+                formData.set("employee_id", employee_id);
 
                 var name = $('#name').val();
+                formData.set("name", name);
+                
                 var hourly_rate = $('#hourly_rate').val();
+                formData.set("hourly_rate", hourly_rate);
+                
                 var position = $('#position').val();
+                formData.set("position", position);
+                
                 var color = $('#color').val();
+                formData.set("color", color);
 
                 BlockUtil.block('#form-employee');
 
-                $.ajax({
-                    type: "POST",
-                    url: "employee/salvarEmployee",
-                    dataType: "json",
-                    data: {
-                        'employee_id': employee_id,
-                        'name': name,
-                        'hourly_rate': hourly_rate,
-                        'position': position,
-                        'color': color
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-employee');
-                        if (response.success) {
+                axios.post("employee/salvarEmployee", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-                            cerrarForms();
-                            oTable.load();
+                                cerrarForms();
+
+                                oTable.draw();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-employee');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-employee");
+                    });
             }
         };
     }
@@ -267,9 +388,8 @@ var Employees = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -288,8 +408,8 @@ var Employees = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-employee').addClass('m--hide');
-        $('#lista-employee').removeClass('m--hide');
+        $('#form-employee').addClass('hide');
+        $('#lista-employee').removeClass('hide');
     };
     //Editar
     var initAccionEditar = function () {
@@ -301,48 +421,50 @@ var Employees = function () {
             var employee_id = $(this).data('id');
             $('#employee_id').val(employee_id);
 
-            $('#form-employee').removeClass('m--hide');
-            $('#lista-employee').addClass('m--hide');
+            mostrarForm();
 
             editRow(employee_id);
         });
 
         function editRow(employee_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("employee_id", employee_id);
+
             BlockUtil.block('#form-employee');
 
-            $.ajax({
-                type: "POST",
-                url: "employee/cargarDatos",
-                dataType: "json",
-                data: {
-                    'employee_id': employee_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-employee');
-                    if (response.success) {
-                        //Datos employee
+            axios.post("employee/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        var formTitle = "You want to update the employee? Follow the next steps:";
-                        $('#form-employee-title').html(formTitle);
+                            //Datos unit
+                            cargarDatos(response.employee);
 
-                        $('#name').val(response.employee.name);
-                        $('#hourly_rate').val(response.employee.hourly_rate);
-                        $('#position').val(response.employee.position);
-                        $('#color').minicolors('value', response.employee.color);
-
-                        event_change = false;
-
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-employee');
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-employee");
+                });
 
-                    toastr.error(response.error, "");
-                }
-            });
+            function cargarDatos(employee) {
+
+                KTUtil.find(KTUtil.get("form-employee"), ".card-label").innerHTML = "Update Employee: " + employee.name;
+
+                $('#name').val(employee.name);
+                $('#hourly_rate').val(employee.hourly_rate);
+                $('#position').val(employee.position);
+                $('#color').minicolors('value', employee.color);
+
+                event_change = false;
+            }
 
         }
     };
@@ -353,9 +475,8 @@ var Employees = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
         });
 
         $(document).off('click', "#btn-eliminar-employee");
@@ -374,20 +495,10 @@ var Employees = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#employee-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
             } else {
                 toastr.error('Select employees to delete', "");
             }
@@ -396,84 +507,84 @@ var Employees = function () {
         function btnClickModalEliminar() {
             var employee_id = rowDelete;
 
-            BlockUtil.block('#employee-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("employee_id", employee_id);
 
-            $.ajax({
-                type: "POST",
-                url: "employee/eliminarEmployee",
-                dataType: "json",
-                data: {
-                    'employee_id': employee_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#employee-table-editable');
+            BlockUtil.block('#lista-employee');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("employee/eliminarEmployee", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
 
+                            // change pay items
+                            employee_ids_con_items = response.employee_ids_con_items;
+                            if (employee_ids_con_items.length > 0) {
+                                mostrarModalPayItems();
+                            }
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#employee-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-employee");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#employee-table-editable').join(',');
 
-            BlockUtil.block('#employee-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "employee/eliminarEmployees",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#employee-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-employee');
 
+            axios.post("employee/eliminarEmployees", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+
+                            // change pay items
+                            employee_ids_con_items = response.employee_ids_con_items;
+                            if (employee_ids_con_items.length > 0) {
+                                mostrarModalPayItems();
+                            }
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#employee-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-employee");
+                });
         };
     };
 
 
     var initWidgets = function () {
-
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
         $('#color').minicolors({
             control: 'hue',
             format: "hex",
-            defaultValue: '#34bfa3',
+            defaultValue: '#17C653',
             inline: false,
             letterCase: 'uppercase',
             opacity: false,
@@ -485,30 +596,17 @@ var Employees = function () {
         });
     }
 
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-employee');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
     return {
         //main function to initiate the module
         init: function () {
 
             initWidgets();
+
             initTable();
-            initForm();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             initAccionChange();
 
