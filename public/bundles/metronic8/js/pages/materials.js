@@ -529,7 +529,7 @@ var Materials = function () {
 
             var formData = new URLSearchParams();
 
-            formData.set("ids", rowDelete);
+            formData.set("ids", ids);
 
             BlockUtil.block('#lista-material');
 

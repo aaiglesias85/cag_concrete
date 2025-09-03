@@ -3,7 +3,7 @@ overheadprice:
   defaults: { _controller: App\Controller\Admin\OverheadPriceController::index }
 
 listarOverheadAdmin:
-  path:  /overhead-price/listarOverhead
+  path:  /overhead-price/listar
   defaults: { _controller: App\Controller\Admin\OverheadPriceController::listar, _format: json }
 
 eliminarOverheadAdmin:
