@@ -905,7 +905,7 @@ google map
     border-color: #037fff !important;
 }
 
-.form-control-number, .form-control-number-float {
+.form-control-number, .form-control-float, .form-control-price {
     text-align: right;
 }
 

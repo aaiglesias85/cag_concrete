@@ -98,4 +98,51 @@ class MaterialRepository extends EntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * ListarMaterialsConTotal Lista los materials con total
+     *
+     * @return []
+     */
+    public function ListarMaterialsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'materialId'  => 'm.materialId',
+            'name' => 'm.name',
+            'unit' => 'u.description',
+            'price' => 'm.price',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'm.name';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('m')
+            ->leftJoin('m.unit', 'u');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('m.name LIKE :search OR u.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(m.materialId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
 }

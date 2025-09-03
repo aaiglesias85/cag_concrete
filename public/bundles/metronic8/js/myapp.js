@@ -798,11 +798,32 @@ var MyApp = function () {
     }
 
     var handlerFormatNumber = function () {
-        if (!jQuery().number) {
-            return;
-        }
-        $('.form-control-number').number(true, 0, ',', '.');
-        $('.form-control-number-float').number(true, 6, ',', '.');
+        // Enteros
+        NumberUtil.jQueryPlugin(window.jQuery, '.form-control-number', {
+            decimals: 0,
+            decPoint: '.',
+            thousandsSep: ','
+        });
+
+        // precio
+        NumberUtil.jQueryPlugin(window.jQuery, '.form-control-price', {
+            decimals: 2,
+            decPoint: '.',
+            thousandsSep: ',',
+            roundMode: 'none',   // para moneda: redondea y deja 2 decimales
+            trimZeros: false      // mantiene ".00" (ya es el default)
+        });
+
+        // Con 6 decimales
+        NumberUtil.jQueryPlugin(window.jQuery, '.form-control-float', {
+            decimals: 6,
+            decPoint: '.',
+            thousandsSep: ','
+        });
+
+        // Ejemplos get y set
+        // const rate = NumberUtil.getNumericValue('#rate', {decPoint: '.', thousandsSep: ',', decimals: 6});
+        // numberUtil.setFormattedValue('#rate', 0.1234567, {decPoint: '.', thousandsSep: ',', decimals: 6});
     }
 
     //Cookies remember

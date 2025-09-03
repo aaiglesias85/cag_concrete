@@ -255,7 +255,7 @@ var Items = function () {
         $('#select-equation').removeClass('hide').addClass('hide');
 
         // tooltips selects
-        MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("item-form"));
 
         // projects
         projects = [];

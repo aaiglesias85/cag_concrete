@@ -6,15 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/employees.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/employees.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/EmployeeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/EmployeeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/EmployeeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/EmployeeRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/InspectorRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/InspectorRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/ScheduleEmployeeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ScheduleEmployeeRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/employee.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/employee.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/EmployeeService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/EmployeeService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/InspectorService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/InspectorService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/employee/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/employee/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/items.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/items.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/materials.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/materials.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/MaterialController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/MaterialController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/MaterialRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/MaterialRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/material.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/material.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/MaterialService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/MaterialService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/layout.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/layout.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/material/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/material/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -270,7 +271,7 @@
       <updated>1756443808180</updated>
       <workItem from="1756443809293" duration="52098000" />
       <workItem from="1756661702269" duration="598000" />
-      <workItem from="1756662307510" duration="25831000" />
+      <workItem from="1756662307510" duration="32427000" />
     </task>
     <servers />
   </component>
