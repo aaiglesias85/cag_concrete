@@ -1031,8 +1031,8 @@ var MyApp = function () {
         var fecha_array = fecha.split("/");
 
         var year = fecha_array[2];
-        var mouth = fecha_array[1] - 1;
-        var day = fecha_array[0];
+        var mouth = fecha_array[0] - 1;
+        var day = fecha_array[1];
 
         var objectDate = new Date(year, mouth, day);
 

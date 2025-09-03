@@ -267,69 +267,27 @@ class AdvertisementService extends Base
      */
     public function ListarAdvertisements($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Advertisement::class)
+            ->ListarAdvertisementsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(Advertisement::class)
-            ->ListarAdvertisements($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $advertisement_id = $value->getAdvertisementId();
 
-            $acciones = $this->ListarAcciones($advertisement_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $advertisement_id,
                 "title" => $value->getTitle(),
                 "description" => $value->getDescription(),
                 "status" => $value->getStatus() ? 1 : 0,
                 "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
                 "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalAdvertisements: Total de advertisements
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalAdvertisements($sSearch, $fecha_inicial, $fecha_fin)
-    {
-        $total = $this->getDoctrine()->getRepository(Advertisement::class)
-            ->TotalAdvertisements($sSearch, $fecha_inicial, $fecha_fin);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 17);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }

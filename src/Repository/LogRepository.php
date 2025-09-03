@@ -134,7 +134,7 @@ class LogRepository extends EntityRepository
 
         // Whitelist de campos ordenables
         $sortable = [
-            'id' => 'n.id',
+            'id' => 'l.id',
             'fecha' => 'l.fecha',
             'operacion' => 'l.operacion',
             'categoria' => 'l.categoria',

@@ -3,7 +3,7 @@ advertisement:
   defaults: { _controller: App\Controller\Admin\AdvertisementController::index }
 
 listarAdvertisementAdmin:
-  path:  /advertisement/listarAdvertisement
+  path:  /advertisement/listar
   defaults: { _controller: App\Controller\Admin\AdvertisementController::listar, _format: json }
 
 eliminarAdvertisementAdmin:
