@@ -226,65 +226,24 @@ class PlanStatusService extends Base
      */
     public function ListarStatus($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(PlanStatus::class)
+            ->ListarStatusConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        $lista = $this->getDoctrine()->getRepository(PlanStatus::class)
-            ->ListarStatus($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $status_id = $value->getStatusId();
 
-            $acciones = $this->ListarAcciones($status_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $status_id,
                 "description" => $value->getDescription(),
                 "status" => $value->getStatus() ? 1 : 0,
-                "acciones" => $acciones
             );
-
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalStatus: Total de statuss
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalStatus($sSearch)
-    {
-        return $this->getDoctrine()->getRepository(PlanStatus::class)
-            ->TotalStatus($sSearch);
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 27);
-
-        $acciones = '';
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }

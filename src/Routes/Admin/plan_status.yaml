@@ -15,7 +15,7 @@ eliminarPlanStatusAdmin:
   defaults: { _controller: App\Controller\Admin\PlanStatusController::eliminar, _format: json }
 
 eliminarPlanStatussAdmin:
-  path: /plan-status/eliminarStatuss
+  path: /plan-status/eliminarStatus
   defaults: { _controller: App\Controller\Admin\PlanStatusController::eliminarStatuss, _format: json }
 
 cargarDatosPlanStatusAdmin:
