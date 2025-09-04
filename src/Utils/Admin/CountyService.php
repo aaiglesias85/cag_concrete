@@ -270,66 +270,25 @@ class CountyService extends Base
      */
     public function ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(County::class)
+            ->ListarCountysConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id);
 
-        $lista = $this->getDoctrine()->getRepository(County::class)
-            ->ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $county_id = $value->getCountyId();
 
-            $acciones = $this->ListarAcciones($county_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $county_id,
                 "description" => $value->getDescription(),
                 "district" => $value->getDistrict() ? $value->getDistrict()->getDescription() : "",
                 "status" => $value->getStatus() ? 1 : 0,
-                "acciones" => $acciones
             );
-
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalCountys: Total de countys
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalCountys($sSearch, $district_id)
-    {
-        return $this->getDoctrine()->getRepository(County::class)
-            ->TotalCountys($sSearch, $district_id);
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 32);
-
-        $acciones = '';
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }
