@@ -6,13 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/employees.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/employees.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/project-stages.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/project-stages.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProjectStageController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProjectStageController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/ProjectStageRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProjectStageRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/ProjectStageService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/ProjectStageService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/project-types.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/project-types.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProjectTypeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProjectTypeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProjectTypeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProjectTypeRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/ProjectTypeService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/ProjectTypeService.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin/project-stage/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/project-stage/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/project-type/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/project-type/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -268,7 +267,7 @@
       <updated>1756443808180</updated>
       <workItem from="1756443809293" duration="52098000" />
       <workItem from="1756661702269" duration="598000" />
-      <workItem from="1756662307510" duration="45358000" />
+      <workItem from="1756662307510" duration="46030000" />
     </task>
     <servers />
   </component>
