@@ -469,7 +469,7 @@ var PlanStatus = function () {
                 // mostar modal
                 ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
             } else {
-                toastr.error('Select proposal types to delete', "");
+                toastr.error('Select plan status to delete', "");
             }
         };
 

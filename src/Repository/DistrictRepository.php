@@ -78,4 +78,50 @@ class DistrictRepository extends EntityRepository
         return (int)$consulta->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * ListarDistrictsConTotal Lista los districts con total
+     *
+     * @return []
+     */
+    public function ListarDistrictsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'districtId'  => 'd.districtId',
+            'description' => 'd.description',
+            'status' => 'd.status',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'd.description';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('d');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('d.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(d.districtId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
+
 }
