@@ -126,4 +126,65 @@ class ReminderRepository extends EntityRepository
         return (int)$consulta->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * ListarRemindersConTotal: Lista y cuenta aplicando los mismos filtros.
+     *
+     */
+    public function ListarRemindersConTotal(
+        int     $start,
+        int     $limit,
+        ?string $sSearch = null,
+        string  $sortField = 'day',
+        string  $sortDir = 'DESC',
+        ?string $fecha_inicial = '',
+        ?string $fecha_fin = ''
+    ): array
+    {
+        $sortable = [
+            'reminderId' => 'r.reminderId',
+            'subject' => 'r.subject',
+            'day' => 'r.day',
+            'destinatarios' => 'r.day',
+            'status' => 'r.status',
+        ];
+        $orderBy = $sortable[$sortField] ?? 'r.day';
+        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        
+        $baseQb = $this->createQueryBuilder('r');
+
+        if ($sSearch != "") {
+            $baseQb->andWhere('r.subject LIKE :search OR r.body LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+
+            $baseQb->andWhere('r.day >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
+
+            $baseQb->andWhere('r.day <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        // Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)->setFirstResult($start);
+        if ($limit > 0) $dataQb->setMaxResults($limit);
+        $data = $dataQb->getQuery()->getResult();
+
+        // Conteo
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')->select('COUNT(r.reminderId)');
+        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+
+        return ['data' => $data, 'total' => $total];
+    }
+
 }

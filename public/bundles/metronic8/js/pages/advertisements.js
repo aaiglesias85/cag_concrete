@@ -31,7 +31,7 @@ var Advertisements = function () {
         const language = DatatableUtil.getDataTableLenguaje();
 
         // order
-        const order = permiso.eliminar ? [[1, 'desc']] : [[0, 'desc']];
+        const order = permiso.eliminar ? [[2, 'desc']] : [[1, 'desc']];
 
         oTable = $(table).DataTable({
             searchDelay: 500,
@@ -510,6 +510,8 @@ var Advertisements = function () {
                 TempusUtil.setDate('datetimepicker-end-date', end_date);
 
                 $('#estadoactivo').prop('checked', advertisement.status);
+
+                event_change = false;
             }
 
         }

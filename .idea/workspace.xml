@@ -6,14 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/myapp.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-reminder.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/components/modal-reminder.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/advertisements.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/advertisements.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/AdvertisementController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/AdvertisementController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/AdvertisementRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/AdvertisementRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/LogRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/LogRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/advertisement.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/advertisement.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/AdvertisementService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/AdvertisementService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/advertisement/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/advertisement/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/reminders.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/reminders.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ReminderController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ReminderController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ReminderRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ReminderRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/ReminderService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/ReminderService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/reminder/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/reminder/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -269,7 +268,7 @@
       <updated>1756443808180</updated>
       <workItem from="1756443809293" duration="52098000" />
       <workItem from="1756661702269" duration="598000" />
-      <workItem from="1756662307510" duration="37573000" />
+      <workItem from="1756662307510" duration="41270000" />
     </task>
     <servers />
   </component>

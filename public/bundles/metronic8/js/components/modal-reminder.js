@@ -167,9 +167,7 @@ var ModalReminder = function () {
         TempusUtil.setDate('datetimepicker-day-reminder-modal', new Date());
 
         // limpiar select usuario
-        $('#usuario-reminder-modal option').each(function () {
-            if ($(this).val() !== "") $(this).remove();
-        });
+        MyUtil.limpiarSelect('#usuario-reminder-modal');
         initSelectUsuario();
 
         // limpiar Quill por selector

@@ -4,138 +4,265 @@ var Reminders = function () {
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#reminder-table-editable');
+        const table = "#reminder-table-editable";
 
-        var table = $('#reminder-table-editable');
+        // datasource
+        const datasource = {
+            url: `reminder/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        aoColumns.push(
-            {
-                field: "subject",
-                title: "Subject"
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[2, 'desc']] : [[1, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "day",
-                title: "Day"
-            },
-            {
-                field: "destinatarios",
-                title: "Recipients",
-                width: 550,
-                template: function (row) {
-                    return `<div>${row.destinatarios}</div>`;
-                }
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'Active', 'class': ' m-badge--success'},
-                        0: {'title': 'Inactive', 'class': ' m-badge--danger'}
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
-                }
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'reminder/listar',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar reminders
-                reminders: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#reminder-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#reminder-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#reminder-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#reminder-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#reminder-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-reminder .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+
+        columns.push(
+            {data: 'subject'},
+            {data: 'day'},
+            {data: 'destinatarios'},
+            {data: 'status'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            {
+                targets: 3,
+                orderable: false,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 600);
+                }
+            },
+            {
+                targets: 4,
+                className: 'text-center',
+                render: DatatableUtil.getRenderColumnEstado
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 2,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 600);
+                    }
+                },
+                {
+                    targets: 3,
+                    className: 'text-center',
+                    render: DatatableUtil.getRenderColumnEstado
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-reminder [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-reminder [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Reminders';
+        var table = document.querySelector('#reminder-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#reminder-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#reminder_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.reminder("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.reminder("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-reminder').removeClass('hide');
+        } else {
+            $('#btn-eliminar-reminder').addClass('hide');
+        }
+    }
 
     //Filtrar
     var initAccionFiltrar = function () {
@@ -145,114 +272,67 @@ var Reminders = function () {
             btnClickFiltrar();
         });
 
-    };
-    var initAccionResetFiltrar = function () {
-
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-reminder .m_form_search').val('');
-
-            $('#fechaInicial').val('');
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+            btnClickResetFilters();
         });
 
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-reminder .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-reminder [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-reminder [data-table-filter="search"]').val('');
 
-        var fechaInicial = $('#fechaInicial').val();
-        var fechaFin = $('#fechaFin').val();
+        TempusUtil.clear('datetimepicker-desde');
+        TempusUtil.clear('datetimepicker-hasta');
 
-        query.fechaInicial = fechaInicial;
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        oTable.search('').draw();
     }
 
     //Reset forms
     var resetForms = function () {
-        $('#reminder-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("reminder-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset fecha (TempusUtil, sin variables) — solo fecha
+        TempusUtil.clear('datetimepicker-day');
+        TempusUtil.setDate('datetimepicker-day', new Date());
 
-        var fecha_actual = new Date();
-        $('#day').val(fecha_actual.format('m/d/Y'));
+        // limpiar Quill por selector
+        QuillUtil.setHtml('#body', '');
 
+        KTUtil.get("estadoactivo").checked = true;
 
         // select usuario
-        $('#usuario option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
+        MyUtil.limpiarSelect('#usuario');
         initSelectUsuario();
 
-
-        $('#estadoactivo').prop('checked', true);
-
-        $('#body').summernote('code', '');
-
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("reminder-modal-form"));
 
         event_change = false;
     };
 
     //Validacion
-    var initForm = function () {
-        //Validacion
-        $("#reminder-form").validate({
-            rules: {
-                subject: {
-                    required: true
-                },
-                day: {
-                    required: true
-                }
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+    var validateForm = function () {
+        var result = false;
+        var form = KTUtil.get('reminder-form');
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var constraints = {
+            subject: { presence: { message: "This field is required" } },
+            day:     { presence: { message: "This field is required" } }, // sigue validando tu input hidden/text
+        };
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        var errors = validate(form, constraints);
+        if (!errors) result = true;
+        else MyApp.showErrorsValidateForm(form, errors);
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
+        MyUtil.attachChangeValidacion(form, constraints);
+        return result;
     };
 
     //Nuevo
@@ -264,12 +344,18 @@ var Reminders = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new reminder? Follow the next steps:";
-            $('#form-reminder-title').html(formTitle);
-            $('#form-reminder').removeClass('m--hide');
-            $('#lista-reminder').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-reminder'), '.card-label').innerHTML = "New Reminder:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-reminder'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-reminder'), 'hide');
+    }
+    
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-salvar-reminder");
@@ -278,80 +364,64 @@ var Reminders = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
             var usuarios_id = $('#usuario').val();
-            var body = $('#body').summernote('code');
 
-            if ($('#reminder-form').valid() && usuarios_id.length > 0 && body !== '') {
+            var body = QuillUtil.getHtml('#body');
+            var bodyIsEmpty = !body || body.trim() === '' || body === '<p><br></p>';
+
+            if (validateForm() && usuarios_id.length > 0 && !bodyIsEmpty) {
+
+                var formData = new URLSearchParams();
 
                 var reminder_id = $('#reminder_id').val();
-
+                formData.set("reminder_id", reminder_id);
+                
                 var subject = $('#subject').val();
-                var day = $('#day').val();
+                formData.set("subject", subject);
 
+                var day = TempusUtil.getString('datetimepicker-day');
+                formData.set("day", day)
+
+                formData.set("body", body);
+                formData.set("usuarios_id", usuarios_id.join(','));
 
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+                formData.set("status", status);
 
                 BlockUtil.block('#form-reminder');
 
-                $.ajax({
-                    type: "POST",
-                    url: "reminder/salvar",
-                    dataType: "json",
-                    data: {
-                        'reminder_id': reminder_id,
-                        'subject': subject,
-                        'body': body,
-                        'day': day,
-                        'usuarios_id': usuarios_id,
-                        'status': status
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-reminder');
-                        if (response.success) {
+                axios.post("reminder/salvar", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-                            cerrarForms();
+                                cerrarForms();
 
-                            btnClickFiltrar();
+                                btnClickFiltrar();
 
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-reminder');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-reminder");
+                    });
             } else {
-                if(usuarios_id.length === 0){
-                    var $element = $('#select-usuario .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                if (usuarios_id.length === 0) {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-usuario"), "This field is required");
                 }
-                if (body === "") {
-                    var $element = $('.note-editor');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "Este campo es obligatorio")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'top'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                if (bodyIsEmpty) {
+                    toastr.error("The body of the reminder cannot be empty.", "");
                 }
             }
         };
@@ -369,9 +439,8 @@ var Reminders = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -390,8 +459,8 @@ var Reminders = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-reminder').addClass('m--hide');
-        $('#lista-reminder').removeClass('m--hide');
+        $('#form-reminder').addClass('hide');
+        $('#lista-reminder').removeClass('hide');
     };
     //Editar
     var initAccionEditar = function () {
@@ -403,72 +472,68 @@ var Reminders = function () {
             var reminder_id = $(this).data('id');
             $('#reminder_id').val(reminder_id);
 
-            $('#form-reminder').removeClass('m--hide');
-            $('#lista-reminder').addClass('m--hide');
+            mostrarForm();
 
             editRow(reminder_id);
         });
 
         function editRow(reminder_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("reminder_id", reminder_id);
+
             BlockUtil.block('#form-reminder');
 
-            $.ajax({
-                type: "POST",
-                url: "reminder/cargarDatos",
-                dataType: "json",
-                data: {
-                    'reminder_id': reminder_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-reminder');
-                    if (response.success) {
-                        //Datos reminder
+            axios.post("reminder/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        var formTitle = "You want to update the reminder? Follow the next steps:";
-                        $('#form-reminder-title').html(formTitle);
+                            //Datos unit
+                            cargarDatos(response.reminder);
 
-                        $('#subject').val(response.reminder.subject);
-                        $('#body').summernote('code', response.reminder.body);
-
-                        $('#day').val(response.reminder.day);
-
-                        if (!response.reminder.status) {
-                            $('#estadoactivo').prop('checked', false);
-                            $('#estadoinactivo').prop('checked', true);
+                        } else {
+                            toastr.error(response.error, "");
                         }
-
-                        // destinatarios
-                        var select = "#usuario";
-
-                        $(select + ' option').each(function (e) {
-                            if ($(this).val() != "")
-                                $(this).remove();
-                        });
-                        initSelectUsuario();
-
-                        const destinatarios = response.reminder.destinatarios;
-                        for (var i = 0; i < destinatarios.length; i++) {
-                            $(select).append(new Option(`${destinatarios[i].nombre}<${destinatarios[i].email}>`, destinatarios[i].usuario_id, false, false));
-                        }
-
-                        // select
-                        const usuarios_id = destinatarios.map(item => item.usuario_id);
-                        $(select).val(usuarios_id);
-                        $(select).trigger('change');
-
-                        event_change = false;
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-reminder');
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-reminder");
+                });
 
-                    toastr.error(response.error, "");
+            function cargarDatos(reminder) {
+
+                KTUtil.find(KTUtil.get("form-reminder"), ".card-label").innerHTML = "Update Reminder: " + reminder.subject;
+
+                $('#subject').val(reminder.subject);
+                QuillUtil.setHtml('#body', reminder.body);
+
+                const day = MyApp.convertirStringAFecha(reminder.day);
+                TempusUtil.setDate('datetimepicker-day', day);
+
+                $('#estadoactivo').prop('checked', reminder.status);
+
+                // destinatarios
+                var select = "#usuario";
+                MyUtil.limpiarSelect(select);
+                initSelectUsuario();
+
+                const destinatarios = reminder.destinatarios;
+                for (var i = 0; i < destinatarios.length; i++) {
+                    $(select).append(new Option(`${destinatarios[i].nombre}<${destinatarios[i].email}>`, destinatarios[i].usuario_id, false, false));
                 }
-            });
+
+                // select
+                const usuarios_id = destinatarios.map(item => item.usuario_id);
+                $(select).val(usuarios_id);
+                $(select).trigger('change');
+
+                event_change = false;
+            }
 
         }
     };
@@ -479,9 +544,8 @@ var Reminders = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
         });
 
         $(document).off('click', "#btn-eliminar-reminder");
@@ -500,20 +564,10 @@ var Reminders = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#reminder-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
             } else {
                 toastr.error('Select reminders to delete', "");
             }
@@ -522,83 +576,90 @@ var Reminders = function () {
         function btnClickModalEliminar() {
             var reminder_id = rowDelete;
 
-            BlockUtil.block('#reminder-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("reminder_id", reminder_id);
 
-            $.ajax({
-                type: "POST",
-                url: "reminder/eliminar",
-                dataType: "json",
-                data: {
-                    'reminder_id': reminder_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#reminder-table-editable');
+            BlockUtil.block('#lista-reminder');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("reminder/eliminar", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
+                            oTable.draw();
 
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#reminder-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-reminder");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            var header_ids = [];
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                        header_ids.push(value);
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#reminder-table-editable').join(',');
 
-            BlockUtil.block('#reminder-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "reminder/eliminarReminders",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#reminder-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-reminder');
 
+            axios.post("reminder/eliminarReminders", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#reminder-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-reminder");
+                });
         };
     };
 
 
     var initWidgets = function () {
-
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
         initSelectUsuario();
+
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        TempusUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        TempusUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+
+        // Tempus Dominus SOLO FECHA (sin horas)
+        TempusUtil.initDate('datetimepicker-day', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
+        });
+
+        // Quill SIN variables: se gestiona por selector
+        QuillUtil.init('#body');
     }
 
     var initSelectUsuario = function () {
@@ -631,32 +692,17 @@ var Reminders = function () {
         });
     }
 
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-reminder');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
     return {
         //main function to initiate the module
         init: function () {
 
             initWidgets();
             initTable();
-            initForm();
 
             initAccionFiltrar();
-            initAccionResetFiltrar();
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             initAccionChange();
 

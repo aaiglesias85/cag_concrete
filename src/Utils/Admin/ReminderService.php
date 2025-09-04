@@ -291,16 +291,13 @@ class ReminderService extends Base
      */
     public function ListarReminders($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Reminder::class)
+            ->ListarRemindersConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(Reminder::class)
-            ->ListarReminders($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $reminder_id = $value->getReminderId();
-
-            $acciones = $this->ListarAcciones($reminder_id);
 
             // destinatarios
             $destinatarios = $this->ListarDestinatariosEmail($reminder_id);
@@ -310,21 +307,20 @@ class ReminderService extends Base
                 $destinatarios_html .= implode(', ', $grupo) . '<br>';
             }
 
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $reminder_id,
                 "day" => $value->getDay()->format('m/d/Y'),
                 "subject" => $value->getSubject(),
                 "body" => $value->getBody(),
                 "status" => $value->getStatus() ? 1 : 0,
                 "destinatarios" => $destinatarios_html,
-                "acciones" => $acciones
             );
-
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     // listar los destinatarios
@@ -339,42 +335,5 @@ class ReminderService extends Base
         }
 
         return $emails;
-    }
-
-    /**
-     * TotalReminders: Total de reminders
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalReminders($sSearch, $fecha_inicial, $fecha_fin)
-    {
-        return $this->getDoctrine()->getRepository(Reminder::class)
-            ->TotalReminders($sSearch, $fecha_inicial, $fecha_fin);
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 23);
-
-        $acciones = '';
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
     }
 }
