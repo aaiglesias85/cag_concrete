@@ -522,12 +522,6 @@ var Employees = function () {
                             oTable.draw();
                         } else {
                             toastr.error(response.error, "");
-
-                            // change pay items
-                            employee_ids_con_items = response.employee_ids_con_items;
-                            if (employee_ids_con_items.length > 0) {
-                                mostrarModalPayItems();
-                            }
                         }
                     } else {
                         toastr.error("An internal error has occurred, please try again.", "");
@@ -558,12 +552,6 @@ var Employees = function () {
                             oTable.draw();
                         } else {
                             toastr.error(response.error, "");
-
-                            // change pay items
-                            employee_ids_con_items = response.employee_ids_con_items;
-                            if (employee_ids_con_items.length > 0) {
-                                mostrarModalPayItems();
-                            }
                         }
                     } else {
                         toastr.error("An internal error has occurred, please try again.", "");

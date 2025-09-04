@@ -229,30 +229,26 @@ class ProjectStageService extends Base
      */
     public function ListarStages($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(ProjectStage::class)
+            ->ListarStagesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        $lista = $this->getDoctrine()->getRepository(ProjectStage::class)
-            ->ListarStages($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $stage_id = $value->getStageId();
 
-            $acciones = $this->ListarAcciones($stage_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $stage_id,
                 "description" => $value->getDescription(),
                 "color" => $value->getColor(),
                 "status" => $value->getStatus() ? 1 : 0,
-                "acciones" => $acciones
             );
-
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**
