@@ -1,119 +1,241 @@
 var Holidays = function () {
-
-    var oTable;
+    
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#holiday-table-editable');
+        const table = "#holiday-table-editable";
 
-        var table = $('#holiday-table-editable');
+        // datasource
+        const datasource = {
+            url: `holiday/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        aoColumns.push(
-            {
-                field: "day",
-                title: "Day"
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'desc']] : [[0, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "description",
-                title: "Description"
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'holiday/listarHoliday',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar holidays
-                holidays: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#holiday-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#holiday-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#holiday-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#holiday-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#holiday-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-holiday .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+
+        columns.push(
+            {data: 'day'},
+            {data: 'description'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-holiday [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-holiday [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Holidays';
+        var table = document.querySelector('#holiday-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#holiday-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#holiday_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.holiday("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.holiday("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-holiday').removeClass('hide');
+        } else {
+            $('#btn-eliminar-holiday').addClass('hide');
+        }
+    }
 
     //Filtrar
     var initAccionFiltrar = function () {
@@ -123,96 +245,54 @@ var Holidays = function () {
             btnClickFiltrar();
         });
 
-    };
-    var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
-
-        var generalSearch = $('#lista-holiday .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var fechaInicial = $('#fechaInicial').val();
-        var fechaFin = $('#fechaFin').val();
-
-        query.fechaInicial = fechaInicial;
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
-    }
-
-    var initAccionResetFiltrar = function () {
-
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-holiday .m_form_search').val('');
-
-            $('#fechaInicial').val('');
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+            btnClickResetFilters();
         });
 
     };
+    var btnClickFiltrar = function () {
+
+        const search = $('#lista-holiday [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-holiday [data-table-filter="search"]').val('');
+
+        TempusUtil.clear('datetimepicker-desde');
+        TempusUtil.clear('datetimepicker-hasta');
+
+        oTable.search('').draw();
+    }
 
     //Reset forms
     var resetForms = function () {
-        $('#holiday-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("holiday-form");
 
-            $element.data("description", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset fecha (TempusUtil, sin variables) — solo fecha
+        TempusUtil.clear('datetimepicker-day');
 
         event_change = false;
     };
 
     //Validacion
-    var initForm = function () {
-        //Validacion
-        $("#holiday-form").validate({
-            rules: {
-                day: {
-                    required: true
-                },
-                description: {
-                    required: true
-                }
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+    var validateForm = function () {
+        var result = false;
+        var form = KTUtil.get('holiday-form');
 
-                    $element.data("description", "") // Clear the description - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var constraints = {
+            description: { presence: { message: "This field is required" } },
+            day:     { presence: { message: "This field is required" } }, // sigue validando tu input hidden/text
+        };
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        var errors = validate(form, constraints);
+        if (!errors) result = true;
+        else MyApp.showErrorsValidateForm(form, errors);
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("description", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the description
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
+        MyUtil.attachChangeValidacion(form, constraints);
+        return result;
     };
 
     //Nuevo
@@ -224,12 +304,18 @@ var Holidays = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new holiday day? Follow the next steps:";
-            $('#form-holiday-description').html(formTitle);
-            $('#form-holiday').removeClass('m--hide');
-            $('#lista-holiday').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-holiday'), '.card-label').innerHTML = "New Holiday Day:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-holiday'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-holiday'), 'hide');
+    }
+    
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-salvar-holiday");
@@ -238,45 +324,47 @@ var Holidays = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
             
-            if ($('#holiday-form').valid()) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
 
                 var holiday_id = $('#holiday_id').val();
+                formData.set("holiday_id", holiday_id);
 
                 var description = $('#description').val();
-                var day = $('#day').val();
+                formData.set("description", description);
+
+                var day = TempusUtil.getString('datetimepicker-day');
+                formData.set("day", day);
 
                 BlockUtil.block('#form-holiday');
 
-                $.ajax({
-                    type: "POST",
-                    url: "holiday/salvarHoliday",
-                    dataType: "json",
-                    data: {
-                        'holiday_id': holiday_id,
-                        'description': description,
-                        'day': day,
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-holiday');
-                        if (response.success) {
+                axios.post("holiday/salvarHoliday", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-                            cerrarForms();
-                            oTable.load();
+                                cerrarForms();
+
+                                btnClickFiltrar();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-holiday');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-holiday");
+                    });
             }
         };
     }
@@ -293,9 +381,8 @@ var Holidays = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -314,8 +401,8 @@ var Holidays = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-holiday').addClass('m--hide');
-        $('#lista-holiday').removeClass('m--hide');
+        $('#form-holiday').addClass('hide');
+        $('#lista-holiday').removeClass('hide');
     };
     //Editar
     var initAccionEditar = function () {
@@ -327,47 +414,50 @@ var Holidays = function () {
             var holiday_id = $(this).data('id');
             $('#holiday_id').val(holiday_id);
 
-            $('#form-holiday').removeClass('m--hide');
-            $('#lista-holiday').addClass('m--hide');
+            mostrarForm();
 
             editRow(holiday_id);
         });
 
         function editRow(holiday_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("holiday_id", holiday_id);
+
             BlockUtil.block('#form-holiday');
 
-            $.ajax({
-                type: "POST",
-                url: "holiday/cargarDatos",
-                dataType: "json",
-                data: {
-                    'holiday_id': holiday_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-holiday');
-                    if (response.success) {
-                        //Datos holiday
+            axios.post("holiday/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        var formTitle = "You want to update the holiday day? Follow the next steps:";
-                        $('#form-holiday-description').html(formTitle);
+                            //Datos unit
+                            cargarDatos(response.holiday);
 
-                        $('#description').val(response.holiday.description);
-
-                        $('#day').val(response.holiday.day);
-
-                        event_change = false;
-
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-holiday');
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-holiday");
+                });
 
-                    toastr.error(response.error, "");
-                }
-            });
+            function cargarDatos(holiday) {
+
+                KTUtil.find(KTUtil.get("form-holiday"), ".card-label").innerHTML = "Update Holiday Day: " + holiday.description;
+
+                $('#description').val(holiday.description);
+               
+                const day = MyApp.convertirStringAFecha(holiday.day);
+                TempusUtil.setDate('datetimepicker-day', day);
+
+                event_change = false;
+            }
 
         }
     };
@@ -378,9 +468,8 @@ var Holidays = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
         });
 
         $(document).off('click', "#btn-eliminar-holiday");
@@ -399,20 +488,10 @@ var Holidays = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#holiday-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
             } else {
                 toastr.error('Select holidays to delete', "");
             }
@@ -421,91 +500,84 @@ var Holidays = function () {
         function btnClickModalEliminar() {
             var holiday_id = rowDelete;
 
-            BlockUtil.block('#holiday-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("holiday_id", holiday_id);
 
-            $.ajax({
-                type: "POST",
-                url: "holiday/eliminarHoliday",
-                dataType: "json",
-                data: {
-                    'holiday_id': holiday_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#holiday-table-editable');
+            BlockUtil.block('#lista-holiday');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("holiday/eliminarHoliday", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
+                            oTable.draw();
 
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#holiday-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-holiday");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            var header_ids = [];
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                        header_ids.push(value);
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#holiday-table-editable').join(',');
 
-            BlockUtil.block('#holiday-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "holiday/eliminarHolidays",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#holiday-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-holiday');
 
+            axios.post("holiday/eliminarHolidays", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#holiday-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-holiday");
+                });
         };
     };
 
 
     var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
 
-        initPortlets();
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-holiday');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        TempusUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        TempusUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
         });
 
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
+        // Tempus Dominus SOLO FECHA (sin horas)
+        TempusUtil.initDate('datetimepicker-day', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
     }
 
@@ -515,16 +587,12 @@ var Holidays = function () {
 
             initWidgets();
             initTable();
-            initForm();
 
             initAccionFiltrar();
-            initAccionResetFiltrar();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             initAccionChange();
 

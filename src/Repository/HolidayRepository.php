@@ -122,6 +122,65 @@ class HolidayRepository extends EntityRepository
     }
 
     /**
+     * ListarHolidaysConTotal: Lista y cuenta aplicando los mismos filtros.
+     *
+     */
+    public function ListarHolidaysConTotal(
+        int     $start,
+        int     $limit,
+        ?string $sSearch = null,
+        string  $sortField = 'day',
+        string  $sortDir = 'DESC',
+        ?string $fecha_inicial = '',
+        ?string $fecha_fin = ''
+    ): array
+    {
+        $sortable = [
+            'holidayId' => 'h.holidayId',
+            'description' => 'h.description',
+            'day' => 'h.day'
+        ];
+        $orderBy = $sortable[$sortField] ?? 'h.day';
+        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        
+        $baseQb = $this->createQueryBuilder('h');
+
+        if ($sSearch != "") {
+            $baseQb->andWhere('h.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+
+            $baseQb->andWhere('h.day >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
+
+            $baseQb->andWhere('h.day <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        // Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)->setFirstResult($start);
+        if ($limit > 0) $dataQb->setMaxResults($limit);
+        $data = $dataQb->getQuery()->getResult();
+
+        // Conteo
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')->select('COUNT(h.holidayId)');
+        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+
+        return ['data' => $data, 'total' => $total];
+    }
+
+    /**
      * BuscarHoliday: busca un holiday
      *
      * @return Holiday

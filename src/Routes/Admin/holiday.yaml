@@ -3,7 +3,7 @@ holiday:
   defaults: { _controller: App\Controller\Admin\HolidayController::index }
 
 listarHolidayAdmin:
-  path:  /holiday/listarHoliday
+  path:  /holiday/listar
   defaults: { _controller: App\Controller\Admin\HolidayController::listar, _format: json }
 
 eliminarHolidayAdmin:

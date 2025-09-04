@@ -1,6 +1,5 @@
 var Reminders = function () {
 
-    var oTable;
     var rowDelete = null;
 
     //Inicializar table
@@ -384,7 +383,7 @@ var Reminders = function () {
                 formData.set("subject", subject);
 
                 var day = TempusUtil.getString('datetimepicker-day');
-                formData.set("day", day)
+                formData.set("day", day);
 
                 formData.set("body", body);
                 formData.set("usuarios_id", usuarios_id.join(','));
