@@ -78,4 +78,50 @@ class PlanDownloadingRepository extends EntityRepository
         return (int)$consulta->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * ListarPlansConTotal Lista los plans con total
+     *
+     * @return []
+     */
+    public function ListarPlansConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'planDownloadingId'  => 'p_d.planDownloadingId',
+            'description' => 'p_d.description',
+            'status' => 'p_d.status',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'p_d.description';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('p_d');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('p_d.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(p_d.planDownloadingId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
+
 }
