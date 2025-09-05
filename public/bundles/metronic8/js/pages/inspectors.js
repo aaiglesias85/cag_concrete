@@ -307,7 +307,7 @@ var Inspectors = function () {
         $(document).off('click', "#form-inspector .wizard-tab");
         $(document).on('click', "#form-inspector .wizard-tab", function (e) {
             e.preventDefault();
-            var inspector = $(this).data('inspector');
+            var inspector = $(this).data('item');
 
             // validar
             if (inspector > activeTab && !validWizard()) {
@@ -394,7 +394,7 @@ var Inspectors = function () {
         // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
         $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
         $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
-        $('.nav-inspector-hide').removeClass('hide').addClass('hide');
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
 
         // reset valid
         KTUtil.findAll(KTUtil.get("inspector-form"), ".nav-link").forEach(function (element, index) {
@@ -604,7 +604,7 @@ var Inspectors = function () {
                 // habilitar tab
                 totalTabs = 2;
                 $('#btn-wizard-siguiente').removeClass('hide');
-                $('.nav-inspector-hide').removeClass('hide');
+                $('.nav-item-hide').removeClass('hide');
 
                 event_change = false;
             }
@@ -709,7 +709,6 @@ var Inspectors = function () {
 
 
     var initWidgets = function () {
-
         // init widgets generales
         MyApp.initWidgets();
 
@@ -742,7 +741,7 @@ var Inspectors = function () {
             {
                 targets: 0,
                 render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 120);
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {

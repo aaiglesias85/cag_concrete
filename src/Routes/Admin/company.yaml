@@ -3,7 +3,7 @@ company:
   defaults: { _controller: App\Controller\Admin\CompanyController::index }
 
 listarCompanyAdmin:
-  path:  /company/listarCompany
+  path:  /company/listar
   defaults: { _controller: App\Controller\Admin\CompanyController::listar, _format: json }
 
 eliminarCompanyAdmin:

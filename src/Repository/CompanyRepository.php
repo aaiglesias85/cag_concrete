@@ -68,4 +68,51 @@ class CompanyRepository extends EntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * ListarCompaniesConTotal Lista los companies con total
+     *
+     * @return []
+     */
+    public function ListarCompaniesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'companyId'  => 'c.companyId',
+            'name' => 'c.name',
+            'phone'    => 'c.phone',
+            'address' => 'c.address',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'c.name';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('c');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search OR c.address LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(c.companyId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
 }
