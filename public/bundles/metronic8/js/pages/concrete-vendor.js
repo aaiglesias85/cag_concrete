@@ -1,157 +1,264 @@
 var ConcreteVendor = function () {
 
-    var oTable;
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#concrete-vendor-table-editable');
+        const table = "#concrete-vendor-table-editable";
+        // datasource
+        const datasource = DatatableUtil.getDataTableDatasource(`concrete-vendor/listar`);
 
-        var table = $('#concrete-vendor-table-editable');
+        // columns
+        const columns = getColumnsTable();
 
-        var aoColumns = [];
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
-        aoColumns.push(
-            {
-                field: "name",
-                title: "Name"
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "phone",
-                title: "Phone",
-                width: 200,
-                template: function (row) {
-                    return row.phone !== '' ? '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>' : '';
-                }
-            },
-            {
-                field: "contactEmail",
-                title: "Email",
-                width: 200,
-                template: function (row) {
-                    return row.contactEmail ? '<a class="m-link" href="mailto:' + row.contactEmail + '">' + row.contactEmail + '</a>' : '';
-                }
-            },
-            {
-                field: "address",
-                title: "Address"
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'concrete-vendor/listar',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#concrete-vendor-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#concrete-vendor-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#concrete-vendor-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#concrete-vendor-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#concrete-vendor-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-concrete-vendor .m_form_search').on('keyup', function (e) {
-            // shortcode to datatable.getDataSourceParam('query');
-            var query = oTable.getDataSourceQuery();
-            query.generalSearch = $(this).val().toLowerCase();
-            // shortcode to datatable.setDataSourceParam('query', query);
-            oTable.setDataSourceQuery(query);
-            oTable.load();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        // columns
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+        columns.push(
+            {data: 'name'},
+            {data: 'phone'},
+            {data: 'email'},
+            {data: 'address'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            {
+                targets: 2,
+                render: DatatableUtil.getRenderColumnPhone
+            },
+            {
+                targets: 3,
+                render: DatatableUtil.getRenderColumnEmail
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 350);
+                }
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 1,
+                    render: DatatableUtil.getRenderColumnPhone
+                },
+                {
+                    targets: 2,
+                    render: DatatableUtil.getRenderColumnEmail
+                },
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 350);
+                    }
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        const filterSearch = document.querySelector('#lista-concrete-vendor [data-table-filter="search"]');
+        let debounceTimeout;
+
+        filterSearch.addEventListener('keyup', function (e) {
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Concrete Vendors';
+        var table = document.querySelector('#concrete-vendor-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#concrete-vendor-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#concrete-vendor_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-concrete-vendor').removeClass('hide');
+        } else {
+            $('#btn-eliminar-concrete-vendor').addClass('hide');
+        }
+    }
 
     //Reset forms
     var resetForms = function () {
-        $('#concrete-vendor-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#concrete-vendor-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("concrete-vendor-form");
 
         //contacts
         contacts = [];
@@ -161,6 +268,7 @@ var ConcreteVendor = function () {
         projects = [];
         actualizarTableListaProjects();
 
+        //Mostrar el primer tab
         resetWizard();
 
         event_change = false;
@@ -168,49 +276,170 @@ var ConcreteVendor = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#concrete-vendor-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-                contactemail: {
-                    optionalEmail: true // Usamos la validación personalizada en lugar de email:true
-                }
+        var form = KTUtil.get('concrete-vendor-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            email: {
+                email: {message: "The email must be valid"}
+            },
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+        return result;
+    };
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 2;
+    var initWizard = function () {
+        $(document).off('click', "#form-concrete-vendor .wizard-tab");
+        $(document).on('click', "#form-concrete-vendor .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
 
-                });
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
             }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
+            //bug visual de la tabla que muestra las cols corridas
+            switch (activeTab) {
+                case 2:
+                    actualizarTableListaContacts();
+                    break;
+                case 3:
+                    actualizarTableListaProjects();
+                    break;
+            }
+
         });
 
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-contacts').tab('show');
+                    actualizarTableListaContacts();
+                    break;
+                case 3:
+                    $('#tab-projects').tab('show');
+                    actualizarTableListaProjects();
+                    break;
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 2;
+        mostrarTab();
+        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide');
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("concrete-vendor-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function () {
+        var result = true;
+        if (activeTab == 1) {
+
+            if (!validateForm()) {
+                result = false;
+            }
+
+        }
+
+        return result;
+    }
+
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("concrete-vendor-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("concrete-vendor-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
     };
 
     //Nuevo
@@ -222,12 +451,18 @@ var ConcreteVendor = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new concrete vendor? Follow the next steps:";
-            $('#form-concrete-vendor-title').html(formTitle);
-            $('#form-concrete-vendor').removeClass('m--hide');
-            $('#lista-concrete-vendor').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-concrete-vendor'), '.card-label').innerHTML = "New Concrete Vendors:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-concrete-vendor'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-concrete-vendor'), 'hide');
+    }
+
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
@@ -236,53 +471,55 @@ var ConcreteVendor = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
-            if ($('#concrete-vendor-form').valid()) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
 
                 var vendor_id = $('#vendor_id').val();
+                formData.set("vendor_id", vendor_id);
 
                 var name = $('#name').val();
+                formData.set("name", name);
+
                 var phone = $('#phone').val();
-                var address = $('#address').val();
-                var contactName = $('#contactName').val();
+                formData.set("phone", phone);
+
                 var contactEmail = $('#contactEmail').val();
+                formData.set("contactEmail", contactEmail);
+
+                var address = $('#address').val();
+                formData.set("address", address);
+
+                formData.set("contacts", JSON.stringify(contacts));
 
                 BlockUtil.block('#form-concrete-vendor');
 
-                $.ajax({
-                    type: "POST",
-                    url: "concrete-vendor/salvar",
-                    dataType: "json",
-                    data: {
-                        'vendor_id': vendor_id,
-                        'name': name,
-                        'phone': phone,
-                        'address': address,
-                        'contactName': contactName,
-                        'contactEmail': contactEmail,
-                        'contacts': JSON.stringify(contacts)
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-concrete-vendor');
-                        if (response.success) {
+                axios.post("concrete-vendor/salvar", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                cerrarForms();
 
-                            cerrarForms();
-                            oTable.load();
+                                oTable.draw();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-concrete-vendor');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-concrete-vendor");
+                    });
             }
         };
     }
@@ -298,9 +535,8 @@ var ConcreteVendor = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -319,8 +555,8 @@ var ConcreteVendor = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-concrete-vendor').addClass('m--hide');
-        $('#lista-concrete-vendor').removeClass('m--hide');
+        $('#form-concrete-vendor').addClass('hide');
+        $('#lista-concrete-vendor').removeClass('hide');
     };
 
     //Editar
@@ -333,62 +569,62 @@ var ConcreteVendor = function () {
             var vendor_id = $(this).data('id');
             $('#vendor_id').val(vendor_id);
 
-            $('#form-concrete-vendor').removeClass('m--hide');
-            $('#lista-concrete-vendor').addClass('m--hide');
+            mostrarForm()
 
             editRow(vendor_id);
         });
 
         function editRow(vendor_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("vendor_id", vendor_id);
+
             BlockUtil.block('#form-concrete-vendor');
 
-            $.ajax({
-                type: "POST",
-                url: "concrete-vendor/cargarDatos",
-                dataType: "json",
-                data: {
-                    'vendor_id': vendor_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-concrete-vendor');
-                    if (response.success) {
-                        //Datos concrete-vendor
+            axios.post("concrete-vendor/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        var formTitle = "You want to update the concrete vendor? Follow the next steps:";
-                        $('#form-concrete-vendor-title').html(formTitle);
+                            //cargar datos
+                            cargarDatos(response.vendor);
 
-                        $('#name').val(response.vendor.name);
-                        $('#phone').val(response.vendor.phone);
-                        $('#address').val(response.vendor.address);
-                        $('#contactName').val(response.vendor.contactName);
-                        $('#contactEmail').val(response.vendor.contactEmail);
-
-                        // contacts
-                        contacts = response.vendor.contacts;
-                        actualizarTableListaContacts();
-
-                        // projects
-                        projects = response.vendor.projects;
-                        actualizarTableListaProjects();
-
-                        // habilitar tab
-                        totalTabs = 3;
-                        $('.nav-item-hide').removeClass('m--hide');
-
-                        event_change = false;
-
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-concrete-vendor');
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-concrete-vendor");
+                });
 
-                    toastr.error(response.error, "");
-                }
-            });
+            function cargarDatos(vendor) {
 
+                KTUtil.find(KTUtil.get("form-concrete-vendor"), ".card-label").innerHTML = "Update Concrete Vendors: " + vendor.name;
+
+                $('#name').val(vendor.name);
+                $('#phone').val(vendor.phone);
+                $('#address').val(vendor.address);
+                $('#contactEmail').val(vendor.contactEmail);
+
+                // contacts
+                contacts = vendor.contacts;
+                actualizarTableListaContacts();
+
+                // projects
+                projects = vendor.projects;
+                actualizarTableListaProjects();
+
+                // habilitar tab
+                totalTabs = 3;
+                $('.nav-item-hide').removeClass('hide');
+
+                event_change = false;
+            }
         }
     };
     //Eliminar
@@ -398,9 +634,8 @@ var ConcreteVendor = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-eliminar-concrete-vendor");
@@ -419,288 +654,185 @@ var ConcreteVendor = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#concrete-vendor-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
-                toastr.error('Select Subcontractors to delete', "");
+                toastr.error('Select companies to delete', "");
             }
         };
 
         function btnClickModalEliminar() {
             var vendor_id = rowDelete;
 
-            BlockUtil.block('#concrete-vendor-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("vendor_id", vendor_id);
 
-            $.ajax({
-                type: "POST",
-                url: "concrete-vendor/eliminar",
-                dataType: "json",
-                data: {
-                    'vendor_id': vendor_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#concrete-vendor-table-editable');
+            BlockUtil.block('#lista-concrete-vendor');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("concrete-vendor/eliminar", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
-
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#concrete-vendor-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-concrete-vendor");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#concrete-vendor-table-editable').join(',');
 
-            BlockUtil.block('#concrete-vendor-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "concrete-vendor/eliminarVendors",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#concrete-vendor-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-concrete-vendor');
 
+            axios.post("concrete-vendor/eliminarVendors", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#concrete-vendor-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-concrete-vendor");
+                });
         };
     };
 
 
     var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
 
-        initPortlets();
-
-        $('.phone').inputmask("mask", {
-            "mask": "(999)999-9999"
-        });
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-concrete-vendor');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask(".input-phone");
     }
 
     // Contacts
     var contacts = [];
-    var oTableListaContacts;
+    var oTableContacts;
     var nEditingRowContact = null;
-    var initTableListaContacts = function () {
-        BlockUtil.block('#lista-contacts-table-editable');
+    var initTableContacts = function () {
+        const table = "#contacts-table-editable";
 
-        var table = $('#lista-contacts-table-editable');
+        // columns
+        const columns = [
+            {data: 'name'},
+            {data: 'email'},
+            {data: 'phone'},
+            {data: 'role'},
+            {data: 'notes'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "name",
-                title: "Name"
+                targets: 1,
+                render: DatatableUtil.getRenderColumnEmail
             },
             {
-                field: "email",
-                title: "Email",
-                width: 200,
-                template: function (row) {
-                    return '<a class="m-link" href="mailto:' + row.email + '">' + row.email + '</a>';
-                }
+                targets: 2,
+                render: DatatableUtil.getRenderColumnPhone
             },
             {
-                field: "phone",
-                title: "Phone",
-                width: 150,
-                template: function (row) {
-                    return '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>';
-                }
-            },
-            {
-                field: "role",
-                title: "Role"
-            },
-            {
-                field: "notes",
-                title: "Notes"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit contact"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete contact"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableListaContacts = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: contacts,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-contacts .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableContacts = DatatableUtil.initSafeDataTable(table, {
+            data: contacts,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaContacts
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableContacts();
 
     };
+
+    var handleSearchDatatableContacts = function () {
+        $(document).off('keyup', '#lista-contacts [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-contacts [data-table-filter="search"]', function (e) {
+            oTableContacts.search(e.target.value).draw();
+        });
+    }
+
     var actualizarTableListaContacts = function () {
-        if (oTableListaContacts) {
-            oTableListaContacts.destroy();
+        if (oTableContacts) {
+            oTableContacts.destroy();
         }
 
-        initTableListaContacts();
+        initTableContacts();
     }
-    var initFormContact = function () {
-        $("#contact-form").validate({
-            rules: {
-                /*name: {
-                    required: true
-                },*/
-                email: {
-                    // required: true,
-                    optionalEmail: true
-                },
-                /*phone: {
-                    required: true
-                },*/
+
+    var validateFormContact = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('contact-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            email: {
+                email: {message: "The email must be valid"}
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
     var initAccionesContacts = function () {
 
@@ -709,16 +841,15 @@ var ConcreteVendor = function () {
             // reset
             resetFormContact();
 
-            $('#modal-contact').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-contact', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-contact");
         $(document).on('click', "#btn-salvar-contact", function (e) {
             e.preventDefault();
 
-            if ($('#contact-form').valid()) {
+            if (validateFormContact()) {
                 var name = $('#contact-name').val();
                 var email = $('#contact-email').val();
                 var phone = $('#contact-phone').val();
@@ -748,22 +879,20 @@ var ConcreteVendor = function () {
                     }
                 }
 
-                if (nEditingRowContact != null) {
-                    $('#modal-contact').modal('hide');
-                }
-
                 //actualizar lista
                 actualizarTableListaContacts();
 
                 // reset
                 resetFormContact();
+                // hide modal
+                ModalUtil.hide('modal-contact');
 
             }
 
         });
 
-        $(document).off('click', "#lista-contacts-table-editable a.edit");
-        $(document).on('click', "#lista-contacts-table-editable a.edit", function () {
+        $(document).off('click', "#contacts-table-editable a.edit");
+        $(document).on('click', "#contacts-table-editable a.edit", function () {
             var posicion = $(this).data('posicion');
             if (contacts[posicion]) {
 
@@ -779,53 +908,71 @@ var ConcreteVendor = function () {
                 $('#contact-role').val(contacts[posicion].role);
                 $('#contact-notes').val(contacts[posicion].notes);
 
-                // open modal
-                $('#modal-contact').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-contact', {backdrop: 'static', keyboard: true});
 
             }
         });
 
-        $(document).off('click', "#lista-contacts-table-editable a.delete");
-        $(document).on('click', "#lista-contacts-table-editable a.delete", function (e) {
+        $(document).off('click', "#contacts-table-editable a.delete");
+        $(document).on('click', "#contacts-table-editable a.delete", function (e) {
 
             e.preventDefault();
             var posicion = $(this).data('posicion');
-
             if (contacts[posicion]) {
 
-                if (contacts[posicion].contact_id !== '') {
-                    BlockUtil.block('#lista-contacts-table-editable');
+                Swal.fire({
+                    text: "Are you sure you want to delete the contact?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-success",
+                        cancelButton: "btn fw-bold btn-danger"
+                    }
+                }).then(function (result) {
+                    if (result.value) {
+                        eliminarContact(posicion);
+                    }
+                });
+            }
+        });
 
-                    $.ajax({
-                        type: "POST",
-                        url: "concrete-vendor/eliminarContact",
-                        dataType: "json",
-                        data: {
-                            'contact_id': contacts[posicion].contact_id
-                        },
-                        success: function (response) {
-                            BlockUtil.unblock('#lista-contacts-table-editable');
+        function eliminarContact(posicion) {
+
+            if (contacts[posicion].contact_id != '') {
+
+                var formData = new URLSearchParams();
+                formData.set("contact_id", contacts[posicion].contact_id);
+
+                BlockUtil.block('#lista-contacts');
+
+                axios.post("concrete-vendor/eliminarContact", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
                             if (response.success) {
-
                                 toastr.success(response.message, "");
 
                                 deleteContact(posicion);
-
                             } else {
                                 toastr.error(response.error, "");
                             }
-                        },
-                        failure: function (response) {
-                            BlockUtil.unblock('#lista-contacts-table-editable');
-
-                            toastr.error(response.error, "");
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#lista-contacts");
                     });
-                } else {
-                    deleteContact(posicion);
-                }
+
+            } else {
+                deleteContact(posicion);
             }
-        });
+        }
 
         function deleteContact(posicion) {
             //Eliminar
@@ -840,297 +987,122 @@ var ConcreteVendor = function () {
 
     };
     var resetFormContact = function () {
-        $('#contact-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#contact-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("contact-form");
 
         nEditingRowContact = null;
     };
 
-
-
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 2;
-    var initWizard = function () {
-        $(document).off('click', "#form-concrete-vendor .wizard-tab");
-        $(document).on('click', "#form-concrete-vendor .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    actualizarTableListaContacts();
-                    break;
-                case 3:
-                    actualizarTableListaProjects();
-                    break;
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab == totalTabs) {
-                    $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-contacts').tab('show');
-                    actualizarTableListaContacts();
-                    break;
-                case 3:
-                    $('#tab-projects').tab('show');
-                    actualizarTableListaProjects();
-                    break;
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 2;
-        mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide');
-        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab === 1) {
-
-            if (!$('#concrete-vendor-form').valid()) {
-                result = false;
-            }
-
-        }
-
-        return result;
-    }
-
     // Projects
     var projects = [];
-    var oTableListaProjects;
+    var oTableProjects;
     var initTableListaProjects = function () {
-        BlockUtil.block('#lista-projects-table-editable');
+        const table = "#projects-table-editable";
 
-        var table = $('#lista-projects-table-editable');
+        // columns
+        const columns = [
+            {data: 'projectNumber'},
+            {data: 'county'},
+            {data: 'name'},
+            {data: 'description'},
+            {data: 'dueDate'},
+            {data: 'company'},
+            {data: 'status'},
+            {data: 'nota'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "projectNumber",
-                title: "C & G Project #",
-                width: 120,
-            },
-            {
-                field: "county",
-                title: "County"
-            },
-            {
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "description",
-                title: "Description"
-            },
-            {
-                field: "dueDate",
-                title: "Due Date",
-                width: 100,
-            },
-            {
-                field: "concrete-vendor",
-                title: "Company"
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 100,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'In Progress', 'class': ' m-badge--info'},
-                        0: {'title': 'Not Started', 'class': ' m-badge--danger'},
-                        2: {'title': 'Completed', 'class': ' m-badge--success'},
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
+                targets: 0,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {
-                field: "nota",
-                title: "Notes",
-                responsive: {visible: 'lg'},
-                width: 200,
-                sortable: false,
-                // callback function support for column rendering
-                template: function (row) {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data ?? '', 150);
+                }
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
+
+                    var status = {
+                        1: {'title': 'In Progress', 'class': 'badge-primary'},
+                        0: {'title': 'Not Started', 'class': 'badge-danger'},
+                        2: {'title': 'Completed', 'class': 'badge-success'},
+                    };
+
+                    return `<div style="width: 180px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
+                }
+            },
+            {
+                targets: 7,
+                render: function (data, type, row) {
 
                     var html = '';
-                    if (row.nota != null) {
-                        html = `${row.nota.nota} <span class="m-badge m-badge--info">${row.nota.date}</span>`;
+                    if (data != null) {
+                        html = `${data.nota} <span class="badge badge-primary">${data.date}</span>`;
                     }
                     return html;
                 }
             },
             {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="detalle m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View project"><i class="la la-eye"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row,  ['detalle']);
+                },
             }
         ];
-        oTableListaProjects = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: projects,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-projects .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableProjects = DatatableUtil.initSafeDataTable(table, {
+            data: projects,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaProjects
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
-
+        handleSearchDatatableProjects();
     };
+    var handleSearchDatatableProjects = function () {
+        $(document).off('keyup', '#lista-projects [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-projects [data-table-filter="search"]', function (e) {
+            oTableProjects.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaProjects = function () {
-        if(oTableListaProjects){
-            oTableListaProjects.destroy();
+        if (oTableProjects) {
+            oTableProjects.destroy();
         }
 
         initTableListaProjects();
     }
-
     var initAccionesProjects = function () {
 
-        $(document).off('click', "#lista-projects-table-editable a.detalle");
-        $(document).on('click', "#lista-projects-table-editable a.detalle", function (e) {
+        $(document).off('click', "#projects-table-editable a.detalle");
+        $(document).on('click', "#projects-table-editable a.detalle", function (e) {
             var posicion = $(this).data('posicion');
             if (projects[posicion]) {
                 localStorage.setItem('project_id_edit', projects[posicion].id);
@@ -1148,23 +1120,21 @@ var ConcreteVendor = function () {
 
             initWidgets();
             initTable();
-            initForm();
+
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
-            initAccionChange();
 
             // contacts
-            initFormContact();
             initAccionesContacts();
 
             // projects
             initAccionesProjects();
+
+            initAccionChange();
         }
 
     };

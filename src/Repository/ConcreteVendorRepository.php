@@ -68,4 +68,53 @@ class ConcreteVendorRepository extends ServiceEntityRepository
 
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * ListarVendorsConTotal Lista los vendors con total
+     *
+     * @return []
+     */
+    public function ListarVendorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'vendorId'  => 'c_v.vendorId',
+            'name' => 'c_v.name',
+            'email' => 'c_v.contactEmail',
+            'phone'    => 'c_v.phone',
+            'address' => 'c_v.address',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'c_v.name';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('c_v');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('c_v.address LIKE :search OR c_v.contactEmail LIKE :search OR
+             c_v.contactName LIKE :search OR c_v.phone LIKE :search OR c_v.name LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(c_v.vendorId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
 }

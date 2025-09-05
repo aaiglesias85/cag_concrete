@@ -990,7 +990,6 @@ var Companies = function () {
             {data: 'name'},
             {data: 'description'},
             {data: 'dueDate'},
-            {data: 'company'},
             {data: 'status'},
             {data: 'nota'},
             {data: null},
@@ -1017,7 +1016,7 @@ var Companies = function () {
                 }
             },
             {
-                targets: 6,
+                targets: 5,
                 render: function (data, type, row) {
 
                     var status = {
@@ -1030,7 +1029,7 @@ var Companies = function () {
                 }
             },
             {
-                targets: 7,
+                targets: 6,
                 render: function (data, type, row) {
 
                     var html = '';
