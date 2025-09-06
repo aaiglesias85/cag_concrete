@@ -359,7 +359,7 @@ var Projects = function () {
         });
 
         // Función para seleccionar todas las filas
-        $(`${table} .check-select-all`).on('click', function () {
+        $(`.check-select-all`).on('click', function () {
             if (!tableSelectAll) {
                 oTable.rows().select(); // Selecciona todas las filas
             } else {
