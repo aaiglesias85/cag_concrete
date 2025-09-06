@@ -5,415 +5,618 @@
 {% block stylesheetspecific %}{% endblock %}
 
 {% block content %}
-    <!-- BEGIN: Subheader -->
-    <div class="m-subheader ">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <h3 class="m-subheader__title m-subheader__title--separator">Subcontractors</h3>
-                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-                    <li class="m-nav__item m-nav__item--home">
-                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
-                            <i class="m-nav__link-icon la la-home"></i>
-                        </a>
+
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <!--begin::Toolbar container-->
+        <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+            <!--begin::Page title-->
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <!--begin::Title-->
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    Subcontractors
+                </h1>
+                <!--end::Title-->
+                <!--begin::Breadcrumb-->
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
                     </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Subcontractors</span>
-                        </a>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
                     </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Manage subcontractors</span>
-                        </a>
-                    </li>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">Manage Subcontractors</li>
+                    <!--end::company-->
                 </ul>
+                <!--end::Breadcrumb-->
             </div>
+            <!--end::Page title-->
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+
+            </div>
+            <!--end::Actions-->
         </div>
+        <!--end::Toolbar container-->
     </div>
-    <!-- END: Subheader -->
+    <!--end::Toolbar-->
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <!--begin::Content container-->
+        <div id="kt_app_content_container" class="app-container container-fluid">
 
-    <div class="m-content">
-        <div id="lista-subcontractor" class="m-portlet m-portlet--mobile" m-portlet="true">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text">
-                            Subcontractors
-                        </h3>
+            <!-- lista -->
+            <div id="lista-subcontractor" class="card card-sticky">
+                <div class="card-header border-0 pt-6"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="lista-subcontractor"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <input type="text" data-table-filter="search"
+                                   class="form-control form-control-solid w-300px ps-13"
+                                   placeholder="Buscar..."/>
+                        </div>
+                    </div>
+                    <div class="card-toolbar">
+                        <div class="d-flex justify-content-end">
+
+                            <!-- new -->
+                            {% if permiso.agregar %}
+                                <button
+                                        type="button"
+                                        id="btn-nuevo-subcontractor"
+                                        class="btn btn-success me-2"
+                                >
+                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span
+                                                class="path2"></span><span
+                                                class="path3"></span><span class="path4"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">New</span>
+                                </button>
+                            {% endif %}
+
+                            <!-- delete -->
+                            {% if permiso.eliminar %}
+                                <button
+                                        type="button"
+                                        id="btn-eliminar-subcontractor"
+                                        class="btn btn-danger me-2 hide"
+                                >
+                                    <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span
+                                                class="path2"></span><span
+                                                class="path3"></span><span class="path4"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Delete</span>
+                                </button>
+                            {% endif %}
+
+                            <!-- export -->
+                            <div>
+                                <!--begin::Export buttons-->
+                                <div id="subcontractor-table-editable-export" class="d-none"></div>
+                                <!--end::Export buttons-->
+
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
+                                        data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
+                                                class="path2"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                                </button>
+
+                                <!--begin::Menu-->
+                                <div id="subcontractor_export_menu"
+                                     class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                     data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                            Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                            Export to Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                            Export CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="pdf">
+                                            Export to PDF
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+
+                                <!--begin::Hide default export buttons-->
+                                <div id="subcontractor-table-editable-buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        {% if permiso.agregar %}
-                            <li class="m-portlet__nav-item">
-                                <a id="btn-nuevo-subcontractor"
-                                   class="btn btn-success btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-plus"></i>
-                                        <span class="m--hidden-mobile">New</span>
-                                    </span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if permiso.eliminar %}
-                            <li class="m-portlet__nav-item">
-                                <a id="btn-eliminar-subcontractor"
-                                   class="btn btn-danger btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-trash-o"></i>
-                                        <span class="m--hidden-mobile">Delete</span>
-                                    </span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;" m-portlet-tool="fullscreen"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon">
-                                <i class="la la-expand"></i>
-                            </a>
-                        </li>
-                    </ul>
+                <div class="card-body">
+                    <!--begin::Datatable-->
+                    <table id="subcontractor-table-editable"
+                           class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                        <thead>
+                        <tr class="fw-bold fs-6 text-gray-800 px-7">
+                            {% if permiso.eliminar %}
+                                <th class="w-10px pe-2">
+                                    <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                        <input class="form-check-input check-select-all" type="checkbox"
+                                               data-kt-check="true"
+                                               data-kt-check-target="#subcontractor-table-editable .form-check-input"
+                                               value="1"/>
+                                    </div>
+                                </th>
+                            {% endif %}
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th class="text-end min-w-100px">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-semibold">
+                        </tbody>
+                    </table>
+                    <!--end::Datatable-->
                 </div>
             </div>
-            <div class="m-portlet__body">
-                <!--begin: Search Form -->
-                <div class="form-group m-form__group row align-items-center mb-2">
-                    <div class="col-md-4">
-                        <div class="m-input-icon m-input-icon--left">
-                            <input type="text" class="form-control m-input m_form_search"
-                                   placeholder="Search...">
-                            <span class="m-input-icon__icon m-input-icon__icon--left">
-									<span><i class="la la-search"></i></span>
-								</span>
-                        </div>
+
+            <!-- form -->
+            <div id="form-subcontractor" class="card card-sticky hide">
+                <div class="card-header"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="form-subcontractor"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '60px', xl: '60px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+                        <h3 class="card-label">New Subcontractor:</h3>
                     </div>
-                </div>
-                <!--end: Search Form -->
-                <!--begin: Datatable -->
-                <div class="m_datatable" id="subcontractor-table-editable"></div>
-                <!--end: Datatable -->
-            </div>
-        </div>
+                    <div class="card-toolbar">
 
-        <div id="form-subcontractor" class="m-portlet m--hide">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text" id="form-subcontractor-title">
-                            Do you want to create a new subcontractor? Follow the next steps:
-                        </h3>
-                    </div>
-                </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-subcontractor"><i
-                                        class="la la-close"></i></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="m-portlet__body">
-
-                <ul class="nav nav-tabs nav-item-hide" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active wizard-tab" data-item="1"
-                           data-toggle="tab" href="#tab-content-general" id="tab-general">
-                            General
+                        <a href="javascript:;" class="btn btn-secondary cerrar-form-subcontractor me-2">
+                            <i class="la la-close"></i>
+                            <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link wizard-tab" data-item="2"
-                           data-toggle="tab" href="#tab-content-employees" id="tab-employees">
-                            Employees
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link wizard-tab" data-item="3"
-                           data-toggle="tab" href="#tab-content-notes" id="tab-notes">
-                            Notes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link wizard-tab" data-item="4"
-                           data-toggle="tab" href="#tab-content-projects" id="tab-projects">
-                            Projects
-                        </a>
-                    </li>
-                </ul>
 
-                <div class="tab-content">
-
-                    <div class="tab-pane active" id="tab-content-general" role="tabpanel">
-                        <form class="m-form" id="subcontractor-form" action="#" enctype="multipart/form-data"
-                              method="post">
-
-                            <input type="hidden" id="subcontractor_id" name="subcontractor_id"/>
-
-                            <div class="m-form__section m-form__section--first">
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
-                                        <div class="col-md-5">
-                                            <label>
-                                                <span class="ic-step-number">1</span>
-                                                Subcontractor Name
-                                                <span class="ic-small italic">(required)</span>
-                                            </label>
-                                            <input type="text" class="form-control form-control-text event-change"
-                                                   id="name" name="name"/>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label>
-                                                Subcontractor Phone
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <div class="input-group m-input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i
-                                                                class="flaticon-support"></i></span>
-                                                </div>
-                                                <input type="text" class="form-control event-change phone" id="phone"
-                                                       name="phone">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>
-                                                Subcontractor Address
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <textarea class="form-control event-change" id="address" name="address" rows="3"></textarea>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="form-group m-form__group ic-form-group">
-                                    <div class="row">
-                                        <div class="col-md-5">
-                                            <label>
-                                                <span class="ic-step-number">2</span>
-                                                Company Name
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <input type="text" class="form-control form-control-text event-change"
-                                                   id="companyName" name="companyname"/>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label>
-                                                Company Phone
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <div class="input-group m-input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i
-                                                                class="flaticon-support"></i></span>
-                                                </div>
-                                                <input type="text" class="form-control event-change phone" id="companyPhone"
-                                                       name="companyphone">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>
-                                                Company Address
-                                                <span class="ic-small italic">(optional)</span>
-                                            </label>
-                                            <textarea class="form-control event-change" id="companyAddress" name="companyaddress" rows="3"></textarea>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </form>
-                    </div>
-                    <div class="tab-pane" id="tab-content-employees" role="tabpanel">
-                        <div class="row" id="lista-employees">
-                            <div class="col-lg-12">
-                                <!--begin: Search Form -->
-                                <div class="m-form m-form--label-align-right">
-                                    <div class="row align-items-center">
-                                        <div class="col-xl-12 order-1">
-                                            <div class="form-group m-form__group row align-items-center">
-                                                <div class="col-md-8">
-                                                    {% if permiso.agregar or permiso.editar %}
-                                                    <div class="btn-group">
-                                                        <button id="btn-agregar-employee" class="btn btn-success"
-                                                                style="margin-bottom: 20px; margin-top: 10px;">
-                                                            New <i class="la la-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                    {% endif %}
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="m-input-icon m-input-icon--left">
-                                                        <input type="text" class="form-control m-input m_form_search"
-                                                               placeholder="Search...">
-                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span><i class="la la-search"></i></span>
-                                                    </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <!--end: Search Form -->
-                                <!--begin: Datatable -->
-                                <div class="m_datatable" id="employees-table-editable"></div>
-                                <!--end: Datatable -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="tab-content-notes" role="tabpanel">
-                        <div class="row" id="lista-notes">
-                            <div class="col-lg-12">
-                                <!--begin: Search Form -->
-                                <div class="m-form m-form--label-align-right">
-                                    <div class="row align-items-center">
-                                        <div class="col-xl-12 order-1">
-                                            <div class="form-group m-form__group row align-items-center">
-                                                {% if permiso.agregar or permiso.editar %}
-                                                    <div class="col-md-2">
-                                                        <div class="btn-group">
-                                                            <button id="btn-agregar-note" class="btn btn-success"
-                                                                    style="margin-bottom: 20px; margin-top: 10px;">
-                                                                New <i class="la la-plus"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-
-                                                <div class="col-md-2">
-                                                    <div class='input-group date'>
-                                                        <input type='text' class="form-control m-input date-picker "
-                                                               placeholder="From" autocomplete="off"
-                                                               id="filtro-fecha-inicial-notes"/>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">
-                                                                <i class="la la-calendar glyphicon-th"></i>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <div class='input-group date'>
-                                                        <input type='text' class="form-control m-input date-picker "
-                                                               placeholder="To" autocomplete="off"
-                                                               id="filtro-fecha-fin-notes"/>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">
-                                                                <i class="la la-calendar glyphicon-th"></i>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <div class="m-input-icon m-input-icon--left">
-                                                        <input type="text" class="form-control m-input m_form_search"
-                                                               placeholder="Search...">
-                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span><i class="la la-search"></i></span>
-                                                    </span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <a href="javascript:;" id="btn-filtrar-notes"
-                                                       class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
-                                                        <span>
-                                                            <i class="la la-search"></i>
-                                                            <span>Search</span>
-                                                        </span>
-                                                    </a>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <a id="btn-eliminar-notes"
-                                                       class="btn btn-danger btn-icon"
-                                                       href="javascript:;">
-                                                        <span>
-                                                            <i class="la la-trash-o"></i>
-                                                            <span class="m--hidden-mobile">Delete</span>
-                                                        </span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <!--end: Search Form -->
-                                <!--begin: Datatable -->
-                                <div class="m_datatable" id="notes-table-editable"></div>
-                                <!--end: Datatable -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="tab-content-projects" role="tabpanel">
-                        <div class="row" id="lista-projects">
-                            <div class="col-lg-12">
-                                <!--begin: Search Form -->
-                                <div class="m-form m-form--label-align-right mb-3">
-                                    <div class="row align-items-center">
-                                        <div class="col-xl-12 order-1">
-                                            <div class="form-group m-form__group row align-items-center">
-                                                <div class="col-md-4">
-                                                    <div class="m-input-icon m-input-icon--left">
-                                                        <input type="text" class="form-control m-input m_form_search"
-                                                               placeholder="Search...">
-                                                        <span class="m-input-icon__icon m-input-icon__icon--left">
-                                                        <span><i class="la la-search"></i></span>
-                                                    </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <!--end: Search Form -->
-                                <!--begin: Datatable -->
-                                <div class="m_datatable" id="lista-projects-table-editable"></div>
-                                <!--end: Datatable -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="m-form">
-                    <div class="m-form__actions text-center">
-                        <button id="btn-wizard-anterior"
-                                class="btn btn-info m--hide" type="button">
-                            Back
+                        <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
+                            <i class="la la-arrow-left me-2"></i>
+                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
                         </button>
 
-                        <button id="btn-wizard-siguiente"
-                                class="btn btn-primary m--hide" type="button">
-                            Next
+                        <button id="btn-wizard-siguiente" class="btn btn-primary me-2 hide" type="button">
+                            <span class="kt-hidden-mobile font-weight-bold">Next</span>
+                            <i class="la la-arrow-right ms-2"></i>
                         </button>
+
                         {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-wizard-finalizar" class="btn btn-success" type="button">
-                                Save
+                            <button type="button" id="btn-wizard-finalizar"
+                                    class="btn btn-success">
+                                <i class="la la-check"></i>
+                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
                             </button>
                         {% endif %}
-                        <button class="btn btn-danger cerrar-form-subcontractor" type="button">
-                            Cancel
-                        </button>
                     </div>
                 </div>
+
+                <form
+                        class="form"
+                        id="subcontractor-form"
+                        action="javascript:;"
+                        enctype="multipart/form-data"
+                        method="post"
+                >
+                    <input type="hidden" id="subcontractor_id" name="subcontractor_id"/>
+
+                    <div class="card-body">
+
+                        <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6 hide nav-item-hide">
+                            <li class="nav-item">
+                                <a class="nav-link active wizard-tab" data-item="1"
+                                   data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
+                                    <div class="wizard-wrapper">
+                                        <span class="wizard-number">
+                                            <i class="wizard-check ki-duotone ki-check"></i>
+                                            <span class="number">1</span>
+                                        </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">General</div>
+                                            <div class="wizard-desc">General information</div>
+                                        </div>
+                                        <span class="svg-icon ps-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                        <rect fill="#000000" opacity="0.3"
+                                              transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                              x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                        <path
+                                                d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                                fill="#000000" fill-rule="nonzero"
+                                                transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path>
+                                    </g>
+                                </svg>
+                                        </span>
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link wizard-tab" data-item="2"
+                                   data-bs-toggle="tab" href="#tab-content-employees" id="tab-employees">
+                                    <div class="wizard-wrapper">
+                                        <span class="wizard-number">
+                                            <i class="wizard-check ki-duotone ki-check"></i>
+                                            <span class="number">2</span>
+                                        </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">Employees</div>
+                                            <div class="wizard-desc">List of employees</div>
+                                        </div>
+                                        <span class="svg-icon ps-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                        <rect fill="#000000" opacity="0.3"
+                                              transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                              x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                        <path
+                                                d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                                fill="#000000" fill-rule="nonzero"
+                                                transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path>
+                                    </g>
+                                </svg>
+                                        </span>
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link wizard-tab" data-item="3"
+                                   data-bs-toggle="tab" href="#tab-content-notes" id="tab-notes">
+                                    <div class="wizard-wrapper">
+                                        <span class="wizard-number">
+                                            <i class="wizard-check ki-duotone ki-check"></i>
+                                            <span class="number">3</span>
+                                        </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">Notes</div>
+                                            <div class="wizard-desc">List of notes</div>
+                                        </div>
+                                        <span class="svg-icon ps-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                 width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                        <rect fill="#000000" opacity="0.3"
+                                              transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                              x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                        <path
+                                                d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                                fill="#000000" fill-rule="nonzero"
+                                                transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path>
+                                    </g>
+                                </svg>
+                                        </span>
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link wizard-tab" data-item="4"
+                                   data-bs-toggle="tab" href="#tab-content-projects" id="tab-projects">
+                                    <div class="wizard-wrapper">
+                                      <span class="wizard-number">
+                                          <i class="wizard-check ki-duotone ki-check"></i>
+                                          <span class="number">4</span>
+                                      </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">Projects</div>
+                                            <div class="wizard-desc">List of projects</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+
+                            <div class="tab-pane fade show active" id="tab-content-general" role="tabpanel">
+
+                                <div class="form-group ic-form-group">
+                                    <div class="row">
+                                        <!-- Subcontractor Name -->
+                                        <div class="col-md-6">
+                                            <label class="form-label required">
+                                                <span class="ic-step-number">1</span>
+                                                Subcontractor Name
+                                            </label>
+                                            <input type="text" class="form-control form-control-validate form-control-solid event-change"
+                                                   id="name" name="name"/>
+                                        </div>
+
+                                        <!-- Subcontractor Phone -->
+                                        <div class="col-md-3">
+                                            <label class="form-label">Subcontractor Phone</label>
+                                            <div class="input-group input-group-solid">
+                                                <span class="input-group-text"><i class="la la-phone"></i></span>
+                                                <input type="text"
+                                                       class="form-control form-control-validate input-phone event-change"
+                                                       id="phone" name="phone" autocomplete="off">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <!-- Subcontractor Address -->
+                                        <div class="col-md-12">
+                                            <label class="form-label">Subcontractor Address</label>
+                                            <textarea class="form-control form-control-validate form-control-solid event-change"
+                                                      id="address" name="address" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group ic-form-group">
+                                    <div class="row">
+                                        <!-- Company Name -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                <span class="ic-step-number">2</span>
+                                                Company Name
+                                            </label>
+                                            <input type="text" class="form-control form-control-validate form-control-solid event-change"
+                                                   id="companyName" name="companyname"/>
+                                        </div>
+
+                                        <!-- Company Phone -->
+                                        <div class="col-md-3">
+                                            <label class="form-label">Company Phone</label>
+                                            <div class="input-group input-group-solid">
+                                                <span class="input-group-text"><i class="la la-phone"></i></span>
+                                                <input type="text"
+                                                       class="form-control form-control-validate input-phone event-change"
+                                                       id="companyPhone" name="companyphone" autocomplete="off">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <!-- Company Address -->
+                                        <div class="col-md-12">
+                                            <label class="form-label">Company Address</label>
+                                            <textarea class="form-control form-control-validate form-control-solid event-change"
+                                                      id="companyAddress" name="companyaddress" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="tab-pane fade" id="tab-content-employees" role="tabpanel">
+                                <div class="row" id="lista-employees">
+                                    <div class="col-md-12">
+
+                                        <!--begin::Wrapper-->
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+
+                                            <!-- Acciones -->
+                                            <div class="d-flex flex-wrap gap-3">
+                                                {% if permiso.agregar or permiso.editar %}
+                                                    <button id="btn-agregar-employee" class="btn btn-success w-125px">
+                                                        <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span
+                                                                    class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                        New
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Filtros -->
+                                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                                <!--search-->
+                                                <div class="position-relative w-250px">
+                                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span
+                                                                class="path1"></span><span class="path2"></span></i>
+                                                    <input type="text" data-table-filter="search"
+                                                           class="form-control form-control-solid ps-13"
+                                                           placeholder="Buscar..."/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <!--end::Wrapper-->
+
+                                        <!--begin::Datatable-->
+                                        <table id="employees-table-editable"
+                                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                            <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                <th>Name</th>
+                                                <th>Hourly Rate</th>
+                                                <th>Position</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="text-gray-600 fw-semibold">
+
+                                            </tbody>
+                                        </table>
+                                        <!--end::Datatable-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-content-notes" role="tabpanel">
+                                <div class="row" id="lista-notes">
+                                    <div class="col-md-12">
+                                        <!--begin::Wrapper-->
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+
+                                            <!-- Acciones -->
+                                            <div class="d-flex flex-wrap gap-3">
+                                                {% if permiso.agregar or permiso.editar %}
+                                                    <button id="btn-agregar-note" class="btn btn-success w-125px">
+                                                        <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span
+                                                                    class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                        New
+                                                    </button>
+                                                {% endif %}
+
+                                                {% if permiso.eliminar %}
+                                                    <button id="btn-eliminar-notes" class="btn btn-danger w-125px">
+                                                        <i class="ki-duotone ki-trash fs-1 me-2"><span class="path1"></span><span
+                                                                    class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                        Delete
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Filtros -->
+                                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                                <!-- desde -->
+                                                <div class="input-group input-group-solid date-picker-filter w-200px" id="datetimepicker-desde"
+                                                     data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                                    <input type="text" class="form-control filter-date" placeholder="Desde"
+                                                           data-td-target="#datetimepicker-desde" autocomplete="off"/>
+                                                    <span class="input-group-text" data-td-target="#datetimepicker-desde" data-td-toggle="datetimepicker">
+                                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                                    </span>
+                                                </div>
+
+                                                <!-- hasta -->
+                                                <div class="input-group input-group-solid date-picker-filter w-200px" id="datetimepicker-hasta"
+                                                     data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                                    <input type="text" class="form-control filter-date" placeholder="Hasta"
+                                                           data-td-target="#datetimepicker-hasta" autocomplete="off"/>
+                                                    <span class="input-group-text" data-td-target="#datetimepicker-hasta" data-td-toggle="datetimepicker">
+                                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                                    </span>
+                                                </div>
+
+                                                <!--search-->
+                                                <div class="position-relative w-250px">
+                                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span
+                                                                class="path1"></span><span class="path2"></span></i>
+                                                    <input type="text" data-table-filter="search"
+                                                           class="form-control form-control-solid ps-13"
+                                                           placeholder="Buscar..."/>
+                                                </div>
+
+                                                <!-- botón -->
+                                                <button class="btn btn-primary fw-semibold w-125px" id="btn-filtrar-notes">
+                                                    Filter
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                        <!--end::Wrapper-->
+
+                                        <!--begin::Datatable-->
+                                        <table id="notes-table-editable"
+                                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                            <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                <th>Date</th>
+                                                <th>Notes</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="text-gray-600 fw-semibold">
+
+                                            </tbody>
+                                        </table>
+                                        <!--end::Datatable-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-content-projects" role="tabpanel">
+                                <div class="row" id="lista-projects">
+                                    <div class="col-md-12">
+                                        <!--begin::Wrapper-->
+                                        <div class="d-flex flex-column flex-lg-row justify-content-between mb-5">
+                                            <!--search-->
+                                            <div class="d-flex align-items-center position-relative my-1">
+                                                <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span
+                                                            class="path1"></span><span
+                                                            class="path2"></span></i>
+                                                <input type="text" data-table-filter="search"
+                                                       class="form-control form-control-solid w-300px ps-15"
+                                                       placeholder="Buscar..."/>
+                                            </div>
+
+                                        </div>
+                                        <!--end::Wrapper-->
+
+                                        <!--begin::Datatable-->
+                                        <table id="projects-table-editable"
+                                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                            <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                <th>C & G Project #</th>
+                                                <th>County</th>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Due Date</th>
+                                                <th>Status</th>
+                                                <th>Notes</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="text-gray-600 fw-semibold">
+
+                                            </tbody>
+                                        </table>
+                                        <!--end::Datatable-->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </form>
             </div>
 
         </div>
-
+        <!--end::Content container-->
     </div>
+    <!--end::Content-->
 
     <!-- employees -->
     <div class="modal fade" id="modal-employee" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -421,9 +624,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">New employee</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                         aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <form class="m-form" id="employee-form" action="#"
@@ -431,39 +635,37 @@
 
                         <input type="hidden" id="employee_id" name="employee_id"/>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
+                        <div class="form-group ic-form-group">
+                            <label class="form-label required">
                                 <span class="ic-step-number">1</span>
                                 Name
                             </label>
-                            <input type="text" class="form-control form-control-text"
+                            <input type="text" class="form-control form-control-solid form-control-validate"
                                    id="employee-name" name="name"/>
                         </div>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
+                        <div class="form-group ic-form-group">
+                            <label class="form-label">
                                 <span class="ic-step-number">2</span>
                                 Hourly Rate
-                                <span class="ic-small italic">(required)</span>
                             </label>
                             <div class="row">
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control form-control-text just-float event-change"
-                                           id="employee-hourly_rate" name="hourly_rate"/>
+                                    <input type="text" class="form-control form-control-solid form-control-validate just-float event-change"
+                                           id="employee-hourly_rate" name="hourlyrate"/>
                                 </div>
                             </div>
 
                         </div>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
+                        <div class="form-group ic-form-group">
+                            <label class="form-label">
                                 <span class="ic-step-number">3</span>
                                 Position
-                                <span class="ic-small italic">(optional)</span>
                             </label>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control form-control-text event-change"
+                                    <input type="text" class="form-control form-control-validate form-control-solid event-change"
                                            id="employee-position" name="position"/>
                                 </div>
                             </div>
@@ -479,26 +681,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-eliminar-employee" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Are you sure you want to delete the selected note?</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="btn-delete-employee">Yes
-                    </button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- notes -->
     <div class="modal fade" id="modal-notes" role="dialog" aria-labelledby="myModalLabel">
@@ -507,17 +689,11 @@
                 <div class="modal-header">
                     <h5 class="modal-title">
                         New Note
-
-                        <span style="margin-left: 10px">
-                            <span id="proyect-number-note" class="m-badge m-badge--info"></span>
-                            <span id="proyect-name-note"></span>
-                        </span>
                     </h5>
-
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                         aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <form class="m-form" id="notes-form" action="#"
@@ -525,43 +701,35 @@
 
                         <input type="hidden" id="notes_id" name="notes_id"/>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
+                        <div class="form-group ic-form-group">
+                            <label class="form-label required">
                                 <span class="ic-step-number">1</span>
                                 Date
-                                <span class="ic-small italic">(required)</span>
                             </label>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker "
-                                               placeholder="Select" autocomplete="off"
-                                               id="notes-date" name="date"/>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="la la-calendar glyphicon-th"></i>
-                                            </span>
-                                        </div>
+                                    <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-notes-date" data-td-target-input="nearest"
+                                         data-td-target-toggle="nearest">
+                                        <input type="text" class="form-control filter-date" placeholder="Select a date" id="notes-date"
+                                               data-td-target="#datetimepicker-notes-date" autocomplete="off" name="day"/>
+                                        <span class="input-group-text" data-td-target="#datetimepicker-notes-date" data-td-toggle="datetimepicker">
+                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group m-form__group ic-form-group">
-                            <label>
+                        <div class="form-group ic-form-group">
+                            <label class="form-label required">
                                 <span class="ic-step-number">2</span>
                                 Notes
-                                <span class="ic-small italic">(required)</span>
                             </label>
-
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div id="notes" class=""></div>
+                                    <div id="notes" class="h-150px"></div>
                                 </div>
                             </div>
-                            {#
-                            <textarea class="form-control" name="notes" id="notes" rows="6"></textarea>
-                            #}
                         </div>
 
                     </form>
@@ -573,50 +741,11 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-eliminar-notes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Are you sure you want to delete the selected note?</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="btn-delete-note">Yes
-                    </button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="modal-eliminar-notes-date" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Are you sure you want to delete the notes?</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="btn-delete-note-date">Yes
-                    </button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
 
 {% block javascriptsspecific %}
+    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script src="{{ asset('bundles/metronic8/js/pages/subcontractors.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 

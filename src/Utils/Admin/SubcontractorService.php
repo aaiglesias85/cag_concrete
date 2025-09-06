@@ -75,6 +75,7 @@ class SubcontractorService extends Base
         /** @var SubcontractorEmployee $entity */
         if ($entity != null) {
 
+            $arreglo_resultado['employee_id'] = $employee_id;
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['hourly_rate'] = $entity->getHourlyRate();
             $arreglo_resultado['position'] = $entity->getPosition();
@@ -200,66 +201,26 @@ class SubcontractorService extends Base
      */
     public function ListarEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
+            ->ListarEmployeesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id);
 
-        $lista = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
-            ->ListarEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $employee_id = $value->getEmployeeId();
 
-            $acciones = $this->ListarAccionesEmployees($employee_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $employee_id,
                 "name" => $value->getName(),
                 "hourlyRate" => $value->getHourlyRate(),
                 "position" => $value->getPosition(),
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalEmployees: Total de employees
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalEmployees($sSearch, $subcontractor_id)
-    {
-        $total = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
-            ->TotalEmployees($sSearch, $subcontractor_id);
-
-        return $total;
-    }
-
-    /**
-     * ListarAccionesEmployees: Lista las acciones
-     *
-     * @author Marcel
-     */
-    public function ListarAccionesEmployees($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 18);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**
@@ -354,6 +315,7 @@ class SubcontractorService extends Base
         /** @var SubcontractorNotes $entity */
         if ($entity != null) {
 
+            $arreglo_resultado['notes_id'] = $notes_id;
             $arreglo_resultado['notes'] = $entity->getNotes();
             $arreglo_resultado['date'] = $entity->getDate()->format('m/d/Y');
 
@@ -442,68 +404,28 @@ class SubcontractorService extends Base
      */
     public function ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(SubcontractorNotes::class)
+            ->ListarNotesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(SubcontractorNotes::class)
-            ->ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $notes_id = $value->getId();
-
-            $acciones = $this->ListarAccionesNotes($notes_id);
 
             $notes = $value->getNotes();
             $notes = mb_convert_encoding($notes, 'UTF-8', 'UTF-8');
 
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $notes_id,
                 "notes" => $notes,
                 "date" => $value->getDate()->format('m/d/Y'),
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalNotes: Total de notes
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalNotes($sSearch, $subcontractor_id, $fecha_inicial, $fecha_fin)
-    {
-        $total = $this->getDoctrine()->getRepository(SubcontractorNotes::class)
-            ->TotalNotes($sSearch, $subcontractor_id, $fecha_inicial, $fecha_fin);
-
-        return $total;
-    }
-
-    /**
-     * ListarAccionesNotes: Lista las acciones
-     *
-     * @author Marcel
-     */
-    public function ListarAccionesNotes($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 18);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'],
+        ];
     }
 
     /**
@@ -823,18 +745,15 @@ class SubcontractorService extends Base
      */
     public function ListarSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Subcontractor::class)
+            ->ListarSubcontractorsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-        $lista = $this->getDoctrine()->getRepository(Subcontractor::class)
-            ->ListarSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $subcontractor_id = $value->getSubcontractorId();
 
-            $acciones = $this->ListarAcciones($subcontractor_id);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $subcontractor_id,
                 "name" => $value->getName(),
                 "phone" => $value->getPhone() ?? '',
@@ -844,51 +763,12 @@ class SubcontractorService extends Base
                 "companyName" => $value->getCompanyName(),
                 "companyPhone" => $value->getCompanyPhone() ?? '',
                 "companyAddress" => $value->getCompanyAddress(),
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalSubcontractors: Total de subcontractors
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalSubcontractors($sSearch)
-    {
-        $total = $this->getDoctrine()->getRepository(Subcontractor::class)
-            ->TotalSubcontractors($sSearch);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 18);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }

@@ -74,4 +74,52 @@ class SubcontractorRepository extends ServiceEntityRepository
 
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * ListarSubcontractorsConTotal Lista los subcontractors con total
+     *
+     * @return []
+     */
+    public function ListarSubcontractorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'subcontractorId'  => 's.subcontractorId',
+            'name' => 's.name',
+            'phone'    => 's.phone',
+            'address' => 's.address',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 's.name';
+        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('s');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('s.companyPhone LIKE :search OR s.companyAddress LIKE :search OR s.companyName LIKE :search OR
+                s.contactEmail LIKE :search OR s.contactName LIKE :search OR s.phone LIKE :search OR s.name LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(s.subcontractorId)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
 }

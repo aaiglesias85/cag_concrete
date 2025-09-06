@@ -1,165 +1,254 @@
 var Subcontractors = function () {
 
-    var oTable;
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#subcontractor-table-editable');
+        const table = "#subcontractor-table-editable";
+        // datasource
+        const datasource = DatatableUtil.getDataTableDatasource(`subcontractor/listar`);
 
-        var table = $('#subcontractor-table-editable');
+        // columns
+        const columns = getColumnsTable();
 
-        var aoColumns = [];
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
-        aoColumns.push(
-            {
-                field: "name",
-                title: "Name"
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "phone",
-                title: "Phone",
-                width: 200,
-                template: function (row) {
-                    return row.phone !== '' ? '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>' : '';
-                }
-            },
-            {
-                field: "address",
-                title: "Address"
-            },
-            {
-                field: "companyName",
-                title: "Company Name"
-            },
-            {
-                field: "companyPhone",
-                title: "Company Phone",
-                width: 200,
-                template: function (row) {
-                    return row.companyPhone !== '' ? '<a class="m-link" href="tel:' + row.companyPhone + '">' + row.companyPhone + '</a>' : '';
-                }
-            },
-            {
-                field: "companyAddress",
-                title: "Company Address"
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'subcontractor/listarSubcontractor',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#subcontractor-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#subcontractor-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#subcontractor-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#subcontractor-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#subcontractor-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-subcontractor .m_form_search').on('keyup', function (e) {
-            // shortcode to datatable.getDataSourceParam('query');
-            var query = oTable.getDataSourceQuery();
-            query.generalSearch = $(this).val().toLowerCase();
-            // shortcode to datatable.setDataSourceParam('query', query);
-            oTable.setDataSourceQuery(query);
-            oTable.load();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        // columns
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+        columns.push(
+            {data: 'name'},
+            {data: 'phone'},
+            {data: 'address'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            {
+                targets: 2,
+                render: DatatableUtil.getRenderColumnPhone
+            },
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 350);
+                }
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 1,
+                    render: DatatableUtil.getRenderColumnPhone
+                },
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 350);
+                    }
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        const filterSearch = document.querySelector('#lista-subcontractor [data-table-filter="search"]');
+        let debounceTimeout;
+
+        filterSearch.addEventListener('keyup', function (e) {
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Subcontractors';
+        var table = document.querySelector('#subcontractor-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#subcontractor-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#subcontractor_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.log("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-subcontractor').removeClass('hide');
+        } else {
+            $('#btn-eliminar-subcontractor').addClass('hide');
+        }
+    }
 
     //Reset forms
     var resetForms = function () {
-        $('#subcontractor-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#subcontractor-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("subcontractor-form");
 
         //projects
         projects = [];
@@ -173,374 +262,31 @@ var Subcontractors = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#subcontractor-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-                contactemail: {
-                    optionalEmail: true
-                }
+        var form = KTUtil.get('subcontractor-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
-    };
-
-    //Nuevo
-    var initAccionNuevo = function () {
-        $(document).off('click', "#btn-nuevo-subcontractor");
-        $(document).on('click', "#btn-nuevo-subcontractor", function (e) {
-            btnClickNuevo();
-        });
-
-        function btnClickNuevo() {
-            resetForms();
-            var formTitle = "Do you want to create a new subcontractor? Follow the next steps:";
-            $('#form-subcontractor-title').html(formTitle);
-            $('#form-subcontractor').removeClass('m--hide');
-            $('#lista-subcontractor').addClass('m--hide');
-        };
-    };
-    //Salvar
-    var initAccionSalvar = function () {
-        $(document).off('click', "#btn-wizard-finalizar");
-        $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
-        });
-
-        function btnClickSalvarForm() {
-            mUtil.scrollTo();
-
-            event_change = false;
-
-            if ($('#subcontractor-form').valid()) {
-
-                var subcontractor_id = $('#subcontractor_id').val();
-
-                var name = $('#name').val();
-                var phone = $('#phone').val();
-                var address = $('#address').val();
-                var contactName = $('#contactName').val();
-                var contactEmail = $('#contactEmail').val();
-
-                var companyName = $('#companyName').val();
-                var companyPhone = $('#companyPhone').val();
-                var companyAddress = $('#companyAddress').val();
-
-                BlockUtil.block('#form-subcontractor');
-
-                $.ajax({
-                    type: "POST",
-                    url: "subcontractor/salvarSubcontractor",
-                    dataType: "json",
-                    data: {
-                        'subcontractor_id': subcontractor_id,
-                        'name': name,
-                        'phone': phone,
-                        'address': address,
-                        'contactName': contactName,
-                        'contactEmail': contactEmail,
-                        'companyName': companyName,
-                        'companyPhone': companyPhone,
-                        'companyAddress': companyAddress,
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-subcontractor');
-                        if (response.success) {
-
-                            toastr.success(response.message, "");
-                            cerrarForms();
-                            oTable.load();
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-subcontractor');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-            }
-        };
-    }
-    //Cerrar form
-    var initAccionCerrar = function () {
-        $(document).off('click', ".cerrar-form-subcontractor");
-        $(document).on('click', ".cerrar-form-subcontractor", function (e) {
-            cerrarForms();
-        });
-    }
-    //Cerrar forms
-    var cerrarForms = function () {
-        if (!event_change) {
-            cerrarFormsConfirmated();
+        if (!errors) {
+            result = true;
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            MyApp.showErrorsValidateForm(form, errors);
         }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
-
-    //Eventos change
-    var event_change = false;
-    var initAccionChange = function () {
-        $(document).off('change', ".event-change");
-        $(document).on('change', ".event-change", function (e) {
-            event_change = true;
-        });
-
-        $(document).off('click', "#btn-save-changes");
-        $(document).on('click', "#btn-save-changes", function (e) {
-            cerrarFormsConfirmated();
-        });
-    };
-    var cerrarFormsConfirmated = function () {
-        resetForms();
-        $('#form-subcontractor').addClass('m--hide');
-        $('#lista-subcontractor').removeClass('m--hide');
-    };
-
-    //Editar
-    var initAccionEditar = function () {
-        $(document).off('click', "#subcontractor-table-editable a.edit");
-        $(document).on('click', "#subcontractor-table-editable a.edit", function (e) {
-            e.preventDefault();
-            resetForms();
-
-            var subcontractor_id = $(this).data('id');
-            $('#subcontractor_id').val(subcontractor_id);
-
-            $('#form-subcontractor').removeClass('m--hide');
-            $('#lista-subcontractor').addClass('m--hide');
-
-            editRow(subcontractor_id);
-        });
-
-        function editRow(subcontractor_id) {
-
-            BlockUtil.block('#form-subcontractor');
-
-            $.ajax({
-                type: "POST",
-                url: "subcontractor/cargarDatos",
-                dataType: "json",
-                data: {
-                    'subcontractor_id': subcontractor_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-subcontractor');
-                    if (response.success) {
-                        //Datos subcontractor
-
-                        var formTitle = "You want to update the subcontractor? Follow the next steps:";
-                        $('#form-subcontractor-title').html(formTitle);
-
-                        $('#name').val(response.subcontractor.name);
-                        $('#phone').val(response.subcontractor.phone);
-                        $('#address').val(response.subcontractor.address);
-                        $('#contactName').val(response.subcontractor.contactName);
-                        $('#contactEmail').val(response.subcontractor.contactEmail);
-
-                        $('#companyName').val(response.subcontractor.companyName);
-                        $('#companyPhone').val(response.subcontractor.companyPhone);
-                        $('#companyAddress').val(response.subcontractor.companyAddress);
-
-                        // projects
-                        projects = response.subcontractor.projects;
-                        actualizarTableListaProjects();
-
-                        // habilitar tab
-                        totalTabs = 4;
-                        $('#btn-wizard-siguiente').removeClass('m--hide');
-                        $('.nav-item-hide').removeClass('m--hide');
-
-                        event_change = false;
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#form-subcontractor');
-
-                    toastr.error(response.error, "");
-                }
-            });
-
-        }
-    };
-    //Eliminar
-    var initAccionEliminar = function () {
-        $(document).off('click', "#subcontractor-table-editable a.delete");
-        $(document).on('click', "#subcontractor-table-editable a.delete", function (e) {
-            e.preventDefault();
-
-            rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
-        });
-
-        $(document).off('click', "#btn-eliminar-subcontractor");
-        $(document).on('click', "#btn-eliminar-subcontractor", function (e) {
-            btnClickEliminar();
-        });
-
-        $(document).off('click', "#btn-delete");
-        $(document).on('click', "#btn-delete", function (e) {
-            btnClickModalEliminar();
-        });
-
-        $(document).off('click', "#btn-delete-selection");
-        $(document).on('click', "#btn-delete-selection", function (e) {
-            btnClickModalEliminarSeleccion();
-        });
-
-        function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
-            if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
-            } else {
-                toastr.error('Select Subcontractors to delete', "");
-            }
-        };
-
-        function btnClickModalEliminar() {
-            var subcontractor_id = rowDelete;
-
-            BlockUtil.block('#subcontractor-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "subcontractor/eliminarSubcontractor",
-                dataType: "json",
-                data: {
-                    'subcontractor_id': subcontractor_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#subcontractor-table-editable');
-
-                    if (response.success) {
-                        oTable.load();
-
-                        toastr.success(response.message, "");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#subcontractor-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
-        };
-
-        function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
-            BlockUtil.block('#subcontractor-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "subcontractor/eliminarSubcontractors",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#subcontractor-table-editable');
-                    if (response.success) {
-
-                        oTable.load();
-                        toastr.success(response.message, "");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#subcontractor-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
-        };
-    };
-
-
-    var initWidgets = function () {
-
-        initPortlets();
-
-        $('.phone').inputmask("mask", {
-            "mask": "(999)999-9999"
-        });
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-subcontractor');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
 
     //Wizard
     var activeTab = 1;
@@ -560,20 +306,23 @@ var Subcontractors = function () {
             activeTab = parseInt(item);
 
             if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
             }
             if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
             }
             if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
             }
             if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
             }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
 
             //bug visual de la tabla que muestra las cols corridas
             switch (activeTab) {
@@ -595,10 +344,10 @@ var Subcontractors = function () {
         $(document).on('click', "#btn-wizard-siguiente", function (e) {
             if (validWizard()) {
                 activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
+                $('#btn-wizard-anterior').removeClass('hide');
                 if (activeTab == totalTabs) {
-                    $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
+                    $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
                 }
 
                 mostrarTab();
@@ -609,11 +358,11 @@ var Subcontractors = function () {
         $(document).on('click', "#btn-wizard-anterior", function (e) {
             activeTab--;
             if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
+                $('#btn-wizard-anterior').addClass('hide');
             }
             if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
+                $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
             }
             mostrarTab();
         });
@@ -644,16 +393,21 @@ var Subcontractors = function () {
         activeTab = 1;
         totalTabs = 1;
         mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
+        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("subcontractor-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
     }
     var validWizard = function () {
         var result = true;
         if (activeTab == 1) {
 
-            if (!$('#subcontractor-form').valid()) {
+            if (!validateForm()) {
                 result = false;
             }
 
@@ -662,169 +416,465 @@ var Subcontractors = function () {
         return result;
     }
 
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("subcontractor-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("subcontractor-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
+    };
+
+    //Nuevo
+    var initAccionNuevo = function () {
+        $(document).off('click', "#btn-nuevo-subcontractor");
+        $(document).on('click', "#btn-nuevo-subcontractor", function (e) {
+            btnClickNuevo();
+        });
+
+        function btnClickNuevo() {
+            resetForms();
+
+            KTUtil.find(KTUtil.get('form-subcontractor'), '.card-label').innerHTML = "New Subcontractor:";
+
+            mostrarForm();
+        };
+    };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-subcontractor'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-subcontractor'), 'hide');
+    }
+
+    //Salvar
+    var initAccionSalvar = function () {
+        $(document).off('click', "#btn-wizard-finalizar");
+        $(document).on('click', "#btn-wizard-finalizar", function (e) {
+            btnClickSalvarForm();
+        });
+
+        function btnClickSalvarForm() {
+            KTUtil.scrollTop();
+
+            event_change = false;
+
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
+
+                var subcontractor_id = $('#subcontractor_id').val();
+                formData.set("subcontractor_id", subcontractor_id);
+
+                var name = $('#name').val();
+                formData.set("name", name);
+
+                var phone = $('#phone').val();
+                formData.set("phone", phone);
+
+                var address = $('#address').val();
+                formData.set("address", address);
+
+                var companyName = $('#companyName').val();
+                formData.set("companyName", companyName);
+
+                var companyPhone = $('#companyPhone').val();
+                formData.set("companyPhone", companyPhone);
+
+                var companyAddress = $('#companyAddress').val();
+                formData.set("companyAddress", companyAddress);
+
+                BlockUtil.block('#form-subcontractor');
+
+                axios.post("subcontractor/salvarSubcontractor", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+
+                                cerrarForms();
+
+                                oTable.draw();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
+                        }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-subcontractor");
+                    });
+            }
+        };
+    }
+    //Cerrar form
+    var initAccionCerrar = function () {
+        $(document).off('click', ".cerrar-form-subcontractor");
+        $(document).on('click', ".cerrar-form-subcontractor", function (e) {
+            cerrarForms();
+        });
+    }
+    //Cerrar forms
+    var cerrarForms = function () {
+        if (!event_change) {
+            cerrarFormsConfirmated();
+        } else {
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
+        }
+    };
+
+    //Eventos change
+    var event_change = false;
+    var initAccionChange = function () {
+        $(document).off('change', ".event-change");
+        $(document).on('change', ".event-change", function (e) {
+            event_change = true;
+        });
+
+        $(document).off('click', "#btn-save-changes");
+        $(document).on('click', "#btn-save-changes", function (e) {
+            cerrarFormsConfirmated();
+        });
+    };
+    var cerrarFormsConfirmated = function () {
+        resetForms();
+        $('#form-subcontractor').addClass('hide');
+        $('#lista-subcontractor').removeClass('hide');
+    };
+
+    //Editar
+    var initAccionEditar = function () {
+        $(document).off('click', "#subcontractor-table-editable a.edit");
+        $(document).on('click', "#subcontractor-table-editable a.edit", function (e) {
+            e.preventDefault();
+            resetForms();
+
+            var subcontractor_id = $(this).data('id');
+            $('#subcontractor_id').val(subcontractor_id);
+
+            mostrarForm()
+
+            editRow(subcontractor_id);
+        });
+
+        function editRow(subcontractor_id) {
+
+            var formData = new URLSearchParams();
+            formData.set("subcontractor_id", subcontractor_id);
+
+            BlockUtil.block('#form-subcontractor');
+
+            axios.post("subcontractor/cargarDatos", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+
+                            //cargar datos
+                            cargarDatos(response.subcontractor);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-subcontractor");
+                });
+
+            function cargarDatos(subcontractor) {
+
+                KTUtil.find(KTUtil.get("form-subcontractor"), ".card-label").innerHTML = "Update Subcontractor: " + subcontractor.name;
+
+                $('#name').val(subcontractor.name);
+                $('#phone').val(subcontractor.phone);
+                $('#address').val(subcontractor.address);
+
+                $('#companyName').val(subcontractor.companyName);
+                $('#companyPhone').val(subcontractor.companyPhone);
+                $('#companyAddress').val(subcontractor.companyAddress);
+
+                // projects
+                projects = subcontractor.projects;
+                actualizarTableListaProjects();
+
+                // habilitar tab
+                totalTabs = 4;
+                $('#btn-wizard-siguiente').removeClass('hide');
+                $('.nav-item-hide').removeClass('hide');
+
+                event_change = false;
+
+            }
+
+        }
+    };
+    //Eliminar
+    var initAccionEliminar = function () {
+        $(document).off('click', "#subcontractor-table-editable a.delete");
+        $(document).on('click', "#subcontractor-table-editable a.delete", function (e) {
+            e.preventDefault();
+
+            rowDelete = $(this).data('id');
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
+        });
+
+        $(document).off('click', "#btn-eliminar-subcontractor");
+        $(document).on('click', "#btn-eliminar-subcontractor", function (e) {
+            btnClickEliminar();
+        });
+
+        $(document).off('click', "#btn-delete");
+        $(document).on('click', "#btn-delete", function (e) {
+            btnClickModalEliminar();
+        });
+
+        $(document).off('click', "#btn-delete-selection");
+        $(document).on('click', "#btn-delete-selection", function (e) {
+            btnClickModalEliminarSeleccion();
+        });
+
+        function btnClickEliminar() {
+            var ids = DatatableUtil.getTableSelectedRowKeys('#subcontractor-table-editable').join(',');
+            if (ids != '') {
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
+            } else {
+                toastr.error('Select subcontractors to delete', "");
+            }
+        };
+
+        function btnClickModalEliminar() {
+            var subcontractor_id = rowDelete;
+
+            var formData = new URLSearchParams();
+            formData.set("subcontractor_id", subcontractor_id);
+
+            BlockUtil.block('#lista-subcontractor');
+
+            axios.post("subcontractor/eliminarSubcontractor", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-subcontractor");
+                });
+        };
+
+        function btnClickModalEliminarSeleccion() {
+            var ids = DatatableUtil.getTableSelectedRowKeys('#subcontractor-table-editable').join(',');
+
+            var formData = new URLSearchParams();
+
+            formData.set("ids", ids);
+
+            BlockUtil.block('#lista-subcontractor');
+
+            axios.post("subcontractor/eliminarSubcontractors", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-subcontractor");
+                });
+        };
+    };
+
+
+    var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
+
+        // filtros fechas
+        TempusUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
+        });
+        TempusUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
+        });
+
+        // Tempus Dominus SOLO FECHA (sin horas)
+        TempusUtil.initDate('datetimepicker-notes-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
+        });
+        // set default date (hoy)
+        TempusUtil.setDate('datetimepicker-notes-date', new Date());
+
+        // Quill SIN variables: se gestiona por selector
+        QuillUtil.init('#notes');
+
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask(".input-phone");
+    }
+
     // employees
     var oTableEmployees;
     var rowDeleteEmployee = null;
     var rowEditEmployee = null;
     var initTableEmployees = function () {
-        BlockUtil.block('#employees-table-editable');
 
-        var table = $('#employees-table-editable');
+        const table = "#employees-table-editable";
 
-        var aoColumns = [
-            {
-                field: "name",
-                title: "Name"
+        // datasource
+        const datasource = {
+            url: `subcontractor/listarEmployees`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    subcontractor_id: $('#subcontractor_id').val(),
+                });
             },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
+
+        // columns
+        const columns = [
+            {data: 'name'},
+            {data: 'hourlyRate'},
+            {data: 'position'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "hourlyRate",
-                title: "Hourly Rate"
-            },
-            {
-                field: "position",
-                title: "Position"
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
             }
         ];
-        oTableEmployees = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'subcontractor/listarEmployees',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        oTableEmployees = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableEmployees
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#employees-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#employees-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#employees-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#employees-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#employees-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // init acciones
+            initAccionesEmployees();
+        });
 
-        //Busqueda
-        var query = oTableEmployees.getDataSourceQuery();
-        $('#lista-employees .m_form_search').on('keyup', function (e) {
-            btnClickFiltrarEmployees();
-        }).val(query.generalSearch);
+        // search
+        handleSearchDatatableEmployees();
     };
-    var btnClickFiltrarEmployees = function () {
-        var query = oTableEmployees.getDataSourceQuery();
-
-        var generalSearch = $('#lista-employees .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var subcontractor_id = $('#subcontractor_id').val();
-        query.subcontractor_id = subcontractor_id;
-
-        oTableEmployees.setDataSourceQuery(query);
-        oTableEmployees.load();
-    }
-    var initFormEmployee = function () {
-        $("#employee-form").validate({
-            rules: {
-                date: {
-                    required: true
-                },
-                /*notes: {
-                    required: true,
-                }*/
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
+    var handleSearchDatatableEmployees = function () {
+        $(document).off('keyup', '#lista-employees [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-employees [data-table-filter="search"]', function (e) {
+            btnClickFiltrarEmployees();
         });
+    }
+    var btnClickFiltrarEmployees = function () {
+        const search = $('#lista-employees [data-table-filter="search"]').val();
+        oTableEmployees.search(search).draw();
+    }
+    // validacion
+    var validateFormEmployee = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('employee-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
+            },
+            hourlyrate: {
+                presence: {message: "This field is required"},
+            },
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
     var initAccionesEmployees = function () {
 
-        $('#modal-employee').on('shown.bs.modal', function () {
+        $(document).off('click', "#btn-agregar-employee");
+        $(document).on('click', "#btn-agregar-employee", function (e) {
+            // mostar modal
+            ModalUtil.show('modal-employee', {backdrop: 'static', keyboard: true});
+        });
 
+        ModalUtil.on('modal-employee', 'shown.bs.modal', function () {
             // reset
             resetFormEmployee();
 
@@ -832,71 +882,61 @@ var Subcontractors = function () {
             if (rowEditEmployee != null) {
                 editRowEmployee(rowEditEmployee);
             }
-
-        });
-
-        $(document).off('click', "#btn-agregar-employee");
-        $(document).on('click', "#btn-agregar-employee", function (e) {
-
-            $('#modal-employee').modal({
-                'show': true
-            });
         });
 
         $(document).off('click', "#btn-salvar-employee");
         $(document).on('click', "#btn-salvar-employee", function (e) {
             e.preventDefault();
 
-            if ($('#employee-form').valid()) {
+            if (validateFormEmployee()) {
+
+                var formData = new URLSearchParams();
 
                 var employee_id = $('#employee_id').val();
+                formData.set("employee_id", employee_id);
+
                 var subcontractor_id = $('#subcontractor_id').val();
+                formData.set("subcontractor_id", subcontractor_id);
 
                 var name = $('#employee-name').val();
+                formData.set("name", name);
+
                 var hourly_rate = $('#employee-hourly_rate').val();
+                formData.set("hourly_rate", hourly_rate);
+
                 var position = $('#employee-position').val();
+                formData.set("position", position);
 
                 BlockUtil.block('#modal-employee .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "subcontractor/agregarEmployee",
-                    dataType: "json",
-                    data: {
-                        'employee_id': employee_id,
-                        'subcontractor_id': subcontractor_id,
-                        'name': name,
-                        'hourly_rate': hourly_rate,
-                        'position': position
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-employee .modal-content');
-                        if (response.success) {
+                axios.post("subcontractor/agregarEmployee", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "Success");
+                                if (employee_id !== '') {
+                                    ModalUtil.hide('modal-employee');
+                                }
 
-                            if (employee_id !== '') {
-                                $('#modal-employee').modal('hide');
+                                // reset
+                                resetFormEmployee();
+
+                                //actualizar lista
+                                btnClickFiltrarEmployees();
+
+                            } else {
+                                toastr.error(response.error, "");
                             }
-
-                            // reset
-                            resetFormEmployee();
-
-                            //actualizar lista
-                            btnClickFiltrarEmployees();
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-employee .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-
-
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-employee .modal-content");
+                    });
             }
         });
 
@@ -906,101 +946,103 @@ var Subcontractors = function () {
 
             rowEditEmployee = $(this).data('id');
 
-            $('#modal-employee').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-employee', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#employees-table-editable a.delete");
         $(document).on('click', "#employees-table-editable a.delete", function (e) {
 
             e.preventDefault();
-            rowDeleteEmployee = $(this).data('id');
-            $('#modal-eliminar-employee').modal({
-                'show': true
-            });
-        });
+            var employee_id = $(this).data('id');
 
-        $(document).off('click', "#btn-delete-employee");
-        $(document).on('click', "#btn-delete-employee", function (e) {
-
-            var employee_id = rowDeleteEmployee;
-
-            BlockUtil.block('#employees-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "subcontractor/eliminarEmployee",
-                dataType: "json",
-                data: {
-                    'employee_id': employee_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#employees-table-editable');
-                    if (response.success) {
-
-                        btnClickFiltrarEmployees();
-
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#employees-table-editable');
-
-                    toastr.error(response.error, "");
+            Swal.fire({
+                text: "Are you sure you want to delete the employee?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarEmployee(employee_id);
                 }
             });
 
         });
 
+        function eliminarEmployee(employee_id) {
 
+            var formData = new URLSearchParams();
+            formData.set("employee_id", employee_id);
+
+            BlockUtil.block('#lista-employees');
+
+            axios.post("subcontractor/eliminarEmployee", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            btnClickFiltrarEmployees();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-employees");
+                });
+        }
     };
     var editRowEmployee = function (employee_id) {
 
-        $('#employee_id').val(employee_id);
+        var formData = new URLSearchParams();
+        formData.set("employee_id", employee_id);
+
         rowEditEmployee = null;
 
         BlockUtil.block('#modal-employee .modal-content');
 
-        $.ajax({
-            type: "POST",
-            url: "subcontractor/cargarDatosEmployee",
-            dataType: "json",
-            data: {
-                'employee_id': employee_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#modal-employee .modal-content');
-                if (response.success) {
-                    //Datos project
+        axios.post("subcontractor/cargarDatosEmployee", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    $('#employee-name').val(response.employee.name);
-                    $('#employee-hourly_rate').val(response.employee.hourly_rate);
-                    $('#employee-position').val(response.employee.position);
+                        //Datos unit
+                        cargarDatos(response.employee);
 
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#modal-employee .modal-content');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#modal-employee .modal-content");
+            });
 
-                toastr.error(response.error, "");
-            }
-        });
-
+        function cargarDatos(employee) {
+            $('#employee_id').val(employee.employee_id);
+            $('#employee-name').val(employee.name);
+            $('#employee-hourly_rate').val(employee.hourly_rate);
+            $('#employee-position').val(employee.position);
+        }
     }
     var resetFormEmployee = function () {
-        $('#employee-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("employee-form");
     };
 
     // notes
@@ -1008,107 +1050,88 @@ var Subcontractors = function () {
     var rowDeleteNote = null;
     var rowEditNote = null;
     var initTableNotes = function () {
-        BlockUtil.block('#notes-table-editable');
 
-        var table = $('#notes-table-editable');
+        const table = "#notes-table-editable";
 
-        var aoColumns = [
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // datasource
+        const datasource = {
+            url: `subcontractor/listarNotes`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    subcontractor_id: $('#subcontractor_id').val(),
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                });
             },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
+
+        // columns
+        const columns = [
+            {data: 'date'},
+            {data: 'notes'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "notes",
-                title: "Notes",
-                template: function (row) {
-                    return `<div>${row.notes}</div>`;
-                }
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
             }
         ];
-        oTableNotes = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'subcontractor/listarNotes',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        oTableNotes = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableNotes
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#notes-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#notes-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#notes-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#notes-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#notes-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // init acciones
+            initAccionesNotes();
+        });
 
-        //Busqueda
-        var query = oTableNotes.getDataSourceQuery();
-        $('#lista-notes .m_form_search').on('keyup', function (e) {
-            btnClickFiltrarNotes();
-        }).val(query.generalSearch);
+        // search
+        handleSearchDatatableNotes();
     };
+    var handleSearchDatatableNotes = function () {
+        $(document).off('keyup', '#lista-notes [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-notes [data-table-filter="search"]', function (e) {
+            btnClickFiltrarNotes();
+        });
+    }
     var initAccionFiltrarNotes = function () {
 
         $(document).off('click', "#btn-filtrar-notes");
@@ -1118,160 +1141,88 @@ var Subcontractors = function () {
 
     };
     var btnClickFiltrarNotes = function () {
-        var query = oTableNotes.getDataSourceQuery();
-
-        var generalSearch = $('#lista-notes .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var subcontractor_id = $('#subcontractor_id').val();
-        query.subcontractor_id = subcontractor_id;
-
-        var fechaInicial = $('#filtro-fecha-inicial-notes').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#filtro-fecha-fin-notes').val();
-        query.fechaFin = fechaFin;
-
-        oTableNotes.setDataSourceQuery(query);
-        oTableNotes.load();
+        const search = $('#lista-notes [data-table-filter="search"]').val();
+        oTableNotes.search(search).draw();
     }
-    var initFormNote = function () {
-        $("#notes-form").validate({
-            rules: {
-                date: {
-                    required: true
-                },
-                /*notes: {
-                    required: true,
-                }*/
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
-    };
     var initAccionesNotes = function () {
-
-        $('#modal-notes').on('shown.bs.modal', function () {
-
-            $('#notes').summernote({
-                dialogsInBody: true,
-                height: 300
-            });
-
-            $.fn.modal.Constructor.prototype._enforceFocus = function () {
-            };
-
-            // reset
-            resetFormNote();
-
-            // editar nota
-            if (rowEditNote != null) {
-                editRowNote(rowEditNote);
-            }
-
-        });
-
 
         $(document).off('click', "#btn-agregar-note");
         $(document).on('click', "#btn-agregar-note", function (e) {
+            // mostar modal
+            ModalUtil.show('modal-notes', {backdrop: 'static', keyboard: true});
+        });
 
-            $('#modal-notes').modal({
-                'show': true
-            });
+        ModalUtil.on('modal-notes', 'shown.bs.modal', function () {
+            // reset
+            resetFormNote();
+
+            // editar note
+            if (rowEditNote != null) {
+                editRowNote(rowEditNote);
+            }
         });
 
         $(document).off('click', "#btn-salvar-note");
         $(document).on('click', "#btn-salvar-note", function (e) {
             e.preventDefault();
 
-            var notes = $('#notes').summernote('code');
+            var date = TempusUtil.getString('datetimepicker-notes-date');
 
-            if ($('#notes-form').valid() && notes !== '') {
+            var notes = QuillUtil.getHtml('#notes');
+            var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
+
+            if (date !== '' && !notesIsEmpty) {
+
+                var formData = new URLSearchParams();
 
                 var notes_id = $('#notes_id').val();
+                formData.set("notes_id", notes_id);
+
                 var subcontractor_id = $('#subcontractor_id').val();
-                var date = $('#notes-date').val();
+                formData.set("subcontractor_id", subcontractor_id);
+
+                formData.set("notes", notes);
+                formData.set("date", date);
 
                 BlockUtil.block('#modal-notes .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "subcontractor/salvarNotes",
-                    dataType: "json",
-                    data: {
-                        'notes_id': notes_id,
-                        'subcontractor_id': subcontractor_id,
-                        'notes': notes,
-                        'date': date
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-notes .modal-content');
-                        if (response.success) {
+                axios.post("subcontractor/salvarNotes", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "Success");
+                                if (notes_id !== '') {
+                                    // Cerrar modal
+                                    ModalUtil.hide('modal-notes');
+                                }
 
-                            if (notes_id !== '') {
-                                $('#modal-notes').modal('hide');
+                                // reset
+                                resetFormNote();
+
+                                //actualizar lista
+                                btnClickFiltrarNotes();
+
+                            } else {
+                                toastr.error(response.error, "");
                             }
-
-                            // reset
-                            resetFormNote();
-
-                            //actualizar lista
-                            btnClickFiltrarNotes();
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-notes .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-notes .modal-content");
+                    });
 
             } else {
-                if (notes == "") {
-                    var $element = $('.note-editor');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "Este campo es obligatorio")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'top'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                if (date === '') {
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("notes-date"), "This field is required");
+                }
+                if (notesIsEmpty) {
+                    toastr.error("The note cannot be empty.", "");
                 }
             }
         });
@@ -1282,336 +1233,294 @@ var Subcontractors = function () {
 
             rowEditNote = $(this).data('id');
 
-            $('#modal-notes').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-notes', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#notes-table-editable a.delete");
         $(document).on('click', "#notes-table-editable a.delete", function (e) {
 
             e.preventDefault();
-            rowDeleteNote = $(this).data('id');
-            $('#modal-eliminar-notes').modal({
-                'show': true
-            });
-        });
+            var notes_id = $(this).data('id');
 
-        $(document).off('click', "#btn-delete-note");
-        $(document).on('click', "#btn-delete-note", function (e) {
-
-            var notes_id = rowDeleteNote;
-
-            BlockUtil.block('#notes-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "subcontractor/eliminarNotes",
-                dataType: "json",
-                data: {
-                    'notes_id': notes_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#notes-table-editable');
-                    if (response.success) {
-
-                        btnClickFiltrarNotes();
-
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#notes-table-editable');
-
-                    toastr.error(response.error, "");
+            Swal.fire({
+                text: "Are you sure you want to delete the notes?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarNote(notes_id);
                 }
             });
 
         });
+
+        function eliminarNote(notes_id) {
+
+            var formData = new URLSearchParams();
+            formData.set("notes_id", notes_id);
+
+            BlockUtil.block('#lista-notes');
+
+            axios.post("subcontractor/eliminarNotes", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            btnClickFiltrarNotes();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-notes");
+                });
+        }
 
         $(document).off('click', "#btn-eliminar-notes");
         $(document).on('click', "#btn-eliminar-notes", function (e) {
 
             e.preventDefault();
 
-            var fechaInicial = $('#filtro-fecha-inicial-notes').val();
-            var fechaFin = $('#filtro-fecha-fin-notes').val();
+            var fechaInicial = TempusUtil.getString('datetimepicker-desde');
+            var fechaFin = TempusUtil.getString('datetimepicker-hasta');
 
             if (fechaInicial === '' && fechaFin === '') {
                 toastr.error("Select the dates to delete", "");
                 return;
             }
 
-            $('#modal-eliminar-notes-date').modal({
-                'show': true
-            });
-        });
-
-        $(document).off('click', "#btn-delete-note-date");
-        $(document).on('click', "#btn-delete-note-date", function (e) {
-
-            var subcontractor_id = $('#subcontractor_id').val();
-            var fechaInicial = $('#filtro-fecha-inicial-notes').val();
-            var fechaFin = $('#filtro-fecha-fin-notes').val();
-
-            BlockUtil.block('#notes-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "subcontractor/eliminarNotesDate",
-                dataType: "json",
-                data: {
-                    'subcontractor_id': subcontractor_id,
-                    'from': fechaInicial,
-                    'to': fechaFin,
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#notes-table-editable');
-                    if (response.success) {
-
-                        // reset
-                        $('#filtro-fecha-inicial-notes').val('');
-                        $('#filtro-fecha-fin-notes').val('');
-
-                        btnClickFiltrarNotes();
-
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#notes-table-editable');
-
-                    toastr.error(response.error, "");
+            Swal.fire({
+                text: "Are you sure you want to delete the notes?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarNotes(fechaInicial, fechaFin);
                 }
             });
-
         });
 
+        function eliminarNotes(fechaInicial, fechaFin) {
+
+            var formData = new URLSearchParams();
+
+            var subcontractor_id = $('#subcontractor_id').val();
+            formData.set("subcontractor_id", subcontractor_id);
+
+            formData.set("from", fechaInicial);
+            formData.set("to", fechaFin);
+
+            BlockUtil.block('#lista-notes');
+
+            axios.post("subcontractor/eliminarNotesDate", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            // reset
+                            TempusUtil.clear('datetimepicker-desde');
+                            TempusUtil.clear('datetimepicker-hasta');
+
+                            btnClickFiltrarNotes();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-notes");
+                });
+        }
 
     };
 
     var editRowNote = function (notes_id) {
 
-        $('#notes_id').val(notes_id);
         rowEditNote = null;
+
+        var formData = new URLSearchParams();
+        formData.set("notes_id", notes_id);
 
         BlockUtil.block('#modal-notes .modal-content');
 
-        $.ajax({
-            type: "POST",
-            url: "subcontractor/cargarDatosNotes",
-            dataType: "json",
-            data: {
-                'notes_id': notes_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#modal-notes .modal-content');
-                if (response.success) {
-                    //Datos project
+        axios.post("subcontractor/cargarDatosNotes", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    $('#notes-date').val(response.notes.date);
-                    $('#notes').summernote('code', response.notes.notes);
+                        //Datos unit
+                        cargarDatos(response.notes);
 
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#modal-notes .modal-content');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#modal-notes .modal-content");
+            });
 
-                toastr.error(response.error, "");
-            }
-        });
+        function cargarDatos(notes) {
+
+            $('#notes_id').val(notes.notes_id);
+
+            const date = MyApp.convertirStringAFecha(notes.date);
+            TempusUtil.setDate('datetimepicker-notes-date', date);
+
+            QuillUtil.setHtml('#notes', notes.notes);
+        }
 
     }
     var resetFormNote = function () {
-        $('#notes-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("notes-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#notes-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        QuillUtil.setHtml('#notes', '');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#notes').summernote('code', '');
-
-        var fecha_actual = new Date();
-        $('#notes-date').val(fecha_actual.format('m/d/Y'));
-
-        // add datos de proyecto
-        $("#proyect-number-note").html($('#number').val());
-        $("#proyect-name-note").html($('#name').val());
+        // reset fecha (TempusUtil, sin variables) — solo fecha
+        TempusUtil.clear('datetimepicker-notes-date');
+        TempusUtil.setDate('datetimepicker-notes-date', new Date());
     };
 
     // Projects
     var projects = [];
-    var oTableListaProjects;
+    var oTableProjects;
     var initTableListaProjects = function () {
-        BlockUtil.block('#lista-projects-table-editable');
+        const table = "#projects-table-editable";
 
-        var table = $('#lista-projects-table-editable');
+        // columns
+        const columns = [
+            {data: 'projectNumber'},
+            {data: 'county'},
+            {data: 'name'},
+            {data: 'description'},
+            {data: 'dueDate'},
+            {data: 'status'},
+            {data: 'nota'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "projectNumber",
-                title: "C & G Project #",
-                width: 120,
-            },
-            {
-                field: "county",
-                title: "County"
-            },
-            {
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "description",
-                title: "Description"
-            },
-            {
-                field: "dueDate",
-                title: "Due Date",
-                width: 100,
-            },
-            {
-                field: "company",
-                title: "Company"
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 100,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'In Progress', 'class': ' m-badge--info'},
-                        0: {'title': 'Not Started', 'class': ' m-badge--danger'},
-                        2: {'title': 'Completed', 'class': ' m-badge--success'},
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
+                targets: 0,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {
-                field: "nota",
-                title: "Notes",
-                responsive: {visible: 'lg'},
-                width: 200,
-                sortable: false,
-                // callback function support for column rendering
-                template: function (row) {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data ?? '', 150);
+                }
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            {
+                targets: 5,
+                render: function (data, type, row) {
+
+                    var status = {
+                        1: {'title': 'In Progress', 'class': 'badge-primary'},
+                        0: {'title': 'Not Started', 'class': 'badge-danger'},
+                        2: {'title': 'Completed', 'class': 'badge-success'},
+                    };
+
+                    return `<div style="width: 180px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
+                }
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
 
                     var html = '';
-                    if (row.nota != null) {
-                        html = `${row.nota.nota} <span class="m-badge m-badge--info">${row.nota.date}</span>`;
+                    if (data != null) {
+                        html = `${data.nota} <span class="badge badge-primary">${data.date}</span>`;
                     }
                     return html;
                 }
             },
             {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="detalle m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View project"><i class="la la-eye"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['detalle']);
+                },
             }
         ];
-        oTableListaProjects = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: projects,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-projects .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableProjects = DatatableUtil.initSafeDataTable(table, {
+            data: projects,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaProjects
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-projects-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
-
+        handleSearchDatatableProjects();
     };
+    var handleSearchDatatableProjects = function () {
+        $(document).off('keyup', '#lista-projects [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-projects [data-table-filter="search"]', function (e) {
+            oTableProjects.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaProjects = function () {
-        if(oTableListaProjects){
-            oTableListaProjects.destroy();
+        if (oTableProjects) {
+            oTableProjects.destroy();
         }
 
         initTableListaProjects();
     }
     var initAccionesProjects = function () {
 
-        $(document).off('click', "#lista-projects-table-editable a.detalle");
-        $(document).on('click', "#lista-projects-table-editable a.detalle", function (e) {
+        $(document).off('click', "#projects-table-editable a.detalle");
+        $(document).on('click', "#projects-table-editable a.detalle", function (e) {
             var posicion = $(this).data('posicion');
             if (projects[posicion]) {
                 localStorage.setItem('project_id_edit', projects[posicion].id);
@@ -1628,25 +1537,22 @@ var Subcontractors = function () {
         init: function () {
 
             initWidgets();
+
             initTable();
-            initForm();
+
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
 
             // employees
             initTableEmployees();
-            initFormEmployee();
             initAccionesEmployees();
 
             // notes
             initTableNotes();
             initAccionFiltrarNotes();
-            initFormNote();
             initAccionesNotes();
 
             // projects

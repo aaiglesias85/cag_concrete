@@ -3,7 +3,7 @@ subcontractor:
   defaults: { _controller: App\Controller\Admin\SubcontractorController::index }
 
 listarSubcontractorAdmin:
-  path:  /subcontractor/listarSubcontractor
+  path:  /subcontractor/listar
   defaults: { _controller: App\Controller\Admin\SubcontractorController::listar, _format: json }
 
 eliminarSubcontractorAdmin:
