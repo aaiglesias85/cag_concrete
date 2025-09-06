@@ -138,15 +138,13 @@ class ProjectService extends Base
      */
     public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending)
     {
-        $arreglo_resultado = array();
+        $resultado = $this->getDoctrine()->getRepository(DataTracking::class)
+            ->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
 
-        $lista = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $data_tracking_id = $value->getId();
-
-            $acciones = $this->ListarAccionesDataTracking($data_tracking_id);
 
             // conc vendor
             $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
@@ -200,7 +198,7 @@ class ProjectService extends Base
 
             $leads = $this->ListarLeadsDeDataTracking($data_tracking_id);
 
-            $arreglo_resultado[] = [
+            $data[] = [
                 "id" => $data_tracking_id,
                 'project' => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
                 'date' => $value->getDate()->format('m/d/Y'),
@@ -234,11 +232,13 @@ class ProjectService extends Base
                 'total_concrete' => $total_concrete,
                 'profit' => $profit,
                 'pending' => $pending,
-                'acciones' => $acciones
             ];
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'],
+        ];
     }
 
     /**
@@ -261,40 +261,6 @@ class ProjectService extends Base
         }
 
         return implode(",", $items);
-    }
-
-    /**
-     * TotalDataTrackings: Total de items
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending)
-    {
-        $total = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending);
-
-        return $total;
-    }
-
-    /**
-     * ListarAccionesDataTracking: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAccionesDataTracking($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 10);
-
-        $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones = '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            }
-        }
-
-        return $acciones;
     }
 
     /**
@@ -824,31 +790,28 @@ class ProjectService extends Base
      */
     public function ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(ProjectNotes::class)
+            ->ListarNotesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(ProjectNotes::class)
-            ->ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $notes_id = $value->getId();
-
-            $acciones = $this->ListarAccionesNotes($notes_id);
 
             $notes = $value->getNotes();
             $notes = mb_convert_encoding($notes, 'UTF-8', 'UTF-8');
 
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $notes_id,
                 "notes" => $notes,
                 "date" => $value->getDate()->format('m/d/Y'),
-                "acciones" => $acciones
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'],
+        ];
     }
 
     /**

@@ -926,8 +926,8 @@ var ConcreteVendor = function () {
                     icon: "warning",
                     showCancelButton: true,
                     buttonsStyling: false,
-                    confirmButtonText: "Yes",
-                    cancelButtonText: "No",
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel",
                     customClass: {
                         confirmButton: "btn fw-bold btn-success",
                         cancelButton: "btn fw-bold btn-danger"

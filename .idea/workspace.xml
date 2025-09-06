@@ -5,17 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0106f181-891f-4555-8568-d01eb4e75800" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/database/cambios_constructora_06_09.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/companies.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/companies.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/concrete-vendor.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/concrete-vendor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/projects-detalle.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/projects-detalle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/projects.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/subcontractors.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/subcontractors.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/SubcontractorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/SubcontractorController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/SubcontractorEmployeeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/SubcontractorEmployeeRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/usuarios.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/pages/usuarios.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/bundles/metronic8/js/utils/datatable-util.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProjectController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProjectController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/Item.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Item.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Http/DataTablesHelper.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Http/DataTablesHelper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/DataTrackingRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/DataTrackingRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProjectItemRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProjectItemRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProjectNotesRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProjectNotesRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ProjectRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProjectRepository.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Repository/SubcontractorNotesRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/SubcontractorNotesRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/SubcontractorRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/SubcontractorRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/subcontractor.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/subcontractor.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/SubcontractorService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/SubcontractorService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/company/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/company/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/concrete-vendor/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/concrete-vendor/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/inspector/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/inspector/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Routes/Admin/project.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Routes/Admin/project.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utils/Admin/ProjectService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils/Admin/ProjectService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/advertisement/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/advertisement/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/default/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/default/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/holiday/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/holiday/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/log/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/log/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/notification/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/notification/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/project/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/project/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/reminder/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/reminder/index.html.twig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin/subcontractor/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/subcontractor/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -272,7 +289,7 @@
       <updated>1756443808180</updated>
       <workItem from="1756443809293" duration="52098000" />
       <workItem from="1756661702269" duration="598000" />
-      <workItem from="1756662307510" duration="71199000" />
+      <workItem from="1756662307510" duration="104061000" />
     </task>
     <servers />
   </component>
@@ -292,5 +309,20 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="php-line-method">
+          <url>file://$PROJECT_DIR$/src/Repository/EmployeeRepository.php</url>
+          <line>101</line>
+          <properties>
+            <option name="className" value="\App\Repository\EmployeeRepository" />
+            <option name="methodName" value="ListarEmployeesConTotal" />
+          </properties>
+          <option name="timeStamp" value="52" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

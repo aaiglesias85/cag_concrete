@@ -2,19 +2,11 @@ var ProjectsDetalle = function () {
 
     //Reset forms
     var resetForms = function () {
-        $('#project-form-detalle input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("project-form-detalle");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#estadoactivo-detalle').val(1);
-        $('#estadoinactivo-detalle').val(0);
-        $('#estadocompleted-detalle').val(2);
-        $('#estadocanceled-detalle').val(3);
-        $('#estadoactivo-detalle').prop('checked', true);
+        $('#status-detalle').val(1);
+        $('#status-detalle').trigger('change');
 
         $('#federal_fun-detalle').prop('checked', false);
         $('#resurfacing-detalle').prop('checked', false);
@@ -50,24 +42,24 @@ var ProjectsDetalle = function () {
         $(document).off('click', ".cerrar-form-project-detalle");
         $(document).on('click', ".cerrar-form-project-detalle", function (e) {
             resetForms();
-            $('#form-project-detalle').addClass('m--hide');
-            $('#lista-project').removeClass('m--hide');
+            $('#form-project-detalle').addClass('hide');
+            $('#lista-project').removeClass('hide');
         });
     }
 
 
     //Editar
     var initAccionDetalle = function () {
-        $(document).off('click', "#project-table-editable a.view");
-        $(document).on('click', "#project-table-editable a.view", function (e) {
+        $(document).off('click', "#project-table-editable a.detalle");
+        $(document).on('click', "#project-table-editable a.detalle", function (e) {
             e.preventDefault();
             resetForms();
 
             var project_id = $(this).data('id');
-            $('#project_id').val(project_id);
+            $('#project_id_detalle').val(project_id);
 
-            $('#form-project-detalle').removeClass('m--hide');
-            $('#lista-project').addClass('m--hide');
+            $('#form-project-detalle').removeClass('hide');
+            $('#lista-project').addClass('hide');
 
             editRow(project_id);
         });
@@ -75,89 +67,90 @@ var ProjectsDetalle = function () {
 
     function editRow(project_id) {
 
+        var formData = new URLSearchParams();
+        formData.set("project_id", project_id);
+
         BlockUtil.block('#form-project-detalle');
 
-        $.ajax({
-            type: "POST",
-            url: "project/cargarDatos",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#form-project-detalle');
-                if (response.success) {
-                    //Datos project
+        axios.post("project/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    $('#company-detalle').val(response.project.company);
-                    $('#inspector-detalle').val(response.project.inspector);
+                        //cargar datos
+                        cargarDatos(response.project);
 
-                    $('#name-detalle').val(response.project.name);
-                    $('#description-detalle').val(response.project.description);
-                    $('#number-detalle').val(response.project.number);
-
-                    $('#location-detalle').val(response.project.location);
-                    $('#po_number-detalle').val(response.project.po_number);
-                    $('#po_cg-detalle').val(response.project.po_cg);
-                    $('#manager-detalle').val(response.project.manager);
-                    $('#owner-detalle').val(response.project.owner);
-                    $('#subcontract-detalle').val(response.project.subcontract);
-                    $('#county-detalle').val(response.project.county);
-                    $('#invoice_contact-detalle').val(response.project.invoice_contact);
-
-
-                    $('#contract_amount-detalle').val(MyApp.formatearNumero(response.project.contract_amount, 2, '.', ','));
-
-                    $('#proposal_number-detalle').val(response.project.proposal_number);
-                    $('#project_id_number-detalle').val(response.project.project_id_number);
-
-                    $('#federal_fun-detalle').prop('checked', response.project.federal_fun);
-                    $('#resurfacing-detalle').prop('checked', response.project.resurfacing);
-                    $('#certified_payrolls-detalle').prop('checked', response.project.certified_payrolls);
-
-
-                    $('.project-estado-detalle').each(function () {
-                        if ($(this).val() == response.project.status) {
-                            $(this).prop('checked', true);
-                        } else {
-                            $(this).prop('checked', false);
-                        }
-                    });
-
-                    $('#start_date-detalle').val(response.project.start_date);
-                    $('#end_date-detalle').val(response.project.end_date);
-                    $('#due_date-detalle').val(response.project.due_date);
-
-                    // items
-                    items = response.project.items;
-                    actualizarTableListaItems();
-
-                    // contacts
-                    contacts = response.project.contacts;
-                    actualizarTableListaContacts();
-
-                    // invoices
-                    invoices = response.project.invoices;
-                    actualizarTableListaInvoices();
-
-                    // ajustes precio
-                    ajustes_precio = response.project.ajustes_precio;
-                    actualizarTableListaAjustesPrecio();
-
-                    // archivos
-                    archivos = response.project.archivos;
-                    actualizarTableListaArchivos();
-
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#form-project-detalle');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-project-detalle");
+            });
 
-                toastr.error(response.error, "");
-            }
-        });
+        function cargarDatos(project) {
+
+            KTUtil.find(KTUtil.get("form-project-detalle"), ".card-label").innerHTML = "Update Project: " + project.number;
+
+            $('#company-detalle').val(project.company);
+            $('#inspector-detalle').val(project.inspector);
+
+            $('#name-detalle').val(project.name);
+            $('#description-detalle').val(project.description);
+            $('#number-detalle').val(project.number);
+
+            $('#location-detalle').val(project.location);
+            $('#po_number-detalle').val(project.po_number);
+            $('#po_cg-detalle').val(project.po_cg);
+            $('#manager-detalle').val(project.manager);
+            $('#owner-detalle').val(project.owner);
+            $('#subcontract-detalle').val(project.subcontract);
+            $('#county-detalle').val(project.county);
+            $('#invoice_contact-detalle').val(project.invoice_contact);
+
+            $('#contract_amount-detalle').val(MyApp.formatearNumero(project.contract_amount, 2, '.', ','));
+
+            $('#proposal_number-detalle').val(project.proposal_number);
+            $('#project_id_number-detalle').val(project.project_id_number);
+
+            $('#federal_fun-detalle').prop('checked', project.federal_fun);
+            $('#resurfacing-detalle').prop('checked', project.resurfacing);
+            $('#certified_payrolls-detalle').prop('checked', project.certified_payrolls);
+
+
+            $('#status-detalle').val(project.status);
+            $('#status-detalle').trigger('change');
+
+            $('#start_date-detalle').val(project.start_date);
+            $('#end_date-detalle').val(project.end_date);
+            $('#due_date-detalle').val(project.due_date);
+
+            // items
+            items = project.items;
+            actualizarTableListaItems();
+
+            // contacts
+            contacts = project.contacts;
+            actualizarTableListaContacts();
+
+            // invoices
+            invoices = project.invoices;
+            actualizarTableListaInvoices();
+
+            // ajustes precio
+            ajustes_precio = project.ajustes_precio;
+            actualizarTableListaAjustesPrecio();
+
+            // archivos
+            archivos = project.archivos;
+            actualizarTableListaArchivos();
+
+        }
 
     }
 
@@ -173,16 +166,19 @@ var ProjectsDetalle = function () {
             activeTab = parseInt(item);
 
             if (activeTab == 1) {
-                $('#btn-wizard-anterior-detalle').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente-detalle').removeClass('m--hide');
+                $('#btn-wizard-anterior-detalle').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente-detalle').removeClass('hide');
             }
             if (activeTab > 1) {
-                $('#btn-wizard-anterior-detalle').removeClass('m--hide');
-                $('#btn-wizard-siguiente-detalle').removeClass('m--hide');
+                $('#btn-wizard-anterior-detalle').removeClass('hide');
+                $('#btn-wizard-siguiente-detalle').removeClass('hide');
             }
             if (activeTab == totalTabs) {
-                $('#btn-wizard-siguiente-detalle').removeClass('m--hide').addClass('m--hide');
+                $('#btn-wizard-siguiente-detalle').removeClass('hide').addClass('hide');
             }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
 
             //bug visual de la tabla que muestra las cols corridas
             switch (activeTab) {
@@ -215,9 +211,9 @@ var ProjectsDetalle = function () {
         $(document).off('click', "#btn-wizard-siguiente-detalle");
         $(document).on('click', "#btn-wizard-siguiente-detalle", function (e) {
             activeTab++;
-            $('#btn-wizard-anterior-detalle').removeClass('m--hide');
+            $('#btn-wizard-anterior-detalle').removeClass('hide');
             if (activeTab == totalTabs) {
-                $('#btn-wizard-siguiente-detalle').addClass('m--hide');
+                $('#btn-wizard-siguiente-detalle').addClass('hide');
             }
 
             mostrarTab();
@@ -227,10 +223,10 @@ var ProjectsDetalle = function () {
         $(document).on('click', "#btn-wizard-anterior-detalle", function (e) {
             activeTab--;
             if (activeTab == 1) {
-                $('#btn-wizard-anterior-detalle').addClass('m--hide');
+                $('#btn-wizard-anterior-detalle').addClass('hide');
             }
             if (activeTab < totalTabs) {
-                $('#btn-wizard-siguiente-detalle').removeClass('m--hide');
+                $('#btn-wizard-siguiente-detalle').removeClass('hide');
             }
             mostrarTab();
         });
@@ -277,156 +273,119 @@ var ProjectsDetalle = function () {
         activeTab = 1;
         totalTabs = 8;
         mostrarTab();
-        $('#btn-wizard-anterior-detalle').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente-detalle').removeClass('m--hide');
+        $('#btn-wizard-anterior-detalle').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente-detalle').removeClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("project-form-detalle"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
     }
+
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("project-form-detalle"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("project-form-detalle"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                KTUtil.addClass(element, "valid");
+            }
+        });
+    };
 
     // items
     var oTableItems;
     var items = [];
     var initTableItems = function () {
-        BlockUtil.block('#items-table-editable-detalle');
 
-        var table = $('#items-table-editable-detalle');
+        const table = "#items-table-editable-detalle";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'yield_calculation_name'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
+            {data: 'quantity_old'},
+            {data: 'price_old'},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "item",
-                title: "Item",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "yield_calculation_name",
-                title: "Yield Calculation",
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "quantity_old",
-                title: "Previous Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity_old, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price_old",
-                title: "Previous Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price_old, 2, '.', ',')}</span>`;
-                }
+                targets: 7,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (!data.principal) {
-                        $(row).addClass('row-secondary');
-                    }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            // marcar secondary
+            createdRow: (row, data, index) => {
+                // console.log(data);
+                if (!data.principal) {
+                    $(row).addClass('row-secondary');
                 }
             }
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#items-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#items-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#items-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#items-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#items-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
 
         // totals
         $('#total_count_items-detalle').val(items.length);
 
         var total = calcularMontoTotalItems();
         $('#total_total_items-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
-        // $('#contract_amount').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items-detalle [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
@@ -449,99 +408,72 @@ var ProjectsDetalle = function () {
     // notes
     var oTableNotes;
     var initTableNotes = function () {
-        BlockUtil.block('#notes-table-editable-detalle');
 
-        var table = $('#notes-table-editable-detalle');
+        const table = "#notes-table-editable-detalle";
 
-        var aoColumns = [
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // datasource
+        const datasource = {
+            url: `project/listarNotes`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    project_id: $('#project_id_detalle').val(),
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde-notes-detalle'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta-notes-detalle'),
+                });
             },
-            {
-                field: "notes",
-                title: "Notes",
-                template: function (row) {
-                    return `<div>${row.notes}</div>`;
-                }
-            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
+
+        // columns
+        const columns = [
+            {data: 'date'},
+            {data: 'notes'},
         ];
-        oTableNotes = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'project/listarNotes',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+
+        // column defs
+        let columnDefs = [
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        oTableNotes = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableNotes
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#notes-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#notes-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#notes-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#notes-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#notes-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
-
-        //Busqueda
-        var query = oTableNotes.getDataSourceQuery();
-        $('#lista-notes-detalle .m_form_search').on('keyup', function (e) {
-            btnClickFiltrarNotes();
-        }).val(query.generalSearch);
+        // search
+        handleSearchDatatableNotes();
     };
+    var handleSearchDatatableNotes = function () {
+        $(document).off('keyup', '#lista-notes-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-notes-detalle [data-table-filter="search"]', function (e) {
+            btnClickFiltrarNotes();
+        });
+    }
     var initAccionFiltrarNotes = function () {
 
         $(document).off('click', "#btn-filtrar-notes-detalle");
@@ -551,133 +483,68 @@ var ProjectsDetalle = function () {
 
     };
     var btnClickFiltrarNotes = function () {
-        var query = oTableNotes.getDataSourceQuery();
-
-        var generalSearch = $('#lista-notes-detalle .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var project_id = $('#project_id').val();
-        query.project_id = project_id;
-
-        var fechaInicial = $('#filtro-fecha-inicial-notes-detalle').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#filtro-fecha-fin-notes-detalle').val();
-        query.fechaFin = fechaFin;
-
-        oTableNotes.setDataSourceQuery(query);
-        oTableNotes.load();
+        const search = $('#lista-notes-detalle [data-table-filter="search"]').val();
+        oTableNotes.search(search).draw();
     }
 
     // Contacts
     var contacts = [];
-    var oTableListaContacts;
-    var initTableListaContacts = function () {
-        BlockUtil.block('#lista-contacts-table-editable-detalle');
+    var oTableContacts;
+    var initTableContacts = function () {
+        const table = "#contacts-table-editable-detalle";
 
-        var table = $('#lista-contacts-table-editable-detalle');
+        // columns
+        const columns = [
+            {data: 'name'},
+            {data: 'email'},
+            {data: 'phone'},
+            {data: 'role'},
+            {data: 'notes'},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "name",
-                title: "Name"
+                targets: 1,
+                render: DatatableUtil.getRenderColumnEmail
             },
             {
-                field: "email",
-                title: "Email",
-                width: 200,
-                template: function (row) {
-                    return '<a class="m-link" href="mailto:' + row.email + '">' + row.email + '</a>';
-                }
-            },
-            {
-                field: "phone",
-                title: "Phone",
-                width: 150,
-                template: function (row) {
-                    return '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>';
-                }
-            },
-            {
-                field: "role",
-                title: "Role"
-            },
-            {
-                field: "notes",
-                title: "Notes"
+                targets: 2,
+                render: DatatableUtil.getRenderColumnPhone
             },
         ];
-        oTableListaContacts = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: contacts,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-contacts-detalle .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableContacts = DatatableUtil.initSafeDataTable(table, {
+            data: contacts,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaContacts
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-contacts-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-contacts-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-contacts-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-contacts-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-contacts-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableContacts();
 
     };
+    var handleSearchDatatableContacts = function () {
+        $(document).off('keyup', '#lista-contacts-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-contacts-detalle [data-table-filter="search"]', function (e) {
+            oTableContacts.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaContacts = function () {
-        if (oTableListaContacts) {
-            oTableListaContacts.destroy();
+        if (oTableContacts) {
+            oTableContacts.destroy();
         }
 
-        initTableListaContacts();
+        initTableContacts();
     }
 
 
@@ -685,142 +552,67 @@ var ProjectsDetalle = function () {
     var oTableInvoices;
     var invoices = [];
     var initTableInvoices = function () {
-        BlockUtil.block('#invoices-table-editable-detalle');
+        const table = "#invoices-table-editable-detalle";
 
-        var table = $('#invoices-table-editable-detalle');
+        // columns
+        const columns = [
+            {data: 'number'},
+            {data: 'startDate'},
+            {data: 'endDate'},
+            {data: 'total'},
+            {data: 'notes'},
+            {data: 'paid'},
+            {data: 'createdAt'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "number",
-                title: "Number",
-                width: 80,
-            },
-            {
-                field: "company",
-                title: "Company"
-            },
-            {
-                field: "project",
-                title: "Project"
-            },
-            {
-                field: "startDate",
-                title: "From",
-                width: 100,
-            },
-            {
-                field: "endDate",
-                title: "To",
-                width: 100,
-            },
-            {
-                field: "total",
-                title: "Amount",
-                width: 100,
-                textAlign: 'center',
-            },
-            {
-                field: "notes",
-                title: "Notes",
-                width: 150
-            },
-            {
-                field: "paid",
-                title: "Paid",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
+                targets: 5,
+                render: function (data, type, row) {
                     var status = {
-                        1: {'title': 'Yes', 'class': ' m-badge--success'},
-                        0: {'title': 'No', 'class': ' m-badge--danger'}
+                        1: {'title': 'Yes', 'class': 'badge-success'},
+                        0: {'title': 'No', 'class': 'badge-danger'}
                     };
-                    return '<span class="m-badge ' + status[row.paid].class + ' m-badge--wide">' + status[row.paid].title + '</span>';
+                    return  `<span class="badge ${status[data].class}">${status[data].title}</span>`;
                 }
             },
             {
-                field: "createdAt",
-                title: "Created At",
-                width: 100,
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit invoice"><i class="la la-edit"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['detalle']);
+                },
             }
         ];
-        oTableInvoices = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: invoices,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-invoices .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[1, 'desc']];
+
+        // escapar contenido de la tabla
+        oTableInvoices = DatatableUtil.initSafeDataTable(table, {
+            data: invoices,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableInvoices
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#invoices-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#invoices-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#invoices-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#invoices-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#invoices-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableInvoices();
     };
+    var handleSearchDatatableInvoices = function () {
+        $(document).off('keyup', '#lista-invoices-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-invoices-detalle [data-table-filter="search"]', function (e) {
+            oTableProjects.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaInvoices = function () {
         if (oTableInvoices) {
             oTableInvoices.destroy();
@@ -828,7 +620,6 @@ var ProjectsDetalle = function () {
 
         initTableInvoices();
     }
-
     var initAccionesInvoices = function () {
 
         $(document).off('click', "#invoices-table-editable-detalle a.edit");
@@ -849,211 +640,183 @@ var ProjectsDetalle = function () {
     // datatracking
     var oTableDataTracking;
     var initTableDataTracking = function () {
-        BlockUtil.block('#data-tracking-table-editable-detalle');
 
-        var table = $('#data-tracking-table-editable-detalle');
+        const table = "#data-tracking-table-editable-detalle";
 
-        var aoColumns = [
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // datasource
+        const datasource = {
+            url: `project/listarDataTracking`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    project_id: $('#project_id_detalle').val(),
+                    pending: $('#pending-data-tracking-detalle').val(),
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde-data-tracking-detalle'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta-data-tracking-detalle'),
+                });
             },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
+
+        // columns
+        const columns = [
+            {data: 'date'},
+            {data: 'leads'},
+            {data: 'totalConcUsed'},
+            {data: 'total_concrete_yiel'},
+            {data: 'lostConcrete'},
+            {data: 'total_concrete'},
+            {data: 'totalLabor'},
+            {data: 'total_daily_today'},
+            {data: 'profit'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "leads",
-                title: "Lead",
-                width: 150,
-                sortable: false,
-            },
-            {
-                field: "totalConcUsed",
-                title: "Conc. Used (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.totalConcUsed, 2, '.', ',')}</span>`;
+                targets: 0,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
             {
-                field: "total_concrete_yiel",
-                title: "Conc. Yield (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_concrete_yiel, 2, '.', ',')}</span>`;
+                targets: 1,
+                orderable: false,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {
-                field: "lostConcrete",
-                title: "Difference (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.lostConcrete, 2, '.', ',')}</span>`;
-                }
+                targets: 2,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "total_concrete",
-                title: "Conc. Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
-                }
+                targets: 3,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "totalLabor",
-                title: "Labor Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
-                }
+                targets: 4,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "total_daily_today",
-                title: "Daily Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
-                }
+                targets: 5,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "profit",
-                title: "Profit ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
-                }
+                targets: 6,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: 7,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
+            },
+            {
+                targets: 8,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
+            },
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit']);
+                },
             }
         ];
-        oTableDataTracking = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'project/listarDataTracking',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'desc']];
+
+        oTableDataTracking = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (data.pending === 1) {
-                        $(row).addClass('row-pending');
-                    }
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            // marcar pending
+            createdRow: (row, data, index) => {
+                // console.log(data);
+                if (data.pending === 1) {
+                    $(row).addClass('row-pending');
                 }
             }
         });
 
-        //Events
-        oTableDataTracking
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#data-tracking-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#data-tracking-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#data-tracking-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#data-tracking-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#data-tracking-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTableDataTracking.on('draw', function () {
+            // init acciones
+            initAccionesDataTracking();
+        });
 
-        //Busqueda
-        var query = oTableDataTracking.getDataSourceQuery();
-        $('#lista-data-tracking-detalle .m_form_search').on('keyup', function (e) {
-            btnClickFiltrarDataTracking();
-        }).val(query.generalSearch);
+        // search
+        handleSearchDatatableDataTracking();
     };
+    var handleSearchDatatableDataTracking = function () {
+        $(document).off('keyup', '#lista-data-tracking-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-data-tracking-detalle [data-table-filter="search"]', function (e) {
+            btnClickFiltrarNotes();
+        });
+    }
     var initAccionFiltrarDataTracking = function () {
 
-        $(document).off('click', "#btn-filtrar-data-tracking");
-        $(document).on('click', "#btn-filtrar-data-tracking", function (e) {
+        $(document).off('click', "#btn-filtrar-data-tracking-detalle");
+        $(document).on('click', "#btn-filtrar-data-tracking-detalle", function (e) {
             btnClickFiltrarDataTracking();
         });
 
     };
     var btnClickFiltrarDataTracking = function () {
-        var query = oTableDataTracking.getDataSourceQuery();
-
-        var generalSearch = $('#lista-data-tracking-detalle .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var project_id = $('#project_id').val();
-        query.project_id = project_id;
-
-        var fechaInicial = $('#fechaInicial-data-tracking-detalle').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#fechaFin-data-tracking-detalle').val();
-        query.fechaFin = fechaFin;
-
-        var pending = $('#pending-data-tracking-detalle').val();
-        query.pending = pending;
-
-        oTableDataTracking.setDataSourceQuery(query);
-        oTableDataTracking.load();
+        const search = $('#lista-data-tracking-detalle [data-table-filter="search"]').val();
+        oTableDataTracking.search(search).draw();
     }
     var initAccionesDataTracking = function () {
 
@@ -1080,91 +843,51 @@ var ProjectsDetalle = function () {
     };
 
     // Ajustes Precio
+    var oTableAjustesPrecio;
     var ajustes_precio = [];
-    var oTableListaAjustesPrecio;
     var initTableListaAjustesPrecio = function () {
-        BlockUtil.block('#lista-ajustes-precio-table-editable-detalle');
 
-        var table = $('#lista-ajustes-precio-table-editable-detalle');
+        const table = "#ajustes-precio-table-editable-detalle";
 
-        var aoColumns = [
-            {
-                field: "day",
-                title: "Day"
-            },
-            {
-                field: "percent",
-                title: "Percent"
-            },
+        // columns
+        const columns = [
+            {data: 'day'},
+            {data: 'percent'},
         ];
-        oTableListaAjustesPrecio = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: ajustes_precio,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-ajustes-precio-detalle .m_form_search'),
-            },
+
+        // column defs
+        let columnDefs = [
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableAjustesPrecio = DatatableUtil.initSafeDataTable(table, {
+            data: ajustes_precio,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaAjustesPrecio
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-ajustes-precio-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-ajustes-precio-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-ajustes-precio-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-ajustes-precio-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-ajustes-precio-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableAjustesPrecio();
 
     };
+    var handleSearchDatatableAjustesPrecio = function () {
+        $(document).off('keyup', '#lista-ajustes-precio-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-ajustes-precio-detalle [data-table-filter="search"]', function (e) {
+            const search = $(this).val();
+            oTableAjustesPrecio.search(search).draw();
+        });
+    }
     var actualizarTableListaAjustesPrecio = function () {
-        if (oTableListaAjustesPrecio) {
-            oTableListaAjustesPrecio.destroy();
+        if (oTableAjustesPrecio) {
+            oTableAjustesPrecio.destroy();
         }
 
         initTableListaAjustesPrecio();
@@ -1172,111 +895,72 @@ var ProjectsDetalle = function () {
 
     // Archivos
     var archivos = [];
-    var oTableListaArchivos;
+    var oTableArchivos;
     var initTableListaArchivos = function () {
-        BlockUtil.block('#lista-archivo-table-editable-detalle');
 
-        var table = $('#lista-archivo-table-editable-detalle');
+        const table = "#archivo-table-editable-detalle";
 
-        var aoColumns = [
-            {
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "file",
-                title: "File"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
-                    `;
-                }
-            }
+
+        const columns = [];
+
+        // columns
+        columns.push(
+            {data: 'name'},
+            {data: 'file'},
+            {data: null},
+        );
+
+        // column defs
+        let columnDefs = [
         ];
-        oTableListaArchivos = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: archivos,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-archivo-detalle .m_form_search'),
+
+        // acciones
+        columnDefs.push({
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['download']);
             },
         });
 
-        //Events
-        oTableListaArchivos
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableArchivos = DatatableUtil.initSafeDataTable(table, {
+            data: archivos,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        handleSearchDatatableArchivos();
 
     };
+    var handleSearchDatatableArchivos = function () {
+        $(document).off('keyup', '#lista-archivos-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-archivos-detalle [data-table-filter="search"]', function (e) {
+            oTableArchivos.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaArchivos = function () {
-        if (oTableListaArchivos) {
-            oTableListaArchivos.destroy();
+        if (oTableArchivos) {
+            oTableArchivos.destroy();
         }
 
         initTableListaArchivos();
     }
     var initAccionesArchivo = function () {
 
-        $(document).off('click', "#lista-archivo-table-editable-detalle a.download");
-        $(document).on('click', "#lista-archivo-table-editable-detalle a.download", function () {
+        $(document).off('click', "#archivo-table-editable-detalle a.download");
+        $(document).on('click', "#archivo-table-editable-detalle a.download", function () {
             var posicion = $(this).data('posicion');
             if (archivos[posicion]) {
 
@@ -1293,22 +977,41 @@ var ProjectsDetalle = function () {
             }
         });
 
-        function deleteArchivo(posicion) {
-            //Eliminar
-            archivos.splice(posicion, 1);
-            //actualizar posiciones
-            for (var i = 0; i < archivos.length; i++) {
-                archivos[i].posicion = i;
-            }
-            //actualizar lista
-            actualizarTableListaArchivos();
-        }
-
     };
+
+    var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
+
+        initTempus();
+
+    }
+
+    var initTempus = function () {
+
+        // filtros notes
+        TempusUtil.initDate('datetimepicker-desde-notes-detalle', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+        TempusUtil.initDate('datetimepicker-hasta-notes-detalle', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // filtros data tracking
+        TempusUtil.initDate('datetimepicker-desde-data-tracking-detalle', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+        TempusUtil.initDate('datetimepicker-hasta-data-tracking-detalle', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+    }
 
     return {
         //main function to initiate the module
         init: function () {
+
+            initWidgets();
             
             initWizard();
 

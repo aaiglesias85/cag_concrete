@@ -1,0 +1,1 @@
+UPDATE project SET name = description WHERE name IS NULL OR name = '';

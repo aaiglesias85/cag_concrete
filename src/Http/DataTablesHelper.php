@@ -55,8 +55,8 @@ final class DataTablesHelper
         if (isset($params['columns']) && is_array($params['columns'])) {
             foreach ($params['columns'] as $c) {
                 $columns[] = [
-                    'data'       => isset($c['data']) ? (is_string($c['data']) ? $c['data'] : null) : null,
-                    'name'       => isset($c['name']) ? (is_string($c['name']) ? $c['name'] : null) : null,
+                    'data'       => (isset($c['data']) && is_string($c['data']) && $c['data'] !== '') ? $c['data'] : null,
+                    'name'       => (isset($c['name']) && is_string($c['name']) && $c['name'] !== '') ? $c['name'] : null,
                     'searchable' => filter_var($c['searchable'] ?? false, FILTER_VALIDATE_BOOLEAN),
                     'orderable'  => filter_var($c['orderable']  ?? false, FILTER_VALIDATE_BOOLEAN),
                     'search'     => [
@@ -75,7 +75,12 @@ final class DataTablesHelper
         // Resuelve nombre del campo a ordenar desde columns[*][name] o [data]
         $orderField = $defaultOrderField;
         if (isset($columns[$orderColIndex])) {
-            $candidate = $columns[$orderColIndex]['name'] ?? $columns[$orderColIndex]['data'] ?? null;
+
+            $candidate = $columns[$orderColIndex]['name'];
+            if ($candidate === null || $candidate === '') {
+                $candidate = $columns[$orderColIndex]['data'];
+            }
+
             if (is_string($candidate) && $candidate !== '') {
                 $orderField = $candidate;
             }

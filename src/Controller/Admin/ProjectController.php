@@ -8,6 +8,7 @@ use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Item;
 use App\Entity\Unit;
+use App\Http\DataTablesHelper;
 use App\Utils\Admin\ProjectService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -71,59 +72,38 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * listar Acción que lista los projects
+     * listar Acción que lista los usuarios
      *
      */
     public function listar(Request $request)
     {
-
-        // search filter by keywords
-        $query = !empty($request->get('query')) ? $request->get('query') : array();
-        $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $company_id = isset($query['company_id']) && is_string($query['company_id']) ? $query['company_id'] : '';
-        $status = isset($query['status']) && is_string($query['status']) ? $query['status'] : '';
-        $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
-        $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
-
-        //Sort
-        $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
-        $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'asc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'name';
-        //$start and $limit
-        $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
-        $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
-        $limit = !empty($pagination['perpage']) ? (int)$pagination['perpage'] : -1;
-        $start = 0;
-
         try {
-            $pages = 1;
-            $total = $this->projectService->TotalProjects($sSearch, $company_id, $status, $fecha_inicial, $fecha_fin);
-            if ($limit > 0) {
-                $pages = ceil($total / $limit); // calculate total pages
-                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-                $start = ($page - 1) * $limit;
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
 
-            $meta = array(
-                'page' => $page,
-                'pages' => $pages,
-                'perpage' => $limit,
-                'total' => $total,
-                'field' => $iSortCol_0,
-                'sort' => $sSortDir_0
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'projectNumber', 'subcontract', 'status', 'county', 'name', 'dueDate', 'company', 'nota' ],
+                defaultOrderField: 'projectNumber'
             );
 
-            $data = $this->projectService->ListarProjects($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+            // filtros
+            $company_id = $request->get('company_id');
+            $status = $request->get('status');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
+
+
+            $data = $this->projectService->ListarProjects($dt['start'], $dt['length'], $dt['search'], $dt['orderField'], $dt['orderDir'],
                 $company_id, $status, $fecha_inicial, $fecha_fin);
 
-            $resultadoJson = array(
-                'meta' => $meta,
-                'data' => $data
-            );
+            $total = $this->projectService->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin);
+
+            $resultadoJson = [
+                'draw'            => $dt['draw'],
+                'data'            => $data,
+                'recordsTotal'    => (int) $total,
+                'recordsFiltered' => (int) $total
+            ];
 
             return $this->json($resultadoJson);
 
@@ -367,57 +347,42 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * listarNotes Acción que lista los notes projects
+     * listarNotes Acción que lista los notes subcontractors
      *
      */
     public function listarNotes(Request $request)
     {
-
-        // search filter by keywords
-        $query = !empty($request->get('query')) ? $request->get('query') : array();
-        $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
-        $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
-        $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
-
-        //Sort
-        $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
-        $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'desc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'date';
-        //$start and $limit
-        $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
-        $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
-        $limit = !empty($pagination['perpage']) ? (int)$pagination['perpage'] : -1;
-        $start = 0;
-
         try {
-            $pages = 1;
-            $total = $project_id != '' ? $this->projectService->TotalNotes($sSearch, $project_id, $fecha_inicial, $fecha_fin) : 0;
-            if ($limit > 0) {
-                $pages = ceil($total / $limit); // calculate total pages
-                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-                $start = ($page - 1) * $limit;
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
-
-            $meta = array(
-                'page' => $page,
-                'pages' => $pages,
-                'perpage' => $limit,
-                'total' => $total,
-                'field' => $iSortCol_0,
-                'sort' => $sSortDir_0
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'date', 'notes'],
+                defaultOrderField: 'date'
             );
 
-            $data = $project_id != '' ? $this->projectService->ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin) : [];
+            // filtros
+            $project_id = $request->get('project_id');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
 
-            $resultadoJson = array(
-                'meta' => $meta,
-                'data' => $data
-            );
+            // total + data en una sola llamada a tu servicio
+            $result = $project_id != "" ? $this->projectService->ListarNotes(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $project_id,
+                $fecha_inicial,
+                $fecha_fin
+            ) : ['data' => [], 'total' => 0];
+
+            $resultadoJson = [
+                'draw'            => $dt['draw'],
+                'data'            => $result['data'],
+                'recordsTotal'    => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
 
             return $this->json($resultadoJson);
 
@@ -759,53 +724,39 @@ class ProjectController extends AbstractController
      */
     public function listarDataTracking(Request $request)
     {
-
-        // search filter by keywords
-        $query = !empty($request->get('query')) ? $request->get('query') : array();
-        $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
-        $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
-        $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
-        $pending = isset($query['pending']) && is_string($query['pending']) ? $query['pending'] : '';
-
-        //Sort
-        $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
-        $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'desc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'date';
-        //$start and $limit
-        $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
-        $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
-        $limit = !empty($pagination['perpage']) ? (int)$pagination['perpage'] : -1;
-        $start = 0;
-
         try {
-            $pages = 1;
-            $total = $project_id != '' ? $this->projectService->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending) : 0;
-            if ($limit > 0) {
-                $pages = ceil($total / $limit); // calculate total pages
-                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-                $start = ($page - 1) * $limit;
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
-
-            $meta = array(
-                'page' => $page,
-                'pages' => $pages,
-                'perpage' => $limit,
-                'total' => $total,
-                'field' => $iSortCol_0,
-                'sort' => $sSortDir_0
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'date', 'leads', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
+                defaultOrderField: 'date'
             );
 
-            $data = $project_id != '' ? $this->projectService->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending) : [];
+            // filtros
+            $project_id = $request->get('project_id');
+            $pending = $request->get('pending');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
 
-            $resultadoJson = array(
-                'meta' => $meta,
-                'data' => $data
-            );
+            // total + data en una sola llamada a tu servicio
+            $result = $project_id != "" ? $this->projectService->ListarDataTrackings(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $project_id,
+                $fecha_inicial,
+                $fecha_fin,
+                $pending
+            ) : ['data' => [], 'total' => 0];
+
+            $resultadoJson = [
+                'draw'            => $dt['draw'],
+                'data'            => $result['data'],
+                'recordsTotal'    => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
 
             return $this->json($resultadoJson);
 

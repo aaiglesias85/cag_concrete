@@ -182,20 +182,20 @@ class ProjectRepository extends EntityRepository
         }
 
         // Ordenar por columna especificada
-        switch ($iSortCol_0) {
-            case "company":
-                $consulta->orderBy("c.name", $sSortDir_0);
-                break;
-            case "inspector":
-                $consulta->orderBy("i.name", $sSortDir_0);
-                break;
-            case "county":
-                $consulta->orderBy("c_o.description", $sSortDir_0);
-                break;
-            default:
-                $consulta->orderBy("p.$iSortCol_0", $sSortDir_0);
-                break;
-        }
+        $sortable = [
+            'projectId'  => 'p.projectId',
+            'projectNumber' => 'p.projectNumber',
+            'subcontract' => 'p.subcontract',
+            'status' => 'p.status',
+            'county' => 'c_o.description',
+            'name' => 'p.name',
+            'dueDate' => 'p.dueDate',
+            'company' => 'c.name',
+        ];
+        $orderBy = $sortable[$iSortCol_0] ?? 'p.name';
+        $dir     = strtoupper($sSortDir_0) === 'DESC' ? 'DESC' : 'ASC';
+
+        $consulta->orderBy($orderBy, $dir);
 
         // Paginación
         if ($limit > 0) {

@@ -229,6 +229,83 @@ class DataTrackingRepository extends EntityRepository
     }
 
     /**
+     * ListarDataTrackingsConTotal Lista los data trackings con total
+     *
+     * @return []
+     */
+    public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?int $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = ''): array
+    {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'id' => 'd_t.id',
+            'date' => 'd_t.date',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'd_t.date';
+        $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('d_t')
+            ->leftJoin('d_t.project', 'p')
+            ->leftJoin('p.company', 'c')
+            ->leftJoin('d_t.inspector', 'ins');
+
+        if ($sSearch != "") {
+            $baseQb->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
+            d_t.crewLead LIKE :search OR d_t.measuredBy LIKE :search OR d_t.stationNumber LIKE :search OR d_t.notes LIKE :search OR
+              d_t.otherMaterials LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($project_id != '') {
+            $baseQb->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+
+            $baseQb->andWhere('d_t.date >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
+            $fecha_fin = $fecha_fin->format("Y-m-d");
+
+            $baseQb->andWhere('d_t.date <= :fecha_fin')
+                ->setParameter('fecha_fin', $fecha_fin);
+        }
+
+        if ($pending !== '') {
+            $baseQb->andWhere('d_t.pending = :pending')
+                ->setParameter('pending', $pending);
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(d_t.id)');
+
+        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data' => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
+
+    /**
      * TotalOverhead: Total de $total_people * $overhead_price
      * @param string $data_tracking_id
      *

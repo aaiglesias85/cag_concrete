@@ -142,4 +142,72 @@ class ProjectNotesRepository extends EntityRepository
         return $consulta->getQuery()->getSingleScalarResult();
     }
 
+
+    /**
+     * ListarNotesConTotal Lista los notes con total
+     *
+     * @return []
+     */
+    public function ListarNotesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?int $project_id = null, ?string $fechaInicial = null, ?string $fechaFinal = null): array
+    {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'id' => 'p_n.id',
+            'date' => 'p_n.date',
+            'notes' => 'p_n.notes',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'p_n.date';
+        $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('p_n')
+            ->leftJoin('p_n.project', 'p');
+
+        // Filtrar por búsqueda
+        if ($sSearch) {
+            $baseQb->andWhere('p_n.notes LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
+
+        // Filtrar por subcontratista
+        if ($project_id != '') {
+            $baseQb->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        // Filtrar por fechas
+        if ($fechaInicial) {
+            $fechaInicialDate = \DateTime::createFromFormat("m/d/Y", $fechaInicial)->format("Y-m-d");
+            $baseQb->andWhere('p_n.date >= :fechaInicial')
+                ->setParameter('fechaInicial', $fechaInicialDate);
+        }
+
+        if ($fechaFinal) {
+            $fechaFinalDate = \DateTime::createFromFormat("m/d/Y", $fechaFinal)->format("Y-m-d");
+            $baseQb->andWhere('p_n.date <= :fechaFinal')
+                ->setParameter('fechaFinal', $fechaFinalDate);
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(p_n.id)');
+
+        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data' => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
 }

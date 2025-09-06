@@ -1,176 +1,387 @@
 var Projects = function () {
 
-    var oTable;
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        MyApp.block('#project-table-editable');
+        const table = "#project-table-editable";
 
-        var table = $('#project-table-editable');
+        // datasource
+        const datasource = {
+            url: `project/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    company_id: $('#filtro-company').val(),
+                    status: $('#filtro-status').val(),
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
+
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            fixedColumns: {
+                start: 2,
+                end: 1
+            },
+            // paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            // scrollY: 500,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
+            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
+
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
 
         if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
+            columns.push({data: 'id'});
         }
-        aoColumns.push(
+
+        columns.push(
+            {data: 'projectNumber'},
+            {data: 'subcontract'},
+            {data: 'status'},
+            {data: 'county'},
+            {data: 'name'},
+            {data: 'dueDate'},
+            {data: 'company'},
+            {data: 'nota'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
             {
-                field: "projectNumber",
-                title: "C & G Project #",
-                width: 120,
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
             },
             {
-                field: "subcontract",
-                title: "Prime Job No",
-                width: 120,
-            },
-            {
-                field: "status",
-                title: "Status",
-                responsive: {visible: 'lg'},
-                width: 100,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'In Progress', 'class': ' m-badge--info'},
-                        0: {'title': 'Not Started', 'class': ' m-badge--warning'},
-                        2: {'title': 'Completed', 'class': ' m-badge--success'},
-                        3: {'title': 'Canceled', 'class': ' m-badge--danger'},
-                    };
-                    return '<span class="m-badge ' + status[row.status].class + ' m-badge--wide">' + status[row.status].title + '</span>';
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {
-                field: "county",
-                title: "County"
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
             },
             {
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "description",
-                title: "Description"
-            },
-            {
-                field: "dueDate",
-                title: "Due Date",
-                width: 100,
-            },
-            {
-                field: "company",
-                title: "Company"
-            },
-            {
-                field: "nota",
-                title: "Notes",
-                responsive: {visible: 'lg'},
-                width: 200,
-                sortable: false,
-                // callback function support for column rendering
-                template: function (row) {
+                targets: 3,
+                render: function (data, type, row) {
 
+                    var status = {
+                        1: {'title': 'In Progress', 'class': 'badge-primary'},
+                        0: {'title': 'Not Started', 'class': 'badge-danger'},
+                        2: {'title': 'Completed', 'class': 'badge-success'},
+                    };
+
+                    return `<div style="width: 100px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
+                }
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 180);
+                }
+            },
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            {
+                targets: 8,
+                render: function (data, type, row) {
                     var html = '';
-                    if (row.nota != null) {
-                        html = `${row.nota.nota} <span class="m-badge m-badge--info">${row.nota.date}</span> 
-                            <i class="flaticon-edit editar-notas" data-id="${row.id}" 
-                            data-projectnumber="${row.projectNumber}" data-projectname="${row.name}"
-                             data-notaid="${row.nota.id}" style="cursor:pointer;" title="Edit notes"></i>`;
+                    if (data != null) {
+                        html = `<div class="w-400px">${row.nota.nota} <span class="badge badge-primary">${row.nota.date}</span>
+                            <i class="ki-duotone ki-notepad-edit fs-2" data-id="${row.id}" 
+                                data-projectnumber="${row.projectNumber}" data-projectname="${row.name}"
+                                data-notaid="${row.nota.id}" style="cursor:pointer;" title="Edit notes">
+                             <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i> 
+                            </div>`;
                     }
                     return html;
                 }
             },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+
+                        var status = {
+                            1: {'title': 'In Progress', 'class': 'badge-primary'},
+                            0: {'title': 'Not Started', 'class': 'badge-danger'},
+                            2: {'title': 'Completed', 'class': 'badge-success'},
+                        };
+
+                        return `<div style="width: 100px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
+                    }
+                },
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 180);
+                    }
+                },
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 200);
+                    }
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                {
+                    targets: 6,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 200);
+                    }
+                },
+                {
+                    targets: 7,
+                    render: function (data, type, row) {
+                        var html = '';
+                        if (data != null) {
+                            html = `<div class="w-400px">${row.nota.nota} <span class="badge badge-primary">${row.nota.date}</span>
+                            <i class="ki-duotone ki-notepad-edit fs-2" data-id="${row.id}" 
+                                data-projectnumber="${row.projectNumber}" data-projectname="${row.name}"
+                                data-notaid="${row.nota.id}" style="cursor:pointer;" title="Edit notes">
+                             <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i> 
+                            </div>`;
+                        }
+                        return html;
+                    }
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
             {
-                field: "acciones",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['detalle', 'edit', 'delete']);
+                },
             }
         );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'project/listarProject',
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-project [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-project [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Projects';
+        var table = document.querySelector('#project-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
                 },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 }
-            },
+            ]
+        }).container().appendTo($('#project-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#project_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#project-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#project-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#project-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#project-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#project-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-project .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+        // Función para seleccionar todas las filas
+        $(`${table} .check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-project').removeClass('hide');
+        } else {
+            $('#btn-eliminar-project').addClass('hide');
+        }
+    }
 
     //Filtrar
     var initAccionFiltrar = function () {
@@ -180,60 +391,37 @@ var Projects = function () {
             btnClickFiltrar();
         });
 
-    };
-    var initAccionResetFiltrar = function () {
-
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-project .m_form_search').val('');
-
-            $('#filtro-company').val('');
-            $('#filtro-company').trigger('change');
-
-            $('#filtro-status').val('');
-            $('#filtro-status').trigger('change');
-
-            $('#fechaInicial').val('');
-
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+            btnClickResetFilters();
         });
 
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-project .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-project [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-project [data-table-filter="search"]').val('');
 
-        var company_id = $('#filtro-company').val();
-        query.company_id = company_id;
+        $('#filtro-company').val('');
+        $('#filtro-company').trigger('change');
 
-        var status = $('#filtro-status').val();
-        query.status = status;
+        $('#filtro-status').val('');
+        $('#filtro-status').trigger('change');
 
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
+        TempusUtil.clear('datetimepicker-desde');
+        TempusUtil.clear('datetimepicker-hasta');
 
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        oTable.search('').draw();
     }
 
     //Reset forms
     var resetForms = function (reset_wizard = true) {
-        $('#project-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("project-form");
 
         $('#company').val('');
         $('#company').trigger('change');
@@ -244,20 +432,21 @@ var Projects = function () {
         $('#county').val('');
         $('#county').trigger('change');
 
-        $('#estadoactivo').val(1);
-        $('#estadoinactivo').val(0);
-        $('#estadocompleted').val(2);
-        $('#estadocanceled').val(3);
-        $('#estadoactivo').prop('checked', true);
+        $('#status').val(1);
+        $('#status').trigger('change');
 
         $('#federal_funding').prop('checked', false);
         $('#resurfacing').prop('checked', false);
         $('#certified_payrolls').prop('checked', false);
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        TempusUtil.clear('datetimepicker-start-date');
+        TempusUtil.clear('datetimepicker-end-date');
+        TempusUtil.clear('datetimepicker-due-date');
 
-        $('#div-contract-amount').removeClass('m--hide').addClass('m--hide');
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
+
+        $('#div-contract-amount').removeClass('hide').addClass('hide');
 
         // items
         items = [];
@@ -284,714 +473,51 @@ var Projects = function () {
             resetWizard();
         }
 
-
         event_change = false;
 
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#project-form").validate({
-            rules: {
-                subcontract: {
-                    required: true
-                },
-                end_date: {
-                    required: true
-                },
-                /*contract_amount: {
-                    required: true
-                },*/
-                owner: {
-                    required: true
-                },
-                number: {
-                    required: true
-                },
-                name: {
-                    required: true
-                },
-                description: {
-                    required: true
-                },
-                project_id_number: {
-                    required: true
-                }
+        var form = KTUtil.get('project-form');
+
+        var constraints = {
+            subcontract: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
-    };
-
-    //Nuevo
-    var initAccionNuevo = function () {
-        $(document).off('click', "#btn-nuevo-project");
-        $(document).on('click', "#btn-nuevo-project", function (e) {
-            btnClickNuevo();
-        });
-
-        function btnClickNuevo() {
-            resetForms();
-            var formTitle = "Do you want to create a new project? Follow the next steps:";
-            $('#form-project-title').html(formTitle);
-            $('#form-project').removeClass('m--hide');
-            $('#lista-project').addClass('m--hide');
-        };
-    };
-    //Salvar
-    var initAccionSalvar = function () {
-        $(document).off('click', "#btn-wizard-finalizar");
-        $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
-        });
-
-        function btnClickSalvarForm() {
-            mUtil.scrollTo();
-
-            event_change = false;
-
-            var company_id = $('#company').val();
-            var county_id = $('#county').val();
-
-            if ($('#project-form').valid() && company_id != '' && county_id !== "") {
-
-                SalvarProject();
-
-            } else {
-                if (company_id == "") {
-                    var $element = $('#select-company .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-                if (county_id == "") {
-                    var $element = $('#select-county .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-            }
-        };
-    }
-
-    var SalvarProject = function (next = false) {
-        var project_id = $('#project_id').val();
-
-        var company_id = $('#company').val();
-        var inspector_id = $('#inspector').val();
-        var number = $('#number').val();
-        var name = $('#name').val();
-        var description = $('#description').val();
-        var location = $('#location').val();
-        var po_number = $('#po_number').val();
-        var po_cg = $('#po_cg').val();
-        var manager = $('#manager').val();
-
-        var contract_amount = calcularMontoTotalItems();
-        // contract_amount = contract_amount.replace(/,/g, '');  // Elimina todas las comas
-
-        var proposal_number = $('#proposal_number').val();
-        var project_id_number = $('#project_id_number').val();
-
-        var status = 1;
-        $('.project-estado').each(function () {
-            if ($(this).prop('checked')) {
-                status = $(this).val();
-            }
-        });
-
-        var owner = $('#owner').val();
-        var subcontract = $('#subcontract').val();
-        var county_id = $('#county').val();
-        var federal_funding = ($('#federal_funding').prop('checked')) ? 1 : 0;
-        var resurfacing = ($('#resurfacing').prop('checked')) ? 1 : 0;
-        var certified_payrolls = ($('#certified_payrolls').prop('checked')) ? 1 : 0;
-        var invoice_contact = $('#invoice_contact').val();
-        var start_date = $('#start_date').val();
-        var end_date = $('#end_date').val();
-        var due_date = $('#due_date').val();
-
-        MyApp.block('#form-project');
-
-        $.ajax({
-            type: "POST",
-            url: "project/salvarProject",
-            dataType: "json",
-            data: {
-                'project_id': project_id,
-                'company_id': company_id,
-                'inspector_id': inspector_id,
-                'name': name,
-                'description': description,
-                'number': number,
-                'location': location,
-                'po_number': po_number,
-                'po_cg': po_cg,
-                'manager': manager,
-                'status': status,
-                'owner': owner,
-                'subcontract': subcontract,
-                'county_id': county_id,
-                'federal_funding': federal_funding,
-                'resurfacing': resurfacing,
-                'certified_payrolls': certified_payrolls,
-                'invoice_contact': invoice_contact,
-                'start_date': start_date,
-                'end_date': end_date,
-                'due_date': due_date,
-                'contract_amount': contract_amount,
-                'proposal_number': proposal_number,
-                'project_id_number': project_id_number,
-                'items': JSON.stringify(items),
-                'contacts': JSON.stringify(contacts),
-                'ajustes_precio': JSON.stringify(ajustes_precio),
-                'archivos': JSON.stringify(archivos),
+            owner: {
+                presence: {message: "This field is required"},
             },
-            success: function (response) {
-                mApp.unblock('#form-project');
-                if (response.success) {
-
-                    toastr.success(response.message, "Success");
-
-                    btnClickFiltrar();
-
-                    // add new items
-                    if (response.items.length > 0) {
-                        for (let item of response.items) {
-                            $('#item').append(new Option(item.description, item.item_id, false, false));
-                            $('#item option[value="' + item.item_id + '"]').attr("data-price", item.price);
-                            $('#item option[value="' + item.item_id + '"]').attr("data-unit", item.unit);
-                            $('#item option[value="' + item.item_id + '"]').attr("data-equation", item.equation);
-                            $('#item option[value="' + item.item_id + '"]').attr("data-yield", item.yield);
-                        }
-                        $('#item').select2();
-                    }
-
-                    if (!next) {
-
-                        resetForms(false);
-
-                        var project_id = response.project_id;
-                        $('#project_id').val(project_id);
-
-                        editRow(project_id, false, false);
-                    } else {
-                        var project_id = response.project_id;
-                        $('#project_id').val(project_id);
-
-                        editRow(project_id, false, true);
-                    }
-
-                } else {
-                    toastr.error(response.error, "");
-                }
+            number: {
+                presence: {message: "This field is required"},
             },
-            failure: function (response) {
-                mApp.unblock('#form-project');
+            name: {
+                presence: {message: "This field is required"},
+            },
+            description: {
+                presence: {message: "This field is required"},
+            },
+            projectidnumber: {
+                presence: {message: "This field is required"},
+            },
+        }
 
-                toastr.error(response.error, "");
-            }
-        });
-    }
+        var errors = validate(form, constraints);
 
-    //Cerrar form
-    var initAccionCerrar = function () {
-        $(document).off('click', ".cerrar-form-project");
-        $(document).on('click', ".cerrar-form-project", function (e) {
-            cerrarForms();
-
-            // actualizar listado
-            btnClickFiltrar();
-        });
-    }
-    //Cerrar forms
-    var cerrarForms = function () {
-        if (!event_change) {
-            cerrarFormsConfirmated();
+        if (!errors) {
+            result = true;
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            MyApp.showErrorsValidateForm(form, errors);
         }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
-
-    //Eventos change
-    var event_change = false;
-    var initAccionChange = function () {
-        $(document).off('change', ".event-change");
-        $(document).on('change', ".event-change", function (e) {
-            event_change = true;
-        });
-
-        $(document).off('click', "#btn-save-changes");
-        $(document).on('click', "#btn-save-changes", function (e) {
-            cerrarFormsConfirmated();
-        });
-    };
-    var cerrarFormsConfirmated = function () {
-        resetForms();
-        $('#form-project').addClass('m--hide');
-        $('#lista-project').removeClass('m--hide');
-    };
-
-    //Editar
-    var initAccionEditar = function () {
-        $(document).off('click', "#project-table-editable a.edit");
-        $(document).on('click', "#project-table-editable a.edit", function (e) {
-            e.preventDefault();
-            resetForms();
-
-            var project_id = $(this).data('id');
-            $('#project_id').val(project_id);
-
-            $('#form-project').removeClass('m--hide');
-            $('#lista-project').addClass('m--hide');
-
-            editRow(project_id, false);
-        });
-
-        $(document).off('click', "#project-table-editable i.editar-notas");
-        $(document).on('click', "#project-table-editable i.editar-notas", function (e) {
-            e.preventDefault();
-            resetForms();
-
-            var project_id = $(this).data('id');
-            $('#project_id').val(project_id);
-
-            $('#form-project').removeClass('m--hide');
-            $('#lista-project').addClass('m--hide');
-
-            editRow(project_id, true);
-
-            // editar nota directo
-            var notes_id = $(this).data('notaid');
-            $('#name').val($(this).data('projectnumber'));
-            $('#number').val($(this).data('projectname'));
-
-            rowEditNote = notes_id;
-
-            $('#modal-notes').modal({
-                'show': true
-            });
-        });
-    };
-
-    function editRow(project_id, editar_notas, next = false) {
-
-        MyApp.block('#form-project');
-
-        $.ajax({
-            type: "POST",
-            url: "project/cargarDatos",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                mApp.unblock('#form-project');
-                if (response.success) {
-                    //Datos project
-
-                    var formTitle = "You want to update the project? Follow the next steps:";
-                    $('#form-project-title').html(formTitle);
-
-                    $('#company').val(response.project.company_id);
-                    $('#company').trigger('change');
-
-                    $('#inspector').val(response.project.inspector_id);
-                    $('#inspector').trigger('change');
-
-                    $('#county').val(response.project.county_id);
-                    $('#county').trigger('change');
-
-                    $('#name').val(response.project.name);
-                    $('#description').val(response.project.description);
-                    $('#number').val(response.project.number);
-
-                    $('#location').val(response.project.location);
-                    $('#po_number').val(response.project.po_number);
-                    $('#po_cg').val(response.project.po_cg);
-                    $('#manager').val(response.project.manager);
-                    $('#owner').val(response.project.owner);
-                    $('#subcontract').val(response.project.subcontract);
-                    $('#invoice_contact').val(response.project.invoice_contact);
-
-
-                    $('#contract_amount').val(MyApp.formatearNumero(response.project.contract_amount, 2, '.', ','));
-                    $('#div-contract-amount').removeClass('m--hide');
-
-                    $('#proposal_number').val(response.project.proposal_number);
-                    $('#project_id_number').val(response.project.project_id_number);
-
-                    $('#federal_funding').prop('checked', response.project.federal_funding);
-                    $('#resurfacing').prop('checked', response.project.resurfacing);
-                    $('#certified_payrolls').prop('checked', response.project.certified_payrolls);
-
-
-                    $('.project-estado').each(function () {
-                        if ($(this).val() == response.project.status) {
-                            $(this).prop('checked', true);
-                        } else {
-                            $(this).prop('checked', false);
-                        }
-                    });
-
-                    $('#start_date').val(response.project.start_date);
-                    $('#end_date').val(response.project.end_date);
-                    $('#due_date').val(response.project.due_date);
-
-                    // items
-                    items = response.project.items;
-                    actualizarTableListaItems();
-
-                    // contacts
-                    contacts = response.project.contacts;
-                    actualizarTableListaContacts();
-
-                    // invoices
-                    invoices = response.project.invoices;
-                    actualizarTableListaInvoices();
-
-                    // ajustes precio
-                    ajustes_precio = response.project.ajustes_precio;
-                    actualizarTableListaAjustesPrecio();
-
-                    // archivos
-                    archivos = response.project.archivos;
-                    actualizarTableListaArchivos();
-
-                    // habilitar tab
-                    totalTabs = 8;
-                    $('.nav-item-hide').removeClass('m--hide');
-
-                    event_change = false;
-
-                    // next tab
-                    if (next) {
-                        siguienteTab();
-                    }
-
-                    // ir al tab de notas
-                    if (editar_notas) {
-                        activeTab = 4;
-                        mostrarTab();
-                    }
-
-                } else {
-                    toastr.error(response.error, "");
-                }
-            },
-            failure: function (response) {
-                mApp.unblock('#form-project');
-
-                toastr.error(response.error, "");
-            }
-        });
-
-    }
-
-    //Eliminar
-    var initAccionEliminar = function () {
-        $(document).off('click', "#project-table-editable a.delete");
-        $(document).on('click', "#project-table-editable a.delete", function (e) {
-            e.preventDefault();
-
-            rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
-        });
-
-        $(document).off('click', "#btn-eliminar-project");
-        $(document).on('click', "#btn-eliminar-project", function (e) {
-            btnClickEliminar();
-        });
-
-        $(document).off('click', "#btn-delete");
-        $(document).on('click', "#btn-delete", function (e) {
-            btnClickModalEliminar();
-        });
-
-        $(document).off('click', "#btn-delete-selection");
-        $(document).on('click', "#btn-delete-selection", function (e) {
-            btnClickModalEliminarSeleccion();
-        });
-
-        function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
-            if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
-            } else {
-                toastr.error('Select projects to delete', "");
-            }
-        };
-
-        function btnClickModalEliminar() {
-            var project_id = rowDelete;
-
-            MyApp.block('#project-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "project/eliminarProject",
-                dataType: "json",
-                data: {
-                    'project_id': project_id
-                },
-                success: function (response) {
-                    mApp.unblock('#project-table-editable');
-
-                    if (response.success) {
-                        oTable.load();
-
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#project-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
-        };
-
-        function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
-            MyApp.block('#project-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "project/eliminarProjects",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    mApp.unblock('#project-table-editable');
-                    if (response.success) {
-
-                        oTable.load();
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#project-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
-        };
-    };
-
-
-    var initWidgets = function () {
-
-        initPortlets();
-
-        $('.m-select2').select2();
-
-        $('#item').select2({
-            dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
-        });
-
-        $('.phone').inputmask("mask", {
-            "mask": "(999)999-9999"
-        });
-
-        $("[data-switch=true]").bootstrapSwitch();
-
-        // change
-        $('#item').change(changeItem);
-        $('#yield-calculation').change(changeYield);
-
-        $(document).off('switchChange.bootstrapSwitch', '#item-type');
-        $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
-
-        // change file
-        $('#fileinput').on('change', changeFile);
-
-
-        /*$('#contract_amount').change(function () {
-            var value = $(this).val();
-            $(this).val(MyApp.formatearNumero(value, 2, '.', ','));
-        });
-
-         */
-
-    }
-
-    var changeFile = function () {
-        const allowed = ['png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'xls', 'xlsx'];
-
-        const $input = $(this);
-        const fileObj = this.files && this.files[0];
-        const rawName = fileObj ? fileObj.name : ($input.val().split('\\').pop() || '');
-        const name = (rawName || '').trim();
-        const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
-
-        const $error = $('#file-error');
-
-        if (!name) {
-            // Nada seleccionado
-            $error.addClass('d-none').text('');
-            return;
-        }
-
-        if (!allowed.includes(ext)) {
-            // Mensaje para el usuario
-            $error
-                .removeClass('d-none')
-                .text('Invalid file type. Allowed: ' + allowed.join(', ') + '.');
-
-            // Limpiar selección
-            $input.val('');
-
-            // Resetear la UI de Jasny Bootstrap Fileinput
-            $('#fileinput-archivo .fileinput-filename').text('');
-            $('#fileinput-archivo')
-                .removeClass('fileinput-exists')
-                .addClass('fileinput-new');
-        } else {
-            // OK
-            $error.addClass('d-none').text('');
-        }
-    }
-
-    var changeItemType = function (event, state) {
-
-        // reset
-        $('#item').val('');
-        $('#item').trigger('change');
-        $('#div-item').removeClass('m--hide');
-
-        $('#item-name').val('');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
-
-        $('#unit').val('');
-        $('#unit').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
-
-        if (!state) {
-            $('#div-item').removeClass('m--hide').addClass('m--hide');
-            $('#item-name').removeClass('m--hide');
-            $('#select-unit').removeClass('m--hide');
-        }
-    }
-
-    var changeYield = function () {
-        var yield_calculation = $('#yield-calculation').val();
-
-        // reset
-        $('#equation').val('');
-        $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
-
-        if (yield_calculation == 'equation') {
-            $('#select-equation').removeClass('m--hide');
-        }
-    }
-
-    var changeItem = function () {
-        var item_id = $('#item').val();
-
-        // reset
-
-        $('#yield-calculation').val('');
-        $('#yield-calculation').trigger('change');
-
-        $('#equation').val('');
-        $('#equation').trigger('change');
-
-        if (item_id != '') {
-
-            var yield = $('#item option[value="' + item_id + '"]').data("yield");
-            $('#yield-calculation').val(yield);
-            $('#yield-calculation').trigger('change');
-
-            var equation = $('#item option[value="' + item_id + '"]').data("equation");
-            $('#equation').val(equation);
-            $('#equation').trigger('change');
-        }
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-project');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
 
     //Wizard
     var activeTab = 1;
@@ -1011,20 +537,23 @@ var Projects = function () {
             activeTab = parseInt(item);
 
             if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
             }
             if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
             }
             if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
             }
             if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
             }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
 
             //bug visual de la tabla que muestra las cols corridas
             switch (activeTab) {
@@ -1065,11 +594,11 @@ var Projects = function () {
         $(document).on('click', "#btn-wizard-anterior", function (e) {
             activeTab--;
             if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
+                $('#btn-wizard-anterior').addClass('hide');
             }
             if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
+                $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
             }
             mostrarTab();
         });
@@ -1077,10 +606,10 @@ var Projects = function () {
     };
     var siguienteTab = function () {
         activeTab++;
-        $('#btn-wizard-anterior').removeClass('m--hide');
+        $('#btn-wizard-anterior').removeClass('hide');
         if (activeTab == totalTabs) {
-            $('#btn-wizard-finalizar').removeClass('m--hide');
-            $('#btn-wizard-siguiente').addClass('m--hide');
+            $('#btn-wizard-finalizar').removeClass('hide');
+            $('#btn-wizard-siguiente').addClass('hide');
         }
 
         mostrarTab();
@@ -1126,31 +655,26 @@ var Projects = function () {
         activeTab = 1;
         totalTabs = 3;
         mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide');
-        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
+        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide');
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("project-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
     }
     var validWizard = function () {
         var result = true;
         if (activeTab == 1) {
 
             var company_id = $('#company').val();
-            if (!$('#project-form').valid() || company_id == '') {
+            if (!validateForm() || company_id == '') {
                 result = false;
 
                 if (company_id == "") {
-
-                    var $element = $('#select-company .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company"), "This field is required");
                 }
             }
 
@@ -1159,168 +683,784 @@ var Projects = function () {
         return result;
     }
 
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("project-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("project-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
+    };
+
+    //Nuevo
+    var initAccionNuevo = function () {
+        $(document).off('click', "#btn-nuevo-project");
+        $(document).on('click', "#btn-nuevo-project", function (e) {
+            btnClickNuevo();
+        });
+
+        function btnClickNuevo() {
+            resetForms();
+
+            KTUtil.find(KTUtil.get('form-project'), '.card-label').innerHTML = "New Project:";
+
+            mostrarForm();
+        };
+    };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-project'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-project'), 'hide');
+    }
+
+    //Salvar
+    var initAccionSalvar = function () {
+        $(document).off('click', "#btn-wizard-finalizar");
+        $(document).on('click', "#btn-wizard-finalizar", function (e) {
+            btnClickSalvarForm();
+        });
+
+        function btnClickSalvarForm() {
+            KTUtil.scrollTop();
+
+            event_change = false;
+
+            var company_id = $('#company').val();
+            var county_id = $('#county').val();
+
+            if (validateForm() && company_id != '' && county_id !== "") {
+
+                SalvarProject();
+
+            } else {
+                if (company_id == "") {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company"), "This field is required");
+                }
+                if (county_id == "") {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-county"), "This field is required");
+                }
+            }
+        };
+    }
+
+    var SalvarProject = function (next = false) {
+
+        var formData = new URLSearchParams();
+
+        var project_id = $('#project_id').val();
+        formData.set("project_id", project_id);
+
+        var company_id = $('#company').val();
+        formData.set("company_id", company_id);
+
+        var inspector_id = $('#inspector').val();
+        formData.set("inspector_id", inspector_id);
+
+        var number = $('#number').val();
+        formData.set("number", number);
+
+        var name = $('#name').val();
+        formData.set("name", name);
+
+        var description = $('#description').val();
+        formData.set("description", description);
+
+        var location = $('#location').val();
+        formData.set("location", location);
+
+        var po_number = $('#po_number').val();
+        formData.set("po_number", po_number);
+
+        var po_cg = $('#po_cg').val();
+        formData.set("po_cg", po_cg);
+
+        var manager = $('#manager').val();
+        formData.set("manager", manager);
+
+
+        var contract_amount = calcularMontoTotalItems();
+        formData.set("contract_amount", contract_amount);
+
+        var proposal_number = $('#proposal_number').val();
+        formData.set("proposal_number", proposal_number);
+
+        var project_id_number = $('#project_id_number').val();
+        formData.set("project_id_number", project_id_number);
+
+        var status = $('#status').val();
+        formData.set("status", status);
+
+        var owner = $('#owner').val();
+        formData.set("owner", owner);
+
+        var subcontract = $('#subcontract').val();
+        formData.set("subcontract", subcontract);
+
+        var county_id = $('#county').val();
+        formData.set("county_id", county_id);
+
+        var federal_funding = ($('#federal_funding').prop('checked')) ? 1 : 0;
+        formData.set("federal_funding", federal_funding);
+
+        var resurfacing = ($('#resurfacing').prop('checked')) ? 1 : 0;
+        formData.set("resurfacing", resurfacing);
+
+        var certified_payrolls = ($('#certified_payrolls').prop('checked')) ? 1 : 0;
+        formData.set("certified_payrolls", certified_payrolls);
+
+        var invoice_contact = $('#invoice_contact').val();
+        formData.set("invoice_contact", invoice_contact);
+
+        var start_date = TempusUtil.getString('datetimepicker-start-date');
+        formData.set("start_date", start_date);
+
+        var end_date = TempusUtil.getString('datetimepicker-end-date');
+        formData.set("end_date", end_date);
+
+        var due_date = TempusUtil.getString('datetimepicker-due-date');
+        formData.set("due_date", due_date);
+
+        formData.set("items", JSON.stringify(items));
+        formData.set("contacts", JSON.stringify(contacts));
+        formData.set("ajustes_precio", JSON.stringify(ajustes_precio));
+        formData.set("archivos", JSON.stringify(archivos));
+
+        BlockUtil.block('#form-project');
+
+        axios.post("project/salvarProject", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    BlockUtil.unblock("#form-project");
+                    if (response.success) {
+                        toastr.success(response.message, "");
+
+                        btnClickFiltrar();
+
+                        // add new items
+                        if (response.items.length > 0) {
+                            for (let item of response.items) {
+                                $('#item').append(new Option(item.description, item.item_id, false, false));
+                                $('#item option[value="' + item.item_id + '"]').attr("data-price", item.price);
+                                $('#item option[value="' + item.item_id + '"]').attr("data-unit", item.unit);
+                                $('#item option[value="' + item.item_id + '"]').attr("data-equation", item.equation);
+                                $('#item option[value="' + item.item_id + '"]').attr("data-yield", item.yield);
+                            }
+                            $('#item').select2();
+                        }
+
+                        if (!next) {
+
+                            resetForms(false);
+
+                            var project_id = response.project_id;
+                            $('#project_id').val(project_id);
+
+                            editRow(project_id, false, false);
+                        } else {
+                            var project_id = response.project_id;
+                            $('#project_id').val(project_id);
+
+                            editRow(project_id, false, true);
+                        }
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+            });
+    }
+
+    //Cerrar form
+    var initAccionCerrar = function () {
+        $(document).off('click', ".cerrar-form-project");
+        $(document).on('click', ".cerrar-form-project", function (e) {
+            cerrarForms();
+        });
+    }
+    //Cerrar forms
+    var cerrarForms = function () {
+        if (!event_change) {
+            cerrarFormsConfirmated();
+        } else {
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
+        }
+    };
+
+    //Eventos change
+    var event_change = false;
+    var initAccionChange = function () {
+        $(document).off('change', ".event-change");
+        $(document).on('change', ".event-change", function (e) {
+            event_change = true;
+        });
+
+        $(document).off('click', "#btn-save-changes");
+        $(document).on('click', "#btn-save-changes", function (e) {
+            cerrarFormsConfirmated();
+        });
+    };
+    var cerrarFormsConfirmated = function () {
+        resetForms();
+        $('#form-project').addClass('hide');
+        $('#lista-project').removeClass('hide');
+
+        btnClickFiltrar();
+    };
+
+    //Editar
+    var initAccionEditar = function () {
+        $(document).off('click', "#project-table-editable a.edit");
+        $(document).on('click', "#project-table-editable a.edit", function (e) {
+            e.preventDefault();
+            resetForms();
+
+            var project_id = $(this).data('id');
+            $('#project_id').val(project_id);
+
+            mostrarForm();
+
+            editRow(project_id, false);
+        });
+
+        $(document).off('click', "#project-table-editable i.editar-notas");
+        $(document).on('click', "#project-table-editable i.editar-notas", function (e) {
+            e.preventDefault();
+            resetForms();
+
+            var project_id = $(this).data('id');
+            $('#project_id').val(project_id);
+
+            mostrarForm();
+
+            editRow(project_id, true);
+
+            // editar nota directo
+            var notes_id = $(this).data('notaid');
+            $('#name').val($(this).data('projectnumber'));
+            $('#number').val($(this).data('projectname'));
+
+            rowEditNote = notes_id;
+
+            // mostar modal
+            ModalUtil.show('modal-notes', {backdrop: 'static', keyboard: true});
+        });
+    };
+
+    function editRow(project_id, editar_notas, next = false) {
+
+        var formData = new URLSearchParams();
+        formData.set("project_id", project_id);
+
+        BlockUtil.block('#form-project');
+
+        axios.post("project/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+
+                        //cargar datos
+                        cargarDatos(response.project);
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-project");
+            });
+
+        function cargarDatos(project) {
+
+            KTUtil.find(KTUtil.get("form-project"), ".card-label").innerHTML = "Update Project: " + project.number;
+
+            $('#company').val(project.company_id);
+            $('#company').trigger('change');
+
+            $('#inspector').val(project.inspector_id);
+            $('#inspector').trigger('change');
+
+            $('#county').val(project.county_id);
+            $('#county').trigger('change');
+
+            $('#name').val(project.name);
+            $('#description').val(project.description);
+            $('#number').val(project.number);
+
+            $('#location').val(project.location);
+            $('#po_number').val(project.po_number);
+            $('#po_cg').val(project.po_cg);
+            $('#manager').val(project.manager);
+            $('#owner').val(project.owner);
+            $('#subcontract').val(project.subcontract);
+            $('#invoice_contact').val(project.invoice_contact);
+
+            $('#contract_amount').val(MyApp.formatearNumero(project.contract_amount, 2, '.', ','));
+            $('#div-contract-amount').removeClass('hide');
+
+            $('#proposal_number').val(project.proposal_number);
+            $('#project_id_number').val(project.project_id_number);
+
+            $('#federal_funding').prop('checked', project.federal_funding);
+            $('#resurfacing').prop('checked', project.resurfacing);
+            $('#certified_payrolls').prop('checked', project.certified_payrolls);
+
+            $('#status').val(project.status);
+            $('#status').trigger('change');
+
+            if (project.start_date !== '') {
+                const start_date = MyApp.convertirStringAFecha(project.start_date);
+                TempusUtil.setDate('datetimepicker-start-date', start_date);
+            }
+
+            if (project.end_date !== '') {
+                const end_date = MyApp.convertirStringAFecha(project.end_date);
+                TempusUtil.setDate('datetimepicker-end-date', end_date);
+            }
+
+            if (project.due_date !== '') {
+                const due_date = MyApp.convertirStringAFecha(project.due_date);
+                TempusUtil.setDate('datetimepicker-due-date', due_date);
+            }
+
+            // items
+            items = project.items;
+            actualizarTableListaItems();
+
+            // contacts
+            contacts = project.contacts;
+            actualizarTableListaContacts();
+
+            // invoices
+            invoices = project.invoices;
+            actualizarTableListaInvoices();
+
+            // ajustes precio
+            ajustes_precio = project.ajustes_precio;
+            actualizarTableListaAjustesPrecio();
+
+            // archivos
+            archivos = project.archivos;
+            actualizarTableListaArchivos();
+
+            // habilitar tab
+            totalTabs = 8;
+            $('.nav-item-hide').removeClass('hide');
+
+            event_change = false;
+
+            // next tab
+            if (next) {
+                siguienteTab();
+            }
+
+            // ir al tab de notas
+            if (editar_notas) {
+                activeTab = 4;
+                mostrarTab();
+            }
+
+        }
+
+    }
+
+    //Eliminar
+    var initAccionEliminar = function () {
+        $(document).off('click', "#project-table-editable a.delete");
+        $(document).on('click', "#project-table-editable a.delete", function (e) {
+            e.preventDefault();
+
+            rowDelete = $(this).data('id');
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
+        });
+
+        $(document).off('click', "#btn-eliminar-project");
+        $(document).on('click', "#btn-eliminar-project", function (e) {
+            btnClickEliminar();
+        });
+
+        $(document).off('click', "#btn-delete");
+        $(document).on('click', "#btn-delete", function (e) {
+            btnClickModalEliminar();
+        });
+
+        $(document).off('click', "#btn-delete-selection");
+        $(document).on('click', "#btn-delete-selection", function (e) {
+            btnClickModalEliminarSeleccion();
+        });
+
+        function btnClickEliminar() {
+            var ids = DatatableUtil.getTableSelectedRowKeys('#project-table-editable').join(',');
+            if (ids != '') {
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
+            } else {
+                toastr.error('Select projects to delete', "");
+            }
+        };
+
+        function btnClickModalEliminar() {
+            var project_id = rowDelete;
+
+            var formData = new URLSearchParams();
+            formData.set("project_id", project_id);
+
+            BlockUtil.block('#lista-project');
+
+            axios.post("project/eliminarProject", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-project");
+                });
+        };
+
+        function btnClickModalEliminarSeleccion() {
+            var ids = DatatableUtil.getTableSelectedRowKeys('#project-table-editable').join(',');
+
+            var formData = new URLSearchParams();
+
+            formData.set("ids", ids);
+
+            BlockUtil.block('#lista-project');
+
+            axios.post("project/eliminarProjects", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-project");
+                });
+        };
+    };
+
+
+    var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
+
+        initTempus();
+
+        // Quill SIN variables: se gestiona por selector
+        QuillUtil.init('#notes');
+
+        $('.select-modal-item').select2({
+            dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
+        });
+
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask(".input-phone");
+
+        // change
+        $('#item').change(changeItem);
+        $('#yield-calculation').change(changeYield);
+
+        $(document).off('click', '.item-type');
+        $(document).on('click', '.item-type', changeItemType);
+
+        // change file
+        $('#fileinput').on('change', changeFile);
+
+    }
+
+    var initTempus = function () {
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        TempusUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        TempusUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+
+        // due date
+        TempusUtil.initDate('datetimepicker-due-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // start date
+        TempusUtil.initDate('datetimepicker-start-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // end date
+        TempusUtil.initDate('datetimepicker-end-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // filtros notes
+        TempusUtil.initDate('datetimepicker-desde-notes', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+        TempusUtil.initDate('datetimepicker-hasta-notes', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // filtros data tracking
+        TempusUtil.initDate('datetimepicker-desde-data-tracking', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+        TempusUtil.initDate('datetimepicker-hasta-data-tracking', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // notes date
+        TempusUtil.initDate('datetimepicker-notes-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // ajuste precio day
+        TempusUtil.initDate('datetimepicker-ajuste-precio-day', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+    }
+
+    var changeFile = function () {
+        const allowed = ['png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'xls', 'xlsx'];
+
+        const $input = $(this);
+        const fileObj = this.files && this.files[0];
+        const rawName = fileObj ? fileObj.name : ($input.val().split('\\').pop() || '');
+        const name = (rawName || '').trim();
+        const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+
+        const $error = $('#file-error');
+
+        if (!name) {
+            // Nada seleccionado
+            $error.addClass('hide').text('');
+            return;
+        }
+
+        if (!allowed.includes(ext)) {
+            // Mensaje para el usuario
+            $error
+                .removeClass('hide')
+                .text('Invalid file type. Allowed: ' + allowed.join(', ') + '.');
+
+            // Limpiar selección
+            $input.val('');
+
+            // Resetear la UI de Jasny Bootstrap Fileinput
+            $('#fileinput-archivo .fileinput-filename').text('');
+            $('#fileinput-archivo')
+                .removeClass('fileinput-exists')
+                .addClass('fileinput-new');
+        } else {
+            // OK
+            $error.addClass('hide').text('');
+        }
+    }
+
+    var changeItemType = function () {
+
+        var state = $('#item-type-existing').prop('checked');
+
+        // reset
+        $('#item').val('');
+        $('#item').trigger('change');
+        $('#div-item').removeClass('hide');
+
+        $('#item-name').val('');
+        $('#item-name').removeClass('hide').addClass('hide');
+
+        $('#unit').val('');
+        $('#unit').trigger('change');
+        $('#select-unit').removeClass('hide').addClass('hide');
+
+        if (!state) {
+            $('#div-item').removeClass('hide').addClass('hide');
+            $('#item-name').removeClass('hide');
+            $('#select-unit').removeClass('hide');
+        }
+    }
+
+    var changeYield = function () {
+        var yield_calculation = $('#yield-calculation').val();
+
+        // reset
+        $('#equation').val('');
+        $('#equation').trigger('change');
+        $('#select-equation').removeClass('hide').addClass('hide');
+
+        if (yield_calculation == 'equation') {
+            $('#select-equation').removeClass('hide');
+        }
+    }
+
+    var changeItem = function () {
+        var item_id = $('#item').val();
+
+        // reset
+
+        $('#yield-calculation').val('');
+        $('#yield-calculation').trigger('change');
+
+        $('#equation').val('');
+        $('#equation').trigger('change');
+
+        if (item_id != '') {
+
+            var yield = $('#item option[value="' + item_id + '"]').data("yield");
+            $('#yield-calculation').val(yield);
+            $('#yield-calculation').trigger('change');
+
+            var equation = $('#item option[value="' + item_id + '"]').data("equation");
+            $('#equation').val(equation);
+            $('#equation').trigger('change');
+        }
+    }
+
     // items
     var oTableItems;
     var items = [];
     var nEditingRowItem = null;
     var rowDeleteItem = null;
     var initTableItems = function () {
-        MyApp.block('#items-table-editable');
 
-        var table = $('#items-table-editable');
+        const table = "#items-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'yield_calculation_name'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
+            {data: 'quantity_old'},
+            {data: 'price_old'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "item",
-                title: "Item",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "yield_calculation_name",
-                title: "Yield Calculation",
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
+                targets: 7,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "total",
-                title: "Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "quantity_old",
-                title: "Previous Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity_old, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price_old",
-                title: "Previous Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price_old, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (!data.principal) {
-                        $(row).addClass('row-secondary');
-                    }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            // marcar secondary
+            createdRow: (row, data, index) => {
+                // console.log(data);
+                if (!data.principal) {
+                    $(row).addClass('row-secondary');
                 }
             }
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#items-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#items-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#items-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
 
         // totals
         $('#total_count_items').val(items.length);
 
         var total = calcularMontoTotalItems();
         $('#total_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
-        // $('#contract_amount').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
@@ -1328,51 +1468,35 @@ var Projects = function () {
 
         initTableItems();
     }
-    var initFormItem = function () {
-        $("#item-form").validate({
-            rules: {
-                quantity: {
-                    required: true
-                },
-                price: {
-                    required: true
-                },
-                item: {
-                    required: true
-                },
+    var validateFormItem = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('item-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            price: {
+                presence: {message: "This field is required"},
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
+
     var initAccionesItems = function () {
 
         $(document).off('click', "#btn-agregar-item");
@@ -1380,9 +1504,8 @@ var Projects = function () {
             // reset
             resetFormItem();
 
-            $('#modal-item').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-item");
@@ -1397,118 +1520,97 @@ var Projects = function () {
                 $('#item-name').val(item);
             }
 
+            if (validateFormItem() && isValidItem() && isValidYield() && isValidUnit()) {
 
-            if ($('#item-form').valid() && isValidItem() && isValidYield() && isValidUnit()) {
+                var formData = new URLSearchParams();
 
                 var project_item_id = $('#project_item_id').val();
+                formData.set("project_item_id", project_item_id);
+
+                var project_id = $('#project_id').val();
+                formData.set("project_id", project_id);
+
+                formData.set("item_id", item_id);
+
+                item = $('#item-name').val();
+                formData.set("item", item);
+
                 var unit_id = $('#unit').val();
+                formData.set("unit_id", unit_id);
+
                 var price = $('#item-price').val();
+                formData.set("price", price);
+
                 var quantity = $('#item-quantity').val();
+                formData.set("quantity", quantity);
+
                 var yield_calculation = $('#yield-calculation').val();
+                formData.set("yield_calculation", yield_calculation);
+
                 var equation_id = $('#equation').val();
+                formData.set("equation_id", equation_id);
 
-                MyApp.block('#modal-item .modal-content');
+                BlockUtil.block('#modal-item .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "project/agregarItem",
-                    dataType: "json",
-                    data: {
-                        project_item_id: project_item_id,
-                        project_id: $('#project_id').val(),
-                        item_id: item_id,
-                        item: item,
-                        unit_id: unit_id,
-                        price: price,
-                        quantity: quantity,
-                        yield_calculation: yield_calculation,
-                        equation_id: equation_id
-                    },
-                    success: function (response) {
-                        mApp.unblock('#modal-item .modal-content');
-                        if (response.success) {
+                axios.post("project/agregarItem", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "Success");
+                                //add item
+                                var item_new = response.item;
+                                if (nEditingRowItem == null) {
+                                    item_new.posicion = items.length;
+                                    items.push(item_new);
+                                } else {
+                                    item_new.posicion = items[nEditingRowItem].posicion;
+                                    items[nEditingRowItem] = item_new;
+                                }
 
-                            //add item
-                            var item_new = response.item;
-                            if (nEditingRowItem == null) {
-                                item_new.posicion = items.length;
-                                items.push(item_new);
+                                // new item
+                                if (response.is_new_item) {
+                                    $('#item').append(new Option(item_new.item, item_new.item_id, false, false));
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-price", item_new.price);
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-unit", item_new.unit);
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-equation", item_new.equation_id);
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-yield", item_new.yield_calculation);
+
+                                    $('#item').select2();
+                                }
+
+                                //actualizar lista
+                                actualizarTableListaItems();
+
+                                if (nEditingRowItem != null) {
+                                    ModalUtil.hide('modal-item');
+                                }
+
+                                // reset
+                                resetFormItem();
+
                             } else {
-                                item_new.posicion = items[nEditingRowItem].posicion;
-                                items[nEditingRowItem] = item_new;
+                                toastr.error(response.error, "");
                             }
-
-                            // new item
-                            if (response.is_new_item) {
-                                $('#item').append(new Option(item_new.item, item_new.item_id, false, false));
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-price", item_new.price);
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-unit", item_new.unit);
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-equation", item_new.equation_id);
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-yield", item_new.yield_calculation);
-
-                                $('#item').select2();
-                            }
-
-                            //actualizar lista
-                            actualizarTableListaItems();
-
-                            if (nEditingRowItem != null) {
-                                $('#modal-item').modal('hide');
-                            }
-
-                            // reset
-                            resetFormItem();
-
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#modal-item .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-item .modal-content");
+                    });
 
             } else {
                 if (!isValidItem()) {
-                    var $element = $('#select-item .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-item"), "This field is required");
                 }
                 if (!isValidYield()) {
-                    var $element = $('#select-equation .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-equation"), "This field is required");
                 }
                 if (!isValidUnit()) {
-                    var $element = $('#select-unit .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-unit"), "This field is required");
                 }
             }
 
@@ -1546,17 +1648,14 @@ var Projects = function () {
                 $('#equation').trigger('change');
 
                 if (items[posicion].equation_id != '') {
-                    $('#select-equation').removeClass('m--hide');
+                    $('#select-equation').removeClass('hide');
                 }
 
                 $('#yield-calculation').on('change', changeYield);
 
-                $(document).off('switchChange.bootstrapSwitch', '#item-type', changeItemType);
-
                 if (items[posicion].item_id == '') {
 
-                    $('#item-type').prop('checked', false);
-                    $("#item-type").bootstrapSwitch("state", false, true);
+                    $('#item-type-new').prop('checked', true);
 
                     $('#item-name').val(items[posicion].item);
 
@@ -1564,10 +1663,8 @@ var Projects = function () {
                     $('#unit').trigger('change');
                 }
 
-                $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
-
-                // open modal
-                $('#modal-item').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -1576,59 +1673,65 @@ var Projects = function () {
         $(document).on('click', "#items-table-editable a.delete", function (e) {
 
             e.preventDefault();
-            rowDeleteItem = $(this).data('posicion');
-            $('#modal-eliminar-item').modal({
-                'show': true
+            var posicion = $(this).data('posicion');
+
+            Swal.fire({
+                text: "Are you sure you want to delete the item?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarItem(posicion);
+                }
             });
         });
 
-        $(document).off('click', "#btn-delete-item");
-        $(document).on('click', "#btn-delete-item", function (e) {
-
-            e.preventDefault();
-            var posicion = rowDeleteItem;
-
+        function eliminarItem(posicion) {
             if (items[posicion]) {
 
                 if (items[posicion].project_item_id != '') {
-                    MyApp.block('#items-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "project/eliminarItem",
-                        dataType: "json",
-                        data: {
-                            'project_item_id': items[posicion].project_item_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#items-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("project_item_id", items[posicion].project_item_id);
 
-                                toastr.success(response.message, "Success");
+                    BlockUtil.block('#lista-items');
 
-                                deleteItem(posicion);
+                    axios.post("project/eliminarItem", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteItem(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#items-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-items");
+                        });
                 } else {
                     deleteItem(posicion);
                 }
             }
-
-        });
+        }
 
         function isValidItem() {
             var valid = true;
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
             var item_id = $('#item').val();
 
             if (item_type && item_id == '') {
@@ -1642,7 +1745,7 @@ var Projects = function () {
         function isValidUnit() {
             var valid = true;
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
             var unit_id = $('#unit').val();
 
             if (!item_type && unit_id == '') {
@@ -1693,16 +1796,12 @@ var Projects = function () {
         }
     };
     var resetFormItem = function () {
-        $('#item-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("item-form");
 
-        $('#item-type').prop('checked', true);
-        $("#item-type").bootstrapSwitch("state", true, true);
+        $('#item-type-existing').prop('checked', true);
+        $('#item-type-new').prop('checked', false);
 
         $('#item').val('');
         $('#item').trigger('change');
@@ -1712,17 +1811,17 @@ var Projects = function () {
 
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
-        $('#div-item').removeClass('m--hide');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
+        $('#div-item').removeClass('hide');
+        $('#item-name').removeClass('hide').addClass('hide');
 
         $('#unit').val('');
         $('#unit').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
+        $('#select-unit').removeClass('hide').addClass('hide');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("item-form"));
 
         nEditingRowItem = null;
 
@@ -1747,107 +1846,88 @@ var Projects = function () {
     var rowDeleteNote = null;
     var rowEditNote = null;
     var initTableNotes = function () {
-        MyApp.block('#notes-table-editable');
 
-        var table = $('#notes-table-editable');
+        const table = "#notes-table-editable";
 
-        var aoColumns = [
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // datasource
+        const datasource = {
+            url: `project/listarNotes`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    project_id: $('#project_id').val(),
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde-notes'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta-notes'),
+                });
             },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
+
+        // columns
+        const columns = [
+            {data: 'date'},
+            {data: 'notes'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "notes",
-                title: "Notes",
-                template: function (row) {
-                    return `<div>${row.notes}</div>`;
-                }
-            },
-            {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
             }
         ];
-        oTableNotes = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'project/listarNotes',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        oTableNotes = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableNotes
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#notes-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#notes-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#notes-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#notes-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#notes-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTableNotes.on('draw', function () {
+            // init acciones
+            initAccionesNotes();
+        });
 
-        //Busqueda
-        var query = oTableNotes.getDataSourceQuery();
-        $('#lista-notes .m_form_search').on('keyup', function (e) {
-            btnClickFiltrarNotes();
-        }).val(query.generalSearch);
+        // search
+        handleSearchDatatableNotes();
     };
+    var handleSearchDatatableNotes = function () {
+        $(document).off('keyup', '#lista-notes [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-notes [data-table-filter="search"]', function (e) {
+            btnClickFiltrarNotes();
+        });
+    }
     var initAccionFiltrarNotes = function () {
 
         $(document).off('click', "#btn-filtrar-notes");
@@ -1857,160 +1937,88 @@ var Projects = function () {
 
     };
     var btnClickFiltrarNotes = function () {
-        var query = oTableNotes.getDataSourceQuery();
-
-        var generalSearch = $('#lista-notes .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var project_id = $('#project_id').val();
-        query.project_id = project_id;
-
-        var fechaInicial = $('#filtro-fecha-inicial-notes').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#filtro-fecha-fin-notes').val();
-        query.fechaFin = fechaFin;
-
-        oTableNotes.setDataSourceQuery(query);
-        oTableNotes.load();
+        const search = $('#lista-notes [data-table-filter="search"]').val();
+        oTableNotes.search(search).draw();
     }
-    var initFormNote = function () {
-        $("#notes-form").validate({
-            rules: {
-                date: {
-                    required: true
-                },
-                /*notes: {
-                    required: true,
-                }*/
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
-    };
     var initAccionesNotes = function () {
-
-        $('#modal-notes').on('shown.bs.modal', function () {
-
-            $('#notes').summernote({
-                dialogsInBody: true,
-                height: 300
-            });
-
-            $.fn.modal.Constructor.prototype._enforceFocus = function () {
-            };
-
-            // reset
-            resetFormNote();
-
-            // editar nota
-            if (rowEditNote != null) {
-                editRowNote(rowEditNote);
-            }
-
-        });
-
 
         $(document).off('click', "#btn-agregar-note");
         $(document).on('click', "#btn-agregar-note", function (e) {
+            // mostar modal
+            ModalUtil.show('modal-notes', {backdrop: 'static', keyboard: true});
+        });
 
-            $('#modal-notes').modal({
-                'show': true
-            });
+        ModalUtil.on('modal-notes', 'shown.bs.modal', function () {
+            // reset
+            resetFormNote();
+
+            // editar note
+            if (rowEditNote != null) {
+                editRowNote(rowEditNote);
+            }
         });
 
         $(document).off('click', "#btn-salvar-note");
         $(document).on('click', "#btn-salvar-note", function (e) {
             e.preventDefault();
 
-            var notes = $('#notes').summernote('code');
+            var date = TempusUtil.getString('datetimepicker-notes-date');
 
-            if ($('#notes-form').valid() && notes !== '') {
+            var notes = QuillUtil.getHtml('#notes');
+            var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
+
+            if (date !== '' && !notesIsEmpty) {
+
+                var formData = new URLSearchParams();
 
                 var notes_id = $('#notes_id').val();
+                formData.set("notes_id", notes_id);
+
                 var project_id = $('#project_id').val();
-                var date = $('#notes-date').val();
+                formData.set("project_id", project_id);
 
-                MyApp.block('#modal-notes .modal-content');
+                formData.set("notes", notes);
+                formData.set("date", date);
 
-                $.ajax({
-                    type: "POST",
-                    url: "project/salvarNotes",
-                    dataType: "json",
-                    data: {
-                        'notes_id': notes_id,
-                        'project_id': project_id,
-                        'notes': notes,
-                        'date': date
-                    },
-                    success: function (response) {
-                        mApp.unblock('#modal-notes .modal-content');
-                        if (response.success) {
+                BlockUtil.block('#modal-notes .modal-content');
 
-                            toastr.success(response.message, "Success");
+                axios.post("project/salvarNotes", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            if (notes_id !== '') {
-                                $('#modal-notes').modal('hide');
+                                if (notes_id !== '') {
+                                    // Cerrar modal
+                                    ModalUtil.hide('modal-notes');
+                                }
+
+                                // reset
+                                resetFormNote();
+
+                                //actualizar lista
+                                btnClickFiltrarNotes();
+
+                            } else {
+                                toastr.error(response.error, "");
                             }
-
-                            // reset
-                            resetFormNote();
-
-                            //actualizar lista
-                            btnClickFiltrarNotes();
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#modal-notes .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-notes .modal-content");
+                    });
 
             } else {
-                if (notes == "") {
-                    var $element = $('.note-editor');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "Este campo es obligatorio")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'top'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                if (date === '') {
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("notes-date"), "This field is required");
+                }
+                if (notesIsEmpty) {
+                    toastr.error("The note cannot be empty.", "");
                 }
             }
         });
@@ -2021,179 +2029,184 @@ var Projects = function () {
 
             rowEditNote = $(this).data('id');
 
-            $('#modal-notes').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-notes', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#notes-table-editable a.delete");
         $(document).on('click', "#notes-table-editable a.delete", function (e) {
 
             e.preventDefault();
-            rowDeleteNote = $(this).data('id');
-            $('#modal-eliminar-notes').modal({
-                'show': true
-            });
-        });
+            var notes_id = $(this).data('id');
 
-        $(document).off('click', "#btn-delete-note");
-        $(document).on('click', "#btn-delete-note", function (e) {
-
-            var notes_id = rowDeleteNote;
-
-            MyApp.block('#notes-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "project/eliminarNotes",
-                dataType: "json",
-                data: {
-                    'notes_id': notes_id
-                },
-                success: function (response) {
-                    mApp.unblock('#notes-table-editable');
-                    if (response.success) {
-
-                        btnClickFiltrarNotes();
-
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#notes-table-editable');
-
-                    toastr.error(response.error, "");
+            Swal.fire({
+                text: "Are you sure you want to delete the notes?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarNote(notes_id);
                 }
             });
 
         });
+
+        function eliminarNote(notes_id) {
+
+            var formData = new URLSearchParams();
+            formData.set("notes_id", notes_id);
+
+            BlockUtil.block('#lista-notes');
+
+            axios.post("subcontractor/eliminarNotes", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            btnClickFiltrarNotes();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-notes");
+                });
+        }
 
         $(document).off('click', "#btn-eliminar-notes");
         $(document).on('click', "#btn-eliminar-notes", function (e) {
 
             e.preventDefault();
 
-            var project_id = $('#project_id').val();
-            var fechaInicial = $('#filtro-fecha-inicial-notes').val();
-            var fechaFin = $('#filtro-fecha-fin-notes').val();
+            var fechaInicial = TempusUtil.getString('datetimepicker-desde-notes');
+            var fechaFin = TempusUtil.getString('datetimepicker-hasta-notes');
 
             if (fechaInicial === '' && fechaFin === '') {
                 toastr.error("Select the dates to delete", "");
                 return;
             }
 
-            $('#modal-eliminar-notes-date').modal({
-                'show': true
-            });
-        });
-
-        $(document).off('click', "#btn-delete-note-date");
-        $(document).on('click', "#btn-delete-note-date", function (e) {
-
-            var project_id = $('#project_id').val();
-            var fechaInicial = $('#filtro-fecha-inicial-notes').val();
-            var fechaFin = $('#filtro-fecha-fin-notes').val();
-
-            MyApp.block('#notes-table-editable');
-
-            $.ajax({
-                type: "POST",
-                url: "project/eliminarNotesDate",
-                dataType: "json",
-                data: {
-                    'project_id': project_id,
-                    'from': fechaInicial,
-                    'to': fechaFin,
-                },
-                success: function (response) {
-                    mApp.unblock('#notes-table-editable');
-                    if (response.success) {
-
-                        // reset
-                        $('#filtro-fecha-inicial-notes').val('');
-                        $('#filtro-fecha-fin-notes').val('');
-
-                        btnClickFiltrarNotes();
-
-                        toastr.success(response.message, "Success");
-
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#notes-table-editable');
-
-                    toastr.error(response.error, "");
+            Swal.fire({
+                text: "Are you sure you want to delete the notes?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarNotes(fechaInicial, fechaFin);
                 }
             });
-
         });
 
+        function eliminarNotes(fechaInicial, fechaFin) {
+
+            var formData = new URLSearchParams();
+
+            var project_id = $('#project_id').val();
+            formData.set("project_id", project_id);
+
+            formData.set("from", fechaInicial);
+            formData.set("to", fechaFin);
+
+            BlockUtil.block('#lista-notes');
+
+            axios.post("subcontractor/eliminarNotesDate", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            // reset
+                            TempusUtil.clear('datetimepicker-desde');
+                            TempusUtil.clear('datetimepicker-hasta');
+
+                            btnClickFiltrarNotes();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-notes");
+                });
+        }
 
     };
 
     var editRowNote = function (notes_id) {
 
-        $('#notes_id').val(notes_id);
         rowEditNote = null;
 
-        MyApp.block('#modal-notes .modal-content');
+        var formData = new URLSearchParams();
+        formData.set("notes_id", notes_id);
 
-        $.ajax({
-            type: "POST",
-            url: "project/cargarDatosNotes",
-            dataType: "json",
-            data: {
-                'notes_id': notes_id
-            },
-            success: function (response) {
-                mApp.unblock('#modal-notes .modal-content');
-                if (response.success) {
-                    //Datos project
+        BlockUtil.block('#modal-notes .modal-content');
 
-                    $('#notes-date').val(response.notes.date);
-                    $('#notes').summernote('code', response.notes.notes);
+        axios.post("subcontractor/cargarDatosNotes", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
+                        //Datos unit
+                        cargarDatos(response.notes);
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                mApp.unblock('#modal-notes .modal-content');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#modal-notes .modal-content");
+            });
 
-                toastr.error(response.error, "");
-            }
-        });
+        function cargarDatos(notes) {
+
+            $('#notes_id').val(notes.notes_id);
+
+            const date = MyApp.convertirStringAFecha(notes.date);
+            TempusUtil.setDate('datetimepicker-notes-date', date);
+
+            QuillUtil.setHtml('#notes', notes.notes);
+        }
 
     }
     var resetFormNote = function () {
-        $('#notes-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("notes-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#notes-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        QuillUtil.setHtml('#notes', '');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#notes').summernote('code', '');
-
-        var fecha_actual = new Date();
-        $('#notes-date').val(fecha_actual.format('m/d/Y'));
-
-        // add datos de proyecto
-        $("#proyect-number-note").html($('#number').val());
-        $("#proyect-name-note").html($('#name').val());
+        // reset fecha (TempusUtil, sin variables) — solo fecha
+        TempusUtil.clear('datetimepicker-notes-date');
+        TempusUtil.setDate('datetimepicker-notes-date', new Date());
     };
 
     // unit
@@ -2236,174 +2249,102 @@ var Projects = function () {
 
     // Contacts
     var contacts = [];
-    var oTableListaContacts;
+    var oTableContacts;
     var nEditingRowContact = null;
-    var initTableListaContacts = function () {
-        MyApp.block('#lista-contacts-table-editable');
+    var initTableContacts = function () {
+        const table = "#contacts-table-editable";
 
-        var table = $('#lista-contacts-table-editable');
+        // columns
+        const columns = [
+            {data: 'name'},
+            {data: 'email'},
+            {data: 'phone'},
+            {data: 'role'},
+            {data: 'notes'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "name",
-                title: "Name"
+                targets: 1,
+                render: DatatableUtil.getRenderColumnEmail
             },
             {
-                field: "email",
-                title: "Email",
-                width: 200,
-                template: function (row) {
-                    return '<a class="m-link" href="mailto:' + row.email + '">' + row.email + '</a>';
-                }
+                targets: 2,
+                render: DatatableUtil.getRenderColumnPhone
             },
             {
-                field: "phone",
-                title: "Phone",
-                width: 150,
-                template: function (row) {
-                    return '<a class="m-link" href="tel:' + row.phone + '">' + row.phone + '</a>';
-                }
-            },
-            {
-                field: "role",
-                title: "Role"
-            },
-            {
-                field: "notes",
-                title: "Notes"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit contact"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete contact"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableListaContacts = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: contacts,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-contacts .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableContacts = DatatableUtil.initSafeDataTable(table, {
+            data: contacts,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaContacts
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#lista-contacts-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableContacts();
 
     };
+    var handleSearchDatatableContacts = function () {
+        $(document).off('keyup', '#lista-contacts [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-contacts [data-table-filter="search"]', function (e) {
+            oTableContacts.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaContacts = function () {
-        if (oTableListaContacts) {
-            oTableListaContacts.destroy();
+        if (oTableContacts) {
+            oTableContacts.destroy();
         }
 
-        initTableListaContacts();
+        initTableContacts();
     }
-    var initFormContact = function () {
-        $("#contact-form").validate({
-            rules: {
-                /*name: {
-                    required: true
-                },*/
-                email: {
-                    // required: true,
-                    optionalEmail: true
-                },
-                /*phone: {
-                    required: true
-                },*/
+
+    var validateFormContact = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('contact-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            email: {
+                email: {message: "The email must be valid"}
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
     var initAccionesContacts = function () {
 
@@ -2412,16 +2353,15 @@ var Projects = function () {
             // reset
             resetFormContact();
 
-            $('#modal-contact').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-contact', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-contact");
         $(document).on('click', "#btn-salvar-contact", function (e) {
             e.preventDefault();
 
-            if ($('#contact-form').valid()) {
+            if (validateFormContact()) {
                 var name = $('#contact-name').val();
                 var email = $('#contact-email').val();
                 var phone = $('#contact-phone').val();
@@ -2451,22 +2391,20 @@ var Projects = function () {
                     }
                 }
 
-                if (nEditingRowContact != null) {
-                    $('#modal-contact').modal('hide');
-                }
-
                 //actualizar lista
                 actualizarTableListaContacts();
 
                 // reset
                 resetFormContact();
+                // hide modal
+                ModalUtil.hide('modal-contact');
 
             }
 
         });
 
-        $(document).off('click', "#lista-contacts-table-editable a.edit");
-        $(document).on('click', "#lista-contacts-table-editable a.edit", function () {
+        $(document).off('click', "#contacts-table-editable a.edit");
+        $(document).on('click', "#contacts-table-editable a.edit", function () {
             var posicion = $(this).data('posicion');
             if (contacts[posicion]) {
 
@@ -2482,53 +2420,71 @@ var Projects = function () {
                 $('#contact-role').val(contacts[posicion].role);
                 $('#contact-notes').val(contacts[posicion].notes);
 
-                // open modal
-                $('#modal-contact').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-contact', {backdrop: 'static', keyboard: true});
 
             }
         });
 
-        $(document).off('click', "#lista-contacts-table-editable a.delete");
-        $(document).on('click', "#lista-contacts-table-editable a.delete", function (e) {
+        $(document).off('click', "#contacts-table-editable a.delete");
+        $(document).on('click', "#contacts-table-editable a.delete", function (e) {
 
             e.preventDefault();
             var posicion = $(this).data('posicion');
-
             if (contacts[posicion]) {
 
-                if (contacts[posicion].contact_id !== '') {
-                    MyApp.block('#lista-contacts-table-editable');
+                Swal.fire({
+                    text: "Are you sure you want to delete the contact?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "No, cancel",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-success",
+                        cancelButton: "btn fw-bold btn-danger"
+                    }
+                }).then(function (result) {
+                    if (result.value) {
+                        eliminarContact(posicion);
+                    }
+                });
+            }
+        });
 
-                    $.ajax({
-                        type: "POST",
-                        url: "project/eliminarContact",
-                        dataType: "json",
-                        data: {
-                            'contact_id': contacts[posicion].contact_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#lista-contacts-table-editable');
+        function eliminarContact(posicion) {
+
+            if (contacts[posicion].contact_id != '') {
+
+                var formData = new URLSearchParams();
+                formData.set("contact_id", contacts[posicion].contact_id);
+
+                BlockUtil.block('#lista-contacts');
+
+                axios.post("company/eliminarContact", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
                             if (response.success) {
-
                                 toastr.success(response.message, "");
 
                                 deleteContact(posicion);
-
                             } else {
                                 toastr.error(response.error, "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#lista-contacts-table-editable');
-
-                            toastr.error(response.error, "");
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#lista-contacts");
                     });
-                } else {
-                    deleteContact(posicion);
-                }
+
+            } else {
+                deleteContact(posicion);
             }
-        });
+        }
 
         function deleteContact(posicion) {
             //Eliminar
@@ -2543,21 +2499,9 @@ var Projects = function () {
 
     };
     var resetFormContact = function () {
-        $('#contact-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#contact-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("contact-form");
 
         nEditingRowContact = null;
     };
@@ -2567,142 +2511,67 @@ var Projects = function () {
     var oTableInvoices;
     var invoices = [];
     var initTableInvoices = function () {
-        MyApp.block('#invoices-table-editable');
+        const table = "#invoices-table-editable";
 
-        var table = $('#invoices-table-editable');
+        // columns
+        const columns = [
+            {data: 'number'},
+            {data: 'startDate'},
+            {data: 'endDate'},
+            {data: 'total'},
+            {data: 'notes'},
+            {data: 'paid'},
+            {data: 'createdAt'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
             {
-                field: "number",
-                title: "Number",
-                width: 80,
-            },
-            {
-                field: "company",
-                title: "Company"
-            },
-            {
-                field: "project",
-                title: "Project"
-            },
-            {
-                field: "startDate",
-                title: "From",
-                width: 100,
-            },
-            {
-                field: "endDate",
-                title: "To",
-                width: 100,
-            },
-            {
-                field: "total",
-                title: "Amount",
-                width: 100,
-                textAlign: 'center',
-            },
-            {
-                field: "notes",
-                title: "Notes",
-                width: 150
-            },
-            {
-                field: "paid",
-                title: "Paid",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
+                targets: 5,
+                render: function (data, type, row) {
                     var status = {
-                        1: {'title': 'Yes', 'class': ' m-badge--success'},
-                        0: {'title': 'No', 'class': ' m-badge--danger'}
+                        1: {'title': 'Yes', 'class': 'badge-success'},
+                        0: {'title': 'No', 'class': 'badge-danger'}
                     };
-                    return '<span class="m-badge ' + status[row.paid].class + ' m-badge--wide">' + status[row.paid].title + '</span>';
+                    return  `<span class="badge ${status[data].class}">${status[data].title}</span>`;
                 }
             },
             {
-                field: "createdAt",
-                title: "Created At",
-                width: 100,
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit invoice"><i class="la la-edit"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['detalle']);
+                },
             }
         ];
-        oTableInvoices = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: invoices,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-invoices .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[1, 'desc']];
+
+        // escapar contenido de la tabla
+        oTableInvoices = DatatableUtil.initSafeDataTable(table, {
+            data: invoices,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableInvoices
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#invoices-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#invoices-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#invoices-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#invoices-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#invoices-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableInvoices();
     };
+    var handleSearchDatatableInvoices = function () {
+        $(document).off('keyup', '#lista-invoices [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-invoices [data-table-filter="search"]', function (e) {
+            oTableProjects.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaInvoices = function () {
         if (oTableInvoices) {
             oTableInvoices.destroy();
@@ -2710,7 +2579,6 @@ var Projects = function () {
 
         initTableInvoices();
     }
-
     var initAccionesInvoices = function () {
 
         $(document).off('click', "#invoices-table-editable a.edit");
@@ -2731,183 +2599,173 @@ var Projects = function () {
     // datatracking
     var oTableDataTracking;
     var initTableDataTracking = function () {
-        MyApp.block('#data-tracking-table-editable');
 
-        var table = $('#data-tracking-table-editable');
+        const table = "#data-tracking-table-editable";
 
-        var aoColumns = [
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // datasource
+        const datasource = {
+            url: `project/listarDataTracking`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    project_id: $('#project_id').val(),
+                    pending: $('#pending-data-tracking').val(),
+                    fechaInicial: TempusUtil.getString('datetimepicker-desde-data-tracking'),
+                    fechaFin: TempusUtil.getString('datetimepicker-hasta-data-tracking'),
+                });
             },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
+
+        // columns
+        const columns = [
+            {data: 'date'},
+            {data: 'leads'},
+            {data: 'totalConcUsed'},
+            {data: 'total_concrete_yiel'},
+            {data: 'lostConcrete'},
+            {data: 'total_concrete'},
+            {data: 'totalLabor'},
+            {data: 'total_daily_today'},
+            {data: 'profit'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "leads",
-                title: "Lead",
-                width: 150,
-                sortable: false,
-            },
-            {
-                field: "totalConcUsed",
-                title: "Conc. Used (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.totalConcUsed, 2, '.', ',')}</span>`;
+                targets: 0,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
             {
-                field: "total_concrete_yiel",
-                title: "Conc. Yield (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_concrete_yiel, 2, '.', ',')}</span>`;
+                targets: 1,
+                orderable: false,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {
-                field: "lostConcrete",
-                title: "Difference (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.lostConcrete, 2, '.', ',')}</span>`;
-                }
+                targets: 2,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "total_concrete",
-                title: "Conc. Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
-                }
+                targets: 3,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "totalLabor",
-                title: "Labor Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
-                }
+                targets: 4,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "total_daily_today",
-                title: "Daily Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
-                }
+                targets: 5,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "profit",
-                title: "Profit ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
-                }
+                targets: 6,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
             },
             {
-                field: "acciones",
-                width: 80,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: 7,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
+            },
+            {
+                targets: 8,
+                orderable: false,
+                render: function (data, type, row) {
+                    var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    return DatatableUtil.getRenderColumnDiv(html, 100);
+                },
+            },
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit']);
+                },
             }
         ];
-        oTableDataTracking = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'project/listarDataTracking',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'desc']];
+
+        oTableDataTracking = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (data.pending === 1) {
-                        $(row).addClass('row-pending');
-                    }
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            // marcar pending
+            createdRow: (row, data, index) => {
+                // console.log(data);
+                if (data.pending === 1) {
+                    $(row).addClass('row-pending');
                 }
             }
         });
 
-        //Events
-        oTableDataTracking
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTableDataTracking.on('draw', function () {
+            // init acciones
+            initAccionesDataTracking();
+        });
 
-        //Busqueda
-        var query = oTableDataTracking.getDataSourceQuery();
-        $('#lista-data-tracking .m_form_search').on('keyup', function (e) {
-            btnClickFiltrarDataTracking();
-        }).val(query.generalSearch);
+        // search
+        handleSearchDatatableDataTracking();
     };
+    var handleSearchDatatableDataTracking = function () {
+        $(document).off('keyup', '#lista-data-tracking [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-data-tracking [data-table-filter="search"]', function (e) {
+            btnClickFiltrarNotes();
+        });
+    }
+
     var initAccionFiltrarDataTracking = function () {
 
         $(document).off('click', "#btn-filtrar-data-tracking");
@@ -2917,25 +2775,8 @@ var Projects = function () {
 
     };
     var btnClickFiltrarDataTracking = function () {
-        var query = oTableDataTracking.getDataSourceQuery();
-
-        var generalSearch = $('#lista-data-tracking .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var project_id = $('#project_id').val();
-        query.project_id = project_id;
-
-        var fechaInicial = $('#fechaInicial-data-tracking').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#fechaFin-data-tracking').val();
-        query.fechaFin = fechaFin;
-
-        var pending = $('#pending-data-tracking').val();
-        query.pending = pending;
-
-        oTableDataTracking.setDataSourceQuery(query);
-        oTableDataTracking.load();
+        const search = $('#lista-data-tracking [data-table-filter="search"]').val();
+        oTableDataTracking.search(search).draw();
     }
     var initAccionesDataTracking = function () {
 
@@ -2963,151 +2804,92 @@ var Projects = function () {
 
     // Ajustes Precio
     var ajustes_precio = [];
-    var oTableListaAjustesPrecio;
+    var oTableAjustesPrecio;
     var nEditingRowAjustePrecio = null;
     var initTableListaAjustesPrecio = function () {
-        MyApp.block('#lista-ajustes-precio-table-editable');
 
-        var table = $('#lista-ajustes-precio-table-editable');
+        const table = "#ajustes-precio-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'day'},
+            {data: 'percent'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "day",
-                title: "Day"
-            },
-            {
-                field: "percent",
-                title: "Percent"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableListaAjustesPrecio = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: ajustes_precio,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-ajustes-precio .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableAjustesPrecio = DatatableUtil.initSafeDataTable(table, {
+            data: ajustes_precio,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTableListaAjustesPrecio
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#lista-ajustes-precio-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#lista-ajustes-precio-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#lista-ajustes-precio-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#lista-ajustes-precio-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#lista-ajustes-precio-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableAjustesPrecio();
 
     };
+    var handleSearchDatatableAjustesPrecio = function () {
+        $(document).off('keyup', '#lista-ajustes-precio [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-ajustes-precio [data-table-filter="search"]', function (e) {
+            const search = $(this).val();
+            oTableAjustesPrecio.search(search).draw();
+        });
+    }
     var actualizarTableListaAjustesPrecio = function () {
-        if (oTableListaAjustesPrecio) {
-            oTableListaAjustesPrecio.destroy();
+        if (oTableAjustesPrecio) {
+            oTableAjustesPrecio.destroy();
         }
 
         initTableListaAjustesPrecio();
     }
-    var initFormAjustePrecio = function () {
-        $("#ajuste-precio-form").validate({
-            rules: {
-                day: {
-                    required: true
-                },
-                percent: {
-                    required: true
-                },
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+    var validateFormAjustePrecio = function () {
+        var result = false;
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        //Validacion
+        var form = KTUtil.get('ajuste-precio-form');
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        var constraints = {
+            percent: {
+                presence: {message: "This field is required"},
+            }
+        }
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+        var errors = validate(form, constraints);
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                });
-            },
-        });
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
+
     var initAccionesAjustesPrecio = function () {
 
         $(document).off('click', "#btn-agregar-ajuste-precio");
@@ -3115,9 +2897,8 @@ var Projects = function () {
             // reset
             resetFormAjustePrecio();
 
-            $('#modal-ajuste-precio').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-ajuste-precio', {backdrop: 'static', keyboard: true});
         });
 
         function ExisteAjustePrecio(day) {
@@ -3135,8 +2916,9 @@ var Projects = function () {
         $(document).on('click', "#btn-salvar-ajuste-precio", function (e) {
             e.preventDefault();
 
-            if ($('#ajuste-precio-form').valid()) {
-                var day = $('#ajuste_precio_day').val();
+            if (validateFormAjustePrecio()) {
+
+                var day = TempusUtil.getString('datetimepicker-ajuste-precio-day');
                 var percent = $('#ajuste_precio_percent').val();
 
                 if (ExisteAjustePrecio(day)) {
@@ -3162,7 +2944,7 @@ var Projects = function () {
                 }
 
                 // close modal
-                $('#modal-ajuste-precio').modal('hide');
+                ModalUtil.hide('modal-ajuste-precio');
 
                 //actualizar lista
                 actualizarTableListaAjustesPrecio();
@@ -3174,8 +2956,8 @@ var Projects = function () {
 
         });
 
-        $(document).off('click', "#lista-ajustes-precio-table-editable a.edit");
-        $(document).on('click', "#lista-ajustes-precio-table-editable a.edit", function () {
+        $(document).off('click', "#ajustes-precio-table-editable a.edit");
+        $(document).on('click', "#ajustes-precio-table-editable a.edit", function () {
             var posicion = $(this).data('posicion');
             if (ajustes_precio[posicion]) {
 
@@ -3184,57 +2966,78 @@ var Projects = function () {
 
                 nEditingRowAjustePrecio = posicion;
 
-                $('#ajustes_precio').val(ajustes_precio[posicion].id);
-                $('#ajuste_precio_day').val(ajustes_precio[posicion].day);
+                $('#ajuste_precio_id').val(ajustes_precio[posicion].id);
+
+                const day = MyApp.convertirStringAFecha(ajustes_precio[posicion].day);
+                TempusUtil.setDate('datetimepicker-ajuste-precio-day', day);
+
                 $('#ajuste_precio_percent').val(ajustes_precio[posicion].percent);
 
                 // open modal
-                $('#modal-ajuste-precio').modal('show');
+                ModalUtil.show('modal-ajuste-precio', {backdrop: 'static', keyboard: true});
 
             }
         });
 
-        $(document).off('click', "#lista-ajustes-precio-table-editable a.delete");
-        $(document).on('click', "#lista-ajustes-precio-table-editable a.delete", function (e) {
+        $(document).off('click', "#ajustes-precio-table-editable a.delete");
+        $(document).on('click', "#ajustes-precio-table-editable a.delete", function (e) {
 
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
+            Swal.fire({
+                text: "Are you sure you want to delete the record?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarAjustePrecio(posicion);
+                }
+            });
+
+        });
+
+        function eliminarAjustePrecio(posicion){
             if (ajustes_precio[posicion]) {
 
                 if (ajustes_precio[posicion].id !== '') {
-                    MyApp.block('#lista-ajustes-precio-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "project/eliminarAjustePrecio",
-                        dataType: "json",
-                        data: {
-                            'id': ajustes_precio[posicion].id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#lista-ajustes-precio-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("id", ajustes_precio[posicion].id);
 
-                                toastr.success(response.message, "");
+                    BlockUtil.block('#lista-ajustes-precio');
 
-                                deleteAjustePrecio(posicion);
+                    axios.post("project/eliminarAjustePrecio", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteAjustePrecio(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#lista-ajustes-precio-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-ajustes-precio");
+                        });
                 } else {
                     deleteAjustePrecio(posicion);
                 }
             }
-        });
+        }
 
         function deleteAjustePrecio(posicion) {
             //Eliminar
@@ -3249,135 +3052,116 @@ var Projects = function () {
 
     };
     var resetFormAjustePrecio = function () {
-        $('#ajuste-precio-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
+        // reset form
+        MyUtil.resetForm("ajuste-precio-form");
+        
         nEditingRowAjustePrecio = null;
     };
 
     // Archivos
     var archivos = [];
-    var oTableListaArchivos;
+    var oTableArchivos;
     var nEditingRowArchivo = null;
     var initTableListaArchivos = function () {
-        MyApp.block('#lista-archivo-table-editable');
 
-        var table = $('#lista-archivo-table-editable');
+        const table = "#archivo-table-editable";
 
-        var aoColumns = [];
+
+        const columns = [];
 
         if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
+            columns.push({data: 'id'});
         }
 
-        aoColumns.push({
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "file",
-                title: "File"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record"><i class="la la-trash"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
-                    `;
-                }
-            });
+        // columns
+        columns.push(
+            {data: 'name'},
+            {data: 'file'},
+            {data: null},
+        );
 
-        oTableListaArchivos = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: archivos,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-archivo .m_form_search'),
+        // column defs
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            }
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [];
+        }
+
+        // acciones
+        columnDefs.push({
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete', 'download']);
             },
         });
 
-        //Events
-        oTableListaArchivos
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[1, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableArchivos = DatatableUtil.initSafeDataTable(table, {
+            data: archivos,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        handleSearchDatatableArchivos();
 
     };
+    var handleSearchDatatableArchivos = function () {
+        $(document).off('keyup', '#lista-archivos [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-archivos [data-table-filter="search"]', function (e) {
+            oTableArchivos.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaArchivos = function () {
-        if (oTableListaArchivos) {
-            oTableListaArchivos.destroy();
+        if (oTableArchivos) {
+            oTableArchivos.destroy();
         }
 
         initTableListaArchivos();
     }
+
+    var validateFormArchivo = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('archivo-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
+            },
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
+    };
     var initAccionesArchivo = function () {
 
         $(document).off('click', "#btn-agregar-archivo");
@@ -3385,19 +3169,17 @@ var Projects = function () {
             // reset
             resetFormArchivo();
 
-            $('#modal-archivo').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-archivo', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-archivo");
         $(document).on('click', "#btn-salvar-archivo", function (e) {
             e.preventDefault();
 
-            var nombre = $('#archivo-name').val();
+            if (validateFormArchivo() && $('#fileinput-archivo').hasClass('fileinput-exists')) {
 
-            if (nombre !== '' && $('#fileinput-archivo').hasClass('fileinput-exists')) {
-                // validar
+                var nombre = $('#archivo-name').val();
 
                 if (ExisteArchivo(nombre)) {
                     toastr.error('The attachment has already been added', "Error");
@@ -3411,7 +3193,7 @@ var Projects = function () {
                     var formData = new FormData();
                     formData.set('file', file);
 
-                    MyApp.block('#modal-archivo .modal-content');
+                    BlockUtil.block('#modal-archivo .modal-content');
                     // axios
                     axios
                         .post("project/salvarArchivo", formData, {
@@ -3433,11 +3215,11 @@ var Projects = function () {
                             }
                         })
                         .catch(function (err) {
-                            console.log(err);
+                            console.project(err);
                             toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error !!!");
                         })
                         .then(function () {
-                            mApp.unblock('#modal-archivo .modal-content');
+                            BlockUtil.unblock("#modal-archivo .modal-content");
                         });
                 } else {
                     //actualizar solo nombre
@@ -3445,13 +3227,11 @@ var Projects = function () {
 
                     actualizarTableListaArchivos();
                     resetFormArchivo();
-                    $('#modal-archivo').modal('hide');
+
+                    ModalUtil.hide('modal-archivo');
                 }
 
             } else {
-                if (nombre === '') {
-                    toastr.error('Enter the name', "");
-                }
                 if (!$('#fileinput-archivo').hasClass('fileinput-exists')) {
                     toastr.error('Select the file', "");
                 }
@@ -3485,7 +3265,7 @@ var Projects = function () {
             }
 
             // close modal
-            $('#modal-archivo').modal('hide');
+            ModalUtil.hide('modal-archivo');
 
             // actualizar lista
             actualizarTableListaArchivos();
@@ -3495,8 +3275,8 @@ var Projects = function () {
 
         }
 
-        $(document).off('click', "#lista-archivo-table-editable a.edit");
-        $(document).on('click', "#lista-archivo-table-editable a.edit", function () {
+        $(document).off('click', "#archivo-table-editable a.edit");
+        $(document).on('click', "#archivo-table-editable a.edit", function () {
             var posicion = $(this).data('posicion');
             if (archivos[posicion]) {
 
@@ -3511,50 +3291,67 @@ var Projects = function () {
                 $('#fileinput-archivo').fileinput().removeClass("fileinput-new").addClass("fileinput-exists");
 
                 // open modal
-                $('#modal-archivo').modal('show');
+                ModalUtil.show('modal-archivo', {backdrop: 'static', keyboard: true});
 
             }
         });
 
-        $(document).off('click', "#lista-archivo-table-editable a.delete");
-        $(document).on('click', "#lista-archivo-table-editable a.delete", function (e) {
+        $(document).off('click', "#archivo-table-editable a.delete");
+        $(document).on('click', "#archivo-table-editable a.delete", function (e) {
 
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
-            if (archivos[posicion]) {
-                MyApp.block('#lista-archivo-table-editable');
-
-                $.ajax({
-                    type: "POST",
-                    url: "project/eliminarArchivo",
-                    dataType: "json",
-                    data: {
-                        'archivo': archivos[posicion].file
-                    },
-                    success: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-                        if (response.success) {
-
-                            toastr.success(response.message, "");
-
-                            deleteArchivo(posicion);
-
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-            }
+            Swal.fire({
+                text: "Are you sure you want to delete the attachment?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarArchivo(posicion);
+                }
+            });
         });
 
-        $(document).off('click', "#lista-archivo-table-editable a.download");
-        $(document).on('click', "#lista-archivo-table-editable a.download", function () {
+        function eliminarArchivo(posicion) {
+            if (archivos[posicion]) {
+
+                var formData = new URLSearchParams();
+                formData.set("archivo", archivos[posicion].file);
+
+                BlockUtil.block('#lista-archivos');
+
+                axios.post("project/eliminarArchivo", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+
+                                deleteArchivo(posicion);
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
+                        }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#lista-archivos");
+                    });
+            }
+        }
+
+        $(document).off('click', "#archivo-table-editable a.download");
+        $(document).on('click', "#archivo-table-editable a.download", function () {
             var posicion = $(this).data('posicion');
             if (archivos[posicion]) {
 
@@ -3574,15 +3371,7 @@ var Projects = function () {
         $(document).off('click', "#btn-eliminar-archivos");
         $(document).on('click', "#btn-eliminar-archivos", function (e) {
 
-            var ids = [];
-            $('#lista-archivo-table-editable .m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids.push(value);
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#archivo-table-editable');
 
             var archivos_name = [];
             for (var i = 0; i < ids.length; i++) {
@@ -3594,13 +3383,13 @@ var Projects = function () {
 
             if (archivos_name.length > 0) {
 
-                swal.fire({
+                Swal.fire({
+                    text: "Are you sure you want to delete the selected atachments?",
+                    icon: "warning",
+                    showCancelButton: true,
                     buttonsStyling: false,
-                    html: "Are you sure you want to delete the selected atachments?",
-                    type: "warning",
                     confirmButtonText: "Yes, delete it!",
                     confirmButtonClass: "btn btn-sm btn-bold btn-success",
-                    showCancelButton: true,
                     cancelButtonText: "No, cancel",
                     cancelButtonClass: "btn btn-sm btn-bold btn-danger"
                 }).then(function (result) {
@@ -3614,33 +3403,31 @@ var Projects = function () {
             }
 
             function EliminarArchivos(ids, archivos_name) {
-                MyApp.block('#lista-archivo-table-editable');
 
-                $.ajax({
-                    type: "POST",
-                    url: "project/eliminarArchivos",
-                    dataType: "json",
-                    data: {
-                        'archivos': archivos_name
-                    },
-                    success: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-                        if (response.success) {
+                var formData = new URLSearchParams();
+                formData.set("archivos", archivos_name);
 
-                            toastr.success(response.message, "");
+                BlockUtil.block('#lista-archivos');
 
-                            deleteArchivos(ids);
+                axios.post("project/eliminarArchivos", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
+                                deleteArchivos(ids);
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#lista-archivos");
+                    });
             }
 
         });
@@ -3674,13 +3461,8 @@ var Projects = function () {
 
     };
     var resetFormArchivo = function () {
-        $('#archivo-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("archivo-form");
 
         // reset
         $('#fileinput').val('');
@@ -3688,7 +3470,6 @@ var Projects = function () {
         $('#fileinput-archivo').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
 
         nEditingRowArchivo = null;
-
 
     };
 
@@ -3698,21 +3479,19 @@ var Projects = function () {
         init: function () {
 
             initWidgets();
+
             initTable();
-            initForm();
+
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
+
             initAccionFiltrar();
-            initAccionResetFiltrar();
 
             // items
             initTableItems();
-            initFormItem();
             initAccionesItems();
             // units
             initAccionesUnit();
@@ -3722,11 +3501,10 @@ var Projects = function () {
             // notes
             initTableNotes();
             initAccionFiltrarNotes();
-            initFormNote();
+
             initAccionesNotes();
 
             // contacts
-            initFormContact();
             initAccionesContacts();
 
             // invoices
@@ -3739,7 +3517,6 @@ var Projects = function () {
             initAccionesDataTracking();
 
             // ajustes precio
-            initFormAjustePrecio();
             initAccionesAjustesPrecio();
 
             // archivos
@@ -3754,8 +3531,8 @@ var Projects = function () {
 
                 $('#project_id').val(project_id_edit);
 
-                $('#form-project').removeClass('m--hide');
-                $('#lista-project').addClass('m--hide');
+                $('#form-project').removeClass('hide');
+                $('#lista-project').addClass('hide');
 
                 localStorage.removeItem('project_id_edit');
 
@@ -3765,12 +3542,14 @@ var Projects = function () {
             // filtrar
             var fechaInicial = localStorage.getItem('dashboard_fecha_inicial');
             if (fechaInicial) {
-                $('#fechaInicial').val(fechaInicial);
+                fechaInicial = MyApp.convertirStringAFecha(fechaInicial);
+                TempusUtil.setDate('datetimepicker-desde', fechaInicial);
             }
 
             var fechaFin = localStorage.getItem('dashboard_fecha_fin');
             if (fechaFin) {
-                $('#fechaFin').val(fechaFin);
+                fechaFin = MyApp.convertirStringAFecha(fechaFin);
+                TempusUtil.setDate('datetimepicker-hasta', fechaInicial);
             }
 
             btnClickFiltrar();

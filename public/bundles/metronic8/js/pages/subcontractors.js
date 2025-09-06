@@ -961,8 +961,8 @@ var Subcontractors = function () {
                 icon: "warning",
                 showCancelButton: true,
                 buttonsStyling: false,
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
                 customClass: {
                     confirmButton: "btn fw-bold btn-success",
                     cancelButton: "btn fw-bold btn-danger"
@@ -1118,7 +1118,7 @@ var Subcontractors = function () {
         });
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
-        oTable.on('draw', function () {
+        oTableNotes.on('draw', function () {
             // init acciones
             initAccionesNotes();
         });
@@ -1248,8 +1248,8 @@ var Subcontractors = function () {
                 icon: "warning",
                 showCancelButton: true,
                 buttonsStyling: false,
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
                 customClass: {
                     confirmButton: "btn fw-bold btn-success",
                     cancelButton: "btn fw-bold btn-danger"
@@ -1308,8 +1308,8 @@ var Subcontractors = function () {
                 icon: "warning",
                 showCancelButton: true,
                 buttonsStyling: false,
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
                 customClass: {
                     confirmButton: "btn fw-bold btn-success",
                     cancelButton: "btn fw-bold btn-danger"

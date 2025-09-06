@@ -135,7 +135,7 @@ class SubcontractorNotesRepository extends ServiceEntityRepository
             'date' => 's_n.date',
             'notes' => 's_n.notes',
         ];
-        $orderBy = $sortable[$sortColumn] ?? 's_n.name';
+        $orderBy = $sortable[$sortColumn] ?? 's_n.date';
         $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)

@@ -157,21 +157,21 @@ class ProjectItemRepository extends EntityRepository
                 ->setParameter('fecha_fin', $fecha_fin);
         }
 
-        // Ordenación
-        switch ($iSortCol_0) {
-            case "company":
-                $qb->orderBy("c.name", $sSortDir_0);
-                break;
-            case "inspector":
-                $qb->orderBy("i.name", $sSortDir_0);
-                break;
-            case "county":
-                $qb->orderBy("c_o.description", $sSortDir_0);
-                break;
-            default:
-                $qb->orderBy("p.$iSortCol_0", $sSortDir_0);
-                break;
-        }
+        // Ordenar por columna especificada
+        $sortable = [
+            'projectId'  => 'p.projectId',
+            'projectNumber' => 'p.projectNumber',
+            'subcontract' => 'p.subcontract',
+            'status' => 'p.status',
+            'county' => 'c_o.description',
+            'name' => 'p.name',
+            'dueDate' => 'p.dueDate',
+            'company' => 'c.name',
+        ];
+        $orderBy = $sortable[$iSortCol_0] ?? 'p.name';
+        $dir     = strtoupper($sSortDir_0) === 'DESC' ? 'DESC' : 'ASC';
+
+        $qb->orderBy($orderBy, $dir);
 
         $qb->groupBy('p.projectId');
 

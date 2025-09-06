@@ -33,7 +33,7 @@ class Item
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Unit')]
     #[ORM\JoinColumn(name: 'unit_id', referencedColumnName: 'unit_id')]
-    private ?Unit $unit;
+    private ?Unit $unit = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Equation')]
     #[ORM\JoinColumn(name: 'equation_id', referencedColumnName: 'equation_id')]

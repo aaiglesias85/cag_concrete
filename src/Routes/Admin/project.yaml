@@ -3,7 +3,7 @@ project:
   defaults: { _controller: App\Controller\Admin\ProjectController::index }
 
 listarProjectAdmin:
-  path: /project/listarProject
+  path: /project/listar
   defaults: { _controller: App\Controller\Admin\ProjectController::listar, _format: json }
 
 salvarProjectAdmin:

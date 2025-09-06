@@ -627,10 +627,10 @@ var Index = function () {
         $(document).off('click', "#btn-view-all-projects");
         $(document).on('click', "#btn-view-all-projects", function (e) {
 
-            var fechaInicial = $('#fechaInicial').val();
+            var fechaInicial = TempusUtil.getString('datetimepicker-desde');
             localStorage.setItem('dashboard_fecha_inicial', fechaInicial);
 
-            var fechaFin = $('#fechaFin').val();
+            var fechaFin = TempusUtil.getString('datetimepicker-hasta');
             localStorage.setItem('dashboard_fecha_fin', fechaFin);
 
             // open
