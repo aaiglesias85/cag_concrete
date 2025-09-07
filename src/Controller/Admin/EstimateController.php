@@ -14,6 +14,7 @@ use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Unit;
 use App\Entity\Usuario;
+use App\Http\DataTablesHelper;
 use App\Utils\Admin\EstimateService;
 use Google\Cloud\Channel\V1\Plan;
 use PHPUnit\Framework\Constraint\Count;
@@ -109,63 +110,42 @@ class EstimateController extends AbstractController
     }
 
     /**
-     * listar Acción que lista los projects
+     * listar Acción que lista los usuarios
      *
      */
     public function listar(Request $request)
     {
-
-        // search filter by keywords
-        $query = !empty($request->get('query')) ? $request->get('query') : array();
-        $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $stage_id = isset($query['stage_id']) && is_string($query['stage_id']) ? $query['stage_id'] : '';
-        $project_type_id = isset($query['project_type_id']) && is_string($query['project_type_id']) ? $query['project_type_id'] : '';
-        $proposal_type_id = isset($query['proposal_type_id']) && is_string($query['proposal_type_id']) ? $query['proposal_type_id'] : '';
-        $status_id = isset($query['status_id']) && is_string($query['status_id']) ? $query['status_id'] : '';
-        $county_id = isset($query['county_id']) && is_string($query['county_id']) ? $query['county_id'] : '';
-        $district_id = isset($query['district_id']) && is_string($query['district_id']) ? $query['district_id'] : '';
-        $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
-        $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
-
-        //Sort
-        $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
-        $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'asc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'name';
-        //$start and $limit
-        $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
-        $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
-        $limit = !empty($pagination['perpage']) ? (int)$pagination['perpage'] : -1;
-        $start = 0;
-
         try {
-            $pages = 1;
-            $total = $this->estimateService->TotalEstimates($sSearch, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
-            if ($limit > 0) {
-                $pages = ceil($total / $limit); // calculate total pages
-                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-                $start = ($page - 1) * $limit;
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
 
-            $meta = array(
-                'page' => $page,
-                'pages' => $pages,
-                'perpage' => $limit,
-                'total' => $total,
-                'field' => $iSortCol_0,
-                'sort' => $sSortDir_0
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'name',  'company', 'bidDeadline', 'estimators', 'stage'],
+                defaultOrderField: 'name'
             );
 
-            $data = $this->estimateService->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+            // filtros
+            $stage_id = $request->get('stage_id');
+            $project_type_id = $request->get('project_type_id');
+            $proposal_type_id = $request->get('proposal_type_id');
+            $status_id = $request->get('status_id');
+            $county_id = $request->get('county_id');
+            $district_id = $request->get('district_id');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
+
+
+            $data = $this->estimateService->ListarEstimates($dt['start'], $dt['length'], $dt['search'], $dt['orderField'], $dt['orderDir'],
                 $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
 
-            $resultadoJson = array(
-                'meta' => $meta,
-                'data' => $data
-            );
+            $total = $this->estimateService->TotalEstimates($dt['search'], $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+
+            $resultadoJson = [
+                'draw'            => $dt['draw'],
+                'data'            => $data,
+                'recordsTotal'    => (int) $total,
+                'recordsFiltered' => (int) $total
+            ];
 
             return $this->json($resultadoJson);
 

@@ -12,8 +12,8 @@ var Reminders = function () {
             url: `reminder/listar`,
             data: function (d) {
                 return $.extend({}, d, {
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
                 });
             },
             method: "post",
@@ -286,8 +286,8 @@ var Reminders = function () {
         // reset
         $('#lista-reminder [data-table-filter="search"]').val('');
 
-        TempusUtil.clear('datetimepicker-desde');
-        TempusUtil.clear('datetimepicker-hasta');
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
         oTable.search('').draw();
     }
@@ -297,9 +297,9 @@ var Reminders = function () {
         // reset form
         MyUtil.resetForm("reminder-form");
 
-        // reset fecha (TempusUtil, sin variables) — solo fecha
-        TempusUtil.clear('datetimepicker-day');
-        TempusUtil.setDate('datetimepicker-day', new Date());
+        // reset fecha (FlatpickrUtil, sin variables) — solo fecha
+        FlatpickrUtil.clear('datetimepicker-day');
+        FlatpickrUtil.setDate('datetimepicker-day', new Date());
 
         // limpiar Quill por selector
         QuillUtil.setHtml('#body', '');
@@ -382,7 +382,7 @@ var Reminders = function () {
                 var subject = $('#subject').val();
                 formData.set("subject", subject);
 
-                var day = TempusUtil.getString('datetimepicker-day');
+                var day = FlatpickrUtil.getString('datetimepicker-day');
                 formData.set("day", day);
 
                 formData.set("body", body);
@@ -512,7 +512,7 @@ var Reminders = function () {
                 QuillUtil.setHtml('#body', reminder.body);
 
                 const day = MyApp.convertirStringAFecha(reminder.day);
-                TempusUtil.setDate('datetimepicker-day', day);
+                FlatpickrUtil.setDate('datetimepicker-day', day);
 
                 $('#estadoactivo').prop('checked', reminder.status);
 
@@ -643,17 +643,17 @@ var Reminders = function () {
 
         // filtros fechas
         const menuEl = document.getElementById('filter-menu');
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
 
-        // Tempus Dominus SOLO FECHA (sin horas)
-        TempusUtil.initDate('datetimepicker-day', {
+        // Flatpickr SOLO FECHA (sin horas)
+        FlatpickrUtil.initDate('datetimepicker-day', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
 

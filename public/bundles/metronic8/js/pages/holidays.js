@@ -12,8 +12,8 @@ var Holidays = function () {
             url: `holiday/listar`,
             data: function (d) {
                 return $.extend({}, d, {
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
                 });
             },
             method: "post",
@@ -260,8 +260,8 @@ var Holidays = function () {
         // reset
         $('#lista-holiday [data-table-filter="search"]').val('');
 
-        TempusUtil.clear('datetimepicker-desde');
-        TempusUtil.clear('datetimepicker-hasta');
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
         oTable.search('').draw();
     }
@@ -271,8 +271,8 @@ var Holidays = function () {
         // reset form
         MyUtil.resetForm("holiday-form");
 
-        // reset fecha (TempusUtil, sin variables) — solo fecha
-        TempusUtil.clear('datetimepicker-day');
+        // reset fecha (FlatpickrUtil, sin variables) — solo fecha
+        FlatpickrUtil.clear('datetimepicker-day');
 
         event_change = false;
     };
@@ -338,7 +338,7 @@ var Holidays = function () {
                 var description = $('#description').val();
                 formData.set("description", description);
 
-                var day = TempusUtil.getString('datetimepicker-day');
+                var day = FlatpickrUtil.getString('datetimepicker-day');
                 formData.set("day", day);
 
                 BlockUtil.block('#form-holiday');
@@ -454,7 +454,7 @@ var Holidays = function () {
                 $('#description').val(holiday.description);
                
                 const day = MyApp.convertirStringAFecha(holiday.day);
-                TempusUtil.setDate('datetimepicker-day', day);
+                FlatpickrUtil.setDate('datetimepicker-day', day);
 
                 event_change = false;
             }
@@ -566,17 +566,17 @@ var Holidays = function () {
 
         // filtros fechas
         const menuEl = document.getElementById('filter-menu');
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
 
-        // Tempus Dominus SOLO FECHA (sin horas)
-        TempusUtil.initDate('datetimepicker-day', {
+        // Flatpickr SOLO FECHA (sin horas)
+        FlatpickrUtil.initDate('datetimepicker-day', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
     }

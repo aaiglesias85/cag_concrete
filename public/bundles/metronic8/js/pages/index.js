@@ -302,11 +302,11 @@ var Index = function () {
 
         // filtros fechas
         const menuEl = document.getElementById('filter-menu');
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
@@ -341,7 +341,7 @@ var Index = function () {
 
         // fecha inicial
         var fecha_inicio = MyApp.getFirstDayOfMonth();
-        TempusUtil.setDate('datetimepicker-desde', fecha_inicio);
+        FlatpickrUtil.setDate('datetimepicker-desde', fecha_inicio);
 
         // change
         $('#filtro-status').change(changeStatus);
@@ -376,14 +376,22 @@ var Index = function () {
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
 
+            // change
+            $('#filtro-status').off('change', changeStatus);
+            $('#filtro-project').off('change', changeProject);
+
             $('#filtro-project').val('');
             $('#filtro-project').trigger('change');
 
             $('#filtro-status').val('');
             $('#filtro-status').trigger('change');
 
-            TempusUtil.clear('datetimepicker-desde');
-            TempusUtil.clear('datetimepicker-hasta');
+            FlatpickrUtil.clear('datetimepicker-desde');
+            FlatpickrUtil.clear('datetimepicker-hasta');
+
+            // change
+            $('#filtro-status').on('change', changeStatus);
+            $('#filtro-project').on('change', changeProject);
 
             btnClickFiltrar();
 
@@ -401,10 +409,10 @@ var Index = function () {
         var status = $('#filtro-status').val();
         formData.set("status", status);
 
-        var fechaInicial = TempusUtil.getString('datetimepicker-desde');
+        var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
         formData.set("fechaInicial", fechaInicial);
 
-        var fechaFin = TempusUtil.getString('datetimepicker-hasta');
+        var fechaFin = FlatpickrUtil.getString('datetimepicker-hasta');
         formData.set("fechaFin", fechaFin);
 
         BlockUtil.block('#card-dashboard');
@@ -627,10 +635,10 @@ var Index = function () {
         $(document).off('click', "#btn-view-all-projects");
         $(document).on('click', "#btn-view-all-projects", function (e) {
 
-            var fechaInicial = TempusUtil.getString('datetimepicker-desde');
+            var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
             localStorage.setItem('dashboard_fecha_inicial', fechaInicial);
 
-            var fechaFin = TempusUtil.getString('datetimepicker-hasta');
+            var fechaFin = FlatpickrUtil.getString('datetimepicker-hasta');
             localStorage.setItem('dashboard_fecha_fin', fechaFin);
 
             // open

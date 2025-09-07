@@ -10,12 +10,12 @@ var ModalReminder = function () {
     var initWidgets = function () {
         initSelectUsuario();
 
-        // Tempus Dominus SOLO FECHA (sin horas)
-        TempusUtil.initDate('datetimepicker-day-reminder-modal', {
+        // Flatpickr SOLO FECHA (sin horas)
+        FlatpickrUtil.initDate('datetimepicker-day-reminder-modal', {
             localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }
         });
         // set default date (hoy)
-        TempusUtil.setDate('datetimepicker-day-reminder-modal', new Date());
+        FlatpickrUtil.setDate('datetimepicker-day-reminder-modal', new Date());
 
         // Quill SIN variables: se gestiona por selector
         QuillUtil.init('#body-reminder-modal');
@@ -96,7 +96,7 @@ var ModalReminder = function () {
             var bodyIsEmpty = !body || body.trim() === '' || body === '<p><br></p>';
 
             // TOMA EL DÍA DESDE TEMPUS (solo fecha)
-            var day = TempusUtil.getString('datetimepicker-day-reminder-modal'); // "dd/MM/yyyy"
+            var day = FlatpickrUtil.getString('datetimepicker-day-reminder-modal'); // "dd/MM/yyyy"
 
             if (validateForm() && usuarios_id.length > 0 && !bodyIsEmpty) {
                 var formData = new URLSearchParams();
@@ -162,9 +162,9 @@ var ModalReminder = function () {
         // reset form
         MyUtil.resetForm("reminder-modal-form");
 
-        // reset fecha (TempusUtil, sin variables) — solo fecha
-        TempusUtil.clear('datetimepicker-day-reminder-modal');
-        TempusUtil.setDate('datetimepicker-day-reminder-modal', new Date());
+        // reset fecha (FlatpickrUtil, sin variables) — solo fecha
+        FlatpickrUtil.clear('datetimepicker-day-reminder-modal');
+        FlatpickrUtil.setDate('datetimepicker-day-reminder-modal', new Date());
 
         // limpiar select usuario
         MyUtil.limpiarSelect('#usuario-reminder-modal');

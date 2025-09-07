@@ -126,17 +126,19 @@ class EstimateProjectTypeRepository extends EntityRepository
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        switch ($iSortCol_0) {
-            case 'type':
-                $consulta->orderBy("t.description", $sSortDir_0);
-                break;
-            case 'estimator':
-                $consulta->orderBy("e.name", $sSortDir_0);
-                break;
-            default:
-                $consulta->orderBy("e.$iSortCol_0", $sSortDir_0);
-                break;
-        }
+        // Ordenar por columna especificada
+        $sortable = [
+            'estimateId'  => 'e.estimateId',
+            'name' => 'e.name',
+            'company' => 'e.name',
+            'bidDeadline' => 'e.bidDeadline',
+            'estimators' => 'e.name',
+            'stage' => 'pr_s.description',
+        ];
+        $orderBy = $sortable[$iSortCol_0] ?? 'e.name';
+        $dir     = strtoupper($sSortDir_0) === 'DESC' ? 'DESC' : 'ASC';
+
+        $consulta->orderBy($orderBy, $dir);
 
         $consulta->groupBy('e.estimateId');
 

@@ -12,8 +12,8 @@ var Advertisements = function () {
             url: `advertisement/listar`,
             data: function (d) {
                 return $.extend({}, d, {
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
                 });
             },
             method: "post",
@@ -272,8 +272,8 @@ var Advertisements = function () {
         // reset
         $('#lista-advertisement [data-table-filter="search"]').val('');
 
-        TempusUtil.clear('datetimepicker-desde');
-        TempusUtil.clear('datetimepicker-hasta');
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
         oTable.search('').draw();
     }
@@ -284,9 +284,9 @@ var Advertisements = function () {
         // reset form
         MyUtil.resetForm("advertisement-form");
 
-        // reset fecha (TempusUtil, sin variables) — solo fecha
-        TempusUtil.clear('datetimepicker-start-date');
-        TempusUtil.clear('datetimepicker-end-date');
+        // reset fecha (FlatpickrUtil, sin variables) — solo fecha
+        FlatpickrUtil.clear('datetimepicker-start-date');
+        FlatpickrUtil.clear('datetimepicker-end-date');
 
         // limpiar Quill por selector
         QuillUtil.setHtml('#description', '');
@@ -377,10 +377,10 @@ var Advertisements = function () {
 
                 formData.set("description", description);
 
-                var start_date = TempusUtil.getString('datetimepicker-start-date');
+                var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
                 formData.set("start_date", start_date);
 
-                var end_date = TempusUtil.getString('datetimepicker-end-date');
+                var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
                 formData.set("end_date", end_date);
 
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
@@ -504,10 +504,10 @@ var Advertisements = function () {
                 QuillUtil.setHtml('#description', advertisement.description);
 
                 const start_date = MyApp.convertirStringAFecha(advertisement.startDate);
-                TempusUtil.setDate('datetimepicker-start-date', start_date);
+                FlatpickrUtil.setDate('datetimepicker-start-date', start_date);
 
                 const end_date = MyApp.convertirStringAFecha(advertisement.endDate);
-                TempusUtil.setDate('datetimepicker-end-date', end_date);
+                FlatpickrUtil.setDate('datetimepicker-end-date', end_date);
 
                 $('#estadoactivo').prop('checked', advertisement.status);
 
@@ -635,20 +635,20 @@ var Advertisements = function () {
 
         // filtros fechas
         const menuEl = document.getElementById('filter-menu');
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
 
-        // Tempus Dominus SOLO FECHA (sin horas)
-        TempusUtil.initDate('datetimepicker-start-date', {
+        // Flatpickr SOLO FECHA (sin horas)
+        FlatpickrUtil.initDate('datetimepicker-start-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
-        TempusUtil.initDate('datetimepicker-end-date', {
+        FlatpickrUtil.initDate('datetimepicker-end-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
 

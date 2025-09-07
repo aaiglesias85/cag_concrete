@@ -417,8 +417,8 @@ var ProjectsDetalle = function () {
             data: function (d) {
                 return $.extend({}, d, {
                     project_id: $('#project_id_detalle').val(),
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde-notes-detalle'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta-notes-detalle'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde-notes-detalle'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta-notes-detalle'),
                 });
             },
             method: "post",
@@ -650,8 +650,8 @@ var ProjectsDetalle = function () {
                 return $.extend({}, d, {
                     project_id: $('#project_id_detalle').val(),
                     pending: $('#pending-data-tracking-detalle').val(),
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde-data-tracking-detalle'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta-data-tracking-detalle'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde-data-tracking-detalle'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta-data-tracking-detalle'),
                 });
             },
             method: "post",
@@ -990,18 +990,18 @@ var ProjectsDetalle = function () {
     var initTempus = function () {
 
         // filtros notes
-        TempusUtil.initDate('datetimepicker-desde-notes-detalle', {
+        FlatpickrUtil.initDate('datetimepicker-desde-notes-detalle', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
-        TempusUtil.initDate('datetimepicker-hasta-notes-detalle', {
+        FlatpickrUtil.initDate('datetimepicker-hasta-notes-detalle', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // filtros data tracking
-        TempusUtil.initDate('datetimepicker-desde-data-tracking-detalle', {
+        FlatpickrUtil.initDate('datetimepicker-desde-data-tracking-detalle', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
-        TempusUtil.initDate('datetimepicker-hasta-data-tracking-detalle', {
+        FlatpickrUtil.initDate('datetimepicker-hasta-data-tracking-detalle', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 

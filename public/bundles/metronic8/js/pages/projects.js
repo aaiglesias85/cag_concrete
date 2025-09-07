@@ -14,8 +14,8 @@ var Projects = function () {
                 return $.extend({}, d, {
                     company_id: $('#filtro-company').val(),
                     status: $('#filtro-status').val(),
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
                 });
             },
             method: "post",
@@ -412,8 +412,8 @@ var Projects = function () {
         $('#filtro-status').val('');
         $('#filtro-status').trigger('change');
 
-        TempusUtil.clear('datetimepicker-desde');
-        TempusUtil.clear('datetimepicker-hasta');
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
         oTable.search('').draw();
     }
@@ -439,9 +439,9 @@ var Projects = function () {
         $('#resurfacing').prop('checked', false);
         $('#certified_payrolls').prop('checked', false);
 
-        TempusUtil.clear('datetimepicker-start-date');
-        TempusUtil.clear('datetimepicker-end-date');
-        TempusUtil.clear('datetimepicker-due-date');
+        FlatpickrUtil.clear('datetimepicker-start-date');
+        FlatpickrUtil.clear('datetimepicker-end-date');
+        FlatpickrUtil.clear('datetimepicker-due-date');
 
         // tooltips selects
         MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
@@ -818,13 +818,13 @@ var Projects = function () {
         var invoice_contact = $('#invoice_contact').val();
         formData.set("invoice_contact", invoice_contact);
 
-        var start_date = TempusUtil.getString('datetimepicker-start-date');
+        var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
         formData.set("start_date", start_date);
 
-        var end_date = TempusUtil.getString('datetimepicker-end-date');
+        var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
         formData.set("end_date", end_date);
 
-        var due_date = TempusUtil.getString('datetimepicker-due-date');
+        var due_date = FlatpickrUtil.getString('datetimepicker-due-date');
         formData.set("due_date", due_date);
 
         formData.set("items", JSON.stringify(items));
@@ -1028,17 +1028,17 @@ var Projects = function () {
 
             if (project.start_date !== '') {
                 const start_date = MyApp.convertirStringAFecha(project.start_date);
-                TempusUtil.setDate('datetimepicker-start-date', start_date);
+                FlatpickrUtil.setDate('datetimepicker-start-date', start_date);
             }
 
             if (project.end_date !== '') {
                 const end_date = MyApp.convertirStringAFecha(project.end_date);
-                TempusUtil.setDate('datetimepicker-end-date', end_date);
+                FlatpickrUtil.setDate('datetimepicker-end-date', end_date);
             }
 
             if (project.due_date !== '') {
                 const due_date = MyApp.convertirStringAFecha(project.due_date);
-                TempusUtil.setDate('datetimepicker-due-date', due_date);
+                FlatpickrUtil.setDate('datetimepicker-due-date', due_date);
             }
 
             // items
@@ -1211,53 +1211,53 @@ var Projects = function () {
     var initTempus = function () {
         // filtros fechas
         const menuEl = document.getElementById('filter-menu');
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
 
         // due date
-        TempusUtil.initDate('datetimepicker-due-date', {
+        FlatpickrUtil.initDate('datetimepicker-due-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // start date
-        TempusUtil.initDate('datetimepicker-start-date', {
+        FlatpickrUtil.initDate('datetimepicker-start-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // end date
-        TempusUtil.initDate('datetimepicker-end-date', {
+        FlatpickrUtil.initDate('datetimepicker-end-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // filtros notes
-        TempusUtil.initDate('datetimepicker-desde-notes', {
+        FlatpickrUtil.initDate('datetimepicker-desde-notes', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
-        TempusUtil.initDate('datetimepicker-hasta-notes', {
+        FlatpickrUtil.initDate('datetimepicker-hasta-notes', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // filtros data tracking
-        TempusUtil.initDate('datetimepicker-desde-data-tracking', {
+        FlatpickrUtil.initDate('datetimepicker-desde-data-tracking', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
-        TempusUtil.initDate('datetimepicker-hasta-data-tracking', {
+        FlatpickrUtil.initDate('datetimepicker-hasta-data-tracking', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // notes date
-        TempusUtil.initDate('datetimepicker-notes-date', {
+        FlatpickrUtil.initDate('datetimepicker-notes-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
         // ajuste precio day
-        TempusUtil.initDate('datetimepicker-ajuste-precio-day', {
+        FlatpickrUtil.initDate('datetimepicker-ajuste-precio-day', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
@@ -1855,8 +1855,8 @@ var Projects = function () {
             data: function (d) {
                 return $.extend({}, d, {
                     project_id: $('#project_id').val(),
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde-notes'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta-notes'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde-notes'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta-notes'),
                 });
             },
             method: "post",
@@ -1963,7 +1963,7 @@ var Projects = function () {
         $(document).on('click', "#btn-salvar-note", function (e) {
             e.preventDefault();
 
-            var date = TempusUtil.getString('datetimepicker-notes-date');
+            var date = FlatpickrUtil.getString('datetimepicker-notes-date');
 
             var notes = QuillUtil.getHtml('#notes');
             var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
@@ -2091,8 +2091,8 @@ var Projects = function () {
 
             e.preventDefault();
 
-            var fechaInicial = TempusUtil.getString('datetimepicker-desde-notes');
-            var fechaFin = TempusUtil.getString('datetimepicker-hasta-notes');
+            var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde-notes');
+            var fechaFin = FlatpickrUtil.getString('datetimepicker-hasta-notes');
 
             if (fechaInicial === '' && fechaFin === '') {
                 toastr.error("Select the dates to delete", "");
@@ -2137,8 +2137,8 @@ var Projects = function () {
                             toastr.success(response.message, "");
 
                             // reset
-                            TempusUtil.clear('datetimepicker-desde');
-                            TempusUtil.clear('datetimepicker-hasta');
+                            FlatpickrUtil.clear('datetimepicker-desde');
+                            FlatpickrUtil.clear('datetimepicker-hasta');
 
                             btnClickFiltrarNotes();
 
@@ -2192,7 +2192,7 @@ var Projects = function () {
             $('#notes_id').val(notes.notes_id);
 
             const date = MyApp.convertirStringAFecha(notes.date);
-            TempusUtil.setDate('datetimepicker-notes-date', date);
+            FlatpickrUtil.setDate('datetimepicker-notes-date', date);
 
             QuillUtil.setHtml('#notes', notes.notes);
         }
@@ -2204,9 +2204,9 @@ var Projects = function () {
 
         QuillUtil.setHtml('#notes', '');
 
-        // reset fecha (TempusUtil, sin variables) — solo fecha
-        TempusUtil.clear('datetimepicker-notes-date');
-        TempusUtil.setDate('datetimepicker-notes-date', new Date());
+        // reset fecha (FlatpickrUtil, sin variables) — solo fecha
+        FlatpickrUtil.clear('datetimepicker-notes-date');
+        FlatpickrUtil.setDate('datetimepicker-notes-date', new Date());
     };
 
     // unit
@@ -2609,8 +2609,8 @@ var Projects = function () {
                 return $.extend({}, d, {
                     project_id: $('#project_id').val(),
                     pending: $('#pending-data-tracking').val(),
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde-data-tracking'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta-data-tracking'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde-data-tracking'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta-data-tracking'),
                 });
             },
             method: "post",
@@ -2918,7 +2918,7 @@ var Projects = function () {
 
             if (validateFormAjustePrecio()) {
 
-                var day = TempusUtil.getString('datetimepicker-ajuste-precio-day');
+                var day = FlatpickrUtil.getString('datetimepicker-ajuste-precio-day');
                 var percent = $('#ajuste_precio_percent').val();
 
                 if (ExisteAjustePrecio(day)) {
@@ -2969,7 +2969,7 @@ var Projects = function () {
                 $('#ajuste_precio_id').val(ajustes_precio[posicion].id);
 
                 const day = MyApp.convertirStringAFecha(ajustes_precio[posicion].day);
-                TempusUtil.setDate('datetimepicker-ajuste-precio-day', day);
+                FlatpickrUtil.setDate('datetimepicker-ajuste-precio-day', day);
 
                 $('#ajuste_precio_percent').val(ajustes_precio[posicion].percent);
 
@@ -3543,13 +3543,13 @@ var Projects = function () {
             var fechaInicial = localStorage.getItem('dashboard_fecha_inicial');
             if (fechaInicial) {
                 fechaInicial = MyApp.convertirStringAFecha(fechaInicial);
-                TempusUtil.setDate('datetimepicker-desde', fechaInicial);
+                FlatpickrUtil.setDate('datetimepicker-desde', fechaInicial);
             }
 
             var fechaFin = localStorage.getItem('dashboard_fecha_fin');
             if (fechaFin) {
                 fechaFin = MyApp.convertirStringAFecha(fechaFin);
-                TempusUtil.setDate('datetimepicker-hasta', fechaInicial);
+                FlatpickrUtil.setDate('datetimepicker-hasta', fechaInicial);
             }
 
             btnClickFiltrar();

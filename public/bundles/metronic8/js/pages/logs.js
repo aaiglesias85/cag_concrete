@@ -12,8 +12,8 @@ var Logs = function () {
             url: `log/listar`,
             data: function (d) {
                 return $.extend({}, d, {
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
                 });
             },
             method: "post",
@@ -263,8 +263,8 @@ var Logs = function () {
         // reset
         $('#lista-log [data-table-filter="search"]').val('');
 
-        TempusUtil.clear('datetimepicker-desde');
-        TempusUtil.clear('datetimepicker-hasta');
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
         oTable.search('').draw();
     }
@@ -373,11 +373,11 @@ var Logs = function () {
 
         // filtros fechas
         const menuEl = document.getElementById('filter-menu');
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: menuEl
         });

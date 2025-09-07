@@ -984,7 +984,10 @@ class EstimateService extends Base
             }
         }
 
-        if (!empty($estimators_id)) {
+        if ($estimators_id !== '') {
+
+            $estimators_id = explode(',', $estimators_id);
+
             foreach ($estimators_id as $estimator_id) {
                 $user_entity = $this->getDoctrine()->getRepository(Usuario::class)
                     ->find($estimator_id);
@@ -1014,7 +1017,10 @@ class EstimateService extends Base
             }
         }
 
-        if (!empty($project_types_id)) {
+        if ($project_types_id !== '') {
+
+            $project_types_id = explode(',', $project_types_id);
+
             foreach ($project_types_id as $project_type_id) {
                 $project_type_entity = $this->getDoctrine()->getRepository(ProjectType::class)
                     ->find($project_type_id);
@@ -1138,18 +1144,18 @@ class EstimateService extends Base
         }
 
         // Badge principal
-        $html .= '<span class="badge badge-info" style="' . $estiloPrincipal . '" title="' . $primerNombre . '">' . $primerNombre_truncado . '</span>';
+        $html .= '<span class="badge badge-primary" style="' . $estiloPrincipal . '" title="' . $primerNombre . '">' . $primerNombre_truncado . '</span>';
 
         if (count($restantes) > 0) {
             // Badges del popover
             $contenidoPopover = implode('', array_map(function ($c) use ($estiloBase) {
                 $c = htmlspecialchars($c, ENT_QUOTES, 'UTF-8');
-                return '<div class="mb-1"><span class="badge badge-info" style="' . $estiloBase . '">' . $c . '</span></div>';
+                return '<div class="mb-1"><span class="badge badge-primary" style="' . $estiloBase . '">' . $c . '</span></div>';
             }, $restantes));
 
             $dataContent = htmlspecialchars($contenidoPopover, ENT_QUOTES, 'UTF-8');
 
-            $html .= '<span class="badge badge-info popover-company" data-toggle="popover" data-html="true" data-content="' . $dataContent . '" style="' . $estiloBase . '">+' . count($restantes) . '</span>';
+            $html .= '<span class="badge badge-primary popover-company" data-toggle="popover" data-html="true" data-content="' . $dataContent . '" style="' . $estiloBase . '">+' . count($restantes) . '</span>';
         }
 
         $html .= '</div>';

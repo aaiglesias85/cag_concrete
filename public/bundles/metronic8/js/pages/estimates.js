@@ -1,270 +1,364 @@
 var Estimates = function () {
 
-    var oTable;
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#estimate-table-editable');
+        const table = "#estimate-table-editable";
 
-        var table = $('#estimate-table-editable');
+        // datasource
+        const datasource = {
+            url: `estimate/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    stage_id: $('#filtro-stage').val(),
+                    project_type_id: $('#filtro-project-type').val(),
+                    proposal_type_id: $('#filtro-proposal-type').val(),
+                    status_id: $('#filtro-plan-status').val(),
+                    county_id: $('#filtro-county').val(),
+                    district_id: $('#filtro-district').val(),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
+
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
+            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
+
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+
+            // init pop over
+            setTimeout(function () {
+                $('.popover-company').popover({
+                    trigger: 'hover',
+                    html: true,
+                    placement: 'top',
+                    container: 'body' // muy importante si están dentro de scrolls/tablas
+                });
+            }, 500);
+
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
 
         if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
+            columns.push({data: 'id'});
         }
-        aoColumns.push(
+
+        columns.push(
+            {data: 'name'},
+            {data: 'company'},
+            {data: 'bidDeadline'},
+            {data: 'estimators'},
+            {data: 'stage'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
             {
-                field: "name",
-                title: "Name",
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
             },
             {
-                field: "company",
-                title: "Companies",
-                width: 200,
-            },
-            {
-                field: "bidDeadline",
-                title: "Bid Deadline",
-                width: 150,
-            },
-            {
-                field: "estimators",
-                title: "Estimators",
-                width: 200,
-                template: function (row) {
-                    return `<div class="d-flex" style="gap: 5px;">${row.estimators}</div>`;
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 300);
                 }
             },
             {
-                field: "stage",
-                title: "Stage",
-                width: 150,
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
             },
             {
-                field: "acciones",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<div class="d-flex" style="gap: 5px;">${data}</div>`;
+                }
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 300);
+                    }
+                },
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        return `<div class="d-flex" style="gap: 5px;">${data}</div>`;
+                    }
+                },
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+                },
             }
         );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'estimate/listar',
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-estimate [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-estimate [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Estimates';
+        var table = document.querySelector('#estimate-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
                 },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
                     }
                 }
-            },
-        });
+            ]
+        }).container().appendTo($('#estimate-table-editable-buttons'));
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#estimate-table-editable');
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#estimate_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
 
-                // init pop over
-                setTimeout(function () {
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
 
-                    // Volver a inicializar popovers
-                    $('.popover-company').popover({
-                        trigger: 'hover',
-                        html: true,
-                        placement: 'top',
-                        container: 'body' // muy importante si están dentro de scrolls/tablas
-                    });
-
-                }, 500);
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#estimate-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#estimate-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#estimate-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#estimate-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
+                // Trigger click event on hidden datatable export buttons
+                target.click();
             });
+        });
+    }
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-estimate .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
-
-    //Filtrar
-    var mostrar_filtros = false;
-    var initAccionFiltrar = function () {
-
-        $(document).off('click', "#btn-filter");
-        $(document).on('click', "#btn-filter", function (e) {
-            mostrar_filtros = !mostrar_filtros;
-
-            if (mostrar_filtros) {
-                $('#div-filters').removeClass('m--hide');
-                $(this).html('<span><i class="la la-filter mr-1"></i><span>Hide Filters</span></span>');
-
-            } else {
-                $('#div-filters').addClass('m--hide');
-                $(this).html('<span><i class="la la-filter mr-1"></i><span>Show Filters</span></span>');
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
             }
         });
 
-        $(document).off('click', "#btn-reset-filtrar");
-        $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-estimate .m_form_search').val('');
-
-            $('#filtro-stage').val('');
-            $('#filtro-stage').trigger('change');
-
-            $('#filtro-project-type').val('');
-            $('#filtro-project-type').trigger('change');
-
-            $('#filtro-proposal-type').val('');
-            $('#filtro-proposal-type').trigger('change');
-
-            $('#filtro-plan-status').val('');
-            $('#filtro-plan-status').trigger('change');
-
-            $('#filtro-county').val('');
-            $('#filtro-county').trigger('change');
-
-            // limpiar select
-            MyApp.limpiarSelect('#filtro-district');
-
-            $('#fechaInicial').val('');
-
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
         });
+
+        // Función para seleccionar todas las filas
+        $(`.check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-estimate').removeClass('hide');
+        } else {
+            $('#btn-eliminar-estimate').addClass('hide');
+        }
+    }
+
+    //Filtrar
+    var initAccionFiltrar = function () {
 
         $(document).off('click', "#btn-filtrar");
         $(document).on('click', "#btn-filtrar", function (e) {
             btnClickFiltrar();
         });
 
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+            btnClickResetFilters();
+        });
+
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-estimate .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-estimate [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-estimate [data-table-filter="search"]').val('');
 
-        var stage_id = $('#filtro-stage').val();
-        query.stage_id = stage_id;
+        $('#filtro-stage').val('');
+        $('#filtro-stage').trigger('change');
 
-        var project_type_id = $('#filtro-project-type').val();
-        query.project_type_id = project_type_id;
+        $('#filtro-project-type').val('');
+        $('#filtro-project-type').trigger('change');
 
-        var proposal_type_id = $('#filtro-proposal-type').val();
-        query.proposal_type_id = proposal_type_id;
+        $('#filtro-proposal-type').val('');
+        $('#filtro-proposal-type').trigger('change');
 
-        var status_id = $('#filtro-plan-status').val();
-        query.status_id = status_id;
+        $('#filtro-plan-status').val('');
+        $('#filtro-plan-status').trigger('change');
 
-        var county_id = $('#filtro-county').val();
-        query.county_id = county_id;
+        $('#filtro-county').val('');
+        $('#filtro-county').trigger('change');
 
-        var district_id = $('#filtro-district').val();
-        query.district_id = district_id;
+        // limpiar select
+        MyApp.limpiarSelect('#filtro-district');
 
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        oTable.search('').draw();
     }
 
     //Reset forms
     var resetForms = function () {
-        $('#estimate-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#estimate-bid-details-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#bid-information-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#bid-information-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("estimate-form");
 
         $('#estimator').val([]);
         $('#estimator').trigger('change');
@@ -302,8 +396,17 @@ var Estimates = function () {
 
         $('#quoteReceived').prop('checked', false);
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        FlatpickrUtil.clear('datetimepicker-bidDeadline');
+        FlatpickrUtil.clear('datetimepicker-jobWalk');
+        FlatpickrUtil.clear('datetimepicker-rfiDueDate');
+        FlatpickrUtil.clear('datetimepicker-projectStart');
+        FlatpickrUtil.clear('datetimepicker-projectEnd');
+        FlatpickrUtil.clear('datetimepicker-submittedDate');
+        FlatpickrUtil.clear('datetimepicker-awardedDate');
+        FlatpickrUtil.clear('datetimepicker-lostDate');
+
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("estimate-form"));
 
         //bid deadlines
         bid_deadlines = [];
@@ -326,46 +429,182 @@ var Estimates = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#estimate-form").validate({
-            rules: {
-                name: {
-                    required: true
-                }
+        var form = KTUtil.get('estimate-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+        return result;
+    };
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 1;
+    var initWizard = function () {
+        $(document).off('click', "#form-estimate .wizard-tab");
+        $(document).on('click', "#form-estimate .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
 
-                });
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
             }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
+            //bug visual de la tabla que muestra las cols corridas
+            switch (activeTab) {
+                case 2:
+                    actualizarTableListaBidDeadLines();
+                    break;
+                case 3:
+                    actualizarTableListaItems()
+                    break;
+                // case 4:
+                //     actualizarTableListaProjectInformation();
+                //    break;
+            }
+
         });
 
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-bid-details').tab('show');
+                    break;
+                case 3:
+                    $('#tab-quotes').tab('show');
+                    actualizarTableListaItems();
+                    break;
+                // case 4:
+                //     $('#tab-project-information').tab('show');
+                //     actualizarTableListaProjectInformation();
+                //     break;
+                case 4:
+                    $('#tab-bid-information').tab('show');
+                    break;
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 1;
+        mostrarTab();
+        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("estimate-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function () {
+        var result = true;
+        if (activeTab == 1) {
+
+            var stage_id = $('#project-stage').val();
+
+            if (!validateForm() || stage_id == '') {
+                result = false;
+
+                if (stage_id == "") {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project-stage"), "This field is required");
+                }
+            }
+
+        }
+
+        return result;
+    }
+
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("estimate-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("estimate-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
     };
 
     //Nuevo
@@ -377,12 +616,18 @@ var Estimates = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new project estimate? Follow the next steps:";
-            $('#form-estimate-title').html(formTitle);
-            $('#form-estimate').removeClass('m--hide');
-            $('#lista-estimate').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-estimate'), '.card-label').innerHTML = "New Project Estimate:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-estimate'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-estimate'), 'hide');
+    }
+
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
@@ -391,128 +636,149 @@ var Estimates = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
             var stage_id = $('#project-stage').val();
 
-            if ($('#estimate-form').valid() && stage_id !== "") {
+            if (validateForm() && stage_id !== "") {
 
                 SalvarEstimate();
 
             } else {
-
                 if (stage_id === "") {
-                    var $element = $('#select-project-stage .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project-stage"), "This field is required");
                 }
             }
         };
     }
 
-    var SalvarEstimate = function (next = false) {
+    var SalvarEstimate = function () {
+
+        var formData = new URLSearchParams();
+
         var estimate_id = $('#estimate_id').val();
+        formData.set("estimate_id", estimate_id);
 
         var name = $('#name').val();
-        var bidDeadline = $('#bidDeadline').val();
-        var estimators_id = $('#estimator').val();
-        var stage_id = $('#project-stage').val();
-        var county_id = $('#county').val();
-        var project_types_id = $('#project-type').val();
-        var proposal_type_id = $('#proposal-type').val();
-        var status_id = $('#plan-status').val();
-        var district_id = $('#district').val();
-        var project_id = $('#project_id').val();
-        var priority = $('#priority').val();
-        var bidNo = $('#bidNo').val();
-        var workHour = $('#workHour').val();
-        var phone = $('#phone').val();
-        var email = $('#email').val();
+        formData.set("name", name);
 
-        var jobWalk = $('#jobWalk').val();
-        var rfiDueDate = $('#rfiDueDate').val();
-        var projectStart = $('#projectStart').val();
-        var projectEnd = $('#projectEnd').val();
-        var submittedDate = $('#submittedDate').val();
-        var awardedDate = $('#awardedDate').val();
-        var lostDate = $('#lostDate').val();
+
+        var bidDeadline = FlatpickrUtil.getString('datetimepicker-bidDeadline');
+        formData.set("bidDeadline", bidDeadline);
+
+        var estimators_id = $('#estimator').val();
+        formData.set("estimators_id", estimators_id.join(','));
+
+        var stage_id = $('#project-stage').val();
+        formData.set("stage_id", stage_id);
+
+        var county_id = $('#county').val();
+        formData.set("county_id", county_id);
+
+        var project_types_id = $('#project-type').val();
+        formData.set("project_types_id", project_types_id.join(','));
+
+        var proposal_type_id = $('#proposal-type').val();
+        formData.set("proposal_type_id", proposal_type_id);
+
+        var status_id = $('#plan-status').val();
+        formData.set("status_id", status_id);
+
+        var district_id = $('#district').val();
+        formData.set("district_id", district_id);
+
+        var project_id = $('#project_id').val();
+        formData.set("project_id", project_id);
+
+        var priority = $('#priority').val();
+        formData.set("priority", priority);
+
+        var bidNo = $('#bidNo').val();
+        formData.set("bidNo", bidNo);
+
+        var workHour = $('#workHour').val();
+        formData.set("workHour", workHour);
+
+        var phone = $('#phone').val();
+        formData.set("phone", phone);
+
+        var email = $('#email').val();
+        formData.set("email", email);
+
+
+        var jobWalk = FlatpickrUtil.getString('datetimepicker-jobWalk');
+        formData.set("jobWalk", jobWalk);
+
+        var rfiDueDate = FlatpickrUtil.getString('datetimepicker-rfiDueDate');
+        formData.set("rfiDueDate", rfiDueDate);
+
+        var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
+        formData.set("projectStart", projectStart);
+
+        var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
+        formData.set("projectEnd", projectEnd);
+
+        var submittedDate = FlatpickrUtil.getString('datetimepicker-submittedDate');
+        formData.set("submittedDate", submittedDate);
+
+        var awardedDate = FlatpickrUtil.getString('datetimepicker-awardedDate');
+        formData.set("awardedDate", awardedDate);
+
+        var lostDate = FlatpickrUtil.getString('datetimepicker-lostDate');
+        formData.set("lostDate", lostDate);
+
         var location = $('#location').val();
+        formData.set("location", location);
+
         var sector = $('#sector').val();
+        formData.set("sector", sector);
+
         var plan_downloading_id = $('#plan-downloading').val();
+        formData.set("plan_downloading_id", plan_downloading_id);
+
         var bidDescription = $('#bidDescription').val();
+        formData.set("bidDescription", bidDescription);
+
         var bidInstructions = $('#bidInstructions').val();
+        formData.set("bidInstructions", bidInstructions);
+
         var planLink = $('#planLink').val();
+        formData.set("planLink", planLink);
+
         var quoteReceived = $('#quoteReceived').prop('checked') ? 1 : 0;
+        formData.set("quoteReceived", quoteReceived);
+
+        formData.set("bid_deadlines", JSON.stringify(bid_deadlines));
+        formData.set("companys", JSON.stringify(companys));
+
 
         BlockUtil.block('#form-estimate');
 
-        $.ajax({
-            type: "POST",
-            url: "estimate/salvar",
-            dataType: "json",
-            data: {
-                'estimate_id': estimate_id,
-                'name': name,
-                'bidDeadline': bidDeadline,
-                'estimators_id': estimators_id,
-                'stage_id': stage_id,
-                'county_id': county_id,
-                'project_types_id': project_types_id,
-                'proposal_type_id': proposal_type_id,
-                'status_id': status_id,
-                'district_id': district_id,
-                'project_id': project_id,
-                'priority': priority,
-                'bidNo': bidNo,
-                'workHour': workHour,
-                'phone': phone,
-                'email': email,
-                'jobWalk': jobWalk,
-                'rfiDueDate': rfiDueDate,
-                'projectStart': projectStart,
-                'projectEnd': projectEnd,
-                'submittedDate': submittedDate,
-                'awardedDate': awardedDate,
-                'lostDate': lostDate,
-                'location': location,
-                'sector': sector,
-                'bidDescription': bidDescription,
-                'bidInstructions': bidInstructions,
-                'planLink': planLink,
-                'quoteReceived': quoteReceived,
-                'plan_downloading_id': plan_downloading_id,
-                'bid_deadlines': JSON.stringify(bid_deadlines),
-                'companys': JSON.stringify(companys),
-            },
-            success: function (response) {
-                BlockUtil.unblock('#form-estimate');
-                if (response.success) {
+        axios.post("estimate/salvar", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    BlockUtil.unblock("#form-project");
+                    if (response.success) {
+                        toastr.success(response.message, "");
 
-                    toastr.success(response.message, "Success");
+                        cerrarForms();
 
-                    cerrarForms();
+                        btnClickFiltrar();
 
-                    btnClickFiltrar();
-
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
                 BlockUtil.unblock('#form-estimate');
-
-                toastr.error(response.error, "");
-            }
-        });
+            });
     }
 
     //Cerrar form
@@ -520,9 +786,6 @@ var Estimates = function () {
         $(document).off('click', ".cerrar-form-estimate");
         $(document).on('click', ".cerrar-form-estimate", function (e) {
             cerrarForms();
-
-            // actualizar listado
-            btnClickFiltrar();
         });
     }
     //Cerrar forms
@@ -530,9 +793,8 @@ var Estimates = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -551,8 +813,8 @@ var Estimates = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-estimate').addClass('m--hide');
-        $('#lista-estimate').removeClass('m--hide');
+        $('#form-estimate').addClass('hide');
+        $('#lista-estimate').removeClass('hide');
     };
 
     //Editar
@@ -565,129 +827,146 @@ var Estimates = function () {
             var estimate_id = $(this).data('id');
             $('#estimate_id').val(estimate_id);
 
-            $('#form-estimate').removeClass('m--hide');
-            $('#lista-estimate').addClass('m--hide');
+            mostrarForm()
 
-            editRow(estimate_id, false);
+            editRow(estimate_id);
         });
     };
 
-    function editRow(estimate_id, editar_notas, next = false) {
+    function editRow(estimate_id) {
+
+        var formData = new URLSearchParams();
+        formData.set("estimate_id", estimate_id);
 
         BlockUtil.block('#form-estimate');
 
-        $.ajax({
-            type: "POST",
-            url: "estimate/cargarDatos",
-            dataType: "json",
-            data: {
-                'estimate_id': estimate_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#form-estimate');
-                if (response.success) {
-                    //Datos estimate
+        axios.post("estimate/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    var formTitle = "You want to update the project estimate? Follow the next steps:";
-                    $('#form-estimate-title').html(formTitle);
+                        //cargar datos
+                        cargarDatos(response.estimate);
 
-                    $('#name').val(response.estimate.name);
-                    $('#bidDeadline').val(response.estimate.bidDeadline);
-
-                    $('#project_id').val(response.estimate.project_id);
-                    $('#bidNo').val(response.estimate.bidNo);
-                    $('#workHour').val(response.estimate.workHour);
-
-                    $('#estimator').val(response.estimate.estimators_id);
-                    $('#estimator').trigger('change');
-
-                    $('#project-stage').val(response.estimate.stage_id);
-                    $('#project-stage').trigger('change');
-
-                    $('#project-type').val(response.estimate.project_types_id);
-                    $('#project-type').trigger('change');
-
-                    $('#proposal-type').val(response.estimate.proposal_type_id);
-                    $('#proposal-type').trigger('change');
-
-                    $('#plan-status').val(response.estimate.status_id);
-                    $('#plan-status').trigger('change');
-
-                    // select dependientes
-                    $(document).off('change', "#county", changeCounty);
-
-                    $('#county').val(response.estimate.county_id);
-                    $('#county').trigger('change');
-
-                    $('#district').val(response.estimate.district_id);
-                    $('#district').trigger('change');
-
-                    $(document).on('change', "#county", changeCounty);
-
-                    $('#priority').val(response.estimate.priority);
-                    $('#priority').trigger('change');
-
-                    // phone
-                    if (response.estimate.phone != "" && response.estimate.phone != null) {
-                        $('#phone').importTags(response.estimate.phone);
+                    } else {
+                        toastr.error(response.error, "");
                     }
-
-                    // email
-                    if (response.estimate.email != "" && response.estimate.email != null) {
-                        $('#email').importTags(response.estimate.email);
-                    }
-
-                    $('#jobWalk').val(response.estimate.jobWalk);
-                    $('#rfiDueDate').val(response.estimate.rfiDueDate);
-                    $('#projectStart').val(response.estimate.projectStart);
-                    $('#projectEnd').val(response.estimate.projectEnd);
-                    $('#submittedDate').val(response.estimate.submittedDate);
-                    $('#awardedDate').val(response.estimate.awardedDate);
-                    $('#lostDate').val(response.estimate.lostDate);
-                    $('#location').val(response.estimate.location);
-
-                    $('#sector').val(response.estimate.sector);
-                    $('#sector').trigger('change');
-
-                    $('#plan-downloading').val(response.estimate.plan_downloading_id);
-                    $('#plan-downloading').trigger('change');
-
-                    $('#bidDescription').val(response.estimate.bidDescription);
-                    $('#bidInstructions').val(response.estimate.bidInstructions);
-                    $('#planLink').val(response.estimate.planLink);
-                    $('#quoteReceived').prop('checked', response.estimate.quoteReceived);
-
-                    // bid deadlines
-                    bid_deadlines = response.estimate.bid_deadlines;
-                    actualizarTableListaBidDeadLines();
-                    actualizarTableListaProjectInformation();
-
-                    // items
-                    items = response.estimate.items;
-                    actualizarTableListaItems();
-
-                    // companys
-                    companys = response.estimate.companys;
-                    actualizarTableListaCompanysEstimate();
-
-
-                    // habilitar tab
-                    totalTabs = 4;
-                    $('#btn-wizard-siguiente').removeClass('m--hide');
-                    $('.nav-item-hide').removeClass('m--hide');
-
-                    event_change = false;
-
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#form-estimate');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-estimate");
+            });
 
-                toastr.error(response.error, "");
+        function cargarDatos(estimate) {
+
+            KTUtil.find(KTUtil.get("form-estimate"), ".card-label").innerHTML = "Update Project Estimate: " + estimate.name;
+
+            $('#name').val(estimate.name);
+            $('#bidDeadline').val(estimate.bidDeadline);
+
+            $('#project_id').val(estimate.project_id);
+            $('#bidNo').val(estimate.bidNo);
+            $('#workHour').val(estimate.workHour);
+
+            $('#estimator').val(estimate.estimators_id);
+            $('#estimator').trigger('change');
+
+            $('#project-stage').val(estimate.stage_id);
+            $('#project-stage').trigger('change');
+
+            $('#project-type').val(estimate.project_types_id);
+            $('#project-type').trigger('change');
+
+            $('#proposal-type').val(estimate.proposal_type_id);
+            $('#proposal-type').trigger('change');
+
+            $('#plan-status').val(estimate.status_id);
+            $('#plan-status').trigger('change');
+
+            // select dependientes
+            $(document).off('change', "#county", changeCounty);
+
+            $('#county').val(estimate.county_id);
+            $('#county').trigger('change');
+
+            $('#district').val(estimate.district_id);
+            $('#district').trigger('change');
+
+            $(document).on('change', "#county", changeCounty);
+
+            $('#priority').val(estimate.priority);
+            $('#priority').trigger('change');
+
+            // phone
+            if (estimate.phone != "" && estimate.phone != null) {
+                $('#phone').importTags(estimate.phone);
             }
-        });
+
+            // email
+            if (estimate.email != "" && estimate.email != null) {
+                $('#email').importTags(estimate.email);
+            }
+
+            const jobWalk = MyApp.convertirStringAFecha(estimate.jobWalk);
+            FlatpickrUtil.setDate('datetimepicker-jobWalk', jobWalk);
+
+            const rfiDueDate = MyApp.convertirStringAFecha(estimate.rfiDueDate);
+            FlatpickrUtil.setDate('datetimepicker-rfiDueDate', rfiDueDate);
+
+            const projectStart = MyApp.convertirStringAFecha(estimate.projectStart);
+            FlatpickrUtil.setDate('datetimepicker-projectStart', projectStart);
+
+            const projectEnd = MyApp.convertirStringAFecha(estimate.projectEnd);
+            FlatpickrUtil.setDate('datetimepicker-projectEnd', projectEnd);
+
+            const submittedDate = MyApp.convertirStringAFecha(estimate.submittedDate);
+            FlatpickrUtil.setDate('datetimepicker-submittedDate', submittedDate);
+
+            const awardedDate = MyApp.convertirStringAFecha(estimate.awardedDate);
+            FlatpickrUtil.setDate('datetimepicker-awardedDate', awardedDate);
+
+            const lostDate = MyApp.convertirStringAFecha(estimate.lostDate);
+            FlatpickrUtil.setDate('datetimepicker-lostDate', lostDate);
+
+            $('#location').val(estimate.location);
+
+            $('#sector').val(estimate.sector);
+            $('#sector').trigger('change');
+
+            $('#plan-downloading').val(estimate.plan_downloading_id);
+            $('#plan-downloading').trigger('change');
+
+            $('#bidDescription').val(estimate.bidDescription);
+            $('#bidInstructions').val(estimate.bidInstructions);
+            $('#planLink').val(estimate.planLink);
+            $('#quoteReceived').prop('checked', estimate.quoteReceived);
+
+            // bid deadlines
+            bid_deadlines = estimate.bid_deadlines;
+            actualizarTableListaBidDeadLines();
+            actualizarTableListaProjectInformation();
+
+            // items
+            items = estimate.items;
+            actualizarTableListaItems();
+
+            // companys
+            companys = estimate.companys;
+            actualizarTableListaCompanysEstimate();
+
+
+            // habilitar tab
+            totalTabs = 4;
+            $('#btn-wizard-siguiente').removeClass('hide');
+            $('.nav-item-hide').removeClass('hide');
+
+            event_change = false;
+
+        }
 
     }
 
@@ -698,9 +977,8 @@ var Estimates = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-eliminar-estimate");
@@ -719,20 +997,10 @@ var Estimates = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#estimate-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
                 toastr.error('Select estimates to delete', "");
             }
@@ -741,83 +1009,72 @@ var Estimates = function () {
         function btnClickModalEliminar() {
             var estimate_id = rowDelete;
 
-            BlockUtil.block('#estimate-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("estimate_id", estimate_id);
 
-            $.ajax({
-                type: "POST",
-                url: "estimate/eliminar",
-                dataType: "json",
-                data: {
-                    'estimate_id': estimate_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#estimate-table-editable');
+            BlockUtil.block('#lista-estimate');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("estimate/eliminar", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "Success");
-
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#estimate-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-estimate");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#estimate-table-editable').join(',');
 
-            BlockUtil.block('#estimate-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "estimate/eliminarEstimates",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#estimate-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        oTable.load();
-                        toastr.success(response.message, "Success");
+            BlockUtil.block('#lista-estimate');
 
+            axios.post("estimate/eliminarEstimates", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#estimate-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-estimate");
+                });
         };
     };
 
 
     var initWidgets = function () {
 
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('.m-select2').select2();
+        initTempus();
 
-        $('#item').select2({
+        $('.select-modal-item').select2({
             dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
         });
 
@@ -973,29 +1230,89 @@ var Estimates = function () {
         $('#item').change(changeItem);
         $('#yield-calculation').change(changeYield);
 
-        $(document).off('switchChange.bootstrapSwitch', '#item-type');
-        $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
+        $(document).off('click', '.item-type');
+        $(document).on('click', '.item-type', changeItemType);
 
     }
 
-    var changeItemType = function (event, state) {
+    var initTempus = function () {
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        FlatpickrUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+
+        // bidDeadline
+        FlatpickrUtil.initDate('datetimepicker-bidDeadline', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // jobWalk
+        FlatpickrUtil.initDate('datetimepicker-jobWalk', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // rfiDueDate
+        FlatpickrUtil.initDate('datetimepicker-rfiDueDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // projectStart
+        FlatpickrUtil.initDate('datetimepicker-projectStart', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // projectEnd
+        FlatpickrUtil.initDate('datetimepicker-projectEnd', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // submittedDate
+        FlatpickrUtil.initDate('datetimepicker-submittedDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // awardedDate
+        FlatpickrUtil.initDate('datetimepicker-awardedDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // lostDate
+        FlatpickrUtil.initDate('datetimepicker-lostDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // bid-deadline-date
+        FlatpickrUtil.initDate('datetimepicker-bid-deadline-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+    }
+
+    var changeItemType = function () {
+
+        var state = $('#item-type-existing').prop('checked');
 
         // reset
         $('#item').val('');
         $('#item').trigger('change');
-        $('#div-item').removeClass('m--hide');
+        $('#div-item').removeClass('hide');
 
         $('#item-name').val('');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
+        $('#item-name').removeClass('hide').addClass('hide');
 
         $('#unit').val('');
         $('#unit').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
+        $('#select-unit').removeClass('hide').addClass('hide');
 
         if (!state) {
-            $('#div-item').removeClass('m--hide').addClass('m--hide');
-            $('#item-name').removeClass('m--hide');
-            $('#select-unit').removeClass('m--hide');
+            $('#div-item').removeClass('hide').addClass('hide');
+            $('#item-name').removeClass('hide');
+            $('#select-unit').removeClass('hide');
         }
     }
 
@@ -1005,10 +1322,10 @@ var Estimates = function () {
         // reset
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
         if (yield_calculation == 'equation') {
-            $('#select-equation').removeClass('m--hide');
+            $('#select-equation').removeClass('hide');
         }
     }
 
@@ -1092,33 +1409,32 @@ var Estimates = function () {
         MyApp.limpiarSelect('#contact');
 
         if (company_id !== '') {
+
+            var formData = new URLSearchParams();
+
+            formData.set("company_id", company_id);
+
             BlockUtil.block('#select-contact');
 
-            $.ajax({
-                type: "POST",
-                url: "company/listarContacts",
-                dataType: "json",
-                data: {
-                    'company_id': company_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#select-contact');
-                    if (response.success) {
-
-                        // llenar select
-                        contacts_company = response.contacts;
-                        actualizarSelectContacts();
-
+            axios.post("company/listarContacts", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            // llenar select
+                            contacts_company = response.contacts;
+                            actualizarSelectContacts();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#select-contact');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#select-contact");
+                });
         }
     }
     var actualizarSelectContacts = function () {
@@ -1149,155 +1465,6 @@ var Estimates = function () {
 
     }
 
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-estimate');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 1;
-    var initWizard = function () {
-        $(document).off('click', "#form-estimate .wizard-tab");
-        $(document).on('click', "#form-estimate .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    actualizarTableListaBidDeadLines();
-                    break;
-                case 3:
-                    actualizarTableListaItems()
-                    break;
-                // case 4:
-                //     actualizarTableListaProjectInformation();
-                //    break;
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab == totalTabs) {
-                    $('#btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-bid-details').tab('show');
-                    break;
-                case 3:
-                    $('#tab-quotes').tab('show');
-                    actualizarTableListaItems();
-                    break;
-                // case 4:
-                //     $('#tab-project-information').tab('show');
-                //     actualizarTableListaProjectInformation();
-                //     break;
-                case 4:
-                    $('#tab-bid-information').tab('show');
-                    break;
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 1;
-        mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab == 1) {
-
-            var stage_id = $('#project-stage').val();
-
-            if (!$('#estimate-form').valid() || stage_id == '') {
-                result = false;
-
-                if (stage_id == "") {
-
-                    var $element = $('#select-project-stage .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-            }
-
-        }
-
-        return result;
-    }
-
     var initAccionesCompany = function () {
         $(document).off('click', ".btn-add-company");
         $(document).on('click', ".btn-add-company", function (e) {
@@ -1322,16 +1489,7 @@ var Estimates = function () {
             if (company_id !== "") {
                 ModalContactCompany.mostrarModal(company_id);
             } else {
-                var $element = $('#select-company .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
+                MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company"), "This field is required");
             }
 
 
@@ -1366,7 +1524,7 @@ var Estimates = function () {
             $('#project-stage-change').val(stage_id);
             $('#project-stage-change').trigger('change');
 
-            $('#modal-project-stage').modal('show');
+            ModalUtil.show('modal-project-stage', {backdrop: 'static', keyboard: true});
 
         });
 
@@ -1379,49 +1537,41 @@ var Estimates = function () {
 
                 var estimate_id = $('#estimate_id').val();
 
+                var formData = new URLSearchParams();
+                formData.set("estimate_id", estimate_id);
+                formData.set("stage_id", stage_id);
+
                 BlockUtil.block('.modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "estimate/cambiarStage",
-                    dataType: "json",
-                    data: {
-                        'estimate_id': estimate_id,
-                        'stage_id': stage_id,
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('.modal-content');
-                        if (response.success) {
+                axios.post("estimate/cambiarStage", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
 
-                            toastr.success(response.message, "Success");
+                                toastr.success(response.message, "");
 
-                            $('#modal-project-stage').modal('hide');
+                                btnClickFiltrar();
 
-                            btnClickFiltrar();
+                                ModalUtil.hide('modal-project-stage');
 
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('.modal-content');
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock(".modal-content");
+                    });
 
-                        toastr.error(response.error, "");
-                    }
-                });
+                BlockUtil.block('.modal-content');
 
             } else {
                 if (stage_id === "") {
-                    var $element = $('#select-project-stage-change .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project-stage-change"), "This field is required");
                 }
             }
 
@@ -1435,76 +1585,42 @@ var Estimates = function () {
     var actualizarTableListaBidDeadLines = function () {
         var html = '';
 
-        bid_deadlines.forEach(function (item) {
+        bid_deadlines.forEach(function (item, index) {
             html += `
-            <div class="m-widget4__item" style="width: 500px;">
-                <div class="m-widget4__info">
-                    <span class="m-widget4__title">
+        <div class="d-flex flex-stack py-2" style="width: 500px;">
+            <!--begin::Info-->
+            <div class="d-flex flex-column">
+                <span class="fw-semibold fs-6 text-gray-800">
                     ${item.bidDeadline}
-                        
-                    </span><br>
-                    <span class="m-widget4__sub">
-                        ${item.company}
-                    </span>
-                </div>
-                <span class="m-widget4__ext d-flex">
-                    <a href="javascript:;" 
-                           class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" 
-                           title="Edit record" 
-                           data-posicion="${item.posicion}">
-                            <i class="la la-edit"></i>
-                    </a>
-                    <a href="javascript:;" 
-                       class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" 
-                       title="Delete record" 
-                       data-posicion="${item.posicion}">
-                        <i class="la la-trash"></i>
-                    </a>
+                </span>
+                <span class="text-muted fs-7">
+                    ${item.company}
                 </span>
             </div>
+            <!--end::Info-->
+
+            <!--begin::Actions-->
+            <div class="d-flex gap-2">
+                <button type="button"
+                        class="btn btn-icon btn-sm btn-light-success"
+                        title="Edit record"
+                        data-posicion="${item.posicion}">
+                    <i class="la la-edit"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-icon btn-sm btn-light-danger"
+                        title="Delete record"
+                        data-posicion="${item.posicion}">
+                    <i class="la la-trash"></i>
+                </button>
+            </div>
+            <!--end::Actions-->
+        </div>
+        <div class="separator separator-dashed my-3"></div>
         `;
         });
 
         $('#lista-bid-deadline').html(html);
-    }
-    var initFormBidDeadLines = function () {
-        $("#bid-deadline-form").validate({
-            rules: {
-                biddeadlinedate: {
-                    required: true
-                }
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
     };
     var initAccionesBidDeadLines = function () {
 
@@ -1513,21 +1629,18 @@ var Estimates = function () {
             // reset
             resetFormBidDeadLines();
 
-            $('#modal-bid-deadline').modal({
-                'show': true
-            });
+            ModalUtil.show('modal-bid-deadline', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-bid-deadline");
         $(document).on('click', "#btn-salvar-bid-deadline", function (e) {
             e.preventDefault();
 
+            var bidDeadline = FlatpickrUtil.getString('datetimepicker-bid-deadline-date');
             var company_id = $('#company-bid-deadline').val();
             var hour = $('#bid-deadline-hour').val();
 
-            if ($('#bid-deadline-form').valid() && company_id !== "" && hour !== "") {
-
-                var bidDeadline = $('#bid-deadline-date').val();
+            if (bidDeadline !== '' && company_id !== "" && hour !== "") {
 
                 var company = $("#company-bid-deadline option:selected").text();
 
@@ -1558,35 +1671,20 @@ var Estimates = function () {
 
                 // reset
                 resetFormBidDeadLines();
-                $('#modal-bid-deadline').modal('hide');
+                ModalUtil.hide('modal-bid-deadline');
 
                 // definir la fecha mas reciente
                 definirFechaMasReciente();
 
             } else {
+                if (bidDeadline === '') {
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("bid-deadline-date"), "This field is required");
+                }
                 if (company_id === "") {
-                    var $element = $('#select-company-bid-deadline .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company-bid-deadline"), "This field is required");
                 }
                 if (hour === "") {
-                    var $element = $('#select-bid-deadline-hour .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-bid-deadline-hour"), "This field is required");
                 }
             }
 
@@ -1604,7 +1702,8 @@ var Estimates = function () {
 
                 var date_array = bid_deadlines[posicion].bidDeadline.split(' ');
 
-                $('#bid-deadline-date').val(date_array[0]);
+                const date = MyApp.convertirStringAFecha(date_array[0]);
+                FlatpickrUtil.setDate('datetimepicker-bid-deadline-date', date);
 
                 $('#bid-deadline-hour').val(date_array[1]);
                 $('#bid-deadline-hour').trigger('change');
@@ -1613,7 +1712,7 @@ var Estimates = function () {
                 $('#company-bid-deadline').trigger('change');
 
                 // open modal
-                $('#modal-bid-deadline').modal('show');
+                ModalUtil.show('modal-bid-deadline', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -1624,7 +1723,23 @@ var Estimates = function () {
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
-            eliminarBidDeadline(posicion, '#lista-bid-deadline');
+            Swal.fire({
+                text: "Are you sure you want to delete the bid deadline?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarBidDeadline(posicion, '#lista-bid-deadline');
+                }
+            });
+
         });
 
     };
@@ -1632,36 +1747,34 @@ var Estimates = function () {
         if (bid_deadlines[posicion]) {
 
             if (bid_deadlines[posicion].id != '') {
+
+                var formData = new URLSearchParams();
+                formData.set("id", bid_deadlines[posicion].id);
+
                 BlockUtil.block(block_element);
 
-                $.ajax({
-                    type: "POST",
-                    url: "estimate/eliminarBidDeadline",
-                    dataType: "json",
-                    data: {
-                        'id': bid_deadlines[posicion].id
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock(block_element);
-                        if (response.success) {
+                axios.post("estimate/eliminarBidDeadline", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-
-                            deleteBidDeadline(posicion);
-
+                                deleteBidDeadline(posicion);
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
                         BlockUtil.unblock(block_element);
-
-                        toastr.error(response.error, "");
-                    }
-                });
-            } else {
-                deleteBidDeadline(posicion);
+                    });
             }
+        } else {
+            deleteBidDeadline(posicion);
         }
 
         function deleteBidDeadline(posicion) {
@@ -1680,13 +1793,8 @@ var Estimates = function () {
         }
     }
     var resetFormBidDeadLines = function () {
-        $('#bid-deadline-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("bid-deadline-form");
 
         $('#company-bid-deadline').val('');
         $('#company-bid-deadline').trigger('change');
@@ -1694,8 +1802,8 @@ var Estimates = function () {
         $('#bid-deadline-hour').val('');
         $('#bid-deadline-hour').trigger('change');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("bid-deadline-form"));
 
         nEditingRowBidDeadlines = null;
     };
@@ -1707,7 +1815,9 @@ var Estimates = function () {
 
         // Tomar la fecha más cercana
         var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
-        $('#bidDeadline').val(fechaMasCercana);
+
+        const date = MyApp.convertirStringAFecha(fechaMasCercana);
+        FlatpickrUtil.setDate('datetimepicker-bidDeadline', date);
 
         // funcion para parsear
         function parseFecha(fechaStr) {
@@ -1720,11 +1830,10 @@ var Estimates = function () {
     }
 
     // project information
-    var oTableListaProjectInformation;
+    var oTableProjectInformation;
     var initTableListaProjectInformation = function () {
-        BlockUtil.block('#project-information-table-editable');
 
-        var table = $('#project-information-table-editable');
+        const table = "#project-information-table-editable";
 
         const tagOptions = [
             {text: ""},
@@ -1735,120 +1844,80 @@ var Estimates = function () {
             {text: "Don't Bid"},
         ];
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'company'},
+            {data: 'tag'},
+            {data: 'address'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "company",
-                title: "Company"
-            },
-            {
-                field: "tag",
-                title: "Tag",
-                width: 150,
-                template: function (row) {
-                    const current = row.tag ?? '';
+                targets: 1,
+                render: function (data, type, row) {
+                    const current = data ?? '';
                     const optionsHtml = tagOptions.map(option => {
                         const selected = option.text === current ? 'selected' : '';
                         return `<option value="${option.text}" ${selected}>${option.text}</option>`;
                     }).join('');
 
-                    return `<select class="form-control m-select2 project-information-tag" data-posicion="${row.posicion}" style="width: 150px;">${optionsHtml}</select>`;
-                }
+                    return `<div class="w-150px"><select class="form-select form-select2 form-select-solid fw-bold project-information-tag" data-posicion="${row.posicion}">${optionsHtml}</select></div>`;
+                },
             },
             {
-                field: "address",
-                title: "Address",
-                width: 500,
-                template: function (row) {
-                    return `<input type="text" class="form-control project-information-address" value="${row.address}" data-posicion="${row.posicion}" />`;
-                }
+                targets: 2,
+                render: function (data, type, row) {
+                    return `<div class="w-400px"><input type="text" class="form-control project-information-address" value="${data}" data-posicion="${row.posicion}" /></div>`;
+                },
             },
             {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete company"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['delete']);
+                },
             }
         ];
-        oTableListaProjectInformation = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: bid_deadlines,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-project-information .m_form_search'),
-            },
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableProjectInformation = DatatableUtil.initSafeDataTable(table, {
+            data: contacts,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            createdRow: (row, data, index) => {
+                // init select
+                setTimeout(function () {
+                    $('.project-information-tag').select2();
+                }, 1000);
+            }
         });
 
-        //Events
-        oTableListaProjectInformation
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#project-information-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#project-information-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#project-information-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#project-information-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#project-information-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
-
-        // init select
-        setTimeout(function () {
-            $('.project-information-tag').select2();
-        }, 1000);
+        handleSearchDatatableProjectInformation();
 
     };
+    var handleSearchDatatableProjectInformation = function () {
+        $(document).off('keyup', '#lista-project-information [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-project-information [data-table-filter="search"]', function (e) {
+            oTableContacts.search(e.target.value).draw();
+        });
+    }
+
     var actualizarTableListaProjectInformation = function () {
-        if (oTableListaProjectInformation) {
-            oTableListaProjectInformation.destroy();
+        if (oTableProjectInformation) {
+            oTableProjectInformation.destroy();
         }
 
         initTableListaProjectInformation();
@@ -1878,7 +1947,24 @@ var Estimates = function () {
 
             e.preventDefault();
             var posicion = $(this).data('posicion');
-            eliminarBidDeadline(posicion, '#project-information-table-editable');
+
+            Swal.fire({
+                text: "Are you sure you want to delete the project information?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarBidDeadline(posicion, '#lista-project-information');
+                }
+            });
+
         });
 
     };
@@ -1889,137 +1975,81 @@ var Estimates = function () {
     var nEditingRowItem = null;
     var rowDeleteItem = null;
     var initTableItems = function () {
-        BlockUtil.block('#items-table-editable');
 
-        var table = $('#items-table-editable');
+        const table = "#items-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'yield_calculation_name'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "item",
-                title: "Item",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "yield_calculation_name",
-                title: "Yield Calculation",
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
 
         // totals
         $('#total_count_items').val(items.length);
 
         var total = calcularMontoTotalItems();
         $('#total_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
-        // $('#contract_amount').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
@@ -2027,45 +2057,35 @@ var Estimates = function () {
 
         initTableItems();
     }
-    var initFormItem = function () {
-        $("#item-form").validate({
-            rules: {
-                quantity: {
-                    required: true
-                },
+    var validateFormItem = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('item-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            price: {
+                presence: {message: "This field is required"},
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
+
     var initAccionesItems = function () {
 
         $(document).off('click', "#btn-agregar-item");
@@ -2073,9 +2093,8 @@ var Estimates = function () {
             // reset
             resetFormItem();
 
-            $('#modal-item').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-item");
@@ -2090,118 +2109,97 @@ var Estimates = function () {
                 $('#item-name').val(item);
             }
 
+            if (validateFormItem() && isValidItem() && isValidYield() && isValidUnit()) {
 
-            if ($('#item-form').valid() && isValidItem() && isValidYield() && isValidUnit()) {
+                var formData = new URLSearchParams();
 
-                var estimate_item_id = $('#estimate_item_id').val();
+                var project_item_id = $('#project_item_id').val();
+                formData.set("project_item_id", project_item_id);
+
+                var project_id = $('#project_id').val();
+                formData.set("project_id", project_id);
+
+                formData.set("item_id", item_id);
+
+                item = $('#item-name').val();
+                formData.set("item", item);
+
                 var unit_id = $('#unit').val();
+                formData.set("unit_id", unit_id);
+
                 var price = $('#item-price').val();
+                formData.set("price", price);
+
                 var quantity = $('#item-quantity').val();
+                formData.set("quantity", quantity);
+
                 var yield_calculation = $('#yield-calculation').val();
+                formData.set("yield_calculation", yield_calculation);
+
                 var equation_id = $('#equation').val();
+                formData.set("equation_id", equation_id);
 
                 BlockUtil.block('#modal-item .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "estimate/agregarItem",
-                    dataType: "json",
-                    data: {
-                        estimate_item_id: estimate_item_id,
-                        estimate_id: $('#estimate_id').val(),
-                        item_id: item_id,
-                        item: item,
-                        unit_id: unit_id,
-                        price: price,
-                        quantity: quantity,
-                        yield_calculation: yield_calculation,
-                        equation_id: equation_id
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-item .modal-content');
-                        if (response.success) {
+                axios.post("project/agregarItem", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "Success");
+                                //add item
+                                var item_new = response.item;
+                                if (nEditingRowItem == null) {
+                                    item_new.posicion = items.length;
+                                    items.push(item_new);
+                                } else {
+                                    item_new.posicion = items[nEditingRowItem].posicion;
+                                    items[nEditingRowItem] = item_new;
+                                }
 
-                            //add item
-                            var item_new = response.item;
-                            if (nEditingRowItem == null) {
-                                item_new.posicion = items.length;
-                                items.push(item_new);
+                                // new item
+                                if (response.is_new_item) {
+                                    $('#item').append(new Option(item_new.item, item_new.item_id, false, false));
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-price", item_new.price);
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-unit", item_new.unit);
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-equation", item_new.equation_id);
+                                    $('#item option[value="' + item_new.item_id + '"]').attr("data-yield", item_new.yield_calculation);
+
+                                    $('#item').select2();
+                                }
+
+                                //actualizar lista
+                                actualizarTableListaItems();
+
+                                if (nEditingRowItem != null) {
+                                    ModalUtil.hide('modal-item');
+                                }
+
+                                // reset
+                                resetFormItem();
+
                             } else {
-                                item_new.posicion = items[nEditingRowItem].posicion;
-                                items[nEditingRowItem] = item_new;
+                                toastr.error(response.error, "");
                             }
-
-                            // new item
-                            if (response.is_new_item) {
-                                $('#item').append(new Option(item_new.item, item_new.item_id, false, false));
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-price", item_new.price);
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-unit", item_new.unit);
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-equation", item_new.equation_id);
-                                $('#item option[value="' + item_new.item_id + '"]').attr("data-yield", item_new.yield_calculation);
-
-                                $('#item').select2();
-                            }
-
-                            //actualizar lista
-                            actualizarTableListaItems();
-
-                            if (nEditingRowItem != null) {
-                                $('#modal-item').modal('hide');
-                            }
-
-                            // reset
-                            resetFormItem();
-
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-item .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-item .modal-content");
+                    });
 
             } else {
                 if (!isValidItem()) {
-                    var $element = $('#select-item .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-item"), "This field is required");
                 }
                 if (!isValidYield()) {
-                    var $element = $('#select-equation .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-equation"), "This field is required");
                 }
                 if (!isValidUnit()) {
-                    var $element = $('#select-unit .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-unit"), "This field is required");
                 }
             }
 
@@ -2217,7 +2215,7 @@ var Estimates = function () {
 
                 nEditingRowItem = posicion;
 
-                $('#estimate_item_id').val(items[posicion].estimate_item_id);
+                $('#project_item_id').val(items[posicion].project_item_id);
 
                 $('#item').off('change', changeItem);
 
@@ -2239,17 +2237,14 @@ var Estimates = function () {
                 $('#equation').trigger('change');
 
                 if (items[posicion].equation_id != '') {
-                    $('#select-equation').removeClass('m--hide');
+                    $('#select-equation').removeClass('hide');
                 }
 
                 $('#yield-calculation').on('change', changeYield);
 
-                $(document).off('switchChange.bootstrapSwitch', '#item-type', changeItemType);
-
                 if (items[posicion].item_id == '') {
 
-                    $('#item-type').prop('checked', false);
-                    $("#item-type").bootstrapSwitch("state", false, true);
+                    $('#item-type-new').prop('checked', true);
 
                     $('#item-name').val(items[posicion].item);
 
@@ -2257,10 +2252,8 @@ var Estimates = function () {
                     $('#unit').trigger('change');
                 }
 
-                $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
-
-                // open modal
-                $('#modal-item').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -2269,59 +2262,65 @@ var Estimates = function () {
         $(document).on('click', "#items-table-editable a.delete", function (e) {
 
             e.preventDefault();
-            rowDeleteItem = $(this).data('posicion');
-            $('#modal-eliminar-item').modal({
-                'show': true
+            var posicion = $(this).data('posicion');
+
+            Swal.fire({
+                text: "Are you sure you want to delete the item?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarItem(posicion);
+                }
             });
         });
 
-        $(document).off('click', "#btn-delete-item");
-        $(document).on('click', "#btn-delete-item", function (e) {
-
-            e.preventDefault();
-            var posicion = rowDeleteItem;
-
+        function eliminarItem(posicion) {
             if (items[posicion]) {
 
-                if (items[posicion].estimate_item_id != '') {
-                    BlockUtil.block('#items-table-editable');
+                if (items[posicion].project_item_id != '') {
 
-                    $.ajax({
-                        type: "POST",
-                        url: "estimate/eliminarItem",
-                        dataType: "json",
-                        data: {
-                            'estimate_item_id': items[posicion].estimate_item_id
-                        },
-                        success: function (response) {
-                            BlockUtil.unblock('#items-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("project_item_id", items[posicion].project_item_id);
 
-                                toastr.success(response.message, "Success");
+                    BlockUtil.block('#lista-items');
 
-                                deleteItem(posicion);
+                    axios.post("project/eliminarItem", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteItem(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            BlockUtil.unblock('#items-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-items");
+                        });
                 } else {
                     deleteItem(posicion);
                 }
             }
-
-        });
+        }
 
         function isValidItem() {
             var valid = true;
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
             var item_id = $('#item').val();
 
             if (item_type && item_id == '') {
@@ -2335,7 +2334,7 @@ var Estimates = function () {
         function isValidUnit() {
             var valid = true;
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
             var unit_id = $('#unit').val();
 
             if (!item_type && unit_id == '') {
@@ -2359,6 +2358,21 @@ var Estimates = function () {
             return valid;
         }
 
+        function DevolverYieldCalculationDeItem() {
+
+            var yield_calculation = $('#yield-calculation').val();
+
+            var yield_calculation_name = yield_calculation != "" ? $('#yield-calculation option:selected').text() : "";
+
+            // para la ecuacion devuelvo la ecuacion asociada
+            if (yield_calculation == 'equation') {
+                var equation_id = $('#equation').val();
+                yield_calculation_name = $('#equation option[value="' + equation_id + '"]').data("equation");
+            }
+
+            return yield_calculation_name;
+        }
+
         function deleteItem(posicion) {
             //Eliminar
             items.splice(posicion, 1);
@@ -2371,16 +2385,12 @@ var Estimates = function () {
         }
     };
     var resetFormItem = function () {
-        $('#item-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("item-form");
 
-        $('#item-type').prop('checked', true);
-        $("#item-type").bootstrapSwitch("state", true, true);
+        $('#item-type-existing').prop('checked', true);
+        $('#item-type-new').prop('checked', false);
 
         $('#item').val('');
         $('#item').trigger('change');
@@ -2390,17 +2400,17 @@ var Estimates = function () {
 
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
-        $('#div-item').removeClass('m--hide');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
+        $('#div-item').removeClass('hide');
+        $('#item-name').removeClass('hide').addClass('hide');
 
         $('#unit').val('');
         $('#unit').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
+        $('#select-unit').removeClass('hide').addClass('hide');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("item-form"));
 
         nEditingRowItem = null;
 
@@ -2465,41 +2475,47 @@ var Estimates = function () {
 
         companys.forEach(function (item) {
             html += `
-            <div class="m-widget4__item" style="width: 500px;">
-                <div class="m-widget4__info">
-                    <span class="m-widget4__title">
-                    ${item.company}  
-                    </span><br>
-                    <span class="m-widget4__sub">
-                        ${item.contact}
-                    </span><br>
-                    <span class="m-widget4__sub">
-                        ${item.email}
-                    </span><br>
-                    <span class="m-widget4__sub">
-                       ${item.phone}
-                    </span>
-                </div>
-                <span class="m-widget4__ext d-flex">
-                    <a href="javascript:;" 
-                           class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" 
-                           title="Edit record" 
-                           data-posicion="${item.posicion}">
-                            <i class="la la-edit"></i>
-                    </a>
-                    <a href="javascript:;" 
-                       class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" 
-                       title="Delete record" 
-                       data-posicion="${item.posicion}">
-                        <i class="la la-trash"></i>
-                    </a>
+        <div class="d-flex flex-stack py-2" style="width: 500px;">
+            <!--begin::Info-->
+            <div class="d-flex flex-column">
+                <span class="fw-semibold fs-6 text-gray-800">
+                    ${item.company}
+                </span>
+                <span class="text-muted fs-7">
+                    ${item.contact}
+                </span>
+                <span class="text-muted fs-7">
+                    ${item.email}
+                </span>
+                <span class="text-muted fs-7">
+                    ${item.phone}
                 </span>
             </div>
+            <!--end::Info-->
+
+            <!--begin::Actions-->
+            <div class="d-flex gap-2">
+                <button type="button"
+                        class="btn btn-icon btn-sm btn-light-success edit"
+                        title="Edit record"
+                        data-posicion="${item.posicion}">
+                    <i class="la la-edit"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-icon btn-sm btn-light-danger delete"
+                        title="Delete record"
+                        data-posicion="${item.posicion}">
+                    <i class="la la-trash"></i>
+                </button>
+            </div>
+            <!--end::Actions-->
+        </div>
+        <div class="separator separator-dashed my-3"></div>
         `;
         });
 
         $('#lista-company').html(html);
-    }
+    };
     var initAccionesCompanysEstimate = function () {
 
         $(document).off('click', "#btn-agregar-company-estimate");
@@ -2507,9 +2523,8 @@ var Estimates = function () {
             // reset
             resetFormCompanyEstimate();
 
-            $('#modal-company-estimate').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-company-estimate', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-company-estimate");
@@ -2561,32 +2576,16 @@ var Estimates = function () {
 
                 // reset
                 resetFormCompanyEstimate();
-                $('#modal-company-estimate').modal('hide');
+
+                // close modal
+                ModalUtil.hide('modal-company-estimate');
 
             } else {
                 if (company_id === "") {
-                    var $element = $('#select-company .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company"), "This field is required");
                 }
                 if (contact_id === "") {
-                    var $element = $('#select-contact .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-contact"), "This field is required");
                 }
             }
 
@@ -2645,8 +2644,9 @@ var Estimates = function () {
 
                 $(document).on('change', "#company", changeCompany);
 
-                // open modal
-                $('#modal-company-estimate').modal('show');
+
+                // mostar modal
+                ModalUtil.show('modal-company-estimate', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -2657,7 +2657,23 @@ var Estimates = function () {
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
-            eliminarCompanyEstimate(posicion, '#lista-company');
+            Swal.fire({
+                text: "Are you sure you want to delete the company?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarCompanyEstimate(posicion, '#lista-company');
+                }
+            });
+
         });
 
     };
@@ -2665,33 +2681,31 @@ var Estimates = function () {
         if (companys[posicion]) {
 
             if (companys[posicion].id !== '') {
+
+                var formData = new URLSearchParams();
+                formData.set("id", companys[posicion].id);
+
                 BlockUtil.block(block_element);
 
-                $.ajax({
-                    type: "POST",
-                    url: "estimate/eliminarCompany",
-                    dataType: "json",
-                    data: {
-                        'id': companys[posicion].id
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock(block_element);
-                        if (response.success) {
+                axios.post("estimate/eliminarCompany", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
-
-                            deleteCompany(posicion);
-
+                                deleteCompany(posicion);
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
                         BlockUtil.unblock(block_element);
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    });
             } else {
                 deleteCompany(posicion);
             }
@@ -2716,8 +2730,8 @@ var Estimates = function () {
         MyApp.limpiarSelect('#contact');
 
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("company-estimate-form"));
 
         nEditingRowCompany = null;
     };
@@ -2728,14 +2742,13 @@ var Estimates = function () {
 
             initWidgets();
             initTable();
-            initForm();
+
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionEliminar();
+
             initAccionFiltrar();
 
             initAccionesCompany();
@@ -2743,7 +2756,6 @@ var Estimates = function () {
             initAccionChangeProjectStage();
 
             // bid deadlines
-            initFormBidDeadLines();
             initAccionesBidDeadLines();
 
             // companys
@@ -2754,7 +2766,6 @@ var Estimates = function () {
 
             // items
             initTableItems();
-            initFormItem();
             initAccionesItems();
             // units
             initAccionesUnit();

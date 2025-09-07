@@ -725,19 +725,19 @@ var Subcontractors = function () {
         MyApp.initWidgets();
 
         // filtros fechas
-        TempusUtil.initDate('datetimepicker-desde', {
+        FlatpickrUtil.initDate('datetimepicker-desde', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
-        TempusUtil.initDate('datetimepicker-hasta', {
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
 
-        // Tempus Dominus SOLO FECHA (sin horas)
-        TempusUtil.initDate('datetimepicker-notes-date', {
+        // Flatpickr SOLO FECHA (sin horas)
+        FlatpickrUtil.initDate('datetimepicker-notes-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
         });
         // set default date (hoy)
-        TempusUtil.setDate('datetimepicker-notes-date', new Date());
+        FlatpickrUtil.setDate('datetimepicker-notes-date', new Date());
 
         // Quill SIN variables: se gestiona por selector
         QuillUtil.init('#notes');
@@ -1059,8 +1059,8 @@ var Subcontractors = function () {
             data: function (d) {
                 return $.extend({}, d, {
                     subcontractor_id: $('#subcontractor_id').val(),
-                    fechaInicial: TempusUtil.getString('datetimepicker-desde'),
-                    fechaFin: TempusUtil.getString('datetimepicker-hasta'),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
                 });
             },
             method: "post",
@@ -1167,7 +1167,7 @@ var Subcontractors = function () {
         $(document).on('click', "#btn-salvar-note", function (e) {
             e.preventDefault();
 
-            var date = TempusUtil.getString('datetimepicker-notes-date');
+            var date = FlatpickrUtil.getString('datetimepicker-notes-date');
 
             var notes = QuillUtil.getHtml('#notes');
             var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
@@ -1295,8 +1295,8 @@ var Subcontractors = function () {
 
             e.preventDefault();
 
-            var fechaInicial = TempusUtil.getString('datetimepicker-desde');
-            var fechaFin = TempusUtil.getString('datetimepicker-hasta');
+            var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
+            var fechaFin = FlatpickrUtil.getString('datetimepicker-hasta');
 
             if (fechaInicial === '' && fechaFin === '') {
                 toastr.error("Select the dates to delete", "");
@@ -1341,8 +1341,8 @@ var Subcontractors = function () {
                             toastr.success(response.message, "");
 
                             // reset
-                            TempusUtil.clear('datetimepicker-desde');
-                            TempusUtil.clear('datetimepicker-hasta');
+                            FlatpickrUtil.clear('datetimepicker-desde');
+                            FlatpickrUtil.clear('datetimepicker-hasta');
 
                             btnClickFiltrarNotes();
 
@@ -1396,7 +1396,7 @@ var Subcontractors = function () {
             $('#notes_id').val(notes.notes_id);
 
             const date = MyApp.convertirStringAFecha(notes.date);
-            TempusUtil.setDate('datetimepicker-notes-date', date);
+            FlatpickrUtil.setDate('datetimepicker-notes-date', date);
 
             QuillUtil.setHtml('#notes', notes.notes);
         }
@@ -1408,9 +1408,9 @@ var Subcontractors = function () {
 
         QuillUtil.setHtml('#notes', '');
 
-        // reset fecha (TempusUtil, sin variables) — solo fecha
-        TempusUtil.clear('datetimepicker-notes-date');
-        TempusUtil.setDate('datetimepicker-notes-date', new Date());
+        // reset fecha (FlatpickrUtil, sin variables) — solo fecha
+        FlatpickrUtil.clear('datetimepicker-notes-date');
+        FlatpickrUtil.setDate('datetimepicker-notes-date', new Date());
     };
 
     // Projects

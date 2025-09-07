@@ -12,46 +12,30 @@ var ModalCompany = function () {
         
     }
 
-    var initFormCompany = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#company-modal-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        var form = KTUtil.get('company-modal-form');
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             }
-        });
+        }
 
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
 
     var mostrarModal = function () {
@@ -59,9 +43,8 @@ var ModalCompany = function () {
         // reset form
         resetFormCompany();
 
-        $('#modal-company').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-company', {backdrop: 'static', keyboard: true});
     }
     var initAccionesCompany = function () {
 
@@ -72,59 +55,56 @@ var ModalCompany = function () {
 
         function btnClickSalvarFormCompany() {
 
-            if ($('#company-modal-form').valid()) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
+
+                formData.set("company_id", '');
 
                 var name = $('#name-company-modal').val();
+                formData.set("name", name);
+
                 var phone = $('#phone-company-modal').val();
+                formData.set("phone", phone);
+
                 var address = $('#address-company-modal').val();
+                formData.set("address", address);
+
+                formData.set("contactName", '');
+                formData.set("contactEmail", '');
+                formData.set("contacts", JSON.stringify([]));
 
                 BlockUtil.block('#modal-company .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "company/salvarCompany",
-                    dataType: "json",
-                    data: {
-                        'company_id': '',
-                        'name': name,
-                        'phone': phone,
-                        'address': address,
-                        'contactName': '',
-                        'contactEmail': '',
-                        'contacts': JSON.stringify([])
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-company .modal-content');
-                        if (response.success) {
+                axios.post("company/salvarCompany", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                company_new = {company_id: response.company_id, name, phone, address};
 
-                            company_new = {company_id: response.company_id, name, phone, address};
+                                // close modal
+                                ModalUtil.hide('modal-company');
 
-                            // close modal
-                            $('#modal-company').modal('hide');
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-company .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-company .modal-content");
+                    });
             }
         };
     };
     var resetFormCompany = function () {
-        $('#company-modal-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("company-modal-form");
 
         // reset company
         company_new = null;
@@ -136,8 +116,6 @@ var ModalCompany = function () {
 
             initWidgets();
 
-            // items
-            initFormCompany();
             initAccionesCompany();
         },
         mostrarModal: mostrarModal,
