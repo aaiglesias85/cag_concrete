@@ -147,18 +147,18 @@ class ReporteSubcontractorService extends Base
     public function ListarReporteSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
                                                 $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
+        $resultado = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
+            ->ListarReporteSubcontractorsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->ListarReporteSubcontractors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
 
             $quantity = $value->getQuantity();
             $price = $value->getPrice();
             $total = $quantity * $price;
 
-            $arreglo_resultado[] = [
+            $data[] = [
                 "id" => $value->getId(),
                 'subcontractor' => $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "",
                 'project' => $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription(),
@@ -172,7 +172,10 @@ class ReporteSubcontractorService extends Base
             ];
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

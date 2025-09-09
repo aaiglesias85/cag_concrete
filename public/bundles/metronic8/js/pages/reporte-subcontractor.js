@@ -1,152 +1,202 @@
 var ReporteSubcontractor = function () {
 
-    var oTable;
-
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#reporte-subcontractor-table-editable');
+        const table = "#reporte-subcontractor-table-editable";
 
-        var table = $('#reporte-subcontractor-table-editable');
+        // datasource
+        const datasource = {
+            url: `report-subcontractor/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    subcontractor_id: $('#filtro-subcontractor').val(),
+                    project_id: $('#filtro-project').val(),
+                    project_item_id: $('#filtro-project-item').val(),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        aoColumns.push(
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "project",
-                title: "Project",
-                width: 150,
-            },
-            {
-                field: "subcontractor",
-                title: "Subcontractor",
-            },
-            {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'report-subcontractor/listar',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (data.pending === 1) {
-                        $(row).addClass('row-pending');
-                    }
-                }
-            }
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#reporte-subcontractor-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#reporte-subcontractor-table-editable');
-            })
-            .on('m-datatable--on-layout-updated', function () {
-                console.log('Layout render updated');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#reporte-subcontractor-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#reporte-subcontractor-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#reporte-subcontractor-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-reporte-subcontractor .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+        });
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        columns.push(
+            {data: 'date'},
+            {data: 'project'},
+            {data: 'subcontractor'},
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        return [
+            {
+                targets: 0,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 300);
+                }
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
+            },
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
+            },
+        ];
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-reporte-subcontractor [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-reporte-subcontractor [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    btnClickFiltrar()
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Subcontractors Report';
+        var table = document.querySelector('#reporte-subcontractor-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#reporte-subcontractor-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#reporte_subcontractor_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
     //Filtrar
     var initAccionFiltrar = function () {
 
@@ -155,75 +205,56 @@ var ReporteSubcontractor = function () {
             btnClickFiltrar();
         });
 
-        $(document).off('click', "#btn-reset-filters");
-        $(document).on('click', "#btn-reset-filters", function (e) {
-
-            $('#lista-reporte-subcontractor .m_form_search').val('');
-
-            $('#filtro-subcontractor option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-subcontractor').select2();
-
-            actualizarSelectSubcontractors(all_subcontractors);
-
-            $('#filtro-project option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project').select2();
-
-            actualizarSelectProjects(all_projects);
-
-            $('#filtro-project-item option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project-item').select2();
-
-            $('#fechaInicial').val('');
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+            btnClickResetFilters();
         });
 
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var subcontractor_id = $('#filtro-subcontractor').val();
-        query.subcontractor_id = subcontractor_id;
-
-        var project_id = $('#filtro-project').val();
-        query.project_id = project_id;
-
-        var project_item_id = $('#filtro-project-item').val();
-        query.project_item_id = project_item_id;
-
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        const search = $('#lista-reporte-subcontractor [data-table-filter="search"]').val();
+        oTable.search(search).draw();
 
         // devolver total
         devolverTotal();
-    }
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-reporte-subcontractor [data-table-filter="search"]').val('');
 
+        // limpiar select
+        MyUtil.limpiarSelect('#filtro-subcontractor');
+        actualizarSelectSubcontractors(all_subcontractors);
+
+        // limpiar select
+        MyUtil.limpiarSelect('#filtro-project');
+        actualizarSelectProjects(all_projects);
+
+        // limpiar select
+        MyUtil.limpiarSelect('#filtro-project-item');
+
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
+
+        btnClickFiltrar();
+    }
 
     var initWidgets = function () {
 
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('.m-select2').select2();
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        FlatpickrUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
 
         // change
         $('#filtro-subcontractor').change(changeSubcontractor);
@@ -236,19 +267,11 @@ var ReporteSubcontractor = function () {
 
         // reset
         if (project_id === '') {
-            $('#filtro-project option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project').select2();
+            MyUtil.limpiarSelect('#filtro-project');
         }
 
         // reset
-        $('#filtro-project-item option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project-item').select2();
+        MyUtil.limpiarSelect('#filtro-project-item');
 
         if (subcontractor_id != '') {
             listarProjectsDeSubcontractor(subcontractor_id, project_id);
@@ -264,45 +287,42 @@ var ReporteSubcontractor = function () {
         btnClickFiltrar();
     }
     var listarProjectsDeSubcontractor = function (subcontractor_id, project_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("subcontractor_id", subcontractor_id);
+
         BlockUtil.block('#select-project');
 
-        $.ajax({
-            type: "POST",
-            url: "subcontractor/listarProjects",
-            dataType: "json",
-            data: {
-                'subcontractor_id': subcontractor_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-project');
-                if (response.success) {
+        axios.post("subcontractor/listarProjects", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    //Llenar select
-                    actualizarSelectProjects(response.projects);
+                        //Llenar select
+                        actualizarSelectProjects(response.projects);
 
-                    if (project_id !== '') {
-                        $('#filtro-project').val(project_id);
-                        $('#filtro-project').trigger('change');
+                        if (project_id !== '') {
+                            $('#filtro-project').val(project_id);
+                            $('#filtro-project').trigger('change');
+                        }
+
+                    } else {
+                        toastr.error(response.error, "");
                     }
-
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-project');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-project");
+            });
     }
     var actualizarSelectProjects = function (projects) {
         // reset
-        $('#filtro-project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project').select2();
+        MyUtil.limpiarSelect('#filtro-project');
 
         for (var i = 0; i < projects.length; i++) {
             $('#filtro-project').append(new Option(`${projects[i].number} - ${projects[i].description}`, projects[i].project_id, false, false));
@@ -316,19 +336,10 @@ var ReporteSubcontractor = function () {
         // reset
         var subcontractor_id = $('#filtro-subcontractor').val();
         if (subcontractor_id === '') {
-            $('#filtro-subcontractor option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-subcontractor').select2();
+            MyUtil.limpiarSelect('#filtro-subcontractor');
         }
 
-
-        $('#filtro-project-item option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project-item').select2();
+        MyUtil.limpiarSelect('#filtro-project-item');
 
         if (project_id != '') {
 
@@ -350,40 +361,35 @@ var ReporteSubcontractor = function () {
         btnClickFiltrar();
     }
     var listarItemsDeProject = function (project_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("project_id", project_id);
+
         BlockUtil.block('#select-project-item');
 
-        $.ajax({
-            type: "POST",
-            url: "project/listarItems",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-project-item');
-                if (response.success) {
-
-                    //Llenar select
-                    actualizarSelectProjectItems(response.items);
-
+        axios.post("project/listarItems", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+                        //Llenar select
+                        actualizarSelectProjectItems(response.items);
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-project-item');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-project-item");
+            });
     }
     var actualizarSelectProjectItems = function (items) {
         // reset
-        $('#filtro-project-item option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project-item').select2();
+        MyUtil.limpiarSelect('#filtro-project-item');
 
         for (var i = 0; i < items.length; i++) {
             $('#filtro-project-item').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
@@ -392,56 +398,40 @@ var ReporteSubcontractor = function () {
     }
 
     var listarSubcontractorsDeProject = function (project_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("project_id", project_id);
+
         BlockUtil.block('#select-subcontractor');
 
-        $.ajax({
-            type: "POST",
-            url: "project/listarSubcontractors",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-subcontractor');
-                if (response.success) {
-
-                    //Llenar select
-                    actualizarSelectSubcontractors(response.subcontractors);
-
+        axios.post("project/listarSubcontractors", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+                        //Llenar select
+                        actualizarSelectSubcontractors(response.subcontractors);
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-subcontractor');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-subcontractor");
+            });
     }
     var actualizarSelectSubcontractors = function (subcontractors) {
         // reset
-        $('#filtro-subcontractor option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-subcontractor').select2();
+        MyUtil.limpiarSelect('#filtro-subcontractor');
 
         for (var i = 0; i < subcontractors.length; i++) {
             $('#filtro-subcontractor').append(new Option(subcontractors[i].name, subcontractors[i].subcontractor_id, false, false));
         }
         $('#filtro-subcontractor').select2();
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-reporte-subcontractor');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
     }
 
     var initAccionExportar = function () {
@@ -450,82 +440,104 @@ var ReporteSubcontractor = function () {
         $(document).on('click', "#btn-exportar", function (e) {
             e.preventDefault();
 
-            var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
+            var formData = new URLSearchParams();
+
+            var generalSearch = $('lista-reporte-subcontractor [data-table-filter="search"]').val();
+            formData.set("search", generalSearch);
+
             var subcontractor_id = $('#filtro-subcontractor').val();
+            formData.set("subcontractor_id", subcontractor_id);
+
             var project_id = $('#filtro-project').val();
+            formData.set("project_id", project_id);
+
             var project_item_id = $('#filtro-project-item').val();
-            var fecha_inicial = $('#fechaInicial').val();
-            var fecha_fin = $('#fechaFin').val();
+            formData.set("project_item_id", project_item_id);
+
+            var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde');
+            formData.set("fecha_inicial", fecha_inicial);
+
+            var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta');
+            formData.set("fecha_fin", fecha_fin);
+
 
             BlockUtil.block('#lista-reporte-subcontractor');
 
-            $.ajax({
-                type: "POST",
-                url: "report-subcontractor/exportarExcel",
-                dataType: "json",
-                data: {
-                    'search': generalSearch,
-                    'subcontractor_id': subcontractor_id,
-                    'project_id': project_id,
-                    'project_item_id': project_item_id,
-                    'fecha_inicial': fecha_inicial,
-                    'fecha_fin': fecha_fin
+            axios.post("report-subcontractor/exportarExcel", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#lista-reporte-subcontractor');
-                    if (response.success) {
-                        document.location = response.url;
+                            //document.location = response.url;
+
+                            var url = response.url;
+                            const archivo = url.split("/").pop();
+
+                            // crear link para que se descargue el archivo
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#lista-reporte-subcontractor');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-reporte-subcontractor");
+                });
         });
     };
 
     var devolverTotal = function () {
-        var generalSearch = $('#lista-reporte-subcontractor .m_form_search').val();
+
+        var formData = new URLSearchParams();
+
+        var generalSearch = $('#lista-reporte-subcontractor [data-table-filter="search"]').val();
+        formData.set("search", generalSearch);
+
         var subcontractor_id = $('#filtro-subcontractor').val();
+        formData.set("subcontractor_id", subcontractor_id);
+
         var project_id = $('#filtro-project').val();
+        formData.set("project_id", project_id);
+
         var project_item_id = $('#filtro-project-item').val();
-        var fecha_inicial = $('#fechaInicial').val();
-        var fecha_fin = $('#fechaFin').val();
+        formData.set("project_item_id", project_item_id);
+
+        var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde');
+        formData.set("fecha_inicial", fecha_inicial);
+
+        var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta');
+        formData.set("fecha_fin", fecha_fin);
+
 
         BlockUtil.block('#lista-reporte-subcontractor');
 
-        $.ajax({
-            type: "POST",
-            url: "report-subcontractor/devolverTotal",
-            dataType: "json",
-            data: {
-                'search': generalSearch,
-                'subcontractor_id': subcontractor_id,
-                'project_id': project_id,
-                'project_item_id': project_item_id,
-                'fecha_inicial': fecha_inicial,
-                'fecha_fin': fecha_fin
-
-            },
-            success: function (response) {
-                BlockUtil.unblock('#lista-reporte-subcontractor');
-                if (response.success) {
-                    $('#total_reporte').val(response.total);
+        axios.post("report-subcontractor/devolverTotal", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+                        $('#total_reporte').val(response.total);
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#lista-reporte-subcontractor');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#lista-reporte-subcontractor");
+            });
     }
 
     return {
@@ -533,6 +545,7 @@ var ReporteSubcontractor = function () {
         init: function () {
 
             initWidgets();
+
             initTable();
 
             initAccionFiltrar();

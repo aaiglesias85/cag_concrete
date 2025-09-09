@@ -7,180 +7,275 @@
 {% endblock %}
 
 {% block content %}
-    <!-- BEGIN: Subheader -->
-    <div class="m-subheader ">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <h3 class="m-subheader__title m-subheader__title--separator">Subcontractors Report</h3>
-                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-                    <li class="m-nav__item m-nav__item--home">
-                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
-                            <i class="m-nav__link-icon la la-home"></i>
-                        </a>
+
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <!--begin::Toolbar container-->
+        <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+            <!--begin::Page title-->
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <!--begin::Title-->
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    Subcontractors Report
+                </h1>
+                <!--end::Title-->
+                <!--begin::Breadcrumb-->
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
                     </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Subcontractors Report</span>
-                        </a>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
                     </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Subcontractors report</span>
-                        </a>
-                    </li>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">Subcontractors Report</li>
+                    <!--end::company-->
                 </ul>
+                <!--end::Breadcrumb-->
             </div>
+            <!--end::Page title-->
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+
+            </div>
+            <!--end::Actions-->
         </div>
+        <!--end::Toolbar container-->
     </div>
-    <!-- END: Subheader -->
+    <!--end::Toolbar-->
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <!--begin::Content container-->
+        <div id="kt_app_content_container" class="app-container container-fluid">
 
-    <div class="m-content">
-
-        <div id="lista-reporte-subcontractor" class="m-portlet m-portlet--mobile" m-portlet="true">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text">
-                            Subcontractors Report
-                        </h3>
-                    </div>
-                      <div class="col-md-1">
-
-                        <a href="javascript:;" id="btn-reset-filters"
-                           class="btn"
-                           aria-label="Reset filters">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>Reset filters</span>
-                            </span>
-                        </a>
-                                    
-                    </div>
-                </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        <li class="m-portlet__nav-item">
-                            <a id="btn-exportar"
-                               class="btn btn-success btn-icon"
-                               href="javascript:;">
-                                    <span>
-                                        <i class="la la-file-excel-o"></i>
-                                        <span class="m--hidden-mobile">Export Excel</span>
-                                    </span>
-                            </a>
-                        </li>
-
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;" m-portlet-tool="fullscreen"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon">
-                                <i class="la la-expand"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="m-portlet__body">
-                <!--begin: Search Form -->
-                <div class="m-form m-form--label-align-right m--margin-bottom-15">
-                    <div class="row align-items-center">
-                        <div class="col-xl-12 order-1">
-                            <div class="row mb-2 align-items-center">
-                                <div class="col-md-4 mb-2" id="select-subcontractor">
-                                    <select class="form-control m-select2 event-change" id="filtro-subcontractor">
-                                        <option value="">Subcontractor</option>
-                                        {% for item in subcontractors %}
-                                            <option value="{{ item.subcontractor_id }}">{{ item.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-2" id="select-project">
-                                    <select class="form-control m-select2 event-change" id="filtro-project">
-                                        <option value="">Project</option>
-                                        {% for item in projects %}
-                                            <option value="{{ item.project_id }}">{{ item.number }} - {{ item.description }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-2" id="select-project-item">
-                                    <select class="form-control m-select2 event-change" id="filtro-project-item">
-                                        <option value="">Item</option>
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row align-items-center">
-                                <div class="col-md-2 mb-2">
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker"
-                                               placeholder="From" autocomplete="off" id="fechaInicial"/>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="la la-calendar glyphicon-th"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-2">
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker"
-                                               placeholder="To" autocomplete="off" id="fechaFin"/>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="la la-calendar glyphicon-th"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input m_form_search"
-                                               placeholder="Search..." id="btn-filtrar-search">
-                                        <span class="m-input-icon__icon m-input-icon__icon--left">
-									<span><i class="la la-search"></i></span>
-								        </span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-2">
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">Total $:</span>
-                                        </div>
-                                        <input type="text" class="form-control m-input"
-                                               id="total_reporte" value="" disabled>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-2">
-                                    <a href="javascript:;" id="btn-filtrar"
-                                       class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air"
-                                       style="margin-right: 10px;">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>Search</span>
-                                        </span>
-                                    </a>
-                                </div>
-                            </div>
+            <!-- lista -->
+            <div id="lista-reporte-subcontractor" class="card card-sticky">
+                <div class="card-header border-0 pt-6"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="lista-reporte-subcontractor"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <input type="text" data-table-filter="search"
+                                   class="form-control form-control-solid w-300px ps-13"
+                                   placeholder="Buscar..."/>
                         </div>
+                    </div>
+                    <div class="card-toolbar">
+                        <div class="d-flex justify-content-end">
 
+                            <!-- total -->
+                            <div class="input-group input-group-solid w-300px me-4">
+                                <span class="input-group-text">Total $:</span>
+                                <input type="text"
+                                       class="form-control form-control-validate event-change"
+                                       id="total_reporte" disabled>
+                            </div>
+
+                            <!--filter-->
+                            <div>
+                                <button type="button" class="btn btn-primary me-3"
+                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-filter fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Filter</span>
+                                </button>
+                                <div id="filter-menu" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px"
+                                     data-kt-menu="true">
+                                    <!--begin::Header-->
+                                    <div class="px-7 py-5">
+                                        <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Separator-->
+                                    <div class="separator border-gray-200"></div>
+                                    <!--end::Separator-->
+                                    <!--begin::Content-->
+                                    <div class="px-7 py-5">
+
+                                        <div class="mb-3" id="select-subcontractor">
+                                            <select class="form-select form-select2 form-select-solid fw-bold" id="filtro-subcontractor">
+                                                <option value="">Subcontractor</option>
+                                                {% for item in subcontractors %}
+                                                    <option value="{{ item.subcontractor_id }}">{{ item.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-3" id="select-project">
+                                            <select class="form-select form-select2 form-select-solid fw-bold" id="filtro-project">
+                                                <option value="">Project</option>
+                                                {% for item in projects %}
+                                                    <option value="{{ item.project_id }}">{{ item.number }} - {{ item.description }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-3" id="select-project-item">
+                                            <select class="form-select form-select2 form-select-solid fw-bold" id="filtro-project-item">
+                                                <option value="">Item</option>
+                                            </select>
+                                        </div>
+
+                                       
+                                        <div class="mb-3">
+                                            <div class="input-group input-group-solid date-picker-filter"
+                                                 id="datetimepicker-desde" data-td-target-input="nearest"
+                                                 data-td-target-toggle="nearest">
+                                                <input type="text" class="form-control filter-date" placeholder="From"
+                                                       data-td-target="#datetimepicker-desde" autocomplete="off"/>
+                                                <span class="input-group-text" data-td-target="#datetimepicker-desde"
+                                                      data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="input-group input-group-solid date-picker-filter"
+                                                 id="datetimepicker-hasta" data-td-target-input="nearest"
+                                                 data-td-target-toggle="nearest">
+                                                <input type="text" class="form-control filter-date" placeholder="To"
+                                                       data-td-target="#datetimepicker-hasta" autocomplete="off"/>
+                                                <span class="input-group-text" data-td-target="#datetimepicker-hasta"
+                                                      data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!--begin::Actions-->
+                                        <div class="d-flex justify-content-end mt-10">
+                                            <button type="reset"
+                                                    class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                                    data-kt-menu-dismiss="true"
+                                                    id="btn-reset-filtrar">Reset filters
+                                            </button>
+                                            <button type="submit" class="btn btn-primary fw-semibold px-6"
+                                                    data-kt-menu-dismiss="true" id="btn-filtrar">
+                                                Apply
+                                            </button>
+                                        </div>
+                                        <!--end::Actions-->
+                                    </div>
+                                    <!--end::Content-->
+                                </div>
+                            </div>
+
+                            <!-- export -->
+                            <div>
+                                <!--begin::Export buttons-->
+                                <div id="reporte-subcontractor-table-editable-export" class="d-none"></div>
+                                <!--end::Export buttons-->
+
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
+                                        data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
+                                                class="path2"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                                </button>
+
+                                <!--begin::Menu-->
+                                <div id="reporte_subcontractor_export_menu"
+                                     class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                     data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                            Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                            Export to Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                            Export CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="pdf">
+                                            Export to PDF
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="javascript:;" class="menu-link px-3" id="btn-exportar">
+                                            Export Report
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+
+                                <!--begin::Hide default export buttons-->
+                                <div id="reporte-subcontractor-table-editable-buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-                <!--end: Search Form -->
-                <!--begin: Datatable -->
-                <div class="m_datatable" id="reporte-subcontractor-table-editable"></div>
-                <!--end: Datatable -->
+                <div class="card-body">
+                    <!--begin::Datatable-->
+                    <table id="reporte-subcontractor-table-editable"
+                           class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                        <thead>
+                        <tr class="fw-bold fs-6 text-gray-800 px-7">
+                            <th>Date</th>
+                            <th>Project</th>
+                            <th>Subcontractor</th>
+                            <th>Item</th>
+                            <th>Unit</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>$ Total</th>
+                        </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-semibold">
+                        </tbody>
+                    </table>
+                    <!--end::Datatable-->
+                </div>
             </div>
-        </div>
 
+        </div>
+        <!--end::Content container-->
     </div>
+    <!--end::Content-->
 
 
 {% endblock %}
 
 {% block javascriptsspecific %}
 
-
+    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script src="{{ asset('bundles/metronic8/js/pages/reporte-subcontractor.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 

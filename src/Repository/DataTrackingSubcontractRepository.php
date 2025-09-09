@@ -322,6 +322,95 @@ class DataTrackingSubcontractRepository extends EntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
+
+    /**
+     * ListarReporteSubcontractorsConTotal: Lista y cuenta aplicando los mismos filtros.
+     *
+     */
+    public function ListarReporteSubcontractorsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'date',
+                                       string $sortDir = 'DESC', ?string $subcontractor_id = '', ?string $project_id = '', ?string $project_item_id = '', ?string $fecha_inicial = '', ?string $fecha_fin = ''): array {
+
+        // Whitelist de campos ordenables
+        $sortable = [
+            'id' => 'd_t_s.id',
+            'date' => 'd_t.date',
+            'project' => 'p.name',
+            'subcontractor' => 's.name',
+            'item' => 'i.description',
+            'unit' => 'u.description',
+            'quantity' => 'd_t_s.quantity',
+            'price' => 'd_t_s.price',
+            'total' => 'd_t_s.price',
+        ];
+        $orderBy = $sortable[$sortField] ?? 'd_t_s.date';
+        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con JOIN y filtros
+        $baseQb = $this->createQueryBuilder('d_t_s')
+            ->leftJoin('d_t_s.subcontractor', 's')
+            ->leftJoin('d_t_s.projectItem', 'p_i')
+            ->leftJoin('p_i.item', 'i')
+            ->leftJoin('i.unit', 'u')
+            ->leftJoin('d_t_s.dataTracking', 'd_t')
+            ->leftJoin('d_t.project', 'p');
+
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('s.name LIKE :search OR i.description LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search')
+                ->setParameter('search', '%' . $sSearch . '%');
+        }
+
+        if ($subcontractor_id != '') {
+            $baseQb->andWhere('s.subcontractorId = :subcontractor_id')
+                ->setParameter('subcontractor_id', $subcontractor_id);
+        }
+
+        if ($project_id != '') {
+            $baseQb->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        if ($project_item_id != '') {
+            $baseQb->andWhere('p_i.id = :project_item_id')
+                ->setParameter('project_item_id', $project_item_id);
+        }
+
+        if ($fecha_inicial != '') {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+            $baseQb->andWhere('d_t.date >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != '') {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+            $baseQb->andWhere('d_t.date <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        // ---- Datos (con paginación y orden) ----
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start);
+
+        if ($limit > 0) {
+            $dataQb->setMaxResults($limit);
+        }
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(d_t_s.id)');
+
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data'  => $data,
+            'total' => $total, // total con el MISMO filtro aplicado
+        ];
+    }
+
+
     /**
      * ListarReporteSubcontractorsParaExcel: Lista el reporte subcontractors
      * @param int $start Inicio
