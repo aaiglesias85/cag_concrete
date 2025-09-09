@@ -215,7 +215,9 @@ class EstimateController extends AbstractController
             if ($estimate_id === '') {
                 $resultado = $this->estimateService->SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
                     $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
-                    $project_types_id, $estimators_id);
+                    $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
+                    $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived,
+                    $companys);
             } else {
                 $resultado = $this->estimateService->ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
                     $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,

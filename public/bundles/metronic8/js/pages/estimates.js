@@ -126,17 +126,23 @@ var Estimates = function () {
             {
                 targets: 2,
                 render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                    return DatatableUtil.getRenderColumnDiv(data, 300);
                 }
             },
             {
                 targets: 3,
                 render: function (data, type, row) {
-                    return `<div class="d-flex" style="gap: 5px;">${data}</div>`;
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
             },
             {
                 targets: 4,
+                render: function (data, type, row) {
+                    return `<div class="d-flex w-200px" style="gap: 5px;">${data}</div>`;
+                }
+            },
+            {
+                targets: 5,
                 render: function (data, type, row) {
                     return DatatableUtil.getRenderColumnDiv(data, 150);
                 }
@@ -155,17 +161,23 @@ var Estimates = function () {
                 {
                     targets: 1,
                     render: function (data, type, row) {
-                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                        return DatatableUtil.getRenderColumnDiv(data, 300);
                     }
                 },
                 {
                     targets: 2,
                     render: function (data, type, row) {
-                        return `<div class="d-flex" style="gap: 5px;">${data}</div>`;
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
                     }
                 },
                 {
                     targets: 3,
+                    render: function (data, type, row) {
+                        return `<div class="d-flex w-200px" style="gap: 5px;">${data}</div>`;
+                    }
+                },
+                {
+                    targets: 4,
                     render: function (data, type, row) {
                         return DatatableUtil.getRenderColumnDiv(data, 150);
                     }
@@ -347,7 +359,7 @@ var Estimates = function () {
         $('#filtro-county').trigger('change');
 
         // limpiar select
-        MyApp.limpiarSelect('#filtro-district');
+        MyUtil.limpiarSelect('#filtro-district');
 
         FlatpickrUtil.clear('datetimepicker-desde');
         FlatpickrUtil.clear('datetimepicker-hasta');
@@ -760,7 +772,6 @@ var Estimates = function () {
             .then(function (res) {
                 if (res.status === 200 || res.status === 201) {
                     var response = res.data;
-                    BlockUtil.unblock("#form-project");
                     if (response.success) {
                         toastr.success(response.message, "");
 
@@ -911,25 +922,25 @@ var Estimates = function () {
                 $('#email').importTags(estimate.email);
             }
 
-            const jobWalk = MyApp.convertirStringAFecha(estimate.jobWalk);
+            const jobWalk = MyApp.convertirStringAFechaHora(estimate.jobWalk);
             FlatpickrUtil.setDate('datetimepicker-jobWalk', jobWalk);
 
-            const rfiDueDate = MyApp.convertirStringAFecha(estimate.rfiDueDate);
+            const rfiDueDate = MyApp.convertirStringAFechaHora(estimate.rfiDueDate);
             FlatpickrUtil.setDate('datetimepicker-rfiDueDate', rfiDueDate);
 
-            const projectStart = MyApp.convertirStringAFecha(estimate.projectStart);
+            const projectStart = MyApp.convertirStringAFechaHora(estimate.projectStart);
             FlatpickrUtil.setDate('datetimepicker-projectStart', projectStart);
 
-            const projectEnd = MyApp.convertirStringAFecha(estimate.projectEnd);
+            const projectEnd = MyApp.convertirStringAFechaHora(estimate.projectEnd);
             FlatpickrUtil.setDate('datetimepicker-projectEnd', projectEnd);
 
-            const submittedDate = MyApp.convertirStringAFecha(estimate.submittedDate);
+            const submittedDate = MyApp.convertirStringAFechaHora(estimate.submittedDate);
             FlatpickrUtil.setDate('datetimepicker-submittedDate', submittedDate);
 
-            const awardedDate = MyApp.convertirStringAFecha(estimate.awardedDate);
+            const awardedDate = MyApp.convertirStringAFechaHora(estimate.awardedDate);
             FlatpickrUtil.setDate('datetimepicker-awardedDate', awardedDate);
 
-            const lostDate = MyApp.convertirStringAFecha(estimate.lostDate);
+            const lostDate = MyApp.convertirStringAFechaHora(estimate.lostDate);
             FlatpickrUtil.setDate('datetimepicker-lostDate', lostDate);
 
             $('#location').val(estimate.location);
@@ -1076,6 +1087,10 @@ var Estimates = function () {
 
         $('.select-modal-item').select2({
             dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
+        });
+
+        $('.select-modal-bid-deadline').select2({
+            dropdownParent: $('#modal-bid-deadline')
         });
 
         $('.select-stage').select2({
@@ -1248,46 +1263,46 @@ var Estimates = function () {
         });
 
         // bidDeadline
-        FlatpickrUtil.initDate('datetimepicker-bidDeadline', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-bidDeadline', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // jobWalk
-        FlatpickrUtil.initDate('datetimepicker-jobWalk', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-jobWalk', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // rfiDueDate
-        FlatpickrUtil.initDate('datetimepicker-rfiDueDate', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-rfiDueDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // projectStart
-        FlatpickrUtil.initDate('datetimepicker-projectStart', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-projectStart', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // projectEnd
-        FlatpickrUtil.initDate('datetimepicker-projectEnd', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-projectEnd', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // submittedDate
-        FlatpickrUtil.initDate('datetimepicker-submittedDate', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-submittedDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // awardedDate
-        FlatpickrUtil.initDate('datetimepicker-awardedDate', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-awardedDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
         // lostDate
-        FlatpickrUtil.initDate('datetimepicker-lostDate', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        FlatpickrUtil.initDateTime('datetimepicker-lostDate', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm'},
         });
 
-        // bid-deadline-date
+        // bid deadline date
         FlatpickrUtil.initDate('datetimepicker-bid-deadline-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
@@ -1406,7 +1421,7 @@ var Estimates = function () {
         var company_id = $('#company').val();
 
         // reset
-        MyApp.limpiarSelect('#contact');
+        MyUtil.limpiarSelect('#contact');
 
         if (company_id !== '') {
 
@@ -1442,7 +1457,7 @@ var Estimates = function () {
         const select = '#contact';
 
         // reset
-        MyApp.limpiarSelect(select);
+        MyUtil.limpiarSelect(select);
 
         for (var i = 0; i < contacts_company.length; i++) {
             $(select).append(new Option(contacts_company[i].name, contacts_company[i].contact_id, false, false));
@@ -1587,7 +1602,7 @@ var Estimates = function () {
 
         bid_deadlines.forEach(function (item, index) {
             html += `
-        <div class="d-flex flex-stack py-2" style="width: 500px;">
+        <div class="d-flex flex-stack py-2 w-500px">
             <!--begin::Info-->
             <div class="d-flex flex-column">
                 <span class="fw-semibold fs-6 text-gray-800">
@@ -1601,22 +1616,22 @@ var Estimates = function () {
 
             <!--begin::Actions-->
             <div class="d-flex gap-2">
-                <button type="button"
-                        class="btn btn-icon btn-sm btn-light-success"
+                <a href="javascript:void(0)"
+                        class="btn btn-icon btn-sm btn-light-success edit"
                         title="Edit record"
                         data-posicion="${item.posicion}">
                     <i class="la la-edit"></i>
-                </button>
-                <button type="button"
-                        class="btn btn-icon btn-sm btn-light-danger"
+                </a>
+                <a href="javascript:void(0)"
+                        class="btn btn-icon btn-sm btn-light-danger delete"
                         title="Delete record"
                         data-posicion="${item.posicion}">
                     <i class="la la-trash"></i>
-                </button>
+                </a>
             </div>
             <!--end::Actions-->
         </div>
-        <div class="separator separator-dashed my-3"></div>
+        <div class="separator separator-dashed my-3 w-500px"></div>
         `;
         });
 
@@ -1678,7 +1693,7 @@ var Estimates = function () {
 
             } else {
                 if (bidDeadline === '') {
-                    MyApp.showErrorMessageValidateInput(KTUtil.get("bid-deadline-date"), "This field is required");
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-bid-deadline-date"), "This field is required");
                 }
                 if (company_id === "") {
                     MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company-bid-deadline"), "This field is required");
@@ -1816,7 +1831,7 @@ var Estimates = function () {
         // Tomar la fecha más cercana
         var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
 
-        const date = MyApp.convertirStringAFecha(fechaMasCercana);
+        const date = MyApp.convertirStringAFechaHora(fechaMasCercana);
         FlatpickrUtil.setDate('datetimepicker-bidDeadline', date);
 
         // funcion para parsear
@@ -1891,7 +1906,7 @@ var Estimates = function () {
 
         // escapar contenido de la tabla
         oTableProjectInformation = DatatableUtil.initSafeDataTable(table, {
-            data: contacts,
+            data: bid_deadlines,
             displayLength: 10,
             order: order,
             columns: columns,
@@ -2113,11 +2128,11 @@ var Estimates = function () {
 
                 var formData = new URLSearchParams();
 
-                var project_item_id = $('#project_item_id').val();
-                formData.set("project_item_id", project_item_id);
+                var estimate_item_id = $('#estimate_item_id').val();
+                formData.set("estimate_item_id", estimate_item_id);
 
-                var project_id = $('#project_id').val();
-                formData.set("project_id", project_id);
+                var estimate_id = $('#estimate_id').val();
+                formData.set("estimate_id", estimate_id);
 
                 formData.set("item_id", item_id);
 
@@ -2141,7 +2156,7 @@ var Estimates = function () {
 
                 BlockUtil.block('#modal-item .modal-content');
 
-                axios.post("project/agregarItem", formData, {responseType: "json"})
+                axios.post("estimate/agregarItem", formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;
@@ -2285,14 +2300,14 @@ var Estimates = function () {
         function eliminarItem(posicion) {
             if (items[posicion]) {
 
-                if (items[posicion].project_item_id != '') {
+                if (items[posicion].estimate_item_id != '') {
 
                     var formData = new URLSearchParams();
-                    formData.set("project_item_id", items[posicion].project_item_id);
+                    formData.set("estimate_item_id", items[posicion].estimate_item_id);
 
                     BlockUtil.block('#lista-items');
 
-                    axios.post("project/eliminarItem", formData, {responseType: "json"})
+                    axios.post("estimate/eliminarItem", formData, {responseType: "json"})
                         .then(function (res) {
                             if (res.status === 200 || res.status === 201) {
                                 var response = res.data;
@@ -2475,7 +2490,7 @@ var Estimates = function () {
 
         companys.forEach(function (item) {
             html += `
-        <div class="d-flex flex-stack py-2" style="width: 500px;">
+        <div class="d-flex flex-stack py-2 w-500px">
             <!--begin::Info-->
             <div class="d-flex flex-column">
                 <span class="fw-semibold fs-6 text-gray-800">
@@ -2495,22 +2510,22 @@ var Estimates = function () {
 
             <!--begin::Actions-->
             <div class="d-flex gap-2">
-                <button type="button"
+                <a href="javascript:void(0)"
                         class="btn btn-icon btn-sm btn-light-success edit"
                         title="Edit record"
                         data-posicion="${item.posicion}">
                     <i class="la la-edit"></i>
-                </button>
-                <button type="button"
+                </a>
+                <a href="javascript:void(0)"
                         class="btn btn-icon btn-sm btn-light-danger delete"
                         title="Delete record"
                         data-posicion="${item.posicion}">
                     <i class="la la-trash"></i>
-                </button>
+                </a>
             </div>
             <!--end::Actions-->
         </div>
-        <div class="separator separator-dashed my-3"></div>
+        <div class="separator separator-dashed my-3 w-500px"></div>
         `;
         });
 
@@ -2727,7 +2742,7 @@ var Estimates = function () {
         $('#company').val('');
         $('#company').trigger('change');
 
-        MyApp.limpiarSelect('#contact');
+        MyUtil.limpiarSelect('#contact');
 
 
         // tooltips selects

@@ -39,7 +39,7 @@
 }
 
 .has-error .form-control, .has-error .note-editor {
-    border-color: #cb5a5e;
+    border-color: #cb5a5e !important;
     box-shadow: none;
 }
 
@@ -48,12 +48,12 @@ input.has-error, .required.has-error, span.has-error {
 }
 
 .is-invalid .form-control {
-    border-color: #fd397a;
+    border-color: #fd397a !important;
     box-shadow: none;
 }
 
 .is-invalid .note-editor {
-    border-color: #fd397a;
+    border-color: #fd397a !important;
     box-shadow: none;
 }
 
@@ -62,7 +62,7 @@ input.has-error, .required.has-error, span.has-error {
 }
 
 textarea.form-control.is-invalid {
-    border-color: #fd397a;
+    border-color: #fd397a !important;
 }
 
 input.is-invalid, .required.is-invalid, span.is-invalid {

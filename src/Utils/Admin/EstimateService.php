@@ -891,7 +891,9 @@ class EstimateService extends Base
      */
     public function SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
                                    $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
-                                   $project_types_id, $estimators_id)
+                                   $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
+                                   $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived,
+                                   $companys)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -913,6 +915,13 @@ class EstimateService extends Base
         $entity->setWorkHour($workHour);
         $entity->setPhone($phone);
         $entity->setEmail($email);
+        $entity->setLocation($location);
+        $entity->setSector($sector);
+
+        $entity->setBidDescription($bidDescription);
+        $entity->setBidInstructions($bidInstructions);
+        $entity->setPlanLink($planLink);
+        $entity->setQuoteReceived($quoteReceived);
 
         if ($bidDeadline != '') {
             $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadline);
@@ -949,6 +958,47 @@ class EstimateService extends Base
             $entity->setDistrict($district);
         }
 
+        if ($jobWalk != '') {
+            $jobWalk = \DateTime::createFromFormat('m/d/Y H:i', $jobWalk);
+            $entity->setJobWalk($jobWalk);
+        }
+
+        if ($rfiDueDate != '') {
+            $rfiDueDate = \DateTime::createFromFormat('m/d/Y H:i', $rfiDueDate);
+            $entity->setRfiDueDate($rfiDueDate);
+        }
+
+        if ($projectStart != '') {
+            $projectStart = \DateTime::createFromFormat('m/d/Y H:i', $projectStart);
+            $entity->setProjectStart($projectStart);
+        }
+
+        if ($projectEnd != '') {
+            $projectEnd = \DateTime::createFromFormat('m/d/Y H:i', $projectEnd);
+            $entity->setProjectEnd($projectEnd);
+        }
+
+        if ($submittedDate != '') {
+            $submittedDate = \DateTime::createFromFormat('m/d/Y H:i', $submittedDate);
+            $entity->setSubmittedDate($submittedDate);
+        }
+
+        if ($awardedDate != '') {
+            $awardedDate = \DateTime::createFromFormat('m/d/Y H:i', $awardedDate);
+            $entity->setAwardedDate($awardedDate);
+        }
+
+        if ($lostDate != '') {
+            $lostDate = \DateTime::createFromFormat('m/d/Y H:i', $lostDate);
+            $entity->setLostDate($lostDate);
+        }
+
+        if ($plan_downloading_id != '') {
+            $plan_downloading = $this->getDoctrine()->getRepository(PlanDownloading::class)
+                ->find($plan_downloading_id);
+            $entity->setPlanDownloading($plan_downloading);
+        }
+
         $em->persist($entity);
 
         // save project types
@@ -956,6 +1006,12 @@ class EstimateService extends Base
 
         // save estimators
         $this->SalvarEstimators($entity, $estimators_id);
+
+        // bid_deadlines
+        $this->SalvarBidDeadlines($entity, $bid_deadlines);
+
+        // companys
+        $this->SalvarCompanys($entity, $companys);
 
         $em->flush();
 
@@ -1135,7 +1191,7 @@ class EstimateService extends Base
         $restantes = array_slice($companies, 1);
 
         // Estilo base para los badges
-        $estiloBase = 'padding: 3px 9px; font-size: 11px;cursor:pointer;';
+        $estiloBase = 'padding: 3px 9px; font-size: 11px;cursor:pointer; color: #FFF;';
 
         // Si hay más de una empresa, agregar borde izquierdo rojo al primer badge
         $estiloPrincipal = $estiloBase;
@@ -1155,7 +1211,11 @@ class EstimateService extends Base
 
             $dataContent = htmlspecialchars($contenidoPopover, ENT_QUOTES, 'UTF-8');
 
-            $html .= '<span class="badge badge-primary popover-company" data-toggle="popover" data-html="true" data-content="' . $dataContent . '" style="' . $estiloBase . '">+' . count($restantes) . '</span>';
+            $html .= '<span class="badge bg-primary popover-company"
+                        data-bs-toggle="popover"
+                        data-bs-html="true"
+                        data-bs-content="' . $dataContent . '"
+                        style="' . $estiloBase . '">+' . count($restantes) . '</span>';
         }
 
         $html .= '</div>';

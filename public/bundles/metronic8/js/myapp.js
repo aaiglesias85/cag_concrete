@@ -1039,22 +1039,39 @@ var MyApp = function () {
         return objectDate;
     };
 
-    const convertirStringAFechaHora = (dateTimeString) => {
-        // Separar la fecha y la hora
-        const [datePart, timePart] = dateTimeString.split(' ');
+    // convertir a fecha
+    var convertirStringAFecha = function (fecha) {
+        var fecha_array = fecha.split("/");
 
-        // Separar el día, mes y año
-        const [day, month, year] = datePart.split('/').map(Number);
+        var year = fecha_array[2];
+        var month = fecha_array[0] - 1; // OJO: mes empieza en 0
+        var day = fecha_array[1];
 
-        // Separar la hora y los minutos
-        const [hours, minutes] = timePart ? timePart.split(':').map(Number) : [0, 0]; // Valores predeterminados 0 si no se proporciona la hora
+        return new Date(year, month, day);
+    };
 
-        // Crear una cadena de fecha y hora en formato ISO
-        const isoString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+    // convertir a fecha y hora
+    var convertirStringAFechaHora = function (dateTimeString) {
+        // Separar fecha y hora
+        var [datePart, timePart] = dateTimeString.split(" ");
 
-        // Convertir la cadena de fecha y hora a UTC
-        return toZonedTime(isoString, 'America/Santiago');
-    }
+        // Extraer día, mes, año
+        var fecha_array = datePart.split("/");
+        var year = fecha_array[2];
+        var month = fecha_array[0] - 1; // mes empieza en 0
+        var day = fecha_array[1];
+
+        // Extraer hora y minutos
+        var hours = 0, minutes = 0;
+        if (timePart) {
+            var time_array = timePart.split(":");
+            hours = parseInt(time_array[0], 10) || 0;
+            minutes = parseInt(time_array[1], 10) || 0;
+        }
+
+        return new Date(year, month, day, hours, minutes);
+    };
+
 
     // session time out
     var sessionTimeout = null;

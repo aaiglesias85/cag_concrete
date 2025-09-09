@@ -389,7 +389,7 @@
 
                     <div class="card-body">
 
-                        <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
+                        <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6 hide nav-item-hide">
                             <li class="nav-item">
                                 <a class="nav-link active wizard-tab" data-item="1"
                                    data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
@@ -1193,23 +1193,20 @@
                             </label>
                             <div class="row">
                                 <div class="col-md-8">
-                                    <div class="input-group input-group-solid date-picker-filter"
-                                         id="datetimepicker-bid-deadline-date" data-td-target-input="nearest"
+                                    <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-bid-deadline-date"
+                                         data-td-target-input="nearest"
                                          data-td-target-toggle="nearest">
-                                        <input type="text" class="form-control filter-date"
+                                        <input type="text" class="form-control filter-date" data-td-target="#datetimepicker-bid-deadline-date"
                                                placeholder="Select a date" id="bid-deadline-date"
-                                               data-td-target="#datetimepicker-bid-deadline-date" autocomplete="off"
+                                               autocomplete="off"
                                                name="day"/>
-                                        <span class="input-group-text"
-                                              data-td-target="#datetimepicker-bid-deadline-date"
-                                              data-td-toggle="datetimepicker">
-                                                  <i class="ki-duotone ki-calendar fs-2"><span
-                                                              class="path1"></span><span class="path2"></span></i>
-                                                </span>
+                                        <span class="input-group-text" data-td-target="#datetimepicker-bid-deadline-date" data-td-toggle="datetimepicker">
+                                            <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="col-md-4" id="select-bid-deadline-hour">
-                                    <select class="form-control form-select form-select2 select-validate form-select-solid"
+                                    <select class="form-control form-select select-validate form-select-solid select-modal-bid-deadline"
                                             id="bid-deadline-hour" name="hour">
                                         <option value="">Hour</option>
                                         {% for h in 0..23 %}
@@ -1230,7 +1227,7 @@
                             <div id="select-company-bid-deadline" class="input-group input-group-solid flex-nowrap">
                                 <div class="overflow-hidden flex-grow-1">
                                     <select id="company-bid-deadline"
-                                            class="form-control form-select form-select2 select-validate form-select-solid rounded-end-0 border-end select-company">
+                                            class="form-control form-select select-validate form-select-solid rounded-end-0 border-end select-company select-modal-bid-deadline">
                                         <option value="">Select</option>
                                         {% for item in companies %}
                                             <option value="{{ item.companyId }}">{{ item.name }}</option>
