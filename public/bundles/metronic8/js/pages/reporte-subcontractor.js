@@ -442,7 +442,7 @@ var ReporteSubcontractor = function () {
 
             var formData = new URLSearchParams();
 
-            var generalSearch = $('lista-reporte-subcontractor [data-table-filter="search"]').val();
+            var generalSearch = $('#lista-reporte-subcontractor [data-table-filter="search"]').val();
             formData.set("search", generalSearch);
 
             var subcontractor_id = $('#filtro-subcontractor').val();

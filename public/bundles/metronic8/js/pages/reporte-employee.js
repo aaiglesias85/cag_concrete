@@ -1,147 +1,208 @@
 var ReporteEmployee = function () {
 
-    var oTable;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#reporte-employee-table-editable');
+        const table = "#reporte-employee-table-editable";
 
-        var table = $('#reporte-employee-table-editable');
+        // datasource
+        const datasource = {
+            url: `report-employee/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    employee_id: $('#filtro-employee').val(),
+                    project_id: $('#filtro-project').val(),
+                    project_item_id: $('#filtro-project-item').val(),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        aoColumns.push(
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "project",
-                title: "Project",
-                width: 150,
-            },
-            {
-                field: "employee",
-                title: "Employee",
-            },
-            {
-                field: "role",
-                title: "Role",
-            },
-            {
-                field: "hours",
-                title: "Hours",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.hours, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "hourly_rate",
-                title: "Hourly Rate",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.hourly_rate, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'report-employee/listar',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (data.pending === 1) {
-                        $(row).addClass('row-pending');
-                    }
-                }
-            }
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#reporte-employee-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#reporte-employee-table-editable');
-            })
-            .on('m-datatable--on-layout-updated', function () {
-                console.log('Layout render updated');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#reporte-employee-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#reporte-employee-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#reporte-employee-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-reporte-employee .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+        });
+
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        columns.push(
+            {data: 'date'},
+            {data: 'project'},
+            {data: 'employee'},
+            {data: 'role'},
+            {data: 'hours'},
+            {data: 'hourly_rate'},
+            {data: 'total'}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        return [
+            {
+                targets: 0,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
+            },
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
+            },
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
+            },
+        ];
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-reporte-employee [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-reporte-employee [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    btnClickFiltrar()
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Employees Report';
+        var table = document.querySelector('#reporte-employee-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#reporte-employee-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#reporte_employee_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
     //Filtrar
     var initAccionFiltrar = function () {
 
@@ -150,66 +211,54 @@ var ReporteEmployee = function () {
             btnClickFiltrar();
         });
 
-        $(document).off('click', "#btn-reset-filters");
-        $(document).on('click', "#btn-reset-filters", function (e) {
-
-            $('#lista-reporte-employee .m_form_search').val('');
-
-            $('#filtro-employee option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-employee').select2();
-
-            actualizarSelectEmployees(all_employees);
-
-            $('#filtro-project option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project').select2();
-
-            actualizarSelectProjects(all_projects);
-
-            $('#fechaInicial').val('');
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+            btnClickResetFilters();
         });
 
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-reporte-employee .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var employee_id = $('#filtro-employee').val();
-        query.employee_id = employee_id;
-
-        var project_id = $('#filtro-project').val();
-        query.project_id = project_id;
-
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        const search = $('#lista-reporte-employee [data-table-filter="search"]').val();
+        oTable.search(search).draw();
 
         // devolver total
         devolverTotal();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-reporte-employee [data-table-filter="search"]').val('');
+
+        // limpiar select
+        MyUtil.limpiarSelect('#filtro-employee');
+        actualizarSelectEmployees(all_employees);
+
+        // limpiar select
+        MyUtil.limpiarSelect('#filtro-project');
+        actualizarSelectProjects(all_projects);
+
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
+
+        btnClickFiltrar();
     }
 
 
     var initWidgets = function () {
 
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('.m-select2').select2();
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        FlatpickrUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
 
         // change
         $('#filtro-employee').change(changeEmployee);
@@ -222,11 +271,7 @@ var ReporteEmployee = function () {
 
         // reset
         if (project_id === '') {
-            $('#filtro-project option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project').select2();
+            MyUtil.limpiarSelect('#filtro-project');
         }
 
         if (employee_id != '') {
@@ -243,45 +288,42 @@ var ReporteEmployee = function () {
         btnClickFiltrar();
     }
     var listarProjectsDeEmployee = function (employee_id, project_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("employee_id", employee_id);
+
         BlockUtil.block('#select-project');
 
-        $.ajax({
-            type: "POST",
-            url: "employee/listarProjects",
-            dataType: "json",
-            data: {
-                'employee_id': employee_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-project');
-                if (response.success) {
+        axios.post("employee/listarProjects", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    //Llenar select
-                    actualizarSelectProjects(response.projects);
+                        //Llenar select
+                        actualizarSelectProjects(response.projects);
 
-                    if (project_id !== '') {
-                        $('#filtro-project').val(project_id);
-                        $('#filtro-project').trigger('change');
+                        if (project_id !== '') {
+                            $('#filtro-project').val(project_id);
+                            $('#filtro-project').trigger('change');
+                        }
+
+                    } else {
+                        toastr.error(response.error, "");
                     }
-
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-project');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-project");
+            });
     }
     var actualizarSelectProjects = function (projects) {
         // reset
-        $('#filtro-project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project').select2();
+        MyUtil.limpiarSelect('#filtro-project');
 
         for (var i = 0; i < projects.length; i++) {
             $('#filtro-project').append(new Option(`${projects[i].number} - ${projects[i].description}`, projects[i].project_id, false, false));
@@ -295,11 +337,7 @@ var ReporteEmployee = function () {
         // reset
         var employee_id = $('#filtro-employee').val();
         if (employee_id === '') {
-            $('#filtro-employee option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-employee').select2();
+            MyUtil.limpiarSelect('#filtro-employee');
         }
 
         if (project_id != '') {
@@ -321,56 +359,40 @@ var ReporteEmployee = function () {
     }
 
     var listarEmployeesDeProject = function (project_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("project_id", project_id);
+
         BlockUtil.block('#select-employee');
 
-        $.ajax({
-            type: "POST",
-            url: "project/listarEmployees",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-employee');
-                if (response.success) {
-
-                    //Llenar select
-                    actualizarSelectEmployees(response.employees);
-
+        axios.post("project/listarEmployees", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+                        //Llenar select
+                        actualizarSelectEmployees(response.employees);
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-employee');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-employee");
+            });
     }
     var actualizarSelectEmployees = function (employees) {
         // reset
-        $('#filtro-employee option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-employee').select2();
-
+        MyUtil.limpiarSelect('#filtro-employee');
+        
         for (var i = 0; i < employees.length; i++) {
             $('#filtro-employee').append(new Option(employees[i].name, employees[i].employee_id, false, false));
         }
         $('#filtro-employee').select2();
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-reporte-employee');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
     }
 
     var initAccionExportar = function () {
@@ -379,78 +401,95 @@ var ReporteEmployee = function () {
         $(document).on('click', "#btn-exportar", function (e) {
             e.preventDefault();
 
-            var generalSearch = $('#lista-reporte-employee .m_form_search').val();
+            var formData = new URLSearchParams();
+
+            var generalSearch = $('#lista-reporte-employee [data-table-filter="search"]').val();
+            formData.set("search", generalSearch);
+            
             var employee_id = $('#filtro-employee').val();
+            formData.set("employee_id", employee_id);
+            
             var project_id = $('#filtro-project').val();
-            var fecha_inicial = $('#fechaInicial').val();
-            var fecha_fin = $('#fechaFin').val();
+            formData.set("project_id", project_id);
+
+            var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde');
+            formData.set("fecha_inicial", fecha_inicial);
+
+            var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta');
+            formData.set("fecha_fin", fecha_fin);
 
             BlockUtil.block('#lista-reporte-employee');
 
-            $.ajax({
-                type: "POST",
-                url: "report-employee/exportarExcel",
-                dataType: "json",
-                data: {
-                    'search': generalSearch,
-                    'employee_id': employee_id,
-                    'project_id': project_id,
-                    'fecha_inicial': fecha_inicial,
-                    'fecha_fin': fecha_fin
+            axios.post("report-employee/exportarExcel", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#lista-reporte-employee');
-                    if (response.success) {
-                        document.location = response.url;
+                            //document.location = response.url;
+
+                            var url = response.url;
+                            const archivo = url.split("/").pop();
+
+                            // crear link para que se descargue el archivo
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#lista-reporte-employee');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-reporte-employee");
+                });
         });
     };
 
     var devolverTotal = function () {
-        var generalSearch = $('#lista-reporte-employee .m_form_search').val();
+        var formData = new URLSearchParams();
+
+        var generalSearch = $('#lista-reporte-employee [data-table-filter="search"]').val();
+        formData.set("search", generalSearch);
+
         var employee_id = $('#filtro-employee').val();
+        formData.set("employee_id", employee_id);
+
         var project_id = $('#filtro-project').val();
-        var fecha_inicial = $('#fechaInicial').val();
-        var fecha_fin = $('#fechaFin').val();
+        formData.set("project_id", project_id);
+
+        var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde');
+        formData.set("fecha_inicial", fecha_inicial);
+
+        var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta');
+        formData.set("fecha_fin", fecha_fin);
 
         BlockUtil.block('#lista-reporte-employee');
 
-        $.ajax({
-            type: "POST",
-            url: "report-employee/devolverTotal",
-            dataType: "json",
-            data: {
-                'search': generalSearch,
-                'employee_id': employee_id,
-                'project_id': project_id,
-                'fecha_inicial': fecha_inicial,
-                'fecha_fin': fecha_fin
-
-            },
-            success: function (response) {
-                BlockUtil.unblock('#lista-reporte-employee');
-                if (response.success) {
-                    $('#total_reporte').val(response.total);
+        axios.post("report-employee/devolverTotal", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+                        $('#total_reporte').val(response.total);
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#lista-reporte-employee');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#lista-reporte-employee");
+            });
     }
 
     return {
@@ -458,6 +497,7 @@ var ReporteEmployee = function () {
         init: function () {
 
             initWidgets();
+
             initTable();
 
             initAccionFiltrar();

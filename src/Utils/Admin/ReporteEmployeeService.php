@@ -270,18 +270,18 @@ class ReporteEmployeeService extends Base
     public function ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
                                            $employee_id, $project_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
+        $resultado = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
+            ->ListarReporteEmployeesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-            ->ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
 
             $hours = $value->getHours();
             $hourly_rate = $value->getHourlyRate();
             $total = $hours * $hourly_rate;
 
-            $arreglo_resultado[] = [
+            $data[] = [
                 "id" => $value->getId(),
                 'employee' => $value->getEmployee() ? $value->getEmployee()->getName() : "",
                 'project' => $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription(),
@@ -293,7 +293,10 @@ class ReporteEmployeeService extends Base
             ];
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

@@ -177,17 +177,4 @@ class ReporteSubcontractorService extends Base
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
     }
-
-    /**
-     * TotalReporteSubcontractors: Total de reporte subcontractors
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalReporteSubcontractors($sSearch, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
-    {
-        $total = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->TotalReporteSubcontractors($sSearch, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
-
-        return $total;
-    }
 }

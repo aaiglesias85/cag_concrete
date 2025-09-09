@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Http\DataTablesHelper;
 use App\Utils\Admin\ProjectService;
 use App\Utils\Admin\ReporteEmployeeService;
 
@@ -48,59 +49,43 @@ class ReporteEmployeeController extends AbstractController
     }
 
     /**
-     * listar Acción que lista los projects
+     * listar Acción que lista los companies
      *
      */
     public function listar(Request $request)
     {
-
-        // search filter by keywords
-        $query = !empty($request->get('query')) ? $request->get('query') : array();
-        $sSearch = isset($query['generalSearch']) && is_string($query['generalSearch']) ? $query['generalSearch'] : '';
-        $employee_id = isset($query['employee_id']) && is_string($query['employee_id']) ? $query['employee_id'] : '';
-        $project_id = isset($query['project_id']) && is_string($query['project_id']) ? $query['project_id'] : '';
-        $fecha_inicial = isset($query['fechaInicial']) && is_string($query['fechaInicial']) ? $query['fechaInicial'] : '';
-        $fecha_fin = isset($query['fechaFin']) && is_string($query['fechaFin']) ? $query['fechaFin'] : '';
-
-        //Sort
-        $sort = !empty($request->get('sort')) ? $request->get('sort') : array();
-        $sSortDir_0 = !empty($sort['sort']) ? $sort['sort'] : 'desc';
-        $iSortCol_0 = !empty($sort['field']) ? $sort['field'] : 'date';
-        //$start and $limit
-        $pagination = !empty($request->get('pagination')) ? $request->get('pagination') : array();
-        $page = !empty($pagination['page']) ? (int)$pagination['page'] : 1;
-        $limit = !empty($pagination['perpage']) ? (int)$pagination['perpage'] : -1;
-        $start = 0;
-
         try {
-            $pages = 1;
-            $total = $this->reporteService->TotalReporteEmployees($sSearch, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
-            if ($limit > 0) {
-                $pages = ceil($total / $limit); // calculate total pages
-                $page = max($page, 1); // get 1 page when $_REQUEST['page'] <= 0
-                $page = min($page, $pages); // get last page when $_REQUEST['page'] > $totalPages
-                $start = ($page - 1) * $limit;
-                if ($start < 0) {
-                    $start = 0;
-                }
-            }
-
-            $meta = array(
-                'page' => $page,
-                'pages' => $pages,
-                'perpage' => $limit,
-                'total' => $total,
-                'field' => $iSortCol_0,
-                'sort' => $sSortDir_0
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'date', 'project', 'subcontractor', 'item', 'unit', 'quantity', 'price', 'total'],
+                defaultOrderField: 'date'
             );
 
-            $data = $this->reporteService->ListarReporteEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                $employee_id, $project_id, $fecha_inicial, $fecha_fin);
+            $employee_id = $request->get('employee_id');
+            $project_id = $request->get('project_id');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
 
-            $resultadoJson = array(
-                'meta' => $meta,
-                'data' => $data
+            // total + data en una sola llamada a tu servicio
+            $result = $this->reporteService->ListarReporteEmployees(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $employee_id,
+                $project_id,
+                $fecha_inicial,
+                $fecha_fin
             );
+
+            $resultadoJson = [
+                'draw'            => $dt['draw'],
+                'data'            => $result['data'],
+                'recordsTotal'    => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
 
             return $this->json($resultadoJson);
 
