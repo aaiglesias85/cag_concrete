@@ -105,6 +105,16 @@ var DatatableUtil = function () {
             html += _getRenderAccionEditar(row, permiso);
         }
 
+        // paid
+        if (acciones.includes('paid') && permiso.editar) {
+            html += _getRenderAccionPaid(row);
+        }
+
+        // exportar
+        if (acciones.includes('exportar_excel')) {
+            html += _getRenderAccionExportarExcel(row);
+        }
+
         // eliminar
         if (acciones.includes('delete') && permiso.eliminar) {
             html += _getRenderAccionEliminar(row);
@@ -171,6 +181,24 @@ var DatatableUtil = function () {
         var title = permiso.editar ? 'Edit' : 'View';
 
         return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
+              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+            </a>`
+    }
+
+    var _getRenderAccionPaid = function (row, permiso) {
+        var edit_icon = 'dollar';
+        var title = 'Paid/Unpaid';
+
+        return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="paid btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
+              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+            </a>`
+    }
+
+    var _getRenderAccionExportarExcel = function (row, permiso) {
+        var edit_icon = 'file-down';
+        var title = 'Export';
+
+        return `<a href="javascript:" data-id="${row.id}" title="${title} excel" class="excel btn btn-sm btn-icon btn-outline btn-outline-warning btn-active-light-warning">
               <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`
     }

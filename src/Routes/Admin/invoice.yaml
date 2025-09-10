@@ -3,7 +3,7 @@ invoice:
   defaults: { _controller: App\Controller\Admin\InvoiceController::index }
 
 listarInvoiceAdmin:
-  path: /invoice/listarInvoice
+  path: /invoice/listar
   defaults: { _controller: App\Controller\Admin\InvoiceController::listar, _format: json }
 
 eliminarInvoiceAdmin:

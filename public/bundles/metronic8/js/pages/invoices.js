@@ -1,166 +1,399 @@
 var Invoices = function () {
 
-    var oTable;
     var rowDelete = null;
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#invoice-table-editable');
+        const table = "#invoice-table-editable";
 
-        var table = $('#invoice-table-editable');
+        // datasource
+        const datasource = {
+            url: `invoice/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    company_id: $('#filtro-company').val(),
+                    project_id: $('#filtro-project').val(),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
-        aoColumns.push(
-            {
-                field: "number",
-                title: "Number",
-                width: 80,
-                template: function (row) {
-                    return `<input type="text" class="form-control invoice-number just-number" data-id="${row.id}" value="${row.number}" />`;
-                }
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[4, 'desc']] : [[3, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            fixedColumns: {
+                start: 2,
+                end: 1
             },
-            {
-                field: "company",
-                title: "Company"
+            // paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            // scrollY: 500,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "project",
-                title: "Project"
-            },
-            {
-                field: "startDate",
-                title: "From",
-                width: 100,
-            },
-            {
-                field: "endDate",
-                title: "To",
-                width: 100,
-            },
-            {
-                field: "total",
-                title: "Amount",
-                width: 100,
-                textAlign: 'center',
-            },
-            {
-                field: "notes",
-                title: "Notes",
-                width: 150
-            },
-            {
-                field: "paid",
-                title: "Paid",
-                responsive: {visible: 'lg'},
-                width: 80,
-                // callback function support for column rendering
-                template: function (row) {
-                    var status = {
-                        1: {'title': 'Yes', 'class': ' m-badge--success'},
-                        0: {'title': 'No', 'class': ' m-badge--danger'}
-                    };
-                    return '<span class="m-badge ' + status[row.paid].class + ' m-badge--wide">' + status[row.paid].title + '</span>';
-                }
-            },
-            {
-                field: "createdAt",
-                title: "Created At",
-                width: 100,
-            },
-            {
-                field: "acciones",
-                width: 150,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'invoice/listarInvoice',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#invoice-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#invoice-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#invoice-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#invoice-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#invoice-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-invoice .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionChangeNumber();
+            initAccionEliminar();
+            initAccionExportar();
+            initAccionPaid();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+
+        columns.push(
+            {data: 'number'},
+            {data: 'company'},
+            {data: 'project'},
+            {data: 'startDate'},
+            {data: 'endDate'},
+            {data: 'total'},
+            {data: 'notes'},
+            {data: 'paid'},
+            {data: 'createdAt'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            // number
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return `<input type="text" class="form-control invoice-number just-number w-100px" data-id="${row.id}" value="${data}" />`;
+                }
+            },
+            // company
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            // project
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 300);
+                }
+            },
+            // startDate
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // endDate
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // total
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // notes
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+            // paid
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    var status = {
+                        1: {'title': 'Yes', 'class': 'badge-primary'},
+                        0: {'title': 'No', 'class': 'badge-danger'},
+                    };
+
+                    return `<div style="width: 100px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
+                }
+            },
+            // createdAt
+            {
+                targets: 9,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                // number
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        return `<input type="text" class="form-control invoice-number just-number w-100px" data-id="${row.id}" value="${data}" />`;
+                    }
+                },
+                // company
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 200);
+                    }
+                },
+                // project
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 300);
+                    }
+                },
+                // startDate
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 100);
+                    }
+                },
+                // endDate
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 100);
+                    }
+                },
+                // total
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        return `<span>${MyApp.formatMoney(data)}</span>`;
+                    },
+                },
+                // notes
+                {
+                    targets: 6,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                // paid
+                {
+                    targets: 7,
+                    render: function (data, type, row) {
+                        var status = {
+                            1: {'title': 'Yes', 'class': 'badge-primary'},
+                            0: {'title': 'No', 'class': 'badge-danger'},
+                        };
+
+                        return `<div style="width: 100px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
+                    }
+                },
+                // createdAt
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete', 'paid', 'exportar_excel']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-invoice [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-invoice [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Invoices';
+        var table = document.querySelector('#invoice-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#invoice-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#invoice_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`.check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-invoice').removeClass('hide');
+        } else {
+            $('#btn-eliminar-invoice').addClass('hide');
+        }
+    }
 
     //Filtrar
     var initAccionFiltrar = function () {
@@ -170,88 +403,52 @@ var Invoices = function () {
             btnClickFiltrar();
         });
 
-    };
-    var initAccionResetFiltrar = function () {
-
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-invoice .m_form_search').val('');
-
-            $('#filtro-company').val('');
-            $('#filtro-company').trigger('change');
-
-            // reset
-            $('#filtro-project option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#filtro-project').select2();
-
-            $('#fechaInicial').val('');
-
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+            btnClickResetFilters();
         });
 
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-invoice .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-invoice [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-project [data-table-filter="search"]').val('');
 
-        var company_id = $('#filtro-company').val();
-        query.company_id = company_id;
+        $('#filtro-company').val('');
+        $('#filtro-company').trigger('change');
 
-        var project_id = $('#filtro-project').val();
-        query.project_id = project_id;
+        // reset
+        MyUtil.limpiarSelect('#filtro-project');
 
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        oTable.search('').draw();
     }
 
     //Reset forms
     var resetForms = function () {
-        $('#invoice-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#invoice-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("invoice-form");
 
         $('#company').val('');
         $('#company').trigger('change');
 
         // reset
-        $('#project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#project').select2();
+        MyUtil.limpiarSelect('#project');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        FlatpickrUtil.clear('datetimepicker-start-date');
+        FlatpickrUtil.clear('datetimepicker-end-date');
 
-        $('#paidinactivo').prop('checked', true);
+        $('#paidactivo').prop('checked', false);
 
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("invoice-form"));
+        
         // items
         items = [];
         actualizarTableListaItems();
@@ -269,46 +466,174 @@ var Invoices = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#invoice-form").validate({
-            rules: {
-                start_date: {
-                    required: true
-                },
-                end_date: {
-                    required: true
-                }
+        var form = KTUtil.get('invoice-form');
+
+        var constraints = {
+            startdate: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            enddate: {
+                presence: {message: "This field is required"},
+            },
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+        return result;
+    };
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 2;
+    var initWizard = function () {
+        $(document).off('click', "#form-invoice .wizard-tab");
+        $(document).on('click', "#form-invoice .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
 
-                });
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
+            }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                $('.btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                $('.btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
+            //bug visual de la tabla que muestra las cols corridas
+            switch (activeTab) {
+                case 2:
+                    actualizarTableListaItems();
+                    break;
+                case 3:
+                    actualizarTableListaPayments();
+                    break;
+            }
+
+        });
+
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    $('.btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('.btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-items').tab('show');
+                    actualizarTableListaItems();
+                    break;
+                case 3:
+                    $('#tab-payments').tab('show');
+                    actualizarTableListaPayments();
+                    break;
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 2;
+        mostrarTab();
+        $('.btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide');
+
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("invoice-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function () {
+        var result = true;
+        if (activeTab == 1) {
+
+            var project_id = $('#project').val();
+            if (!validateForm() || project_id == '' || !isValidNumber()) {
+                result = false;
+
+                if (project_id == "") {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project"), "This field is required");
+                }
+            }
+
+        }
+
+        return result;
+    }
+
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("invoice-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("invoice-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
             }
         });
     };
@@ -322,12 +647,18 @@ var Invoices = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new invoice? Follow the next steps:";
-            $('#form-invoice-title').html(formTitle);
-            $('#form-invoice').removeClass('m--hide');
-            $('#lista-invoice').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-invoice'), '.card-label').innerHTML = "New Invoice:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-invoice'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-invoice'), 'hide');
+    }
+    
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-salvar-invoice");
@@ -341,75 +672,72 @@ var Invoices = function () {
         });
 
         function btnClickSalvarForm(exportar) {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
             var project_id = $('#project').val();
 
-            if ($('#invoice-form').valid() && project_id != '' && isValidNumber()) {
+            if (validateForm() && project_id != '' && isValidNumber()) {
+
+                var formData = new URLSearchParams();
 
                 var invoice_id = $('#invoice_id').val();
+                formData.set("invoice_id", invoice_id);
+                
+                formData.set("project_id", project_id);
 
                 var number = $('#number').val();
+                formData.set("number", number);
 
-                var start_date = $('#start_date').val();
-                var end_date = $('#end_date').val();
+                var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
+                formData.set("start_date", start_date);
+
+                var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
+                formData.set("end_date", end_date);
+
+                
                 var notes = $('#notes').val();
+                formData.set("notes", notes);
+                
                 var paid = ($('#paidactivo').prop('checked')) ? 1 : 0;
+                formData.set("paid", paid);
+
+                formData.set("items", JSON.stringify(items));
+                formData.set("payments", JSON.stringify(payments));
+                formData.set("exportar", exportar ? 1 : 0);
 
                 BlockUtil.block('#form-invoice');
 
-                $.ajax({
-                    type: "POST",
-                    url: "invoice/salvarInvoice",
-                    dataType: "json",
-                    data: {
-                        'invoice_id': invoice_id,
-                        'number': number,
-                        'project_id': project_id,
-                        'start_date': start_date,
-                        'end_date': end_date,
-                        'notes': notes,
-                        'paid': paid,
-                        'items': JSON.stringify(items),
-                        'payments': JSON.stringify(payments),
-                        'exportar': exportar ? 1 : 0
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#form-invoice');
-                        if (response.success) {
+                axios.post("invoice/salvarInvoice", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+                                
+                                cerrarForms();
 
-                            toastr.success(response.message, "");
-                            cerrarForms();
+                                btnClickFiltrar();
 
-                            btnClickFiltrar();
+                                if (response.url != '') {
+                                    document.location = response.url;
+                                }
 
-                            if (response.url != '') {
-                                document.location = response.url;
+                            } else {
+                                toastr.error(response.error, "");
                             }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#form-invoice');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-invoice");
+                    });
             } else {
                 if (project_id == "") {
-                    var $element = $('#select-project .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project"), "This field is required");
                 }
             }
         };
@@ -422,17 +750,7 @@ var Invoices = function () {
         var number = $('#number').val();
         if (invoice_id !== '' && number === '') {
             valid = false;
-
-            var $element = $('#number');
-            $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                .data("title", "This field is required")
-                .addClass("has-error")
-                .tooltip({
-                    placement: 'bottom'
-                }); // Create a new tooltip based on the error messsage we just set in the title
-
-            $element.closest('.form-group')
-                .removeClass('has-success').addClass('has-error');
+            MyApp.showErrorMessageValidateInput(KTUtil.get("number"), "This field is required");
         }
 
         return valid;
@@ -443,6 +761,7 @@ var Invoices = function () {
         $(document).off('click', ".cerrar-form-invoice");
         $(document).on('click', ".cerrar-form-invoice", function (e) {
             cerrarForms();
+
         });
     }
     //Cerrar forms
@@ -450,9 +769,8 @@ var Invoices = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -471,8 +789,11 @@ var Invoices = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-invoice').addClass('m--hide');
-        $('#lista-invoice').removeClass('m--hide');
+
+        $('#form-invoice').addClass('hide');
+        $('#lista-invoice').removeClass('hide');
+
+        btnClickFiltrar();
     };
 
     //Editar
@@ -486,94 +807,98 @@ var Invoices = function () {
             var invoice_id = $(this).data('id');
             $('#invoice_id').val(invoice_id);
 
-            $('#form-invoice').removeClass('m--hide');
-            $('#lista-invoice').addClass('m--hide');
+            mostrarForm();
 
             editRow(invoice_id);
         });
     };
     var editRow = function (invoice_id) {
 
+        var formData = new URLSearchParams();
+        formData.set("invoice_id", invoice_id);
+
         BlockUtil.block('#form-invoice');
 
-        $.ajax({
-            type: "POST",
-            url: "invoice/cargarDatos",
-            dataType: "json",
-            data: {
-                'invoice_id': invoice_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#form-invoice');
-                if (response.success) {
-                    //Datos invoice
-                    invoice = response.invoice;
+        axios.post("invoice/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    var formTitle = "You want to update the invoice? Follow the next steps:";
-                    $('#form-invoice-title').html(formTitle);
+                        //cargar datos
+                        cargarDatos(response.invoice);
 
-                    $('#number').val(response.invoice.number);
-
-                    $('#company').off('change', changeCompany);
-                    $('#project').off('change', listarItems);
-                    $('#start_date').off('change', listarItems);
-                    $('#end_date').off('change', listarItems);
-
-
-                    $('#company').val(response.invoice.company_id);
-                    $('#company').trigger('change');
-
-                    //Llenar select
-                    var projects = response.invoice.projects;
-                    for (var i = 0; i < projects.length; i++) {
-                        var descripcion = `${projects[i].number} - ${projects[i].description}`;
-                        $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
+                    } else {
+                        toastr.error(response.error, "");
                     }
-                    $('#project').select2();
-
-                    $('#project').val(response.invoice.project_id);
-                    $('#project').trigger('change');
-
-
-                    $('#start_date').val(response.invoice.start_date);
-                    $('#end_date').val(response.invoice.end_date);
-                    $('#notes').val(response.invoice.notes);
-
-                    if (response.invoice.paid) {
-                        $('#paidactivo').prop('checked', true);
-                        $('#paidinactivo').prop('checked', false);
-                    }
-
-
-                    $('#company').on('change', changeCompany);
-                    $('#project').on('change', listarItems);
-                    $('#start_date').on('change', listarItems);
-                    $('#end_date').on('change', listarItems);
-
-                    // items
-                    items = response.invoice.items;
-                    actualizarTableListaItems();
-
-                    // payments
-                    payments = response.invoice.payments;
-                    actualizarTableListaPayments();
-
-                    // habilitar tab
-                    totalTabs = 3;
-                    $('.nav-item-hide').removeClass('m--hide');
-
-                    event_change = false;
-
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#form-invoice');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-invoice");
+            });
 
-                toastr.error(response.error, "");
+        function cargarDatos(invoice) {
+
+            KTUtil.find(KTUtil.get("form-invoice"), ".card-label").innerHTML = "Update Invoice: #" + invoice.number;
+
+            $('#number').val(invoice.number);
+
+            $('#company').off('change', changeCompany);
+            $('#project').off('change', listarItems);
+
+            offChangeStart();
+            offChangeEnd();
+
+            $('#company').val(invoice.company_id);
+            $('#company').trigger('change');
+
+            //Llenar select
+            var projects = invoice.projects;
+            for (var i = 0; i < projects.length; i++) {
+                var descripcion = `${projects[i].number} - ${projects[i].description}`;
+                $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
             }
-        });
+            $('#project').select2();
+
+            $('#project').val(invoice.project_id);
+            $('#project').trigger('change');
+
+            if (invoice.start_date !== '') {
+                const start_date = MyApp.convertirStringAFecha(invoice.start_date);
+                FlatpickrUtil.setDate('datetimepicker-start-date', start_date);
+            }
+
+            if (invoice.end_date !== '') {
+                const end_date = MyApp.convertirStringAFecha(invoice.end_date);
+                FlatpickrUtil.setDate('datetimepicker-end-date', end_date);
+            }
+
+            $('#notes').val(invoice.notes);
+
+            $('#paidactivo').prop('checked', invoice.paid);
+
+            $('#company').on('change', changeCompany);
+            $('#project').on('change', listarItems);
+            initChangeTempus();
+
+            // items
+            items = invoice.items;
+            actualizarTableListaItems();
+
+            // payments
+            payments = invoice.payments;
+            actualizarTableListaPayments();
+
+            // habilitar tab
+            totalTabs = 3;
+            $('.nav-item-hide').removeClass('hide');
+
+            event_change = false;
+
+        }
 
     };
 
@@ -583,35 +908,35 @@ var Invoices = function () {
         $(document).on('change', "#invoice-table-editable .invoice-number", function (e) {
             e.preventDefault();
 
+            var formData = new URLSearchParams();
+
             var invoice_id = $(this).data('id');
+            formData.set("invoice_id", invoice_id);
+
             var number = $(this).val();
+            formData.set("number", number);
 
-            BlockUtil.block('#invoice-table-editable');
+            BlockUtil.block('#lista-invoice');
 
-            $.ajax({
-                type: "POST",
-                url: "invoice/changeNumber",
-                dataType: "json",
-                data: {
-                    'invoice_id': invoice_id,
-                    'number': number
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
-                    if (response.success) {
+            axios.post("invoice/changeNumber", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        toastr.success(response.message, "");
+                            toastr.success(response.message, "");
 
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-invoice");
+                });
         });
     };
 
@@ -622,9 +947,8 @@ var Invoices = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-eliminar-invoice");
@@ -643,20 +967,10 @@ var Invoices = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#invoice-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
                 toastr.error('Select invoices to delete', "");
             }
@@ -665,72 +979,60 @@ var Invoices = function () {
         function btnClickModalEliminar() {
             var invoice_id = rowDelete;
 
-            BlockUtil.block('#invoice-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("invoice_id", invoice_id);
 
-            $.ajax({
-                type: "POST",
-                url: "invoice/eliminarInvoice",
-                dataType: "json",
-                data: {
-                    'invoice_id': invoice_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
+            BlockUtil.block('#lista-invoice');
 
-                    if (response.success) {
-                        oTable.load();
+            axios.post("invoice/eliminarInvoice", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "");
-
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-invoice");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#invoice-table-editable').join(',');
 
-            BlockUtil.block('#invoice-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "invoice/eliminarInvoices",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        oTable.load();
-                        toastr.success(response.message, "");
+            BlockUtil.block('#lista-invoice');
 
+            axios.post("invoice/eliminarInvoices", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-invoice");
+                });
         };
     };
 
@@ -743,136 +1045,193 @@ var Invoices = function () {
 
             var invoice_id = $(this).data('id');
 
+            var formData = new URLSearchParams();
+
+            formData.set("invoice_id", invoice_id);
+
             BlockUtil.block('#lista-invoice');
 
-            $.ajax({
-                type: "POST",
-                url: "invoice/exportarExcel",
-                dataType: "json",
-                data: {
-                    'invoice_id': invoice_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#lista-invoice');
-                    if (response.success) {
-                        document.location = response.url;
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#lista-invoice');
+            axios.post("invoice/exportarExcel", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                    toastr.error(response.error, "");
-                }
-            });
+                            var url = response.url;
+                            const archivo = url.split("/").pop();
+
+                            // crear link para que se descargue el archivo
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-invoice");
+                });
         });
     };
 
     var initWidgets = function () {
 
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('.m-select2').select2();
+        initTempus();
 
         // change
         $('#filtro-company').change(changeFiltroCompany);
         $('#company').change(changeCompany);
         $('#project').change(listarItems);
-        $('#start_date').change(listarItems);
-        $('#end_date').change(listarItems);
 
         $('#item').change(changeItem);
         $('#item-quantity').change(calcularTotalItem);
         $('#item-price').change(calcularTotalItem);
     }
 
+    var offChangeStart;
+    var offChangeEnd;
+    var initTempus = function () {
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        FlatpickrUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+
+        // start date
+        FlatpickrUtil.initDate('datetimepicker-start-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // end date
+        FlatpickrUtil.initDate('datetimepicker-end-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        initChangeTempus();
+
+    }
+    var initChangeTempus = function () {
+        offChangeStart = FlatpickrUtil.on('datetimepicker-start-date', 'change', ({ selectedDates, dateStr, instance }) => {
+            // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
+            // selectedDates[0] => objeto Date nativo (si hay selección)
+            console.log('Cambió la fecha:', dateStr, selectedDates[0]);
+
+            listarItems();
+        });
+
+        offChangeEnd = FlatpickrUtil.on('datetimepicker-end-date', 'change', ({ selectedDates, dateStr, instance }) => {
+            // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
+            // selectedDates[0] => objeto Date nativo (si hay selección)
+            console.log('Cambió la fecha:', dateStr, selectedDates[0]);
+
+            listarItems();
+        });
+    }
+
     var listarItems = function () {
         var project_id = $('#project').val();
-        var start_date = $('#start_date').val();
-        var end_date = $('#end_date').val();
+        var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
+        var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
+
 
         // reset
         items = [];
         actualizarTableListaItems();
 
         if (project_id != '' && start_date != '' && end_date != '') {
+
+            var formData = new URLSearchParams();
+
+            formData.set("project_id", project_id);
+            formData.set("start_date", start_date);
+            formData.set("end_date", end_date);
+
             BlockUtil.block('#lista-items');
 
-            $.ajax({
-                type: "POST",
-                url: "project/listarItemsParaInvoice",
-                dataType: "json",
-                data: {
-                    'project_id': project_id,
-                    'fechaInicial': start_date,
-                    'fechaFin': end_date
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#lista-items');
-                    if (response.success) {
+            axios.post("project/listarItemsParaInvoice", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        //Llenar select
-                        for (let item of response.items) {
+                            //Llenar select
+                            for (let item of response.items) {
 
-                            var posicion = items.length;
+                                var posicion = items.length;
 
-                            items.push({
-                                invoice_item_id: '',
-                                project_item_id: item.project_item_id,
-                                item_id: item.item_id,
-                                item: item.item,
-                                unit: item.unit,
-                                contract_qty: item.contract_qty,
-                                quantity: item.quantity,
-                                price: item.price,
-                                contract_amount: item.contract_amount,
-                                quantity_from_previous: item.quantity_from_previous ?? 0,
-                                unpaid_from_previous: item.unpaid_from_previous ?? 0,
-                                quantity_completed: item.quantity_completed,
-                                amount: item.amount,
-                                total_amount: item.total_amount,
-                                principal: item.principal,
-                                posicion: posicion
-                            });
+                                items.push({
+                                    invoice_item_id: '',
+                                    project_item_id: item.project_item_id,
+                                    item_id: item.item_id,
+                                    item: item.item,
+                                    unit: item.unit,
+                                    contract_qty: item.contract_qty,
+                                    quantity: item.quantity,
+                                    price: item.price,
+                                    contract_amount: item.contract_amount,
+                                    quantity_from_previous: item.quantity_from_previous ?? 0,
+                                    unpaid_from_previous: item.unpaid_from_previous ?? 0,
+                                    quantity_completed: item.quantity_completed,
+                                    amount: item.amount,
+                                    total_amount: item.total_amount,
+                                    principal: item.principal,
+                                    posicion: posicion
+                                });
 
-                            payments.push({
-                                invoice_item_id: '',
-                                project_item_id: item.project_item_id,
-                                item_id: item.item_id,
-                                item: item.item,
-                                unit: item.unit,
-                                contract_qty: item.contract_qty,
-                                quantity: item.quantity + item.unpaid_from_previous,
-                                price: item.price,
-                                contract_amount: item.contract_amount,
-                                quantity_from_previous: item.quantity_from_previous ?? 0,
-                                unpaid_from_previous: item.unpaid_from_previous ?? 0,
-                                quantity_completed: item.quantity_completed,
-                                amount: item.amount,
-                                total_amount: item.total_amount,
-                                paid_qty: 0,
-                                unpaid_qty: 0,
-                                paid_amount: 0,
-                                paid_amount_total: item.paid_amount_total,
-                                principal: item.principal,
-                                posicion: posicion
-                            });
+                                payments.push({
+                                    invoice_item_id: '',
+                                    project_item_id: item.project_item_id,
+                                    item_id: item.item_id,
+                                    item: item.item,
+                                    unit: item.unit,
+                                    contract_qty: item.contract_qty,
+                                    quantity: item.quantity + item.unpaid_from_previous,
+                                    price: item.price,
+                                    contract_amount: item.contract_amount,
+                                    quantity_from_previous: item.quantity_from_previous ?? 0,
+                                    unpaid_from_previous: item.unpaid_from_previous ?? 0,
+                                    quantity_completed: item.quantity_completed,
+                                    amount: item.amount,
+                                    total_amount: item.total_amount,
+                                    paid_qty: 0,
+                                    unpaid_qty: 0,
+                                    paid_amount: 0,
+                                    paid_amount_total: item.paid_amount_total,
+                                    principal: item.principal,
+                                    posicion: posicion
+                                });
+                            }
+                            actualizarTableListaItems();
+
+                            actualizarTableListaPayments();
+
+                        } else {
+                            toastr.error(response.error, "");
                         }
-                        actualizarTableListaItems();
-
-                        actualizarTableListaPayments();
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#lista-items');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-items");
+                });
         }
     }
 
@@ -880,90 +1239,82 @@ var Invoices = function () {
         var company_id = $('#company').val();
 
         // reset
-        $('#project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#project').select2();
+        MyUtil.limpiarSelect('#project');
 
         if (company_id != '') {
 
+            var formData = new URLSearchParams();
+
+            formData.set("company_id", company_id);
+
             BlockUtil.block('#select-project');
 
-            $.ajax({
-                type: "POST",
-                url: "project/listarOrdenados",
-                dataType: "json",
-                data: {
-                    'company_id': company_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#select-project');
-                    if (response.success) {
+            axios.post("project/listarOrdenados", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        //Llenar select
-                        var projects = response.projects;
-                        for (var i = 0; i < projects.length; i++) {
-                            var descripcion = `${projects[i].number} - ${projects[i].description}`;
-                            $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
+                            //Llenar select
+                            var projects = response.projects;
+                            for (var i = 0; i < projects.length; i++) {
+                                var descripcion = `${projects[i].number} - ${projects[i].description}`;
+                                $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
+                            }
+                            $('#project').select2();
+
+                        } else {
+                            toastr.error(response.error, "");
                         }
-                        $('#project').select2();
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#select-project');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#select-project");
+                });
         }
     }
     var changeFiltroCompany = function () {
         var company_id = $('#filtro-company').val();
 
         // reset
-        $('#filtro-project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#filtro-project').select2();
+        MyUtil.limpiarSelect('#filtro-project');
 
         if (company_id != '') {
 
+            var formData = new URLSearchParams();
+
+            formData.set("company_id", company_id);
+
             BlockUtil.block('#select-filtro-project');
 
-            $.ajax({
-                type: "POST",
-                url: "project/listarOrdenados",
-                dataType: "json",
-                data: {
-                    'company_id': company_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#select-filtro-project');
-                    if (response.success) {
+            axios.post("project/listarOrdenados", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        //Llenar select
-                        var projects = response.projects;
-                        for (var i = 0; i < projects.length; i++) {
-                            var descripcion = `${projects[i].number} - ${projects[i].description}`;
-                            $('#filtro-project').append(new Option(descripcion, projects[i].project_id, false, false));
+                            //Llenar select
+                            var projects = response.projects;
+                            for (var i = 0; i < projects.length; i++) {
+                                var descripcion = `${projects[i].number} - ${projects[i].description}`;
+                                $('#filtro-project').append(new Option(descripcion, projects[i].project_id, false, false));
+                            }
+                            $('#filtro-project').select2();
+
+                        } else {
+                            toastr.error(response.error, "");
                         }
-                        $('#filtro-project').select2();
-
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#select-filtro-project');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#select-filtro-project");
+                });
         }
     }
 
@@ -991,328 +1342,149 @@ var Invoices = function () {
         }
     }
 
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-invoice');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 2;
-    var initWizard = function () {
-        $(document).off('click', "#form-invoice .wizard-tab");
-        $(document).on('click', "#form-invoice .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            if (activeTab < totalTabs) {
-                $('.btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            if (activeTab == totalTabs) {
-                $('.btn-wizard-finalizar').removeClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide').addClass('m--hide');
-            }
-
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    actualizarTableListaItems();
-                    break;
-                case 3:
-                    actualizarTableListaPayments();
-                    break;
-            }
-
-        });
-
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('m--hide');
-                if (activeTab == totalTabs) {
-                    $('.btn-wizard-finalizar').removeClass('m--hide');
-                    $('#btn-wizard-siguiente').addClass('m--hide');
-                }
-
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('m--hide');
-            }
-            if (activeTab < totalTabs) {
-                $('.btn-wizard-finalizar').addClass('m--hide');
-                $('#btn-wizard-siguiente').removeClass('m--hide');
-            }
-            mostrarTab();
-        });
-
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-items').tab('show');
-                    actualizarTableListaItems();
-                    break;
-                case 3:
-                    $('#tab-payments').tab('show');
-                    actualizarTableListaPayments();
-                    break;
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 2;
-        mostrarTab();
-        $('.btn-wizard-finalizar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-anterior').removeClass('m--hide').addClass('m--hide');
-        $('#btn-wizard-siguiente').removeClass('m--hide');
-
-        $('.nav-item-hide').removeClass('m--hide').addClass('m--hide');
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab == 1) {
-
-            var project_id = $('#project').val();
-            if (!$('#invoice-form').valid() || project_id == '' || !isValidNumber()) {
-                result = false;
-
-                if (project_id == "") {
-
-                    var $element = $('#select-project .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                }
-            }
-
-        }
-
-        return result;
-    }
-
     // items details
     var oTableItems;
     var items = [];
     var nEditingRowItem = null;
     var rowDeleteItem = null;
     var initTableItems = function () {
-        BlockUtil.block('#items-table-editable');
 
-        var table = $('#items-table-editable');
+        const table = "#items-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'contract_qty'},
+            {data: 'price'},
+            {data: 'contract_amount'},
+            {data: 'quantity_from_previous'},
+            {data: 'quantity'},
+            {data: 'unpaid_from_previous'},
+            {data: 'quantity_completed'},
+            {data: 'amount'},
+            {data: 'total_amount'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
+            // unit
             {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "contract_qty",
-                title: "Contract QTY",
-                width: 100,
-                textAlign: 'center',
-            },
-            {
-                field: "price",
-                title: "Unit Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
+            // contract_qty
             {
-                field: "contract_amount",
-                title: "Contract Amount",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.contract_amount, 2, '.', ',')}</span>`;
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
+            // price
             {
-                field: "quantity_from_previous",
-                title: "Quatity Previous Application",
-                width: 100,
-                textAlign: 'center',
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
             },
+            // contract_amount
             {
-                field: "quantity",
-                title: "Quatity This Period",
-                width: 100,
-                textAlign: 'center',
-                sortable: "desc" // Orden descendente por defecto
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
             },
+            // quantity_from_previous
             {
-                field: "unpaid_from_previous",
-                title: "Unpaid Quatity Previous Application",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    var output = `<span>${MyApp.formatearNumero(row.unpaid_from_previous, 2, '.', ',')}</span>`;
+                targets: 5,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // quantity
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // unpaid_from_previous
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    var output = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
                     if (invoice === null || !invoice.paid) {
-                        output = `<input type="number" class="form-control unpaid_qty" value="${row.unpaid_from_previous}" data-position="${row.posicion}" />`;
+                        output = `<input type="number" class="form-control unpaid_qty" value="${data}" data-position="${row.posicion}" />`;
                     }
-                    return output;
+                    return `<div class="w-100px">${output}</div>`;
+                },
+            },
+            // quantity_completed
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
+            // amount
             {
-                field: "quantity_completed",
-                title: "Total Quatity Completed",
-                width: 100,
-                textAlign: 'center',
+                targets: 9,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
+            },
+            // total_amount
+            {
+                targets: 10,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "amount",
-                title: "Amount This Period",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.amount, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total_amount",
-                title: "Total Amount (ToDate)",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_amount, 2, '.', ',')}</span>`;
-                }
-            },
-
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (!data.principal) {
-                        $(row).addClass('row-secondary');
-                    }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[6, 'desc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            // marcar secondary
+            createdRow: (row, data, index) => {
+                // console.log(data);
+                if (!data.principal) {
+                    $(row).addClass('row-secondary');
                 }
             }
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#items-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
     };
-
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
@@ -1320,47 +1492,33 @@ var Invoices = function () {
 
         initTableItems();
     }
-    var initFormItem = function () {
-        $("#item-form").validate({
-            rules: {
-                quantity: {
-                    required: true,
-                },
-                price: {
-                    required: true
-                },
+    var validateFormItem = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('item-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            price: {
+                presence: {message: "This field is required"},
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
     var initAccionesItems = function () {
 
@@ -1369,16 +1527,15 @@ var Invoices = function () {
             // reset
             resetFormItem();
 
-            $('#modal-item').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-item");
         $(document).on('click', "#btn-salvar-item", function (e) {
             e.preventDefault();
 
-            if ($('#item-form').valid()) {
+            if (validateForm()) {
 
                 var quantity = $('#item-quantity').val();
                 var price = $('#item-price').val();
@@ -1402,7 +1559,8 @@ var Invoices = function () {
 
                 // reset
                 resetFormItem();
-                $('#modal-item').modal('hide');
+                // close modal
+                ModalUtil.hide('modal-item');
 
             }
 
@@ -1429,8 +1587,8 @@ var Invoices = function () {
                 $('#item-quantity').on('change', calcularTotalItem);
                 $('#item-price').on('change', calcularTotalItem);
 
-                // open modal
-                $('#modal-item').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -1439,11 +1597,71 @@ var Invoices = function () {
         $(document).on('click', "#items-table-editable a.delete", function (e) {
 
             e.preventDefault();
-            rowDeleteItem = $(this).data('posicion');
-            $('#modal-eliminar-item').modal({
-                'show': true
+            var posicion = $(this).data('posicion');
+
+            Swal.fire({
+                text: "Are you sure you want to delete the item?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarItem(posicion);
+                }
             });
         });
+
+        function eliminarItem(posicion) {
+            if (items[posicion]) {
+
+                if (items[posicion].invoice_item_id != '') {
+
+                    var formData = new URLSearchParams();
+                    formData.set("invoice_item_id", items[posicion].invoice_item_id);
+
+                    BlockUtil.block('#lista-items');
+
+                    axios.post("invoice/eliminarItem", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
+
+                                    deleteItem(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
+                            } else {
+                                toastr.error("An internal error has occurred, please try again.", "");
+                            }
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-items");
+                        });
+                } else {
+                    deleteItem(posicion);
+                }
+            }
+        }
+
+        function deleteItem(posicion) {
+            //Eliminar
+            items.splice(posicion, 1);
+            //actualizar posiciones
+            for (var i = 0; i < items.length; i++) {
+                items[i].posicion = i;
+            }
+            //actualizar lista
+            actualizarTableListaItems();
+        }
 
         $(document).off('change', "#items-table-editable input.unpaid_qty");
         $(document).on('change', "#items-table-editable input.unpaid_qty", function (e) {
@@ -1470,68 +1688,12 @@ var Invoices = function () {
             }
         });
 
-        $(document).off('click', "#btn-delete-item");
-        $(document).on('click', "#btn-delete-item", function (e) {
 
-            e.preventDefault();
-            var posicion = rowDeleteItem;
-
-            if (items[posicion]) {
-
-                if (items[posicion].invoice_item_id != '') {
-                    BlockUtil.block('#items-table-editable');
-
-                    $.ajax({
-                        type: "POST",
-                        url: "invoice/eliminarItem",
-                        dataType: "json",
-                        data: {
-                            'invoice_item_id': items[posicion].invoice_item_id
-                        },
-                        success: function (response) {
-                            BlockUtil.unblock('#items-table-editable');
-                            if (response.success) {
-
-                                toastr.success(response.message, "");
-
-                                deleteItem(posicion);
-
-                            } else {
-                                toastr.error(response.error, "");
-                            }
-                        },
-                        failure: function (response) {
-                            BlockUtil.unblock('#items-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
-                } else {
-                    deleteItem(posicion);
-                }
-            }
-
-        });
-
-        function deleteItem(posicion) {
-            //Eliminar
-            items.splice(posicion, 1);
-            //actualizar posiciones
-            for (var i = 0; i < items.length; i++) {
-                items[i].posicion = i;
-            }
-            //actualizar lista
-            actualizarTableListaItems();
-        }
     };
     var resetFormItem = function () {
-        $('#item-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("item-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
         nEditingRowItem = null;
     };
 
@@ -1541,183 +1703,141 @@ var Invoices = function () {
     var nEditingRowPayment = null;
     var initTablePayments = function () {
 
-        BlockUtil.block('#payments-table-editable');
+        const table = "#payments-table-editable";
 
-        var table = $('#payments-table-editable');
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'contract_qty'},
+            {data: 'price'},
+            {data: 'contract_amount'},
+            {data: 'quantity'},
+            {data: 'amount'},
+            {data: 'paid_qty'},
+            {data: 'unpaid_qty'},
+            {data: 'paid_amount'},
+            {data: 'paid_amount_total'},
+            {data: null},
+        ];
 
-        var aoColumns = [
+        // column defs
+        let columnDefs = [
+            // unit
             {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 50,
-            },
-            {
-                field: "contract_qty",
-                title: "Contract QTY",
-                width: 100,
-                textAlign: 'center',
-            },
-            {
-                field: "price",
-                title: "Unit Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 50);
                 }
             },
+            // contract_qty
             {
-                field: "contract_amount",
-                title: "Contract Amount",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.contract_amount, 2, '.', ',')}</span>`;
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
+            // price
             {
-                field: "quantity",
-                title: "Invoiced Qty",
-                width: 100,
-                textAlign: 'center',
-                sortable: "desc" // Orden descendente por defecto
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
+            // contract_amount
             {
-                field: "amount",
-                title: "Invoiced Amount $",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.amount, 2, '.', ',')}</span>`;
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // quantity
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
+            // amount
             {
-                field: "paid_qty",
-                title: " Paid Qty",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    var output = `<span>${MyApp.formatearNumero(row.paid_qty, 2, '.', ',')}</span>`;
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // paid_qty
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    var output = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
                     if (invoice === null || !invoice.paid) {
-                        output = `<input type="number" class="form-control paid_qty" value="${row.paid_qty}" data-position="${row.posicion}" />`;
+                        output = `<input type="number" class="form-control paid_qty" value="${data}" data-position="${row.posicion}" />`;
                     }
-                    return output;
+                    return `<div class="w-100px">${output}</div>`;
+                },
+            },
+            // unpaid_qty
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
                 }
             },
+            // paid_amount
             {
-                field: "unpaid_qty",
-                title: " Unpaid Qty",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${row.unpaid_qty}</span>`;
-                }
+                targets: 9,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // paid_amount_total
+            {
+                targets: 10,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "paid_amount",
-                title: "Paid Amount",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.paid_amount, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "paid_amount_total",
-                title: "Paid Amount Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.paid_amount_total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
                     var class_css = row.paid_qty > 0 ? 'btn-success' : 'btn-danger';
 
                     return `
                     <a href="javascript:;" data-posicion="${row.posicion}" 
-                    class="paid m-portlet__nav-link btn m-btn m-btn--icon m-btn--icon-only m-btn--pill ${class_css}" 
+                    class="paid btn btn-sm btn-icon ${class_css}" 
                         title="Paid item"><i class="la la-check"></i></a>
                     `;
-                }
+                },
             }
         ];
-        oTablePayments = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: payments,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-payments .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[5, 'desc']];
+
+        // escapar contenido de la tabla
+        oTablePayments = DatatableUtil.initSafeDataTable(table, {
+            data: payments,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTablePayments
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#payments-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#payments-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#payments-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#payments-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#payments-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatablePayments();
     };
+    var handleSearchDatatablePayments = function () {
+        $(document).off('keyup', '#lista-payments [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-payments [data-table-filter="search"]', function (e) {
+            oTablePayments.search(e.target.value).draw();
+        });
+    }
 
     var actualizarTableListaPayments = function () {
         if (oTablePayments) {
@@ -1726,50 +1846,36 @@ var Invoices = function () {
 
         initTablePayments();
     }
-    var initFormPayment = function () {
-        $("#payment-form").validate({
-            rules: {
-                paidqty: {
-                    required: true,
-                },
-                paidamount: {
-                    required: true
-                },
-                paidamounttotal: {
-                    required: true
-                },
+    var validateFormPayment = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('payment-form');
+
+        var constraints = {
+            paidqty: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            paidamount: {
+                presence: {message: "This field is required"},
             },
-        });
+            paidamounttotal: {
+                presence: {message: "This field is required"},
+            },
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
     var initAccionesPayments = function () {
 
@@ -1777,7 +1883,7 @@ var Invoices = function () {
         $(document).on('click', "#btn-salvar-payment", function (e) {
             e.preventDefault();
 
-            if ($('#payment-form').valid()) {
+            if (validateFormPayment()) {
 
                 // payment
                 var paid_qty = $('#item-paid-qty').val();
@@ -1798,7 +1904,8 @@ var Invoices = function () {
 
                 // reset
                 resetFormPayment();
-                $('#modal-payment').modal('hide');
+
+                ModalUtil.hide('modal-payment');
 
             }
 
@@ -1819,7 +1926,7 @@ var Invoices = function () {
                 $('#item-paid-amount-total').val(payments[posicion].paid_amount_total);
 
                 // open modal
-                $('#modal-payment').modal('show');
+                ModalUtil.show('modal-payment', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -1872,21 +1979,16 @@ var Invoices = function () {
         });
     };
     var resetFormPayment = function () {
-        $('#payment-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        MyUtil.resetForm("payment-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
         nEditingRowPayment = null;
     };
 
     //Paid
     var initAccionPaid = function () {
-        //Activar usuario
-        $(document).off('click', "#invoice-table-editable a.block");
-        $(document).on('click', "#invoice-table-editable a.block", function (e) {
+
+        $(document).off('click', "#invoice-table-editable a.paid");
+        $(document).on('click', "#invoice-table-editable a.paid", function (e) {
             e.preventDefault();
             /* Get the row as a parent of the link that was clicked on */
             var invoice_id = $(this).data('id');
@@ -1895,31 +1997,32 @@ var Invoices = function () {
 
         function cambiarEstadoInvoice(invoice_id) {
 
-            BlockUtil.block('#invoice-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "invoice/paid",
-                dataType: "json",
-                data: {
-                    'invoice_id': invoice_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
+            formData.set("invoice_id", invoice_id);
 
-                    if (response.success) {
-                        toastr.success("The operation was successful", "");
-                        oTable.load();
+            BlockUtil.block('#lista-invoice');
 
+            axios.post("invoice/paid", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success("The operation was successful", "");
+
+                             btnClickFiltrar();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#invoice-table-editable');
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-invoice");
+                });
         }
     };
 
@@ -1929,29 +2032,23 @@ var Invoices = function () {
         init: function () {
 
             initWidgets();
+            
             initTable();
-            initForm();
+          
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionChangeNumber();
-            initAccionEliminar();
-            initAccionExportar();
+
             initAccionFiltrar();
-            initAccionResetFiltrar();
-            initAccionPaid();
 
             // items
             initTableItems();
-            initFormItem();
             initAccionesItems();
 
             // payments
             initTablePayments();
-            initFormPayment();
             initAccionesPayments();
 
             initAccionChange();
@@ -1963,8 +2060,8 @@ var Invoices = function () {
 
                 $('#invoice_id').val(invoice_id_edit);
 
-                $('#form-invoice').removeClass('m--hide');
-                $('#lista-invoice').addClass('m--hide');
+                $('#form-invoice').removeClass('hide');
+                $('#lista-invoice').addClass('hide');
 
                 localStorage.removeItem('invoice_id_edit');
 

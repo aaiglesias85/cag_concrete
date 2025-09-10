@@ -746,7 +746,7 @@ class InvoiceService extends Base
             // number
             $invoices = $this->getDoctrine()->getRepository(Invoice::class)->ListarInvoicesDeProject($project_id);
             $number = 1;
-            if(!empty($invoices)){
+            if (!empty($invoices)) {
                 $number = intval($invoices[0]->getNumber()) + 1;
             }
         }
@@ -928,21 +928,18 @@ class InvoiceService extends Base
      */
     public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Invoice::class)
+            ->ListarInvoicesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(Invoice::class)
-            ->ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $invoice_id = $value->getInvoiceId();
-
-            $acciones = $this->ListarAcciones($invoice_id);
 
             $total = $this->getDoctrine()->getRepository(InvoiceItem::class)
                 ->TotalInvoice($invoice_id);
 
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $invoice_id,
                 "number" => $value->getNumber(),
                 "company" => $value->getProject()->getCompany()->getName(),
@@ -950,59 +947,15 @@ class InvoiceService extends Base
                 "startDate" => $value->getStartDate()->format('m/d/Y'),
                 "endDate" => $value->getEndDate()->format('m/d/Y'),
                 "notes" => $this->truncate($value->getNotes(), 50),
-                "total" => number_format($total, 2, '.', ','),
+                "total" => $total,
                 "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
-                "paid" => $value->getPaid() ? 1 : 0,
-                "acciones" => $acciones
+                "paid" => $value->getPaid() ? 1 : 0
             );
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalInvoices: Total de invoices
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin)
-    {
-        $total = $this->getDoctrine()->getRepository(Invoice::class)
-            ->TotalInvoices($sSearch, $company_id, $project_id, $fecha_inicial, $fecha_fin);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 11);
-
-        $acciones = "";
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-                $acciones .= '<a href="javascript:;" class="block m-portlet__nav-link btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill" title="Paid/Unpaid record" data-id="' . $id . '"> <i class="la la-dollar"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-        }
-
-        $acciones .= ' <a href="javascript:;" class="excel m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Export excel" data-id="' . $id . '"><i class="la la-file-excel-o"></i></a>';
-
-
-        if (count($permiso) > 0 && $permiso[0]['eliminar']) {
-            $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }
