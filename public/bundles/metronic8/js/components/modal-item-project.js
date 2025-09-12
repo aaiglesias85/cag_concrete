@@ -13,41 +13,37 @@ var ModalItemProject = function () {
     }
 
     var initWidgets = function () {
-
-        $('.m-select2').select2();
-
-        $("[data-switch=true]").bootstrapSwitch();
+        // init widgets generales
+        MyApp.initWidgets();
 
         // change
         $('#item').change(changeItem);
         $('#yield-calculation').change(changeYield);
 
-        $(document).off('switchChange.bootstrapSwitch', '#item-type');
-        $(document).on('switchChange.bootstrapSwitch', '#item-type', changeItemType);
+        $(document).off('click', '.item-type');
+        $(document).on('click', '.item-type', changeItemType);
     }
 
-    var changeItemType = function (event, state) {
+    var changeItemType = function () {
+
+        var state = $('#item-type-existing').prop('checked');
 
         // reset
         $('#item').val('');
         $('#item').trigger('change');
-        $('#div-item').removeClass('m--hide');
+        $('#div-item').removeClass('hide');
 
         $('#item-name').val('');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
+        $('#item-name').removeClass('hide').addClass('hide');
 
-        $('#unit-item-project').val('');
-        $('#unit-item-project').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
-
-        $('#div-item-quantity').removeClass('m--hide');
-        $('#item-quantity').val(0);
+        $('#unit').val('');
+        $('#unit').trigger('change');
+        $('#select-unit').removeClass('hide').addClass('hide');
 
         if (!state) {
-            $('#div-item').removeClass('m--hide').addClass('m--hide');
-            $('#item-name').removeClass('m--hide');
-            $('#select-unit').removeClass('m--hide');
-            $('#div-item-quantity').removeClass('m--hide').addClass('m--hide');
+            $('#div-item').removeClass('hide').addClass('hide');
+            $('#item-name').removeClass('hide');
+            $('#select-unit').removeClass('hide');
         }
     }
 
@@ -57,10 +53,10 @@ var ModalItemProject = function () {
         // reset
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
         if (yield_calculation == 'equation') {
-            $('#select-equation').removeClass('m--hide');
+            $('#select-equation').removeClass('hide');
         }
     }
 
@@ -87,50 +83,33 @@ var ModalItemProject = function () {
         }
     }
 
-    var initFormItem = function () {
-        $("#item-form").validate({
-            rules: {
-                quantity: {
-                    required: true
-                },
-                item: {
-                    required: true
-                },
-                price: {
-                    required: true
-                },
+    var validateFormItem = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('item-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            price: {
+                presence: {message: "This field is required"},
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
 
     var mostrarModal = function (project_number_param, project_name_param) {
@@ -142,9 +121,8 @@ var ModalItemProject = function () {
         // reset form
         resetFormItem();
 
-        $('#modal-item').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-item', {backdrop: 'static', keyboard: true});
     }
     var initAccionesItems = function () {
 
@@ -152,7 +130,7 @@ var ModalItemProject = function () {
         $(document).on('click', "#btn-salvar-item", function (e) {
             e.preventDefault();
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
 
             var item_id = $('#item').val();
             var item = item_type ? $("#item option:selected").text() : $('#item-name').val();
@@ -160,91 +138,71 @@ var ModalItemProject = function () {
                 $('#item-name').val(item);
             }
 
-            if ($('#item-form').valid() && isValidItem() && isValidYield() && isValidUnit()) {
+            if (validateFormItem() && isValidItem() && isValidYield() && isValidUnit()) {
+
+                var formData = new URLSearchParams();
+                
+                formData.set("project_item_id", '');
+
+                var project_id = $('#project').val();
+                formData.set("project_id", project_id);
+
+                formData.set("item_id", item_id);
+
+                item = $('#item-name').val();
+                formData.set("item", item);
 
                 var unit_id = $('#unit-item-project').val();
-                var price = $('#item-price').val();
-                var quantity = $('#item-quantity').val();
+                formData.set("unit_id", unit_id);
+
+                var price = NumberUtil.getNumericValue('#item-price');
+                formData.set("price", price);
+
+                var quantity = NumberUtil.getNumericValue('#item-quantity');
+                formData.set("quantity", quantity);
+
                 var yield_calculation = $('#yield-calculation').val();
+                formData.set("yield_calculation", yield_calculation);
+
                 var equation_id = $('#equation').val();
+                formData.set("equation_id", equation_id);
 
                 BlockUtil.block('#modal-item .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "project/agregarItem",
-                    dataType: "json",
-                    data: {
-                        project_item_id: '',
-                        project_id: $('#project').val(),
-                        item_id: item_id,
-                        item: item,
-                        unit_id: unit_id,
-                        price: price,
-                        quantity: quantity,
-                        yield_calculation: yield_calculation,
-                        equation_id: equation_id
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-item .modal-content');
-                        if (response.success) {
+                axios.post("project/agregarItem", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "Success");
+                                //add item
+                                item_new = response.item;
 
-                            //add item
-                            item_new = response.item;
+                                // close modal
+                                ModalUtil.hide('modal-item');
 
-                            // close modal
-                            $('#modal-item').modal('hide');
-
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-item .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-item .modal-content");
+                    });
 
             } else {
                 if (!isValidItem()) {
-                    var $element = $('#select-item .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-item"), "This field is required");
                 }
                 if (!isValidYield()) {
-                    var $element = $('#select-equation .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-equation"), "This field is required");
                 }
                 if (!isValidUnit()) {
-                    var $element = $('#select-unit .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-unit"), "This field is required");
                 }
             }
 
@@ -253,7 +211,7 @@ var ModalItemProject = function () {
         function isValidItem() {
             var valid = true;
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
             var item_id = $('#item').val();
 
             if (item_type && item_id == '') {
@@ -267,7 +225,7 @@ var ModalItemProject = function () {
         function isValidUnit() {
             var valid = true;
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
             var unit_id = $('#unit-item-project').val();
 
             if (!item_type && unit_id == '') {
@@ -291,19 +249,14 @@ var ModalItemProject = function () {
         }
     };
     var resetFormItem = function () {
-        $('#item-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("item-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        $('#item-type-existing').prop('checked', true);
+        $('#item-type-new').prop('checked', false);
 
-        $('#div-item-quantity').removeClass('m--hide');
+        $('#div-item-quantity').removeClass('hide');
         $('#item-quantity').val(0);
-
-        $('#item-type').prop('checked', true);
-        $("#item-type").bootstrapSwitch("state", true, true);
 
         $('#item').val('');
         $('#item').trigger('change');
@@ -313,17 +266,17 @@ var ModalItemProject = function () {
 
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
-        $('#div-item').removeClass('m--hide');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
+        $('#div-item').removeClass('hide');
+        $('#item-name').removeClass('hide').addClass('hide');
 
         $('#unit-item-project').val('');
         $('#unit-item-project').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
+        $('#select-unit').removeClass('hide').addClass('hide');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("item-form"));
 
         // add datos de proyecto
         $("#proyect-number-item").html(project_number);
@@ -381,7 +334,6 @@ var ModalItemProject = function () {
             initWidgets();
 
             // items
-            initFormItem();
             initAccionesItems();
 
             // units

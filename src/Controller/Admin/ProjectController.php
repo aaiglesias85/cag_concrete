@@ -321,7 +321,7 @@ class ProjectController extends AbstractController
     }
 
     /**
-     * listarDataTrackingParaInvoice Acción para listar los items para el invoice
+     * listarItemsParaInvoice Acción para listar los items para el invoice
      *
      */
     public function listarItemsParaInvoice(Request $request)

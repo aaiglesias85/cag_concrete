@@ -3,48 +3,49 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">New Employee</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                     aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
             </div>
             <div class="modal-body">
                 <form class="m-form" id="employee-subcontractor-modal-form" action="#"
                       enctype="multipart/form-data" method="post">
 
-                    <div class="form-group m-form__group ic-form-group">
-                        <label>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required">
                             <span class="ic-step-number">1</span>
                             Name
-                            <span class="ic-small italic">(required)</span>
                         </label>
-
-                        <input type="text" class="form-control form-control-text event-change"
+                        <input type="text" class="form-control form-control-solid form-control-validate"
                                id="employee-subcontractor-modal-name" name="name"/>
                     </div>
 
-                    <div class="form-group m-form__group ic-form-group">
-                        <label>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label">
                             <span class="ic-step-number">2</span>
                             Hourly Rate
-                            <span class="ic-small italic">(required)</span>
                         </label>
                         <div class="row">
-                            <div class="col-md-4">
-                                <input type="text" class="form-control form-control-text just-float event-change"
-                                       id="employee-subcontractor-modal-hourly_rate" name="hourly_rate"/>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control form-control-solid form-control-validate just-float event-change"
+                                       id="employee-subcontractor-modal-hourly_rate" name="hourlyrate"/>
                             </div>
                         </div>
 
                     </div>
 
-                    <div class="form-group m-form__group ic-form-group">
-                        <label>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label">
                             <span class="ic-step-number">3</span>
                             Position
-                            <span class="ic-small italic">(optional)</span>
                         </label>
-                        <input type="text" class="form-control form-control-text event-change"
-                               id="employee-subcontractor-modal-position" name="position"/>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control form-control-validate form-control-solid event-change"
+                                       id="employee-subcontractor-modal-position" name="position"/>
+                            </div>
+                        </div>
 
                     </div>
 

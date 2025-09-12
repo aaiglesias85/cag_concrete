@@ -14,52 +14,37 @@ var ModalEmployeeSubcontractor = function () {
     }
 
     var initWidgets = function () {
-        
+        // init widgets generales
+        MyApp.initWidgets();
     }
 
-    var initFormEmployee = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#employee-subcontractor-modal-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-                hourly_rate: {
-                    required: true
-                }
+        var form = KTUtil.get('employee-subcontractor-modal-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            hourlyrate: {
+                presence: {message: "This field is required"},
+            },
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
+        return result;
     };
 
     var mostrarModal = function () {
@@ -67,9 +52,8 @@ var ModalEmployeeSubcontractor = function () {
         // reset form
         resetFormEmployee();
 
-        $('#modal-employee-subcontractor').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-employee-subcontractor', {backdrop: 'static', keyboard: true});
     }
     var initAccionesEmployee = function () {
 
@@ -80,57 +64,53 @@ var ModalEmployeeSubcontractor = function () {
 
         function btnClickSalvarFormEmployee() {
 
-            if ($('#employee-subcontractor-modal-form').valid() && subcontractor_id !== '') {
+            if (validateForm() && subcontractor_id !== '') {
+
+                var formData = new URLSearchParams();
+
+                formData.set("employee_id", '');
+                formData.set("subcontractor_id", subcontractor_id);
 
                 var name = $('#employee-subcontractor-modal-name').val();
+                formData.set("name", name);
+
                 var hourly_rate = $('#employee-subcontractor-modal-hourly_rate').val();
+                formData.set("hourly_rate", hourly_rate);
+
                 var position = $('#employee-subcontractor-modal-position').val();
+                formData.set("position", position);
 
                 BlockUtil.block('#modal-employee-subcontractor .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "subcontractor/agregarEmployee",
-                    dataType: "json",
-                    data: {
-                        'employee_id': '',
-                        'subcontractor_id': subcontractor_id,
-                        'name': name,
-                        'hourly_rate': hourly_rate,
-                        'position': position
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-employee-subcontractor .modal-content');
-                        if (response.success) {
+                axios.post("subcontractor/agregarEmployee", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                employee_new = {employee_id: response.employee_id, name, hourlyRate: hourly_rate, position: position};
 
-                            employee_new = {employee_id: response.employee_id, name, hourlyRate: hourly_rate, position: position};
+                                // close modal
+                                ModalUtil.hide('#modal-employee-subcontractor');
 
-                            // close modal
-                            $('#modal-employee-subcontractor').modal('hide');
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-employee-subcontractor .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-employee-subcontractor .modal-content");
+                    });
             }
         };
     };
     var resetFormEmployee = function () {
-        $('#employee-subcontractor-modal-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("employee-subcontractor-modal-form");
 
         // reset employee
         employee_new = null;
@@ -142,8 +122,6 @@ var ModalEmployeeSubcontractor = function () {
 
             initWidgets();
 
-            // items
-            initFormEmployee();
             initAccionesEmployee();
         },
         mostrarModal: mostrarModal,

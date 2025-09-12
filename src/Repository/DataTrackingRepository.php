@@ -233,13 +233,14 @@ class DataTrackingRepository extends EntityRepository
      *
      * @return []
      */
-    public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?int $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = ''): array
+    public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?string $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = ''): array
     {
 
         // Whitelist de columnas ordenables
         $sortable = [
             'id' => 'd_t.id',
             'date' => 'd_t.date',
+            'project' => 'p.name',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'd_t.date';
         $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';

@@ -478,3 +478,32 @@ div.tagsinput.has-error {
     border-bottom: 1px solid #1B84FF;
     border-color: #ffffff;
 }
+
+.dtfc-fixed-start {
+    background: #fff !important;
+}
+
+.dtfc-fixed-end {
+    background: #fff !important;
+}
+
+.row-pending > td {
+    background: #FFB38C !important;
+}
+
+.row-secondary > td {
+    background: #E6F2FF !important;
+}
+table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n+1):not(.row-pending) > * {
+    box-shadow: none;
+}
+table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n+1):not(.row-secondary) > * {
+    box-shadow: none;
+}
+
+.modal-content .ic-form-group{
+    padding-left: 0px !important;
+}
+.modal-content .ic-step-number{
+    margin-left: 0px !important;
+}

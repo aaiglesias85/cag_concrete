@@ -9,52 +9,41 @@ var ModalConcreteVendor = function () {
     }
 
     var initWidgets = function () {
-        
+        // init widgets generales
+        MyApp.initWidgets();
+
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask("#phone-concrete-vendor-modal");
     }
 
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#concrete-vendor-modal-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-                contactemail: {
-                    optionalEmail: true // Usamos la validación personalizada en lugar de email:true
-                }
+        var form = KTUtil.get('concrete-vendor-modal-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            email: {
+                email: {message: "The email must be valid"}
+            },
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
+        return result;
     };
 
     var mostrarModal = function () {
@@ -62,9 +51,8 @@ var ModalConcreteVendor = function () {
         // reset form
         resetFormConcreteVendor();
 
-        $('#modal-concrete-vendor').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-concrete-vendor', {backdrop: 'static', keyboard: true});
     }
     var initAcciones = function () {
 
@@ -75,61 +63,60 @@ var ModalConcreteVendor = function () {
 
         function btnClickSalvarForm() {
 
-            if ($('#concrete-vendor-modal-form').valid()) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
+
+                formData.set("vendor_id", '');
 
                 var name = $('#name-concrete-vendor-modal').val();
+                formData.set("name", name);
+
                 var phone = $('#phone-concrete-vendor-modal').val();
-                var address = $('#address-concrete-vendor-modal').val();
-                var contactName = $('#contactName-concrete-vendor-modal').val();
+                formData.set("phone", phone);
+
                 var contactEmail = $('#contactEmail-concrete-vendor-modal').val();
+                formData.set("contactEmail", contactEmail);
+
+                var address = $('#address-concrete-vendor-modal').val();
+                formData.set("address", address);
+
+                var contactName = $('#contactName-concrete-vendor-modal').val();
+                formData.set("contactName", contactName);
+
+                formData.set("contacts", JSON.stringify([]));
 
                 BlockUtil.block('#modal-concrete-vendor .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "concrete-vendor/salvar",
-                    dataType: "json",
-                    data: {
-                        'vendor_id': '',
-                        'name': name,
-                        'phone': phone,
-                        'address': address,
-                        'contactName': contactName,
-                        'contactEmail': contactEmail,
-                        'contacts': JSON.stringify([])
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-concrete-vendor .modal-content');
-                        if (response.success) {
+                axios.post("concrete-vendor/salvar", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                vendor_new = {vendor_id: response.vendor_id, name};
 
-                            vendor_new = {vendor_id: response.vendor_id, name};
+                                // close modal
+                                ModalUtil.hide('#modal-concrete-vendor');
 
-                            // close modal
-                            $('#modal-concrete-vendor').modal('hide');
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-concrete-vendor .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-concrete-vendor .modal-content");
+                    });
             }
         };
     };
     var resetFormConcreteVendor = function () {
-        $('#concrete-vendor-modal-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("concrete-vendor-modal-form");
 
         // reset concrete-vendor
         vendor_new = null;
@@ -141,8 +128,6 @@ var ModalConcreteVendor = function () {
 
             initWidgets();
 
-            // items
-            initForm();
             initAcciones();
         },
         mostrarModal: mostrarModal,

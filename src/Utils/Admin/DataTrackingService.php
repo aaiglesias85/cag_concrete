@@ -1195,15 +1195,13 @@ class DataTrackingService extends Base
      */
     public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending)
     {
-        $arreglo_resultado = array();
+        $resultado = $this->getDoctrine()->getRepository(DataTracking::class)
+            ->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
 
-        $lista = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $data_tracking_id = $value->getId();
-
-            $acciones = $this->ListarAcciones($data_tracking_id);
 
             // conc vendor
             $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
@@ -1214,9 +1212,6 @@ class DataTrackingService extends Base
             $lost_concrete = round($total_conc_used - $total_concrete_yiel, 2);
 
             // totales
-
-            /*$total_quantity_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-                ->TotalQuantity($data_tracking_id);*/
             $total_quantity_today = $total_conc_used;
 
             $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
@@ -1255,7 +1250,7 @@ class DataTrackingService extends Base
 
             $pending = $value->getPending() ? 1 : 0;
 
-            $arreglo_resultado[] = [
+            $data[] = [
                 "id" => $data_tracking_id,
                 'project' => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
                 'date' => $value->getDate()->format('m/d/Y'),
@@ -1288,47 +1283,12 @@ class DataTrackingService extends Base
                 'total_concrete' => $total_concrete,
                 'profit' => $profit,
                 'pending' => $pending,
-                'acciones' => $acciones
             ];
         }
 
-        return $arreglo_resultado;
-    }
-
-    /**
-     * TotalDataTrackings: Total de items
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending)
-    {
-        $total = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->TotalDataTrackings($sSearch, $project_id, $fecha_inicial, $fecha_fin, $pending);
-
-        return $total;
-    }
-
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 10);
-
-        $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 }

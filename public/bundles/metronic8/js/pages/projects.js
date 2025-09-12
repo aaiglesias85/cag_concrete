@@ -444,7 +444,7 @@ var Projects = function () {
         FlatpickrUtil.clear('datetimepicker-due-date');
 
         // tooltips selects
-        MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("project-form"));
 
         $('#div-contract-amount').removeClass('hide').addClass('hide');
 
@@ -1512,7 +1512,7 @@ var Projects = function () {
         $(document).on('click', "#btn-salvar-item", function (e) {
             e.preventDefault();
 
-            var item_type = $('#item-type').prop('checked');
+            var item_type = $('#item-type-existing').prop('checked');
 
             var item_id = $('#item').val();
             var item = item_type ? $("#item option:selected").text() : $('#item-name').val();
@@ -1538,10 +1538,10 @@ var Projects = function () {
                 var unit_id = $('#unit').val();
                 formData.set("unit_id", unit_id);
 
-                var price = $('#item-price').val();
+                var price = NumberUtil.getNumericValue('#item-price');
                 formData.set("price", price);
 
-                var quantity = $('#item-quantity').val();
+                var quantity = NumberUtil.getNumericValue('#item-quantity');
                 formData.set("quantity", quantity);
 
                 var yield_calculation = $('#yield-calculation').val();
@@ -1633,8 +1633,8 @@ var Projects = function () {
                 $('#item').val(items[posicion].item_id);
                 $('#item').trigger('change');
 
-                $('#item-price').val(items[posicion].price);
-                $('#item-quantity').val(items[posicion].quantity);
+                $('#item-price').val(MyApp.formatearNumero(items[posicion].price, 2, '.', ','));
+                $('#item-quantity').val(MyApp.formatearNumero(items[posicion].quantity, 2, '.', ','));
 
                 $('#item').on('change', changeItem);
 

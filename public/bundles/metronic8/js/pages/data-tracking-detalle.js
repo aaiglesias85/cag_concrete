@@ -3,27 +3,11 @@ var DataTrackingDetalle = function () {
 
     //Reset forms
     var resetForms = function () {
-        $('#data-tracking-detalle-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#data-tracking-detalle-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("data-tracking-detalle-form");
 
         $('#inspector-detalle').val('');
         $('#inspector-detalle').trigger('change');
-
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
 
         // items
         items_data_tracking = [];
@@ -63,146 +47,33 @@ var DataTrackingDetalle = function () {
 
     };
 
-    //Editar
-    var initAccionDetalle = function () {
-        $(document).off('click', "#data-tracking-table-editable a.view");
-        $(document).on('click', "#data-tracking-table-editable a.view", function (e) {
-            e.preventDefault();
-            resetForms();
-
-            var data_tracking_id = $(this).data('id');
-            $('#data_tracking_id').val(data_tracking_id);
-
-            // open modal
-            $('#modal-data-tracking-detalle').modal('show');
-
-            editRow(data_tracking_id);
+    //Cerrar form
+    var initAccionCerrar = function () {
+        $(document).off('click', ".cerrar-form-data-tracking-detalle");
+        $(document).on('click', ".cerrar-form-data-tracking-detalle", function (e) {
+            cerrarForms();
         });
+    }
+    //Cerrar forms
+    var cerrarForms = function () {
+        resetForms();
+        $('#form-data-tracking-detalle').addClass('hide');
+        $('#lista-data-tracking').removeClass('hide');
     };
-
-    var editRow = function (data_tracking_id) {
-
-        BlockUtil.block('#modal-data-tracking-detalle .modal-content');
-
-        $.ajax({
-            type: "POST",
-            url: "data-tracking/cargarDatos",
-            dataType: "json",
-            data: {
-                'data_tracking_id': data_tracking_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#modal-data-tracking-detalle .modal-content');
-                if (response.success) {
-
-                    // datos project
-                    $('#proyect-number-detalle').html(response.data_tracking.project_number);
-                    $('#proyect-name-detalle').html(response.data_tracking.project_description);
-
-                    $('#data-tracking-date-detalle').val(response.data_tracking.date);
-
-                    $('#inspector-detalle').val(response.data_tracking.inspector_id);
-                    $('#inspector-detalle').trigger('change');
-
-                    $('#station_number-detalle').val(response.data_tracking.station_number);
-                    $('#measured_by-detalle').val(response.data_tracking.measured_by);
-
-                    $('#crew_lead-detalle').val(response.data_tracking.crew_lead);
-                    $('#notes-detalle').val(response.data_tracking.notes);
-                    $('#other_materials-detalle').val(response.data_tracking.other_materials);
-
-
-                    $('#total_people-detalle').val(response.data_tracking.total_people);
-                    $('#overhead_price-detalle').val(response.data_tracking.overhead_price);
-
-                    calcularTotalOverheadPrice();
-
-                    $('#total_stamps-detalle').val(response.data_tracking.total_stamps);
-
-                    $('#color_used-detalle').val(response.data_tracking.color_used);
-                    $('#color_price-detalle').val(response.data_tracking.color_price);
-
-                    calcularTotalColorPrice();
-
-                    // items
-                    items_data_tracking = response.data_tracking.items;
-                    actualizarTableListaItems();
-
-                    // labor
-                    labor = response.data_tracking.labor;
-                    actualizarTableListaLabor();
-
-                    // materials
-                    materials = response.data_tracking.materials;
-                    actualizarTableListaMaterial()
-
-                    // conc vendors
-                    conc_vendors = response.data_tracking.conc_vendors;
-                    actualizarTableListaConcVendors();
-
-                    // subcontracts
-                    subcontracts = response.data_tracking.subcontracts;
-                    actualizarTableListaSubcontracts();
-
-                    // archivos
-                    archivos = response.data_tracking.archivos;
-                    actualizarTableListaArchivos();
-
-                    // totals
-                    $('#total_concrete_yiel-detalle').val(response.data_tracking.total_concrete_yiel);
-                    $('#total_quantity_today-detalle').val(response.data_tracking.total_quantity_today);
-                    $('#total_daily_today-detalle').val(response.data_tracking.total_daily_today);
-                    $('#profit-detalle').val(response.data_tracking.profit);
-
-                } else {
-                    toastr.error(response.error, "");
-                }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#modal-data-tracking-detalle .modal-content');
-
-                toastr.error(response.error, "");
-            }
-        });
-
-    }
-
-    var calcularTotalOverheadPrice = function () {
-        var cantidad = $('#total_people-detalle').val();
-        var price = $('#overhead_price-detalle').val();
-        if (cantidad != '' && price != '') {
-            var total = parseFloat(cantidad) * parseFloat(price);
-            $('#total_overhead_price-detalle').val(total);
-        }
-    }
-
-    var calcularTotalColorPrice = function () {
-        var cantidad = $('#color_used-detalle').val();
-        var price = $('#color_price-detalle').val();
-        if (cantidad != '' && price != '') {
-            var total = parseFloat(cantidad) * parseFloat(price);
-            $('#total_color_price-detalle').val(total);
-        }
-    }
-
-
-    var initWidgets = function () {
-
-        $('.m-select2').select2();
-
-        $("[data-switch=true]").bootstrapSwitch();
-    }
 
     //Wizard
     var activeTab = 1;
     var totalTabs = 7;
     var initWizard = function () {
-        $(document).off('click', "#modal-data-tracking-detalle .wizard-tab");
-        $(document).on('click', "#modal-data-tracking-detalle .wizard-tab", function (e) {
+        $(document).off('click', "#form-data-tracking-detalle .wizard-tab");
+        $(document).on('click', "#form-data-tracking-detalle .wizard-tab", function (e) {
             e.preventDefault();
             var item = $(this).data('item');
 
             activeTab = parseInt(item);
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
 
             //bug visual de la tabla que muestra las cols corridas
             switch (activeTab) {
@@ -226,6 +97,30 @@ var DataTrackingDetalle = function () {
                     break;
             }
 
+        });
+
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente-detalle");
+        $(document).on('click', "#btn-wizard-siguiente-detalle", function (e) {
+            activeTab++;
+            $('#btn-wizard-anterior-detalle').removeClass('hide');
+            if (activeTab == totalTabs) {
+                $('#btn-wizard-siguiente-detalle').addClass('hide');
+            }
+
+            mostrarTab();
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior-detalle");
+        $(document).on('click', "#btn-wizard-anterior-detalle", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior-detalle').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-siguiente-detalle').removeClass('hide');
+            }
+            mostrarTab();
         });
     };
     var mostrarTab = function () {
@@ -265,125 +160,238 @@ var DataTrackingDetalle = function () {
         activeTab = 1;
         totalTabs = 7;
         mostrarTab();
+
+        $('#btn-wizard-anterior-detalle').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente-detalle').removeClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("data-tracking-detalle-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("data-tracking-detalle-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("data-tracking-detalle-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                KTUtil.addClass(element, "valid");
+            }
+        });
+    };
+
+    //Editar
+    var initAccionDetalle = function () {
+        $(document).off('click', "#data-tracking-table-editable a.detalle");
+        $(document).on('click', "#data-tracking-table-editable a.detalle", function (e) {
+            e.preventDefault();
+            resetForms();
+
+            var data_tracking_id = $(this).data('id');
+            $('#data_tracking_id_detalle').val(data_tracking_id);
+
+            // open modal
+            $('#form-data-tracking-detalle').removeClass('hide');
+            $('#lista-data-tracking').addClass('hide');
+
+            editRow(data_tracking_id);
+        });
+    };
+
+    var editRow = function (data_tracking_id) {
+
+        var formData = new URLSearchParams();
+        formData.set("data_tracking_id", data_tracking_id);
+
+        BlockUtil.block('#form-data-tracking-detalle');
+
+        axios.post("data-tracking/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+
+                        //cargar datos
+                        cargarDatos(response.data_tracking);
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-data-tracking-detalle");
+            });
+
+        function cargarDatos(data_tracking) {
+            // datos project
+            $('#proyect-number-detalle').html(data_tracking.project_number);
+            $('#proyect-name-detalle').html(data_tracking.project_description);
+
+            $('#data-tracking-date-detalle').val(data_tracking.date);
+
+            $('#inspector-detalle').val(data_tracking.inspector_id);
+            $('#inspector-detalle').trigger('change');
+
+            $('#station_number-detalle').val(data_tracking.station_number);
+            $('#measured_by-detalle').val(data_tracking.measured_by);
+
+            $('#crew_lead-detalle').val(data_tracking.crew_lead);
+            $('#notes-detalle').val(data_tracking.notes);
+            $('#other_materials-detalle').val(data_tracking.other_materials);
+
+
+            $('#total_people-detalle').val(data_tracking.total_people);
+            $('#overhead_price-detalle').val(data_tracking.overhead_price);
+
+            calcularTotalOverheadPrice();
+
+            $('#total_stamps-detalle').val(data_tracking.total_stamps);
+
+            $('#color_used-detalle').val(MyApp.formatearNumero(data_tracking.color_used, 2, '.', ','));
+            $('#color_price-detalle').val(MyApp.formatearNumero(data_tracking.color_price, 2, '.', ','));
+
+            calcularTotalColorPrice();
+
+            // items
+            items_data_tracking = data_tracking.items;
+            actualizarTableListaItems();
+
+            // labor
+            labor = data_tracking.labor;
+            actualizarTableListaLabor();
+
+            // materials
+            materials = data_tracking.materials;
+            actualizarTableListaMaterial()
+
+            // conc vendors
+            conc_vendors = data_tracking.conc_vendors;
+            actualizarTableListaConcVendors();
+
+            // subcontracts
+            subcontracts = data_tracking.subcontracts;
+            actualizarTableListaSubcontracts();
+
+            // archivos
+            archivos = data_tracking.archivos;
+            actualizarTableListaArchivos();
+
+            // totals
+            $('#total_concrete_yiel-detalle').val(MyApp.formatearNumero(data_tracking.total_concrete_yiel, 2, '.', ','));
+            $('#total_quantity_today-detalle').val(MyApp.formatearNumero(data_tracking.total_quantity_today, 2, '.', ','));
+            $('#total_daily_today-detalle').val(MyApp.formatearNumero(data_tracking.total_daily_today, 2, '.', ','));
+            $('#profit-detalle').val(MyApp.formatearNumero(data_tracking.profit, 2, '.', ','));
+        }
+
+    }
+
+    var calcularTotalOverheadPrice = function () {
+        var cantidad = NumberUtil.getNumericValue('#total_people-detalle');
+        var price = NumberUtil.getNumericValue('#overhead_price-detalle');
+        if (cantidad != '' && price != '') {
+            var total = parseFloat(cantidad) * parseFloat(price);
+            $('#total_overhead_price-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
+        }
+    }
+
+    var calcularTotalColorPrice = function () {
+        var cantidad = NumberUtil.getNumericValue('#color_used-detalle');
+        var price = NumberUtil.getNumericValue('#color_price-detalle');
+        if (cantidad != '' && price != '') {
+            var total = parseFloat(cantidad) * parseFloat(price);
+            $('#total_color_price-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
+        }
+    }
+
+
+    var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
     }
 
     // items
     var oTableItems;
     var items_data_tracking = [];
+
     var initTableItems = function () {
-        BlockUtil.block('#items-detalle-table-editable');
 
-        var table = $('#items-detalle-table-editable');
+        const table = "#items-detalle-table-editable";
 
-        var aoColumns = [
-            {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "yield_calculation_name",
-                title: "Yield Calculation",
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            }
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'yield_calculation_name'},
+            {data: 'quantity'},
+            {data: 'yield_calculation_valor'},
+            {data: 'price'},
+            {data: 'total'},
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items_data_tracking,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
+
+        // column defs
+        let columnDefs = [
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            search: {
-                input: $('#lista-items-detalle .m_form_search'),
-            }
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items_data_tracking,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#items-detalle-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#items-detalle-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#items-detalle-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#items-detalle-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#items-detalle-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
 
         var total = calcularTotalItemsPrice();
         $('#monto_total_items-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items-detalle [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
+
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
@@ -404,110 +412,63 @@ var DataTrackingDetalle = function () {
     // labor
     var oTableLabor;
     var labor = [];
+
     var initTableLabor = function () {
-        BlockUtil.block('#labor-detalle-table-editable');
 
-        var table = $('#labor-detalle-table-editable');
+        const table = "#labor-detalle-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'employee'},
+            {data: 'subcontractor'},
+            {data: 'role'},
+            {data: 'hours'},
+            {data: 'total'},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "employee",
-                title: "Employee",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "subcontractor",
-                title: "Subcontractor",
-            },
-            {
-                field: "role",
-                title: " Position/Role",
-            },
-            {
-                field: "hours",
-                title: "Hours",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.hours, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "Total $",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
         ];
-        oTableLabor = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: labor,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-labor-detalle .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableLabor = DatatableUtil.initSafeDataTable(table, {
+            data: labor,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#labor-detalle-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#labor-detalle-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#labor-detalle-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#labor-detalle-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#labor-detalle-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableLabor();
 
         var total = calcularTotalLaborPrice();
         $('#monto_total_labor-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableLabor = function () {
+        $(document).off('keyup', '#lista-labor-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-labor-detalle [data-table-filter="search"]', function (e) {
+            oTableLabor.search(e.target.value).draw();
+        });
+    }
     
     var actualizarTableListaLabor = function () {
         if (oTableLabor) {
@@ -529,116 +490,71 @@ var DataTrackingDetalle = function () {
     // materials
     var oTableMaterial;
     var materials = [];
+
     var initTableMaterial = function () {
-        BlockUtil.block('#material-detalle-table-editable');
 
-        var table = $('#material-detalle-table-editable');
+        const table = "#material-detalle-table-editable";
 
-        var aoColumns = [
-            {
-                field: "material",
-                title: "Material",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            }
+        // columns
+        const columns = [
+            {data: 'material'},
+            {data: 'unit'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
         ];
-        oTableMaterial = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: materials,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
+
+        // column defs
+        let columnDefs = [
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            search: {
-                input: $('#lista-material-detalle .m_form_search'),
-            }
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableMaterial = DatatableUtil.initSafeDataTable(table, {
+            data: materials,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#material-detalle-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#material-detalle-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#material-detalle-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#material-detalle-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#material-detalle-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableMaterial();
 
+        // totals
         var total = calcularTotalMaterialPrice();
         $('#monto_total_material-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableMaterial = function () {
+        $(document).off('keyup', '#lista-material-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-material-detalle [data-table-filter="search"]', function (e) {
+            oTableMaterial.search(e.target.value).draw();
+        });
+    }
+    
     var actualizarTableListaMaterial = function () {
         if (oTableMaterial) {
             oTableMaterial.destroy();
@@ -660,112 +576,70 @@ var DataTrackingDetalle = function () {
     // conc vendors
     var oTableConcVendor;
     var conc_vendors = [];
-    
+
     var initTableConcVendor = function () {
-        BlockUtil.block('#conc-vendor-detalle-table-editable');
 
-        var table = $('#conc-vendor-detalle-table-editable');
+        const table = "#conc-vendor-detalle-table-editable";
 
-        var aoColumns = [
-            {
-                field: "vendor",
-                title: "Conc Vendor",
-            },
-            {
-                field: "total_conc_used",
-                title: "Total Conc Used",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_conc_used, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "conc_price",
-                title: "Conc Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.conc_price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            }
+        // columns
+        const columns = [
+            {data: 'vendor'},
+            {data: 'total_conc_used'},
+            {data: 'conc_price'},
+            {data: 'total'},
         ];
-        oTableConcVendor = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: conc_vendors,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
+
+        // column defs
+        let columnDefs = [
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            search: {
-                input: $('#lista-conc-vendor-detalle .m_form_search'),
-            }
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableConcVendor = DatatableUtil.initSafeDataTable(table, {
+            data: conc_vendors,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#conc-vendor-detalle-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#conc-vendor-detalle-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#conc-vendor-detalle-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#conc-vendor-detalle-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#conc-vendor-detalle-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableConcVendor();
 
+        // totals
         var total = calcularTotalConcPrice();
         $('#monto_total_conc_vendor-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableConcVendor = function () {
+        $(document).off('keyup', '#lista-conc-vendor-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-conc-vendor-detalle [data-table-filter="search"]', function (e) {
+            oTableConcVendor.search(e.target.value).draw();
+        });
+    }
+
     var actualizarTableListaConcVendors = function () {
         if (oTableConcVendor) {
             oTableConcVendor.destroy();
@@ -786,121 +660,71 @@ var DataTrackingDetalle = function () {
     // subcontracts
     var oTableSubcontracts;
     var subcontracts = [];
+
     var initTableSubcontracts = function () {
 
-        BlockUtil.block('#subcontracts-detalle-table-editable');
+        const table = "#subcontracts-detalle-table-editable";
 
-        var table = $('#subcontracts-detalle-table-editable');
-
-        var aoColumns = [
-            {
-                field: "subcontractor",
-                title: "Subcontractor",
-            },
-            {
-                field: "item",
-                title: "Item",
-            },
-            {
-                field: "unit",
-                title: "Unit",
-                width: 100,
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            }
+        // columns
+        const columns = [
+            {data: 'subcontractor'},
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
         ];
-        oTableSubcontracts = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: subcontracts,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
+
+        // column defs
+        let columnDefs = [
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
-            search: {
-                input: $('#lista-subcontracts-detalle .m_form_search'),
-            }
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableSubcontracts = DatatableUtil.initSafeDataTable(table, {
+            data: subcontracts,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableSubcontracts
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#subcontracts-detalle-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#subcontracts-detalle-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#subcontracts-detalle-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#subcontracts-detalle-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#subcontracts-detalle-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableSubcontracts();
 
+        // totals
         var total = calcularTotalSubcontracts();
         $('#monto_total_subcontract-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableSubcontracts = function () {
+        $(document).off('keyup', '#lista-subcontracts-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-subcontracts-detalle [data-table-filter="search"]', function (e) {
+            oTableSubcontracts.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaSubcontracts = function () {
         if (oTableSubcontracts) {
             oTableSubcontracts.destroy();
@@ -921,116 +745,77 @@ var DataTrackingDetalle = function () {
 
     // Archivos
     var archivos = [];
-    var oTableListaArchivos;
+    var oTableArchivos;
     var initTableListaArchivos = function () {
-        BlockUtil.block('#lista-archivo-table-editable-detalle');
 
-        var table = $('#lista-archivo-table-editable-detalle');
+        const table = "#archivo-table-editable-detalle";
 
-        var aoColumns = [
-            {
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "file",
-                title: "File"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
-                    `;
-                }
-            }
+
+        const columns = [];
+
+        // columns
+        columns.push(
+            {data: 'name'},
+            {data: 'file'},
+            {data: null},
+        );
+
+        // column defs
+        let columnDefs = [
         ];
-        oTableListaArchivos = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: archivos,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-archivo-detalle .m_form_search'),
+
+        // acciones
+        columnDefs.push({
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['download']);
             },
         });
 
-        //Events
-        oTableListaArchivos
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#lista-archivo-table-editable-detalle');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableArchivos = DatatableUtil.initSafeDataTable(table, {
+            data: archivos,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        handleSearchDatatableArchivos();
 
     };
+    var handleSearchDatatableArchivos = function () {
+        $(document).off('keyup', '#lista-archivos-detalle [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-archivos-detalle [data-table-filter="search"]', function (e) {
+            oTableArchivos.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaArchivos = function () {
-        if (oTableListaArchivos) {
-            oTableListaArchivos.destroy();
+        if (oTableArchivos) {
+            oTableArchivos.destroy();
         }
 
         initTableListaArchivos();
     }
     var initAccionesArchivo = function () {
 
-        $(document).off('click', "#lista-archivo-table-editable-detalle a.download");
-        $(document).on('click', "#lista-archivo-table-editable-detalle a.download", function () {
+        $(document).off('click', "#archivo-table-editable-detalle a.download");
+        $(document).on('click', "#archivo-table-editable-detalle a.download", function () {
             var posicion = $(this).data('posicion');
             if (archivos[posicion]) {
 
                 var archivo = archivos[posicion].file;
-                var url = direccion_url + '/uploads/project/' + archivo;
+                var url = direccion_url + '/uploads/data-tracking/' + archivo;
 
                 // crear link para que se descargue el archivo
                 const link = document.createElement('a');
@@ -1042,17 +827,6 @@ var DataTrackingDetalle = function () {
             }
         });
 
-        function deleteArchivo(posicion) {
-            //Eliminar
-            archivos.splice(posicion, 1);
-            //actualizar posiciones
-            for (var i = 0; i < archivos.length; i++) {
-                archivos[i].posicion = i;
-            }
-            //actualizar lista
-            actualizarTableListaArchivos();
-        }
-
     };
 
     return {
@@ -1061,7 +835,8 @@ var DataTrackingDetalle = function () {
 
             initWidgets();
             initWizard();
-            
+
+            initAccionCerrar();
             initAccionDetalle();
 
             // items
@@ -1082,10 +857,10 @@ var DataTrackingDetalle = function () {
             if (data_tracking_id_view) {
                 resetForms();
 
-                $('#data_tracking_id').val(data_tracking_id_view);
+                $('#data_tracking_id_detalle').val(data_tracking_id_view);
 
-                // open modal
-                $('#modal-data-tracking-detalle').modal('show');
+                $('#form-data-tracking-detalle').removeClass('hide');
+                $('#lista-data-tracking').addClass('hide');
 
                 localStorage.removeItem('data_tracking_id_view');
 

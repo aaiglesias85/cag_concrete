@@ -21,10 +21,10 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     public function ListarEmployeesDeSubcontractor(int $subcontractorId): array
     {
         return $this->createQueryBuilder('s_e')
-            ->leftJoin('s_s_e.subcontractor', 's')
+            ->leftJoin('s_e.subcontractor', 's')
             ->andWhere('s.subcontractorId = :subcontractorId')
             ->setParameter('subcontractorId', $subcontractorId)
-            ->orderBy('s_s_e.name', 'ASC')
+            ->orderBy('s_e.name', 'ASC')
             ->getQuery()
             ->getResult();
     }

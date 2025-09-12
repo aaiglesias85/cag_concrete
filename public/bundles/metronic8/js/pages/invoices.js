@@ -1328,17 +1328,17 @@ var Invoices = function () {
 
         if (item_id != '') {
             var price = $('#item option[value="' + item_id + '"]').data("price");
-            $('#item-price').val(price);
+            $('#item-price').val(MyApp.formatearNumero(price, 2, '.', ','));
 
             calcularTotalItem();
         }
     }
     var calcularTotalItem = function () {
-        var cantidad = $('#item-quantity').val();
-        var price = $('#item-price').val();
+        var cantidad = NumberUtil.getNumericValue('#item-quantity');
+        var price = NumberUtil.getNumericValue('#item-price');
         if (cantidad != '' && price != '') {
             var total = parseFloat(cantidad) * parseFloat(price);
-            $('#item-total').val(total);
+            $('#item-total').val(MyApp.formatearNumero(total, 2, '.', ','));
         }
     }
 
@@ -1537,9 +1537,9 @@ var Invoices = function () {
 
             if (validateForm()) {
 
-                var quantity = $('#item-quantity').val();
-                var price = $('#item-price').val();
-                var total = $('#item-total').val();
+                var quantity = NumberUtil.getNumericValue('#item-quantity');
+                var price = NumberUtil.getNumericValue('#item-price');
+                var total = NumberUtil.getNumericValue('#item-total');
 
                 var posicion = nEditingRowItem;
                 if (items[posicion]) {
@@ -1886,9 +1886,9 @@ var Invoices = function () {
             if (validateFormPayment()) {
 
                 // payment
-                var paid_qty = $('#item-paid-qty').val();
-                var paid_amount = $('#item-paid-amount').val();
-                var paid_amount_total = $('#item-paid-amount-total').val();
+                var paid_qty = NumberUtil.getNumericValue('#item-paid-qty');
+                var paid_amount = NumberUtil.getNumericValue('#item-paid-amount');
+                var paid_amount_total = NumberUtil.getNumericValue('#item-paid-amount-total');
 
                 var posicion = nEditingRowPayment;
                 if (payments[posicion]) {

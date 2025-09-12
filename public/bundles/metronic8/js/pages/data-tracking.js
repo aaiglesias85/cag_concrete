@@ -1,227 +1,395 @@
 var DataTracking = function () {
 
-    var oTable;
     var rowDelete = null;
     var items = [];
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        MyApp.block('#data-tracking-table-editable');
+        const table = "#data-tracking-table-editable";
 
-        var table = $('#data-tracking-table-editable');
+        // datasource
+        const datasource = {
+            url: `data-tracking/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    project_id: $('#project').val(),
+                    pending: $('#pending').val(),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
-        aoColumns.push(
-            {
-                field: "date",
-                title: "Date",
-                width: 100,
-                textAlign: 'center'
-            },
-            {
-                field: "project",
-                title: "Project",
-                width: 150,
-            },
-            {
-                field: "totalConcUsed",
-                title: "Conc. Used (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.totalConcUsed, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total_concrete_yiel",
-                title: "Conc. Yield (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_concrete_yiel, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "lostConcrete",
-                title: "Difference (CY)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.lostConcrete, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total_concrete",
-                title: "Conc. Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total_concrete, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "totalLabor",
-                title: "Labor Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.totalLabor, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total_daily_today",
-                title: "Daily Total ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total_daily_today, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "profit",
-                title: "Profit ($)",
-                width: 100,
-                textAlign: 'center',
-                sortable: false,
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.profit, 2, '.', ',')}</span>`;
-                }
-            },
+        // column defs
+        let columnDefs = getColumnsDefTable();
 
-            /*{
-                field: "totalStamps",
-                title: "Total Stamps",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.totalStamps, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "concVendor",
-                title: "Conc Vendor",
-            },
-            {
-                field: "total_quantity_today",
-                title: "Quantity Today",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_quantity_today, 2, '.', ',')}</span>`;
-                }
-            },
-             */
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
 
-            {
-                field: "acciones",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
+        // order
+        const order = permiso.eliminar ? [[1, 'desc']] : [[0, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            fixedColumns: {
+                start: 2,
+                end: 1
             },
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'data-tracking/listar',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
+            // paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            // scrollY: 500,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            rows: {
-                afterTemplate: function (row, data, index) {
-                    if (data.pending === 1) {
-                        $(row).addClass('row-pending');
-                    }
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+            // marcar pending
+            createdRow: (row, data, index) => {
+                // console.log(data);
+                if (data.pending === 1) {
+                    $(row).addClass('row-pending');
                 }
             }
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-layout-updated', function () {
-                console.log('Layout render updated');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#data-tracking-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-data-tracking .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+
+        columns.push(
+            {data: 'date'},
+            {data: 'project'},
+            {data: 'totalConcUsed'},
+            {data: 'total_concrete_yiel'},
+            {data: 'lostConcrete'},
+            {data: 'total_concrete'},
+            {data: 'totalLabor'},
+            {data: 'total_daily_today'},
+            {data: 'profit'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            // date
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // project
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 300);
+                }
+            },
+            // totalConcUsed
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<div class="w-150px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // total_concrete_yiel
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<div class="w-150px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // lostConcrete
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // total_concrete
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // totalLabor
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // total_daily_today
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // profit
+            {
+                targets: 9,
+                render: function (data, type, row) {
+                    return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                // date
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 100);
+                    }
+                },
+                // project
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 300);
+                    }
+                },
+                // totalConcUsed
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        return `<div class="w-150px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // total_concrete_yiel
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return `<div class="w-150px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // lostConcrete
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // total_concrete
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // totalLabor
+                {
+                    targets: 6,
+                    render: function (data, type, row) {
+                        return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // total_daily_today
+                {
+                    targets: 7,
+                    render: function (data, type, row) {
+                        return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // profit
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        return `<div class="w-100px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['detalle', 'edit', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-data-tracking [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-data-tracking [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                    oTable.search(searchTerm).draw();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Data Tracking';
+        var table = document.querySelector('#data-tracking-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#data-tracking-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#data_tracking_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`.check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-data-tracking').removeClass('hide');
+        } else {
+            $('#btn-eliminar-data-tracking').addClass('hide');
+        }
+    }
+
     //Filtrar
     var initAccionFiltrar = function () {
 
@@ -230,49 +398,40 @@ var DataTracking = function () {
             btnClickFiltrar();
         });
 
+        $(document).off('click', "#btn-reset-filtrar");
+        $(document).on('click', "#btn-reset-filtrar", function (e) {
+            btnClickResetFilters();
+        });
+
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-data-tracking .m_form_search').val();
-        query.generalSearch = generalSearch;
+        const search = $('#lista-data-tracking [data-table-filter="search"]').val();
+        oTable.search(search).draw();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-data-tracking [data-table-filter="search"]').val('');
 
-        var project_id = $('#project').val();
-        query.project_id = project_id;
+        $('#project').val('');
+        $('#project').trigger('change');
 
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
+        $('#pending').val('');
+        $('#pending').trigger('change');
 
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
 
-        var pending = $('#pending').val();
-        query.pending = pending;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        oTable.search('').draw();
     }
 
     //Reset forms
     var resetForms = function () {
-        $('#data-tracking-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
+        // reset form
+        MyUtil.resetForm("data-tracking-form");
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#data-tracking-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        var fecha_actual = new Date();
-        $('#data-tracking-date').val(fecha_actual.format('m/d/Y'));
+        FlatpickrUtil.clear('datetimepicker-date');
+        FlatpickrUtil.setDate('datetimepicker-date', new Date());
 
         $('#inspector').val('');
         $('#inspector').trigger('change');
@@ -280,14 +439,10 @@ var DataTracking = function () {
         $('#overhead_price').val('');
         $('#overhead_price').trigger('change');
 
-        $('#item-subcontract').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#item-subcontract').select2();
+        MyUtil.limpiarSelect('#item-subcontract');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("data-tracking-form"));
 
         // items
         items_data_tracking = [];
@@ -316,7 +471,7 @@ var DataTracking = function () {
         //Mostrar el primer tab
         resetWizard();
 
-        $('#form-group-totals').removeClass('m--hide').addClass('m--hide');
+        $('#form-group-totals').removeClass('hide').addClass('hide');
 
         // add datos de proyecto
         $('#proyect-number').html('');
@@ -330,49 +485,196 @@ var DataTracking = function () {
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#data-tracking-form").validate({
-            rules: {
-                date: {
-                    required: true
-                },
-                total_conc_used: {
-                    required: true
-                }
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        var form = KTUtil.get('data-tracking-form');
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var constraints = {}
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        var errors = validate(form, constraints);
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+        return result;
+    };
 
-                });
-            },
+    //Wizard
+    var activeTab = 1;
+    var totalTabs = 7;
+    var initWizard = function () {
+        $(document).off('click', "#form-data-tracking .wizard-tab");
+        $(document).on('click', "#form-data-tracking .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
+
+            // validar
+            if (item > activeTab && !validWizard()) {
+                mostrarTab();
+                return;
+            }
+
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-anterior').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                // $('#btn-wizard-finalizar').removeClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+            }
+
+            // marcar los pasos validos
+            marcarPasosValidosWizard();
+
+            //bug visual de la tabla que muestra las cols corridas
+            switch (activeTab) {
+                case 2:
+                    actualizarTableListaItems()
+                    break;
+                case 3:
+                    actualizarTableListaLabor()
+                    break;
+                case 4:
+                    actualizarTableListaMaterial()
+                    break;
+                case 5:
+                    actualizarTableListaConcVendors()
+                    break;
+                case 6:
+                    actualizarTableListaSubcontracts()
+                    break;
+                case 7:
+                    actualizarTableListaArchivos()
+                    break;
+            }
+
         });
 
+        //siguiente
+        $(document).off('click', "#btn-wizard-siguiente");
+        $(document).on('click', "#btn-wizard-siguiente", function (e) {
+            if (validWizard()) {
+                activeTab++;
+                $('#btn-wizard-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    $('#btn-wizard-finalizar').removeClass('hide');
+                    $('#btn-wizard-siguiente').addClass('hide');
+                }
+
+                mostrarTab();
+            }
+        });
+        //anterior
+        $(document).off('click', "#btn-wizard-anterior");
+        $(document).on('click', "#btn-wizard-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-finalizar').addClass('hide');
+                $('#btn-wizard-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+    };
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-items').tab('show');
+                    actualizarTableListaItems();
+                    break;
+                case 3:
+                    $('#tab-labor').tab('show');
+                    actualizarTableListaLabor();
+                    break;
+                case 4:
+                    $('#tab-material').tab('show');
+                    actualizarTableListaMaterial();
+                    break;
+                case 5:
+                    $('#tab-conc-vendor').tab('show');
+                    actualizarTableListaConcVendors();
+                    break;
+                case 6:
+                    $('#tab-subcontracts').tab('show');
+                    actualizarTableListaSubcontracts();
+                    break;
+                case 7:
+                    $('#tab-archivos').tab('show');
+                    actualizarTableListaArchivos();
+                    break;
+            }
+        }, 0);
+    }
+    var resetWizard = function () {
+        activeTab = 1;
+        totalTabs = 7;
+        mostrarTab();
+        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide');
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+        // reset valid
+        KTUtil.findAll(KTUtil.get("data-tracking-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+    }
+    var validWizard = function () {
+        var result = true;
+        if (activeTab == 1) {
+
+            var date = FlatpickrUtil.getString('datetimepicker-date');
+
+            if (!validateForm() || date === '') {
+                result = false;
+
+                if (date === '') {
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-date"), "This field is required");
+                }
+            }
+
+        }
+
+        return result;
+    }
+
+    var marcarPasosValidosWizard = function () {
+        // reset
+        KTUtil.findAll(KTUtil.get("data-tracking-form"), ".nav-link").forEach(function (element, index) {
+            KTUtil.removeClass(element, "valid");
+        });
+
+        KTUtil.findAll(KTUtil.get("data-tracking-form"), ".nav-link").forEach(function (element, index) {
+            var tab = index + 1;
+            if (tab < activeTab) {
+                if (validWizard(tab)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
     };
 
     //Nuevo
@@ -387,34 +689,25 @@ var DataTracking = function () {
             // validar que haya seleccionado un proyecto
             var project_id = $('#project').val();
             if (project_id == '') {
-
                 toastr.error('Select the project in the top section', "");
-
-                var $element = $('#select-project .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
-
                 return;
             }
 
             resetForms();
 
-            $('#modal-data-tracking').modal({
-                'show': true
-            });
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-data-tracking'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-data-tracking'), 'hide');
+    }
+
     //Salvar
     var initAccionSalvar = function () {
-        $(document).off('click', "#btn-salvar-data-tracking");
-        $(document).on('click', "#btn-salvar-data-tracking", function (e) {
+        $(document).off('click', "#btn-wizard-finalizar");
+        $(document).on('click', "#btn-wizard-finalizar", function (e) {
             btnClickSalvarForm();
         });
 
@@ -428,43 +721,49 @@ var DataTracking = function () {
         function btnClickSalvarForm() {
             var data_tracking_id = $('#data_tracking_id').val();
             var project_id = $('#project').val();
-            if ($('#data-tracking-form').valid() && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
+            var date = FlatpickrUtil.getString('datetimepicker-date');
 
-                var date = $('#data-tracking-date').val();
+            if (validateForm() && date !== '' && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
 
-                MyApp.block('#modal-data-tracking .modal-content');
+                var formData = new URLSearchParams();
 
-                $.ajax({
-                    type: "POST",
-                    url: "data-tracking/validarSiExiste",
-                    dataType: "json",
-                    data: {
-                        'data_tracking_id': data_tracking_id,
-                        'project_id': project_id,
-                        'date': date
-                    },
-                    success: function (response) {
-                        mApp.unblock('#modal-data-tracking .modal-content');
-                        if (response.success) {
+                formData.set("data_tracking_id", data_tracking_id);
+                formData.set("project_id", project_id);
 
-                            if (response.existe) {
 
-                                $('#modal-data-tracking-confirm').modal('show');
+                formData.set("date", date);
+
+                BlockUtil.block('#form-data-tracking');
+
+                axios.post("data-tracking/validarSiExiste", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+
+                                if (response.existe) {
+                                    // mostar modal
+                                    ModalUtil.show('modal-data-tracking-confirm', {backdrop: 'static', keyboard: true});
+
+                                } else {
+                                    SalvarDataTracking();
+                                }
 
                             } else {
-                                SalvarDataTracking();
+                                toastr.error(response.error, "");
                             }
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#modal-data-tracking .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#form-data-tracking");
+                    });
+            } else {
+                if (date === '') {
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-date"), "This field is required");
+                }
             }
         };
     }
@@ -472,78 +771,119 @@ var DataTracking = function () {
     var SalvarDataTracking = function () {
         var data_tracking_id = $('#data_tracking_id').val();
         var project_id = $('#project').val();
-        if ($('#data-tracking-form').valid() && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
+        if (validateForm() && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
 
-            var date = $('#data-tracking-date').val();
+            var formData = new URLSearchParams();
+
+            formData.set("data_tracking_id", data_tracking_id);
+            formData.set("project_id", project_id);
+
+            var date = FlatpickrUtil.getString('datetimepicker-date');
+            formData.set("date", date);
+
             var inspector_id = $('#inspector').val();
+            formData.set("inspector_id", inspector_id);
+
             var station_number = $('#station_number').val();
+            formData.set("station_number", station_number);
+
             var measured_by = $('#measured_by').val();
+            formData.set("measured_by", measured_by);
+
             var crew_lead = $('#crew_lead').val();
+            formData.set("crew_lead", crew_lead);
+
             var notes = $('#notes').val();
-            var other_materials = $('#other_materials').val();
-            var total_stamps = $('#total_stamps').val();
-            var total_people = $('#total_people').val();
+            formData.set("notes", notes);
+
+            var other_materials = $('#other_materials').val() ?? 0;
+            formData.set("other_materials", other_materials);
+
+            var total_stamps = $('#total_stamps').val() ?? 0;
+            formData.set("total_stamps", total_stamps);
+
+            var total_people = NumberUtil.getNumericValue('#total_people');
+            formData.set("total_people", total_people);
+
             var overhead_price_id = $('#overhead_price').val();
-            var color_used = $('#color_used').val();
-            var color_price = $('#color_price').val();
+            formData.set("overhead_price_id", overhead_price_id);
 
-            MyApp.block('#modal-data-tracking .modal-content');
+            var color_used = NumberUtil.getNumericValue('#color_used');
+            formData.set("color_used", color_used);
 
-            $.ajax({
-                type: "POST",
-                url: "data-tracking/salvarDataTracking",
-                dataType: "json",
-                data: {
-                    'data_tracking_id': data_tracking_id,
-                    'project_id': project_id,
-                    'date': date,
-                    'inspector_id': inspector_id,
-                    'station_number': station_number,
-                    'measured_by': measured_by,
-                    // 'conc_vendor': conc_vendor,
-                    // 'conc_price': conc_price,
-                    'crew_lead': crew_lead,
-                    'notes': notes,
-                    'other_materials': other_materials,
-                    // 'total_conc_used': total_conc_used,
-                    'total_stamps': total_stamps,
-                    'total_people': total_people,
-                    'overhead_price_id': overhead_price_id,
-                    'color_used': color_used,
-                    'color_price': color_price,
-                    'items': JSON.stringify(items_data_tracking),
-                    'subcontracts': JSON.stringify(subcontracts),
-                    'labor': JSON.stringify(labor),
-                    'materials': JSON.stringify(materials),
-                    'conc_vendors': JSON.stringify(conc_vendors),
-                    'archivos': JSON.stringify(archivos),
-                },
-                success: function (response) {
-                    mApp.unblock('#modal-data-tracking .modal-content');
-                    if (response.success) {
+            var color_price = NumberUtil.getNumericValue('#color_price');
+            formData.set("color_price", color_used);
 
-                        toastr.success(response.message, "Success");
+            formData.set("items", JSON.stringify(items_data_tracking));
+            formData.set("subcontracts", JSON.stringify(subcontracts));
+            formData.set("labor", JSON.stringify(labor));
+            formData.set("materials", JSON.stringify(materials));
+            formData.set("conc_vendors", JSON.stringify(conc_vendors));
+            formData.set("archivos", JSON.stringify(archivos));
 
-                        // reset
-                        resetForms();
+            axios.post("data-tracking/salvarDataTracking", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                        $('#modal-data-tracking').modal('hide');
+                            toastr.success(response.message, "");
 
-                        //actualizar lista
-                        btnClickFiltrar();
+                            cerrarForms();
 
+                            //actualizar lista
+                            btnClickFiltrar();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    mApp.unblock('#modal-data-tracking .modal-content');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                });
         }
     }
+
+    //Cerrar form
+    var initAccionCerrar = function () {
+        $(document).off('click', ".cerrar-form-data-tracking");
+        $(document).on('click', ".cerrar-form-data-tracking", function (e) {
+            cerrarForms();
+        });
+    }
+    //Cerrar forms
+    var cerrarForms = function () {
+        if (!event_change) {
+            cerrarFormsConfirmated();
+        } else {
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
+        }
+    };
+
+    //Eventos change
+    var event_change = false;
+    var initAccionChange = function () {
+        $(document).off('change', ".event-change");
+        $(document).on('change', ".event-change", function (e) {
+            event_change = true;
+        });
+
+        $(document).off('click', "#btn-save-changes");
+        $(document).on('click', "#btn-save-changes", function (e) {
+            cerrarFormsConfirmated();
+        });
+    };
+    var cerrarFormsConfirmated = function () {
+        resetForms();
+        $('#form-data-tracking').addClass('hide');
+        $('#lista-data-tracking').removeClass('hide');
+
+        btnClickFiltrar();
+    };
 
     //Editar
     var initAccionEditar = function () {
@@ -555,8 +895,7 @@ var DataTracking = function () {
             var data_tracking_id = $(this).data('id');
             $('#data_tracking_id').val(data_tracking_id);
 
-            // open modal
-            $('#modal-data-tracking').modal('show');
+            mostrarForm();
 
             editRow(data_tracking_id);
         });
@@ -564,123 +903,123 @@ var DataTracking = function () {
 
     var editRow = function (data_tracking_id) {
 
-        MyApp.block('#modal-data-tracking .modal-content');
+        var formData = new URLSearchParams();
+        formData.set("data_tracking_id", data_tracking_id);
 
-        $.ajax({
-            type: "POST",
-            url: "data-tracking/cargarDatos",
-            dataType: "json",
-            data: {
-                'data_tracking_id': data_tracking_id
-            },
-            success: function (response) {
-                mApp.unblock('#modal-data-tracking .modal-content');
-                if (response.success) {
+        BlockUtil.block('#form-data-tracking');
 
-                    // datos project
-                    $('#project').off('change', changeProject);
+        axios.post("data-tracking/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    $('#project').val(response.data_tracking.project_id);
-                    $('#project').trigger('change');
+                        //cargar datos
+                        cargarDatos(response.data_tracking);
 
-                    $('#project').on('change', changeProject);
-
-                    $('#proyect-number').html(response.data_tracking.project_number);
-                    $('#proyect-name').html(response.data_tracking.project_description);
-
-                    $('#data-tracking-date').val(response.data_tracking.date);
-
-                    $('#inspector').val(response.data_tracking.inspector_id);
-                    $('#inspector').trigger('change');
-
-                    $('#station_number').val(response.data_tracking.station_number);
-                    $('#measured_by').val(response.data_tracking.measured_by);
-
-                    $('#crew_lead').val(response.data_tracking.crew_lead);
-                    $('#notes').val(response.data_tracking.notes);
-                    $('#other_materials').val(response.data_tracking.other_materials);
-
-
-                    $('#total_people').off('change', calcularTotalOverheadPrice);
-                    $('#overhead_price').off('change', calcularTotalOverheadPrice);
-
-                    $('#total_people').val(response.data_tracking.total_people);
-
-                    $('#overhead_price').val(response.data_tracking.overhead_price_id);
-                    $('#overhead_price').trigger('change');
-
-                    calcularTotalOverheadPrice();
-
-                    $('#total_people').on('change', calcularTotalOverheadPrice);
-                    $('#overhead_price').on('change', calcularTotalOverheadPrice);
-
-                    $('#total_stamps').val(response.data_tracking.total_stamps);
-
-                    $('#color_used').off('change', calcularTotalColorPrice);
-                    $('#color_price').off('change', calcularTotalColorPrice);
-
-                    $('#color_used').val(response.data_tracking.color_used);
-                    $('#color_price').val(response.data_tracking.color_price);
-
-                    calcularTotalColorPrice();
-
-                    $('#color_used').on('change', calcularTotalColorPrice);
-                    $('#color_price').on('change', calcularTotalColorPrice);
-
-                    // items
-                    items_data_tracking = response.data_tracking.items;
-                    actualizarTableListaItems();
-
-                    // project items
-                    items = response.data_tracking.project_items;
-                    actualizarSelectProjectItems();
-
-                    // labor
-                    labor = response.data_tracking.labor;
-
-                    // materials
-                    materials = response.data_tracking.materials;
-
-                    // conc vendors
-                    conc_vendors = response.data_tracking.conc_vendors;
-
-                    // subcontracts
-                    subcontracts = response.data_tracking.subcontracts;
-
-                    // archivos
-                    archivos = response.data_tracking.archivos;
-                    actualizarTableListaArchivos();
-
-                    // totals
-                    $('#form-group-totals').removeClass('m--hide');
-                    $('#total_concrete_yiel').val(MyApp.formatearNumero(response.data_tracking.total_concrete_yiel, 2, '.', ','));
-                    $('#total_quantity_today').val(response.data_tracking.total_quantity_today);
-
-
-                    $('#total_daily_today').val(MyApp.formatearNumero(response.data_tracking.total_daily_today, 2, '.', ','));
-
-                    $('#profit').val(MyApp.formatearNumero(response.data_tracking.profit, 2, '.', ','));
-
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                mApp.unblock('#modal-data-tracking .modal-content');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-data-tracking");
+            });
 
-                toastr.error(response.error, "");
+        function cargarDatos(data_tracking) {
+            // datos project
+            $('#project').off('change', changeProject);
+
+            $('#project').val(data_tracking.project_id);
+            $('#project').trigger('change');
+
+            $('#project').on('change', changeProject);
+
+            $('#proyect-number').html(data_tracking.project_number);
+            $('#proyect-name').html(data_tracking.project_description);
+
+            if (data_tracking.date !== '') {
+                const date = MyApp.convertirStringAFecha(data_tracking.date);
+                FlatpickrUtil.setDate('datetimepicker-date', date);
             }
-        });
+
+            $('#inspector').val(data_tracking.inspector_id);
+            $('#inspector').trigger('change');
+
+            $('#station_number').val(data_tracking.station_number);
+            $('#measured_by').val(data_tracking.measured_by);
+
+            $('#crew_lead').val(data_tracking.crew_lead) ?? '';
+            $('#notes').val(data_tracking.notes);
+            $('#other_materials').val(data_tracking.other_materials);
+
+
+            $('#total_people').off('change', calcularTotalOverheadPrice);
+            $('#overhead_price').off('change', calcularTotalOverheadPrice);
+
+            $('#total_people').val(data_tracking.total_people);
+
+            $('#overhead_price').val(data_tracking.overhead_price_id);
+            $('#overhead_price').trigger('change');
+
+            calcularTotalOverheadPrice();
+
+            $('#total_people').on('change', calcularTotalOverheadPrice);
+            $('#overhead_price').on('change', calcularTotalOverheadPrice);
+
+            $('#total_stamps').val(data_tracking.total_stamps);
+
+            $('#color_used').off('change', calcularTotalColorPrice);
+            $('#color_price').off('change', calcularTotalColorPrice);
+
+            $('#color_used').val(data_tracking.color_used);
+            $('#color_price').val(data_tracking.color_price);
+
+            calcularTotalColorPrice();
+
+            $('#color_used').on('change', calcularTotalColorPrice);
+            $('#color_price').on('change', calcularTotalColorPrice);
+
+            // items
+            items_data_tracking = data_tracking.items;
+            actualizarTableListaItems();
+
+            // project items
+            items = data_tracking.project_items;
+            actualizarSelectProjectItems();
+
+            // labor
+            labor = data_tracking.labor;
+
+            // materials
+            materials = data_tracking.materials;
+
+            // conc vendors
+            conc_vendors = data_tracking.conc_vendors;
+
+            // subcontracts
+            subcontracts = data_tracking.subcontracts;
+
+            // archivos
+            archivos = data_tracking.archivos;
+            actualizarTableListaArchivos();
+
+            // totals
+            $('#form-group-totals').removeClass('hide');
+            $('#total_concrete_yiel').val(MyApp.formatearNumero(data_tracking.total_concrete_yiel, 2, '.', ','));
+            $('#total_quantity_today').val(data_tracking.total_quantity_today);
+            $('#total_daily_today').val(MyApp.formatearNumero(data_tracking.total_daily_today, 2, '.', ','));
+            $('#profit').val(MyApp.formatearNumero(data_tracking.profit, 2, '.', ','));
+        }
 
     }
 
     var actualizarSelectProjectItems = function () {
         // reset
-        $('.items-project option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('.items-project').select2();
+        MyUtil.limpiarSelect('.items-project');
 
         for (var i = 0; i < items.length; i++) {
             var descripcion = `${items[i].item} - ${items[i].unit} - $${items[i].price}`;
@@ -699,9 +1038,8 @@ var DataTracking = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-eliminar-data-tracking");
@@ -720,20 +1058,10 @@ var DataTracking = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#data-tracking-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
                 toastr.error('Select items to delete', "");
             }
@@ -742,85 +1070,70 @@ var DataTracking = function () {
         function btnClickModalEliminar() {
             var data_tracking_id = rowDelete;
 
-            MyApp.block('#data-tracking-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("data_tracking_id", data_tracking_id);
 
-            $.ajax({
-                type: "POST",
-                url: "data-tracking/eliminarDataTracking",
-                dataType: "json",
-                data: {
-                    'data_tracking_id': data_tracking_id
-                },
-                success: function (response) {
-                    mApp.unblock('#data-tracking-table-editable');
+            BlockUtil.block('#lista-data-tracking');
 
-                    if (response.success) {
+            axios.post("data-tracking/eliminarDataTracking", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        btnClickFiltrar();
-
-                        toastr.success(response.message, "Success");
-
+                            btnClickFiltrar();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    mApp.unblock('#data-tracking-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-data-tracking");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#data-tracking-table-editable').join(',');
 
-            MyApp.block('#data-tracking-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "data-tracking/eliminarDataTrackings",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    mApp.unblock('#data-tracking-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        btnClickFiltrar();
+            BlockUtil.block('#lista-data-tracking');
 
-                        toastr.success(response.message, "Success");
+            axios.post("data-tracking/eliminarDataTrackings", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
+                            btnClickFiltrar();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    mApp.unblock('#data-tracking-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-data-tracking");
+                });
         };
     };
 
 
     var initWidgets = function () {
 
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('.m-select2').select2();
-
-        $("[data-switch=true]").bootstrapSwitch();
+        initTempus();
 
         $('#labor-color').minicolors({
             control: 'hue',
@@ -857,6 +1170,25 @@ var DataTracking = function () {
 
         // change file
         $('#fileinput').on('change', changeFile);
+    }
+
+    var initTempus = function () {
+        // filtros fechas
+        const menuEl = document.getElementById('filter-menu');
+        FlatpickrUtil.initDate('datetimepicker-desde', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: menuEl
+        });
+
+        // date
+        FlatpickrUtil.initDate('datetimepicker-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
     }
 
     var changeFile = function () {
@@ -917,35 +1249,35 @@ var DataTracking = function () {
         });
     }
     var calcularTotalConcrete = function () {
-        var cantidad = $('#total_conc_used').val();
-        var price = $('#conc_price').val();
+        var cantidad = NumberUtil.getNumericValue('#total_conc_used');
+        var price = NumberUtil.getNumericValue('#conc_price');
         if (cantidad != '' && price != '') {
             var total = parseFloat(cantidad) * parseFloat(price);
-            $('#total_concrete').val(total);
+            $('#total_concrete').val(MyApp.formatearNumero(total, 2, '.', ','));
 
             // profit
             // calcularProfit();
         }
     }
     var calcularTotalColorPrice = function () {
-        var cantidad = $('#color_used').val();
-        var price = $('#color_price').val();
+        var cantidad = NumberUtil.getNumericValue('#color_used');
+        var price = NumberUtil.getNumericValue('#color_price');
         if (cantidad !== '' && price !== '') {
             var total = parseFloat(cantidad) * parseFloat(price);
-            $('#total_color_price').val(total);
+            $('#total_color_price').val(MyApp.formatearNumero(total, 2, '.', ','));
 
             // profit
             // calcularProfit();
         }
     }
     var calcularTotalOverheadPrice = function () {
-        var cantidad = $('#total_people').val();
+        var cantidad = NumberUtil.getNumericValue('#total_people');
         var price_id = $('#overhead_price').val();
         if (cantidad !== '' && price_id !== '') {
 
             var price = devolverOverheadPrice();
             var total = parseFloat(cantidad) * parseFloat(price);
-            $('#total_overhead_price').val(total);
+            $('#total_overhead_price').val(MyApp.formatearNumero(total, 2, '.', ','));
         }
 
         // profit
@@ -961,7 +1293,6 @@ var DataTracking = function () {
 
         return price;
     }
-
     var calcularTotalItemsPrice = function () {
         var total = 0;
 
@@ -971,7 +1302,6 @@ var DataTracking = function () {
 
         return total;
     }
-
     var calcularTotalSubcontracts = function () {
         var total = 0;
 
@@ -981,14 +1311,13 @@ var DataTracking = function () {
 
         return total;
     }
-
     var calcularProfit = function () {
         var data_tracking_id = $('#data_tracking_id').val();
         if (data_tracking_id !== '') {
             var total_concrete = calcularTotalConcPrice();
             var total_labor = calcularTotalLaborPrice();
             var total_material = calcularTotalMaterialPrice();
-            var total_overhead = $('#total_overhead_price').val();
+            var total_overhead = NumberUtil.getNumericValue('#total_overhead_price');
 
             var total_daily_today = calcularTotalItemsPrice();
             var total_subcontracts = calcularTotalSubcontracts();
@@ -1000,41 +1329,18 @@ var DataTracking = function () {
             $('#profit').val(MyApp.formatearNumero(profit, 2, '.', ','));
         }
     }
-
-    var changeItemType = function (event, state) {
-
-        // reset
-        $('#item').val('');
-        $('#item').trigger('change');
-        $('#div-item').removeClass('m--hide');
-
-        $('#item-name').val('');
-        $('#item-name').removeClass('m--hide').addClass('m--hide');
-
-        $('#unit').val('');
-        $('#unit').trigger('change');
-        $('#select-unit').removeClass('m--hide').addClass('m--hide');
-
-        if (!state) {
-            $('#div-item').removeClass('m--hide').addClass('m--hide');
-            $('#item-name').removeClass('m--hide');
-            $('#select-unit').removeClass('m--hide');
-        }
-    }
-
     var changeYield = function () {
         var yield_calculation = $('#yield-calculation').val();
 
         // reset
         $('#equation').val('');
         $('#equation').trigger('change');
-        $('#select-equation').removeClass('m--hide').addClass('m--hide');
+        $('#select-equation').removeClass('hide').addClass('hide');
 
         if (yield_calculation == 'equation') {
-            $('#select-equation').removeClass('m--hide');
+            $('#select-equation').removeClass('hide');
         }
     }
-
     var changeItem = function () {
         var item_id = $('#item').val();
 
@@ -1060,7 +1366,6 @@ var DataTracking = function () {
             $('#equation').trigger('change');
         }
     }
-
     var changeMaterial = function () {
         var material_id = $('#material').val();
 
@@ -1073,29 +1378,14 @@ var DataTracking = function () {
             $('#material-unit').val(unit);
 
             var price = $('#material option[value="' + material_id + '"]').data("price");
-            $('#material-price').val(price);
+            $('#material-price').val(MyApp.formatearNumero(price, 2, '.', ','));
         }
     }
-
     var changeProject = function (e) {
         var project_id = $('#project').val();
 
-        // evitar la opcion de add
-        if (project_id == 'add') {
-            $('#project').val('');
-            $('#project').trigger('change');
-
-            $('#modal-filter-project').modal('show');
-
-            return;
-        }
-
         // reset
-        $('#item-data-tracking option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#item-data-tracking').select2();
+        MyUtil.limpiarSelect('#item-data-tracking');
 
         if (project_id != '') {
             listarItemsDeProject(project_id);
@@ -1105,44 +1395,34 @@ var DataTracking = function () {
     }
 
     var listarItemsDeProject = function (project_id) {
-        MyApp.block('#modal-data-tracking .modal-content');
 
-        $.ajax({
-            type: "POST",
-            url: "project/listarItems",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                mApp.unblock('#modal-data-tracking .modal-content');
-                if (response.success) {
+        var formData = new URLSearchParams();
 
-                    //Llenar select
-                    items = response.items;
-                    console.log(items);
+        formData.set("project_id", project_id);
 
+        BlockUtil.block('#form-data-tracking');
+
+        axios.post("project/listarItems", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+
+                        //Llenar select
+                        items = response.items;
+                        console.log(items);
+
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                mApp.unblock('#modal-data-tracking .modal-content');
-
-                toastr.error(response.error, "");
-            }
-        });
-    }
-
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-data-tracking');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-data-tracking");
+            });
     }
 
     // inspector
@@ -1197,240 +1477,91 @@ var DataTracking = function () {
 
     };
 
-
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 7;
-    var initWizard = function () {
-        $(document).off('click', "#modal-data-tracking .wizard-tab");
-        $(document).on('click', "#modal-data-tracking .wizard-tab", function (e) {
-            e.preventDefault();
-            var item = $(this).data('item');
-
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
-
-            activeTab = parseInt(item);
-
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    actualizarTableListaItems()
-                    break;
-                case 3:
-                    actualizarTableListaLabor()
-                    break;
-                case 4:
-                    actualizarTableListaMaterial()
-                    break;
-                case 5:
-                    actualizarTableListaConcVendors()
-                    break;
-                case 6:
-                    actualizarTableListaSubcontracts()
-                    break;
-                case 7:
-                    actualizarTableListaArchivos()
-                    break;
-            }
-
-        });
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-items').tab('show');
-                    actualizarTableListaItems();
-                    break;
-                case 3:
-                    $('#tab-labor').tab('show');
-                    actualizarTableListaLabor();
-                    break;
-                case 4:
-                    $('#tab-material').tab('show');
-                    actualizarTableListaMaterial();
-                    break;
-                case 5:
-                    $('#tab-conc-vendor').tab('show');
-                    actualizarTableListaConcVendors();
-                    break;
-                case 6:
-                    $('#tab-subcontracts').tab('show');
-                    actualizarTableListaSubcontracts();
-                    break;
-                case 7:
-                    $('#tab-archivos').tab('show');
-                    actualizarTableListaArchivos();
-                    break;
-            }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 7;
-        mostrarTab();
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab == 1) {
-
-            if (!$('#data-tracking-form').valid()) {
-                result = false;
-            }
-
-        }
-
-        return result;
-    }
-
     // items
     var oTableItems;
     var items_data_tracking = [];
     var nEditingRowItem = null;
     var initTableItems = function () {
-        MyApp.block('#items-table-editable');
 
-        var table = $('#items-table-editable');
+        const table = "#items-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'yield_calculation_name'},
+            {data: 'quantity'},
+            {data: 'yield_calculation_valor'},
+            {data: 'price'},
+            {data: 'total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "item",
-                title: "Item",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "yield_calculation_name",
-                title: "Yield Calculation",
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "yield_calculation_valor",
-                title: "Yield Calculation Value",
-                width: 150,
-                textAlign: 'center',
-                template: function (row) {
-                    return row.yield_calculation_valor !== '' ? `<span>${MyApp.formatearNumero(row.yield_calculation_valor, 2, '.', ',')}</span>` : '';
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableItems = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: items_data_tracking,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableItems = DatatableUtil.initSafeDataTable(table, {
+            data: items_data_tracking,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#items-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#items-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#items-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#items-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableItems();
 
         var total = calcularTotalItemsPrice();
         $('#monto_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableItems = function () {
+        $(document).off('keyup', '#lista-items [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-items [data-table-filter="search"]', function (e) {
+            oTableItems.search(e.target.value).draw();
+        });
+    }
+
     var actualizarTableListaItems = function () {
         if (oTableItems) {
             oTableItems.destroy();
@@ -1441,45 +1572,35 @@ var DataTracking = function () {
         // calcular profit
         calcularProfit();
     }
-    var initFormItem = function () {
-        $("#data-tracking-item-form").validate({
-            rules: {
-                quantity: {
-                    required: true,
-                    pattern: /^[+-]?\d+(\.\d+)?$/ // permite +12, -34, 56, etc.
-                },
+
+    var validateFormItem = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('data-tracking-item-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
+                format: {
+                    pattern: /^[+-]?\d+(\.\d+)?$/, // permite +12, -34, 56, etc.
+                    message: "The field is invalid"
+                }
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
+        return result;
     };
     var initAccionesItems = function () {
 
@@ -1488,9 +1609,8 @@ var DataTracking = function () {
             // reset
             resetFormItem();
 
-            $('#modal-data-tracking-item').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-data-tracking-item', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-data-tracking-item");
@@ -1500,7 +1620,7 @@ var DataTracking = function () {
 
             var item_id = $('#item-data-tracking').val();
 
-            if ($('#data-tracking-item-form').valid() && item_id != '') {
+            if (validateFormItem() && item_id != '') {
 
                 if (ExisteItem(item_id)) {
                     toastr.error("The selected item has already been added", "");
@@ -1571,7 +1691,7 @@ var DataTracking = function () {
                 actualizarTableListaItems();
 
                 if (nEditingRowItem != null) {
-                    $('#modal-data-tracking-item').modal('hide');
+                    ModalUtil.hide('modal-data-tracking-item');
                 }
 
                 // reset
@@ -1579,16 +1699,7 @@ var DataTracking = function () {
 
             } else {
                 if (item_id == '') {
-                    var $element = $('#select-item-data-tracking .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-item-data-tracking"), "This field is required");
                 }
             }
 
@@ -1607,12 +1718,12 @@ var DataTracking = function () {
                 $('#item-data-tracking').val(items_data_tracking[posicion].item_id);
                 $('#item-data-tracking').trigger('change');
 
-                $('#data-tracking-quantity').val(items_data_tracking[posicion].quantity);
+                $('#data-tracking-quantity').val(MyApp.formatearNumero(items_data_tracking[posicion].quantity, 2, '.', ','));
 
                 $('#notes-item-data-tracking').val(items_data_tracking[posicion].notes);
 
                 // open modal
-                $('#modal-data-tracking-item').modal('show');
+                ModalUtil.show('modal-data-tracking-item', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -1641,7 +1752,7 @@ var DataTracking = function () {
         });
 
         function DevolverCantidadItemDataTracking() {
-            var quantity = $('#data-tracking-quantity').val();
+            var quantity = NumberUtil.getNumericValue('#data-tracking-quantity');
 
             if (nEditingRowItem == null) {
                 quantity = quantity.trim().replace(/^[-+]/, "");
@@ -1696,33 +1807,32 @@ var DataTracking = function () {
             if (items_data_tracking[posicion]) {
 
                 if (items_data_tracking[posicion].data_tracking_item_id != '') {
-                    MyApp.block('#items-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "data-tracking/eliminarItem",
-                        dataType: "json",
-                        data: {
-                            'data_tracking_item_id': items_data_tracking[posicion].data_tracking_item_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#items-table-editable');
-                            if (response.success) {
 
-                                toastr.success(response.message, "Success");
+                    var formData = new URLSearchParams();
+                    formData.set("data_tracking_item_id", items_data_tracking[posicion].data_tracking_item_id);
 
-                                deleteItem(posicion);
+                    BlockUtil.block('#lista-items');
 
+                    axios.post("data-tracking/eliminarItem", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
+
+                                    deleteItem(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#items-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-items");
+                        });
                 } else {
                     deleteItem(posicion);
                 }
@@ -1741,267 +1851,90 @@ var DataTracking = function () {
         }
     };
     var resetFormItem = function () {
-        $('#data-tracking-item-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#data-tracking-item-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("data-tracking-item-form");
 
         actualizarSelectProjectItems();
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("data-tracking-item-form"));
 
         nEditingRowItem = null;
-    };
-
-    var initAccionFiltrarProjects = function () {
-
-        $(document).off('click', "#btn-filtrar-projects");
-        $(document).on('click', "#btn-filtrar-projects", function (e) {
-            btnClickFiltrarProjects();
-        });
-
-        $(document).off('click', "#btn-reset-filtros-projects");
-        $(document).on('click', "#btn-reset-filtros-projects", function (e) {
-            resetFormFilter();
-        });
-
-        $(document).off('click', "#btn-reset-filters");
-        $(document).on('click', "#btn-reset-filters", function (e) {
-
-            $('#lista-data-tracking .m_form_search').val('');
-
-            $('#project').val('');
-            $('#project').trigger('change');
-
-            $('#fechaInicial').val('');
-            $('#fechaFin').val('');
-
-            $('#pending').val('');
-            $('#pending').trigger('change');
-
-            btnClickFiltrar();
-
-        });
-
-        function btnClickFiltrarProjects() {
-
-            var fechaInicial = $('#filtro-project-from').val();
-            var fechaFin = $('#filtro-project-to').val();
-            var search = $('#filtro-project-search').val();
-            var status = $('#filtro-project-status').val();
-
-            MyApp.block('#modal-filter-project .modal-content');
-
-            $.ajax({
-                type: "POST",
-                url: "project/listarOrdenados",
-                dataType: "json",
-                data: {
-                    'status': status,
-                    'search': search,
-                    'from': fechaInicial,
-                    'to': fechaFin
-                },
-                success: function (response) {
-                    mApp.unblock('#modal-filter-project .modal-content');
-                    if (response.success) {
-
-                        // reset
-                        $('#project option').each(function (e) {
-                            if ($(this).val() != "" && $(this).val() != "add")
-                                $(this).remove();
-                        });
-                        initSelectProject();
-
-                        var projects = response.projects;
-                        if (projects.length > 0) {
-                            for (var i = 0; i < projects.length; i++) {
-                                $('#project').append(new Option(`${projects[i].number} - ${projects[i].name}`, projects[i].project_id, false, false));
-                            }
-                            initSelectProject();
-
-                            // select si solo hay uno
-                            if (projects.length == 1) {
-                                $('#project').val(projects[0].project_id);
-                                $('#project').trigger('change');
-                            }
-
-                            // close modal
-                            $('#modal-filter-project').modal('hide');
-                        } else {
-                            toastr.error('No projects found', "Error");
-                        }
-
-
-                    } else {
-                        toastr.error(response.error, "Error");
-                    }
-                },
-                failure: function (response) {
-                    mApp.unblock('#modal-filter-project .modal-content');
-
-                    toastr.error(response.error, "Error");
-                }
-            });
-
-        }
-
-        function resetFormFilter() {
-            $('#form-filter-projects input').each(function (e) {
-                $element = $(this);
-                $element.val('');
-            });
-
-            $('#filtro-project-status').val('');
-            $('#filtro-project-status').trigger('change');
-        };
-
     };
 
     // labor
     var oTableLabor;
     var labor = [];
     var nEditingRowLabor = null;
+
     var initTableLabor = function () {
-        MyApp.block('#labor-table-editable');
 
-        var table = $('#labor-table-editable');
+        const table = "#labor-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'employee'},
+            {data: 'subcontractor'},
+            {data: 'role'},
+            {data: 'hours'},
+            {data: 'total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "employee",
-                title: "Employee",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "subcontractor",
-                title: "Subcontractor",
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "role",
-                title: " Position/Role",
-            },
-            {
-                field: "hours",
-                title: "Hours",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.hours, 2, '.', ',')}</span>`;
-                }
-            },
-            /*{
-                field: "hourly_rate",
-                title: "Hourly Rate",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.hourly_rate, 2, '.', ',')}</span>`;
-                }
-            },*/
-            {
-                field: "total",
-                title: "Total $",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableLabor = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: labor,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-labor .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableLabor = DatatableUtil.initSafeDataTable(table, {
+            data: labor,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#labor-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#labor-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#labor-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#labor-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#labor-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableLabor();
 
         var total = calcularTotalLaborPrice();
         $('#monto_total_labor').val(MyApp.formatearNumero(total, 2, '.', ','));
-
         $('#total_people').val(labor.length);
     };
+    var handleSearchDatatableLabor = function () {
+        $(document).off('keyup', '#lista-labor [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-labor [data-table-filter="search"]', function (e) {
+            oTableLabor.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaLabor = function () {
         if (oTableLabor) {
             oTableLabor.destroy();
@@ -2012,45 +1945,33 @@ var DataTracking = function () {
         // calcular profit
         calcularProfit();
     }
-    var initFormLabor = function () {
-        $("#data-tracking-labor-form").validate({
-            rules: {
-                hours: {
-                    required: true
-                },
+
+    var validateFormLabor = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('data-tracking-labor-form');
+
+        var constraints = {
+            hours: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
+        return result;
     };
+
     var initAccionesLabor = function () {
 
         $(document).off('click', "#btn-agregar-labor");
@@ -2058,9 +1979,8 @@ var DataTracking = function () {
             // reset
             resetFormLabor();
 
-            $('#modal-data-tracking-labor').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-data-tracking-labor', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-data-tracking-labor");
@@ -2071,7 +1991,7 @@ var DataTracking = function () {
             var employee_id = $('#employee').val();
             var subcontractor_employee_id = $('#employee-subcontractor').val();
 
-            if ($('#data-tracking-labor-form').valid() && (employee_id !== '' || subcontractor_employee_id !== '')) {
+            if (validateFormLabor() && (employee_id !== '' || subcontractor_employee_id !== '')) {
 
                 var subcontractor_id = $('#subcontractor-labor').val();
                 var employee = employee_id !== '' ? $("#employee option:selected").text() : '';
@@ -2080,7 +2000,7 @@ var DataTracking = function () {
                     employee = subcontractor_employee_id !== '' ? $("#employee-subcontractor option:selected").text() : '';
                 }
 
-                var hours = $('#hours').val();
+                var hours = NumberUtil.getNumericValue('#hours');
                 var role = $('#labor-role').val();
                 var color = $('#labor-color').val();
 
@@ -2128,7 +2048,7 @@ var DataTracking = function () {
                 actualizarTableListaLabor();
 
                 if (nEditingRowLabor != null) {
-                    $('#modal-data-tracking-labor').modal('hide');
+                    ModalUtil.hide('modal-data-tracking-labor');
                 }
 
                 // reset
@@ -2136,28 +2056,10 @@ var DataTracking = function () {
 
             } else {
                 if (employee_id === '') {
-                    var $element = $('#select-employee .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-employee"), "This field is required");
                 }
                 if (subcontractor_employee_id === '') {
-                    var $element = $('#select-employee-subcontractor .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-employee-subcontractor"), "This field is required");
                 }
             }
 
@@ -2185,16 +2087,16 @@ var DataTracking = function () {
                     $('#subcontractor-labor').val(labor[posicion].subcontractor_id);
                     $('#subcontractor-labor').trigger('change');
 
-                    $('#div-employee').removeClass('m--hide').addClass('m--hide');
-                    $('#div-employee-subcontractor').removeClass('m--hide');
+                    $('#div-employee').removeClass('hide').addClass('hide');
+                    $('#div-employee-subcontractor').removeClass('hide');
                 }
 
-                $('#hours').val(labor[posicion].hours);
+                $('#hours').val(MyApp.formatearNumero(labor[posicion].hours, 2, '.', ','));
                 $('#labor-role').val(labor[posicion].role);
                 $('#labor-color').minicolors('value', labor[posicion].color);
 
                 // open modal
-                $('#modal-data-tracking-labor').modal('show');
+                ModalUtil.show('modal-data-tracking-labor', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -2250,11 +2152,8 @@ var DataTracking = function () {
         $(document).off('change', "#subcontractor-labor", changeSubcontractor);
         $(document).on('change', "#subcontractor-labor", changeSubcontractor);
 
-        $(document).off('click', "#employee-type-owner", changeEmployeeType);
-        $(document).on('click', "#employee-type-owner", changeEmployeeType);
-
-        $(document).off('click', "#employee-type-subcontractor", changeEmployeeType);
-        $(document).on('click', "#employee-type-subcontractor", changeEmployeeType);
+        $(document).off('click', ".employee-type", changeEmployeeType);
+        $(document).on('click', ".employee-type", changeEmployeeType);
 
         $(document).off('change', "#employee-subcontractor", changeEmployeeSubcontractor);
         $(document).on('change', "#employee-subcontractor", changeEmployeeSubcontractor);
@@ -2267,16 +2166,7 @@ var DataTracking = function () {
                 ModalEmployeeSubcontractor.mostrarModal();
                 ModalEmployeeSubcontractor.setSubcontractorId(subcontractor_id);
             } else {
-                var $element = $('#select-subcontractor-labor .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
+                MyApp.showErrorMessageValidateSelect(KTUtil.get("select-subcontractor-labor"), "This field is required");
             }
         });
 
@@ -2298,33 +2188,31 @@ var DataTracking = function () {
             if (labor[posicion]) {
 
                 if (labor[posicion].data_tracking_labor_id != '') {
-                    MyApp.block('#labor-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "data-tracking/eliminarLabor",
-                        dataType: "json",
-                        data: {
-                            'data_tracking_labor_id': labor[posicion].data_tracking_labor_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#labor-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("data_tracking_labor_id", labor[posicion].data_tracking_labor_id);
 
-                                toastr.success(response.message, "Success");
+                    BlockUtil.block('#lista-labor');
 
-                                deleteLabor(posicion);
+                    axios.post("data-tracking/eliminarLabor", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteLabor(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#labor-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-labor");
+                        });
                 } else {
                     deleteLabor(posicion);
                 }
@@ -2358,52 +2246,47 @@ var DataTracking = function () {
             var subcontractor_id = $('#subcontractor-labor').val();
 
             // reset
-            $('#employee-subcontractor option').each(function (e) {
-                if ($(this).val() != "")
-                    $(this).remove();
-            });
-            $('#employee-subcontractor').select2();
+            MyUtil.limpiarSelect('#employee-subcontractor');
 
             if (subcontractor_id != '') {
 
-                MyApp.block('#select-employee-subcontractor');
+                var formData = new URLSearchParams();
+                formData.set("subcontractor_id", subcontractor_id);
 
-                $.ajax({
-                    type: "POST",
-                    url: "subcontractor/listarEmployeesDeSubcontractor",
-                    dataType: "json",
-                    data: {
-                        'subcontractor_id': subcontractor_id
-                    },
-                    success: function (response) {
-                        mApp.unblock('#select-employee-subcontractor');
-                        if (response.success) {
+                BlockUtil.block('#select-employee-subcontractor');
 
-                            //Llenar select
-                            var employees = response.employees;
-                            for (var i = 0; i < employees.length; i++) {
-                                $('#employee-subcontractor').append(new Option(employees[i].name, employees[i].employee_id, false, false));
-                                $('#employee-subcontractor option[value="' + employees[i].employee_id + '"]').attr("data-rate", employees[i].hourlyRate);
-                                $('#employee-subcontractor option[value="' + employees[i].employee_id + '"]').attr("data-position", employees[i].position);
+                axios.post("subcontractor/listarEmployeesDeSubcontractor", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+
+                                //Llenar select
+                                var employees = response.employees;
+                                for (var i = 0; i < employees.length; i++) {
+                                    $('#employee-subcontractor').append(new Option(employees[i].name, employees[i].employee_id, false, false));
+                                    $('#employee-subcontractor option[value="' + employees[i].employee_id + '"]').attr("data-rate", employees[i].hourlyRate);
+                                    $('#employee-subcontractor option[value="' + employees[i].employee_id + '"]').attr("data-position", employees[i].position);
+                                }
+                                $('#employee-subcontractor').select2();
+
+                                // select
+                                if (nEditingRowLabor) {
+                                    $('#employee-subcontractor').val(labor[nEditingRowLabor].subcontractor_employee_id);
+                                    $('#employee-subcontractor').trigger('change');
+                                }
+
+                            } else {
+                                toastr.error(response.error, "");
                             }
-                            $('#employee-subcontractor').select2();
-
-                            // select
-                            if (nEditingRowLabor) {
-                                $('#employee-subcontractor').val(labor[nEditingRowLabor].subcontractor_employee_id);
-                                $('#employee-subcontractor').trigger('change');
-                            }
-
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#select-employee-subcontractor');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#select-employee-subcontractor");
+                    });
             }
         }
 
@@ -2411,8 +2294,8 @@ var DataTracking = function () {
             var owner_type = $('#employee-type-owner').prop('checked');
 
             // reset
-            $('#div-employee').removeClass('m--hide');
-            $('#div-employee-subcontractor').removeClass('m--hide').addClass('m--hide');
+            $('#div-employee').removeClass('hide');
+            $('#div-employee-subcontractor').removeClass('hide').addClass('hide');
 
             $('#employee').val('');
             $('#employee').trigger('change');
@@ -2421,8 +2304,8 @@ var DataTracking = function () {
             $('#subcontractor-labor').trigger('change');
 
             if (!owner_type) {
-                $('#div-employee').removeClass('m--hide').addClass('m--hide');
-                $('#div-employee-subcontractor').removeClass('m--hide');
+                $('#div-employee').removeClass('hide').addClass('hide');
+                $('#div-employee-subcontractor').removeClass('hide');
             }
 
         }
@@ -2440,13 +2323,9 @@ var DataTracking = function () {
         }
     };
     var resetFormLabor = function () {
-        $('#data-tracking-labor-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
 
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("data-tracking-labor-form");
 
         $('#employee').val('');
         $('#employee').trigger('change');
@@ -2454,24 +2333,21 @@ var DataTracking = function () {
         $('#subcontractor-labor').val('');
         $('#subcontractor-labor').trigger('change');
 
-        $('#employee-subcontractor option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $('#employee-subcontractor').select2();
+        // limpiar select
+        MyUtil.limpiarSelect('#employee-subcontractor');
 
         $('#employee-type-owner').prop('checked', true);
         $('#employee-type-subcontractor').prop('checked', false);
 
         $('#labor-color').minicolors('value', '#34bfa3');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("data-tracking-labor-form"));
 
         nEditingRowLabor = null;
 
-        $('#div-employee').removeClass('m--hide');
-        $('#div-employee-subcontractor').removeClass('m--hide').addClass('m--hide');
+        $('#div-employee').removeClass('hide');
+        $('#div-employee-subcontractor').removeClass('hide').addClass('hide');
     };
     var calcularTotalLaborPrice = function () {
         var total = 0;
@@ -2488,129 +2364,78 @@ var DataTracking = function () {
     var materials = [];
     var nEditingRowMaterial = null;
     var initTableMaterial = function () {
-        MyApp.block('#material-table-editable');
 
-        var table = $('#material-table-editable');
+        const table = "#material-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'material'},
+            {data: 'unit'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "material",
-                title: "Material",
+                targets: 2,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableMaterial = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: materials,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-items .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableMaterial = DatatableUtil.initSafeDataTable(table, {
+            data: materials,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#material-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#material-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#material-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#material-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#material-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableMaterial();
 
+        // totals
         var total = calcularTotalMaterialPrice();
         $('#monto_total_material').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableMaterial = function () {
+        $(document).off('keyup', '#lista-material [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-material [data-table-filter="search"]', function (e) {
+            oTableMaterial.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaMaterial = function () {
         if (oTableMaterial) {
             oTableMaterial.destroy();
@@ -2621,44 +2446,30 @@ var DataTracking = function () {
         // calcular profit
         calcularProfit();
     }
-    var initFormMaterial = function () {
-        $("#data-tracking-material-form").validate({
-            rules: {
-                quantity: {
-                    required: true
-                },
+    var validateFormMaterial = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('data-tracking-material-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
+        return result;
     };
     var initAccionesMaterial = function () {
 
@@ -2667,22 +2478,20 @@ var DataTracking = function () {
             // reset
             resetFormMaterial();
 
-            $('#modal-data-tracking-material').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-data-tracking-material', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-data-tracking-material");
         $(document).on('click', "#btn-salvar-data-tracking-material", function (e) {
             e.preventDefault();
 
-
             var material_id = $('#material').val();
 
-            if ($('#data-tracking-material-form').valid() && material_id != '') {
+            if (validateFormMaterial() && material_id != '') {
 
                 var material = $("#material option:selected").text();
-                var quantity = $('#material-quantity').val();
+                var quantity = NumberUtil.getNumericValue('#material-quantity');
                 var unit = $('#material option[value="' + material_id + '"]').attr("data-unit");
                 var price = $('#material option[value="' + material_id + '"]').attr("data-price");
                 var total = quantity * price;
@@ -2716,7 +2525,7 @@ var DataTracking = function () {
                 actualizarTableListaMaterial();
 
                 if (nEditingRowMaterial != null) {
-                    $('#modal-data-tracking-material').modal('hide');
+                    ModalUtil.hide('modal-data-tracking-material');
                 }
 
                 // reset
@@ -2724,16 +2533,7 @@ var DataTracking = function () {
 
             } else {
                 if (material_id == '') {
-                    var $element = $('#select-material .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-material"), "This field is required");
                 }
             }
 
@@ -2755,10 +2555,10 @@ var DataTracking = function () {
                 $('#material-quantity').val(materials[posicion].quantity);
 
                 $('#material-unit').val(materials[posicion].unit);
-                $('#material-price').val(materials[posicion].price);
+                $('#material-price').val(MyApp.formatearNumero(materials[posicion].price, 2, '.', ','));
 
-                // open modal
-                $('#modal-data-tracking-material').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-data-tracking-material', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -2790,33 +2590,31 @@ var DataTracking = function () {
             if (materials[posicion]) {
 
                 if (materials[posicion].data_tracking_material_id != '') {
-                    MyApp.block('#material-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "data-tracking/eliminarMaterial",
-                        dataType: "json",
-                        data: {
-                            'data_tracking_material_id': materials[posicion].data_tracking_material_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#material-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("data_tracking_material_id", materials[posicion].data_tracking_material_id);
 
-                                toastr.success(response.message, "Success");
+                    BlockUtil.block('#lista-material');
 
-                                deleteMaterial(posicion);
+                    axios.post("data-tracking/eliminarMaterial", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteMaterial(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#material-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-material");
+                        });
                 } else {
                     deleteMaterial(posicion);
                 }
@@ -2835,19 +2633,14 @@ var DataTracking = function () {
         }
     };
     var resetFormMaterial = function () {
-        $('#data-tracking-material-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("data-tracking-material-form");
 
         $('#material').val('');
         $('#material').trigger('change');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("data-tracking-material-form"));
 
         nEditingRowMaterial = null;
     };
@@ -2866,124 +2659,78 @@ var DataTracking = function () {
     var conc_vendors = [];
     var nEditingRowConcVendor = null;
     var initTableConcVendor = function () {
-        MyApp.block('#conc-vendor-table-editable');
 
-        var table = $('#conc-vendor-table-editable');
+        const table = "#conc-vendor-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'vendor'},
+            {data: 'total_conc_used'},
+            {data: 'conc_price'},
+            {data: 'total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "vendor",
-                title: "Conc Vendor",
+                targets: 1,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "total_conc_used",
-                title: "Total Conc Used",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.total_conc_used, 2, '.', ',')}</span>`;
-                }
+                targets: 2,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "conc_price",
-                title: "Conc Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.conc_price, 2, '.', ',')}</span>`;
-                }
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableConcVendor = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: conc_vendors,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-conc-vendor .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableConcVendor = DatatableUtil.initSafeDataTable(table, {
+            data: conc_vendors,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableItems
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#conc-vendor-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#conc-vendor-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#conc-vendor-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#conc-vendor-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#conc-vendor-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableConcVendor();
 
+        // totals
         var total = calcularTotalConcPrice();
         $('#monto_total_conc_vendor').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableConcVendor = function () {
+        $(document).off('keyup', '#lista-conc-vendor [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-conc-vendor [data-table-filter="search"]', function (e) {
+            oTableConcVendor.search(e.target.value).draw();
+        });
+    }
+
     var actualizarTableListaConcVendors = function () {
         if (oTableConcVendor) {
             oTableConcVendor.destroy();
@@ -2996,47 +2743,34 @@ var DataTracking = function () {
 
         // total quantity daily
         var total_conc_used = calcularTotalConcUsed();
-        $('#total_quantity_today').val(total_conc_used);
+        $('#total_quantity_today').val(MyApp.formatearNumero(total_conc_used, 2, '.', ','));
 
     }
-    var initFormConcVendor = function () {
-        $("#data-tracking-conc-vendor-form").validate({
-            rules: {
-                total_conc_used: {
-                    required: true
-                },
+
+    var validateFormConcVendor = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('data-tracking-conc-vendor-form');
+
+        var constraints = {
+            totalconcused: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        }
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            },
-        });
+        return result;
     };
     var initAccionesConcVendor = function () {
 
@@ -3045,19 +2779,17 @@ var DataTracking = function () {
             // reset
             resetFormConcVendor();
 
-            $('#modal-data-tracking-conc-vendor').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-data-tracking-conc-vendor', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-data-tracking-conc-vendor");
         $(document).on('click', "#btn-salvar-data-tracking-conc-vendor", function (e) {
             e.preventDefault();
 
-
             var vendor_id = $('#concrete-vendor').val();
 
-            if ($('#data-tracking-conc-vendor-form').valid() && vendor_id !== '') {
+            if (validateFormConcVendor() && vendor_id !== '') {
 
                 if (ExistConcreteVendor(vendor_id)) {
                     toastr.error("The selected concrete vendor has already been added", "");
@@ -3065,8 +2797,8 @@ var DataTracking = function () {
                 }
 
                 var vendor = $("#concrete-vendor option:selected").text();
-                var total_conc_used = $('#total_conc_used').val();
-                var conc_price = $('#conc_price').val();
+                var total_conc_used = NumberUtil.getNumericValue('#total_conc_used');
+                var conc_price = NumberUtil.getNumericValue('#conc_price');
 
                 var total = total_conc_used * conc_price;
 
@@ -3097,7 +2829,7 @@ var DataTracking = function () {
                 actualizarTableListaConcVendors();
 
                 if (nEditingRowConcVendor != null) {
-                    $('#modal-data-tracking-conc-vendor').modal('hide');
+                    ModalUtil.hide('modal-data-tracking-conc-vendor');
                 }
 
                 // reset
@@ -3105,16 +2837,7 @@ var DataTracking = function () {
 
             } else {
                 if (vendor_id === '') {
-                    var $element = $('#select-concrete-vendor .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-concrete-vendor"), "This field is required");
                 }
             }
 
@@ -3137,17 +2860,16 @@ var DataTracking = function () {
                 $('#concrete-vendor').trigger('change');
 
 
-                $('#total_conc_used').val(conc_vendors[posicion].total_conc_used);
-                $('#conc_price').val(conc_vendors[posicion].conc_price);
+                $('#total_conc_used').val(MyApp.formatearNumero(conc_vendors[posicion].total_conc_used, 2, '.', ','));
+                $('#conc_price').val(MyApp.formatearNumero(conc_vendors[posicion].conc_price, 2, '.', ','));
 
                 calcularTotalConcrete();
 
                 $('#total_conc_used').on('change', calcularTotalConcrete);
                 $('#conc_price').on('change', calcularTotalConcrete);
 
-
-                // open modal
-                $('#modal-data-tracking-conc-vendor').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-data-tracking-conc-vendor', {backdrop: 'static', keyboard: true});
 
             }
         });
@@ -3200,33 +2922,31 @@ var DataTracking = function () {
             if (conc_vendors[posicion]) {
 
                 if (conc_vendors[posicion].data_tracking_conc_vendor_id != '') {
-                    MyApp.block('#conc-vendor-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "data-tracking/eliminarConcVendor",
-                        dataType: "json",
-                        data: {
-                            'data_tracking_conc_vendor_id': conc_vendors[posicion].data_tracking_conc_vendor_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#conc-vendor-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("data_tracking_conc_vendor_id", conc_vendors[posicion].data_tracking_conc_vendor_id);
 
-                                toastr.success(response.message, "Success");
+                    BlockUtil.block('#lista-conc-vendor');
 
-                                deleteConcVendor(posicion);
+                    axios.post("data-tracking/eliminarConcVendor", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteConcVendor(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#conc-vendor-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-conc-vendor");
+                        });
                 } else {
                     deleteConcVendor(posicion);
                 }
@@ -3268,19 +2988,14 @@ var DataTracking = function () {
         };
     };
     var resetFormConcVendor = function () {
-        $('#data-tracking-conc-vendor-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("data-tracking-conc-vendor-form");
 
         $('#concrete-vendor').val('');
         $('#concrete-vendor').trigger('change');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("data-tracking-conc-vendor-form"));
 
         nEditingRowConcVendor = null;
     };
@@ -3308,133 +3023,79 @@ var DataTracking = function () {
     var subcontracts = [];
     var nEditingRowSubcontract = null;
     var initTableSubcontracts = function () {
-        MyApp.block('#subcontracts-table-editable');
 
-        var table = $('#subcontracts-table-editable');
+        const table = "#subcontracts-table-editable";
 
-        var aoColumns = [
+        // columns
+        const columns = [
+            {data: 'subcontractor'},
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'quantity'},
+            {data: 'price'},
+            {data: 'total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
             {
-                field: "subcontractor",
-                title: "Subcontractor",
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                },
             },
             {
-                field: "item",
-                title: "Item",
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "unit",
-                title: "Unit",
-                width: 100,
+                targets: 5,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
             },
             {
-                field: "quantity",
-                title: "Quantity",
-                width: 120,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.quantity, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "price",
-                title: "Price",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>${MyApp.formatearNumero(row.price, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "total",
-                title: "$ Total",
-                width: 100,
-                textAlign: 'center',
-                template: function (row) {
-                    return `<span>$${MyApp.formatearNumero(row.total, 2, '.', ',')}</span>`;
-                }
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit item"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete item"><i class="la la-trash"></i></a>
-                    `;
-                }
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+                },
             }
         ];
-        oTableSubcontracts = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: subcontracts,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-subcontracts .m_form_search'),
-            }
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[0, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableSubcontracts = DatatableUtil.initSafeDataTable(table, {
+            data: subcontracts,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTableSubcontracts
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#subcontracts-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#subcontracts-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#subcontracts-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#subcontracts-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#subcontracts-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        handleSearchDatatableSubcontracts();
 
+        // totals
         var total = calcularTotalSubcontracts();
         $('#monto_total_subcontract').val(MyApp.formatearNumero(total, 2, '.', ','));
     };
+    var handleSearchDatatableSubcontracts = function () {
+        $(document).off('keyup', '#lista-subcontracts [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-subcontracts [data-table-filter="search"]', function (e) {
+            oTableSubcontracts.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaSubcontracts = function () {
         if (oTableSubcontracts) {
             oTableSubcontracts.destroy();
@@ -3445,47 +3106,33 @@ var DataTracking = function () {
         // calcular profit
         calcularProfit();
     }
-    var initFormSubcontract = function () {
-        $("#subcontract-form").validate({
-            rules: {
-                quantity: {
-                    required: true
-                },
-                price: {
-                    required: true
-                },
+    var validateFormSubcontract = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('subcontract-form');
+
+        var constraints = {
+            quantity: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
-
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
-
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
-
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
-
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
+            price: {
+                presence: {message: "This field is required"},
             },
-        });
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
     };
     var initAccionesSubcontracts = function () {
 
@@ -3494,9 +3141,8 @@ var DataTracking = function () {
             // reset
             resetFormSubcontract();
 
-            $('#modal-subcontract').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-subcontract', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-subcontract");
@@ -3507,7 +3153,7 @@ var DataTracking = function () {
             var project_item_id = $('#item-subcontract').val();
             var subcontractor_id = $('#subcontractor').val();
 
-            if ($('#subcontract-form').valid() && project_item_id != '' && subcontractor_id !== '') {
+            if (validateFormSubcontract() && project_item_id != '' && subcontractor_id !== '') {
 
                 if (ExistSubcontract(project_item_id)) {
                     toastr.error("The selected item has already been added", "");
@@ -3520,8 +3166,8 @@ var DataTracking = function () {
                     return val.project_item_id == project_item_id;
                 });
 
-                var quantity = $('#quantity-subcontract').val();
-                var price = $('#price-subcontract').val();
+                var quantity = NumberUtil.getNumericValue('#quantity-subcontract');
+                var price = NumberUtil.getNumericValue('#price-subcontract');
 
                 var total = quantity * price;
 
@@ -3565,7 +3211,7 @@ var DataTracking = function () {
                 actualizarTableListaSubcontracts();
 
                 if (nEditingRowSubcontract != null) {
-                    $('#modal-subcontract').modal('hide');
+                    ModalUtil.hide('modal-subcontract');
                 }
 
                 // reset
@@ -3573,28 +3219,10 @@ var DataTracking = function () {
 
             } else {
                 if (subcontractor_id == '') {
-                    var $element = $('#select-subcontractor .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-subcontractor"), "This field is required");
                 }
                 if (project_item_id == '') {
-                    var $element = $('#select-item-subcontract .select2');
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-item-subcontract"), "This field is required");
                 }
             }
 
@@ -3616,14 +3244,13 @@ var DataTracking = function () {
                 $('#item-subcontract').val(subcontracts[posicion].project_item_id);
                 $('#item-subcontract').trigger('change');
 
-                $('#quantity-subcontract').val(subcontracts[posicion].quantity);
-                $('#price-subcontract').val(subcontracts[posicion].price);
+                $('#quantity-subcontract').val(MyApp.formatearNumero(subcontracts[posicion].quantity, 2, '.', ','));
+                $('#price-subcontract').val(MyApp.formatearNumero(subcontracts[posicion].price, 2, '.', ','));
 
                 $('#notes-subcontract').val(subcontracts[posicion].notes);
 
-                // open modal
-                $('#modal-subcontract').modal('show');
-
+                // mostar modal
+                ModalUtil.show('modal-subcontract', {backdrop: 'static', keyboard: true});
             }
         });
 
@@ -3727,33 +3354,31 @@ var DataTracking = function () {
             if (subcontracts[posicion]) {
 
                 if (subcontracts[posicion].subcontract_id != '') {
-                    MyApp.block('#subcontracts-table-editable');
 
-                    $.ajax({
-                        type: "POST",
-                        url: "data-tracking/eliminarSubcontract",
-                        dataType: "json",
-                        data: {
-                            'subcontract_id': subcontracts[posicion].subcontract_id
-                        },
-                        success: function (response) {
-                            mApp.unblock('#subcontracts-table-editable');
-                            if (response.success) {
+                    var formData = new URLSearchParams();
+                    formData.set("subcontract_id", subcontracts[posicion].subcontract_id);
 
-                                toastr.success(response.message, "Success");
+                    BlockUtil.block('#lista-subcontracts');
 
-                                deleteSubcontract(posicion);
+                    axios.post("data-tracking/eliminarSubcontract", formData, {responseType: "json"})
+                        .then(function (res) {
+                            if (res.status === 200 || res.status === 201) {
+                                var response = res.data;
+                                if (response.success) {
+                                    toastr.success(response.message, "");
 
+                                    deleteSubcontract(posicion);
+                                } else {
+                                    toastr.error(response.error, "");
+                                }
                             } else {
-                                toastr.error(response.error, "");
+                                toastr.error("An internal error has occurred, please try again.", "");
                             }
-                        },
-                        failure: function (response) {
-                            mApp.unblock('#subcontracts-table-editable');
-
-                            toastr.error(response.error, "");
-                        }
-                    });
+                        })
+                        .catch(MyUtil.catchErrorAxios)
+                        .then(function () {
+                            BlockUtil.unblock("#lista-subcontracts");
+                        });
                 } else {
                     deleteSubcontract(posicion);
                 }
@@ -3772,20 +3397,8 @@ var DataTracking = function () {
         }
     };
     var resetFormSubcontract = function () {
-        $('#subcontract-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-        $('#subcontract-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("subcontract-form");
 
         $('#subcontractor').val('');
         $('#subcontractor').trigger('change');
@@ -3793,130 +3406,116 @@ var DataTracking = function () {
         $('#item-subcontract').val('');
         $('#item-subcontract').trigger('change');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("subcontract-form"));
 
         nEditingRowSubcontract = null;
     };
 
     // Archivos
     var archivos = [];
-    var oTableListaArchivos;
+    var oTableArchivos;
     var nEditingRowArchivo = null;
     var initTableListaArchivos = function () {
-        MyApp.block('#lista-archivo-table-editable');
 
-        var table = $('#lista-archivo-table-editable');
+        const table = "#archivo-table-editable";
 
-        var aoColumns = [];
+
+        const columns = [];
 
         if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
+            columns.push({data: 'id'});
         }
 
-        aoColumns.push({
-                field: "name",
-                title: "Name"
-            },
-            {
-                field: "file",
-                title: "File"
-            },
-            {
-                field: "posicion",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center',
-                template: function (row) {
-                    return `
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record"><i class="la la-edit"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record"><i class="la la-trash"></i></a>
-                    <a href="javascript:;" data-posicion="${row.posicion}" class="download m-portlet__nav-link btn m-btn m-btn--hover-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Download record"><i class="la la-download"></i></a>
-                    `;
-                }
-            });
+        // columns
+        columns.push(
+            {data: 'name'},
+            {data: 'file'},
+            {data: null},
+        );
 
-        oTableListaArchivos = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'local',
-                source: archivos,
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                }
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
-            search: {
-                input: $('#lista-archivo .m_form_search'),
+        // column defs
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            }
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [];
+        }
+
+        // acciones
+        columnDefs.push({
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete', 'download']);
             },
         });
 
-        //Events
-        oTableListaArchivos
-            .on('m-datatable--on-ajax-done', function () {
-                mApp.unblock('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                mApp.unblock('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                MyApp.block('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                MyApp.block('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                MyApp.block('#lista-archivo-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[1, 'asc']];
+
+        // escapar contenido de la tabla
+        oTableArchivos = DatatableUtil.initSafeDataTable(table, {
+            data: archivos,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language
+        });
+
+        handleSearchDatatableArchivos();
 
     };
+    var handleSearchDatatableArchivos = function () {
+        $(document).off('keyup', '#lista-archivos [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-archivos [data-table-filter="search"]', function (e) {
+            oTableArchivos.search(e.target.value).draw();
+        });
+    }
     var actualizarTableListaArchivos = function () {
-        if (oTableListaArchivos) {
-            oTableListaArchivos.destroy();
+        if (oTableArchivos) {
+            oTableArchivos.destroy();
         }
 
         initTableListaArchivos();
     }
+
+    var validateFormArchivo = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('archivo-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
+            },
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
+    };
     var initAccionesArchivo = function () {
 
         $(document).off('click', "#btn-agregar-archivo");
@@ -3924,21 +3523,18 @@ var DataTracking = function () {
             // reset
             resetFormArchivo();
 
-            $('#modal-archivo').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-archivo', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-salvar-archivo");
         $(document).on('click', "#btn-salvar-archivo", function (e) {
             e.preventDefault();
 
-            var nombre = $('#archivo-name').val();
+            if (validateFormArchivo() && $('#fileinput-archivo').hasClass('fileinput-exists')) {
 
-            if (nombre !== '' && $('#fileinput-archivo').hasClass('fileinput-exists')) {
+                var nombre = $('#archivo-name').val();
 
-
-                // validar
                 if (ExisteArchivo(nombre)) {
                     toastr.error('The attachment has already been added', "Error");
                     return;
@@ -3951,10 +3547,10 @@ var DataTracking = function () {
                     var formData = new FormData();
                     formData.set('file', file);
 
-                    MyApp.block('#modal-archivo .modal-content');
+                    BlockUtil.block('#modal-archivo .modal-content');
                     // axios
                     axios
-                        .post("project/salvarArchivo", formData, {
+                        .post("data-tracking/salvarArchivo", formData, {
                             responseType: "json",
                         })
                         .then(function (res) {
@@ -3973,11 +3569,11 @@ var DataTracking = function () {
                             }
                         })
                         .catch(function (err) {
-                            console.log(err);
-                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error");
+                            console.project(err);
+                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error !!!");
                         })
                         .then(function () {
-                            mApp.unblock('#modal-archivo .modal-content');
+                            BlockUtil.unblock("#modal-archivo .modal-content");
                         });
                 } else {
                     //actualizar solo nombre
@@ -3985,13 +3581,11 @@ var DataTracking = function () {
 
                     actualizarTableListaArchivos();
                     resetFormArchivo();
-                    $('#modal-archivo').modal('hide');
+
+                    ModalUtil.hide('modal-archivo');
                 }
 
             } else {
-                if (nombre === '') {
-                    toastr.error('Enter the name', "");
-                }
                 if (!$('#fileinput-archivo').hasClass('fileinput-exists')) {
                     toastr.error('Select the file', "");
                 }
@@ -4025,7 +3619,7 @@ var DataTracking = function () {
             }
 
             // close modal
-            $('#modal-archivo').modal('hide');
+            ModalUtil.hide('modal-archivo');
 
             // actualizar lista
             actualizarTableListaArchivos();
@@ -4035,8 +3629,8 @@ var DataTracking = function () {
 
         }
 
-        $(document).off('click', "#lista-archivo-table-editable a.edit");
-        $(document).on('click', "#lista-archivo-table-editable a.edit", function () {
+        $(document).off('click', "#archivo-table-editable a.edit");
+        $(document).on('click', "#archivo-table-editable a.edit", function () {
             var posicion = $(this).data('posicion');
             if (archivos[posicion]) {
 
@@ -4051,55 +3645,72 @@ var DataTracking = function () {
                 $('#fileinput-archivo').fileinput().removeClass("fileinput-new").addClass("fileinput-exists");
 
                 // open modal
-                $('#modal-archivo').modal('show');
+                ModalUtil.show('modal-archivo', {backdrop: 'static', keyboard: true});
 
             }
         });
 
-        $(document).off('click', "#lista-archivo-table-editable a.delete");
-        $(document).on('click', "#lista-archivo-table-editable a.delete", function (e) {
+        $(document).off('click', "#archivo-table-editable a.delete");
+        $(document).on('click', "#archivo-table-editable a.delete", function (e) {
 
             e.preventDefault();
             var posicion = $(this).data('posicion');
 
-            if (archivos[posicion]) {
-                MyApp.block('#lista-archivo-table-editable');
-
-                $.ajax({
-                    type: "POST",
-                    url: "project/eliminarArchivo",
-                    dataType: "json",
-                    data: {
-                        'archivo': archivos[posicion].file
-                    },
-                    success: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-                        if (response.success) {
-
-                            toastr.success(response.message, "");
-
-                            deleteArchivo(posicion);
-
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-
-                        toastr.error(response.error, "");
-                    }
-                });
-            }
+            Swal.fire({
+                text: "Are you sure you want to delete the attachment?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                    cancelButton: "btn fw-bold btn-danger"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    eliminarArchivo(posicion);
+                }
+            });
         });
 
-        $(document).off('click', "#lista-archivo-table-editable a.download");
-        $(document).on('click', "#lista-archivo-table-editable a.download", function () {
+        function eliminarArchivo(posicion) {
+            if (archivos[posicion]) {
+
+                var formData = new URLSearchParams();
+                formData.set("archivo", archivos[posicion].file);
+
+                BlockUtil.block('#lista-archivos');
+
+                axios.post("data-tracking/eliminarArchivo", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
+
+                                deleteArchivo(posicion);
+                            } else {
+                                toastr.error(response.error, "");
+                            }
+                        } else {
+                            toastr.error("An internal error has occurred, please try again.", "");
+                        }
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#lista-archivos");
+                    });
+            }
+        }
+
+        $(document).off('click', "#archivo-table-editable a.download");
+        $(document).on('click', "#archivo-table-editable a.download", function () {
             var posicion = $(this).data('posicion');
             if (archivos[posicion]) {
 
                 var archivo = archivos[posicion].file;
-                var url = direccion_url + '/uploads/project/' + archivo;
+                var url = direccion_url + '/uploads/datatracking/' + archivo;
 
                 // crear link para que se descargue el archivo
                 const link = document.createElement('a');
@@ -4114,15 +3725,7 @@ var DataTracking = function () {
         $(document).off('click', "#btn-eliminar-archivos");
         $(document).on('click', "#btn-eliminar-archivos", function (e) {
 
-            var ids = [];
-            $('#lista-archivo-table-editable .m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids.push(value);
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#archivo-table-editable');
 
             var archivos_name = [];
             for (var i = 0; i < ids.length; i++) {
@@ -4134,13 +3737,13 @@ var DataTracking = function () {
 
             if (archivos_name.length > 0) {
 
-                swal.fire({
+                Swal.fire({
+                    text: "Are you sure you want to delete the selected atachments?",
+                    icon: "warning",
+                    showCancelButton: true,
                     buttonsStyling: false,
-                    html: "Are you sure you want to delete the selected atachments?",
-                    type: "warning",
                     confirmButtonText: "Yes, delete it!",
                     confirmButtonClass: "btn btn-sm btn-bold btn-success",
-                    showCancelButton: true,
                     cancelButtonText: "No, cancel",
                     cancelButtonClass: "btn btn-sm btn-bold btn-danger"
                 }).then(function (result) {
@@ -4154,33 +3757,31 @@ var DataTracking = function () {
             }
 
             function EliminarArchivos(ids, archivos_name) {
-                MyApp.block('#lista-archivo-table-editable');
 
-                $.ajax({
-                    type: "POST",
-                    url: "data-tracking/eliminarArchivos",
-                    dataType: "json",
-                    data: {
-                        'archivos': archivos_name
-                    },
-                    success: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-                        if (response.success) {
+                var formData = new URLSearchParams();
+                formData.set("archivos", archivos_name);
 
-                            toastr.success(response.message, "");
+                BlockUtil.block('#lista-archivos');
 
-                            deleteArchivos(ids);
+                axios.post("data-tracking/eliminarArchivos", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
+                                deleteArchivos(ids);
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        mApp.unblock('#lista-archivo-table-editable');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#lista-archivos");
+                    });
             }
 
         });
@@ -4214,13 +3815,8 @@ var DataTracking = function () {
 
     };
     var resetFormArchivo = function () {
-        $('#archivo-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("archivo-form");
 
         // reset
         $('#fileinput').val('');
@@ -4228,7 +3824,6 @@ var DataTracking = function () {
         $('#fileinput-archivo').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
 
         nEditingRowArchivo = null;
-
 
     };
 
@@ -4238,15 +3833,14 @@ var DataTracking = function () {
 
             initWidgets();
             initTable();
-            initForm();
+
             initWizard();
 
             initAccionNuevo();
             initAccionSalvar();
-            initAccionEditar();
-            initAccionEliminar();
+            initAccionCerrar();
+
             initAccionFiltrar();
-            initAccionFiltrarProjects();
 
             //modal inspectors
             initAccionesInspector();
@@ -4256,27 +3850,22 @@ var DataTracking = function () {
 
             // items
             initTableItems();
-            initFormItem();
             initAccionesItems();
 
             // labor
             initTableLabor();
-            initFormLabor();
             initAccionesLabor();
 
             // materials
             initTableMaterial();
-            initFormMaterial();
             initAccionesMaterial();
 
             // conc vendor
             initTableConcVendor();
-            initFormConcVendor();
             initAccionesConcVendor();
 
             // subcontracts
             initTableSubcontracts();
-            initFormSubcontract();
             initAccionesSubcontracts();
 
             // archivos
@@ -4290,7 +3879,7 @@ var DataTracking = function () {
                 $('#data_tracking_id').val(data_tracking_id_edit);
 
                 // open modal
-                $('#modal-data-tracking').modal('show');
+                $('#form-data-tracking').modal('show');
 
                 localStorage.removeItem('data_tracking_id_edit');
 

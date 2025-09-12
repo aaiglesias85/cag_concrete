@@ -9,64 +9,50 @@ var ModalInspector = function () {
     }
 
     var initWidgets = function () {
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('#inspector-phone').inputmask("mask", {
-            "mask": "(999)999-9999"
-        });
+        Inputmask({
+            "mask": "(999) 999-9999"
+        }).mask("#inspector-phone");
     }
 
-    var initFormInspector = function () {
+    var validateForm = function () {
+        var result = false;
 
-        $("#inspector-form").validate({
-            rules: {
-                name: {
-                    required: true
-                },
-                email: {
-                    optionalEmail: true // Usamos la validación personalizada en lugar de email:true
-                }
+        //Validacion
+        var form = KTUtil.get('inspector-form');
+
+        var constraints = {
+            name: {
+                presence: {message: "This field is required"},
             },
-            showErrors: function (errorMap, errorList) {
-                // Limpiar tooltips de elementos válidos
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+            email: {
+                email: {message: "The email must be valid"}
+            },
+        }
 
-                    $element.data("title", "") // Limpiar el tooltip
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Crear tooltips para elementos inválidos
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destruir cualquier tooltip previo
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        });
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-                });
-            }
-        });
-
-    };
+        return result;
+    }
 
     var mostrarModal = function () {
 
         // reset form
         resetFormInspector();
 
-        $('#modal-inspector').modal({
-            'show': true
-        });
+        // mostar modal
+        ModalUtil.show('modal-inspector', {backdrop: 'static', keyboard: true});
     }
     var initAccionesInspector = function () {
 
@@ -77,57 +63,54 @@ var ModalInspector = function () {
 
         function btnClickSalvarFormInspector() {
 
-            if ($('#inspector-form').valid()) {
+            if (validateForm()) {
+
+                var formData = new URLSearchParams();
+
+                formData.set("inspector_id", '');
 
                 var name = $('#inspector-name').val();
+                formData.set("name", name);
+
                 var email = $('#inspector-email').val();
+                formData.set("email", email);
+
                 var phone = $('#inspector-phone').val();
+                formData.set("phone", phone);
+
+                formData.set("status", 1);
 
                 BlockUtil.block('#modal-inspector .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "inspector/salvarInspector",
-                    dataType: "json",
-                    data: {
-                        'inspector_id': '',
-                        'name': name,
-                        'email': email,
-                        'phone': phone,
-                        'status': 1
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('#modal-inspector .modal-content');
-                        if (response.success) {
+                axios.post("inspector/salvarInspector", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
+                                toastr.success(response.message, "");
 
-                            toastr.success(response.message, "");
+                                inspector_new = {inspector_id: response.inspector_id, name};
 
-                            inspector_new = {inspector_id: response.inspector_id, name};
+                                // close modal
+                                ModalUtil.hide('modal-inspector');
 
-                            // close modal
-                            $('#modal-inspector').modal('hide');
-
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('#modal-inspector .modal-content');
-
-                        toastr.error(response.error, "");
-                    }
-                });
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock("#modal-inspector .modal-content");
+                    });
             }
         };
     };
     var resetFormInspector = function () {
-        $('#inspector-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("inspector-form");
 
         // reset inspector
         inspector_new = null;
@@ -140,7 +123,6 @@ var ModalInspector = function () {
             initWidgets();
 
             // items
-            initFormInspector();
             initAccionesInspector();
         },
         mostrarModal: mostrarModal,

@@ -19,12 +19,12 @@ const NumberUtil = (() => {
         suffix: '',
         padDecimals: true,
         trimZeros: false,
-        roundMode: 'none'     // ⬅️ por defecto NO redondea
+        roundMode: 'none'     // por defecto NO redondea
     };
 
     const mergeOpts = (o, fallback) => ({ ...(fallback || defaults), ...(o || {}) });
 
-    // --- NUEVO: "limpia" a string crudo sin miles y con '.' decimal, sin perder dígitos
+    // --- "Limpia" a string crudo sin miles y con '.' decimal, sin perder dígitos
     function unformatToString(str, opts = {}) {
         const o = mergeOpts(opts);
         if (str == null) return '';
@@ -32,6 +32,9 @@ const NumberUtil = (() => {
 
         if (o.prefix && s.startsWith(o.prefix)) s = s.slice(o.prefix.length).trim();
         if (o.suffix && s.endsWith(o.suffix)) s = s.slice(0, -o.suffix.length).trim();
+
+        // si queda vacío tras limpiar, no devolver "0"
+        if (s === '') return '';
 
         // quitar miles
         const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -44,19 +47,23 @@ const NumberUtil = (() => {
         let sign = '';
         if (s[0] === '-' || s[0] === '+') { sign = s[0] === '-' ? '-' : ''; s = s.slice(1); }
 
-        // dejar solo dígitos y un punto decimal (la última aparición)
+        // dejar solo dígitos y un punto decimal (última aparición)
         const parts = s.split('.');
-        const intRaw = (parts[0] || '').replace(/\D+/g, '') || '0';
+        const intRaw = (parts[0] || '').replace(/\D+/g, ''); // sin fallback a "0" aquí
         const fracRaw = parts.length > 1 ? parts.slice(1).join('').replace(/\D+/g, '') : '';
 
-        return sign + intRaw + (fracRaw ? ('.' + fracRaw) : '');
+        // si no hay dígitos en absoluto, devolver vacío o solo el signo
+        if (!intRaw && !fracRaw) return sign ? sign : '';
+
+        return sign + (intRaw || '0') + (fracRaw ? ('.' + fracRaw) : '');
     }
 
-    // --- NUEVO: formatea un string crudo sin alterar sus decimales
+    // --- Formatea un string crudo sin alterar sus decimales (cuando roundMode === 'none')
     function formatStringExact(value, opts = {}) {
         const o = mergeOpts(opts);
         let s = unformatToString(value, o);           // "-1234.5600"
-        if (s === '' || s === '-' || s === '+') return o.prefix + '0' + o.suffix;
+        // si quedó vacío o solo signo, no forzar "0" aquí; el flujo externo decide
+        if (s === '' || s === '-' || s === '+') return (o.prefix ? (o.prefix + (o.suffix || '')) : '');
 
         // separar signo, entero y fracción
         let sign = '';
@@ -79,17 +86,23 @@ const NumberUtil = (() => {
     function roundTo(n, d){ const f = Math.pow(10,d); return Math.round((n+Number.EPSILON)*f)/f; }
     function splitSign(n){ return Object.is(n,-0) ? {sign:'-',abs:0} : {sign:n<0?'-':'',abs:Math.abs(n)}; }
 
-    // ⬇️ modifica formatNumber para respetar roundMode
+    // Respeta roundMode: 'none' => conserva texto exacto; 'round' => numérico con redondeo
     function formatNumber(value, opts = {}) {
         const o = mergeOpts(opts);
+
+        // si value es vacío o solo espacios, devolver tal cual (no inyectar "0")
+        if (value == null || String(value).trim() === '') return '';
+
         if (o.roundMode === 'none') {
             // No convertir a Number: mantener exactamente lo escrito
-            return formatStringExact(value, o);
+            const exact = formatStringExact(value, o);
+            // si formatStringExact quedó vacío (por ser solo signo), no forzar "0"
+            return exact === '' ? '' : exact;
         }
 
-        // --- comportamiento original con redondeo ---
+        // --- comportamiento con redondeo ---
         let num = (typeof value === 'number') ? value : unformatNumber(String(value), o);
-        if (!isFinite(num)) num = 0;
+        if (!isFinite(num)) return '';
 
         num = roundTo(num, o.decimals);
         const { sign, abs } = splitSign(num);
@@ -109,6 +122,7 @@ const NumberUtil = (() => {
 
     function unformatNumber(str, opts = {}) {
         const s = unformatToString(str, opts); // reutiliza la versión "string"
+        if (s === '' || s === '-' || s === '+') return NaN;
         const n = Number(s);
         return Number.isFinite(n) ? n : NaN;
     }
@@ -119,19 +133,29 @@ const NumberUtil = (() => {
         const o = mergeOpts(opts);
 
         el.addEventListener('focus', () => {
+            const hasValue = el.value != null && String(el.value).trim() !== '';
+            if (!hasValue) return; // no reescribir si está vacío
+
             if (o.roundMode === 'none') {
-                el.value = unformatToString(el.value, o); // crudo legible
+                const raw = unformatToString(el.value, o);
+                // si el crudo queda vacío, no lo fuerces a "0"
+                if (raw !== '') el.value = raw;
             } else {
-                const raw = unformatNumber(el.value, o);
-                if (isFinite(raw)) el.value = (o.decimals > 0) ? String(raw) : String(Math.trunc(raw));
+                const rawNum = unformatNumber(el.value, o);
+                if (isFinite(rawNum)) el.value = (o.decimals > 0) ? String(rawNum) : String(Math.trunc(rawNum));
             }
         });
 
         el.addEventListener('blur', () => {
+            const hasValue = el.value != null && String(el.value).trim() !== '';
+            if (!hasValue) return; // no formatear vacío a "0"
             el.value = formatNumber(el.value, o);
         });
 
-        if (el.value) el.value = formatNumber(el.value, o);
+        // Formateo inicial solo si viene con algo
+        if (el.value != null && String(el.value).trim() !== '') {
+            el.value = formatNumber(el.value, o);
+        }
     }
 
     function jQueryPlugin($, selector, opts = {}) {
@@ -150,7 +174,12 @@ const NumberUtil = (() => {
         const el = (typeof input === 'string') ? document.querySelector(input) : input;
         if (!el) return;
         const o = mergeOpts(opts, US_DEFAULTS);
-        // Si quieres conservar exactamente los decimales, pasa "value" como STRING.
+
+        if (value == null || String(value).trim() === '') {
+            el.value = ''; // permitir limpiar
+            return;
+        }
+        // Si quieres conservar exactamente los decimales, pasa "value" como STRING y usa roundMode: 'none'
         el.value = formatNumber(value, o);
     }
 
