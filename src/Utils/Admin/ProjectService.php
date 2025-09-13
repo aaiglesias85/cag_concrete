@@ -22,6 +22,7 @@ use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\ProjectPriceAdjustment;
+use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
 use App\Utils\Base;
 
@@ -1226,15 +1227,6 @@ class ProjectService extends Base
         /**@var Project $entity */
         if ($entity != null) {
 
-            // invoices
-            $invoices = $this->getDoctrine()->getRepository(Invoice::class)
-                ->ListarInvoicesDeProject($project_id);
-            if (count($invoices) > 0) {
-                $resultado['success'] = false;
-                $resultado['error'] = "The project could not be deleted, because it is related to a invoice";
-                return $resultado;
-            }
-
             // eliminar informacion de un project
             $this->EliminarInformacionDeProject($project_id);
 
@@ -1262,6 +1254,26 @@ class ProjectService extends Base
     private function EliminarInformacionDeProject($project_id)
     {
         $em = $this->getDoctrine()->getManager();
+
+        // invoices
+        $invoices = $this->getDoctrine()->getRepository(Invoice::class)
+            ->ListarInvoicesDeProject($project_id);
+        foreach ($invoices as $invoice) {
+            $invoice_id = $invoice->getInvoiceId();
+            // items
+            $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                ->ListarItems($invoice_id);
+            foreach ($items as $item) {
+                $em->remove($item);
+            }
+
+            // quickbooks
+            $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+                ->ListarRegistrosDeEntidadId("invoice", $invoice_id);
+            foreach ($quickbooks as $quickbook) {
+                $em->remove($quickbook);
+            }
+        }
 
         // contacts
         $contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
@@ -1354,25 +1366,19 @@ class ProjectService extends Base
                     /**@var Project $entity */
                     if ($entity != null) {
 
-                        // invoices
-                        $invoices = $this->getDoctrine()->getRepository(Invoice::class)
-                            ->ListarInvoicesDeProject($project_id);
-                        if (count($invoices) == 0) {
+                        // eliminar informacion de un project
+                        $this->EliminarInformacionDeProject($project_id);
 
-                            // eliminar informacion de un project
-                            $this->EliminarInformacionDeProject($project_id);
+                        $project_descripcion = $entity->getName();
 
-                            $project_descripcion = $entity->getName();
+                        $em->remove($entity);
+                        $cant_eliminada++;
 
-                            $em->remove($entity);
-                            $cant_eliminada++;
-
-                            //Salvar log
-                            $log_operacion = "Delete";
-                            $log_categoria = "Project";
-                            $log_descripcion = "The project is deleted: $project_descripcion";
-                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-                        }
+                        //Salvar log
+                        $log_operacion = "Delete";
+                        $log_categoria = "Project";
+                        $log_descripcion = "The project is deleted: $project_descripcion";
+                        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
                     }
                 }
