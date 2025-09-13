@@ -401,10 +401,10 @@ class ScheduleService extends Base
                 $title = $value->getProject()->getProjectNumber();
                 $dayOriginal = $value->getDay();
 
-                $class = "m-fc-event--brand";
+                $class = "fc-event-primary";
                 $highpriority = $value->getHighpriority();
                 if ($highpriority) {
-                    $class = "m-fc-event--danger m-fc-event--solid-danger";
+                    $class = "fc-event-danger fc-event-solid-danger";
                 }
 
                 $inicioEvento = clone $horaInicio;
@@ -863,6 +863,7 @@ class ScheduleService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $hours = explode(",", $hours);
         if (empty($hours)) {
             $hour = "";
 
@@ -1091,19 +1092,15 @@ class ScheduleService extends Base
      */
     public function ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $vendor_id, $fecha_inicial, $fecha_fin)
     {
-        $arreglo_resultado = array();
-        $cont = 0;
+        $resultado = $this->getDoctrine()->getRepository(Schedule::class)
+            ->ListarSchedulesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
 
-        $lista = $this->getDoctrine()->getRepository(Schedule::class)
-            ->ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
+        $data = [];
 
-        foreach ($lista as $value) {
+        foreach ($resultado['data'] as $value) {
             $schedule_id = $value->getScheduleId();
 
-            $highpriority = $value->getHighpriority() ? 1 : 0;
-            $acciones = $this->ListarAcciones($schedule_id, $highpriority);
-
-            $arreglo_resultado[$cont] = array(
+            $data[] = array(
                 "id" => $schedule_id,
                 "project" => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
                 "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
@@ -1115,14 +1112,13 @@ class ScheduleService extends Base
                 "quantity" => $value->getQuantity(),
                 "notes" => $value->getNotes(),
                 "highpriority" => $value->getHighpriority(),
-                "acciones" => $acciones
             );
-
-
-            $cont++;
         }
 
-        return $arreglo_resultado;
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
     }
 
     /**

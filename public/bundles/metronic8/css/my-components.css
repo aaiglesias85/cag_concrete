@@ -507,3 +507,37 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n+1):not(.row-seco
 .modal-content .ic-step-number{
     margin-left: 0px !important;
 }
+
+/* Fiter menu */
+#filter-menu { overflow: visible; }
+#filter-menu .input-group { position: relative; }
+.input-group .flatpickr-calendar {
+    position: absolute;
+    left: 0;
+    z-index: 2050;          /* por encima del dropdown */
+    transform: none !important;
+}
+.input-group .flatpickr-calendar.arrowTop {
+    top: 100%;
+    bottom: auto;
+    margin-top: .25rem;
+}
+.input-group .flatpickr-calendar.arrowBottom {
+    bottom: calc(100% + .25rem);
+    top: auto;
+    margin-bottom: 0;
+}
+.date-picker-filter .flatpickr-wrapper {
+    flex: 1 1 auto;
+    width: 1%;             /* mismo hack que usa bootstrap para inputs */
+    min-width: 0;
+    display: flex;
+    align-items: center;   /* alinear verticalmente el input */
+    margin-bottom: 0;      /* quita saltos raros */
+}
+.date-picker-filter .flatpickr-wrapper .form-control {
+    flex: 1 1 auto;
+    width: 100% !important;
+    min-width: 0;
+}
+

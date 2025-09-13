@@ -1,6 +1,5 @@
 var Schedules = function () {
-
-    var oTable;
+    
     var rowDelete = null;
 
     // calendario
@@ -14,26 +13,24 @@ var Schedules = function () {
             mostrar_calendario = !mostrar_calendario;
 
             if (mostrar_calendario) {
-                $('#div-lista-schedule').addClass('m--hide');
-                $('#nav-item-clonar').addClass('m--hide');
-                $('#nav-item-eliminar').addClass('m--hide');
+                $('#div-lista-schedule').addClass('hide');
+                $('#btn-clonar-schedule-listado').addClass('hide');
 
-                $('#div-calendario').removeClass('m--hide');
+                $('#div-calendario').removeClass('hide');
 
                 listarCalendario();
 
-                $(this).html('<span><i class="la la-calendar mr-1"></i><span>Hide Calendar</span></span>');
+                $(this).html('<i class="ki-duotone ki-calendar"><span class="path1"></span><span class="path2"></span></i><span class="kt-hidden-mobile font-weight-bold">Hide Calendar</span>');
 
             } else {
-                $('#div-lista-schedule').removeClass('m--hide');
-                $('#nav-item-clonar').removeClass('m--hide');
-                $('#nav-item-eliminar').removeClass('m--hide');
+                $('#div-lista-schedule').removeClass('hide');
+                $('#btn-clonar-schedule-listado').removeClass('hide');
 
-                $('#div-calendario').addClass('m--hide');
+                $('#div-calendario').addClass('hide');
 
                 btnClickFiltrar();
 
-                $(this).html('<span><i class="la la-calendar mr-1"></i><span>Show Calendar</span></span>');
+                $(this).html('<i class="ki-duotone ki-calendar"><span class="path1"></span><span class="path2"></span></i><span class="kt-hidden-mobile font-weight-bold">Show Calendar</span>');
             }
         });
 
@@ -47,8 +44,8 @@ var Schedules = function () {
 
                 $('#schedule_id').val(schedule_id);
 
-                $('#form-schedule').removeClass('m--hide');
-                $('#lista-schedule').addClass('m--hide');
+                $('#form-schedule').removeClass('hide');
+                $('#lista-schedule').addClass('hide');
 
                 editRow(schedule_id);
             }
@@ -58,56 +55,59 @@ var Schedules = function () {
 
     };
     var listarCalendario = function () {
-        var search = $('#lista-schedule .m_form_search').val();
+
+        var formData = new URLSearchParams();
+
+        var search = $('#lista-schedule [data-table-filter="search"]').val();
+        formData.set("search", search);
+
         var project_id = $('#filtro-project').val();
+        formData.set("project_id", project_id);
+
         var vendor_id = $('#filtro-concrete-vendor').val();
-        var fecha_inicial = $('#fechaInicial').val();
-        var fecha_fin = $('#fechaFin').val();
+        formData.set("vendor_id", vendor_id);
+
+        var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde');
+        formData.set("fecha_inicial", fecha_inicial);
+
+        var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta');
+        formData.set("fecha_fin", fecha_fin);
 
         // loading
         BlockUtil.block('#lista-schedule');
 
-        $.ajax({
-            type: "POST",
-            url: "schedule/listarParaCalendario",
-            dataType: "json",
-            data: {
-                'search': search,
-                'project_id': project_id,
-                'vendor_id': vendor_id,
-                'fecha_inicial': fecha_inicial,
-                'fecha_fin': fecha_fin
-            },
-            success: function (response) {
-                BlockUtil.unblock('#lista-schedule');
-                if (response.success) {
+        axios.post("schedule/listarParaCalendario", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    schedules = response.schedules;
-                    actualizarCalendario();
+                        schedules = response.schedules;
+                        actualizarCalendario();
 
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#lista-schedule');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#lista-schedule");
+            });
     }
 
     var initCalendario = function () {
-
         // default date
         var todayDate = moment().startOf('day');
         var TODAY = todayDate.format('YYYY-MM-DD');
 
         // poner fecha del filtro inicial si lo selecciono, esto para que el calendario empiece ahi
-        var fechaInicial = $('#fechaInicial').val();
+        var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
         if (fechaInicial !== "") {
-            todayDate = MyApp.convertirStringAFecha(fechaInicial, 'Y-m-d');
-            TODAY = todayDate.format('Y-m-d');
+            todayDate = MyApp.convertirStringAFecha(fechaInicial);
+            TODAY = todayDate.format('YYYY-MM-DD'); // <-- usa formato válido
         }
 
         // feriados
@@ -116,97 +116,134 @@ var Schedules = function () {
             title: feriado.description.toUpperCase(),
             start: feriado.fecha,
             allDay: true,
-            display: 'background', // para marcar el fondo del día
+            display: 'background', // marca el fondo del día
             classNames: ['feriado-event']
         }));
 
         // todos los eventos
         const allEvents = [...schedules, ...feriadoEvents];
 
+        // helpers
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s).replace(/[&<>"']/g, m => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+            }[m]));
+        }
+
+        function buildPopoverContent(p, timeText) {
+            const hourText = (p.hour && p.hour !== '') ? p.hour : (timeText || 'All day');
+            const desc = p.description || p.observacion || '';
+            return (
+                `<b>Hour:</b> ${escapeHtml(hourText)} <br>` +
+                `<b>Location:</b> ${escapeHtml(p.location || '')} <br>` +
+                `<b>Description:</b> ${escapeHtml(desc)} <br>` +
+                `<b>Conc. Vendor:</b> ${escapeHtml(p.concreteVendor || '')}`
+            );
+        }
+
+        function setupPopover(el, content) {
+            // Bootstrap 5
+            if (window.bootstrap && bootstrap.Popover) {
+                const prev = bootstrap.Popover.getInstance(el);
+                if (prev) prev.dispose();
+                new bootstrap.Popover(el, {
+                    trigger: 'hover',
+                    html: true,
+                    content,
+                    placement: 'top',
+                    container: 'body'
+                });
+                return;
+            }
+            // Bootstrap 4 (jQuery)
+            if (window.jQuery && typeof jQuery(el).popover === 'function') {
+                jQuery(el).popover({ trigger: 'hover', html: true, content, placement: 'top', container: 'body' });
+                return;
+            }
+            // Metronic (KTApp)
+            if (window.KTApp && typeof KTApp.initPopover === 'function') {
+                el.setAttribute('data-bs-toggle', 'popover');
+                el.setAttribute('data-bs-html', 'true');
+                el.setAttribute('data-bs-content', content);
+                el.setAttribute('data-bs-placement', 'top');
+                KTApp.initPopover(el);
+            }
+        }
+
+        function disposePopover(el) {
+            if (window.bootstrap && bootstrap.Popover) {
+                const inst = bootstrap.Popover.getInstance(el);
+                if (inst) inst.dispose();
+            } else if (window.jQuery && typeof jQuery(el).popover === 'function') {
+                try { jQuery(el).popover('dispose'); } catch (_) {}
+            }
+        }
+
         var calendarEl = document.getElementById('calendario');
         calendar = new FullCalendar.Calendar(calendarEl, {
-            plugins: ['interaction', 'dayGrid', 'timeGrid', 'list'],
-
-            isRTL: false,
-            header: {
+            headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
             },
-            // hiddenDays: [0], // 0 = domingo
             height: 800,
             contentHeight: 780,
-            aspectRatio: 3,  // see: https://fullcalendar.io/docs/aspectRatio
+            aspectRatio: 3,
 
             nowIndicator: true,
-            now: TODAY + 'T09:25:00', // just for demo
+            now: TODAY + 'T09:25:00',
 
             views: {
-                dayGridMonth: {buttonText: 'month'},
-                timeGridWeek: {buttonText: 'week'},
-                timeGridDay: {buttonText: 'day'}
+                dayGridMonth: { buttonText: 'month' },
+                timeGridWeek: { buttonText: 'week' },
+                timeGridDay: { buttonText: 'day' }
             },
 
-            defaultView: 'dayGridMonth',
-            defaultDate: TODAY,
+            initialView: 'dayGridMonth',
+            initialDate: TODAY,
 
             editable: false,
-            eventLimit: true, // allow "more" link when too many events
+            dayMaxEvents: true,
             navLinks: true,
+            selectable: true,
+            selectMirror: true,
+
             events: allEvents,
+            eventOrder: 'order',
 
-            eventRender: function (info) {
-                var element = $(info.el);
+            // ⚠️ No usamos eventContent: mantenemos el HTML por defecto para no romper el layout
 
-                //Para editar
-                $(element).attr('data-id', info.event.id);
+            // POPUP + descripción sin romper el DOM por defecto
+            eventDidMount: function (info) {
+                const el = info.el;
+                el.setAttribute('data-id', info.event.id);
 
-                // console.log(info.event);
+                // No popover para feriados de fondo
+                if (info.event.display === 'background') return;
 
-                if (info.event.extendedProps && info.event.extendedProps.description) {
+                const p = info.event.extendedProps || {};
+                const hasData = p.description || p.observacion || p.location || p.hour || p.concreteVendor;
 
-                    var content = `
-                        <b>Hour:</b> ${info.event.extendedProps.hour !== "" ? info.event.extendedProps.hour : 'All day'} <br>
-                        <b>Location:</b>${info.event.extendedProps.location} <br>
-                        <b>Description:</b>${info.event.extendedProps.description} <br>
-                        <b>Conc. Vendor:</b>${info.event.extendedProps.concreteVendor} <br>
-                        `;
-
-                    if (element.hasClass('fc-day-grid-event')) {
-
-                        element.data('content', content);
-                        element.data('placement', 'top');
-
-                        // mApp.initPopover(element, {html: true});
-
-                        element.popover({trigger: 'hover', html: true});
-
-
-                    } else if (element.hasClass('fc-time-grid-event')) {
-
-                        element.data('content', content);
-                        element.data('placement', 'top');
-
-                        element.popover({trigger: 'hover', html: true});
-
-                        /*element.find('.fc-title').append('<div class="fc-description">' + content + '</div>');
-                        element.css({
-                            height: '150px',
-                            overflow: 'auto'
-                        });
-
-                         */
-
-                    } else if (element.find('.fc-list-item-title').lenght !== 0) {
-                        // element.find('.fc-list-item-title').append('<div class="fc-description">' + content + '</div>');
-
-                        element.data('content', content);
-                        element.data('placement', 'top');
-
-                        element.popover({trigger: 'hover', html: true});
-                    }
+                // Solo popover; no agregamos nada al DOM del evento
+                if (hasData) {
+                    const content = buildPopoverContent(p, info.timeText);
+                    setupPopover(el, content);
                 }
-            }
+
+                // Si en algún render anterior se agregó una descripción, limpiarla
+                el.querySelectorAll('.fc-description').forEach(n => n.remove());
+            },
+
+            eventWillUnmount: function (info) {
+                disposePopover(info.el);
+            },
+
+            // edit event
+            eventClick: function (arg) {
+                const posicion = allEvents.findIndex(evento => evento.id === arg.event.id);
+                console.log('click event id:', arg.event.id, 'posicion:', posicion);
+            },
         });
 
         calendar.render();
@@ -215,12 +252,10 @@ var Schedules = function () {
         holidays.forEach(feriado => {
             const selector = `[data-date="${feriado.fecha}"]`;
             const cell = document.querySelector(selector);
-            if (cell) {
-                cell.classList.add('feriado-cell');
-            }
+            if (cell) cell.classList.add('feriado-cell');
         });
+    };
 
-    }
     var actualizarCalendario = function () {
         // destroy
         if (calendar) {
@@ -231,143 +266,374 @@ var Schedules = function () {
     }
 
     //Inicializar table
+    var oTable;
     var initTable = function () {
-        BlockUtil.block('#schedule-table-editable');
+        const table = "#schedule-table-editable";
 
-        var table = $('#schedule-table-editable');
+        // datasource
+        const datasource = {
+            url: `schedule/listar`,
+            data: function (d) {
+                return $.extend({}, d, {
+                    project_id: $('#filtro-project').val(),
+                    vendor_id: $('#filtro-concrete-vendor').val(),
+                    fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
+                    fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+                });
+            },
+            method: "post",
+            dataType: "json",
+            error: DatatableUtil.errorDataTable
+        };
 
-        var aoColumns = [];
+        // columns
+        const columns = getColumnsTable();
 
-        if (permiso.eliminar) {
-            aoColumns.push({
-                field: "id",
-                title: "#",
-                sortable: false, // disable sort for this column
-                width: 40,
-                textAlign: 'center',
-                selector: {class: 'm-checkbox--solid m-checkbox--brand'}
-            });
-        }
-        aoColumns.push(
-            {
-                field: "project",
-                title: "Project",
+        // column defs
+        let columnDefs = getColumnsDefTable();
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = permiso.eliminar ? [[5, 'desc']] : [[4, 'desc']];
+
+        oTable = $(table).DataTable({
+            searchDelay: 500,
+            processing: true,
+            serverSide: true,
+            order: order,
+            stateSave: false,
+
+            fixedColumns: {
+                start: 2,
+                end: 1
             },
-            {
-                field: "concreteVendor",
-                title: "Conc. Vendor",
+            // paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            // scrollY: 500,
+
+            /*displayLength: 15,
+            lengthMenu: [
+              [15, 25, 50, -1],
+              [15, 25, 50, 'Todos']
+            ],*/
+            select: {
+                info: false,
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]',
+                className: 'row-selected'
             },
-            {
-                field: "description",
-                title: "Description",
-            },
-            {
-                field: "location",
-                title: "Location",
-                width: 250,
-            },
-            {
-                field: "day",
-                title: "Date",
-                width: 100,
-            },
-            {
-                field: "hour",
-                title: "Hour",
-                width: 100,
-            },
-            {
-                field: "quantity",
-                title: "Quantity",
-                width: 100,
-            },
-            {
-                field: "notes",
-                title: "Notes",
-            },
-            {
-                field: "acciones",
-                width: 120,
-                title: "Actions",
-                sortable: false,
-                overflow: 'visible',
-                textAlign: 'center'
-            }
-        );
-        oTable = table.mDatatable({
-            // datasource definition
-            data: {
-                type: 'remote',
-                source: {
-                    read: {
-                        url: 'schedule/listar',
-                    }
-                },
-                pageSize: 25,
-                saveState: {
-                    cookie: false,
-                    webstorage: false
-                },
-                serverPaging: true,
-                serverFiltering: true,
-                serverSorting: true
-            },
-            // layout definition
-            layout: {
-                theme: 'default', // datatable theme
-                class: '', // custom wrapper class
-                scroll: true, // enable/disable datatable scroll both horizontal and vertical when needed.
-                //height: 550, // datatable's body's fixed height
-                footer: false // display/hide footer
-            },
-            // column sorting
-            sortable: true,
-            pagination: true,
-            // columns definition
-            columns: aoColumns,
-            // toolbar
-            toolbar: {
-                // toolbar items
-                items: {
-                    // pagination
-                    pagination: {
-                        // page size select
-                        pageSizeSelect: [10, 25, 30, 50, -1] // display dropdown to select pagination size. -1 is used for "ALl" option
-                    }
-                }
-            },
+            ajax: datasource,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
         });
 
-        //Events
-        oTable
-            .on('m-datatable--on-ajax-done', function () {
-                BlockUtil.unblock('#schedule-table-editable');
-            })
-            .on('m-datatable--on-ajax-fail', function (e, jqXHR) {
-                BlockUtil.unblock('#schedule-table-editable');
-            })
-            .on('m-datatable--on-goto-page', function (e, args) {
-                BlockUtil.block('#schedule-table-editable');
-            })
-            .on('m-datatable--on-reloaded', function (e) {
-                BlockUtil.block('#schedule-table-editable');
-            })
-            .on('m-datatable--on-sort', function (e, args) {
-                BlockUtil.block('#schedule-table-editable');
-            })
-            .on('m-datatable--on-check', function (e, args) {
-                //eventsWriter('Checkbox active: ' + args.toString());
-            })
-            .on('m-datatable--on-uncheck', function (e, args) {
-                //eventsWriter('Checkbox inactive: ' + args.toString());
-            });
+        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+        oTable.on('draw', function () {
+            // reset select all
+            resetSelectRecords(table);
 
-        //Busqueda
-        var query = oTable.getDataSourceQuery();
-        $('#lista-schedule .m_form_search').on('keyup', function (e) {
-            btnClickFiltrar();
-        }).val(query.generalSearch);
-    };
+            // init acciones
+            initAccionEditar();
+            initAccionClonar();
+            initAccionEliminar();
+        });
+
+        // select records
+        handleSelectRecords(table);
+        // search
+        handleSearchDatatable();
+        // export
+        exportButtons();
+    }
+    var getColumnsTable = function () {
+        const columns = [];
+
+        if (permiso.eliminar) {
+            columns.push({data: 'id'});
+        }
+
+        columns.push(
+            {data: 'project'},
+            {data: 'concreteVendor'},
+            {data: 'description'},
+            {data: 'location'},
+            {data: 'day'},
+            {data: 'hour'},
+            {data: 'quantity'},
+            {data: 'notes'},
+            {data: null}
+        );
+
+        return columns;
+    }
+    var getColumnsDefTable = function () {
+
+        let columnDefs = [
+            {
+                targets: 0,
+                orderable: false,
+                render: DatatableUtil.getRenderColumnCheck
+            },
+            // project
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            // concreteVendor
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+            // description
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+            // location
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 150);
+                }
+            },
+            // date
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // hour
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 50);
+                }
+            },
+
+            // quantity
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    return `<div class="w-150px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                }
+            },
+            // notes
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 200);
+                }
+            },
+        ];
+
+        if (!permiso.eliminar) {
+            columnDefs = [
+                // project
+                {
+                    targets: 0,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 200);
+                    }
+                },
+                // concreteVendor
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                // description
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 200);
+                    }
+                },
+                // location
+                {
+                    targets: 3,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 150);
+                    }
+                },
+                // date
+                {
+                    targets: 4,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 100);
+                    }
+                },
+                // hour
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 50);
+                    }
+                },
+
+                // quantity
+                {
+                    targets: 6,
+                    render: function (data, type, row) {
+                        return `<div class="w-150px">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
+                    }
+                },
+                // notes
+                {
+                    targets: 7,
+                    render: function (data, type, row) {
+                        return DatatableUtil.getRenderColumnDiv(data, 200);
+                    }
+                },
+            ];
+        }
+
+        // acciones
+        columnDefs.push(
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'clonar', 'delete']);
+                },
+            }
+        );
+
+        return columnDefs;
+    }
+    var handleSearchDatatable = function () {
+        let debounceTimeout;
+
+        $(document).off('keyup', '#lista-schedule [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-schedule [data-table-filter="search"]', function (e) {
+
+            clearTimeout(debounceTimeout);
+            const searchTerm = e.target.value.trim();
+
+            debounceTimeout = setTimeout(function () {
+                if (searchTerm === '' || searchTerm.length >= 3) {
+                   btnClickFiltrar();
+                }
+            }, 300); // 300ms de debounce
+
+        });
+    }
+    var exportButtons = () => {
+        const documentTitle = 'Data Tracking';
+        var table = document.querySelector('#schedule-table-editable');
+        // Excluir la columna de check y acciones
+        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    title: documentTitle,
+                    exportOptions: {
+                        columns: exclude_columns
+                    }
+                }
+            ]
+        }).container().appendTo($('#schedule-table-editable-buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#data_tracking_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+    }
+
+    // select records
+    var tableSelectAll = false;
+    var handleSelectRecords = function (table) {
+        // Evento para capturar filas seleccionadas
+        oTable.on('select', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // Obtiene los datos de las filas seleccionadas
+                // var selectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas seleccionadas:", selectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Evento para capturar filas deseleccionadas
+        oTable.on('deselect', function (e, dt, type, indexes) {
+            if (type === 'row') {
+                // var deselectedData = oTable.rows(indexes).data().toArray();
+                // console.project("Filas deseleccionadas:", deselectedData);
+                actualizarRecordsSeleccionados();
+            }
+        });
+
+        // Función para seleccionar todas las filas
+        $(`.check-select-all`).on('click', function () {
+            if (!tableSelectAll) {
+                oTable.rows().select(); // Selecciona todas las filas
+            } else {
+                oTable.rows().deselect(); // Deselecciona todas las filas
+            }
+            tableSelectAll = !tableSelectAll;
+        });
+    }
+    var resetSelectRecords = function (table) {
+        tableSelectAll = false;
+        $(`${table} .check-select-all`).prop('checked', false);
+        actualizarRecordsSeleccionados();
+    }
+    var actualizarRecordsSeleccionados = function () {
+        var selectedData = oTable.rows({selected: true}).data().toArray();
+
+        if (selectedData.length > 0) {
+            $('#btn-eliminar-schedule').removeClass('hide');
+            $('#btn-clonar-schedule-listado').removeClass('hide');
+        } else {
+            $('#btn-eliminar-schedule').addClass('hide');
+            $('#btn-clonar-schedule-listado').addClass('hide');
+        }
+    }
 
     //Filtrar
     var initAccionFiltrar = function () {
@@ -377,70 +643,40 @@ var Schedules = function () {
             btnClickFiltrar();
         });
 
-    };
-    var initAccionResetFiltrar = function () {
-
         $(document).off('click', "#btn-reset-filtrar");
         $(document).on('click', "#btn-reset-filtrar", function (e) {
-
-            $('#lista-schedule .m_form_search').val('');
-
-            $('#filtro-project').val('');
-            $('#filtro-project').trigger('change');
-
-            $('#filtro-concrete-vendor').val('');
-            $('#filtro-concrete-vendor').trigger('change');
-
-            $('#fechaInicial').val('');
-            $('#fechaFin').val('');
-
-            btnClickFiltrar();
-
+            btnClickResetFilters();
         });
 
     };
     var btnClickFiltrar = function () {
-        var query = oTable.getDataSourceQuery();
 
-        var generalSearch = $('#lista-schedule .m_form_search').val();
-        query.generalSearch = generalSearch;
-
-        var project_id = $('#filtro-project').val();
-        query.project_id = project_id;
-
-        var vendor_id = $('#filtro-concrete-vendor').val();
-        query.vendor_id = vendor_id;
-
-        var fechaInicial = $('#fechaInicial').val();
-        query.fechaInicial = fechaInicial;
-
-        var fechaFin = $('#fechaFin').val();
-        query.fechaFin = fechaFin;
-
-        oTable.setDataSourceQuery(query);
-        oTable.load();
+        const search = $('#lista-schedule [data-table-filter="search"]').val();
+        oTable.search(search).draw();
 
         // calendario
         listarCalendario();
+    };
+    var btnClickResetFilters = function () {
+        // reset
+        $('#lista-schedule [data-table-filter="search"]').val('');
+
+        $('#project').val('');
+        $('#project').trigger('change');
+
+        $('#pending').val('');
+        $('#pending').trigger('change');
+
+        FlatpickrUtil.clear('datetimepicker-desde');
+        FlatpickrUtil.clear('datetimepicker-hasta');
+
+        btnClickFiltrar();
     }
 
     //Reset forms
     var resetForms = function () {
-        $('#schedule-form input').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
-
-        $('#schedule-form textarea').each(function (e) {
-            $element = $(this);
-            $element.val('');
-
-            $element.data("title", "").removeClass("has-error").tooltip("dispose");
-            $element.closest('.form-group').removeClass('has-error').addClass('success');
-        });
+        // reset form
+        MyUtil.resetForm("schedule-form");
 
         $('#project').val('');
         $('#project').trigger('change');
@@ -463,11 +699,7 @@ var Schedules = function () {
         $('#hour').trigger('change');
 
         // reset
-        $('#contact-project option').each(function (e) {
-            if ($(this).val() !== "")
-                $(this).remove();
-        });
-        $('#contact-project').select2();
+        MyUtil.limpiarSelect('#contact-project');
 
         $('#contact-concrete-vendor option').each(function (e) {
             $(this).remove();
@@ -479,70 +711,42 @@ var Schedules = function () {
         $('#employee').val([]);
         $('#employee').trigger('change');
 
-        var $element = $('.select2');
-        $element.removeClass('has-error').tooltip("dispose");
+        // tooltips selects
+        MyApp.resetErrorMessageValidateSelect(KTUtil.get("schedule-form"));
 
         event_change = false;
 
         latitud = '';
         longitud = '';
 
-        $('.date-new').removeClass('m--hide');
-        $('#div-day').removeClass('m--hide').addClass('m--hide');
-        $('#btn-clonar').removeClass('m--hide').addClass('m--hide');
-        $('#btn-delete-modal').removeClass('m--hide').addClass('m--hide');
+        $('.date-new').removeClass('hide');
+        $('#div-day').removeClass('hide').addClass('hide');
+        $('#btn-clonar').removeClass('hide').addClass('hide');
+        $('#btn-delete-modal').removeClass('hide').addClass('hide');
 
     };
 
     //Validacion
-    var initForm = function () {
+    var validateForm = function () {
+        var result = false;
+
         //Validacion
-        $("#schedule-form").validate({
-            rules: {
-                /*descripcion: {
-                    required: true
-                },
-                location: {
-                    required: true
-                },
-                quantity: {
-                    required: true
-                },
+        var form = KTUtil.get('schedule-form');
 
-                 */
-            },
-            showErrors: function (errorMap, errorList) {
-                // Clean up any tooltips for valid elements
-                $.each(this.validElements(), function (index, element) {
-                    var $element = $(element);
+        var constraints = {}
 
-                    $element.data("title", "") // Clear the title - there is no error associated anymore
-                        .removeClass("has-error")
-                        .tooltip("dispose");
+        var errors = validate(form, constraints);
 
-                    $element
-                        .closest('.form-group')
-                        .removeClass('has-error').addClass('success');
-                });
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
 
-                // Create new tooltips for invalid elements
-                $.each(errorList, function (index, error) {
-                    var $element = $(error.element);
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
 
-                    $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                        .data("title", error.message)
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        }); // Create a new tooltip based on the error messsage we just set in the title
-
-                    $element.closest('.form-group')
-                        .removeClass('has-success').addClass('has-error');
-
-                });
-            }
-        });
-
+        return result;
     };
 
     //Nuevo
@@ -554,12 +758,19 @@ var Schedules = function () {
 
         function btnClickNuevo() {
             resetForms();
-            var formTitle = "Do you want to create a new schedule? Follow the next steps:";
-            $('#form-schedule-title').html(formTitle);
-            $('#form-schedule').removeClass('m--hide');
-            $('#lista-schedule').addClass('m--hide');
+
+            KTUtil.find(KTUtil.get('form-schedule'), '.card-label').innerHTML = "New Schedule:";
+
+            mostrarForm();
         };
     };
+
+    var mostrarForm = function () {
+        KTUtil.removeClass(KTUtil.get('form-schedule'), 'hide');
+        KTUtil.addClass(KTUtil.get('lista-schedule'), 'hide');
+    }
+    
+    
     //Salvar
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-salvar-schedule");
@@ -568,7 +779,7 @@ var Schedules = function () {
         });
 
         function btnClickSalvarForm() {
-            mUtil.scrollTo();
+            KTUtil.scrollTop();
 
             event_change = false;
 
@@ -586,84 +797,76 @@ var Schedules = function () {
         var project_id = $('#project').val();
         var hour = $('#hour').val();
 
-        if ($('#schedule-form').valid() && project_id !== '' && isValidFechas()) {
+        if (validateForm() && project_id !== '' && isValidFechas()) {
 
+            var formData = new URLSearchParams();
+            
+            formData.set("project_id", project_id);
+            
             var project_contact_id = $('#contact-project').val();
-            var date_start = $('#date-start').val();
-            var date_stop = $('#date-stop').val();
+            formData.set("project_contact_id", project_contact_id);
+
+            var date_start = FlatpickrUtil.getString('datetimepicker-start-date');
+            formData.set("date_start", date_start);
+
+            var date_stop = FlatpickrUtil.getString('datetimepicker-stop-date');
+            formData.set("date_stop", date_stop);
 
             var description = $('#description').val();
+            formData.set("description", description);
+            
             var location = $('#location').val();
+            formData.set("location", location);
 
             var vendor_id = $('#concrete-vendor').val();
+            formData.set("vendor_id", vendor_id);
+            
             var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
             concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
+            formData.set("concrete_vendor_contacts_id", concrete_vendor_contacts_id);
 
+            formData.set("hour", hour);
 
-            var quantity = $('#quantity').val();
+            var quantity = NumberUtil.getNumericValue('#quantity');
+            formData.set("quantity", quantity);
+            
             var notes = $('#notes').val();
+            formData.set("notes", notes);
+            
             var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
-
+            formData.set("highpriority", highpriority);
+            
             var employees_id = $('#employee').val();
             employees_id = employees_id.length > 0 ? employees_id.join(',') : '';
+            formData.set("employees_id", employees_id);
 
             BlockUtil.block('#form-schedule');
 
-            $.ajax({
-                type: "POST",
-                url: "schedule/salvar",
-                dataType: "json",
-                data: {
-                    'project_id': project_id,
-                    'project_contact_id': project_contact_id,
-                    'description': description,
-                    'location': location,
-                    'date_start': date_start,
-                    'date_stop': date_stop,
-                    'latitud': latitud,
-                    'longitud': longitud,
-                    'vendor_id': vendor_id,
-                    'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
-                    'hour': hour,
-                    'quantity': quantity,
-                    'notes': notes,
-                    'highpriority': highpriority,
-                    'employees_id': employees_id,
+            axios.post("schedule/salvar", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-schedule');
-                    if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "Success");
+                            cerrarForms();
 
-                        cerrarForms();
-
-                        btnClickFiltrar();
-
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
                     BlockUtil.unblock('#form-schedule');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                });
 
         } else {
             if (project_id === "") {
-                var $element = $('#select-project .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
+                MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project"), "This field is required");
             }
         }
     }
@@ -672,83 +875,76 @@ var Schedules = function () {
         var project_id = $('#project').val();
         var hour = $('#hour').val();
 
-        if ($('#schedule-form').valid() && project_id !== '' && isValidFechas()) {
+        if (validateForm() && project_id !== '' && isValidFechas()) {
+
+            var formData = new URLSearchParams();
 
             var schedule_id = $('#schedule_id').val();
+            formData.set("schedule_id", schedule_id);
+            
+            formData.set("project_id", project_id);
+            
             var project_contact_id = $('#contact-project').val();
-            var day = $('#day').val();
+            formData.set("project_contact_id", project_contact_id);
+
+            var day = FlatpickrUtil.getString('datetimepicker-day');
+            formData.set("day", day);
+
+            formData.set("hour", hour);
 
             var description = $('#description').val();
+            formData.set("description", description);
+            
             var location = $('#location').val();
+            formData.set("location", location);
 
             var vendor_id = $('#concrete-vendor').val();
+            formData.set("vendor_id", vendor_id);
+            
             var concrete_vendor_contacts_id = $('#contact-concrete-vendor').val();
             concrete_vendor_contacts_id = concrete_vendor_contacts_id.length > 0 ? concrete_vendor_contacts_id.join(',') : '';
+            formData.set("concrete_vendor_contacts_id", concrete_vendor_contacts_id);
 
-            var quantity = $('#quantity').val();
+            var quantity = NumberUtil.getNumericValue('#quantity');
+            formData.set("quantity", quantity);
+            
             var notes = $('#notes').val();
+            formData.set("notes", notes);
+            
             var highpriority = $('#highpriority').prop('checked') ? 1 : 0;
+            formData.set("highpriority", highpriority);
 
             var employees_id = $('#employee').val();
             employees_id = employees_id.length > 0 ? employees_id.join(',') : '';
+            formData.set("employees_id", employees_id);
 
             BlockUtil.block('#form-schedule');
 
-            $.ajax({
-                type: "POST",
-                url: "schedule/actualizar",
-                dataType: "json",
-                data: {
-                    'schedule_id': schedule_id,
-                    'project_id': project_id,
-                    'project_contact_id': project_contact_id,
-                    'description': description,
-                    'location': location,
-                    'day': day,
-                    'latitud': latitud,
-                    'longitud': longitud,
-                    'vendor_id': vendor_id,
-                    'concrete_vendor_contacts_id': concrete_vendor_contacts_id,
-                    'hour': hour,
-                    'quantity': quantity,
-                    'notes': notes,
-                    'highpriority': highpriority,
-                    'employees_id': employees_id,
+            axios.post("schedule/actualizar", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#form-schedule');
-                    if (response.success) {
+                            toastr.success(response.message, "");
 
-                        toastr.success(response.message, "Success");
+                            cerrarForms();
 
-                        cerrarForms();
-
-                        btnClickFiltrar();
-
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
                     BlockUtil.unblock('#form-schedule');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                });
 
         } else {
             if (project_id === "") {
-                var $element = $('#select-project .select2');
-                $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                    .data("title", "This field is required")
-                    .addClass("has-error")
-                    .tooltip({
-                        placement: 'bottom'
-                    }); // Create a new tooltip based on the error messsage we just set in the title
-
-                $element.closest('.form-group')
-                    .removeClass('has-success').addClass('has-error');
+                MyApp.showErrorMessageValidateSelect(KTUtil.get("select-project"), "This field is required");
             }
         }
 
@@ -767,24 +963,10 @@ var Schedules = function () {
                 valid = false;
 
                 if (date_start === '') {
-                    var $element = $('#date-start');
-                    $element.tooltip("dispose")
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        });
-                    $element.closest('.form-group').removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-start-date"), "This field is required");
                 }
                 if (date_stop === '') {
-                    var $element = $('#date-stop');
-                    $element.tooltip("dispose")
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        });
-                    $element.closest('.form-group').removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-stop-date"), "This field is required");
                 }
 
 
@@ -796,14 +978,7 @@ var Schedules = function () {
                 valid = false;
 
                 if (day === '') {
-                    var $element = $('#day');
-                    $element.tooltip("dispose")
-                        .data("title", "This field is required")
-                        .addClass("has-error")
-                        .tooltip({
-                            placement: 'bottom'
-                        });
-                    $element.closest('.form-group').removeClass('has-success').addClass('has-error');
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-day"), "This field is required");
                 }
 
 
@@ -828,9 +1003,8 @@ var Schedules = function () {
         if (!event_change) {
             cerrarFormsConfirmated();
         } else {
-            $('#modal-salvar-cambios').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
         }
     };
 
@@ -849,8 +1023,8 @@ var Schedules = function () {
     };
     var cerrarFormsConfirmated = function () {
         resetForms();
-        $('#form-schedule').addClass('m--hide');
-        $('#lista-schedule').removeClass('m--hide');
+        $('#form-schedule').addClass('hide');
+        $('#lista-schedule').removeClass('hide');
 
         // actualizar listado
         btnClickFiltrar();
@@ -866,8 +1040,7 @@ var Schedules = function () {
             var schedule_id = $(this).data('id');
             $('#schedule_id').val(schedule_id);
 
-            $('#form-schedule').removeClass('m--hide');
-            $('#lista-schedule').addClass('m--hide');
+            mostrarForm();
 
             editRow(schedule_id);
         });
@@ -875,90 +1048,96 @@ var Schedules = function () {
 
     function editRow(schedule_id) {
 
+        var formData = new URLSearchParams();
+        formData.set("schedule_id", schedule_id);
+
         BlockUtil.block('#form-schedule');
 
-        $.ajax({
-            type: "POST",
-            url: "schedule/cargarDatos",
-            dataType: "json",
-            data: {
-                'schedule_id': schedule_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#form-schedule');
-                if (response.success) {
-                    //Datos schedule
+        axios.post("schedule/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    var formTitle = "You want to update the schedule? Follow the next steps:";
-                    $('#form-schedule-title').html(formTitle);
+                        //cargar datos
+                        cargarDatos(response.schedule);
 
-                    // project
-                    $(document).off('change', "#project", changeProject);
-
-                    $('#project').val(response.schedule.project_id);
-                    $('#project').trigger('change');
-
-                    // contacts project
-                    actualizarSelectContactProjects(response.schedule.contacts_project);
-                    $('#contact-project').val(response.schedule.project_contact_id);
-                    $('#contact-project').trigger('change');
-
-                    $(document).on('change', "#project", changeProject);
-
-                    $('#description').val(response.schedule.description);
-                    $('#location').val(response.schedule.location);
-                    $('#date-start').val(response.schedule.date_start);
-                    $('#date-stop').val(response.schedule.date_stop);
-
-                    latitud = response.schedule.latitud;
-                    longitud = response.schedule.longitud;
-
-                    // concrete vendor
-                    $(document).off('change', "#concrete-vendor", changeConcreteVendor);
-
-                    $('#concrete-vendor').val(response.schedule.vendor_id);
-                    $('#concrete-vendor').trigger('change');
-
-                    // contacts concrete vendor
-                    actualizarSelectContactConcreteVendor(response.schedule.concrete_vendor_contacts);
-                    $('#contact-concrete-vendor').val(response.schedule.schedule_concrete_vendor_contacts_id);
-                    $('#contact-concrete-vendor').trigger('change');
-
-                    $(document).on('change', "#concrete-vendor", changeConcreteVendor);
-
-                    $('#employee').val(response.schedule.employees_id);
-                    $('#employee').trigger('change');
-
-                    $('#day').val(response.schedule.day);
-                    $('#div-day').removeClass('m--hide');
-                    $('.date-new').addClass('m--hide');
-
-                    $('#hour').removeAttr('multiple');
-                    $('#hour').prepend(new Option('Select', '', false, false));
-                    $('#hour').select2();
-
-                    $('#hour').val(response.schedule.hour);
-                    $('#hour').trigger('change');
-
-                    $('#quantity').val(response.schedule.quantity);
-                    $('#notes').val(response.schedule.notes);
-
-                    $('#highpriority').prop('checked', response.schedule.highpriority);
-
-                    $('#btn-clonar').removeClass('m--hide');
-                    $('#btn-delete-modal').removeClass('m--hide');
-
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#form-schedule');
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-schedule");
+            });
 
-                toastr.error(response.error, "");
+        function cargarDatos(schedule) {
+
+            KTUtil.find(KTUtil.get("form-schedule"), ".card-label").innerHTML = "Update Schedule:";
+
+            // project
+            $(document).off('change', "#project", changeProject);
+
+            $('#project').val(schedule.project_id);
+            $('#project').trigger('change');
+
+            // contacts project
+            actualizarSelectContactProjects(schedule.contacts_project);
+            $('#contact-project').val(schedule.project_contact_id);
+            $('#contact-project').trigger('change');
+
+            $(document).on('change', "#project", changeProject);
+
+            $('#description').val(schedule.description);
+            $('#location').val(schedule.location);
+
+            if (schedule.day !== '') {
+                const day = MyApp.convertirStringAFecha(schedule.day);
+                FlatpickrUtil.setDate('datetimepicker-day', day);
             }
-        });
 
+            latitud = schedule.latitud;
+            longitud = schedule.longitud;
+
+            // concrete vendor
+            $(document).off('change', "#concrete-vendor", changeConcreteVendor);
+
+            $('#concrete-vendor').val(schedule.vendor_id);
+            $('#concrete-vendor').trigger('change');
+
+            // contacts concrete vendor
+            actualizarSelectContactConcreteVendor(schedule.concrete_vendor_contacts);
+            $('#contact-concrete-vendor').val(schedule.schedule_concrete_vendor_contacts_id);
+            $('#contact-concrete-vendor').trigger('change');
+
+            $(document).on('change', "#concrete-vendor", changeConcreteVendor);
+
+            $('#employee').val(schedule.employees_id);
+            $('#employee').trigger('change');
+
+            $('#day').val(schedule.day);
+            $('#div-day').removeClass('hide');
+            $('.date-new').addClass('hide');
+
+            $('#hour').removeAttr('multiple');
+            $('#hour').prepend(new Option('Select', '', false, false));
+            $('#hour').select2();
+
+            $('#hour').val(schedule.hour);
+            $('#hour').trigger('change');
+
+            $('#quantity').val(MyApp.formatearNumero(schedule.quantity, 2, '.', ','));
+            $('#notes').val(schedule.notes);
+
+            $('#highpriority').prop('checked', schedule.highpriority);
+
+            $('#btn-clonar').removeClass('hide');
+            $('#btn-delete-modal').removeClass('hide');
+
+        }
     }
 
     //Eliminar
@@ -968,9 +1147,9 @@ var Schedules = function () {
             e.preventDefault();
 
             rowDelete = $(this).data('id');
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-delete-modal");
@@ -979,9 +1158,8 @@ var Schedules = function () {
 
             rowDelete = $('#schedule_id').val();
 
-            $('#modal-eliminar').modal({
-                'show': true
-            });
+            // mostar modal
+            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
 
             cerrarFormsConfirmated();
         });
@@ -1002,20 +1180,10 @@ var Schedules = function () {
         });
 
         function btnClickEliminar() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#schedule-table-editable').join(',');
             if (ids != '') {
-                $('#modal-eliminar-seleccion').modal({
-                    'show': true
-                });
+                // mostar modal
+                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
             } else {
                 toastr.error('Select schedules to delete', "");
             }
@@ -1024,83 +1192,71 @@ var Schedules = function () {
         function btnClickModalEliminar() {
             var schedule_id = rowDelete;
 
-            BlockUtil.block('#schedule-table-editable');
+            var formData = new URLSearchParams();
+            formData.set("schedule_id", schedule_id);
 
-            $.ajax({
-                type: "POST",
-                url: "schedule/eliminar",
-                dataType: "json",
-                data: {
-                    'schedule_id': schedule_id
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#schedule-table-editable');
+            BlockUtil.block('#lista-schedule');
 
-                    if (response.success) {
+            axios.post("schedule/eliminar", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
-                        btnClickFiltrar();
+                            btnClickFiltrar();
 
-                        toastr.success(response.message, "Success");
-
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#schedule-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-schedule");
+                });
         };
 
         function btnClickModalEliminarSeleccion() {
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
+            var ids = DatatableUtil.getTableSelectedRowKeys('#schedule-table-editable').join(',');
 
-            BlockUtil.block('#schedule-table-editable');
+            var formData = new URLSearchParams();
 
-            $.ajax({
-                type: "POST",
-                url: "schedule/eliminarSchedules",
-                dataType: "json",
-                data: {
-                    'ids': ids
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#schedule-table-editable');
-                    if (response.success) {
+            formData.set("ids", ids);
 
-                        btnClickFiltrar();
+            BlockUtil.block('#lista-schedule');
 
-                        toastr.success(response.message, "Success");
+            axios.post("schedule/eliminarSchedules", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
+                            btnClickFiltrar();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
                     } else {
-                        toastr.error(response.error, "");
+                        toastr.error("An internal error has occurred, please try again.", "");
                     }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#schedule-table-editable');
-
-                    toastr.error(response.error, "");
-                }
-            });
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-schedule");
+                });
         };
     };
 
 
     var initWidgets = function () {
 
-        initPortlets();
+        // init widgets generales
+        MyApp.initWidgets();
 
-        $('.m-select2').select2();
+        initTempus();
 
         $('#hour').select2({
             placeholder: 'Select',
@@ -1123,6 +1279,58 @@ var Schedules = function () {
 
         $(document).off('change', "#concrete-vendor");
         $(document).on('change', "#concrete-vendor", changeConcreteVendor);
+
+    }
+
+    var initTempus = function () {
+        // filtros fechas
+        const desdeInput = document.getElementById('datetimepicker-desde');
+        const desdeGroup = desdeInput.closest('.input-group');
+        FlatpickrUtil.initDate('datetimepicker-desde', {
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: desdeGroup,            // → cfg.appendTo = .input-group
+            positionElement: desdeInput,      // → referencia de posición
+            static: true,                     // → evita top/left “globales”
+            position: 'above'                 // → fuerza arriba del input
+        });
+
+        const hastaInput = document.getElementById('datetimepicker-hasta');
+        const hastaGroup = hastaInput.closest('.input-group');
+        FlatpickrUtil.initDate('datetimepicker-hasta', {
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: hastaGroup,
+            positionElement: hastaInput,
+            static: true,
+            position: 'above'
+        });
+
+        // day
+        FlatpickrUtil.initDate('datetimepicker-day', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // start date
+        FlatpickrUtil.initDate('datetimepicker-start-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // stop date
+        FlatpickrUtil.initDate('datetimepicker-stop-date', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+        });
+
+        // start date clone
+        const modalEl = document.getElementById('modal-clonar-schedule');
+        FlatpickrUtil.initDate('datetimepicker-date-start-clonar', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: modalEl
+        });
+
+        // stop date clone
+        FlatpickrUtil.initDate('datetimepicker-date-stop-clonar', {
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: modalEl
+        });
 
     }
 
@@ -1162,53 +1370,46 @@ var Schedules = function () {
         var project_id = $('#project').val();
 
         // reset
-        $('#contact-project option').each(function (e) {
-            if ($(this).val() !== "")
-                $(this).remove();
-        });
-        $('#contact-project').select2();
+        MyUtil.limpiarSelect('#contact-project');
 
         if (project_id !== '') {
             listarContactsDeProject(project_id);
         }
     }
     var listarContactsDeProject = function (project_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("project_id", project_id);
+
         BlockUtil.block('#select-contact-project');
 
-        $.ajax({
-            type: "POST",
-            url: "project/listarContacts",
-            dataType: "json",
-            data: {
-                'project_id': project_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-contact-project');
-                if (response.success) {
+        axios.post("project/listarContacts", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    //Llenar select
-                    actualizarSelectContactProjects(response.contacts);
+                        //Llenar select
+                        actualizarSelectContactProjects(response.contacts);
 
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-contact-project');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-contact-project");
+            });
     }
     var actualizarSelectContactProjects = function (contacts) {
         const select = '#contact-project';
 
         // reset
-        $(select + ' option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $(select).select2();
+        MyUtil.limpiarSelect(select);
 
         for (var i = 0; i < contacts.length; i++) {
             $(select).append(new Option(contacts[i].name, contacts[i].contact_id, false, false));
@@ -1233,44 +1434,39 @@ var Schedules = function () {
         }
     }
     var listarContactsDeConcreteVendor = function (vendor_id) {
+
+        var formData = new URLSearchParams();
+
+        formData.set("vendor_id", vendor_id);
+
         BlockUtil.block('#select-contact-concrete-vendor');
 
-        $.ajax({
-            type: "POST",
-            url: "concrete-vendor/listarContacts",
-            dataType: "json",
-            data: {
-                'vendor_id': vendor_id
-            },
-            success: function (response) {
-                BlockUtil.unblock('#select-contact-concrete-vendor');
-                if (response.success) {
+        axios.post("concrete-vendor/listarContacts", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                    //Llenar select
-                    actualizarSelectContactConcreteVendor(response.contacts);
+                        //Llenar select
+                        actualizarSelectContactConcreteVendor(response.contacts);
 
+                    } else {
+                        toastr.error(response.error, "");
+                    }
                 } else {
-                    toastr.error(response.error, "");
+                    toastr.error("An internal error has occurred, please try again.", "");
                 }
-            },
-            failure: function (response) {
-                BlockUtil.unblock('#select-contact-concrete-vendor');
-
-                toastr.error(response.error, "");
-            }
-        });
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#select-contact-concrete-vendor");
+            });
     }
     var actualizarSelectContactConcreteVendor = function (contacts) {
         const select = '#contact-concrete-vendor';
 
         // reset
-        $(select + ' option').each(function (e) {
-            if ($(this).val() != "")
-                $(this).remove();
-        });
-        $(select).select2({
-            placeholder: 'Select contacts',
-        });
+        MyUtil.limpiarSelect(select);
 
         for (var i = 0; i < contacts.length; i++) {
             $(select).append(new Option(contacts[i].name, contacts[i].contact_id, false, false));
@@ -1280,22 +1476,9 @@ var Schedules = function () {
         });
     }
 
-    var initPortlets = function () {
-        var portlet = new mPortlet('lista-schedule');
-        portlet.on('afterFullscreenOn', function (portlet) {
-            $('.m-portlet').addClass('m-portlet--fullscreen');
-        });
-
-        portlet.on('afterFullscreenOff', function (portlet) {
-            $('.m-portlet').removeClass('m-portlet--fullscreen');
-        });
-    }
-
     // clonar
     var schedules_id = '';
     var initAccionClonar = function () {
-        // validacion
-        initFormClonar();
 
         $(document).off('click', "#schedule-table-editable a.clonar");
         $(document).on('click', "#schedule-table-editable a.clonar", function (e) {
@@ -1309,7 +1492,9 @@ var Schedules = function () {
             var highpriority = $(this).data('highpriority') === '1' ? true : false;
             $('#highpriority-clonar').prop('checked', highpriority);
 
-            $('#modal-clonar-schedule').modal('show');
+            // mostar modal
+            ModalUtil.show('modal-clonar-schedule', {backdrop: 'static', keyboard: true});
+
         });
 
         $(document).off('click', "#btn-clonar");
@@ -1322,29 +1507,22 @@ var Schedules = function () {
             var highpriority = $('#highpriority').prop('checked');
             $('#highpriority-clonar').prop('checked', highpriority);
 
-            $('#modal-clonar-schedule').modal('show');
+            // mostar modal
+            ModalUtil.show('modal-clonar-schedule', {backdrop: 'static', keyboard: true});
         });
 
         $(document).off('click', "#btn-clonar-schedule-listado");
         $(document).on('click', "#btn-clonar-schedule-listado", function (e) {
 
-            var ids = '';
-            $('.m-datatable__cell--check .m-checkbox--brand > input[type="checkbox"]').each(function () {
-                if ($(this).prop('checked')) {
-                    var value = $(this).attr('value');
-                    if (value != undefined) {
-                        ids += value + ',';
-                    }
-                }
-            });
-
+            var ids = DatatableUtil.getTableSelectedRowKeys('#schedule-table-editable').join(',');
             if (ids != '') {
 
                 resetFormsClonar();
 
                 schedules_id = ids;
 
-                $('#modal-clonar-schedule').modal('show');
+                // mostar modal
+                ModalUtil.show('modal-clonar-schedule', {backdrop: 'static', keyboard: true});
 
             } else {
                 toastr.error('Select schedules to clone', "");
@@ -1355,103 +1533,83 @@ var Schedules = function () {
         $(document).off('click', "#btn-clonar-schedule");
         $(document).on('click', "#btn-clonar-schedule", function (e) {
 
-            if ($('#clonar-schedule-form').valid() && schedules_id !== '') {
+            var date_start = FlatpickrUtil.getString('datetimepicker-date-start-clonar');
+            var date_stop = FlatpickrUtil.getString('datetimepicker-date-stop-clonar');
 
-                var date_start = $('#date-start-clonar').val();
-                var date_stop = $('#date-stop-clonar').val();
+            if (validateFormClonar() && schedules_id !== '' && date_start !== '' && date_stop !== '') {
+
+                var formData = new URLSearchParams();
+
+                formData.set("date_start", date_start);
+                formData.set("date_stop", date_stop);
+
                 var highpriority = $('#highpriority-clonar').prop('checked') ? 1 : 0;
+                formData.set("highpriority", highpriority);
 
-                BlockUtil.block('.modal-content');
+                BlockUtil.block('#modal-clonar-schedule .modal-content');
 
-                $.ajax({
-                    type: "POST",
-                    url: "schedule/clonar",
-                    dataType: "json",
-                    data: {
-                        'schedules_id': schedules_id,
-                        'date_start': date_start,
-                        'date_stop': date_stop,
-                        'highpriority': highpriority
-                    },
-                    success: function (response) {
-                        BlockUtil.unblock('.modal-content');
-                        if (response.success) {
+                axios.post("schedule/clonar", formData, {responseType: "json"})
+                    .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                            var response = res.data;
+                            if (response.success) {
 
-                            toastr.success(response.message, "Success");
+                                toastr.success(response.message, "");
 
-                            cerrarFormsConfirmated();
-                            resetFormsClonar();
-                            $('#modal-clonar-schedule').modal('hide');
+                                cerrarFormsConfirmated();
+                                resetFormsClonar();
 
-                            btnClickFiltrar();
+                                ModalUtil.hide('modal-clonar-schedule');
 
+                                btnClickFiltrar();
+
+                            } else {
+                                toastr.error(response.error, "");
+                            }
                         } else {
-                            toastr.error(response.error, "");
+                            toastr.error("An internal error has occurred, please try again.", "");
                         }
-                    },
-                    failure: function (response) {
-                        BlockUtil.unblock('.modal-content');
+                    })
+                    .catch(MyUtil.catchErrorAxios)
+                    .then(function () {
+                        BlockUtil.unblock('#modal-clonar-schedule .modal-content');
+                    });
 
-                        toastr.error(response.error, "");
-                    }
-                });
-
+            }else{
+                if(date_start === ''){
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-date-start-clonar"), "This field is required");
+                }
+                if(date_stop === ''){
+                    MyApp.showErrorMessageValidateInput(KTUtil.get("datetimepicker-date-stop-clonar"), "This field is required");
+                }
             }
         });
 
+        var validateFormClonar = function () {
+            var result = false;
 
-        function initFormClonar() {
-            $("#clonar-schedule-form").validate({
-                rules: {
-                    datestart: {
-                        required: true
-                    },
-                    datestop: {
-                        required: true
-                    },
-                },
-                showErrors: function (errorMap, errorList) {
-                    // Clean up any tooltips for valid elements
-                    $.each(this.validElements(), function (index, element) {
-                        var $element = $(element);
+            //Validacion
+            var form = KTUtil.get('clonar-schedule-form');
 
-                        $element.data("title", "") // Clear the title - there is no error associated anymore
-                            .removeClass("has-error")
-                            .tooltip("dispose");
+            var constraints = {}
 
-                        $element
-                            .closest('.form-group')
-                            .removeClass('has-error').addClass('success');
-                    });
+            var errors = validate(form, constraints);
 
-                    // Create new tooltips for invalid elements
-                    $.each(errorList, function (index, error) {
-                        var $element = $(error.element);
+            if (!errors) {
+                result = true;
+            } else {
+                MyApp.showErrorsValidateForm(form, errors);
+            }
 
-                        $element.tooltip("dispose") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
-                            .data("title", error.message)
-                            .addClass("has-error")
-                            .tooltip({
-                                placement: 'bottom'
-                            }); // Create a new tooltip based on the error messsage we just set in the title
+            //attach change
+            MyUtil.attachChangeValidacion(form, constraints);
 
-                        $element.closest('.form-group')
-                            .removeClass('has-success').addClass('has-error');
-
-                    });
-                }
-            });
-
+            return result;
         };
 
         function resetFormsClonar() {
-            $('#clonar-schedule-form input').each(function (e) {
-                $element = $(this);
-                $element.val('');
-
-                $element.data("title", "").removeClass("has-error").tooltip("dispose");
-                $element.closest('.form-group').removeClass('has-error').addClass('success');
-            });
+            // reset form
+            MyUtil.resetForm("clonar-schedule-form");
 
             $('#highpriority-clonar').prop('checked', false);
         };
@@ -1463,39 +1621,55 @@ var Schedules = function () {
         $(document).on('click', "#btn-exportar", function (e) {
             e.preventDefault();
 
-            var search = $('#lista-schedule .m_form_search').val();
+            var formData = new URLSearchParams();
+
+            var search = $('#lista-schedule [data-table-filter="search"]').val();
+            formData.set("search", search);
+
             var project_id = $('#filtro-project').val();
+            formData.set("project_id", project_id);
+
             var vendor_id = $('#filtro-concrete-vendor').val();
-            var fecha_inicial = $('#fechaInicial').val();
-            var fecha_fin = $('#fechaFin').val();
+            formData.set("vendor_id", vendor_id);
+
+            var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde');
+            formData.set("fecha_inicial", fecha_inicial);
+
+            var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta');
+            formData.set("fecha_fin", fecha_fin);
 
             BlockUtil.block('#lista-schedule');
 
-            $.ajax({
-                type: "POST",
-                url: "schedule/exportarExcel",
-                dataType: "json",
-                data: {
-                    'search': search,
-                    'project_id': project_id,
-                    'vendor_id': vendor_id,
-                    'fecha_inicial': fecha_inicial,
-                    'fecha_fin': fecha_fin
-                },
-                success: function (response) {
-                    BlockUtil.unblock('#lista-schedule');
-                    if (response.success) {
-                        document.location = response.url;
-                    } else {
-                        toastr.error(response.error, "");
-                    }
-                },
-                failure: function (response) {
-                    BlockUtil.unblock('#lista-schedule');
+            axios.post("schedule/exportarExcel", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
 
-                    toastr.error(response.error, "");
-                }
-            });
+                            // document.location = response.url;
+
+                            var url = response.url;
+                            const archivo = url.split("/").pop();
+
+                            // crear link para que se descargue el archivo
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-schedule");
+                });
         });
     };
 
@@ -1506,16 +1680,12 @@ var Schedules = function () {
 
             initWidgets();
             initTable();
-            initForm();
 
             initAccionNuevo();
             initAccionSalvar();
             initAccionCerrar();
-            initAccionEditar();
-            initAccionClonar();
-            initAccionEliminar();
+
             initAccionFiltrar();
-            initAccionResetFiltrar();
 
             initAccionChange();
 

@@ -84,6 +84,20 @@ var FlatpickrUtil = (function () {
             onChange: []
         };
 
+        if (options && (options.appendTo || options.container)) {
+            cfg.appendTo = options.appendTo || options.container;
+        }
+        if (options && options.positionElement) {
+            cfg.positionElement = options.positionElement;
+        }
+        // 👇 clave para dropdowns: que Flatpickr NO calcule top/left
+        if (options && options.static === true) {
+            cfg.static = true;
+        }
+        if (options && options.position) {
+            cfg.position = options.position; // "auto" | "above" | "below"
+        }
+
         // Locale (si está cargado)
         try {
             if (flatpickr.l10ns && flatpickr.l10ns[flatpickrLocale]) {

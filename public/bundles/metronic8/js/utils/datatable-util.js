@@ -105,6 +105,11 @@ var DatatableUtil = function () {
             html += _getRenderAccionEditar(row, permiso);
         }
 
+        // clonar
+        if (acciones.includes('clonar') && permiso.agregar) {
+            html += _getRenderAccionClonar(row);
+        }
+
         // paid
         if (acciones.includes('paid') && permiso.editar) {
             html += _getRenderAccionPaid(row);
@@ -181,6 +186,15 @@ var DatatableUtil = function () {
         var title = permiso.editar ? 'Edit' : 'View';
 
         return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
+              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+            </a>`
+    }
+
+    var _getRenderAccionClonar = function (row) {
+        var edit_icon = 'copy';
+        var title = 'Clone';
+
+        return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="clonar btn btn-sm btn-icon btn-outline btn-outline-warning btn-active-light-warning">
               <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`
     }

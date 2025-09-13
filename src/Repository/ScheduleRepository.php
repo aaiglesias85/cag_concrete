@@ -166,7 +166,8 @@ class ScheduleRepository extends EntityRepository
      *
      * @return Schedule[]
      */
-    public function ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id = '', $vendor_id = '', $fecha_inicial = '', $fecha_fin = '')
+    public function ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
+                                    $project_id = '', $vendor_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.project', 'p')
@@ -277,6 +278,90 @@ class ScheduleRepository extends EntityRepository
 
         return (int)$consulta->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * ListarSchedulesConTotal Lista los schedules con total
+     *
+     * @return []
+     */
+    public function ListarSchedulesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'day', string $sortDirection = 'DESC',
+                                            ?string $project_id = null, ?string $vendor_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null): array
+    {
+
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'id' => 's.scheduleId',
+            'project' => 'p.name',
+            'concreteVendor' => 'c_v.name',
+            'description' => 's.description',
+            'location' => 's.location',
+            'day' => 's.day',
+            'hour' => 's.hour',
+            'quantity' => 's.quantity',
+            'notes' => 's.notes',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 's.day';
+        $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('s')
+            ->leftJoin('s.project', 'p')
+            ->leftJoin('s.contactProject', 'p_c')
+            ->leftJoin('s.concreteVendor', 'c_v');
+
+        if ($sSearch != "") {
+            $baseQb->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
+            s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($vendor_id != '') {
+            $baseQb->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
+        }
+
+        if ($project_id != '') {
+            $baseQb->andWhere('p.projectId = :project_id')
+                ->setParameter('project_id', $project_id);
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+
+            $baseQb->andWhere('s.day >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+
+            $baseQb->andWhere('s.day <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+            ->setFirstResult($start)
+            ->setMaxResults($limit > 0 ? $limit : null);
+
+        $data = $dataQb->getQuery()->getResult();
+
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+            ->select('COUNT(s.scheduleId)');
+
+        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+
+        return [
+            'data' => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
+
 
     /**
      * ListarSchedulesParaCalendario: Lista los schedules para el calendario

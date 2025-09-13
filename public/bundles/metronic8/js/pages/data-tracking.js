@@ -1174,14 +1174,24 @@ var DataTracking = function () {
 
     var initTempus = function () {
         // filtros fechas
-        const menuEl = document.getElementById('filter-menu');
+        const desdeInput = document.getElementById('datetimepicker-desde');
+        const desdeGroup = desdeInput.closest('.input-group');
         FlatpickrUtil.initDate('datetimepicker-desde', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
-            container: menuEl
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: desdeGroup,            // → cfg.appendTo = .input-group
+            positionElement: desdeInput,      // → referencia de posición
+            static: true,                     // → evita top/left “globales”
+            position: 'above'                 // → fuerza arriba del input
         });
+
+        const hastaInput = document.getElementById('datetimepicker-hasta');
+        const hastaGroup = hastaInput.closest('.input-group');
         FlatpickrUtil.initDate('datetimepicker-hasta', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
-            container: menuEl
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: hastaGroup,
+            positionElement: hastaInput,
+            static: true,
+            position: 'above'
         });
 
         // date

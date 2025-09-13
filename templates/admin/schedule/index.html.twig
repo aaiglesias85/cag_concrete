@@ -3,275 +3,447 @@
 {% block subtitle %} - Schedules{% endblock %}
 
 {% block stylesheetspecific %}
-    <link href="{{ asset('bundles/metronic8/plugins/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}"
+          rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}"
+          rel="stylesheet">
     <style>
-
         .fc-slats tr,
         .fc-slats td {
             border: none !important;
             background: none !important;
         }
 
+        .fc-timegrid-event{
+            height: 30px;
+        }
 
-        .fc-slats .fc-time {
+
+        .fc-event-time {
             display: none !important;
         }
 
-        .fc-event.feriado-event {
+        .feriado-event {
             background-color: black !important;
+            background: black !important;
             color: white !important;
             border: none !important;
             font-weight: bold;
-        }
-
-        .fc-event.feriado-event .fc-title {
-            color: #fff !important;
-        }
-
-        .fc-unthemed .feriado-event.fc-start .fc-content:before {
-            background: #fff !important;
+            opacity: 1 !important;
         }
 
         .fc-day.feriado-cell {
             background-color: black !important;
-            color: white !important;
+            background: black !important;
+            opacity: 1 !important;
         }
 
-        .fc-day.feriado-cell .fc-day-number,
-        .fc-day.feriado-cell .fc-event {
-            color: white !important;
+        .feriado-event .fc-event-title {
+            color: #fff !important;
         }
+
+        .feriado-event.fc-start .fc-daygrid-event-dot {
+            border: calc(8px / 2) solid #fff;
+        }
+
+        .fc-event-solid-danger {
+            background: #F8285A !important;
+            color: #fff !important;
+        }
+
+        .fc-event-danger .fc-daygrid-event-dot {
+            border: calc(8px / 2) solid #fff;
+        }
+
     </style>
 {% endblock %}
 
 {% block content %}
-    <!-- BEGIN: Subheader -->
-    <div class="m-subheader ">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <h3 class="m-subheader__title m-subheader__title--separator">Schedules</h3>
-                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-                    <li class="m-nav__item m-nav__item--home">
-                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
-                            <i class="m-nav__link-icon la la-home"></i>
-                        </a>
+
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <!--begin::Toolbar container-->
+        <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+            <!--begin::Page title-->
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <!--begin::Title-->
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    Schedules
+                </h1>
+                <!--end::Title-->
+                <!--begin::Breadcrumb-->
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
                     </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Schedules</span>
-                        </a>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
                     </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Manage schedules</span>
-                        </a>
-                    </li>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">Manage Schedules</li>
+                    <!--end::company-->
                 </ul>
+                <!--end::Breadcrumb-->
             </div>
+            <!--end::Page title-->
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+
+            </div>
+            <!--end::Actions-->
         </div>
+        <!--end::Toolbar container-->
     </div>
-    <!-- END: Subheader -->
+    <!--end::Toolbar-->
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <!--begin::Content container-->
+        <div id="kt_app_content_container" class="app-container container-fluid">
 
-    <div class="m-content">
-        <div id="lista-schedule" class="m-portlet m-portlet--mobile" m-portlet="true">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text">
-                            Schedules
-                        </h3>
+            <!-- lista -->
+            <div id="lista-schedule" class="card card-sticky">
+                <div class="card-header border-0 pt-6"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="lista-schedule"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <input type="text" data-table-filter="search"
+                                   class="form-control form-control-solid w-300px ps-13"
+                                   placeholder="Buscar..."/>
+                        </div>
+                    </div>
+                    <div class="card-toolbar">
+                        <div class="d-flex justify-content-end">
+
+                            <!--hide calendar-->
+                            <a href="javascript:;" id="btn-calendario" class="btn btn-secondary me-3">
+                                <i class="ki-duotone ki-calendar"><span class="path1"></span><span class="path2"></span></i>
+                                <span class="kt-hidden-mobile font-weight-bold">Hide Calendar</span>
+                            </a>
+
+                            <!--filter-->
+                            <div>
+                                <button type="button" class="btn btn-primary me-3"
+                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-filter fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Filter</span>
+                                </button>
+                                <div id="filter-menu" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px"
+                                     data-kt-menu="true">
+                                    <!--begin::Header-->
+                                    <div class="px-7 py-5">
+                                        <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Separator-->
+                                    <div class="separator border-gray-200"></div>
+                                    <!--end::Separator-->
+                                    <!--begin::Content-->
+                                    <div class="px-7 py-5">
+
+                                        <div class="mb-3">
+                                            <select class="form-select form-select2 form-select-solid fw-bold"
+                                                    id="filtro-project">
+                                                <option value="">Project</option>
+                                                {% for item in projects %}
+                                                    <option value="{{ item.projectId }}">{{ item.projectNumber }}
+                                                        - {{ item.description }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <select class="form-select form-select2 form-select-solid fw-bold"
+                                                    id="filtro-concrete-vendor">
+                                                <option value="">Concrete Vendor</option>
+                                                {% for item in concrete_vendors %}
+                                                    <option value="{{ item.vendorId }}">{{ item.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="input-group input-group-solid date-picker-filter"
+                                                 id="datetimepicker-desde" data-td-target-input="nearest"
+                                                 data-td-target-toggle="nearest">
+                                                <input type="text" class="form-control filter-date w-100" placeholder="From"
+                                                       data-td-target="#datetimepicker-desde" autocomplete="off"/>
+                                                <span class="input-group-text" data-td-target="#datetimepicker-desde"
+                                                      data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="input-group input-group-solid date-picker-filter"
+                                                 id="datetimepicker-hasta" data-td-target-input="nearest"
+                                                 data-td-target-toggle="nearest">
+                                                <input type="text" class="form-control filter-date w-100" placeholder="To"
+                                                       data-td-target="#datetimepicker-hasta" autocomplete="off"/>
+                                                <span class="input-group-text" data-td-target="#datetimepicker-hasta"
+                                                      data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!--begin::Actions-->
+                                        <div class="d-flex justify-content-end mt-10">
+                                            <button type="reset"
+                                                    class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                                    data-kt-menu-dismiss="true"
+                                                    id="btn-reset-filtrar">Reset filters
+                                            </button>
+                                            <button type="submit" class="btn btn-primary fw-semibold px-6"
+                                                    data-kt-menu-dismiss="true" id="btn-filtrar">
+                                                Apply
+                                            </button>
+                                        </div>
+                                        <!--end::Actions-->
+                                    </div>
+                                    <!--end::Content-->
+                                </div>
+                            </div>
+
+                            <!-- new -->
+                            {% if permiso.agregar %}
+                                <button
+                                        type="button"
+                                        id="btn-nuevo-schedule"
+                                        class="btn btn-success me-2"
+                                >
+                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span
+                                                class="path2"></span><span
+                                                class="path3"></span><span class="path4"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">New</span>
+                                </button>
+
+                                <button type="button" id="btn-clonar-schedule-listado"
+                                        class="btn btn-warning me-2 hide">
+                                    <i class="ki-duotone ki-copy"></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Clone</span>
+                                </button>
+                            {% endif %}
+
+                            <!-- delete -->
+                            {% if permiso.eliminar %}
+                                <button
+                                        type="button"
+                                        id="btn-eliminar-schedule"
+                                        class="btn btn-danger me-2 hide"
+                                >
+                                    <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span
+                                                class="path2"></span><span
+                                                class="path3"></span><span class="path4"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Delete</span>
+                                </button>
+                            {% endif %}
+
+                            <!-- export -->
+                            <div>
+                                <!--begin::Export buttons-->
+                                <div id="schedule-table-editable-export" class="d-none"></div>
+                                <!--end::Export buttons-->
+
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
+                                        data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
+                                                class="path2"></span></i>
+                                    <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                                </button>
+
+                                <!--begin::Menu-->
+                                <div id="schedule_export_menu"
+                                     class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                     data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                            Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                            Export to Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                            Export CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="pdf">
+                                            Export to PDF
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="javascript:;" class="menu-link px-3" id="btn-exportar">
+                                            Export Report
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+
+                                <!--begin::Hide default export buttons-->
+                                <div id="schedule-table-editable-buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <!--begin: Datatable -->
+                    <div id="div-lista-schedule" class="hide">
+                        <table id="schedule-table-editable"
+                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                            <thead>
+                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                {% if permiso.eliminar %}
+                                    <th class="w-10px pe-2">
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                            <input class="form-check-input check-select-all" type="checkbox"
+                                                   data-kt-check="true"
+                                                   data-kt-check-target="#schedule-table-editable .form-check-input"
+                                                   value="1"/>
+                                        </div>
+                                    </th>
+                                {% endif %}
+                                <th>Project</th>
+                                <th>Conc. Vendor</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                                <th>Date</th>
+                                <th>Hour</th>
+                                <th>Quantity</th>
+                                <th>Notes</th>
+                                <th class="text-end min-w-100px">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable -->
+
+                    <div class="row mt-5" id="div-calendario">
+                        <div class="col-md-12">
+                            <div id="calendario"></div>
+                        </div>
                     </div>
 
-                    <a href="javascript:;" id="btn-reset-filtrar" class="btn mr-1">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>Reset filters</span>
-                            </span>
-                    </a>
-
-                    <a href="javascript:;" id="btn-calendario" class="btn">
-                        <span><i class="la la-calendar mr-1"></i><span>Hide Calendar</span></span>
-                    </a>
-
-                </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        {% if permiso.agregar %}
-                            <li class="m-portlet__nav-item">
-                                <a id="btn-nuevo-schedule"
-                                   class="btn btn-success btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-plus"></i>
-                                        <span class="m--hidden-mobile">New</span>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li class="m-portlet__nav-item m--hide" id="nav-item-clonar">
-                                <a id="btn-clonar-schedule-listado"
-                                   class="btn btn-warning btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-copy"></i>
-                                        <span class="m--hidden-mobile">Clone</span>
-                                    </span>
-                                </a>
-                            </li>
-
-                        {% endif %}
-                        {% if permiso.eliminar %}
-                            <li class="m-portlet__nav-item m--hide" id="nav-item-eliminar">
-                                <a id="btn-eliminar-schedule"
-                                   class="btn btn-danger btn-icon"
-                                   href="javascript:;">
-                                    <span>
-                                        <i class="la la-trash-o"></i>
-                                        <span class="m--hidden-mobile">Delete</span>
-                                    </span>
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        <li class="m-portlet__nav-item">
-                            <a id="btn-exportar"
-                               class="btn btn-success btn-icon"
-                               href="javascript:;">
-                                    <span>
-                                        <i class="la la-file-excel-o"></i>
-                                        <span class="m--hidden-mobile">Export Excel</span>
-                                    </span>
-                            </a>
-                        </li>
-
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;" m-portlet-tool="fullscreen"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon">
-                                <i class="la la-expand"></i>
-                            </a>
-                        </li>
-                    </ul>
                 </div>
             </div>
-            <div class="m-portlet__body">
-                <!--begin: Search Form -->
-                <div class="form-group m-form__group row align-items-center mb-2">
-                    <div class="col-md-2">
-                        <select class="form-control m-select2" id="filtro-project">
-                            <option value="">Projects</option>
-                            {% for item in projects %}
-                                <option value="{{ item.projectId }}">{{ item.projectNumber }}
-                                    - {{ item.description }}</option>
-                            {% endfor %}
-                        </select>
+
+            <!-- form -->
+            <div id="form-schedule" class="card card-sticky hide">
+                <div class="card-header"
+                     data-kt-sticky="true"
+                     data-kt-sticky-name="form-schedule"
+                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+                     data-kt-sticky-left="auto"
+                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '60px', xl: '60px'}"
+                     data-kt-sticky-animation="false"
+                     data-kt-sticky-zindex="95">
+                    <div class="card-title">
+                        <h3 class="card-label">
+                            New Schedules:
+                        </h3>
                     </div>
-                    <div class="col-md-2">
-                        <select class="form-control m-select2" id="filtro-concrete-vendor">
-                            <option value="">Concrete Vendor</option>
-                            {% for item in concrete_vendors %}
-                                <option value="{{ item.vendorId }}">{{ item.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <div class='input-group date'>
-                            <input type='text' class="form-control m-input date-picker"
-                                   placeholder="From" autocomplete="off" id="fechaInicial"/>
-                            <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="la la-calendar glyphicon-th"></i>
-                                            </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class='input-group date'>
-                            <input type='text' class="form-control m-input date-picker"
-                                   placeholder="To" autocomplete="off" id="fechaFin"/>
-                            <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <i class="la la-calendar glyphicon-th"></i>
-                                            </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="m-input-icon m-input-icon--left">
-                            <input type="text" class="form-control m-input m_form_search"
-                                   placeholder="Search...">
-                            <span class="m-input-icon__icon m-input-icon__icon--left">
-									<span><i class="la la-search"></i></span>
-								</span>
-                        </div>
-                    </div>
-                    <div class="col-md-1">
-                        <a href="javascript:;" id="btn-filtrar"
-                           class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>Search</span>
-                                        </span>
+                    <div class="card-toolbar">
+                        <a href="javascript:;" class="btn btn-secondary cerrar-form-schedule me-2">
+
+                            <i class="ki-duotone ki-arrow-left fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+
+                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
                         </a>
+
+                        {% if permiso.agregar or permiso.editar %}
+                            <button type="button" id="btn-salvar-schedule" class="btn btn-success me-2">
+                                <i class="ki-duotone ki-double-check fs-1 me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
+                            </button>
+
+                            <button type="button" id="btn-clonar" class="btn btn-warning me-2 hide">
+                                <i class="ki-duotone ki-copy"></i>
+                                <span class="kt-hidden-mobile font-weight-bold">Clone Schedule</span>
+                            </button>
+
+                        {% endif %}
+
+                        {% if permiso.eliminar %}
+                            <button type="button" id="btn-delete-modal" class="btn btn-danger me-2 hide">
+                                <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span
+                                            class="path2"></span><span
+                                            class="path3"></span><span class="path4"></span></i>
+                                <span class="kt-hidden-mobile font-weight-bold">Delete</span>
+                            </button>
+                        {% endif %}
+
                     </div>
                 </div>
-                <!--end: Search Form -->
 
+                <form
+                        class="form"
+                        id="schedule-form"
+                        action="javascript:;"
+                        enctype="multipart/form-data"
+                        method="post"
+                >
+                    <input type="hidden" id="schedule_id" name="schedule_id"/>
 
-                <!--begin: Datatable -->
-                <div id="div-lista-schedule" class="m--hide">
-                    <div class="m_datatable" id="schedule-table-editable"></div>
-                </div>
-                <!--end: Datatable -->
+                    <div class="card-body">
 
-                <div class="row mt-5" id="div-calendario">
-                    <div class="col-md-12">
-                        <div id="calendario"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="form-schedule" class="m-portlet m--hide">
-            <div class="m-portlet__head">
-                <div class="m-portlet__head-caption">
-                    <div class="m-portlet__head-title">
-                        <h3 class="m-portlet__head-text" id="form-schedule-title">
-                            Do you want to create a new schedule? Follow the next steps:
-                        </h3>
-                    </div>
-                </div>
-                <div class="m-portlet__head-tools">
-                    <ul class="m-portlet__nav">
-                        <li class="m-portlet__nav-item">
-                            <a href="javascript:;"
-                               class="m-portlet__nav-link m-portlet__nav-link--icon cerrar-form-schedule"><i
-                                        class="la la-close"></i></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <form class="m-form" id="schedule-form" action="#"
-                  enctype="multipart/form-data" method="post">
-
-                <input type="hidden" id="schedule_id" name="schedule_id"/>
-
-                <div class="m-portlet__body">
-
-                    <div class="m-form__section m-form__section--first">
-
-                        <div class="form-group m-form__group ic-form-group">
+                        <div class="form-group ic-form-group">
                             <div class="row">
                                 <div class="col-md-4" id="select-project">
-                                    <label>
+                                    <label class="form-label required">
                                         <span class="ic-step-number">1</span>
                                         Project
-                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="project"
-                                            name="project">
+                                    <select class="form-control form-select form-select2 select-validate form-select-solid event-change"
+                                            id="project" name="project">
                                         <option value="">Select</option>
                                         {% for item in projects %}
                                             <option value="{{ item.projectId }}">{{ item.projectNumber }}
@@ -280,97 +452,105 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4" id="select-contact-project">
-                                    <label>
+                                    <label class="form-label">
                                         Contact Project
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="contact-project"
-                                            name="contactproject">
+                                    <select class="form-control form-select form-select2 select-validate form-select-solid event-change"
+                                            id="contact-project" name="contactproject">
                                         <option value="">Select</option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 m--hide" id="div-day">
-                                    <label>
+                                <div class="col-md-2 hide" id="div-day">
+                                    <label class="form-label required">
                                         Day
-                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker event-change"
-                                               placeholder="Select a date" autocomplete="off"
-                                               id="day" name="day"/>
-                                        <div class="input-group-append">
-                                                    <span class="input-group-text">
-                                                        <i class="la la-calendar glyphicon-th"></i>
-                                                    </span>
-                                        </div>
+                                    <div class="input-group input-group-solid date-picker-filter"
+                                         id="datetimepicker-day" data-td-target-input="nearest"
+                                         data-td-target-toggle="nearest">
+                                        <input type="text" class="form-control filter-date"
+                                               placeholder="Select a date" id="date"
+                                               data-td-target="#datetimepicker-day" autocomplete="off"
+                                               name="day"/>
+                                        <span class="input-group-text" data-td-target="#datetimepicker-day"
+                                              data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 date-new">
-                                    <label>
+                                    <label class="form-label required">
                                         Start Date
-                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker event-change"
-                                               placeholder="Date Start" autocomplete="off"
-                                               id="date-start" name="datestart"/>
-                                        <div class="input-group-append">
-                                                    <span class="input-group-text">
-                                                        <i class="la la-calendar glyphicon-th"></i>
-                                                    </span>
-                                        </div>
+                                    <div class="input-group input-group-solid date-picker-filter"
+                                         id="datetimepicker-start-date" data-td-target-input="nearest"
+                                         data-td-target-toggle="nearest">
+                                        <input type="text" class="form-control filter-date"
+                                               placeholder="Select a date" id="start-date"
+                                               data-td-target="#datetimepicker-start-date" autocomplete="off"
+                                               name="day"/>
+                                        <span class="input-group-text"
+                                              data-td-target="#datetimepicker-start-date"
+                                              data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 date-new">
-                                    <label>
+                                    <label class="form-label required">
                                         Stop Date
-                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker event-change"
-                                               placeholder="Date Stop" autocomplete="off"
-                                               id="date-stop" name="datestop"/>
-                                        <div class="input-group-append">
-                                                    <span class="input-group-text">
-                                                        <i class="la la-calendar glyphicon-th"></i>
-                                                    </span>
-                                        </div>
+                                    <div class="input-group input-group-solid date-picker-filter"
+                                         id="datetimepicker-stop-date" data-td-target-input="nearest"
+                                         data-td-target-toggle="nearest">
+                                        <input type="text" class="form-control filter-date"
+                                               placeholder="Select a date" id="stop-date"
+                                               data-td-target="#datetimepicker-end-date" autocomplete="off"
+                                               name="day"/>
+                                        <span class="input-group-text" data-td-target="#datetimepicker-stop-date"
+                                              data-td-toggle="datetimepicker">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group m-form__group ic-form-group">
+                        <div class="form-group ic-form-group">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label>
+                                    <label class="form-label">
                                         <span class="ic-step-number">2</span>
                                         Work Description
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <input type="text" class="form-control event-change" id="description"
+                                    <input type="text"
+                                           class="form-control form-control-validate form-control-solid event-change"
+                                           id="description"
                                            name="description">
                                 </div>
                                 <div class="col-md-3">
-                                    <label>
+                                    <label class="form-label">
                                         Location
                                         <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i
-                                                        class="flaticon-location"></i></span></div>
-                                        <input type="text" class="form-control event-change" id="location"
-                                               name="location">
-
+                                    <div class="input-group input-group-solid">
+                                                <span class="input-group-text">
+                                                    <i class="ki-duotone ki-geolocation"><span
+                                                                class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                        <input type="text"
+                                               class="form-control form-control-validate event-change"
+                                               id="location" name="location">
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <label>
+                                    <label class="form-label">
                                         Lead
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="employee"
-                                            name="employee" multiple>
+                                    <select class="form-control form-select select-validate form-select-solid event-change"
+                                            id="employee" name="employee" multiple>
                                         <option value="">Select</option>
                                         {% for item in leads %}
                                             <option value="{{ item.employeeId }}">{{ item.name }}</option>
@@ -381,16 +561,15 @@
                             </div>
                         </div>
 
-                        <div class="form-group m-form__group ic-form-group">
+                        <div class="form-group ic-form-group">
                             <div class="row">
                                 <div class="col-md-4" id="select-concrete-vendor">
-                                    <label>
+                                    <label class="form-label">
                                         <span class="ic-step-number">3</span>
                                         Concrete Vendor
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="concrete-vendor"
-                                            name="concretevendor">
+                                    <select class="form-control form-select form-select2 select-validate form-select-solid event-change"
+                                            id="concrete-vendor" name="concretevendor">
                                         <option value="">Select</option>
                                         {% for item in concrete_vendors %}
                                             <option value="{{ item.vendorId }}">{{ item.name }}</option>
@@ -398,11 +577,10 @@
                                     </select>
                                 </div>
                                 <div class="col-md-8" id="select-contact-concrete-vendor">
-                                    <label>
+                                    <label class="form-label">
                                         Contacts Concrete Vendor
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change"
+                                    <select class="form-control form-select select-validate form-select-solid event-change"
                                             id="contact-concrete-vendor" name="contactconcretevendor" multiple>
 
                                     </select>
@@ -410,15 +588,14 @@
                             </div>
                         </div>
 
-                        <div class="form-group m-form__group ic-form-group">
+                        <div class="form-group ic-form-group">
                             <div class="row">
                                 <div class="col-md-3" id="select-hour">
-                                    <label>
+                                    <label class="form-label">
                                         Hour
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <select class="form-control m-select2 event-change" id="hour" name="hour"
-                                            multiple="">
+                                    <select class="form-control form-select select-validate form-select-solid event-change"
+                                            id="hour" name="hour" multiple="">
                                         {% for h in 0..23 %}
                                             {% for m in [0, 15, 30, 45] %}
                                                 {% set hour = "%02d:%02d"|format(h, m) %}
@@ -428,63 +605,40 @@
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label>
+                                    <label class="form-label">
                                         Quantity
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <input type="text" class="form-control" id="quantity" name="quantity">
+                                    <input type="text"
+                                           class="form-control form-control-validate form-control-solid form-control-number event-change"
+                                           id="quantity" name="quantity">
                                 </div>
                                 <div class="col-md-2">
-                                    <label></label>
-                                    <div>
-                                        <label class="m-checkbox">
-                                            <input type="checkbox" id="highpriority" name="highpriority">
+                                    <label class="form-label"></label>
+                                    <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                        <input type="checkbox" id="highpriority" class="form-check-input"/>
+                                        <label class="form-check-label">
                                             High Priority
-                                            <span></span>
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label>
+                                    <label class="form-label">
                                         Notes
-                                        <span class="ic-small italic">(optional)</span>
                                     </label>
-                                    <textarea class="form-control form-control-text" rows="3" id="notes"
-                                              name="notes"> </textarea>
+                                    <textarea class="form-control form-control-validate form-control-solid event-change"
+                                              rows="3" id="notes" name="notes"></textarea>
                                 </div>
-
                             </div>
                         </div>
 
                     </div>
-
-                    <div class="m-form__actions">
-                        {% if permiso.agregar or permiso.editar %}
-                            <button id="btn-salvar-schedule" class="btn btn-success" type="button">
-                                Save
-                            </button>
-
-                            <button id="btn-clonar" class="btn btn-warning m--hide" type="button">
-                                Clone Schedule
-                            </button>
-                        {% endif %}
-
-                        {% if permiso.eliminar %}
-                            <button class="btn btn-danger m--hide" type="button" id="btn-delete-modal">
-                                Delete
-                            </button>
-                        {% endif %}
-
-                        <button class="btn btn-danger cerrar-form-schedule" type="button">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
 
         </div>
-
+        <!--end::Content container-->
     </div>
+    <!--end::Content-->
 
     <!-- modal clonar -->
     <div class="modal fade" id="modal-clonar-schedule" role="dialog" aria-labelledby="myModalLabel">
@@ -495,60 +649,57 @@
                         Clone Schedule
                     </h5>
 
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                         aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
 
                 </div>
                 <div class="modal-body">
                     <form class="m-form" id="clonar-schedule-form" action="#"
                           enctype="multipart/form-data" method="post">
 
-                        <div class="form-group m-form__group">
+                        <div class="form-group">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label>
+                                    <label class="form-label required">
                                         Start Date
-                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker event-change"
-                                               placeholder="Date Start" autocomplete="off"
-                                               id="date-start-clonar" name="datestart"/>
-                                        <div class="input-group-append">
-                                                    <span class="input-group-text">
-                                                        <i class="la la-calendar glyphicon-th"></i>
-                                                    </span>
-                                        </div>
+                                    <div class="input-group input-group-solid date-picker-filter">
+                                        <input type="text" class="form-control filter-date"
+                                               placeholder="Select a date" id="datetimepicker-date-start-clonar" autocomplete="off" name="day"/>
+                                        <span class="input-group-text">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                                </span>
                                     </div>
+
                                 </div>
                                 <div class="col-md-6">
-                                    <label>
+                                    <label class="form-label required">
                                         Stop Date
-                                        <span class="ic-small italic">(required)</span>
                                     </label>
-                                    <div class='input-group date'>
-                                        <input type='text' class="form-control m-input date-picker event-change"
-                                               placeholder="Date Stop" autocomplete="off"
-                                               id="date-stop-clonar" name="datestop"/>
-                                        <div class="input-group-append">
-                                                    <span class="input-group-text">
-                                                        <i class="la la-calendar glyphicon-th"></i>
-                                                    </span>
-                                        </div>
+                                    <div class="input-group input-group-solid date-picker-filter">
+                                        <input type="text" class="form-control filter-date"
+                                               placeholder="Select a date" id="datetimepicker-date-stop-clonar" autocomplete="off" name="day"/>
+                                        <span class="input-group-text">
+                                                  <i class="ki-duotone ki-calendar fs-2"><span
+                                                              class="path1"></span><span class="path2"></span></i>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group m-form__group">
+                        <div class="form-group">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" id="highpriority-clonar" name="highpriority">
-                                        High Priority
-                                        <span></span>
-                                    </label>
+                                    <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                        <input type="checkbox" id="highpriority-clonar" class="form-check-input"/>
+                                        <label class="form-check-label">
+                                            High Priority
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -588,10 +739,16 @@
         })
         ({key: "{{ google_maps_api_key }}", v: "weekly"});</script>
 
+    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+
+    <!-- datatable fixed column -->
+    <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+
     <!-- calendario -->
     <script src="{{ asset('bundles/metronic8/plugins/moment/moment.min.js') }}"></script>
     <script src="{{ asset('bundles/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/plugins/fullcalendar/fullcalendar.bundle.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
 
     <script src="{{ asset('bundles/metronic8/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
@@ -603,7 +760,6 @@
         };
 
         var holidays = {{ holidays|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
-        console.log(holidays);
 
         jQuery(document).ready(function () {
             Schedules.init();
