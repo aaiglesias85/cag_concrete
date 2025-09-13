@@ -44,11 +44,11 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     ): array
     {
         $qb = $this->createQueryBuilder('s_e')
-            ->leftJoin('s_s_e.subcontractor', 's');
+            ->leftJoin('s_e.subcontractor', 's');
 
         // Filtrar por búsqueda
         if ($sSearch) {
-            $qb->andWhere('s_s_e.name LIKE :search OR s_s_e.position LIKE :search')
+            $qb->andWhere('s_e.name LIKE :search OR s_e.position LIKE :search')
                 ->setParameter('search', '%' . $sSearch . '%');
         }
 
@@ -58,7 +58,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
                 ->setParameter('subcontractorId', $subcontractorId);
         }
 
-        return $qb->orderBy('s_s_e.' . $sortColumn, $sortDirection)
+        return $qb->orderBy('s_e.' . $sortColumn, $sortDirection)
             ->setFirstResult($start)
             ->setMaxResults($limit)
             ->getQuery()
@@ -73,12 +73,12 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     public function TotalEmployees(?string $sSearch = null, ?int $subcontractorId = null): int
     {
         $qb = $this->createQueryBuilder('s_e')
-            ->select('COUNT(s_s_e.employeeId)')
-            ->leftJoin('s_s_e.subcontractor', 's');
+            ->select('COUNT(s_e.employeeId)')
+            ->leftJoin('s_e.subcontractor', 's');
 
         // Filtrar por búsqueda
         if ($sSearch) {
-            $qb->andWhere('s_s_e.name LIKE :search OR s_s_e.position LIKE :search')
+            $qb->andWhere('s_e.name LIKE :search OR s_e.position LIKE :search')
                 ->setParameter('search', '%' . $sSearch . '%');
         }
 
@@ -106,7 +106,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
             'hourlyRate' => 's_s_e.hourlyRate',
             'position' => 's_s_e.position'
         ];
-        $orderBy = $sortable[$sortColumn] ?? 's_e.name';
+        $orderBy = $sortable[$sortColumn] ?? 's_s_e.name';
         $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
