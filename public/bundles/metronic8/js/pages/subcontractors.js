@@ -733,8 +733,10 @@ var Subcontractors = function () {
         });
 
         // Flatpickr SOLO FECHA (sin horas)
+        const modalElNotes = document.getElementById('modal-notes');
         FlatpickrUtil.initDate('datetimepicker-notes-date', {
-            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'}
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: modalElNotes
         });
         // set default date (hoy)
         FlatpickrUtil.setDate('datetimepicker-notes-date', new Date());

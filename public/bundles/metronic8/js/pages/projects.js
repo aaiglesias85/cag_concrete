@@ -169,7 +169,7 @@ var Projects = function () {
                     var html = '';
                     if (data != null) {
                         html = `<div class="w-400px">${row.nota.nota} <span class="badge badge-primary">${row.nota.date}</span>
-                            <i class="ki-duotone ki-notepad-edit fs-2" data-id="${row.id}" 
+                            <i class="ki-duotone ki-notepad-edit fs-2 editar-notas" data-id="${row.id}" 
                                 data-projectnumber="${row.projectNumber}" data-projectname="${row.name}"
                                 data-notaid="${row.nota.id}" style="cursor:pointer;" title="Edit notes">
                              <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i> 
@@ -237,7 +237,7 @@ var Projects = function () {
                         var html = '';
                         if (data != null) {
                             html = `<div class="w-400px">${row.nota.nota} <span class="badge badge-primary">${row.nota.date}</span>
-                            <i class="ki-duotone ki-notepad-edit fs-2" data-id="${row.id}" 
+                            <i class="ki-duotone ki-notepad-edit fs-2 editar-notas" data-id="${row.id}" 
                                 data-projectnumber="${row.projectNumber}" data-projectname="${row.name}"
                                 data-notaid="${row.nota.id}" style="cursor:pointer;" title="Edit notes">
                              <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i> 
@@ -1262,13 +1262,17 @@ var Projects = function () {
         });
 
         // notes date
+        const modalElNotes = document.getElementById('modal-notes');
         FlatpickrUtil.initDate('datetimepicker-notes-date', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: modalElNotes
         });
 
         // ajuste precio day
+        const modalElAjustes = document.getElementById('modal-ajuste-precio');
         FlatpickrUtil.initDate('datetimepicker-ajuste-precio-day', {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
+            container: modalElAjustes
         });
 
     }
@@ -2075,7 +2079,7 @@ var Projects = function () {
 
             BlockUtil.block('#lista-notes');
 
-            axios.post("subcontractor/eliminarNotes", formData, {responseType: "json"})
+            axios.post("project/eliminarNotes", formData, {responseType: "json"})
                 .then(function (res) {
                     if (res.status === 200 || res.status === 201) {
                         var response = res.data;
@@ -2139,7 +2143,7 @@ var Projects = function () {
 
             BlockUtil.block('#lista-notes');
 
-            axios.post("subcontractor/eliminarNotesDate", formData, {responseType: "json"})
+            axios.post("project/eliminarNotesDate", formData, {responseType: "json"})
                 .then(function (res) {
                     if (res.status === 200 || res.status === 201) {
                         var response = res.data;
@@ -2176,7 +2180,7 @@ var Projects = function () {
 
         BlockUtil.block('#modal-notes .modal-content');
 
-        axios.post("subcontractor/cargarDatosNotes", formData, {responseType: "json"})
+        axios.post("project/cargarDatosNotes", formData, {responseType: "json"})
             .then(function (res) {
                 if (res.status === 200 || res.status === 201) {
                     var response = res.data;
