@@ -197,15 +197,17 @@ class UsuarioController extends AbstractController
 
         $telefono = $request->get('telefono');
 
+        $estimator = $request->get('estimator');
+
         $resultadoJson = array();
 
         try {
             if ($usuario_id == "") {
                 $resultado = $this->usuarioService->SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos,
-                    $email, $permisos, $telefono);
+                    $email, $permisos, $telefono, $estimator);
             } else {
                 $resultado = $this->usuarioService->ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre,
-                    $apellidos, $email, $permisos, $telefono);
+                    $apellidos, $email, $permisos, $telefono, $estimator);
             }
 
             if ($resultado['success']) {

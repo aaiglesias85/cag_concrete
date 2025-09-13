@@ -1161,6 +1161,7 @@ var Estimates = function () {
 
         $('#estimator').select2({
             multiple: true,
+            placeholder: 'Select estimators',
             templateResult: function (data) {
                 if (!data.element) return data.text;
 

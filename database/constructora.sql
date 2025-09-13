@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 22-08-2025 a las 19:19:12
+-- Tiempo de generación: 13-09-2025 a las 14:59:08
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -1222,6 +1222,7 @@ CREATE TABLE `project` (
   `project_number` varchar(50) DEFAULT NULL,
   `proposal_number` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `owner` varchar(255) DEFAULT NULL,
   `subcontract` varchar(255) DEFAULT NULL,
@@ -1249,10 +1250,10 @@ CREATE TABLE `project` (
 -- Volcado de datos para la tabla `project`
 --
 
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
-(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', 1, 1, NULL),
-(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', 1, 1, NULL),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', 3, 1, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `created_at`, `updated_at`, `company_id`, `inspector_id`, `county_id`) VALUES
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', 1, 1, NULL),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', 1, 1, NULL),
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', 3, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -1679,6 +1680,7 @@ CREATE TABLE `user` (
   `email` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `status` tinyint(1) DEFAULT NULL,
+  `estimator` tinyint(1) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -1689,8 +1691,8 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `phone`, `created_at`, `updated_at`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', 1);
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `phone`, `created_at`, `updated_at`, `rol_id`) VALUES
+(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', 1);
 
 -- --------------------------------------------------------
 

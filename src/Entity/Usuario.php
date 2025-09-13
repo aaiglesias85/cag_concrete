@@ -33,6 +33,9 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: "status", type: "boolean", nullable: true)]
     private ?bool $habilitado;
 
+    #[ORM\Column(name: "estimator", type: "boolean", nullable: true)]
+    private ?bool $estimator;
+
     #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
     private ?\DateTime $createdAt;
 
@@ -234,5 +237,15 @@ class Usuario implements UserInterface, EquatableInterface
     public function isUser(): bool
     {
         return $this->rol && $this->rol->getRolId() === 2;
+    }
+
+    public function getEstimator(): ?bool
+    {
+        return $this->estimator;
+    }
+
+    public function setEstimator(?bool $estimator): void
+    {
+        $this->estimator = $estimator;
     }
 }

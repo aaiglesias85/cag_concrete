@@ -18,7 +18,7 @@ class UsuarioRepository extends ServiceEntityRepository
      *
      * @return Usuario[]
      */
-    public function ListarOrdenados($search = "", $perfil_id = ''): array
+    public function ListarOrdenados($search = "", $perfil_id = '', $estimator = ''): array
     {
         $qb = $this->createQueryBuilder('u')
             ->leftJoin('u.rol', 'r');
@@ -33,6 +33,12 @@ class UsuarioRepository extends ServiceEntityRepository
         if ($perfil_id !== "") {
             $qb->andWhere('r.rolId = :perfil_id')
                 ->setParameter('perfil_id', $perfil_id);
+        }
+
+        // Filtro por estimator
+        if ($estimator !== "") {
+            $qb->andWhere('u.estimator = :estimator')
+                ->setParameter('estimator', $estimator);
         }
 
         $qb->andWhere('u.habilitado = 1');

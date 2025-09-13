@@ -68,7 +68,7 @@ class EstimateController extends AbstractController
 
                 // estimators
                 $estimators = $this->estimateService->getDoctrine()->getRepository(Usuario::class)
-                    ->ListarOrdenados("", 1);
+                    ->ListarOrdenados("", '', 1);
 
                 // plan downloadings
                 $plan_downloadings = $this->estimateService->getDoctrine()->getRepository(PlanDownloading::class)

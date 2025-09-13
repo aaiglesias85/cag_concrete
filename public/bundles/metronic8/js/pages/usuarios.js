@@ -302,6 +302,7 @@ var Usuarios = function () {
         KTUtil.triggerEvent(KTUtil.get("perfil"), "change");
 
         KTUtil.get("estadoactivo").checked = true;
+        KTUtil.get("estimator").checked = false;
 
         //Permisos
         permisos = [];
@@ -602,6 +603,9 @@ var Usuarios = function () {
                 var estado = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("habilitado", estado);
 
+                var estimator = ($('#estimator').prop('checked')) ? 1 : 0;
+                formData.set("estimator", estimator);
+
                 var telefono = $('#telefono').val();
                 formData.set("telefono", telefono);
 
@@ -707,6 +711,7 @@ var Usuarios = function () {
                 $('#telefono').val(usuario.telefono);
 
                 $('#estadoactivo').prop('checked', usuario.habilitado);
+                $('#estimator').prop('checked', usuario.estimator);
 
                 permisos = usuario.permisos;
                 marcarPermisos();
