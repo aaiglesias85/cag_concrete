@@ -11,20 +11,16 @@ var ModalReminder = function () {
         initSelectUsuario();
 
         // Flatpickr SOLO FECHA (sin horas)
+        const modalEl = document.getElementById('modal-reminder');
         FlatpickrUtil.initDate('datetimepicker-day-reminder-modal', {
-            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: modalEl
         });
         // set default date (hoy)
         FlatpickrUtil.setDate('datetimepicker-day-reminder-modal', new Date());
 
         // Quill SIN variables: se gestiona por selector
         QuillUtil.init('#body-reminder-modal');
-
-        // Modal con ModalUtil y foco al abrir
-        ModalUtil.init('modal-reminder', { backdrop: 'static', keyboard: true });
-        ModalUtil.on('modal-reminder', 'shown.bs.modal', function () {
-            QuillUtil.focus('#body-reminder-modal');
-        });
     };
 
     var initSelectUsuario = function () {
