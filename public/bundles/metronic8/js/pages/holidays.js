@@ -213,7 +213,7 @@ var Holidays = function () {
         });
 
         // Función para seleccionar todas las filas
-        $(`${table} .check-select-all`).on('click', function () {
+        $(`.check-select-all`).on('click', function () {
             if (!tableSelectAll) {
                 oTable.rows().select(); // Selecciona todas las filas
             } else {
@@ -224,7 +224,7 @@ var Holidays = function () {
     }
     var resetSelectRecords = function (table) {
         tableSelectAll = false;
-        $(`${table} .check-select-all`).prop('checked', false);
+        $(`.check-select-all`).prop('checked', false);
         actualizarRecordsSeleccionados();
     }
     var actualizarRecordsSeleccionados = function () {

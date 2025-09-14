@@ -620,7 +620,7 @@ var Schedules = function () {
     }
     var resetSelectRecords = function (table) {
         tableSelectAll = false;
-        $(`${table} .check-select-all`).prop('checked', false);
+        $(`.check-select-all`).prop('checked', false);
         actualizarRecordsSeleccionados();
     }
     var actualizarRecordsSeleccionados = function () {
