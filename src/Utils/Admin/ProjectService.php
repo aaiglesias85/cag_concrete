@@ -22,6 +22,9 @@ use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectNotes;
 use App\Entity\ProjectPriceAdjustment;
+use App\Entity\Schedule;
+use App\Entity\ScheduleConcreteVendorContact;
+use App\Entity\ScheduleEmployee;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
 use App\Utils\Base;
@@ -1254,6 +1257,30 @@ class ProjectService extends Base
     private function EliminarInformacionDeProject($project_id)
     {
         $em = $this->getDoctrine()->getManager();
+
+        // schedules
+        $schedules = $this->getDoctrine()->getRepository(Schedule::class)
+            ->ListarSchedulesDeProject($project_id);
+        foreach ($schedules as $schedule) {
+            $schedule_id = $schedule->getScheduleId();
+
+            // contacts
+            $schedules_contact = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
+                ->ListarContactosDeSchedule($schedule_id);
+            foreach ($schedules_contact as $schedule_contact) {
+                $em->remove($schedule_contact);
+            }
+
+            // employees
+            $schedules_employees = $this->getDoctrine()->getRepository(ScheduleEmployee::class)
+                ->ListarEmployeesDeSchedule($schedule_id);
+            foreach ($schedules_employees as $schedules_employee) {
+                $em->remove($schedules_employee);
+            }
+
+            $em->remove($schedule);
+        }
+
 
         // invoices
         $invoices = $this->getDoctrine()->getRepository(Invoice::class)
