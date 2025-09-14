@@ -1057,7 +1057,7 @@ class ProjectService extends Base
             $arreglo_resultado['proposal_number'] = $entity->getProposalNumber();
             $arreglo_resultado['project_id_number'] = $entity->getProjectIdNumber();
 
-            $arreglo_resultado['vendor_id'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId(): '';
+            $arreglo_resultado['vendor_id'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId() : '';
             $arreglo_resultado['concrete_vendor'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getName() : '';
             $arreglo_resultado['concrete_quote_price'] = $entity->getConcreteQuotePrice() ?? '';
             $arreglo_resultado['concrete_quote_price_escalator'] = $entity->getConcreteQuotePriceEscalator() ?? '';
@@ -1721,6 +1721,8 @@ class ProjectService extends Base
                     'notes' => 'Change concrete quote price, old value: ' . $entity->getConcreteQuotePrice(),
                     'date' => new \DateTime()
                 ];
+
+                $entity->setUpdatedAtConcreteQuotePrice(new \DateTime());
             }
             $entity->setConcreteQuotePrice($concrete_quote_price);
 
@@ -1864,6 +1866,10 @@ class ProjectService extends Base
         $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
         $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
         $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
+
+        if ($concrete_quote_price !== '') {
+            $entity->setUpdatedAtConcreteQuotePrice(new \DateTime());
+        }
 
         $entity->setCreatedAt(new \DateTime());
 

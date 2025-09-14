@@ -52,6 +52,10 @@ cronajusteprecio:
   path:  /cron-price-adjustment
   defaults: { _controller: App\Controller\ScriptController::cronajusteprecio }
 
+cronajusteconcretequoteprecio:
+  path:  /cron-concrete-quote-price-adjustment
+  defaults: { _controller: App\Controller\ScriptController::cronajusteconcretequoteprecio }
+
 #scripts
 definirpendingdatatracking:
   path:  /definir-pending-datatracking

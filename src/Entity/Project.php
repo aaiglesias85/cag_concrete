@@ -110,6 +110,9 @@ class Project
     #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id')]
     private ?ConcreteVendor $concreteVendor;
 
+    #[ORM\Column(name: 'updated_at_concrete_quote_price', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAtConcreteQuotePrice;
+
     public function getProjectId(): ?int
     {
         return $this->projectId;
@@ -423,6 +426,16 @@ class Project
     public function setConcreteQuotePriceEscalator(?float $concreteQuotePriceEscalator): void
     {
         $this->concreteQuotePriceEscalator = $concreteQuotePriceEscalator;
+    }
+
+    public function getUpdatedAtConcreteQuotePrice(): ?\DateTimeInterface
+    {
+        return $this->updatedAtConcreteQuotePrice;
+    }
+
+    public function setUpdatedAtConcreteQuotePrice(?\DateTimeInterface $updatedAtConcreteQuotePrice): void
+    {
+        $this->updatedAtConcreteQuotePrice = $updatedAtConcreteQuotePrice;
     }
 
 

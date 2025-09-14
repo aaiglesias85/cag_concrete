@@ -87,4 +87,11 @@ class ScriptController extends AbstractController
 
         return new Response('OK', 200);
     }
+
+    public function cronajusteconcretequoteprecio()
+    {
+        $this->scriptService->CronAjustePrecioConcreteVendor();
+
+        return new Response('OK', 200);
+    }
 }

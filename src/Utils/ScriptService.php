@@ -25,6 +25,119 @@ class ScriptService extends Base
 {
 
     /**
+     * CronAjustePrecioConcreteVendor
+     * - Sube el precio cuando hayan pasado N periodos desde updatedAtConcreteQuotePrice.
+     * - Si updatedAtConcreteQuotePrice es null, usa startDate (o createdAt).
+     */
+    public function CronAjustePrecioConcreteVendor()
+    {
+        $em  = $this->getDoctrine()->getManager();
+        $now = new \DateTimeImmutable('now');
+
+        $this->writelog("CronAjustePrecioConcreteVendor: " . $now->format('Y-m-d H:i:s'));
+
+        $projects = $em->getRepository(Project::class)->findAll();
+
+        foreach ($projects as $project) {
+            $price      = $project->getConcreteQuotePrice();             // decimal
+            $escalator  = $project->getConcreteQuotePriceEscalator();    // decimal (fijo)
+            $everyN     = $project->getConcreteTimePeriodEveryN();       // int
+            $unit       = $project->getConcreteTimePeriodUnit();         // 'day'|'month'|'year'
+
+            if (!$price || !$escalator || !$everyN || !$unit) {
+                continue; // faltan datos
+            }
+
+            // Ancla para contar periodos
+            $last = $project->getUpdatedAtConcreteQuotePrice();
+            if (!$last) {
+                continue;
+            }
+
+            // Normalizar a inmutable
+            $last = $last instanceof \DateTimeImmutable ? $last : \DateTimeImmutable::createFromMutable(clone $last);
+
+            // Intervalo segun unidad
+            $step = $this->makeInterval($unit, (int) $everyN);
+            if (!$step) {
+                continue; // unidad desconocida
+            }
+
+            // ¿Cuántos periodos completos pasaron?
+            [$periods, $lastBoundary] = $this->periodsPassed($last, $now, $step);
+
+            if ($periods <= 0) {
+                continue; // nada que hacer
+            }
+
+            // Aplicar incrementos (fijo). Si fuera %: $price *= pow(1+$escalator, $periods);
+            $newPrice = round($price + ($escalator * $periods), 2);
+
+            $project->setConcreteQuotePrice($newPrice);
+
+            // Importante: mover updatedAt al último límite alcanzado (no a "ahora")
+            $project->setUpdatedAtConcreteQuotePrice(\DateTime::createFromImmutable($lastBoundary));
+
+            $this->writelog(sprintf(
+                'Project %s: +%s x %d → %s (last=%s)',
+                (string) $project->getProjectId(),
+                number_format($escalator, 2, '.', ''),
+                $periods,
+                number_format($newPrice, 2, '.', ''),
+                $lastBoundary->format('Y-m-d')
+            ));
+        }
+
+        $em->flush();
+    }
+
+    /** Devuelve DateInterval según unidad/eachN */
+    private function makeInterval(string $unit, int $n): ?\DateInterval
+    {
+        $n = max(1, $n);
+        switch (strtolower($unit)) {
+            case 'day':
+            case 'days':
+                return new \DateInterval('P' . $n . 'D');
+            case 'month':
+            case 'months':
+                return new \DateInterval('P' . $n . 'M');
+            case 'year':
+            case 'years':
+                return new \DateInterval('P' . $n . 'Y');
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Cuenta periodos completos desde $from hasta $to y devuelve:
+     *  - [0] cantidad de periodos
+     *  - [1] última frontera alcanzada (from + k*step <= to)
+     *
+     * @return array{0:int,1:\DateTimeImmutable}
+     */
+    private function periodsPassed(\DateTimeImmutable $from, \DateTimeImmutable $to, \DateInterval $step): array
+    {
+        if ($to <= $from) {
+            return [0, $from];
+        }
+        $count  = 0;
+        $cursor = $from;
+        while (true) {
+            $next = $cursor->add($step);
+            if ($next > $to) {
+                break;
+            }
+            $cursor = $next;
+            $count++;
+            if ($count > 1000) { break; } // guarda por si acaso
+        }
+        return [$count, $cursor];
+    }
+
+
+    /**
      * DefinirItemPrincipal
      */
     public function DefinirItemPrincipal()
