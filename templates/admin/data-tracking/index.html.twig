@@ -108,8 +108,9 @@
                                             <select class="form-select form-select2 form-select-solid fw-bold" id="project">
                                                 <option value="">Project</option>
                                                 {% for item in projects %}
-                                                    <option value="{{ item.projectId }}">{{ item.projectNumber }}
-                                                        - {{ item.description }}</option>
+                                                    <option value="{{ item.projectId }}" data-vendor="{{ item.concreteVendor ? item.concreteVendor.vendorId : '' }}">
+                                                        {{ item.projectNumber }} - {{ item.description }}
+                                                    </option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -954,6 +955,13 @@
                                             <!-- Filtros -->
                                             <div class="d-flex flex-wrap align-items-center gap-3">
 
+                                                <div class="input-group input-group-solid w-300px hide" id="div-project_concrete_vendor">
+                                                    <span class="input-group-text" id="project_concrete_vendor"></span>
+                                                    <input type="text"
+                                                           class="form-control form-control-validate event-change"
+                                                           id="project_concrete_quote_price" disabled>
+                                                </div>
+
                                                 <div class="input-group input-group-solid w-300px">
                                                     <span class="input-group-text">Total $:</span>
                                                     <input type="text"
@@ -1741,6 +1749,13 @@
 
                                             <!-- Filtros -->
                                             <div class="d-flex flex-wrap align-items-center gap-3">
+
+                                                <div class="input-group input-group-solid w-300px hide" id="div-project_concrete_vendor-detalle">
+                                                    <span class="input-group-text" id="project_concrete_vendor-detalle"></span>
+                                                    <input type="text"
+                                                           class="form-control form-control-validate event-change"
+                                                           id="project_concrete_quote_price-detalle" disabled>
+                                                </div>
 
                                                 <div class="input-group input-group-solid w-300px">
                                                     <span class="input-group-text">Total $:</span>

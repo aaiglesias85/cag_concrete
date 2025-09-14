@@ -2683,8 +2683,15 @@ var Projects = function () {
             {
                 targets: 0,
                 render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 100);
-                }
+
+                    const concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
+
+                    const icon = concrete_quote_price && concrete_quote_price < row.total_concrete ? '<i class="ki-duotone ki-arrow-up-right fs-2 text-danger me-2">\n' +
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path1"></span>\n' +
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path2"></span>\n' +
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</i>': ''
+                    return `<div class="w-150px">${data} ${icon}</div>`;
+                },
             },
             {
                 targets: 1,
@@ -2790,7 +2797,10 @@ var Projects = function () {
             // marcar pending
             createdRow: (row, data, index) => {
                 // console.log(data);
-                if (data.pending === 1) {
+
+                const concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
+
+                if (data.pending === 1 || (concrete_quote_price && concrete_quote_price < data.total_concrete)) {
                     $(row).addClass('row-pending');
                 }
             }

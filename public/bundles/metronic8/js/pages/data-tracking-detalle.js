@@ -24,6 +24,7 @@ var DataTrackingDetalle = function () {
         // conc vendors
         conc_vendors = [];
         actualizarTableListaConcVendors();
+        $('#div-project_concrete_vendor-detalle').removeClass('hide').addClass('hide');
 
         // subcontracts
         subcontracts = [];
@@ -202,6 +203,7 @@ var DataTrackingDetalle = function () {
         });
     };
 
+    var project_vendor_id = '';
     var editRow = function (data_tracking_id) {
 
         var formData = new URLSearchParams();
@@ -274,15 +276,19 @@ var DataTrackingDetalle = function () {
 
             // conc vendors
             conc_vendors = data_tracking.conc_vendors;
-            actualizarTableListaConcVendors();
+
+            project_vendor_id = data_tracking.project_vendor_id;
+            if(data_tracking.project_concrete_vendor !== ''){
+                $('#div-project_concrete_vendor-detalle').removeClass('hide');
+                $('#project_concrete_vendor-detalle').html(data_tracking.project_concrete_vendor);
+                $('#project_concrete_quote_price-detalle').val(`$${MyApp.formatearNumero(data_tracking.project_concrete_quote_price, 2, '.', ',')}`);
+            }
 
             // subcontracts
             subcontracts = data_tracking.subcontracts;
-            actualizarTableListaSubcontracts();
 
             // archivos
             archivos = data_tracking.archivos;
-            actualizarTableListaArchivos();
 
             // totals
             $('#total_concrete_yiel-detalle').val(MyApp.formatearNumero(data_tracking.total_concrete_yiel, 2, '.', ','));
@@ -592,6 +598,16 @@ var DataTrackingDetalle = function () {
         // column defs
         let columnDefs = [
             {
+                targets: 0,
+                render: function (data, type, row) {
+                    const icon = isTotalMayorConcPrice() ? '<i class="ki-duotone ki-arrow-up-right fs-2 text-danger me-2">\n' +
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path1"></span>\n' +
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path2"></span>\n' +
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</i>': ''
+                    return `<div class="w-400px">${data} ${icon}</div>`;
+                },
+            },
+            {
                 targets: 1,
                 render: function (data, type, row) {
                     return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
@@ -625,6 +641,21 @@ var DataTrackingDetalle = function () {
             columns: columns,
             columnDefs: columnDefs,
             language: language,
+            // marcar secondary
+            createdRow: (row, data, index) => {
+                // console.log(data);
+
+                // verificar el total
+                if (isTotalMayorConcPrice()) {
+                    $(row).addClass('row-price-vendor');
+                    return;
+                }
+
+                // verificar el vendor
+                if (project_vendor_id && data.id != project_vendor_id) {
+                    $(row).addClass('row-incorrect-vendor');
+                }
+            }
         });
 
         handleSearchDatatableConcVendor();
@@ -655,6 +686,18 @@ var DataTrackingDetalle = function () {
         }
 
         return total;
+    }
+
+    var isTotalMayorConcPrice = function () {
+        var is_mayor = false;
+
+        var total = calcularTotalConcPrice();
+        var price = NumberUtil.getNumericValue('#project_concrete_quote_price-detalle');
+        if (price && total > price) {
+            is_mayor = true;
+        }
+
+        return is_mayor;
     }
 
     // subcontracts

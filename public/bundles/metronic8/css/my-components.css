@@ -488,12 +488,21 @@ div.tagsinput.has-error {
 }
 
 .row-pending > td {
-    background: #FFB38C !important;
+    background: #FFE1D1 !important;
 }
 
 .row-secondary > td {
     background: #E6F2FF !important;
 }
+
+.row-incorrect-vendor > td {
+    background: #FFFCE6 !important;
+}
+
+.row-price-vendor > td {
+    background: #FFE1D1 !important;
+}
+
 table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n+1):not(.row-pending) > * {
     box-shadow: none;
 }

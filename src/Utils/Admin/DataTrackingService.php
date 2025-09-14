@@ -303,6 +303,10 @@ class DataTrackingService extends Base
             $arreglo_resultado['project_name'] = $entity->getProject()->getName();
             $arreglo_resultado['project_description'] = $entity->getProject()->getDescription();
 
+            $arreglo_resultado['project_vendor_id'] = $entity->getProject()->getConcreteVendor() != null ? $entity->getProject()->getConcreteVendor()->getVendorId(): '';
+            $arreglo_resultado['project_concrete_vendor'] = $entity->getProject()->getConcreteVendor() != null ? $entity->getProject()->getConcreteVendor()->getName() : '';
+            $arreglo_resultado['project_concrete_quote_price'] = $entity->getProject()->getConcreteQuotePrice() ?? '';
+
             $arreglo_resultado['date'] = $entity->getDate()->format('m/d/Y');
             $arreglo_resultado['inspector_id'] = $entity->getInspector() != null ? $entity->getInspector()->getInspectorId() : '';
             $arreglo_resultado['station_number'] = $entity->getStationNumber();
