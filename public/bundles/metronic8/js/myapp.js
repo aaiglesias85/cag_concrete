@@ -1027,27 +1027,8 @@ var MyApp = function () {
 
     // convertir a fecha
     var convertirStringAFecha = function (fecha) {
-
-        var fecha_array = fecha.split("/");
-
-        var year = fecha_array[2];
-        var mouth = fecha_array[0] - 1;
-        var day = fecha_array[1];
-
-        var objectDate = new Date(year, mouth, day);
-
-        return objectDate;
-    };
-
-    // convertir a fecha
-    var convertirStringAFecha = function (fecha) {
-        var fecha_array = fecha.split("/");
-
-        var year = fecha_array[2];
-        var month = fecha_array[0] - 1; // OJO: mes empieza en 0
-        var day = fecha_array[1];
-
-        return new Date(year, month, day);
+        const [month, day, year] = fecha.split('/').map(Number); // MM/DD/YYYY
+        return new Date(year, month - 1, day);
     };
 
     // convertir a fecha y hora

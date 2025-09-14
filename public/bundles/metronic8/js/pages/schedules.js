@@ -106,7 +106,7 @@ var Schedules = function () {
         // poner fecha del filtro inicial si lo selecciono, esto para que el calendario empiece ahi
         var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
         if (fechaInicial !== "") {
-            todayDate = MyApp.convertirStringAFecha(fechaInicial);
+            todayDate = moment(MyApp.convertirStringAFecha(fechaInicial)).startOf('day');
             TODAY = todayDate.format('YYYY-MM-DD'); // <-- usa formato válido
         }
 
@@ -532,7 +532,7 @@ var Schedules = function () {
         });
     }
     var exportButtons = () => {
-        const documentTitle = 'Data Tracking';
+        const documentTitle = 'Schedules';
         var table = document.querySelector('#schedule-table-editable');
         // Excluir la columna de check y acciones
         var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
@@ -571,7 +571,7 @@ var Schedules = function () {
         }).container().appendTo($('#schedule-table-editable-buttons'));
 
         // Hook dropdown menu click event to datatable export buttons
-        const exportButtons = document.querySelectorAll('#data_tracking_export_menu [data-kt-export]');
+        const exportButtons = document.querySelectorAll('#schedule_export_menu [data-kt-export]');
         exportButtons.forEach(exportButton => {
             exportButton.addEventListener('click', e => {
                 e.preventDefault();
