@@ -9,3 +9,5 @@ ALTER TABLE `project` ADD `concrete_quote_price_escalator` DECIMAL(18,2) NULL AF
 
 ALTER TABLE `project` ADD `concrete_time_period_every_n` INT(11) NULL AFTER `concrete_quote_price_escalator`,
     ADD `concrete_time_period_unit` ENUM('day','month','year','') NULL AFTER `concrete_time_period_every_n`;
+
+ALTER TABLE `project` ADD `updated_at_concrete_quote_price` DATETIME NULL AFTER `updated_at`;
