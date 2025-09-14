@@ -1060,6 +1060,7 @@ class ProjectService extends Base
             $arreglo_resultado['vendor_id'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId(): '';
             $arreglo_resultado['concrete_vendor'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getName() : '';
             $arreglo_resultado['concrete_quote_price'] = $entity->getConcreteQuotePrice() ?? '';
+            $arreglo_resultado['concrete_quote_price_escalator'] = $entity->getConcreteQuotePriceEscalator() ?? '';
             $arreglo_resultado['concrete_time_period_every_n'] = $entity->getConcreteTimePeriodEveryN() ?? '';
             $arreglo_resultado['concrete_time_period_unit'] = $entity->getConcreteTimePeriodUnit() ?? '';
 
@@ -1442,7 +1443,7 @@ class ProjectService extends Base
     public function ActualizarProject($project_id, $company_id, $inspector_id, $number, $name, $description, $location,
                                       $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                       $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount, $proposal_number, $project_id_number,
-                                      $items, $contacts, $ajustes_precio, $archivos, $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit)
+                                      $items, $contacts, $ajustes_precio, $archivos, $vendor_id, $concrete_quote_price, $concrete_quote_price_escalator, $concrete_time_period_every_n, $concrete_time_period_unit)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1723,6 +1724,14 @@ class ProjectService extends Base
             }
             $entity->setConcreteQuotePrice($concrete_quote_price);
 
+            if ($concrete_quote_price_escalator != $entity->getConcreteQuotePriceEscalator()) {
+                $notas[] = [
+                    'notes' => 'Change concrete quote price escalator, old value: ' . $entity->getConcreteQuotePriceEscalator(),
+                    'date' => new \DateTime()
+                ];
+            }
+            $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
+
             if ($concrete_time_period_every_n != $entity->getConcreteTimePeriodEveryN()) {
                 $notas[] = [
                     'notes' => 'Change concrete time periodo every n, old value: ' . $entity->getConcreteTimePeriodEveryN(),
@@ -1779,7 +1788,7 @@ class ProjectService extends Base
                                   $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                   $certified_payrolls, $start_date, $end_date, $due_date,
                                   $contract_amount, $proposal_number, $project_id_number, $items, $contacts,
-                                  $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit)
+                                  $vendor_id, $concrete_quote_price, $concrete_quote_price_escalator, $concrete_time_period_every_n, $concrete_time_period_unit)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1852,6 +1861,7 @@ class ProjectService extends Base
         }
 
         $entity->setConcreteQuotePrice($concrete_quote_price);
+        $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
         $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
         $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
 

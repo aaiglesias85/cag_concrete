@@ -140,6 +140,7 @@ var ProjectsDetalle = function () {
             $('#concrete-vendor-detalle').trigger('change');
 
             $('#concrete_quote_price-detalle').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
+            $('#concrete_quote_price_escalator-detalle').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
 
             $('#tp-every-n-detalle').val(project.concrete_time_period_every_n);
 

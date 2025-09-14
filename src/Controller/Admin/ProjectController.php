@@ -156,6 +156,7 @@ class ProjectController extends AbstractController
 
         $vendor_id = $request->get('vendor_id');
         $concrete_quote_price = $request->get('concrete_quote_price');
+        $concrete_quote_price_escalator = $request->get('concrete_quote_price_escalator');
         $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
         $concrete_time_period_unit = $request->get('concrete_time_period_unit');
 
@@ -182,12 +183,12 @@ class ProjectController extends AbstractController
                 $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name, $description,
                     $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
-                    $proposal_number, $project_id_number, $items, $contacts, $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit);
+                    $proposal_number, $project_id_number, $items, $contacts, $vendor_id, $concrete_quote_price, $concrete_quote_price_escalator, $concrete_time_period_every_n, $concrete_time_period_unit);
             } else {
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
                     $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
-                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio, $archivos, $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit);
+                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio, $archivos, $vendor_id, $concrete_quote_price, $concrete_quote_price_escalator, $concrete_time_period_every_n, $concrete_time_period_unit);
             }
 
             if ($resultado['success']) {

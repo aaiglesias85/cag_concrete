@@ -85,6 +85,9 @@ class Project
     #[ORM\Column(name: 'concrete_quote_price', type: 'float')]
     private ?float $concreteQuotePrice;
 
+    #[ORM\Column(name: 'concrete_quote_price_escalator', type: 'float')]
+    private ?float $concreteQuotePriceEscalator;
+
     #[ORM\Column(name: 'concrete_time_period_every_n', type: 'integer')]
     private ?int $concreteTimePeriodEveryN;
 
@@ -410,6 +413,16 @@ class Project
     public function setConcreteTimePeriodUnit(?string $concreteTimePeriodUnit): void
     {
         $this->concreteTimePeriodUnit = $concreteTimePeriodUnit;
+    }
+
+    public function getConcreteQuotePriceEscalator(): ?float
+    {
+        return $this->concreteQuotePriceEscalator;
+    }
+
+    public function setConcreteQuotePriceEscalator(?float $concreteQuotePriceEscalator): void
+    {
+        $this->concreteQuotePriceEscalator = $concreteQuotePriceEscalator;
     }
 
 

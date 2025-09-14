@@ -839,6 +839,9 @@ var Projects = function () {
         var concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
         formData.set("concrete_quote_price", concrete_quote_price);
 
+        var concrete_quote_price_escalator = NumberUtil.getNumericValue('#concrete_quote_price_escalator');
+        formData.set("concrete_quote_price_escalator", concrete_quote_price_escalator);
+
         var concrete_time_period_every_n = $('#tp-every-n').val();
         formData.set("concrete_time_period_every_n", concrete_time_period_every_n);
 
@@ -1063,6 +1066,7 @@ var Projects = function () {
             $('#concrete-vendor').trigger('change');
 
             $('#concrete_quote_price').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
+            $('#concrete_quote_price_escalator').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
 
             $('#tp-every-n').val(project.concrete_time_period_every_n);
 
