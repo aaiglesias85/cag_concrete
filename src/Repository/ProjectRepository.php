@@ -118,6 +118,25 @@ class ProjectRepository extends EntityRepository
     }
 
     /**
+     * ListarProjectsDeConcVendor: Lista los projects de un conc vendor
+     *
+     * @return Project[]
+     */
+    public function ListarProjectsDeConcVendor($vendor_id)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.concreteVendor', 'c_v')
+            ->orderBy('p.id', 'ASC');
+
+        if (!empty($vendor_id)) {
+            $qb->andWhere('c_v.vendorId = :vendor_id')
+                ->setParameter('vendor_id', $vendor_id);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * ListarProjects: Lista los projects con filtros y paginación
      * @param int $start Inicio
      * @param int $limit Limite

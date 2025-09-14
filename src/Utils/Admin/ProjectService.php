@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\Company;
+use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\DataTrackingConcVendor;
 use App\Entity\DataTrackingItem;
@@ -1056,6 +1057,13 @@ class ProjectService extends Base
             $arreglo_resultado['proposal_number'] = $entity->getProposalNumber();
             $arreglo_resultado['project_id_number'] = $entity->getProjectIdNumber();
 
+            $arreglo_resultado['vendor_id'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId(): '';
+            $arreglo_resultado['concrete_vendor'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getName() : '';
+            $arreglo_resultado['concrete_quote_price'] = $entity->getConcreteQuotePrice() ?? '';
+            $arreglo_resultado['concrete_time_period_every_n'] = $entity->getConcreteTimePeriodEveryN() ?? '';
+            $arreglo_resultado['concrete_time_period_unit'] = $entity->getConcreteTimePeriodUnit() ?? '';
+
+
             // items
             $items = $this->ListarItemsDeProject($project_id);
             $arreglo_resultado['items'] = $items;
@@ -1432,11 +1440,9 @@ class ProjectService extends Base
      * @author Marcel
      */
     public function ActualizarProject($project_id, $company_id, $inspector_id, $number, $name, $description, $location,
-                                      $po_number, $po_cg, $manager, $status, $owner, $subcontract,
-                                      $federal_funding, $county_id, $resurfacing, $invoice_contact,
-                                      $certified_payrolls, $start_date, $end_date, $due_date,
-                                      $contract_amount, $proposal_number, $project_id_number,
-                                      $items, $contacts, $ajustes_precio, $archivos)
+                                      $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id, $resurfacing, $invoice_contact,
+                                      $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount, $proposal_number, $project_id_number,
+                                      $items, $contacts, $ajustes_precio, $archivos, $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1691,6 +1697,48 @@ class ProjectService extends Base
                 $entity->setDueDate($due_date);
             }
 
+
+            // conc vendor
+            $vendor_id_old = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
+            $vendor_descripcion_old = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getName() : "";
+            $entity->setConcreteVendor(NULL);
+            if ($vendor_id != '') {
+                $vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                    ->find($vendor_id);
+                $entity->setConcreteVendor($vendor);
+            }
+
+            if ($vendor_id != $vendor_id_old) {
+                $notas[] = [
+                    'notes' => 'Change concrete vendor, old value: ' . $vendor_descripcion_old,
+                    'date' => new \DateTime()
+                ];
+            }
+
+            if ($concrete_quote_price != $entity->getConcreteQuotePrice()) {
+                $notas[] = [
+                    'notes' => 'Change concrete quote price, old value: ' . $entity->getConcreteQuotePrice(),
+                    'date' => new \DateTime()
+                ];
+            }
+            $entity->setConcreteQuotePrice($concrete_quote_price);
+
+            if ($concrete_time_period_every_n != $entity->getConcreteTimePeriodEveryN()) {
+                $notas[] = [
+                    'notes' => 'Change concrete time periodo every n, old value: ' . $entity->getConcreteTimePeriodEveryN(),
+                    'date' => new \DateTime()
+                ];
+            }
+            $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
+
+            if ($concrete_time_period_unit != $entity->getConcreteTimePeriodUnit()) {
+                $notas[] = [
+                    'notes' => 'Change concrete time periodo unit, old value: ' . $entity->getConcreteTimePeriodUnit(),
+                    'date' => new \DateTime()
+                ];
+            }
+            $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
+
             $entity->setUpdatedAt(new \DateTime());
 
             // items
@@ -1730,7 +1778,8 @@ class ProjectService extends Base
                                   $po_number, $po_cg, $manager, $status, $owner, $subcontract,
                                   $federal_funding, $county_id, $resurfacing, $invoice_contact,
                                   $certified_payrolls, $start_date, $end_date, $due_date,
-                                  $contract_amount, $proposal_number, $project_id_number, $items, $contacts)
+                                  $contract_amount, $proposal_number, $project_id_number, $items, $contacts,
+                                  $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -1795,6 +1844,16 @@ class ProjectService extends Base
             $due_date = \DateTime::createFromFormat('m/d/Y', $due_date);
             $entity->setDueDate($due_date);
         }
+
+        if ($vendor_id !== "") {
+            $conc_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+                ->find($vendor_id);
+            $entity->setConcreteVendor($conc_vendor);
+        }
+
+        $entity->setConcreteQuotePrice($concrete_quote_price);
+        $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
+        $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
 
         $entity->setCreatedAt(new \DateTime());
 

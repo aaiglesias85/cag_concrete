@@ -828,6 +828,73 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">
+                                                <span class="ic-step-number">4</span>
+                                                Concrete Vendor
+                                            </label>
+                                            <div class="input-group input-group-solid flex-nowrap">
+                                                <div class="overflow-hidden flex-grow-1">
+                                                    <select id="concrete-vendor"
+                                                            class="form-control form-select form-select2 select-validate form-select-solid rounded-end-0 border-end event-change">
+                                                        <option value="">Select</option>
+                                                        {% for item in concrete_vendors %}
+                                                            <option value="{{ item.vendorId }}">
+                                                                {{ item.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <span class="input-group-text" title="Add Conc Vendor"
+                                                      id="btn-add-conc-vendor"
+                                                      style="cursor: pointer;">
+                                                    <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span
+                                                                class="path2"></span><span class="path3"></span><span
+                                                                class="path4"></span></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">
+                                                Concrete Quote Price
+                                            </label>
+                                            <div class="input-group input-group-solid">
+                                                <span class="input-group-text">$</span>
+                                                <input type="text"
+                                                       class="form-control form-control-price event-change"
+                                                       id="concrete_quote_price"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Time Period
+                                            </label>
+                                            <div class="d-flex align-items-center flex-nowrap gap-3">
+                                                <label for="tp-every-n" class="form-label w-100px mb-0 me-1">Repeat
+                                                    every</label>
+
+                                                <input type="number"
+                                                       class="form-control form-control-solid form-control-validate event-change w-100px"
+                                                       id="tp-every-n" name="tp_every_n"/>
+
+                                                <div class="w-200px">
+                                                    <select id="tp-unit" name="tp_unit"
+                                                            class="form-select form-select2 select-validate form-select-solid">
+                                                        <option value="">Select</option>
+                                                        <option value="month">months</option>
+                                                        <option value="day">days</option>
+                                                        <option value="year">years</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-text mb-0">e.g. every 6 months</div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div class="tab-pane fade" id="tab-content-items" role="tabpanel">
                                 <div class="row" id="lista-items">
@@ -1829,6 +1896,62 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group ic-form-group">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">
+                                                <span class="ic-step-number">4</span>
+                                                Concrete Vendor
+                                            </label>
+                                            <select id="concrete-vendor-detalle" disabled
+                                                    class="form-control form-select form-select2 select-validate form-select-solid">
+                                                <option value="">Select</option>
+                                                {% for item in concrete_vendors %}
+                                                    <option value="{{ item.vendorId }}">
+                                                        {{ item.name }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">
+                                                Concrete Quote Price
+                                            </label>
+                                            <div class="input-group input-group-solid">
+                                                <span class="input-group-text">$</span>
+                                                <input type="text"
+                                                       class="form-control form-control-price"
+                                                       id="concrete_quote_price-detalle" disabled/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Time Period
+                                            </label>
+                                            <div class="d-flex align-items-center flex-nowrap gap-3">
+                                                <label for="tp-every-n" class="form-label w-100px mb-0 me-1">Repeat
+                                                    every</label>
+
+                                                <input type="number"
+                                                       class="form-control form-control-solid form-control-validate w-100px"
+                                                       id="tp-every-n-detalle" name="tp_every_n"/>
+
+                                                <div class="w-200px">
+                                                    <select id="tp-unit-detalle" name="tp_unit"
+                                                            class="form-select form-select2 select-validate form-select-solid">
+                                                        <option value="">Select</option>
+                                                        <option value="month">months</option>
+                                                        <option value="day">days</option>
+                                                        <option value="year">years</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-text mb-0">e.g. every 6 months</div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div class="tab-pane fade" id="tab-content-items-detalle" role="tabpanel">
                                 <div class="row" id="lista-items-detalle">
@@ -2731,6 +2854,7 @@
     <!-- components -->
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
     {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
+    {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalConcreteVendor')) }}
 
 {% endblock %}
 
@@ -2761,6 +2885,7 @@
             <!-- init components -->
             ModalUnit.init();
             ModalEquation.init();
+            ModalConcreteVendor.init();
 
             Projects.init();
             ProjectsDetalle.init();

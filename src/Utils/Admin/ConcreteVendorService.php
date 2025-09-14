@@ -167,6 +167,15 @@ class ConcreteVendorService extends Base
         /**@var ConcreteVendor $entity */
         if ($entity != null) {
 
+            // projects
+            $projects = $this->getDoctrine()->getRepository(Project::class)
+                ->ListarProjectsDeConcVendor($vendor_id);
+            if (count($projects) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = "The concrete vendor could not be deleted, because it is related to a project";
+                return $resultado;
+            }
+
             // eliminar informacion relacionada
             $this->EliminarInformacionRelacionada($vendor_id);
 
@@ -246,19 +255,24 @@ class ConcreteVendorService extends Base
                     /**@var ConcreteVendor $entity */
                     if ($entity != null) {
 
-                        // eliminar informacion relacionada
-                        $this->EliminarInformacionRelacionada($vendor_id);
+                        // projects
+                        $projects = $this->getDoctrine()->getRepository(Project::class)
+                            ->ListarProjectsDeConcVendor($vendor_id);
+                        if (count($projects) === 0) {
+                            // eliminar informacion relacionada
+                            $this->EliminarInformacionRelacionada($vendor_id);
 
-                        $vendor_descripcion = $entity->getName();
+                            $vendor_descripcion = $entity->getName();
 
-                        $em->remove($entity);
-                        $cant_eliminada++;
+                            $em->remove($entity);
+                            $cant_eliminada++;
 
-                        //Salvar log
-                        $log_operacion = "Delete";
-                        $log_categoria = "Concrete Vendor";
-                        $log_descripcion = "The concrete vendor is deleted: $vendor_descripcion";
-                        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                            //Salvar log
+                            $log_operacion = "Delete";
+                            $log_categoria = "Concrete Vendor";
+                            $log_descripcion = "The concrete vendor is deleted: $vendor_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
 
                     }
                 }
@@ -268,11 +282,11 @@ class ConcreteVendorService extends Base
 
         if ($cant_eliminada == 0) {
             $resultado['success'] = false;
-            $resultado['error'] = "The vendors could not be deleted, because they are associated with a vendor";
+            $resultado['error'] = "The vendors could not be deleted, because they are associated with a project";
         } else {
             $resultado['success'] = true;
 
-            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected vendors because they are associated with a vendor";
+            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected vendors because they are associated with a project";
             $resultado['message'] = $mensaje;
         }
 

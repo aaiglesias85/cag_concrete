@@ -443,6 +443,12 @@ var Projects = function () {
         FlatpickrUtil.clear('datetimepicker-end-date');
         FlatpickrUtil.clear('datetimepicker-due-date');
 
+        $('#concrete-vendor').val('');
+        $('#concrete-vendor').trigger('change');
+
+        $('#tp-unit').val('');
+        $('#tp-unit').trigger('change');
+
         // tooltips selects
         MyApp.resetErrorMessageValidateSelect(KTUtil.get("project-form"));
 
@@ -827,6 +833,18 @@ var Projects = function () {
         var due_date = FlatpickrUtil.getString('datetimepicker-due-date');
         formData.set("due_date", due_date);
 
+        var vendor_id = $('#concrete-vendor').val();
+        formData.set("vendor_id", vendor_id);
+
+        var concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
+        formData.set("concrete_quote_price", concrete_quote_price);
+
+        var concrete_time_period_every_n = $('#tp-every-n').val();
+        formData.set("concrete_time_period_every_n", concrete_time_period_every_n);
+
+        var concrete_time_period_unit = $('#tp-unit').val();
+        formData.set("concrete_time_period_unit", concrete_time_period_unit);
+
         formData.set("items", JSON.stringify(items));
         formData.set("contacts", JSON.stringify(contacts));
         formData.set("ajustes_precio", JSON.stringify(ajustes_precio));
@@ -1040,6 +1058,16 @@ var Projects = function () {
                 const due_date = MyApp.convertirStringAFecha(project.due_date);
                 FlatpickrUtil.setDate('datetimepicker-due-date', due_date);
             }
+
+            $('#concrete-vendor').val(project.vendor_id);
+            $('#concrete-vendor').trigger('change');
+
+            $('#concrete_quote_price').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
+
+            $('#tp-every-n').val(project.concrete_time_period_every_n);
+
+            $('#tp-unit').val(project.concrete_time_period_unit);
+            $('#tp-unit').trigger('change');
 
             // items
             items = project.items;
@@ -3487,6 +3515,31 @@ var Projects = function () {
 
     };
 
+    // concrete vendor
+    var initAccionesConcVendor = function () {
+
+        // add conc vendor
+        $(document).off('click', "#btn-add-conc-vendor");
+        $(document).on('click', "#btn-add-conc-vendor", function (e) {
+
+            ModalConcreteVendor.mostrarModal();
+
+        });
+
+        $('#modal-concrete-vendor').on('hidden.bs.modal', function () {
+            var concrete_vendor = ModalConcreteVendor.getVendor();
+            if (concrete_vendor != null) {
+                //add conc vendor to select
+                $('#concrete-vendor').append(new Option(concrete_vendor.name, concrete_vendor.vendor_id, false, false));
+
+                $('#concrete-vendor').select2();
+
+                $('#concrete-vendor').val(concrete_vendor.vendor_id);
+                $('#concrete-vendor').trigger('change');
+            }
+        });
+    };
+
 
     return {
         //main function to initiate the module
@@ -3535,6 +3588,9 @@ var Projects = function () {
 
             // archivos
             initAccionesArchivo();
+
+            // concrete vendors
+            initAccionesConcVendor();
 
             initAccionChange();
 

@@ -12,6 +12,12 @@ var ProjectsDetalle = function () {
         $('#resurfacing-detalle').prop('checked', false);
         $('#certified_payrolls-detalle').prop('checked', false);
 
+        $('#concrete-vendor-detalle').val('');
+        $('#concrete-vendor-detalle').trigger('change');
+
+        $('#tp-unit-detalle').val('');
+        $('#tp-unit-detalle').trigger('change');
+
         // items
         items = [];
         actualizarTableListaItems();
@@ -129,6 +135,16 @@ var ProjectsDetalle = function () {
             $('#start_date-detalle').val(project.start_date);
             $('#end_date-detalle').val(project.end_date);
             $('#due_date-detalle').val(project.due_date);
+
+            $('#concrete-vendor-detalle').val(project.vendor_id);
+            $('#concrete-vendor-detalle').trigger('change');
+
+            $('#concrete_quote_price-detalle').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
+
+            $('#tp-every-n-detalle').val(project.concrete_time_period_every_n);
+
+            $('#tp-unit-detalle').val(project.concrete_time_period_unit);
+            $('#tp-unit-detalle').trigger('change');
 
             // items
             items = project.items;

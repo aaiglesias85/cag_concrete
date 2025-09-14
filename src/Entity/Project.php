@@ -82,6 +82,15 @@ class Project
     #[ORM\Column(name: 'proposal_number', type: 'string', length: 255)]
     private ?string $proposalNumber;
 
+    #[ORM\Column(name: 'concrete_quote_price', type: 'float')]
+    private ?float $concreteQuotePrice;
+
+    #[ORM\Column(name: 'concrete_time_period_every_n', type: 'integer')]
+    private ?int $concreteTimePeriodEveryN;
+
+    #[ORM\Column(name: 'concrete_time_period_unit', type: 'string', length: 50)]
+    private ?string $concreteTimePeriodUnit;
+
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Company')]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'company_id')]
     private ?Company $company;
@@ -93,6 +102,10 @@ class Project
     #[ORM\ManyToOne(targetEntity: 'App\Entity\County')]
     #[ORM\JoinColumn(name: 'county_id', referencedColumnName: 'county_id')]
     private ?County $countyObj;
+
+    #[ORM\ManyToOne(targetEntity: ConcreteVendor::class)]
+    #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id')]
+    private ?ConcreteVendor $concreteVendor;
 
     public function getProjectId(): ?int
     {
@@ -358,4 +371,46 @@ class Project
     {
         $this->countyObj = $countyObj;
     }
+
+    public function getConcreteVendor(): ?ConcreteVendor
+    {
+        return $this->concreteVendor;
+    }
+
+    public function setConcreteVendor(?ConcreteVendor $concreteVendor): void
+    {
+        $this->concreteVendor = $concreteVendor;
+    }
+
+    public function getConcreteQuotePrice(): ?float
+    {
+        return $this->concreteQuotePrice;
+    }
+
+    public function setConcreteQuotePrice(?float $concreteQuotePrice): void
+    {
+        $this->concreteQuotePrice = $concreteQuotePrice;
+    }
+
+    public function getConcreteTimePeriodEveryN(): ?int
+    {
+        return $this->concreteTimePeriodEveryN;
+    }
+
+    public function setConcreteTimePeriodEveryN(?int $concreteTimePeriodEveryN): void
+    {
+        $this->concreteTimePeriodEveryN = $concreteTimePeriodEveryN;
+    }
+
+    public function getConcreteTimePeriodUnit(): ?string
+    {
+        return $this->concreteTimePeriodUnit;
+    }
+
+    public function setConcreteTimePeriodUnit(?string $concreteTimePeriodUnit): void
+    {
+        $this->concreteTimePeriodUnit = $concreteTimePeriodUnit;
+    }
+
+
 }

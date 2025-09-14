@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\Equation;
 use App\Entity\Inspector;
@@ -54,6 +55,10 @@ class ProjectController extends AbstractController
                 $countys = $this->projectService->getDoctrine()->getRepository(County::class)
                     ->ListarOrdenados();
 
+                // concrete vendors
+                $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
+                    ->ListarOrdenados();
+
                 return $this->render('admin/project/index.html.twig', array(
                     'permiso' => $permiso[0],
                     'companies' => $companies,
@@ -63,6 +68,7 @@ class ProjectController extends AbstractController
                     'yields_calculation' => $yields_calculation,
                     'units' => $units,
                     'countys' => $countys,
+                    'concrete_vendors' => $concrete_vendors,
                     'direccion_url' => $this->projectService->ObtenerURL()
                 ));
             }
@@ -148,6 +154,12 @@ class ProjectController extends AbstractController
         $end_date = $request->get('end_date');
         $due_date = $request->get('due_date');
 
+        $vendor_id = $request->get('vendor_id');
+        $concrete_quote_price = $request->get('concrete_quote_price');
+        $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
+        $concrete_time_period_unit = $request->get('concrete_time_period_unit');
+
+
         // items
         $items = $request->get('items');
         $items = json_decode($items);
@@ -170,12 +182,12 @@ class ProjectController extends AbstractController
                 $resultado = $this->projectService->SalvarProject($company_id, $inspector_id, $number, $name, $description,
                     $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
-                    $proposal_number, $project_id_number, $items, $contacts);
+                    $proposal_number, $project_id_number, $items, $contacts, $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit);
             } else {
                 $resultado = $this->projectService->ActualizarProject($project_id, $company_id, $inspector_id, $number,
                     $name, $description, $location, $po_number, $po_cg, $manager, $status, $owner, $subcontract, $federal_funding, $county_id,
                     $resurfacing, $invoice_contact, $certified_payrolls, $start_date, $end_date, $due_date, $contract_amount,
-                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio, $archivos);
+                    $proposal_number, $project_id_number, $items, $contacts, $ajustes_precio, $archivos, $vendor_id, $concrete_quote_price, $concrete_time_period_every_n, $concrete_time_period_unit);
             }
 
             if ($resultado['success']) {
