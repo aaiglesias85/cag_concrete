@@ -993,9 +993,6 @@ var Schedules = function () {
         $(document).off('click', ".cerrar-form-schedule");
         $(document).on('click', ".cerrar-form-schedule", function (e) {
             cerrarForms();
-
-            // actualizar listado
-            btnClickFiltrar();
         });
     }
     //Cerrar forms
