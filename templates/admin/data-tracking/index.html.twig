@@ -81,6 +81,17 @@
                     <div class="card-toolbar">
                         <div class="d-flex justify-content-end">
 
+                            <div class="w-300px me-5" id="select-project">
+                                <select class="form-select form-select2 form-select-solid fw-bold" id="project">
+                                    <option value="">Project</option>
+                                    {% for item in projects %}
+                                        <option value="{{ item.projectId }}" data-vendor="{{ item.concreteVendor ? item.concreteVendor.vendorId : '' }}">
+                                            {{ item.projectNumber }} - {{ item.description }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
                             <!--filter-->
                             <div>
                                 <button type="button" class="btn btn-primary me-3"
@@ -103,18 +114,6 @@
                                     <!--end::Separator-->
                                     <!--begin::Content-->
                                     <div class="px-7 py-5">
-
-                                        <div class="mb-3" id="select-project">
-                                            <select class="form-select form-select2 form-select-solid fw-bold" id="project">
-                                                <option value="">Project</option>
-                                                {% for item in projects %}
-                                                    <option value="{{ item.projectId }}" data-vendor="{{ item.concreteVendor ? item.concreteVendor.vendorId : '' }}">
-                                                        {{ item.projectNumber }} - {{ item.description }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-
                                         <div class="mb-3">
                                             <select class="form-select form-select2 form-select-solid fw-bold" id="pending">
                                                 <option value="">Status</option>
