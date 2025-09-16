@@ -1557,7 +1557,7 @@ class ProjectService extends Base
 
             if ($company_id != '') {
 
-                if ($company_id != $entity->getCompany()->getCompanyId()) {
+                if ($entity->getCompany() && $company_id != $entity->getCompany()->getCompanyId()) {
                     $notas[] = [
                         'notes' => 'Change company, old value: ' . $entity->getCompany()->getName(),
                         'date' => new \DateTime()
@@ -1572,7 +1572,7 @@ class ProjectService extends Base
 
             if ($inspector_id != '') {
 
-                if ($inspector_id != $entity->getInspector()->getInspectorId()) {
+                if ($entity->getInspector() && $inspector_id != $entity->getInspector()->getInspectorId()) {
                     $notas[] = [
                         'notes' => 'Change inspector, old value: ' . $entity->getInspector()->getName(),
                         'date' => new \DateTime()
