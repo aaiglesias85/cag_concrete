@@ -167,7 +167,7 @@ const NumberUtil = (() => {
         const el = (typeof input === 'string') ? document.querySelector(input) : input;
         if (!el) return NaN;
         const o = mergeOpts(opts, US_DEFAULTS);
-        return unformatNumber(el.value, o);
+        return el.value !== '' ? unformatNumber(el.value, o) : 0;
     }
 
     function setFormattedValue(input, value, opts) {

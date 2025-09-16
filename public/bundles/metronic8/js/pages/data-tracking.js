@@ -1743,7 +1743,7 @@ var DataTracking = function () {
                 $('#item-data-tracking').val(items_data_tracking[posicion].item_id);
                 $('#item-data-tracking').trigger('change');
 
-                $('#data-tracking-quantity').val(MyApp.formatearNumero(items_data_tracking[posicion].quantity, 2, '.', ','));
+                $('#data-tracking-quantity').val(items_data_tracking[posicion].quantity);
 
                 $('#notes-item-data-tracking').val(items_data_tracking[posicion].notes);
 
@@ -1777,7 +1777,7 @@ var DataTracking = function () {
         });
 
         function DevolverCantidadItemDataTracking() {
-            var quantity = NumberUtil.getNumericValue('#data-tracking-quantity');
+            var quantity = $('#data-tracking-quantity').val();
 
             if (nEditingRowItem == null) {
                 quantity = quantity.trim().replace(/^[-+]/, "");
