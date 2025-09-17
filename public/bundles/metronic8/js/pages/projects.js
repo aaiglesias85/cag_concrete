@@ -842,7 +842,7 @@ var Projects = function () {
         var concrete_quote_price_escalator = NumberUtil.getNumericValue('#concrete_quote_price_escalator');
         formData.set("concrete_quote_price_escalator", concrete_quote_price_escalator);
 
-        var concrete_time_period_every_n = $('#tp-every-n').val();
+        var concrete_time_period_every_n = NumberUtil.getNumericValue('#tp-every-n');
         formData.set("concrete_time_period_every_n", concrete_time_period_every_n);
 
         var concrete_time_period_unit = $('#tp-unit').val();
