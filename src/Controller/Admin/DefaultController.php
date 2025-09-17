@@ -39,7 +39,8 @@ class DefaultController extends AbstractController
             if ($permiso[0]['ver']) {
 
                 // primer dia del mes
-                $from = $this->defaultService->ObtenerPrimerDiaMes();
+                // $from = $this->defaultService->ObtenerPrimerDiaMes();
+                $from = '';
 
                 //last 6 projects
                 $projects = $this->defaultService->ListarProjectsParaDashboard('', $from, '', 'DESC', 6);
