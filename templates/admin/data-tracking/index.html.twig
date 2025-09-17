@@ -580,7 +580,7 @@
                                             <div class="input-group input-group-solid flex-nowrap">
                                                 <div class="overflow-hidden flex-grow-1">
                                                     <select id="inspector"
-                                                            class="form-control form-select form-select2 select-modal-item select-validate form-select-solid rounded-end-0 border-end">
+                                                            class="form-control form-select form-select2 select-validate form-select-solid rounded-end-0 border-end">
                                                         <option value="">Select</option>
                                                         {% for item in inspectors %}
                                                             <option value="{{ item.inspectorId }}">{{ item.name }}</option>
@@ -1421,7 +1421,7 @@
                                                 Inspector
                                             </label>
                                             <select id="inspector-detalle" disabled
-                                                    class="form-control form-select form-select2 select-modal-item select-validate form-select-solid">
+                                                    class="form-control form-select form-select2 select-validate form-select-solid">
                                                 <option value="">Select</option>
                                                 {% for item in inspectors %}
                                                     <option value="{{ item.inspectorId }}">{{ item.name }}</option>
@@ -1985,7 +1985,7 @@
                             <div class="input-group input-group-solid flex-nowrap">
                                 <div class="overflow-hidden flex-grow-1">
                                     <select id="item-data-tracking"
-                                            class="form-control form-select form-select2 items-project select-validate form-select-solid rounded-end-0 border-end">
+                                            class="form-control form-select select-modal-item items-project select-validate form-select-solid rounded-end-0 border-end">
                                         <option value="">Select</option>
                                     </select>
                                 </div>
@@ -2056,7 +2056,7 @@
                             </label>
                             <div class="row">
                                 <div class="col-md-12" id="select-subcontractor">
-                                    <select class="form-control form-select form-select2 select-modal-subcontract select-validate form-select-solid event-change" id="subcontractor">
+                                    <select class="form-control form-select select-modal-subcontract select-validate form-select-solid event-change" id="subcontractor">
                                         <option value="">Select</option>
                                         {% for item in subcontractors %}
                                             <option value="{{ item.subcontractorId }}">
@@ -2075,7 +2075,7 @@
                             <div class="input-group input-group-solid flex-nowrap">
                                 <div class="overflow-hidden flex-grow-1">
                                     <select id="item-subcontract"
-                                            class="form-control form-select form-select2 items-project select-validate form-select-solid rounded-end-0 border-end">
+                                            class="form-control form-select select-modal-subcontract items-project select-validate form-select-solid rounded-end-0 border-end">
                                         <option value="">Select</option>
                                     </select>
                                 </div>
@@ -2190,7 +2190,7 @@
                             <div class="input-group input-group-solid flex-nowrap">
                                 <div class="overflow-hidden flex-grow-1">
                                     <select id="employee"
-                                            class="form-control form-select form-select2 select-modal-labor select-validate form-select-solid rounded-end-0 border-end">
+                                            class="form-control form-select select-modal-labor select-validate form-select-solid rounded-end-0 border-end">
                                         <option value="">Select</option>
                                         {% for item in employees %}
                                             <option value="{{ item.employeeId }}"
@@ -2216,7 +2216,7 @@
                                     <label class="form-label required">
                                         Subcontractor
                                     </label>
-                                    <select class="form-control form-select2 form-select select-modal-labor select-validate form-select-solid"
+                                    <select class="form-control form-select select-modal-labor select-validate form-select-solid"
                                             id="subcontractor-labor">
                                         <option value="">Select</option>
                                         {% for item in subcontractors %}
@@ -2235,7 +2235,7 @@
                                     <div class="input-group input-group-solid flex-nowrap">
                                         <div class="overflow-hidden flex-grow-1">
                                             <select id="employee-subcontractor"
-                                                    class="form-control form-select form-select2 select-modal-labor select-validate form-select-solid rounded-end-0 border-end">
+                                                    class="form-control form-select select-modal-labor select-validate form-select-solid rounded-end-0 border-end">
                                                 <option value="">Select</option>
                                             </select>
                                         </div>
@@ -2320,7 +2320,7 @@
 
                             <div class="row">
                                 <div class="col-md-12" id="select-material">
-                                    <select class="form-control form-select form-select2 select-validate form-select-solid select-modal-material"
+                                    <select class="form-control form-select select-modal-material select-validate form-select-solid select-modal-material"
                                             id="material">
                                         <option value="">Select</option>
                                         {% for item in materials %}
@@ -2423,7 +2423,7 @@
                                     <div class="input-group input-group-solid flex-nowrap">
                                         <div class="overflow-hidden flex-grow-1">
                                             <select id="concrete-vendor"
-                                                    class="form-control form-select form-select2 select-modal-item select-validate form-select-solid rounded-end-0 border-end select-modal-data-tracking-conc-vendor">
+                                                    class="form-control form-select select-modal-conc-vendor select-validate form-select-solid rounded-end-0 border-end select-modal-data-tracking-conc-vendor">
                                                 <option value="">Select</option>
                                                 {% for item in concrete_vendors %}
                                                     <option value="{{ item.vendorId }}">

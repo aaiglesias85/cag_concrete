@@ -1037,6 +1037,8 @@ var DataTracking = function () {
             $('.items-project').append(new Option(descripcion, items[i].project_item_id, false, false));
         }
         $('.items-project').select2();
+
+        initSelectsModal();
     }
 
     //Eliminar
@@ -1143,6 +1145,8 @@ var DataTracking = function () {
 
         initTempus();
 
+        initSelectsModal();
+
         $('#labor-color').minicolors({
             control: 'hue',
             format: "hex",
@@ -1207,6 +1211,28 @@ var DataTracking = function () {
             localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
         });
 
+    }
+
+    var initSelectsModal = function (){
+        $('.select-modal-labor').select2({
+            dropdownParent: $('#modal-data-tracking-labor') // Asegúrate de que es el ID del modal
+        });
+
+        $('.select-modal-item').select2({
+            dropdownParent: $('#modal-data-tracking-item') // Asegúrate de que es el ID del modal
+        });
+
+        $('.select-modal-subcontract').select2({
+            dropdownParent: $('#modal-subcontract') // Asegúrate de que es el ID del modal
+        });
+
+        $('.select-modal-material').select2({
+            dropdownParent: $('#modal-data-tracking-material') // Asegúrate de que es el ID del modal
+        });
+
+        $('.select-modal-conc-vendor').select2({
+            dropdownParent: $('#modal-data-tracking-conc-vendor') // Asegúrate de que es el ID del modal
+        });
     }
 
     var changeFile = function () {
@@ -1494,6 +1520,8 @@ var DataTracking = function () {
                 }
                 $('.items-project').append(new Option(descripcion, item.project_item_id, false, false));
                 $('.items-project').select2();
+
+                initSelectsModal();
 
                 $('#item-data-tracking').val(item.project_item_id);
                 $('#item-data-tracking').trigger('change');
@@ -2206,6 +2234,8 @@ var DataTracking = function () {
 
                 $('#employee-subcontractor').val(employee.employee_id);
                 $('#employee-subcontractor').trigger('change');
+
+                initSelectsModal();
             }
         });
 
@@ -2295,6 +2325,8 @@ var DataTracking = function () {
                                 }
                                 $('#employee-subcontractor').select2();
 
+                                initSelectsModal();
+
                                 // select
                                 if (nEditingRowLabor) {
                                     $('#employee-subcontractor').val(labor[nEditingRowLabor].subcontractor_employee_id);
@@ -2360,6 +2392,8 @@ var DataTracking = function () {
 
         // limpiar select
         MyUtil.limpiarSelect('#employee-subcontractor');
+
+        initSelectsModal();
 
         $('#employee-type-owner').prop('checked', true);
         $('#employee-type-subcontractor').prop('checked', false);
