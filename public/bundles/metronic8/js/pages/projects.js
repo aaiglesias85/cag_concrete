@@ -676,11 +676,15 @@ var Projects = function () {
         if (activeTab == 1) {
 
             var company_id = $('#company').val();
-            if (!validateForm() || company_id == '') {
+            var county_id = $('#county').val();
+            if (!validateForm() || company_id == '' || county_id == '') {
                 result = false;
 
                 if (company_id == "") {
                     MyApp.showErrorMessageValidateSelect(KTUtil.get("select-company"), "This field is required");
+                }
+                if (county_id == "") {
+                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-county"), "This field is required");
                 }
             }
 
