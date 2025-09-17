@@ -350,7 +350,8 @@ var Index = function () {
         });
 
         // fecha inicial
-        var fecha_inicio = MyApp.getFirstDayOfMonth();
+        const fecha_inicio = new Date();
+        fecha_inicio.setDate(fecha_inicio.getDate() - 180);
         FlatpickrUtil.setDate('datetimepicker-desde', fecha_inicio);
 
         // change
