@@ -74,7 +74,7 @@ var Schedules = function () {
         formData.set("fecha_fin", fecha_fin);
 
         // loading
-        BlockUtil.block('#lista-schedule');
+        BlockUtil.block('#div-calendario');
 
         axios.post("schedule/listarParaCalendario", formData, {responseType: "json"})
             .then(function (res) {
@@ -94,7 +94,7 @@ var Schedules = function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-                BlockUtil.unblock("#lista-schedule");
+                BlockUtil.unblock("#div-calendario");
             });
     }
 
@@ -1537,6 +1537,7 @@ var Schedules = function () {
 
                 var formData = new URLSearchParams();
 
+                formData.set("schedules_id", schedules_id);
                 formData.set("date_start", date_start);
                 formData.set("date_stop", date_stop);
 
