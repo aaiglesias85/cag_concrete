@@ -56,7 +56,7 @@
 
                         <div class="row" id="div-item">
                             <div class="col-md-12" id="select-item">
-                                <select class="form-control form-select select-modal-item select-validate form-select-solid event-change"
+                                <select class="form-control form-select select-modal-item-project select-validate form-select-solid event-change"
                                         id="item">
                                     <option value="">Select</option>
                                     {% for item in items %}
@@ -78,7 +78,7 @@
                         </label>
                         <div class="row">
                             <div class="col-md-12" id="select-yield-calculation">
-                                <select class="form-control form-select select-modal-item select-validate form-select-solid"
+                                <select class="form-control form-select select-modal-item-project select-validate form-select-solid"
                                         id="yield-calculation" name="yield">
                                     <option value="">Select</option>
                                     {% for item in yields_calculation %}
@@ -96,7 +96,7 @@
                         <div class="input-group input-group-solid flex-nowrap">
                             <div class="overflow-hidden flex-grow-1">
                                 <select id="equation"
-                                        class="form-control form-select select-modal-item select-validate form-select-solid rounded-end-0 border-end">
+                                        class="form-control form-select select-modal-item-project select-validate form-select-solid rounded-end-0 border-end">
                                     <option value="">Select</option>
                                     {% for item in equations %}
                                         <option value="{{ item.equationId }}" data-equation="{{ item.equation }}">
@@ -120,8 +120,8 @@
                         </label>
                         <div class="input-group input-group-solid flex-nowrap">
                             <div class="overflow-hidden flex-grow-1">
-                                <select id="unit"
-                                        class="form-control form-select select-modal-item select-validate form-select-solid rounded-end-0 border-end">
+                                <select id="unit-item-project"
+                                        class="form-control form-select select-modal-item-project select-validate form-select-solid rounded-end-0 border-end">
                                     <option value="">Select</option>
                                     {% for item in units %}
                                         <option value="{{ item.unitId }}">{{ item.description }}

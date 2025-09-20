@@ -1218,7 +1218,7 @@ var DataTracking = function () {
             dropdownParent: $('#modal-data-tracking-labor') // Asegúrate de que es el ID del modal
         });
 
-        $('.select-modal-item').select2({
+        $('.select-modal-data-tracking-item').select2({
             dropdownParent: $('#modal-data-tracking-item') // Asegúrate de que es el ID del modal
         });
 

@@ -16,6 +16,10 @@ var ModalItemProject = function () {
         // init widgets generales
         MyApp.initWidgets();
 
+        $('.select-modal-item-project').select2({
+            dropdownParent: $('#modal-item') // Asegúrate de que es el ID del modal
+        });
+
         // change
         $('#item').change(changeItem);
         $('#yield-calculation').change(changeYield);
