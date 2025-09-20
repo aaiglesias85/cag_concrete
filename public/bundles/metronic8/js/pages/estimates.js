@@ -2754,15 +2754,57 @@ var Estimates = function () {
         }
 
         function deleteCompany(posicion) {
-            //Eliminar
+            // Guardar contacto eliminado antes de quitarlo del array
+            const removed = {email: companys[posicion].email, phone: companys[posicion].phone};
+
+            // Eliminar del array
             companys.splice(posicion, 1);
-            //actualizar posiciones
+
+            // Recalcular posiciones
             for (var i = 0; i < companys.length; i++) {
                 companys[i].posicion = i;
             }
-            //actualizar lista
+
+            // Actualizar lista
             actualizarTableListaCompanysEstimate();
+
+            // Remover tags del contacto eliminado si ya no están en uso
+            removeContactTagsIfUnused(removed.email, removed.phone);
         }
+
+        // Quita del input los tags de email/phone del contacto eliminado,
+        // solo si ya no están en uso por otras compañías del array "companys".
+        function removeContactTagsIfUnused(email, phone) {
+            // Normalizar
+            const normPhone = (phone || '').trim();
+            const normEmail = (email || '').trim().toLowerCase();
+
+            // Leer valores actuales de los inputs (tags separados por coma)
+            let currentPhones = ($('#phone').val() || '').split(',').map(p => p.trim()).filter(Boolean);
+            let currentEmails = ($('#email').val() || '').split(',').map(e => e.trim()).filter(Boolean);
+
+            // ¿Aún los usa alguna otra compañía?
+            const phoneStillUsed = normPhone
+                ? companys.some(c => (c.phone || '').trim() === normPhone)
+                : false;
+
+            const emailStillUsed = normEmail
+                ? companys.some(c => (c.email || '').trim().toLowerCase() === normEmail)
+                : false;
+
+            // Si ya no se usan, sacarlos de los inputs
+            if (normPhone && !phoneStillUsed) {
+                currentPhones = currentPhones.filter(p => p !== normPhone);
+            }
+            if (normEmail && !emailStillUsed) {
+                currentEmails = currentEmails.filter(e => e.toLowerCase() !== normEmail);
+            }
+
+            // Reimportar sin duplicados
+            $('#phone').importTags(currentPhones.join(','));
+            $('#email').importTags(currentEmails.join(','));
+        }
+
     }
     var resetFormCompanyEstimate = function () {
 
