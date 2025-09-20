@@ -126,7 +126,7 @@ class ProjectRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.concreteVendor', 'c_v')
-            ->orderBy('p.id', 'ASC');
+            ->orderBy('p.projectId', 'ASC');
 
         if (!empty($vendor_id)) {
             $qb->andWhere('c_v.vendorId = :vendor_id')

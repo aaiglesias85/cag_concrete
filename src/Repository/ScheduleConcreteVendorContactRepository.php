@@ -45,7 +45,7 @@ class ScheduleConcreteVendorContactRepository extends EntityRepository
                 ->setParameter('contact_id', $contact_id);
         }
 
-        $consulta->orderBy('s.dateStart', "ASC");
+        $consulta->orderBy('s.day', "ASC");
 
         return $consulta->getQuery()->getResult();
     }
