@@ -303,7 +303,10 @@ var Schedules = function () {
             processing: true,
             serverSide: true,
             order: order,
-            stateSave: false,
+
+            stateSave: true,
+            displayLength: 25,
+            stateSaveParams: DatatableUtil.stateSaveParams,
 
             fixedColumns: {
                 start: 2,

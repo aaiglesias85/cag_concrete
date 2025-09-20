@@ -464,7 +464,11 @@ var ProjectsDetalle = function () {
             processing: true,
             serverSide: true,
             order: order,
-            stateSave: false,
+
+            stateSave: true,
+            displayLength: 25,
+            stateSaveParams: DatatableUtil.stateSaveParams,
+
             /*displayLength: 15,
             lengthMenu: [
               [15, 25, 50, -1],
@@ -790,7 +794,11 @@ var ProjectsDetalle = function () {
             processing: true,
             serverSide: true,
             order: order,
-            stateSave: false,
+
+            stateSave: true,
+            displayLength: 25,
+            stateSaveParams: DatatableUtil.stateSaveParams,
+
             /*displayLength: 15,
             lengthMenu: [
               [15, 25, 50, -1],

@@ -26,12 +26,17 @@ var Perfiles = function () {
             processing: true,
             serverSide: true,
             order: order,
-            stateSave: false,
+
+            stateSave: true,
+            displayLength: 25,
+            stateSaveParams: DatatableUtil.stateSaveParams,
+
             /*displayLength: 15,
             lengthMenu: [
               [15, 25, 50, -1],
               [15, 25, 50, 'Todos']
             ],*/
+
             select: {
                 info: false,
                 style: 'multi',
@@ -41,7 +46,7 @@ var Perfiles = function () {
             ajax: datasource,
             columns: columns,
             columnDefs: columnDefs,
-            language: language
+            language: language,
         });
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw

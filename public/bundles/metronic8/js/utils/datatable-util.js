@@ -434,6 +434,15 @@ var DatatableUtil = function () {
         return $(selector).DataTable(finalOptions);
     };
 
+    // SOLO guardar paginación
+    var stateSaveParams = function (settings, data) {
+        // Conserva únicamente estos campos
+        const keep = { time: data.time, start: data.start, length: data.length };
+        for (const k of Object.keys(data)) {
+            if (!(k in keep)) delete data[k];
+        }
+    };
+
     return {
         getDataTableDatasource: getDataTableDatasource,
         errorDataTable: errorDataTable,
@@ -454,6 +463,7 @@ var DatatableUtil = function () {
         lightenColor: lightenColor,
         escapeHtml: escapeHtml,
         initSafeDataTable: initSafeDataTable,
+        stateSaveParams: stateSaveParams,
     }
 
 }();
