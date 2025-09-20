@@ -922,26 +922,42 @@ var Estimates = function () {
                 $('#email').importTags(estimate.email);
             }
 
-            const jobWalk = MyApp.convertirStringAFechaHora(estimate.jobWalk);
-            FlatpickrUtil.setDate('datetimepicker-jobWalk', jobWalk);
+            if (estimate.jobWalk) {
+                const jobWalk = MyApp.convertirStringAFechaHora(estimate.jobWalk);
+                FlatpickrUtil.setDate('datetimepicker-jobWalk', jobWalk);
+            }
 
-            const rfiDueDate = MyApp.convertirStringAFechaHora(estimate.rfiDueDate);
-            FlatpickrUtil.setDate('datetimepicker-rfiDueDate', rfiDueDate);
+            if (estimate.rfiDueDate) {
+                const rfiDueDate = MyApp.convertirStringAFechaHora(estimate.rfiDueDate);
+                FlatpickrUtil.setDate('datetimepicker-rfiDueDate', rfiDueDate);
+            }
 
-            const projectStart = MyApp.convertirStringAFechaHora(estimate.projectStart);
-            FlatpickrUtil.setDate('datetimepicker-projectStart', projectStart);
 
-            const projectEnd = MyApp.convertirStringAFechaHora(estimate.projectEnd);
-            FlatpickrUtil.setDate('datetimepicker-projectEnd', projectEnd);
+            if (estimate.projectStart) {
+                const projectStart = MyApp.convertirStringAFechaHora(estimate.projectStart);
+                FlatpickrUtil.setDate('datetimepicker-projectStart', projectStart);
+            }
 
-            const submittedDate = MyApp.convertirStringAFechaHora(estimate.submittedDate);
-            FlatpickrUtil.setDate('datetimepicker-submittedDate', submittedDate);
+            if (estimate.projectEnd) {
+                const projectEnd = MyApp.convertirStringAFechaHora(estimate.projectEnd);
+                FlatpickrUtil.setDate('datetimepicker-projectEnd', projectEnd);
+            }
 
-            const awardedDate = MyApp.convertirStringAFechaHora(estimate.awardedDate);
-            FlatpickrUtil.setDate('datetimepicker-awardedDate', awardedDate);
+            if (estimate.submittedDate) {
+                const submittedDate = MyApp.convertirStringAFechaHora(estimate.submittedDate);
+                FlatpickrUtil.setDate('datetimepicker-submittedDate', submittedDate);
+            }
 
-            const lostDate = MyApp.convertirStringAFechaHora(estimate.lostDate);
-            FlatpickrUtil.setDate('datetimepicker-lostDate', lostDate);
+            if (estimate.awardedDate) {
+                const awardedDate = MyApp.convertirStringAFechaHora(estimate.awardedDate);
+                FlatpickrUtil.setDate('datetimepicker-awardedDate', awardedDate);
+            }
+
+            if (estimate.lostDate) {
+                const lostDate = MyApp.convertirStringAFechaHora(estimate.lostDate);
+                FlatpickrUtil.setDate('datetimepicker-lostDate', lostDate);
+            }
+
 
             $('#location').val(estimate.location);
 
@@ -1256,7 +1272,7 @@ var Estimates = function () {
         const desdeInput = document.getElementById('datetimepicker-desde');
         const desdeGroup = desdeInput.closest('.input-group');
         FlatpickrUtil.initDate('datetimepicker-desde', {
-            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: desdeGroup,            // → cfg.appendTo = .input-group
             positionElement: desdeInput,      // → referencia de posición
             static: true,                     // → evita top/left “globales”
@@ -1266,7 +1282,7 @@ var Estimates = function () {
         const hastaInput = document.getElementById('datetimepicker-hasta');
         const hastaGroup = hastaInput.closest('.input-group');
         FlatpickrUtil.initDate('datetimepicker-hasta', {
-            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            localization: {locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy'},
             container: hastaGroup,
             positionElement: hastaInput,
             static: true,
@@ -2580,7 +2596,7 @@ var Estimates = function () {
                         email: email,
                         phone: phone,
                         contacts: contacts_company,
-                        posicion: bid_deadlines.length
+                        posicion: companys.length
                     });
 
                 } else {
