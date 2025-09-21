@@ -3669,7 +3669,7 @@ var DataTracking = function () {
                         })
                         .catch(function (err) {
                             console.project(err);
-                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error !!!");
+                            toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', "Error");
                         })
                         .then(function () {
                             BlockUtil.unblock("#modal-archivo .modal-content");
