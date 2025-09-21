@@ -25,6 +25,7 @@ var ModalReminder = function () {
 
     var initSelectUsuario = function () {
         $("#usuario-reminder-modal").select2({
+            dropdownParent: $('#modal-reminder'),
             placeholder: "Search users",
             allowClear: true,
             ajax: {
