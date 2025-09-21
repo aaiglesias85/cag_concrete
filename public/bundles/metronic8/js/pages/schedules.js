@@ -1562,8 +1562,6 @@ var Schedules = function () {
 
                                 ModalUtil.hide('modal-clonar-schedule');
 
-                                btnClickFiltrar();
-
                             } else {
                                 toastr.error(response.error, "");
                             }
