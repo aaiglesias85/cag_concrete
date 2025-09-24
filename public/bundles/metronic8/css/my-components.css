@@ -483,8 +483,16 @@ div.tagsinput.has-error {
     background: #fff !important;
 }
 
+[data-bs-theme=dark] .dtfc-fixed-start {
+    background: #15171C !important;
+}
+
 .dtfc-fixed-end {
     background: #fff !important;
+}
+
+[data-bs-theme=dark] .dtfc-fixed-end {
+    background: #15171C !important;
 }
 
 .row-pending > td {
