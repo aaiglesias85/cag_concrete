@@ -3,6 +3,11 @@ body, .app-default {
     background-color: #F4F7FA !important;
 }
 
+[data-bs-theme=dark] body,
+[data-bs-theme=dark] .app-default {
+    background-color: #0F1014 !important;
+}
+
 /*[data-kt-app-layout=dark-sidebar] .app-sidebar {
     background-color: #0e2536;
 }
@@ -1080,7 +1085,11 @@ google map
 }
 
 .card-sticky .card-header {
-    background: #ffffff !important;
+    background-color: #ffffff !important;
+}
+
+[data-bs-theme=dark] .card-sticky .card-header {
+    background-color: transparent !important;
 }
 
 .scrolltop > i {
