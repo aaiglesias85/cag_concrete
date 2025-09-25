@@ -3,11 +3,7 @@ var ModalAdvertisement = function () {
     // Función para mostrar el modal
     function mostrarModal(advertisement_id, fechaHoy) {
 
-        $('#modal-advertisement').modal({
-            show: true,
-            backdrop: 'static',
-            keyboard: false
-        });
+        ModalUtil.show('modal-advertisement', {backdrop: 'static', keyboard: false});
 
         localStorage.setItem(`advertisement-${advertisement_id}`, fechaHoy); // Guardamos la fecha de hoy
     }

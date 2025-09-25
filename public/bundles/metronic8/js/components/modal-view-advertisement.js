@@ -17,10 +17,9 @@ var ModalViewAdvertisement = function () {
 
             var advertisement_id = $(this).data('id');
             var url = $(this).data('title');
-            
-            
 
-            $('#modal-view-advertisement').modal('show');
+            // mostrar modal
+            ModalUtil.show('modal-view-advertisement', {backdrop: 'static', keyboard: true});
 
             editRow(advertisement_id);
         });
