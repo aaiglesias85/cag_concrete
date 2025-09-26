@@ -12,7 +12,7 @@
       </trans-unit>
       <trans-unit id="2" resname="filter_searchword">
         <source>filter_searchword</source>
-        <target>Buscar...</target>
+        <target>Search...</target>
       </trans-unit>
     </body>
   </file>
