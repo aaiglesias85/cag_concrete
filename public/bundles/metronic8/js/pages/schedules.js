@@ -74,7 +74,7 @@ var Schedules = function () {
         formData.set("fecha_fin", fecha_fin);
 
         // loading
-        BlockUtil.block('#div-calendario');
+        BlockUtil.block('#kt_app_content_container');
 
         axios.post("schedule/listarParaCalendario", formData, {responseType: "json"})
             .then(function (res) {
@@ -94,7 +94,7 @@ var Schedules = function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-                BlockUtil.unblock("#div-calendario");
+                BlockUtil.unblock("#kt_app_content_container");
             });
     }
 

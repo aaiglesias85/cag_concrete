@@ -3,7 +3,10 @@ var ModalAdvertisement = function () {
     // Función para mostrar el modal
     function mostrarModal(advertisement_id, fechaHoy) {
 
-        ModalUtil.show('modal-advertisement', {backdrop: 'static', keyboard: false});
+        if(KTUtil.get('modal-advertisement')){
+            ModalUtil.show('modal-advertisement', {backdrop: 'static', keyboard: false});
+        }
+
 
         localStorage.setItem(`advertisement-${advertisement_id}`, fechaHoy); // Guardamos la fecha de hoy
     }
