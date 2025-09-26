@@ -1160,8 +1160,6 @@ var Schedules = function () {
 
             // mostar modal
             ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
-
-            cerrarFormsConfirmated();
         });
 
         $(document).off('click', "#btn-eliminar-schedule");
@@ -1204,7 +1202,7 @@ var Schedules = function () {
                         if (response.success) {
                             toastr.success(response.message, "");
 
-                            btnClickFiltrar();
+                            cerrarFormsConfirmated();
 
                         } else {
                             toastr.error(response.error, "");
@@ -1303,6 +1301,11 @@ var Schedules = function () {
             static: true,
             position: 'above'
         });
+
+        // fecha inicial = primer día del mes actual
+        const hoy = new Date();
+        const fecha_inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        FlatpickrUtil.setDate('datetimepicker-desde', fecha_inicio);
 
         // day
         FlatpickrUtil.initDate('datetimepicker-day', {
