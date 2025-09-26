@@ -691,12 +691,8 @@ var Schedules = function () {
 
 
         // reset
-        $('#hour').each(function (e) {
-            if ($(this).val() === "")
-                $(this).remove();
-        });
         $('#hour').attr('multiple', '');
-        $('#hour').select2();
+        initSelectHour();
 
         $('#hour').val([]);
         $('#hour').trigger('change');
@@ -1122,8 +1118,8 @@ var Schedules = function () {
             $('#div-day').removeClass('hide');
             $('.date-new').addClass('hide');
 
+            // select hour
             $('#hour').removeAttr('multiple');
-            $('#hour').prepend(new Option('Select', '', false, false));
             $('#hour').select2();
 
             $('#hour').val(schedule.hour);
@@ -1256,9 +1252,7 @@ var Schedules = function () {
 
         initTempus();
 
-        $('#hour').select2({
-            placeholder: 'Select',
-        });
+        initSelectHour();
 
         $('#contact-concrete-vendor').select2({
             placeholder: 'Select contacts',
@@ -1278,6 +1272,12 @@ var Schedules = function () {
         $(document).off('change', "#concrete-vendor");
         $(document).on('change', "#concrete-vendor", changeConcreteVendor);
 
+    }
+
+    var initSelectHour = function () {
+        $('#hour').select2({
+            placeholder: 'Select',
+        });
     }
 
     var initTempus = function () {
