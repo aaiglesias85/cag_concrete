@@ -333,6 +333,8 @@ class Base
             array_push($permisos, array(
                 'permiso_id' => $permiso->getPermisoId(),
                 'funcion_id' => $permiso->getFuncion()->getFuncionId(),
+                'funcion_name' => $permiso->getFuncion()->getDescripcion(),
+                'funcion_url' => $permiso->getFuncion()->getUrl(),
                 'ver' => ($ver == 1) ? true : false,
                 'agregar' => ($agregar == 1) ? true : false,
                 'editar' => ($editar == 1) ? true : false,
@@ -519,6 +521,22 @@ class Base
         }
 
         return $menu;
+    }
+
+    //Devolver primera funcion con permiso
+    public function DevolverPrimeraFuncionDeUsuario($usuario_id)
+    {
+        $funcion = null;
+
+        $permisos = $this->ListarPermisosDeUsuario($usuario_id);
+        foreach ($permisos as $permiso) {
+            if ($permiso['ver']) {
+                $funcion = $permiso;
+                break;
+            }
+        }
+
+        return $funcion;
     }
 
     /**

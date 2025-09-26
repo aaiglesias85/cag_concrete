@@ -87,7 +87,13 @@ class UsuarioController extends AbstractController
      */
     public function denegado()
     {
-        return $this->render('admin/usuario/denegado.html.twig', array());
+        $usuario = $this->getUser();
+
+        $funcion = $this->usuarioService->DevolverPrimeraFuncionDeUsuario($usuario->getUsuarioId());
+
+        return $this->render('admin/usuario/denegado.html.twig', array(
+            'funcion' => $funcion
+        ));
     }
 
     /**

@@ -5,38 +5,79 @@
 {% block stylesheetspecific %}{% endblock %}
 
 {% block content %}
-    <!-- BEGIN: Subheader -->
-    <div class="m-subheader ">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <h3 class="m-subheader__title m-subheader__title--separator">Access denied</h3>
-                <ul class="m-subheader__breadcrumbs m-nav m-nav--inline">
-                    <li class="m-nav__item m-nav__item--home">
-                        <a href="{{ url('home') }}" class="m-nav__link m-nav__link--icon">
-                            <i class="m-nav__link-icon la la-home"></i>
-                        </a>
-                    </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Denied</span>
-                        </a>
-                    </li>
-                    <li class="m-nav__separator">-</li>
-                    <li class="m-nav__item">
-                        <a href="" class="m-nav__link">
-                            <span class="m-nav__link-text">Access denied</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
-    <!-- END: Subheader -->
-    <div class="m-content">
-        <h1>You do not have permission to view the requested page</h1>
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <!--begin::Toolbar container-->
+        <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+            <!--begin::Page title-->
+            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                <!--begin::Title-->
+                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
+                    Access denied
+                </h1>
+                <!--end::Title-->
+                <!--begin::Breadcrumb-->
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
+                    </li>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item">
+                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                    </li>
+                    <!--end::company-->
+                    <!--begin::company-->
+                    <li class="breadcrumb-item text-muted">Access denied</li>
+                    <!--end::company-->
+                </ul>
+                <!--end::Breadcrumb-->
+            </div>
+            <!--end::Page title-->
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center gap-2 gap-lg-3">
+
+            </div>
+            <!--end::Actions-->
+        </div>
+        <!--end::Toolbar container-->
     </div>
+    <!--end::Toolbar-->
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <!--begin::Content container-->
+        <div id="kt_app_content_container" class="app-container container-fluid">
+
+            <div class="card card-flush py-5">
+                <div class="card-body py-15 py-lg-20 text-center">
+
+                    <!--begin::Title-->
+                    <h1 class="fw-bolder text-gray-900 mb-5">Access denied</h1>
+                    <!--end::Title-->
+                    <!--begin::Text-->
+                    <div class="fw-semibold fs-6 text-gray-500 mb-7">You do not have permission to view the requested page</div>
+                    <!--end::Text-->
+                    <!--begin::Illustration-->
+                    <div class="mb-0">
+                        <img src="{{ asset('bundles/metronic8/assets/media/auth/welcome.png') }}" class="mw-100 mh-300px theme-light-show" alt="">
+                        <img src="{{ asset('bundles/metronic8/assets/media/auth/welcome-dark.png') }}" class="mw-100 mh-300px theme-dark-show" alt="">
+                    </div>
+                    <!--end::Illustration-->
+                    <!--begin::Link-->
+                    <div class="mb-0">
+                        <a href="{{ url(funcion.funcion_url) }}" class="btn btn-sm btn-primary">Go To {{ funcion.funcion_name }}</a>
+                    </div>
+                    <!--end::Link-->
+                </div>
+            </div>
+
+        </div>
+        <!--end::Content container-->
+    </div>
+    <!--end::Content-->
+
 {% endblock %}
 
 {% block javascriptsspecific %}

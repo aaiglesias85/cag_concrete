@@ -39,8 +39,10 @@ class PermisoUsuarioRepository extends EntityRepository
     {
         $consulta = $this->createQueryBuilder('p_u')
             ->leftJoin('p_u.usuario', 'u')
+            ->leftJoin('p_u.funcion', 'f')
             ->where('u.usuarioId = :usuario_id')
             ->setParameter('usuario_id', $usuario_id)
+            ->orderBy('f.funcionId', 'ASC')
             ->getQuery();
 
         $lista = $consulta->getResult();
