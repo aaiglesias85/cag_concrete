@@ -600,7 +600,7 @@ var DataTrackingDetalle = function () {
             {
                 targets: 0,
                 render: function (data, type, row) {
-                    const icon = isTotalMayorConcPrice() ? '<i class="ki-duotone ki-arrow-up-right fs-2 text-danger me-2">\n' +
+                    const icon = isTotalMayorConcPrice(row.total) ? '<i class="ki-duotone ki-arrow-up-right fs-2 text-danger me-2">\n' +
                         '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path1"></span>\n' +
                         '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path2"></span>\n' +
                         '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</i>': ''
@@ -646,7 +646,7 @@ var DataTrackingDetalle = function () {
                 // console.log(data);
 
                 // verificar el total
-                if (isTotalMayorConcPrice()) {
+                if (isTotalMayorConcPrice(data.total)) {
                     $(row).addClass('row-price-vendor');
                     return;
                 }
@@ -688,10 +688,9 @@ var DataTrackingDetalle = function () {
         return total;
     }
 
-    var isTotalMayorConcPrice = function () {
+    var isTotalMayorConcPrice = function (total) {
         var is_mayor = false;
 
-        var total = calcularTotalConcPrice();
         var price = NumberUtil.getNumericValue('#project_concrete_quote_price-detalle');
         if (price && total > price) {
             is_mayor = true;
