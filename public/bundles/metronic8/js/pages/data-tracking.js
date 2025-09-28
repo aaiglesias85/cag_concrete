@@ -3977,8 +3977,8 @@ var DataTracking = function () {
 
                 $('#data_tracking_id').val(data_tracking_id_edit);
 
-                // open modal
-                $('#form-data-tracking').modal('show');
+                // mostrar form
+                mostrarForm();
 
                 localStorage.removeItem('data_tracking_id_edit');
 
