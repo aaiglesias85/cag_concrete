@@ -350,9 +350,9 @@ var Index = function () {
         });
 
         // fecha inicial
-        // const fecha_inicio = new Date();
-        // fecha_inicio.setDate(fecha_inicio.getDate() - 180);
-        // FlatpickrUtil.setDate('datetimepicker-desde', fecha_inicio);
+        const fecha_inicio = new Date();
+        fecha_inicio.setDate(fecha_inicio.getDate() - 90);
+        FlatpickrUtil.setDate('datetimepicker-desde', fecha_inicio);
 
         // change
         $('#filtro-status').change(changeStatus);
