@@ -652,7 +652,7 @@ var DataTrackingDetalle = function () {
                 }
 
                 // verificar el vendor
-                if (project_vendor_id && data.id != project_vendor_id) {
+                if (project_vendor_id && data.vendor_id != project_vendor_id) {
                     $(row).addClass('row-incorrect-vendor');
                 }
             }
