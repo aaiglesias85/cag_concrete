@@ -40,7 +40,12 @@ class DefaultController extends AbstractController
 
                 // primer dia del mes
                 // $from = $this->defaultService->ObtenerPrimerDiaMes();
-                $from = '';
+                //$from = '';
+                // fecha actual
+                $from = new \DateTime();
+                // restar 90 días
+                $from->sub(new \DateInterval('P90D'));
+                $from = $from->format('m/d/Y');
 
                 //last 6 projects
                 $projects = $this->defaultService->ListarProjectsParaDashboard('', $from, '', 'DESC', 6);
