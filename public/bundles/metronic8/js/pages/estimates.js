@@ -1252,6 +1252,10 @@ var Estimates = function () {
             defaultText: 'Add phone...',
         });
 
+        $('.select-modal-company-estimate').select2({
+            dropdownParent: $('#modal-company-estimate')
+        });
+
         // google maps
         inicializarAutocomplete();
 
@@ -1492,7 +1496,10 @@ var Estimates = function () {
         for (var i = 0; i < contacts_company.length; i++) {
             $(select).append(new Option(contacts_company[i].name, contacts_company[i].contact_id, false, false));
         }
-        $(select).select2();
+
+        $('.select-modal-company-estimate').select2({
+            dropdownParent: $('#modal-company-estimate')
+        });
     }
 
     var changeCounty = function (e) {
@@ -1524,6 +1531,10 @@ var Estimates = function () {
 
                 $('.select-company').val(company.company_id);
                 $('.select-company').trigger('change');
+
+                $('.select-modal-company-estimate').select2({
+                    dropdownParent: $('#modal-company-estimate')
+                });
             }
         });
 
