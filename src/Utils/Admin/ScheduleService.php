@@ -155,7 +155,7 @@ class ScheduleService extends Base
                     }
 
                     if ($indexDia !== false) {
-                        $hora = $schedule->getHour();
+                        $hora = $schedule->getHour() != "" ? $schedule->getHour() : null;
                         $ampm = $hora ? \DateTime::createFromFormat('H:i', $hora)?->format('g:i a') : '';
                         $cantidad = $schedule->getQuantity();
 
