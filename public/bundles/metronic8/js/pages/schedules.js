@@ -667,8 +667,8 @@ var Schedules = function () {
         $('#filtro-project').val('');
         $('#filtro-project').trigger('change');
 
-        $('#pending').val('');
-        $('#pending').trigger('change');
+        $('#filtro-concrete-vendor').val('');
+        $('#filtro-concrete-vendor').trigger('change');
 
         FlatpickrUtil.clear('datetimepicker-desde');
         FlatpickrUtil.clear('datetimepicker-hasta');
