@@ -664,8 +664,8 @@ var Schedules = function () {
         // reset
         $('#lista-schedule [data-table-filter="search"]').val('');
 
-        $('#project').val('');
-        $('#project').trigger('change');
+        $('#filtro-project').val('');
+        $('#filtro-project').trigger('change');
 
         $('#pending').val('');
         $('#pending').trigger('change');
