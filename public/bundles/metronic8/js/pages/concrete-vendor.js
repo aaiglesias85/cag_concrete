@@ -735,6 +735,40 @@ var ConcreteVendor = function () {
         Inputmask({
             "mask": "(999) 999-9999"
         }).mask(".input-phone");
+
+        // google maps
+        inicializarAutocomplete();
+    }
+
+    // google maps
+    var latitud = '';
+    var longitud = '';
+    var inicializarAutocomplete = async function () {
+
+        // Cargar librería de Places
+        await google.maps.importLibrary("places");
+
+        const input = document.getElementById('address');
+
+        const autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ['address'], // Solo direcciones
+            componentRestrictions: {country: 'us'} // Opcional: restringir a país (ej: Chile)
+        });
+
+        autocomplete.addListener('place_changed', function () {
+            const place = autocomplete.getPlace();
+
+            if (!place.geometry) {
+                console.log("No se pudo obtener ubicación.");
+                return;
+            }
+
+            latitud = place.geometry.location.lat();
+            longitud = place.geometry.location.lng();
+
+            console.log('Dirección seleccionada:', place.formatted_address);
+            console.log('Coordenadas:', place.geometry?.location?.toString());
+        });
     }
 
     // Contacts

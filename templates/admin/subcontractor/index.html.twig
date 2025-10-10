@@ -388,8 +388,15 @@
                                         <!-- Subcontractor Address -->
                                         <div class="col-md-12">
                                             <label class="form-label">Subcontractor Address</label>
-                                            <textarea class="form-control form-control-validate form-control-solid event-change"
-                                                      id="address" name="address" rows="2"></textarea>
+                                            <div class="input-group input-group-solid">
+                                                <span class="input-group-text">
+                                                    <i class="ki-duotone ki-geolocation"><span
+                                                                class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                                <input type="text"
+                                                       class="form-control form-control-validate event-change"
+                                                       id="address" name="address">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -422,8 +429,15 @@
                                         <!-- Company Address -->
                                         <div class="col-md-12">
                                             <label class="form-label">Company Address</label>
-                                            <textarea class="form-control form-control-validate form-control-solid event-change"
-                                                      id="companyAddress" name="companyaddress" rows="2"></textarea>
+                                            <div class="input-group input-group-solid">
+                                                <span class="input-group-text">
+                                                    <i class="ki-duotone ki-geolocation"><span
+                                                                class="path1"></span><span class="path2"></span></i>
+                                                </span>
+                                                <input type="text"
+                                                       class="form-control form-control-validate event-change"
+                                                       id="companyAddress" name="companyaddress">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -745,6 +759,28 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
+
+    <!-- Google maps-->
+    <script>(g => {
+            var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+                m = document, b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    await (a = m.createElement("script"));
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a)
+                }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })
+        ({key: "{{ google_maps_api_key }}", v: "weekly"});</script>
+
     <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
     <script src="{{ asset('bundles/metronic8/js/pages/subcontractors.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
