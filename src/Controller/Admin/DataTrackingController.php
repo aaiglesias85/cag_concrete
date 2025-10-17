@@ -71,8 +71,11 @@ class DataTrackingController extends AbstractController
                 $concrete_vendors = $this->dataTrackingService->getDoctrine()->getRepository(ConcreteVendor::class)
                     ->ListarOrdenados();
 
+                $permisoInvoice = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 11);
+
                 return $this->render('admin/data-tracking/index.html.twig', array(
                     'permiso' => $permiso[0],
+                    'permisoInvoice' => $permisoInvoice[0],
                     'projects' => $projects,
                     'items' => $items,
                     'inspectors' => $inspectors,

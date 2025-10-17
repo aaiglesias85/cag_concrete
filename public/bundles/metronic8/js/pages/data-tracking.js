@@ -703,6 +703,28 @@ var DataTracking = function () {
         };
     };
 
+    var initAccionNuevoInvoice = function () {
+        $(document).off('click', "#btn-nuevo-invoice");
+        $(document).on('click', "#btn-nuevo-invoice", function (e) {
+            btnClickNuevo();
+        });
+
+        function btnClickNuevo() {
+
+            // validar que haya seleccionado un proyecto
+            var project_id = $('#project').val();
+            if (project_id == '') {
+                toastr.error('Select the project in the top section', "");
+                return;
+            }
+
+            var company_id =$('#project option[value="' + project_id + '"]').attr("data-company");
+
+
+            ModalInvoice.mostrarModal(company_id, project_id);
+        };
+    };
+
     var mostrarForm = function () {
         KTUtil.removeClass(KTUtil.get('form-data-tracking'), 'hide');
         KTUtil.addClass(KTUtil.get('lista-data-tracking'), 'hide');
@@ -3935,6 +3957,7 @@ var DataTracking = function () {
             initWizard();
 
             initAccionNuevo();
+            initAccionNuevoInvoice();
             initAccionSalvar();
             initAccionCerrar();
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Company;
 use App\Entity\Equation;
 use App\Entity\Item;
 use App\Entity\Unit;
@@ -249,5 +250,17 @@ class DefaultController extends AbstractController
     public function renderModalContactCompany()
     {
         return $this->render('admin/block/modal-contact-company.html.twig', array());
+    }
+
+    public function renderModalInvoice()
+    {
+
+        // companies
+        $companies = $this->defaultService->getDoctrine()->getRepository(Company::class)
+            ->ListarOrdenados();
+
+        return $this->render('admin/block/modal-invoice.html.twig', array(
+            'companies' => $companies,
+        ));
     }
 }
