@@ -468,10 +468,10 @@ var Payments = function () {
                 case 1:
                     actualizarTableListaPayments();
                     break;
-                case 2:
+                case 3:
                     btnClickFiltrarNotes();
                     break;
-                case 3:
+                case 2:
                     actualizarTableListaArchivos();
                     break;
             }
@@ -514,11 +514,11 @@ var Payments = function () {
                     $('#tab-payment').tab('show');
                     actualizarTableListaPayments();
                     break;
-                case 2:
+                case 3:
                     $('#tab-notes').tab('show');
                     btnClickFiltrarNotes();
                     break;
-                case 3:
+                case 2:
                     $('#tab-archivo').tab('show');
                     actualizarTableListaArchivos();
                     break;
@@ -571,8 +571,8 @@ var Payments = function () {
     
     //Salvar
     var initAccionSalvar = function () {
-        $(document).off('click', "#btn-salvar-payment");
-        $(document).on('click', "#btn-salvar-payment", function (e) {
+        $(document).off('click', "#btn-salvar-invoice");
+        $(document).on('click', "#btn-salvar-invoice", function (e) {
             btnClickSalvarForm();
         });
 
@@ -2041,6 +2041,13 @@ var Payments = function () {
             // payments
             initTablePayments();
             initAccionesPayments();
+
+            // notes
+            initTableNotes();
+            initAccionFiltrarNotes();
+
+            // archivos
+            initAccionesArchivo();
 
             initAccionChange()
         }
