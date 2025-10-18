@@ -5,3 +5,46 @@ payment:
 listarPaymentAdmin:
   path: /payment/listar
   defaults: { _controller: App\Controller\Admin\PaymentController::listar, _format: json }
+  
+salvarPaymentAdmin:
+  path: /payment/salvarPayment
+  defaults: { _controller: App\Controller\Admin\PaymentController::salvar, _format: json }
+  
+cargarDatosPaymentAdmin:
+  path: /payment/cargarDatos
+  defaults: { _controller: App\Controller\Admin\PaymentController::cargarDatos, _format: json }
+  
+
+#notes
+listarNotesPaymentAdmin:
+  path: /payment/listarNotes
+  defaults: { _controller: App\Controller\Admin\PaymentController::listarNotes, _format: json }
+
+salvarNotesPaymentAdmin:
+  path: /payment/salvarNotes
+  defaults: { _controller: App\Controller\Admin\PaymentController::salvarNotes, _format: json }
+
+cargarDatosNotesPaymentAdmin:
+  path: /payment/cargarDatosNotes
+  defaults: { _controller: App\Controller\Admin\PaymentController::cargarDatosNotes, _format: json }
+
+eliminarNotesPaymentAdmin:
+  path: /payment/eliminarNotes
+  defaults: { _controller: App\Controller\Admin\PaymentController::eliminarNotes, _format: json }
+
+eliminarNotesDatePaymentAdmin:
+  path: /payment/eliminarNotesDate
+  defaults: { _controller: App\Controller\Admin\PaymentController::eliminarNotesDate, _format: json }
+  
+#attachments
+salvarArchivoPaymentAdmin:
+  path: /payment/salvarArchivo
+  defaults: { _controller: App\Controller\Admin\PaymentController::salvarArchivo, _format: json }
+
+eliminarArchivoPaymentAdmin:
+  path: /payment/eliminarArchivo
+  defaults: { _controller: App\Controller\Admin\PaymentController::eliminarArchivo, _format: json}
+
+eliminarArchivosPaymentAdmin:
+  path: /payment/eliminarArchivos
+  defaults: { _controller: App\Controller\Admin\PaymentController::eliminarArchivos, _format: json}

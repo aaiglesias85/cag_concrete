@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 17-10-2025 a las 20:28:42
+-- Tiempo de generación: 18-10-2025 a las 15:23:17
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3418,6 +3418,19 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `invoice_attachment`
+--
+
+CREATE TABLE `invoice_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `invoice_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `invoice_item`
 --
 
@@ -3572,6 +3585,19 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (184, 0.000000, 0.000000, 106.000000, 26.00, 106.000000, 2756.000000, 2756.000000, 16, 859, NULL),
 (185, 0.000000, 0.000000, 60.000000, 31.00, 60.000000, 1860.000000, 1860.000000, 16, 860, NULL),
 (186, 0.000000, 0.000000, 0.000000, 31.00, 0.000000, 0.000000, 0.000000, 16, 861, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_notes`
+--
+
+CREATE TABLE `invoice_notes` (
+  `id` int(11) NOT NULL,
+  `notes` text,
+  `date` date DEFAULT NULL,
+  `invoice_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -9315,10 +9341,24 @@ ALTER TABLE `invoice`
   ADD PRIMARY KEY (`invoice_id`);
 
 --
+-- Indices de la tabla `invoice_attachment`
+--
+ALTER TABLE `invoice_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refinvoice_attachment1` (`invoice_id`);
+
+--
 -- Indices de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `invoice_notes`
+--
+ALTER TABLE `invoice_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refinvoice_notes1` (`invoice_id`);
 
 --
 -- Indices de la tabla `item`
@@ -9701,10 +9741,22 @@ ALTER TABLE `invoice`
   MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
+-- AUTO_INCREMENT de la tabla `invoice_attachment`
+--
+ALTER TABLE `invoice_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211;
+
+--
+-- AUTO_INCREMENT de la tabla `invoice_notes`
+--
+ALTER TABLE `invoice_notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `item`
@@ -10015,6 +10067,18 @@ ALTER TABLE `estimate_quote`
   ADD CONSTRAINT `Refestimate_quote1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
   ADD CONSTRAINT `Refestimate_quote2` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
   ADD CONSTRAINT `Refestimate_quote3` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`);
+
+--
+-- Filtros para la tabla `invoice_attachment`
+--
+ALTER TABLE `invoice_attachment`
+  ADD CONSTRAINT `Refinvoice_attachment1` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`invoice_id`);
+
+--
+-- Filtros para la tabla `invoice_notes`
+--
+ALTER TABLE `invoice_notes`
+  ADD CONSTRAINT `Refinvoice_notes1` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`invoice_id`);
 
 --
 -- Filtros para la tabla `item`

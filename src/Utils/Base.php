@@ -16,16 +16,19 @@ use App\Entity\District;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateQuote;
 use App\Entity\Holiday;
+use App\Entity\InvoiceItem;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
 use App\Entity\PermisoUsuario;
 use App\Entity\Project;
+use App\Entity\InvoiceAttachment;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
-use App\Entity\ProjectNotes;
+use App\Entity\InvoiceNotes;
 use App\Entity\ProjectPriceAdjustment;
 use App\Entity\ReminderRecipient;
+use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
 use App\Entity\UserQbwcToken;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -849,7 +852,7 @@ class Base
     {
         $nota = null;
 
-        $lista = $this->getDoctrine()->getRepository(ProjectNotes::class)
+        $lista = $this->getDoctrine()->getRepository(InvoiceNotes::class)
             ->ListarNotesDeProject($project_id);
         foreach ($lista as $value) {
             $id = $value->getId();
@@ -1302,7 +1305,7 @@ class Base
         //notes
         foreach ($notas as $value) {
 
-            $project_note = new ProjectNotes();
+            $project_note = new InvoiceNotes();
 
             $project_note->setNotes($value['notes']);
             $project_note->setDate($value['date']);
@@ -1311,6 +1314,52 @@ class Base
 
             $em->persist($project_note);
 
+        }
+    }
+
+    /**
+     * EliminarInformacionDeInvoice
+     * @param $invoice_id
+     * @return void
+     */
+    public function EliminarInformacionDeInvoice($invoice_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // items
+        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
+            ->ListarItems($invoice_id);
+        foreach ($items as $item) {
+            $em->remove($item);
+        }
+
+        // quickbooks
+        $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
+            ->ListarRegistrosDeEntidadId("invoice", $invoice_id);
+        foreach ($quickbooks as $quickbook) {
+            $em->remove($quickbook);
+        }
+
+        // notes
+        $notes = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+            ->ListarNotesDeProject($invoice_id);
+        foreach ($notes as $note) {
+            $em->remove($note);
+        }
+
+        // attachments
+        $dir = 'uploads/invoice/';
+        $attachments = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+            ->ListarAttachmentsDeInvoice($invoice_id);
+        foreach ($attachments as $attachment) {
+
+            //eliminar archivo
+            $file_eliminar = $attachment->getFile();
+            if ($file_eliminar != "" && is_file($dir . $file_eliminar)) {
+                unlink($dir . $file_eliminar);
+            }
+
+            $em->remove($attachment);
         }
     }
 

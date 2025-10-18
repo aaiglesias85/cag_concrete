@@ -569,30 +569,6 @@ class InvoiceService extends Base
     }
 
     /**
-     * EliminarInformacionDeInvoice
-     * @param $invoice_id
-     * @return void
-     */
-    private function EliminarInformacionDeInvoice($invoice_id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        // items
-        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->ListarItems($invoice_id);
-        foreach ($items as $item) {
-            $em->remove($item);
-        }
-
-        // quickbooks
-        $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-            ->ListarRegistrosDeEntidadId("invoice", $invoice_id);
-        foreach ($quickbooks as $quickbook) {
-            $em->remove($quickbook);
-        }
-    }
-
-    /**
      * ActualizarInvoice: Actuializa los datos del rol en la BD
      * @param int $invoice_id Id
      * @author Marcel

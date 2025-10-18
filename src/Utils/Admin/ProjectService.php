@@ -1296,19 +1296,11 @@ class ProjectService extends Base
             ->ListarInvoicesDeProject($project_id);
         foreach ($invoices as $invoice) {
             $invoice_id = $invoice->getInvoiceId();
-            // items
-            $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                ->ListarItems($invoice_id);
-            foreach ($items as $item) {
-                $em->remove($item);
-            }
 
-            // quickbooks
-            $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-                ->ListarRegistrosDeEntidadId("invoice", $invoice_id);
-            foreach ($quickbooks as $quickbook) {
-                $em->remove($quickbook);
-            }
+            // eliminar informacion
+            $this->EliminarInformacionDeInvoice($invoice_id);
+
+            $em->remove($invoice);
         }
 
         // contacts

@@ -182,7 +182,7 @@ var Invoices = function () {
                 targets: 9,
                 render: function (data, type, row) {
                     var status = {
-                        1: {'title': 'Yes', 'class': 'badge-primary'},
+                        1: {'title': 'Yes', 'class': 'badge-success'},
                         0: {'title': 'No', 'class': 'badge-danger'},
                     };
 
@@ -457,7 +457,7 @@ var Invoices = function () {
     };
     var btnClickResetFilters = function () {
         // reset
-        $('#lista-project [data-table-filter="search"]').val('');
+        $('#lista-invoice [data-table-filter="search"]').val('');
 
         $('#filtro-company').val('');
         $('#filtro-company').trigger('change');
