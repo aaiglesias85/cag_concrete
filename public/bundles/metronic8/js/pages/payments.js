@@ -717,7 +717,7 @@ var Payments = function () {
             actualizarTableListaPayments();
 
             // archivos
-            archivos = project.archivos;
+            archivos = invoice.archivos;
             actualizarTableListaArchivos();
 
             event_change = false;

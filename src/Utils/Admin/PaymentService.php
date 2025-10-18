@@ -328,7 +328,7 @@ class PaymentService extends Base
             $arreglo_resultado['archivos'] = $archivos;
 
             $resultado['success'] = true;
-            $resultado['invoice'] = $arreglo_resultado;
+            $resultado['payment'] = $arreglo_resultado;
         }
 
         return $resultado;
