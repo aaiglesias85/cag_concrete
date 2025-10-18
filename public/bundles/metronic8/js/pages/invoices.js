@@ -425,6 +425,30 @@ var Invoices = function () {
             btnClickResetFilters();
         });
 
+        $(document).off('click', "#btn-filter-this-month");
+        $(document).on('click', "#btn-filter-this-month", function (e) {
+            var fechaInicio = MyApp.getFirstDayOfMonth();
+            FlatpickrUtil.setDate('datetimepicker-desde', fechaInicio);
+
+            var fechaFin = MyApp.getFinMesActual();
+            FlatpickrUtil.setDate('datetimepicker-hasta', fechaFin);
+
+            btnClickFiltrar();
+
+        });
+
+        $(document).off('click', "#btn-filter-prev-month");
+        $(document).on('click', "#btn-filter-prev-month", function (e) {
+            var fechaInicio = MyApp.getInicioMesAnterior();
+            FlatpickrUtil.setDate('datetimepicker-desde', fechaInicio);
+
+            var fechaFin = MyApp.getFinMesAnterior();
+            FlatpickrUtil.setDate('datetimepicker-hasta', fechaFin);
+
+            btnClickFiltrar();
+
+        });
+
     };
     var btnClickFiltrar = function () {
 

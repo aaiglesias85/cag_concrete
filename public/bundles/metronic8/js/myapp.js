@@ -1093,9 +1093,28 @@ var MyApp = function () {
         }
     }
 
+    // fecha inicio del mes
     function getFirstDayOfMonth() {
         const today = new Date();
         return new Date(today.getFullYear(), today.getMonth(), 1);
+    }
+
+    // Fecha de fin del mes actual
+    function getFinMesActual() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    }
+
+    // Fecha de inicio del mes anterior
+    function getInicioMesAnterior() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+    }
+
+    // Fecha de fin del mes anterior
+    function getFinMesAnterior() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
     }
 
     var evaluateExpression = function (expression, variableValue) {
@@ -1294,6 +1313,9 @@ var MyApp = function () {
         startSessionTimer: startSessionTimer,
         stopSessionTimer: stopSessionTimer,
         getFirstDayOfMonth: getFirstDayOfMonth,
+        getFinMesActual: getFinMesActual,
+        getInicioMesAnterior: getInicioMesAnterior,
+        getFinMesAnterior: getFinMesAnterior,
         evaluateExpression: evaluateExpression,
         formatearNumero: formatearNumero,
         formatMoney: formatMoney,
