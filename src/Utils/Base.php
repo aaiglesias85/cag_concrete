@@ -385,6 +385,7 @@ class Base
             $menuPlanDownloading = false;
             $menuHoliday = false;
             $menuCounty = false;
+            $menuPayment = false;
 
             foreach ($permisos as $permiso) {
                 if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
@@ -483,6 +484,9 @@ class Base
                 if ($permiso['funcion_id'] == 32 && $permiso['ver']) {
                     $menuCounty = true;
                 }
+                if ($permiso['funcion_id'] == 33 && $permiso['ver']) {
+                    $menuPayment = true;
+                }
             }
             $menu = array(
                 'menuInicio' => $menuInicio,
@@ -517,6 +521,7 @@ class Base
                 'menuPlanDownloading' => $menuPlanDownloading,
                 'menuHoliday' => $menuHoliday,
                 'menuCounty' => $menuCounty,
+                'menuPayment' => $menuPayment,
             );
         }
 

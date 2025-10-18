@@ -1,0 +1,7 @@
+payment:
+  path: /payments
+  defaults: { _controller: App\Controller\Admin\PaymentController::index }
+
+listarPaymentAdmin:
+  path: /payment/listar
+  defaults: { _controller: App\Controller\Admin\PaymentController::listar, _format: json }

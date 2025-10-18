@@ -597,7 +597,7 @@ class InvoiceService extends Base
      * @param int $invoice_id Id
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
+    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -664,9 +664,6 @@ class InvoiceService extends Base
             // items
             $this->SalvarItems($entity, $items);
 
-            // payments
-            $this->SalvarPayments($entity, $payments);
-
             // salvar en la cola
             $this->SalvarInvoiceQuickbook($entity);
 
@@ -699,7 +696,7 @@ class InvoiceService extends Base
      * @param string $description Nombre
      * @author Marcel
      */
-    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar)
+    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -775,9 +772,6 @@ class InvoiceService extends Base
         $this->SalvarItems($entity, $items);
 
         $em->flush();
-
-        // payments
-        $this->SalvarPayments($entity, $payments);
 
         // salvar en la cola
         $this->SalvarInvoiceQuickbook($entity);
@@ -943,6 +937,7 @@ class InvoiceService extends Base
                 "id" => $invoice_id,
                 "number" => $value->getNumber(),
                 "company" => $value->getProject()->getCompany()->getName(),
+                "projectNumber" => $value->getProject()->getProjectNumber(),
                 "project" => $value->getProject()->getDescription(),
                 "startDate" => $value->getStartDate()->format('m/d/Y'),
                 "endDate" => $value->getEndDate()->format('m/d/Y'),

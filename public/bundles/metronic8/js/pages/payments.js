@@ -81,6 +81,7 @@ var Invoices = function () {
             initAccionChangeNumber();
             initAccionEliminar();
             initAccionExportar();
+            initAccionPaid();
         });
 
         // select records
@@ -286,7 +287,7 @@ var Invoices = function () {
                 orderable: false,
                 className: 'text-center',
                 render: function (data, type, row) {
-                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete', 'exportar_excel']);
+                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete', 'paid', 'exportar_excel']);
                 },
             }
         );
@@ -470,6 +471,10 @@ var Invoices = function () {
         items = [];
         actualizarTableListaItems();
 
+        // payments
+        payments = [];
+        actualizarTableListaPayments();
+
         //Mostrar el primer tab
         resetWizard();
 
@@ -549,6 +554,9 @@ var Invoices = function () {
                 case 2:
                     actualizarTableListaItems();
                     break;
+                case 3:
+                    actualizarTableListaPayments();
+                    break;
             }
 
         });
@@ -592,6 +600,10 @@ var Invoices = function () {
                     $('#tab-items').tab('show');
                     actualizarTableListaItems();
                     break;
+                case 3:
+                    $('#tab-payments').tab('show');
+                    actualizarTableListaPayments();
+                    break;
             }
         }, 0);
     }
@@ -602,6 +614,8 @@ var Invoices = function () {
         $('.btn-wizard-finalizar').removeClass('hide').addClass('hide');
         $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
         $('#btn-wizard-siguiente').removeClass('hide');
+
+        $('.nav-item-hide').removeClass('hide').addClass('hide');
 
         // reset valid
         KTUtil.findAll(KTUtil.get("invoice-form"), ".nav-link").forEach(function (element, index) {
@@ -708,7 +722,7 @@ var Invoices = function () {
                 formData.set("paid", paid);
 
                 formData.set("items", JSON.stringify(items));
-
+                formData.set("payments", JSON.stringify(payments));
                 formData.set("exportar", exportar ? 1 : 0);
 
                 BlockUtil.block('#form-invoice');
@@ -891,6 +905,14 @@ var Invoices = function () {
             // items
             items = invoice.items;
             actualizarTableListaItems();
+
+            // payments
+            payments = invoice.payments;
+            actualizarTableListaPayments();
+
+            // habilitar tab
+            totalTabs = 3;
+            $('.nav-item-hide').removeClass('hide');
 
             event_change = false;
 
@@ -1199,8 +1221,33 @@ var Invoices = function () {
                                     principal: item.principal,
                                     posicion: posicion
                                 });
+
+                                payments.push({
+                                    invoice_item_id: '',
+                                    project_item_id: item.project_item_id,
+                                    item_id: item.item_id,
+                                    item: item.item,
+                                    unit: item.unit,
+                                    contract_qty: item.contract_qty,
+                                    quantity: item.quantity + item.unpaid_from_previous,
+                                    price: item.price,
+                                    contract_amount: item.contract_amount,
+                                    quantity_from_previous: item.quantity_from_previous ?? 0,
+                                    unpaid_from_previous: item.unpaid_from_previous ?? 0,
+                                    quantity_completed: item.quantity_completed,
+                                    amount: item.amount,
+                                    total_amount: item.total_amount,
+                                    paid_qty: 0,
+                                    unpaid_qty: 0,
+                                    paid_amount: 0,
+                                    paid_amount_total: item.paid_amount_total,
+                                    principal: item.principal,
+                                    posicion: posicion
+                                });
                             }
                             actualizarTableListaItems();
+
+                            actualizarTableListaPayments();
 
                         } else {
                             toastr.error(response.error, "");
@@ -1653,6 +1700,19 @@ var Invoices = function () {
                 items[posicion].unpaid_from_previous = $this.val();
 
                 actualizarTableListaItems();
+
+                var payment_posicion = payments.findIndex(item => item.project_item_id === items[posicion].project_item_id);
+                if (payments[payment_posicion]) {
+
+                    var unpaid_from_previous = parseFloat(items[posicion].unpaid_from_previous);
+                    var quantity = items[posicion].quantity ?? 0
+                    payments[payment_posicion].quantity = unpaid_from_previous + quantity;
+
+                    var paid_qty = payments[payment_posicion].paid_qty ?? 0;
+                    payments[payment_posicion].unpaid_qty = payments[payment_posicion].quantity - paid_qty;
+
+                    actualizarTableListaPayments();
+                }
             }
         });
 
@@ -1663,6 +1723,335 @@ var Invoices = function () {
         MyUtil.resetForm("item-form");
 
         nEditingRowItem = null;
+    };
+
+    // payments details
+    var oTablePayments;
+    var payments = [];
+    var nEditingRowPayment = null;
+    var initTablePayments = function () {
+
+        const table = "#payments-table-editable";
+
+        // columns
+        const columns = [
+            {data: 'item'},
+            {data: 'unit'},
+            {data: 'contract_qty'},
+            {data: 'price'},
+            {data: 'contract_amount'},
+            {data: 'quantity'},
+            {data: 'amount'},
+            {data: 'paid_qty'},
+            {data: 'unpaid_qty'},
+            {data: 'paid_amount'},
+            {data: 'paid_amount_total'},
+            {data: null},
+        ];
+
+        // column defs
+        let columnDefs = [
+            // unit
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 50);
+                }
+            },
+            // contract_qty
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // price
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // contract_amount
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // quantity
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // amount
+            {
+                targets: 6,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // paid_qty
+            {
+                targets: 7,
+                render: function (data, type, row) {
+                    var output = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    if (invoice === null || !invoice.paid) {
+                        output = `<input type="number" class="form-control paid_qty" value="${data}" data-position="${row.posicion}" />`;
+                    }
+                    return `<div class="w-100px">${output}</div>`;
+                },
+            },
+            // unpaid_qty
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                }
+            },
+            // paid_amount
+            {
+                targets: 9,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            // paid_amount_total
+            {
+                targets: 10,
+                render: function (data, type, row) {
+                    return `<span>${MyApp.formatMoney(data)}</span>`;
+                },
+            },
+            {
+                targets: -1,
+                data: null,
+                orderable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    var class_css = row.paid_qty > 0 ? 'btn-success' : 'btn-danger';
+
+                    return `
+                    <a href="javascript:;" data-posicion="${row.posicion}" 
+                    class="paid btn btn-sm btn-icon ${class_css}" 
+                        title="Paid item"><i class="la la-check"></i></a>
+                    `;
+                },
+            }
+        ];
+
+        // language
+        const language = DatatableUtil.getDataTableLenguaje();
+
+        // order
+        const order = [[5, 'desc']];
+
+        // escapar contenido de la tabla
+        oTablePayments = DatatableUtil.initSafeDataTable(table, {
+            data: payments,
+            displayLength: 10,
+            order: order,
+            columns: columns,
+            columnDefs: columnDefs,
+            language: language,
+        });
+
+        handleSearchDatatablePayments();
+    };
+    var handleSearchDatatablePayments = function () {
+        $(document).off('keyup', '#lista-payments [data-table-filter="search"]');
+        $(document).on('keyup', '#lista-payments [data-table-filter="search"]', function (e) {
+            oTablePayments.search(e.target.value).draw();
+        });
+    }
+
+    var actualizarTableListaPayments = function () {
+        if (oTablePayments) {
+            oTablePayments.destroy();
+        }
+
+        initTablePayments();
+    }
+    var validateFormPayment = function () {
+        var result = false;
+
+        //Validacion
+        var form = KTUtil.get('payment-form');
+
+        var constraints = {
+            paidqty: {
+                presence: {message: "This field is required"},
+            },
+            paidamount: {
+                presence: {message: "This field is required"},
+            },
+            paidamounttotal: {
+                presence: {message: "This field is required"},
+            },
+        }
+
+        var errors = validate(form, constraints);
+
+        if (!errors) {
+            result = true;
+        } else {
+            MyApp.showErrorsValidateForm(form, errors);
+        }
+
+        //attach change
+        MyUtil.attachChangeValidacion(form, constraints);
+
+        return result;
+    };
+    var initAccionesPayments = function () {
+
+        $(document).off('click', "#btn-salvar-payment");
+        $(document).on('click', "#btn-salvar-payment", function (e) {
+            e.preventDefault();
+
+            if (validateFormPayment()) {
+
+                // payment
+                var paid_qty = NumberUtil.getNumericValue('#item-paid-qty');
+                var paid_amount = NumberUtil.getNumericValue('#item-paid-amount');
+                var paid_amount_total = NumberUtil.getNumericValue('#item-paid-amount-total');
+
+                var posicion = nEditingRowPayment;
+                if (payments[posicion]) {
+
+                    // payment
+                    payments[posicion].paid_qty = paid_qty;
+                    payments[posicion].paid_amount = paid_amount;
+                    payments[posicion].paid_amount_total = paid_amount_total;
+                }
+
+                //actualizar lista
+                actualizarTableListaPayments();
+
+                // reset
+                resetFormPayment();
+
+                ModalUtil.hide('modal-payment');
+
+            }
+
+        });
+
+        $(document).off('click', "#payments-table-editable a.edit");
+        $(document).on('click', "#payments-table-editable a.edit", function (e) {
+            var posicion = $(this).data('posicion');
+            if (payments[posicion]) {
+
+                // reset
+                resetFormPayment();
+
+                nEditingRowPayment = posicion;
+
+                $('#item-paid-qty').val(payments[posicion].paid_qty);
+                $('#item-paid-amount').val(payments[posicion].paid_amount);
+                $('#item-paid-amount-total').val(payments[posicion].paid_amount_total);
+
+                // open modal
+                ModalUtil.show('modal-payment', {backdrop: 'static', keyboard: true});
+
+            }
+        });
+
+        $(document).off('change', "#payments-table-editable input.paid_qty");
+        $(document).on('change', "#payments-table-editable input.paid_qty", function (e) {
+            var $this = $(this);
+            var posicion = $this.attr('data-position');
+            if (payments[posicion]) {
+                var paid_qty = $this.val();
+                var price = payments[posicion].price;
+                var amount = payments[posicion].amount;
+
+                var quantity = payments[posicion].quantity;
+                var unpaid_qty = quantity - paid_qty;
+
+                payments[posicion].paid_qty = paid_qty;
+                payments[posicion].unpaid_qty = unpaid_qty;
+
+                var paid_amount = paid_qty * price;
+                payments[posicion].paid_amount = paid_amount;
+
+                payments[posicion].paid_amount_total += paid_amount;
+
+                actualizarTableListaPayments();
+            }
+        });
+
+        $(document).off('click', "#payments-table-editable a.paid");
+        $(document).on('click', "#payments-table-editable a.paid", function (e) {
+            var posicion = $(this).data('posicion');
+            if (payments[posicion]) {
+                var quantity = payments[posicion].quantity;
+                var paid_qty = quantity;
+                var price = payments[posicion].price;
+                var amount = payments[posicion].amount;
+
+                var unpaid_qty = quantity - paid_qty;
+
+                payments[posicion].paid_qty = paid_qty;
+                payments[posicion].unpaid_qty = unpaid_qty;
+
+                var paid_amount = paid_qty * price;
+                payments[posicion].paid_amount = paid_amount;
+
+                payments[posicion].paid_amount_total += paid_amount;
+
+                actualizarTableListaPayments();
+            }
+        });
+    };
+    var resetFormPayment = function () {
+        MyUtil.resetForm("payment-form");
+
+        nEditingRowPayment = null;
+    };
+
+    //Paid
+    var initAccionPaid = function () {
+
+        $(document).off('click', "#invoice-table-editable a.paid");
+        $(document).on('click', "#invoice-table-editable a.paid", function (e) {
+            e.preventDefault();
+            /* Get the row as a parent of the link that was clicked on */
+            var invoice_id = $(this).data('id');
+            cambiarEstadoInvoice(invoice_id);
+        });
+
+        function cambiarEstadoInvoice(invoice_id) {
+
+            var formData = new URLSearchParams();
+
+            formData.set("invoice_id", invoice_id);
+
+            BlockUtil.block('#lista-invoice');
+
+            axios.post("invoice/paid", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success("The operation was successful", "");
+
+                             btnClickFiltrar();
+
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#lista-invoice");
+                });
+        }
     };
 
 
@@ -1685,6 +2074,10 @@ var Invoices = function () {
             // items
             initTableItems();
             initAccionesItems();
+
+            // payments
+            initTablePayments();
+            initAccionesPayments();
 
             initAccionChange();
 

@@ -145,6 +145,7 @@ class InvoiceRepository extends EntityRepository
             'id' => 'i.invoiceId',
             'number' => 'i.number',
             'company' => 'c.name',
+            'projectNumber' => 'p.projectNumber',
             'project' => 'p.name',
             'startDate' => 'i.startDate',
             'endDate' => 'i.endDate',

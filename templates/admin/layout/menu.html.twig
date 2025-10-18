@@ -343,13 +343,14 @@
                     {% endif %}
 
                     <!-- menu invoice -->
-                    {% if menu.menuInvoice %}
+                    {% if menu.menuInvoice or menuPayment %}
                         <div class="menu-item pt-5">
                             <div class="menu-content">
                                 <span class="menu-heading fw-bold text-uppercase fs-7">Accounting</span>
                             </div>
                         </div>
 
+                    {% if menu.menuInvoice %}
                         <div class="menu-item">
                             <a class="menu-link {{ activeRoute == 'invoice' ? 'active' }}" href="{{ url('invoice') }}">
                                 <span class="menu-icon">
@@ -358,9 +359,24 @@
                                         <span class="path2"></span>
                                     </i>
                                 </span>
-                                <span class="menu-title">Invoices and Payments</span>
+                                <span class="menu-title">Invoices</span>
                             </a>
                         </div>
+                    {% endif %}
+
+                    {% if menu.menuPayment %}
+                        <div class="menu-item">
+                            <a class="menu-link {{ activeRoute == 'payment' ? 'active' }}" href="{{ url('payment') }}">
+                            <span class="menu-icon">
+                                <i class="ki-duotone ki-dollar fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                                <span class="menu-title">Payments</span>
+                            </a>
+                        </div>
+                    {% endif %}
 
                     {% endif %}
 

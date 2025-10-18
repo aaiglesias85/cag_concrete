@@ -32,9 +32,6 @@ var ModalInvoice = function () {
         items = [];
         actualizarTableListaItems();
 
-        // payments
-        payments = [];
-
         //Mostrar el primer tab
         resetWizard();
     };
@@ -239,7 +236,7 @@ var ModalInvoice = function () {
                 formData.set("paid", 0);
 
                 formData.set("items", JSON.stringify(items));
-                formData.set("payments", JSON.stringify(payments));
+
                 formData.set("exportar", exportar ? 1 : 0);
 
                 BlockUtil.block('#modal-invoice .modal-content');
@@ -395,29 +392,6 @@ var ModalInvoice = function () {
                                     quantity_completed: item.quantity_completed,
                                     amount: item.amount,
                                     total_amount: item.total_amount,
-                                    principal: item.principal,
-                                    posicion: posicion
-                                });
-
-                                payments.push({
-                                    invoice_item_id: '',
-                                    project_item_id: item.project_item_id,
-                                    item_id: item.item_id,
-                                    item: item.item,
-                                    unit: item.unit,
-                                    contract_qty: item.contract_qty,
-                                    quantity: item.quantity + item.unpaid_from_previous,
-                                    price: item.price,
-                                    contract_amount: item.contract_amount,
-                                    quantity_from_previous: item.quantity_from_previous ?? 0,
-                                    unpaid_from_previous: item.unpaid_from_previous ?? 0,
-                                    quantity_completed: item.quantity_completed,
-                                    amount: item.amount,
-                                    total_amount: item.total_amount,
-                                    paid_qty: 0,
-                                    unpaid_qty: 0,
-                                    paid_amount: 0,
-                                    paid_amount_total: item.paid_amount_total,
                                     principal: item.principal,
                                     posicion: posicion
                                 });
@@ -829,17 +803,6 @@ var ModalInvoice = function () {
                 items[posicion].unpaid_from_previous = $this.val();
 
                 actualizarTableListaItems();
-
-                var payment_posicion = payments.findIndex(item => item.project_item_id === items[posicion].project_item_id);
-                if (payments[payment_posicion]) {
-
-                    var unpaid_from_previous = parseFloat(items[posicion].unpaid_from_previous);
-                    var quantity = items[posicion].quantity ?? 0
-                    payments[payment_posicion].quantity = unpaid_from_previous + quantity;
-
-                    var paid_qty = payments[payment_posicion].paid_qty ?? 0;
-                    payments[payment_posicion].unpaid_qty = payments[payment_posicion].quantity - paid_qty;
-                }
             }
         });
 

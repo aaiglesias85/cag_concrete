@@ -50,7 +50,7 @@ class InvoiceController extends AbstractController
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'number', 'company', 'project', 'startDate', 'endDate', 'total', 'notes', 'paid', 'createdAt'],
+                allowedOrderFields: ['id', 'number', 'company', 'projectNumber', 'project', 'startDate', 'endDate', 'total', 'notes', 'paid', 'createdAt'],
                 defaultOrderField: 'startDate'
             );
 
@@ -108,18 +108,14 @@ class InvoiceController extends AbstractController
         $items = $request->get('items');
         $items = json_decode($items);
 
-        // payments
-        $payments = $request->get('payments');
-        $payments = json_decode($payments);
-
         $exportar = $request->get('exportar');
 
         try {
 
             if ($invoice_id == "") {
-                $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar);
+                $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
             } else {
-                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $payments, $exportar);
+                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
             }
 
             if ($resultado['success']) {
