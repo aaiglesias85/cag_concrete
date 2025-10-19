@@ -880,6 +880,8 @@
             eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
         };
 
+        var direccion_url = "{{ direccion_url }}";
+
         jQuery(document).ready(function () {
             Payments.init();
         });

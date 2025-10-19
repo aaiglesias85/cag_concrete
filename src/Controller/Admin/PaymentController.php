@@ -32,7 +32,8 @@ class PaymentController extends AbstractController
 
                 return $this->render('admin/payment/index.html.twig', array(
                     'permiso' => $permiso[0],
-                    'companies' => $companies
+                    'companies' => $companies,
+                    'direccion_url' => $this->paymentService->ObtenerURL()
                 ));
             }
         } else {
