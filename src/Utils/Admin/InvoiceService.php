@@ -94,172 +94,145 @@ class InvoiceService extends Base
      */
     public function ExportarExcel($invoice_id)
     {
-        //Configurar excel
+        // Configurar excel
         Cell::setValueBinder(new AdvancedValueBinder());
 
-        $styleArray = array(
-            'borders' => array(
-                'outline' => array(
-                    'borderStyle' => Border::BORDER_THIN
-                ),
-            ),
-        );
+        // === Estilo de bordes (4 lados) ===
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'], // negro
+                ],
+            ],
+        ];
 
-        // reader
+        // Reader
         $reader = IOFactory::createReader('Xlsx');
         $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
-        // datos generales del invoice
+        // Datos del invoice
         $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
         /** @var Invoice $invoice_entity */
-
-        // fecha actual
-        $fecha_actual = date('m/d/Y');
-        $objWorksheet->setCellValueExplicit("H5", $fecha_actual, DataType::TYPE_STRING);
-
-        $project_entity = $invoice_entity->getProject();
-        $project_number = $project_entity->getProjectNumber();
-
         $number = $invoice_entity->getNumber();
 
-        $objWorksheet->setCellValue("I5", "$project_number-$number");
-
-        $start_date = $invoice_entity->getStartDate()->format('m/d/Y');
-        $objWorksheet->setCellValueExplicit("H10", $start_date, DataType::TYPE_STRING);
-
-        $end_date = $invoice_entity->getEndDate()->format('m/d/Y');
-        $objWorksheet->setCellValueExplicit("I10", $end_date, DataType::TYPE_STRING);
-
-        // company
-        $company_entity = $invoice_entity->getProject()->getCompany();
-        $objWorksheet->setCellValue("B11", $company_entity->getName());
-        $objWorksheet->setCellValue("B13", $company_entity->getPhone());
-        $objWorksheet->setCellValue("C14", $company_entity->getContactName());
-        $objWorksheet->setCellValue("C15", $company_entity->getContactEmail());
-
-        // inspector
-        $inspector_entity = $invoice_entity->getProject()->getInspector();
-        if ($inspector_entity != null) {
-            $objWorksheet->setCellValue("D11", $inspector_entity->getName());
-            $objWorksheet->setCellValue("D13", $inspector_entity->getPhone());
-            $objWorksheet->setCellValue("D15", $inspector_entity->getEmail());
-        }
-
-        // project
-        $county = $project_entity->getCountyObj() ? $project_entity->getCountyObj()->getDescription() : "";
-        $objWorksheet->setCellValue("C17", $county);
-
-        $objWorksheet->setCellValue("C18", $project_entity->getDescription());
-        $objWorksheet->setCellValue("G17", $project_entity->getProjectIdNumber());
-        $objWorksheet->setCellValue("G18", $project_entity->getSubcontract());
-        $objWorksheet->setCellValue("G19", $project_number);
-
-        // notes
-        $objWorksheet->setCellValue("B20", $invoice_entity->getNotes());
-
-        // items
+        // Totales
         $total_contract_amount = 0;
-        $total_amount = 0;
-        $total_amount_completed = 0;
+        $total_amount_invoice_todate = 0;
+        $total_unpaid = 0;
+        $total_amount_measured = 0;
+        $total_amount_final = 0;
 
-        $fila = 25;
-        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->ListarItems($invoice_id);
+        $fila_inicio = 6;
+        $fila = $fila_inicio;
+
+        $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice_id);
+
         foreach ($items as $key => $value) {
 
             $contract_qty = $value->getProjectItem()->getQuantity();
             $price = $value->getPrice();
-
             $contract_amount = $contract_qty * $price;
             $total_contract_amount += $contract_amount;
 
             $quantity_from_previous = $value->getQuantityFromPrevious();
-
             $quantity = $value->getQuantity();
-
             $quantity_completed = $quantity + $quantity_from_previous;
 
             $amount = $quantity * $price;
-            $total_amount += $amount;
+            $total_amount_invoice_todate += $amount;
+
+            $amount_from_previous = $quantity_from_previous * $price;
+            $total_amount_measured += $amount_from_previous;
 
             $amount_completed = $quantity_completed * $price;
-            $total_amount_completed += $amount_completed;
+            $total_amount_final += $amount_completed;
 
+            $paid_qty = $value->getPaidQty();
+            $unpaid_qty = $value->getUnpaidQty() ?? ($quantity - $paid_qty);
+            $amount_unpaid = $unpaid_qty * $price;
+            $total_unpaid += $amount_unpaid;
+
+            // Escribir fila
             $objWorksheet
                 ->setCellValue('A' . $fila, ($key + 1))
                 ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getDescription())
                 ->setCellValue('E' . $fila, $value->getProjectItem()->getItem()->getUnit()->getDescription())
-                ->setCellValue('F' . $fila, $contract_qty)
-                ->setCellValue('G' . $fila, $price)
-                ->setCellValue('H' . $fila, $contract_amount)
-                ->setCellValue('I' . $fila, $quantity_from_previous)
-                ->setCellValue('J' . $fila, $quantity)
-                ->setCellValue('K' . $fila, $quantity_completed)
-                ->setCellValue('L' . $fila, $amount)
-                ->setCellValue('M' . $fila, $amount_completed);
+                ->setCellValue('F' . $fila, $price)
+                ->setCellValue('G' . $fila, $contract_amount)
+                ->setCellValue('H' . $fila, $quantity)
+                ->setCellValue('I' . $fila, $amount)
+                ->setCellValue('J' . $fila, $unpaid_qty)
+                ->setCellValue('K' . $fila, $amount_unpaid)
+                ->setCellValue('L' . $fila, $quantity_from_previous)
+                ->setCellValue('M' . $fila, $amount_from_previous)
+                ->setCellValue('N' . $fila, "")
+                ->setCellValue('O' . $fila, $quantity_completed)
+                ->setCellValue('P' . $fila, $amount_completed);
 
-            $objWorksheet->getStyle('A' . $fila . ':A' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('B' . $fila . ':D' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('H' . $fila . ':H' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('I' . $fila . ':I' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('J' . $fila . ':J' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('K' . $fila . ':K' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('L' . $fila . ':L' . $fila)->applyFromArray($styleArray);
-            $objWorksheet->getStyle('M' . $fila . ':M' . $fila)->applyFromArray($styleArray);
+            // Aplicar bordes a toda la fila (A–P)
+            $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
 
             $fila++;
-
         }
 
-        // total contract amount
-        $objWorksheet->setCellValue("G$fila", "TOTAL");
-        $objWorksheet->getStyle("G$fila")->getFont()->setBold(true);
-        $objWorksheet->setCellValue("H$fila", $total_contract_amount);
-        $objWorksheet->getStyle("H$fila")->getFont()->setBold(true);
+        // Totales
+        $objWorksheet->setCellValue("F$fila", "TOTAL")->getStyle("F$fila")->getFont()->setBold(true);
+        $objWorksheet->setCellValue("G$fila", $total_contract_amount)->getStyle("G$fila")->getFont()->setBold(true);
+        $objWorksheet->setCellValue("I$fila", $total_amount_invoice_todate)->getStyle("I$fila")->getFont()->setBold(true);
+        $objWorksheet->setCellValue("K$fila", $total_unpaid)->getStyle("K$fila")->getFont()->setBold(true);
+        $objWorksheet->setCellValue("M$fila", $total_amount_measured)->getStyle("M$fila")->getFont()->setBold(true);
+        $objWorksheet->setCellValue("P$fila", $total_amount_final)->getStyle("P$fila")->getFont()->setBold(true);
 
-        // total amount
-        $objWorksheet->mergeCells("J$fila:K$fila");
-        $objWorksheet->setCellValue("J$fila", "Total Completed");
-        $objWorksheet->getStyle("J$fila")->getFont()->setBold(true);
-        $objWorksheet->getStyle("J$fila")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $objWorksheet->setCellValue("L$fila", $total_amount);
-        $objWorksheet->getStyle("L$fila")->getFont()->setBold(true);
+        // Bordes de la fila total
+        $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
 
-        // total amount completed
-        $objWorksheet->setCellValue("M$fila", $total_amount_completed);
-        $objWorksheet->getStyle("M$fila")->getFont()->setBold(true);
+        /* ===========================================
+         * COLORES DE FONDO (desde fila 6 hasta totales)
+         * =========================================== */
+        $lastRow = $fila;
 
-        // bordes a fila
-        $objWorksheet->getStyle('A' . $fila . ':A' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('B' . $fila . ':D' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('E' . $fila . ':E' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('F' . $fila . ':F' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('G' . $fila . ':G' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('H' . $fila . ':H' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('I' . $fila . ':I' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('J' . $fila . ':J' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('K' . $fila . ':K' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('L' . $fila . ':L' . $fila)->applyFromArray($styleArray);
-        $objWorksheet->getStyle('M' . $fila . ':M' . $fila)->applyFromArray($styleArray);
+        // H–I (azul claro)
+        $objWorksheet->getStyle("H{$fila_inicio}:I{$lastRow}")
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFDAEEF3');
 
-        //Salvar excel
+        // J–K (rojo claro)
+        $objWorksheet->getStyle("J{$fila_inicio}:K{$lastRow}")
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFF79494');
+
+        // L–M (naranja suave)
+        $objWorksheet->getStyle("L{$fila_inicio}:M{$lastRow}")
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFCD5B4');
+
+        // N (amarillo suave)
+        $objWorksheet->getStyle("N{$fila_inicio}:N{$lastRow}")
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFF2D068');
+
+        // O–P (verde claro)
+        $objWorksheet->getStyle("O{$fila_inicio}:P{$lastRow}")
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD8E4BC');
+
+        // Guardar Excel
         $fichero = "invoice-$number.xlsx";
-
         $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
         $objWriter->save("uploads" . DIRECTORY_SEPARATOR . "invoice" . DIRECTORY_SEPARATOR . $fichero);
+
         $objPHPExcel->disconnectWorksheets();
         unset($objPHPExcel);
 
         $ruta = $this->ObtenerURL();
-        $dir = 'uploads/invoice/' . $fichero;
-        $url = $ruta . $dir;
+        $url = $ruta . 'uploads/invoice/' . $fichero;
 
         return $url;
     }
+
+
 
     /**
      * EliminarItem: Elimina un item en la BD
