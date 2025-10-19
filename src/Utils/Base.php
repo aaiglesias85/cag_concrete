@@ -1342,7 +1342,7 @@ class Base
 
         // notes
         $notes = $this->getDoctrine()->getRepository(InvoiceNotes::class)
-            ->ListarNotesDeProject($invoice_id);
+            ->ListarNotesDeInvoice($invoice_id);
         foreach ($notes as $note) {
             $em->remove($note);
         }
