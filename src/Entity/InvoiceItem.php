@@ -28,6 +28,9 @@ class InvoiceItem
     #[ORM\Column(name: 'paid_qty', type: 'float', nullable: false)]
     private ?float $paidQty;
 
+    #[ORM\Column(name: 'unpaid_qty', type: 'float', nullable: false)]
+    private ?float $unpaidQty;
+
     #[ORM\Column(name: 'paid_amount', type: 'float', nullable: false)]
     private ?float $paidAmount;
 
@@ -148,5 +151,15 @@ class InvoiceItem
     public function setTxnId(?string $txnId): void
     {
         $this->txnId = $txnId;
+    }
+
+    public function getUnpaidQty(): ?float
+    {
+        return $this->unpaidQty;
+    }
+
+    public function setUnpaidQty(?float $unpaidQty): void
+    {
+        $this->unpaidQty = $unpaidQty;
     }
 }

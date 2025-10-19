@@ -394,67 +394,6 @@ class InvoiceService extends Base
     }
 
     /**
-     * ListarPaymentsDeInvoice
-     * @param $invoice_id
-     * @return array
-     */
-    public function ListarPaymentsDeInvoice($invoice_id)
-    {
-        $payments = [];
-
-        $lista = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->ListarItems($invoice_id);
-        foreach ($lista as $key => $value) {
-
-            $contract_qty = $value->getProjectItem()->getQuantity();
-            $price = $value->getPrice();
-            $contract_amount = $contract_qty * $price;
-
-            $quantity_from_previous = $value->getQuantityFromPrevious();
-            $unpaid_from_previous = $value->getUnpaidFromPrevious();
-
-            $quantity = $value->getQuantity() + $value->getUnpaidFromPrevious();
-
-            $quantity_completed = $quantity + $quantity_from_previous;
-
-            $amount = $quantity * $price;
-
-            $total_amount = $quantity_completed * $price;
-
-            // payment
-            $paid_qty = $value->getPaidQty();
-            $paid_amount = $value->getPaidAmount();
-            $paid_amount_total = $value->getPaidAmountTotal();
-
-            $unpaid_qty = $quantity - $paid_qty;
-
-            $payments[] = [
-                "invoice_item_id" => $value->getId(),
-                "project_item_id" => $value->getProjectItem()->getId(),
-                "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-                "item" => $value->getProjectItem()->getItem()->getDescription(),
-                "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
-                "contract_qty" => $contract_qty,
-                "price" => $price,
-                "contract_amount" => $contract_amount,
-                "quantity_from_previous" => $quantity_from_previous,
-                "unpaid_from_previous" => $unpaid_from_previous,
-                "quantity" => $quantity,
-                "quantity_completed" => $quantity_completed,
-                "amount" => $amount,
-                "total_amount" => $total_amount,
-                "paid_qty" => $paid_qty,
-                "paid_amount" => $paid_amount,
-                "paid_amount_total" => $paid_amount_total,
-                "unpaid_qty" => $unpaid_qty,
-                "posicion" => $key
-            ];
-        }
-
-        return $payments;
-    }
-
-    /**
      * ListarProjectsDeCompany
      * @param $company_id
      * @return array
@@ -852,40 +791,6 @@ class InvoiceService extends Base
         }
     }
 
-    /**
-     * SalvarPayments
-     * @param array $payments
-     * @param Invoice $entity
-     * @return void
-     */
-    public function SalvarPayments($entity, $payments)
-    {
-        $invoice_id = $entity->getInvoiceId();
-
-        //items
-        $paid = true;
-        foreach ($payments as $value) {
-
-            $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                ->BuscarItem($invoice_id, $value->project_item_id);
-            if ($invoice_item_entity != null) {
-                // payment
-                $invoice_item_entity->setPaidQty($value->paid_qty);
-                $invoice_item_entity->setPaidAmount($value->paid_amount);
-                $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
-            }
-
-            // si falta alguno no pago el invoice
-            if ($value->paid_qty == 0 || $value->paid_amount == 0 || $value->paid_amount_total == 0) {
-                $paid = false;
-            }
-        }
-
-        // paid invoice
-        if (!empty($payments) && !$entity->getPaid()) {
-            $entity->setPaid($paid);
-        }
-    }
 
     /**
      * ListarInvoices: Listar los invoices

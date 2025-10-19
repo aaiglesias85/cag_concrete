@@ -1,0 +1,1 @@
+ALTER TABLE `invoice_item` ADD `unpaid_qty` DECIMAL(18,6) NULL AFTER `paid_qty`;

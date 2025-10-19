@@ -989,7 +989,11 @@ var Payments = function () {
             {
                 targets: 8,
                 render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 100);
+                    var output = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+                    if (invoice === null || !invoice.paid) {
+                        output = `<input type="number" class="form-control unpaid_qty" value="${data}" data-position="${row.posicion}" />`;
+                    }
+                    return `<div class="w-100px">${output}</div>`;
                 }
             },
             // paid_amount
@@ -1159,6 +1163,19 @@ var Payments = function () {
                 payments[posicion].paid_amount = paid_amount;
 
                 payments[posicion].paid_amount_total += paid_amount;
+
+                actualizarTableListaPayments();
+            }
+        });
+
+        $(document).off('change', "#payments-table-editable input.unpaid_qty");
+        $(document).on('change', "#payments-table-editable input.unpaid_qty", function (e) {
+            var $this = $(this);
+            var posicion = $this.attr('data-position');
+            if (payments[posicion]) {
+                var unpaid_qty = $this.val();
+
+                payments[posicion].unpaid_qty = unpaid_qty;
 
                 actualizarTableListaPayments();
             }
