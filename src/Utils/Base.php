@@ -25,6 +25,7 @@ use App\Entity\Project;
 use App\Entity\InvoiceAttachment;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
+use App\Entity\ProjectNotes;
 use App\Entity\InvoiceNotes;
 use App\Entity\ProjectPriceAdjustment;
 use App\Entity\ReminderRecipient;
@@ -852,7 +853,7 @@ class Base
     {
         $nota = null;
 
-        $lista = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+        $lista = $this->getDoctrine()->getRepository(ProjectNotes::class)
             ->ListarNotesDeProject($project_id);
         foreach ($lista as $value) {
             $id = $value->getId();
@@ -1305,7 +1306,7 @@ class Base
         //notes
         foreach ($notas as $value) {
 
-            $project_note = new InvoiceNotes();
+            $project_note = new ProjectNotes();
 
             $project_note->setNotes($value['notes']);
             $project_note->setDate($value['date']);
@@ -1427,5 +1428,6 @@ class Base
 
         return $payments;
     }
+
 
 }
