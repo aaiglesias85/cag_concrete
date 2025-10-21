@@ -932,43 +932,46 @@ class ProjectService extends Base
         foreach ($project_items as $value) {
             $project_item_id = $value->getId();
 
-            $contract_qty = $value->getQuantity();
-            $price = $value->getPrice();
-            $contract_amount = $contract_qty * $price;
-
-            $quantity_from_previous = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                ->TotalPreviousQuantity($project_item_id);
-
             $quantity = $this->getDoctrine()->getRepository(DataTrackingItem::class)
                 ->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
+            if ($quantity > 0) {
+                $contract_qty = $value->getQuantity();
+                $price = $value->getPrice();
+                $contract_amount = $contract_qty * $price;
 
-            $quantity_completed = $quantity + $quantity_from_previous;
+                $quantity_from_previous = $this->getDoctrine()->getRepository(InvoiceItem::class)
+                    ->TotalPreviousQuantity($project_item_id);
 
-            $amount = $quantity * $price;
+                $quantity_completed = $quantity + $quantity_from_previous;
 
-            $total_amount = $quantity_completed * $price;
+                $amount = $quantity * $price;
 
-            $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
+                $total_amount = $quantity_completed * $price;
 
-            $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
+                $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
 
-            $items[] = [
-                "project_item_id" => $project_item_id,
-                "item_id" => $value->getItem()->getItemId(),
-                "item" => $value->getItem()->getDescription(),
-                "unit" => $value->getItem()->getUnit()->getDescription(),
-                "contract_qty" => $contract_qty,
-                "price" => $price,
-                "contract_amount" => $contract_amount,
-                "quantity_from_previous" => $quantity_from_previous ?? 0,
-                "unpaid_from_previous" => $unpaid_from_previous,
-                "quantity" => $quantity ?? 0,
-                "quantity_completed" => $quantity_completed,
-                "amount" => $amount,
-                "total_amount" => $total_amount,
-                "paid_amount_total" => $paid_amount_total,
-                "principal" => $value->getPrincipal()
-            ];
+                $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
+
+                $items[] = [
+                    "project_item_id" => $project_item_id,
+                    "item_id" => $value->getItem()->getItemId(),
+                    "item" => $value->getItem()->getDescription(),
+                    "unit" => $value->getItem()->getUnit()->getDescription(),
+                    "contract_qty" => $contract_qty,
+                    "price" => $price,
+                    "contract_amount" => $contract_amount,
+                    "quantity_from_previous" => $quantity_from_previous ?? 0,
+                    "unpaid_from_previous" => $unpaid_from_previous,
+                    "quantity" => $quantity ?? 0,
+                    "quantity_completed" => $quantity_completed,
+                    "amount" => $amount,
+                    "total_amount" => $total_amount,
+                    "paid_amount_total" => $paid_amount_total,
+                    "principal" => $value->getPrincipal()
+                ];
+            }
+
+
         }
 
         return $items;
