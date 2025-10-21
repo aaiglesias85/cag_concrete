@@ -2,6 +2,7 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\InvoiceItemNotes;
 use App\Entity\InvoiceNotes;
 use App\Entity\Project;
 use App\Entity\Invoice;
@@ -9,9 +10,120 @@ use App\Entity\InvoiceItem;
 
 use App\Entity\InvoiceAttachment;
 use App\Utils\Base;
+use Google\Type\Date;
 
 class PaymentService extends Base
 {
+
+    /**
+     * EliminarNotesItem: Elimina un notes en la BD
+     * @param int $notes_id Id
+     * @author Marcel
+     */
+    public function EliminarNotesItem($notes_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
+            ->find($notes_id);
+        /**@var InvoiceItemNotes $entity */
+        if ($entity != null) {
+            $notes = $entity->getNotes();
+            $project_entity = $entity->getInvoiceItem()->getInvoice()->getProject();
+            $invoice_number = $entity->getInvoiceItem()->getInvoice()->getNumber();
+            $item_name =$entity->getInvoiceItem()->getProjectItem()->getItem()->getDescription();
+
+            $em->remove($entity);
+            $em->flush();
+
+            //Salvar log
+            $log_operacion = "Delete";
+            $log_categoria = "Invoice Notes";
+            $log_descripcion = "Notes '$notes' have been deleted to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The requested record does not exist";
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * SalvarNotesItem
+     * @param $notes_id
+     * @param $invoice_item_id
+     * @param $notes
+     * @return array
+     */
+    public function SalvarNotesItem($notes_id, $invoice_item_id, $notes)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
+            ->find($invoice_item_id);
+        /** @var InvoiceItem $invoice_item_entity */
+        if ($invoice_item_entity != null) {
+
+            $project_entity = $invoice_item_entity->getInvoice()->getProject();
+            $invoice_number = $invoice_item_entity->getInvoice()->getNumber();
+            $item_name =$invoice_item_entity->getProjectItem()->getItem()->getDescription();
+
+            $entity = null;
+            $is_new = false;
+
+            if (is_numeric($notes_id)) {
+                $entity = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
+                    ->find($notes_id);
+            }
+
+            if ($entity == null) {
+                $entity = new InvoiceItemNotes();
+                $is_new = true;
+            }
+
+            $entity->setNotes($notes);
+
+
+
+            $log_operacion = "Add";
+            $log_descripcion = "Notes '$notes' have been added to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
+
+            if ($is_new) {
+
+                $entity->setDate(new \DateTime());
+                $entity->setInvoiceItem($invoice_item_entity);
+
+                $em->persist($entity);
+            } else {
+                $log_operacion = "Update";
+                $log_descripcion = "Notes '$notes' have been updated to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
+            }
+
+            $em->flush();
+
+            //Salvar log
+            $log_categoria = "Invoice Notes";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['note'] = [
+                'id' => $entity->getId(),
+                'notes' => mb_convert_encoding($notes, 'UTF-8', 'UTF-8'),
+                'date' => $entity->getDate()->format('m/d/Y')
+            ];
+
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = "The project not exist.";
+        }
+
+        return $resultado;
+
+    }
 
     /**
      * EliminarArchivos: Elimina varios archivos en la BD

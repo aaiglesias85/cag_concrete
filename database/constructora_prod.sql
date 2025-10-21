@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-10-2025 a las 13:46:19
+-- Tiempo de generación: 20-10-2025 a las 21:42:18
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -3406,7 +3406,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (3, '2', '2023-12-01', '2025-01-31', 'test test test', 1, '2025-01-10 14:42:23', '2025-01-10 14:48:19', 53, NULL, NULL),
 (6, '3', '2025-01-01', '2025-01-31', '', 1, '2025-02-05 18:19:05', '2025-10-19 13:34:04', 38, NULL, NULL),
 (8, '4', '2025-01-01', '2025-01-31', '', 1, '2025-02-05 19:22:41', NULL, 53, NULL, NULL),
-(9, '5', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:31:15', '2025-10-19 13:43:28', 53, NULL, NULL),
+(9, '5', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:31:15', '2025-10-19 13:53:29', 53, NULL, NULL),
 (10, '6', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:38:37', '2025-02-05 19:43:56', 52, NULL, NULL),
 (11, '7', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:56:05', NULL, 87, NULL, NULL),
 (12, '8', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:19:37', NULL, 87, NULL, NULL),
@@ -3483,9 +3483,9 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (74, 131.560000, 0.000000, NULL, 50.00, 0.000000, NULL, 0.000000, 0.000000, 8, 392, NULL),
 (75, 0.000000, 0.000000, 241.890000, 107.00, 0.000000, NULL, 0.000000, 0.000000, 8, 393, NULL),
 (76, 0.000000, 0.000000, 7.000000, 386.00, 0.000000, NULL, 0.000000, 0.000000, 8, 394, NULL),
-(77, 131.560000, 0.000000, 20.890000, 50.00, 0.000000, NULL, 0.000000, 0.000000, 9, 392, NULL),
-(78, 241.890000, 0.000000, 221.000000, 107.00, 0.000000, NULL, 0.000000, 0.000000, 9, 393, NULL),
-(79, 7.000000, 0.000000, 7.000000, 386.00, 0.000000, NULL, 0.000000, 0.000000, 9, 394, NULL),
+(77, 131.560000, 0.000000, 20.890000, 50.00, 0.000000, 20.890000, 0.000000, 0.000000, 9, 392, NULL),
+(78, 241.890000, 0.000000, 221.000000, 107.00, 0.000000, 221.000000, 0.000000, 0.000000, 9, 393, NULL),
+(79, 7.000000, 0.000000, 7.000000, 386.00, 0.000000, 7.000000, 0.000000, 0.000000, 9, 394, NULL),
 (80, 0.000000, 0.000000, NULL, 54.00, 0.000000, NULL, 0.000000, 0.000000, 10, 380, NULL),
 (81, 0.000000, 0.000000, NULL, 143.00, 0.000000, NULL, 0.000000, 0.000000, 10, 381, NULL),
 (82, 0.000000, 0.000000, NULL, 143.00, 0.000000, NULL, 0.000000, 0.000000, 10, 382, NULL),
@@ -3593,6 +3593,19 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (184, 0.000000, 0.000000, 106.000000, 26.00, 106.000000, NULL, 2756.000000, 2756.000000, 16, 859, NULL),
 (185, 0.000000, 0.000000, 60.000000, 31.00, 60.000000, NULL, 1860.000000, 1860.000000, 16, 860, NULL),
 (186, 0.000000, 0.000000, 0.000000, 31.00, 0.000000, NULL, 0.000000, 0.000000, 16, 861, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_item_notes`
+--
+
+CREATE TABLE `invoice_item_notes` (
+  `id` int(11) NOT NULL,
+  `notes` text,
+  `date` date DEFAULT NULL,
+  `invoice_item_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -5249,7 +5262,9 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4069, 'Update', 'Invoice', 'The invoice #3 is modified', '::1', '2025-10-19 13:33:40', 1),
 (4070, 'Update', 'Invoice', 'The invoice #3 is modified', '::1', '2025-10-19 13:34:04', 1),
 (4071, 'Add', 'Invoice Notes', 'Notes \'<p>tesst</p>\' have been added to invoice #3 (Project: I-285/I-20 EAST INTERCHANGE)', '::1', '2025-10-19 13:37:46', 1),
-(4072, 'Update', 'Invoice', 'The invoice #5 is modified', '::1', '2025-10-19 13:43:28', 1);
+(4072, 'Update', 'Invoice', 'The invoice #5 is modified', '::1', '2025-10-19 13:43:28', 1),
+(4073, 'Update', 'Invoice', 'The invoice #5 is modified', '::1', '2025-10-19 13:53:23', 1),
+(4074, 'Update', 'Invoice', 'The invoice #5 is modified', '::1', '2025-10-19 13:53:30', 1);
 
 -- --------------------------------------------------------
 
@@ -9375,6 +9390,13 @@ ALTER TABLE `invoice_item`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `invoice_item_notes`
+--
+ALTER TABLE `invoice_item_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refinvoice_item_notes1` (`invoice_item_id`);
+
+--
 -- Indices de la tabla `invoice_notes`
 --
 ALTER TABLE `invoice_notes`
@@ -9774,6 +9796,12 @@ ALTER TABLE `invoice_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
 
 --
+-- AUTO_INCREMENT de la tabla `invoice_item_notes`
+--
+ALTER TABLE `invoice_item_notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `invoice_notes`
 --
 ALTER TABLE `invoice_notes`
@@ -9789,7 +9817,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4073;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4075;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10094,6 +10122,12 @@ ALTER TABLE `estimate_quote`
 --
 ALTER TABLE `invoice_attachment`
   ADD CONSTRAINT `Refinvoice_attachment1` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`invoice_id`);
+
+--
+-- Filtros para la tabla `invoice_item_notes`
+--
+ALTER TABLE `invoice_item_notes`
+  ADD CONSTRAINT `Refinvoice_item_notes1` FOREIGN KEY (`invoice_item_id`) REFERENCES `invoice_item` (`id`);
 
 --
 -- Filtros para la tabla `invoice_notes`

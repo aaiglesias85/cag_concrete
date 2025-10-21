@@ -48,3 +48,13 @@ eliminarArchivoPaymentAdmin:
 eliminarArchivosPaymentAdmin:
   path: /payment/eliminarArchivos
   defaults: { _controller: App\Controller\Admin\PaymentController::eliminarArchivos, _format: json}
+
+
+#notes item
+salvarNotesItemPaymentAdmin:
+  path: /payment/salvarNotesItem
+  defaults: { _controller: App\Controller\Admin\PaymentController::salvarNotesItem, _format: json }
+
+eliminarNotesItemPaymentAdmin:
+  path: /payment/eliminarNotesItem
+  defaults: { _controller: App\Controller\Admin\PaymentController::eliminarNotesItem, _format: json }

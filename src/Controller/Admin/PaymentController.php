@@ -435,4 +435,68 @@ class PaymentController extends AbstractController
             return $this->json($resultadoJson);
         }
     }
+
+    /**
+     * salvarNotesItem Acción que salvar un notes en la BD
+     *
+     */
+    public function salvarNotesItem(Request $request)
+    {
+        $notes_id = $request->get('notes_id');
+
+        $invoice_item_id = $request->get('invoice_item_id');
+        $notes = $request->get('notes');
+
+        try {
+
+            $resultado = $this->paymentService->SalvarNotesItem($notes_id, $invoice_item_id, $notes);
+
+            if ($resultado['success']) {
+
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['note'] = $resultado['note'];
+
+                return $this->json($resultadoJson);
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+
+                return $this->json($resultadoJson);
+            }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarNotesItem Acción que elimina un notes en la BD
+     *
+     */
+    public function eliminarNotesItem(Request $request)
+    {
+        $notes_id = $request->get('notes_id');
+
+        try {
+            $resultado = $this->paymentService->EliminarNotesItem($notes_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = "The operation was successful";
+                return $this->json($resultadoJson);
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+                return $this->json($resultadoJson);
+            }
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+
+    }
 }

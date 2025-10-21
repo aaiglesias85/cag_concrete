@@ -17,6 +17,7 @@ use App\Entity\EstimateEstimator;
 use App\Entity\EstimateQuote;
 use App\Entity\Holiday;
 use App\Entity\InvoiceItem;
+use App\Entity\InvoiceItemNotes;
 use App\Entity\Item;
 use App\Entity\Log;
 use App\Entity\Notification;
@@ -1331,6 +1332,14 @@ class Base
         $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
             ->ListarItems($invoice_id);
         foreach ($items as $item) {
+
+            // notes
+            $notes = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+                ->ListarNotesDeItemInvoice($item->getId());
+            foreach ($notes as $note) {
+                $em->remove($note);
+            }
+
             $em->remove($item);
         }
 
@@ -1402,6 +1411,9 @@ class Base
                 $unpaid_qty = $quantity - $paid_qty;
             }
 
+            // notes
+            $notes = $this->ListarNotesDeItemInvoice($value->getId());
+
 
             $payments[] = [
                 "invoice_item_id" => $value->getId(),
@@ -1422,11 +1434,39 @@ class Base
                 "paid_amount" => $paid_amount,
                 "paid_amount_total" => $paid_amount_total,
                 "unpaid_qty" => $unpaid_qty,
+                "notes" => $notes,
                 "posicion" => $key
             ];
         }
 
         return $payments;
+    }
+
+    /**
+     * ListarNotesDeItemInvoice
+     * @param $invoice_item_id
+     * @return array
+     */
+    public function ListarNotesDeItemInvoice($invoice_item_id)
+    {
+        $notes = [];
+
+        $lista = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
+            ->ListarNotesDeItemInvoice($invoice_item_id);
+        foreach ($lista as $key => $value) {
+
+            $note = $value->getNotes();
+            $note = mb_convert_encoding($note, 'UTF-8', 'UTF-8');
+
+            $notes[] = [
+                "id" => $value->getId(),
+                "notes" => $note,
+                "date" => $value->getDate()->format('m/d/Y'),
+                "posicion" => $key
+            ];
+        }
+
+        return $notes;
     }
 
 

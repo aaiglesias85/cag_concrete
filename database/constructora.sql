@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 19-10-2025 a las 13:46:10
+-- Tiempo de generación: 20-10-2025 a las 21:42:06
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.2.8
 
@@ -664,6 +664,19 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (59, 10.000000, 5.000000, 0.000000, 300.00, 5.000000, NULL, 1500.000000, 3000.000000, 13, 13, NULL),
 (60, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, NULL, 500.000000, 1000.000000, 13, 16, NULL),
 (61, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, NULL, 500.000000, 1000.000000, 13, 17, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_item_notes`
+--
+
+CREATE TABLE `invoice_item_notes` (
+  `id` int(11) NOT NULL,
+  `notes` text,
+  `date` date DEFAULT NULL,
+  `invoice_item_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -2013,6 +2026,13 @@ ALTER TABLE `invoice_item`
   ADD KEY `project_item_id` (`project_item_id`);
 
 --
+-- Indices de la tabla `invoice_item_notes`
+--
+ALTER TABLE `invoice_item_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refinvoice_item_notes1` (`invoice_item_id`);
+
+--
 -- Indices de la tabla `invoice_notes`
 --
 ALTER TABLE `invoice_notes`
@@ -2412,6 +2432,12 @@ ALTER TABLE `invoice_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
+-- AUTO_INCREMENT de la tabla `invoice_item_notes`
+--
+ALTER TABLE `invoice_item_notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `invoice_notes`
 --
 ALTER TABLE `invoice_notes`
@@ -2745,6 +2771,12 @@ ALTER TABLE `invoice_attachment`
 ALTER TABLE `invoice_item`
   ADD CONSTRAINT `Refinvoice69` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`invoice_id`),
   ADD CONSTRAINT `Refprojectitem26` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`);
+
+--
+-- Filtros para la tabla `invoice_item_notes`
+--
+ALTER TABLE `invoice_item_notes`
+  ADD CONSTRAINT `Refinvoice_item_notes1` FOREIGN KEY (`invoice_item_id`) REFERENCES `invoice_item` (`id`);
 
 --
 -- Filtros para la tabla `invoice_notes`
