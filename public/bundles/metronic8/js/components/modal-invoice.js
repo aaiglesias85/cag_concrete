@@ -182,7 +182,7 @@ var ModalInvoice = function () {
         });
     };
 
-    var mostrarModal = function (id, id2) {
+    var mostrarModal = function (id, id2, fecha1, fecha2) {
 
         // reset form
         resetForms();
@@ -192,6 +192,18 @@ var ModalInvoice = function () {
         $('#company-invoice-modal').trigger('change');
 
         project_id_param = id2;
+
+        if (fecha1 !== '') {
+            const start_date = MyApp.convertirStringAFecha(fecha1);
+            FlatpickrUtil.setDate('start-date-invoice-modal', start_date);
+        }
+
+        if (fecha2 !== '') {
+            const end_date = MyApp.convertirStringAFecha(fecha2);
+            FlatpickrUtil.setDate('end-date-invoice-modal', end_date);
+        }
+
+        listarItems();
 
         // mostar modal
         ModalUtil.show('modal-invoice', {backdrop: 'static', keyboard: true});

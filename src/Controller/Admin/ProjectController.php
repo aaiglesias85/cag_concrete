@@ -340,8 +340,8 @@ class ProjectController extends AbstractController
     public function listarItemsParaInvoice(Request $request)
     {
         $project_id = $request->get('project_id');
-        $fecha_inicial = $request->get('fechaInicial');
-        $fecha_fin = $request->get('fechaFin');
+        $fecha_inicial = $request->get('start_date');
+        $fecha_fin = $request->get('end_date');
 
         try {
             $items = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);

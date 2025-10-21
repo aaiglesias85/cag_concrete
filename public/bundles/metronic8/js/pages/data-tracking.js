@@ -718,10 +718,13 @@ var DataTracking = function () {
                 return;
             }
 
-            var company_id =$('#project option[value="' + project_id + '"]').attr("data-company");
+            var company_id = $('#project option[value="' + project_id + '"]').attr("data-company");
+
+            var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
+            var fechaFin = FlatpickrUtil.getString('datetimepicker-hasta');
 
 
-            ModalInvoice.mostrarModal(company_id, project_id);
+            ModalInvoice.mostrarModal(company_id, project_id, fechaInicial, fechaFin);
         };
     };
 
@@ -1238,7 +1241,7 @@ var DataTracking = function () {
 
     }
 
-    var initSelectsModal = function (){
+    var initSelectsModal = function () {
         $('.select-modal-labor').select2({
             dropdownParent: $('#modal-data-tracking-labor') // Asegúrate de que es el ID del modal
         });
@@ -2763,7 +2766,7 @@ var DataTracking = function () {
                     const icon = isTotalMayorConcPrice(row.total) ? '<i class="ki-duotone ki-arrow-up-right fs-2 text-danger me-2">\n' +
                         '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path1"></span>\n' +
                         '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path2"></span>\n' +
-                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</i>': ''
+                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</i>' : ''
                     return `<div class="w-400px">${data} ${icon}</div>`;
                 },
             },
