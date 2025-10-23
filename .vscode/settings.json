@@ -1,0 +1,97 @@
+{
+   // ===== Formateo base =====
+   "editor.formatOnSave": true,
+   "editor.formatOnPaste": true,
+   "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+   // Sangría consistente
+   "editor.tabSize": 3,
+   "editor.insertSpaces": true,
+   "editor.detectIndentation": false,
+
+   // Acciones automáticas al guardar
+   "editor.codeActionsOnSave": {
+      "source.organizeImports": "always",
+      "source.fixAll": "always",
+      "source.fixAll.eslint": "always"
+   },
+
+   // ===== Prettier =====
+   "prettier.tabWidth": 3,
+   "prettier.useTabs": false,
+   "prettier.singleQuote": true,
+   "prettier.trailingComma": "all",
+   "prettier.semi": true,
+   "prettier.printWidth": 200,
+   "prettier.arrowParens": "always",
+   "prettier.bracketSpacing": true,
+   "prettier.endOfLine": "lf",
+
+   // ===== ESLint =====
+   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "html"],
+   "eslint.alwaysShowStatus": true,
+
+   // ===== Formateador por lenguaje (forces Prettier)
+   "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[markdown]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[yaml]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[twig]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+   "[php]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+
+   // === (tu config actual puede mantenerse; combina con esto) ===
+   "typescript.preferences.importModuleSpecifier": "relative",
+   "files.associations": {
+      "*.component.html": "html",
+      "*.component.ts": "typescript",
+      "*.twig": "twig",
+      "*.html.twig": "twig"
+   },
+   "files.exclude": {
+      "**/node_modules": true,
+      "**/.idea": true,
+      "**/dist": true,
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/*.log": true
+   },
+   "explorer.excludeGitIgnore": true,
+   "explorer.sortOrder": "type",
+   "explorer.compactFolders": false,
+   "explorer.decorations.colors": true,
+   "explorer.decorations.badges": true,
+   "explorer.fileNesting.enabled": true,
+   "explorer.fileNesting.expand": false,
+   "explorer.fileNesting.patterns": {
+      "*.component.ts": "${capture}.component.html, ${capture}.component.css, ${capture}.component.scss, ${capture}.component.sass, ${capture}.component.spec.ts",
+      "*.service.ts": "${capture}.service.spec.ts",
+      "*.directive.ts": "${capture}.directive.spec.ts",
+      "*.pipe.ts": "${capture}.pipe.spec.ts",
+      "*.module.ts": "${capture}.routing.ts, ${capture}.routes.ts"
+   },
+   "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/coverage": true
+   },
+   "workbench.iconTheme": "material-icon-theme",
+   "workbench.colorCustomizations": {
+      "titleBar.activeBackground": "#0f172a",
+      "titleBar.activeForeground": "#ffffff",
+      "editorIndentGuide.activeBackground1": "#5a5a5a",
+      "editorIndentGuide.background1": "#3a3a3a",
+      "editorWhitespace.foreground": "#3a3a3a"
+   },
+   "workbench.tree.indent": 16,
+
+   // --- PHP/Intelephense indexa vendor dentro de backend ---
+   "php.validate.executablePath": "/usr/local/opt/php@8.2/bin/php",
+   "intelephense.environment.includePaths": ["backend/vendor"],
+   "intelephense.files.exclude": ["**/var/**", "**/node_modules/**"],
+
+   // Opcionales, pero útiles
+   "intelephense.environment.phpVersion": "8.2",
+   "intelephense.diagnostics.undefinedMethods": false
+}

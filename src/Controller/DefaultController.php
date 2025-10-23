@@ -22,7 +22,6 @@ class DefaultController extends AbstractController
     // test email
     public function testemail()
     {
-
         //Enviar email
         $direccion_url = $this->scriptService->ObtenerURL();
         $direccion_from = $this->getParameter('mailer_sender_address');
