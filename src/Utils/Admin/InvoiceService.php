@@ -400,6 +400,18 @@ class InvoiceService extends Base
 
          $total_amount = $quantity_completed * $price;
 
+         $amount_from_previous = $quantity_from_previous * $price;
+
+         $amount_completed = $quantity_completed * $price;
+
+         $paid_qty = $value->getPaidQty();
+         $unpaid_qty = $value->getUnpaidQty() ?? ($quantity - $paid_qty);
+         $amount_unpaid = $unpaid_qty * $price;
+
+         $quantity_brought_forward = $quantity_from_previous;
+         $quantity_final = $quantity + $quantity_brought_forward;
+         $amount_final = $quantity_final * $price;
+
          $items[] = [
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $value->getProjectItem()->getId(),
@@ -415,6 +427,14 @@ class InvoiceService extends Base
             "quantity_completed" => $quantity_completed,
             "amount" => $amount,
             "total_amount" => $total_amount,
+            "amount_from_previous" => $amount_from_previous,
+            "amount_completed" => $amount_completed,
+            "paid_qty" => $paid_qty,
+            "unpaid_qty" => $unpaid_qty,
+            "amount_unpaid" => $amount_unpaid,
+            "quantity_brought_forward" => $quantity_brought_forward,
+            "quantity_final" => $quantity_final,
+            "amount_final" => $amount_final,
             "principal" => $value->getProjectItem()->getPrincipal(),
             "posicion" => $key
          ];

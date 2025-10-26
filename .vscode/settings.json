@@ -46,8 +46,8 @@
    "files.associations": {
       "*.component.html": "html",
       "*.component.ts": "typescript",
-      "*.twig": "twig",
-      "*.html.twig": "twig"
+      "*.twig": "html",
+      "*.html.twig": "html"
    },
    "files.exclude": {
       "**/node_modules": true,
