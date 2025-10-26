@@ -57,7 +57,7 @@
       "**/.DS_Store": true,
       "**/*.log": true
    },
-   "explorer.excludeGitIgnore": true,
+   "explorer.excludeGitIgnore": false,
    "explorer.sortOrder": "type",
    "explorer.compactFolders": false,
    "explorer.decorations.colors": true,
@@ -78,8 +78,6 @@
    },
    "workbench.iconTheme": "material-icon-theme",
    "workbench.colorCustomizations": {
-      "titleBar.activeBackground": "#0f172a",
-      "titleBar.activeForeground": "#ffffff",
       "editorIndentGuide.activeBackground1": "#5a5a5a",
       "editorIndentGuide.background1": "#3a3a3a",
       "editorWhitespace.foreground": "#3a3a3a"
