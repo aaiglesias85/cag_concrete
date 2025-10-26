@@ -237,7 +237,7 @@ class InvoiceService extends Base
       $objWorksheet->setCellValue("O$fila", $total_amount_final)->getStyle("O$fila")->getFont()->setBold(true);
 
       $objWorksheet->setCellValue("Q$fila", "TOTAL PENDING BALANCE (BTD):")->getStyle("Q$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("R$fila", $total_amount_final)->getStyle("R$fila")->getFont()->setBold(true);
+      $objWorksheet->setCellValue("R$fila", "")->getStyle("R$fila")->getFont()->setBold(true);
 
       // Bordes de la fila total
       $objWorksheet->getStyle("G{$fila}:L{$fila}")->applyFromArray($styleArray);
