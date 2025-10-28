@@ -47,7 +47,8 @@
       "*.component.html": "html",
       "*.component.ts": "typescript",
       "*.twig": "html",
-      "*.html.twig": "html"
+      "*.html.twig": "html",
+      "*.js": "javascript"
    },
    "files.exclude": {
       "**/node_modules": true,

@@ -25,1216 +25,1277 @@ use App\Utils\Base;
 class EstimateService extends Base
 {
 
-    /**
-     * EliminarCompany: Elimina un company en la BD
-     * @param int $id Id
-     * @author Marcel
-     */
-    public function EliminarCompany($id)
-    {
-        $em = $this->getDoctrine()->getManager();
+   /**
+    * EliminarCompany: Elimina un company en la BD
+    * @param int $id Id
+    * @author Marcel
+    */
+   public function EliminarCompany($id)
+   {
+      $em = $this->getDoctrine()->getManager();
 
-        $entity = $this->getDoctrine()->getRepository(EstimateCompany::class)
-            ->find($id);
-        /**@var EstimateCompany $entity */
-        if ($entity != null) {
+      $entity = $this->getDoctrine()->getRepository(EstimateCompany::class)
+         ->find($id);
+      /**@var EstimateCompany $entity */
+      if ($entity != null) {
 
-            $estimate_name = $entity->getEstimate()->getName();
-            $company_name = $entity->getCompany()->getName();
+         $estimate_name = $entity->getEstimate()->getName();
+         $company_name = $entity->getCompany()->getName();
 
-            $em->remove($entity);
-            $em->flush();
+         $em->remove($entity);
+         $em->flush();
 
-            //Salvar log
-            $log_operacion = "Delete";
-            $log_categoria = "Company Estimate";
-            $log_descripcion = "The company estimate is deleted: $estimate_name Company: $company_name";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+         //Salvar log
+         $log_operacion = "Delete";
+         $log_categoria = "Company Estimate";
+         $log_descripcion = "The company estimate is deleted: $estimate_name Company: $company_name";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-            $resultado['success'] = true;
-        } else {
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * AgregarItem
+    * @param $item_id
+    * @param $item_name
+    * @param $unit_id
+    * @param $quantity
+    * @param $price
+    * @param $yield_calculation
+    * @param $equation_id
+    * @return array
+    */
+   public function AgregarItem($estimate_item_id, $estimate_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
+   {
+      $resultado = [];
+
+      $em = $this->getDoctrine()->getManager();
+
+      // validar si existe
+      if ($item_id !== '') {
+         $estimate_item = $this->getDoctrine()->getRepository(EstimateQuote::class)
+            ->BuscarItemEstimate($estimate_id, $item_id);
+         if (!empty($estimate_item) && $estimate_item_id != $estimate_item[0]->getId()) {
             $resultado['success'] = false;
-            $resultado['error'] = "The requested record does not exist";
-        }
-
-        return $resultado;
-    }
-
-    /**
-     * AgregarItem
-     * @param $item_id
-     * @param $item_name
-     * @param $unit_id
-     * @param $quantity
-     * @param $price
-     * @param $yield_calculation
-     * @param $equation_id
-     * @return array
-     */
-    public function AgregarItem($estimate_item_id, $estimate_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
-    {
-        $resultado = [];
-
-        $em = $this->getDoctrine()->getManager();
-
-        // validar si existe
-        if ($item_id !== '') {
-            $estimate_item = $this->getDoctrine()->getRepository(EstimateQuote::class)
-                ->BuscarItemEstimate($estimate_id, $item_id);
-            if (!empty($estimate_item) && $estimate_item_id != $estimate_item[0]->getId()) {
-                $resultado['success'] = false;
-                $resultado['error'] = "The item already exists in the project estimate";
-                return $resultado;
-            }
-        } else {
-
-            //Verificar description
-            $item = $this->getDoctrine()->getRepository(Item::class)
-                ->findOneBy(['description' => $item_name]);
-            if ($item_id == '' && $item != null) {
-                $resultado['success'] = false;
-                $resultado['error'] = "The item name is in use, please try entering another one.";
-                return $resultado;
-            }
-        }
-
-
-        $estimate_entity = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
-        if ($estimate_entity != null) {
-            $estimate_item_entity = null;
-
-            if (is_numeric($estimate_item_id)) {
-                $estimate_item_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
-                    ->find($estimate_item_id);
-            }
-
-            $is_new_estimate_item = false;
-            if ($estimate_item_entity == null) {
-                $estimate_item_entity = new EstimateQuote();
-                $is_new_estimate_item = true;
-            }
-
-            $estimate_item_entity->setYieldCalculation($yield_calculation);
-
-            $price = $price !== "" ? $price : NULL;
-            $estimate_item_entity->setPrice($price);
-
-            $estimate_item_entity->setQuantity($quantity);
-
-            $equation_entity = null;
-            if ($equation_id != '') {
-                $equation_entity = $this->getDoctrine()->getRepository(Equation::class)->find($equation_id);
-                $estimate_item_entity->setEquation($equation_entity);
-            }
-
-            $is_new_item = false;
-            if ($item_id != '') {
-                $item_entity = $this->getDoctrine()->getRepository(Item::class)->find($item_id);
-            } else {
-                // add new item
-                $new_item_data = json_encode([
-                    'item' => $item_name,
-                    'price' => $price,
-                    'yield_calculation' => $yield_calculation,
-                    'unit_id' => $unit_id
-                ]);
-                $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
-
-                $is_new_item = true;
-            }
-
-            $estimate_item_entity->setItem($item_entity);
-
-            if ($is_new_estimate_item) {
-                $estimate_item_entity->setEstimate($estimate_entity);
-
-                $em->persist($estimate_item_entity);
-            }
-
-            $em->flush();
-
-            $resultado['success'] = true;
-
-            // devolver item
-            $item = $this->DevolverItemDeEstimate($estimate_item_entity);
-            $resultado['item'] = $item;
-            $resultado['is_new_item'] = $is_new_item;
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = 'The project not exist';
-        }
-
-        return $resultado;
-    }
-
-    /**
-     * EliminarItem: Elimina un item en la BD
-     * @param int $estimate_item_id Id
-     * @author Marcel
-     */
-    public function EliminarItem($estimate_item_id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
-            ->find($estimate_item_id);
-        /**@var EstimateQuote $entity */
-        if ($entity != null) {
-
-            $item_name = $entity->getItem()->getDescription();
-
-            $em->remove($entity);
-            $em->flush();
-
-            //Salvar log
-            $log_operacion = "Delete";
-            $log_categoria = "Estimate Item";
-            $log_descripcion = "The item: $item_name of the project estimate is deleted";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = "The requested record does not exist";
-        }
-
-        return $resultado;
-    }
-
-    /**
-     * EliminarBidDeadline: Elimina un bid deadline en la BD
-     * @param int $id Id
-     * @author Marcel
-     */
-    public function EliminarBidDeadline($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-            ->find($id);
-        /**@var EstimateBidDeadline $entity */
-        if ($entity != null) {
-
-            $estimate_name = $entity->getEstimate()->getName();
-            $bid_deadline = $entity->getBidDeadline()->format('d/m/Y H:i');
-
-            $em->remove($entity);
-            $em->flush();
-
-            //Salvar log
-            $log_operacion = "Delete";
-            $log_categoria = "Bid Deadline Estimate";
-            $log_descripcion = "The bid deadline estimate is deleted: $estimate_name Bid Deadline: $bid_deadline";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = "The requested record does not exist";
-        }
-
-        return $resultado;
-    }
-
-    /**
-     * CambiarStage: Cambia stage del estiamte en la BD
-     * @param int $estimate_id Id
-     * @author Marcel
-     */
-    public function CambiarStage($estimate_id, $stage_id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $this->getDoctrine()->getRepository(Estimate::class)
-            ->find($estimate_id);
-        /** @var Estimate $entity */
-        if ($entity != null) {
-
-            $name = $entity->getName();
-
-            $entity->setStage(NULL);
-            if ($stage_id != '') {
-                $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
-                    ->find($stage_id);
-                $entity->setStage($project_stage);
-            }
-
-            $em->flush();
-
-            //Salvar log
-            $log_operacion = "Update";
-            $log_categoria = "Estimate";
-            $log_descripcion = "The estimate is modified: $name";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-
-
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = "The requested record does not exist";
-        }
-
-        return $resultado;
-    }
-
-    /**
-     * CargarDatosEstimate: Carga los datos de un estimate
-     *
-     * @param int $estimate_id Id
-     *
-     * @author Marcel
-     */
-    public function CargarDatosEstimate($estimate_id)
-    {
-        $resultado = array();
-        $arreglo_resultado = array();
-
-        $entity = $this->getDoctrine()->getRepository(Estimate::class)
-            ->find($estimate_id);
-        /** @var Estimate $entity */
-        if ($entity != null) {
-
-            $arreglo_resultado['project_id'] = $entity->getProjectId();
-            $arreglo_resultado['name'] = $entity->getName();
-            $arreglo_resultado['bidDeadline'] = $entity->getBidDeadline() ? $entity->getBidDeadline()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['priority'] = $entity->getPriority();
-            $arreglo_resultado['bidNo'] = $entity->getBidNo();
-            $arreglo_resultado['workHour'] = $entity->getWorkHour();
-            $arreglo_resultado['phone'] = $entity->getPhone();
-            $arreglo_resultado['email'] = $entity->getEmail();
-
-            $arreglo_resultado['jobWalk'] = $entity->getJobWalk() ? $entity->getJobWalk()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['rfiDueDate'] = $entity->getRfiDueDate() ? $entity->getRfiDueDate()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['projectStart'] = $entity->getProjectStart() ? $entity->getProjectStart()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['projectEnd'] = $entity->getProjectEnd() ? $entity->getProjectEnd()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['submittedDate'] = $entity->getSubmittedDate() ? $entity->getSubmittedDate()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['awardedDate'] = $entity->getAwardedDate() ? $entity->getAwardedDate()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['lostDate'] = $entity->getLostDate() ? $entity->getLostDate()->format('m/d/Y H:i') : "";
-            $arreglo_resultado['location'] = $entity->getLocation();
-            $arreglo_resultado['sector'] = $entity->getSector();
-            $arreglo_resultado['bidDescription'] = $entity->getBidDescription();
-            $arreglo_resultado['bidInstructions'] = $entity->getBidInstructions();
-            $arreglo_resultado['planLink'] = $entity->getPlanLink();
-            $arreglo_resultado['quoteReceived'] = $entity->getQuoteReceived();
-
-            $arreglo_resultado['stage_id'] = $entity->getStage() != null ? $entity->getStage()->getStageId() : '';
-            $arreglo_resultado['proposal_type_id'] = $entity->getProposalType() != null ? $entity->getProposalType()->getTypeId() : '';
-            $arreglo_resultado['status_id'] = $entity->getStatus() != null ? $entity->getStatus()->getStatusId() : '';
-
-            $county_id = $entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : null;
-            $arreglo_resultado['county_id'] = $county_id;
-
-            $arreglo_resultado['district_id'] = $entity->getDistrict() != null ? $entity->getDistrict()->getDistrictId() : '';
-            $arreglo_resultado['plan_downloading_id'] = $entity->getPlanDownloading() != null ? $entity->getPlanDownloading()->getPlanDownloadingId() : '';
-
-            // estimators ids
-            $estimators_id = $this->ListarEstimatorsId($estimate_id);
-            $arreglo_resultado['estimators_id'] = $estimators_id;
-
-            // project types ids
-            $project_types_id = $this->ListarProjectTypesId($estimate_id);
-            $arreglo_resultado['project_types_id'] = $project_types_id;
-
-            // bid deadlines
-            $bid_deadlines = $this->ListarBidDeadlines($estimate_id);
-            $arreglo_resultado['bid_deadlines'] = $bid_deadlines;
-
-            // items
-            $items = $this->ListarItemsDeEstimate($estimate_id);
-            $arreglo_resultado['items'] = $items;
-
-            // companys
-            $companys = $this->ListarCompanys($estimate_id);
-            $arreglo_resultado['companys'] = $companys;
-
-            $resultado['success'] = true;
-            $resultado['estimate'] = $arreglo_resultado;
-        }
-
-        return $resultado;
-    }
-
-    // listar los companys del estimate
-    private function ListarCompanys($estimate_id)
-    {
-        $companys = [];
-
-        $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
-            ->ListarCompanysDeEstimate($estimate_id);
-        foreach ($estimate_companys as $key => $estimate_company) {
-
-
-            $contact_id = "";
-            $contact = "";
-            $email = "";
-            $phone = "";
-            if($estimate_company->getContact()){
-                $contact_id = $estimate_company->getContact()->getContactId();
-                $contact = $estimate_company->getContact()->getName();
-                $email = $estimate_company->getContact()->getEmail();
-                $phone = $estimate_company->getContact()->getPhone();
-            }
-
-            // contacts
-            $contacts = $this->ListarContactsDeCompany($estimate_company->getCompany()->getCompanyId());
-
-
-            $companys[] = [
-                'id' => $estimate_company->getId(),
-                'company_id' => $estimate_company->getCompany()->getCompanyId(),
-                'company' => $estimate_company->getCompany()->getName(),
-                'contact_id' => $contact_id,
-                'contact' => $contact,
-                'email' => $email,
-                'phone' => $phone,
-                'contacts' => $contacts,
-                "posicion" => $key
-            ];
-        }
-
-        return $companys;
-    }
-
-    /**
-     * ListarItemsDeEstimate
-     * @param $estimate_id
-     * @return array
-     */
-    public function ListarItemsDeEstimate($estimate_id)
-    {
-        $items = [];
-
-        $lista = $this->getDoctrine()->getRepository(EstimateQuote::class)
-            ->ListarItemsDeEstimate($estimate_id);
-        foreach ($lista as $key => $value) {
-
-            $item = $this->DevolverItemDeEstimate($value, $key);
-            $items[] = $item;
-        }
-
-        return $items;
-    }
-
-    /**
-     * DevolverItemDeEstimate
-     * @param EstimateQuote $value
-     * @return array
-     */
-    public function DevolverItemDeEstimate($value, $key = -1)
-    {
-        $yield_calculation_name = $this->DevolverYieldCalculationDeItemProject($value);
-
-        $quantity = $value->getQuantity();
-        $price = $value->getPrice();
-        $total = $quantity * $price;
-
-        return [
-            'estimate_item_id' => $value->getId(),
-            "item_id" => $value->getItem()->getItemId(),
-            "item" => $value->getItem()->getDescription(),
-            "unit" => $value->getItem()->getUnit()->getDescription(),
-            "quantity" => $quantity,
-            "price" => $price,
-            "total" => $total,
-            "yield_calculation" => $value->getYieldCalculation(),
-            "yield_calculation_name" => $yield_calculation_name,
-            "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
-            "posicion" => $key
-        ];
-    }
-
-    // listar los bid deadlines del estimate
-    private function ListarBidDeadlines($estimate_id)
-    {
-        $bid_deadlines = [];
-
-        $estimate_bid_deadlines = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-            ->ListarBidDeadlineDeEstimate($estimate_id);
-        foreach ($estimate_bid_deadlines as $key => $estimate_bid_deadline) {
-            $bid_deadlines[] = [
-                'id' => $estimate_bid_deadline->getId(),
-                'bidDeadline' => $estimate_bid_deadline->getBidDeadline()->format('m/d/Y H:i'),
-                'tag' => $estimate_bid_deadline->getTag() ?? '',
-                'address' => $estimate_bid_deadline->getAddress() ?? '',
-                'company_id' => $estimate_bid_deadline->getCompany()->getCompanyId(),
-                'company' => $estimate_bid_deadline->getCompany()->getName(),
-                "posicion" => $key
-            ];
-        }
-
-        return $bid_deadlines;
-    }
-
-    // listar los estimators del estimate
-    private function ListarEstimatorsId($estimate_id)
-    {
-        $ids = [];
-
-        $estimate_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-            ->ListarUsuariosDeEstimate($estimate_id);
-        foreach ($estimate_estimators as $estimate_estimator) {
-            $ids[] = $estimate_estimator->getUser()->getUsuarioId();
-        }
-
-        return $ids;
-    }
-
-    // listar los project types del estimate
-    private function ListarProjectTypesId($estimate_id)
-    {
-        $ids = [];
-
-        $estimate_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-            ->ListarTypesDeEstimate($estimate_id);
-        foreach ($estimate_project_types as $estimate_project_type) {
-            $ids[] = $estimate_project_type->getType()->getTypeId();
-        }
-
-        return $ids;
-    }
-
-    /**
-     * EliminarEstimate: Elimina un rol en la BD
-     * @param int $estimate_id Id
-     * @author Marcel
-     */
-    public function EliminarEstimate($estimate_id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $this->getDoctrine()->getRepository(Estimate::class)
-            ->find($estimate_id);
-        /**@var Estimate $entity */
-        if ($entity != null) {
-
-            // eliminar informacion relacionada
-            $this->EliminarInformacionRelacionada($estimate_id);
-
-            $estimate_descripcion = $entity->getName();
-
-
-            $em->remove($entity);
-            $em->flush();
-
-            //Salvar log
-            $log_operacion = "Delete";
-            $log_categoria = "Estimate";
-            $log_descripcion = "The estimate is deleted: $estimate_descripcion";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = "The requested record does not exist";
-        }
-
-        return $resultado;
-    }
-
-    /**
-     * EliminarEstimates: Elimina los estimates seleccionados en la BD
-     * @param int $ids Ids
-     * @author Marcel
-     */
-    public function EliminarEstimates($ids)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        if ($ids != "") {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
-            foreach ($ids as $estimate_id) {
-                if ($estimate_id != "") {
-                    $cant_total++;
-                    $entity = $this->getDoctrine()->getRepository(Estimate::class)
-                        ->find($estimate_id);
-                    /**@var Estimate $entity */
-                    if ($entity != null) {
-
-                        // eliminar informacion relacionada
-                        $this->EliminarInformacionRelacionada($estimate_id);
-
-                        $estimate_descripcion = $entity->getName();
-
-                        $em->remove($entity);
-                        $cant_eliminada++;
-
-                        //Salvar log
-                        $log_operacion = "Delete";
-                        $log_categoria = "Estimate";
-                        $log_descripcion = "The estimate is deleted: $estimate_descripcion";
-                        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-                    }
-                }
-            }
-        }
-        $em->flush();
-
-        if ($cant_eliminada == 0) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The estimates could not be deleted, because they are associated with a invoice";
-        } else {
-            $resultado['success'] = true;
-
-            $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected estimates because they are associated with a invoice";
-            $resultado['message'] = $mensaje;
-        }
-
-        return $resultado;
-    }
-
-    // eliminar informacion relacionada
-    private function EliminarInformacionRelacionada($estimate_id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        // estimators
-        $estimates_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-            ->ListarUsuariosDeEstimate($estimate_id);
-        foreach ($estimates_estimators as $estimate_estimator) {
-            $em->remove($estimate_estimator);
-        }
-
-        // project types
-        $estimates_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-            ->ListarTypesDeEstimate($estimate_id);
-        foreach ($estimates_project_types as $estimate_project_type) {
-            $em->remove($estimate_project_type);
-        }
-
-        // bid deadlines
-        $bid_deadlines = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-            ->ListarBidDeadlineDeEstimate($estimate_id);
-        foreach ($bid_deadlines as $bid_deadline) {
-            $em->remove($bid_deadline);
-        }
-
-        // items
-        $estimate_items = $this->getDoctrine()->getRepository(EstimateQuote::class)
-            ->ListarItemsDeEstimate($estimate_id);
-        foreach ($estimate_items as $estimate_item) {
-            $em->remove($estimate_item);
-        }
-
-        // companys
-        $companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
-            ->ListarCompanysDeEstimate($estimate_id);
-        foreach ($companys as $company) {
-            $em->remove($company);
-        }
-
-    }
-
-    /**
-     * ActualizarEstimate: Actuializa los datos del rol en la BD
-     * @param int $estimate_id Id
-     * @author Marcel
-     */
-    public function ActualizarEstimate($estimate_id, $project_id, $name, $bidDeadline, $county_id, $priority,
-                                       $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
-                                       $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                                       $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions,
-                                       $planLink, $quoteReceived, $companys)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $this->getDoctrine()->getRepository(Estimate::class)
-            ->find($estimate_id);
-        /** @var Estimate $entity */
-        if ($entity != null) {
-
-            //Verificar nombre
-            $estimate = $this->getDoctrine()->getRepository(Estimate::class)
-                ->findOneBy(['name' => $name]);
-            if ($estimate != null && $estimate_id != $estimate->getEstimateId()) {
-                $resultado['success'] = false;
-                $resultado['error'] = "The project estimate name is in use, please try entering another one.";
-                return $resultado;
-            }
-
-            $entity->setProjectId($project_id);
-            $entity->setName($name);
-            $entity->setPriority($priority);
-            $entity->setBidNo($bidNo);
-            $entity->setWorkHour($workHour);
-            $entity->setPhone($phone);
-            $entity->setEmail($email);
-            $entity->setLocation($location);
-            $entity->setSector($sector);
-
-            $entity->setBidDescription($bidDescription);
-            $entity->setBidInstructions($bidInstructions);
-            $entity->setPlanLink($planLink);
-            $entity->setQuoteReceived($quoteReceived);
-
-            $entity->setBidDeadline(NULL);
-            if ($bidDeadline != '') {
-                $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadline);
-                $entity->setBidDeadline($bidDeadline);
-            }
-
-            $entity->setStage(NULL);
-            if ($stage_id != '') {
-                $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
-                    ->find($stage_id);
-                $entity->setStage($project_stage);
-            }
-
-            $entity->setProposalType(NULL);
-            if ($proposal_type_id != '') {
-                $proposal_type = $this->getDoctrine()->getRepository(ProposalType::class)
-                    ->find($proposal_type_id);
-                $entity->setProposalType($proposal_type);
-            }
-
-            $entity->setStatus(NULL);
-            if ($status_id != '') {
-                $plan_status = $this->getDoctrine()->getRepository(PlanStatus::class)
-                    ->find($status_id);
-                $entity->setStatus($plan_status);
-            }
-
-            $entity->setCountyObj(NULL);
-            if ($county_id != '') {
-                $county = $this->getDoctrine()->getRepository(County::class)
-                    ->find($county_id);
-                $entity->setCountyObj($county);
-            }
-
-            $entity->setDistrict(NULL);
-            if ($district_id != '') {
-                $district = $this->getDoctrine()->getRepository(District::class)
-                    ->find($district_id);
-                $entity->setDistrict($district);
-            }
-
-            $entity->setJobWalk(NULL);
-            if ($jobWalk != '') {
-                $jobWalk = \DateTime::createFromFormat('m/d/Y H:i', $jobWalk);
-                $entity->setJobWalk($jobWalk);
-            }
-
-            $entity->setRfiDueDate(NULL);
-            if ($rfiDueDate != '') {
-                $rfiDueDate = \DateTime::createFromFormat('m/d/Y H:i', $rfiDueDate);
-                $entity->setRfiDueDate($rfiDueDate);
-            }
-
-            $entity->setProjectStart(NULL);
-            if ($projectStart != '') {
-                $projectStart = \DateTime::createFromFormat('m/d/Y H:i', $projectStart);
-                $entity->setProjectStart($projectStart);
-            }
-
-            $entity->setProjectEnd(NULL);
-            if ($projectEnd != '') {
-                $projectEnd = \DateTime::createFromFormat('m/d/Y H:i', $projectEnd);
-                $entity->setProjectEnd($projectEnd);
-            }
-
-            $entity->setSubmittedDate(NULL);
-            if ($submittedDate != '') {
-                $submittedDate = \DateTime::createFromFormat('m/d/Y H:i', $submittedDate);
-                $entity->setSubmittedDate($submittedDate);
-            }
-
-            $entity->setAwardedDate(NULL);
-            if ($awardedDate != '') {
-                $awardedDate = \DateTime::createFromFormat('m/d/Y H:i', $awardedDate);
-                $entity->setAwardedDate($awardedDate);
-            }
-
-            $entity->setLostDate(NULL);
-            if ($lostDate != '') {
-                $lostDate = \DateTime::createFromFormat('m/d/Y H:i', $lostDate);
-                $entity->setLostDate($lostDate);
-            }
-
-            $entity->setPlanDownloading(NULL);
-            if ($plan_downloading_id != '') {
-                $plan_downloading = $this->getDoctrine()->getRepository(PlanDownloading::class)
-                    ->find($plan_downloading_id);
-                $entity->setPlanDownloading($plan_downloading);
-            }
-
-            // save project types
-            $this->SalvarProjectTypes($entity, $project_types_id, false);
-
-            // save estimators
-            $this->SalvarEstimators($entity, $estimators_id, false);
-
-            // bid_deadlines
-            $this->SalvarBidDeadlines($entity, $bid_deadlines);
-
-            // companys
-            $this->SalvarCompanys($entity, $companys);
-
-            $em->flush();
-
-            //Salvar log
-            $log_operacion = "Update";
-            $log_categoria = "Estimate";
-            $log_descripcion = "The estimate is modified: $name";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-
+            $resultado['error'] = "The item already exists in the project estimate";
             return $resultado;
-        }
-    }
+         }
+      } else {
 
-    /**
-     * SalvarBidDeadlines
-     * @param $bid_deadlines
-     * @param Estimate $entity
-     * @return void
-     */
-    public function SalvarBidDeadlines($entity, $bid_deadlines)
-    {
-        $em = $this->getDoctrine()->getManager();
+         //Verificar description
+         $item = $this->getDoctrine()->getRepository(Item::class)
+            ->findOneBy(['description' => $item_name]);
+         if ($item_id == '' && $item != null) {
+            $resultado['success'] = false;
+            $resultado['error'] = "The item name is in use, please try entering another one.";
+            return $resultado;
+         }
+      }
 
-        if (!empty($bid_deadlines)) {
-            foreach ($bid_deadlines as $value) {
 
-                $bid_deadline_entity = null;
+      $estimate_entity = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
+      if ($estimate_entity != null) {
+         $estimate_item_entity = null;
 
-                if (is_numeric($value->id)) {
-                    $bid_deadline_entity = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-                        ->find($value->id);
-                }
+         if (is_numeric($estimate_item_id)) {
+            $estimate_item_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
+               ->find($estimate_item_id);
+         }
 
-                $is_new_bid_deadline = false;
-                if ($bid_deadline_entity == null) {
-                    $bid_deadline_entity = new EstimateBidDeadline();
-                    $is_new_bid_deadline = true;
-                }
+         $is_new_estimate_item = false;
+         if ($estimate_item_entity == null) {
+            $estimate_item_entity = new EstimateQuote();
+            $is_new_estimate_item = true;
+         }
 
-                if ($value->bidDeadline != '') {
-                    $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $value->bidDeadline);
-                    $bid_deadline_entity->setBidDeadline($bidDeadline);
-                }
+         $estimate_item_entity->setYieldCalculation($yield_calculation);
 
-                $bid_deadline_entity->setTag($value->tag);
-                $bid_deadline_entity->setAddress($value->address);
+         $price = $price !== "" ? $price : NULL;
+         $estimate_item_entity->setPrice($price);
 
-                if ($value->company_id != '') {
-                    $company = $this->getDoctrine()->getRepository(Company::class)
-                        ->find($value->company_id);
-                    $bid_deadline_entity->setCompany($company);
-                }
+         $estimate_item_entity->setQuantity($quantity);
 
-                if ($is_new_bid_deadline) {
-                    $bid_deadline_entity->setEstimate($entity);
+         $equation_entity = null;
+         if ($equation_id != '') {
+            $equation_entity = $this->getDoctrine()->getRepository(Equation::class)->find($equation_id);
+            $estimate_item_entity->setEquation($equation_entity);
+         }
 
-                    $em->persist($bid_deadline_entity);
-                }
+         $is_new_item = false;
+         if ($item_id != '') {
+            $item_entity = $this->getDoctrine()->getRepository(Item::class)->find($item_id);
+         } else {
+            // add new item
+            $new_item_data = json_encode([
+               'item' => $item_name,
+               'price' => $price,
+               'yield_calculation' => $yield_calculation,
+               'unit_id' => $unit_id
+            ]);
+            $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
+
+            $is_new_item = true;
+         }
+
+         $estimate_item_entity->setItem($item_entity);
+
+         if ($is_new_estimate_item) {
+            $estimate_item_entity->setEstimate($estimate_entity);
+
+            $em->persist($estimate_item_entity);
+         }
+
+         $em->flush();
+
+         $resultado['success'] = true;
+
+         // devolver item
+         $item = $this->DevolverItemDeEstimate($estimate_item_entity);
+         $resultado['item'] = $item;
+         $resultado['is_new_item'] = $is_new_item;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = 'The project not exist';
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * EliminarItem: Elimina un item en la BD
+    * @param int $estimate_item_id Id
+    * @author Marcel
+    */
+   public function EliminarItem($estimate_item_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      $entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
+         ->find($estimate_item_id);
+      /**@var EstimateQuote $entity */
+      if ($entity != null) {
+
+         $item_name = $entity->getItem()->getDescription();
+
+         $em->remove($entity);
+         $em->flush();
+
+         //Salvar log
+         $log_operacion = "Delete";
+         $log_categoria = "Estimate Item";
+         $log_descripcion = "The item: $item_name of the project estimate is deleted";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * EliminarBidDeadline: Elimina un bid deadline en la BD
+    * @param int $id Id
+    * @author Marcel
+    */
+   public function EliminarBidDeadline($id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      $entity = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+         ->find($id);
+      /**@var EstimateBidDeadline $entity */
+      if ($entity != null) {
+
+         $estimate_name = $entity->getEstimate()->getName();
+         $bid_deadline = $entity->getBidDeadline()->format('d/m/Y H:i');
+
+         $em->remove($entity);
+         $em->flush();
+
+         //Salvar log
+         $log_operacion = "Delete";
+         $log_categoria = "Bid Deadline Estimate";
+         $log_descripcion = "The bid deadline estimate is deleted: $estimate_name Bid Deadline: $bid_deadline";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * CambiarStage: Cambia stage del estiamte en la BD
+    * @param int $estimate_id Id
+    * @author Marcel
+    */
+   public function CambiarStage($estimate_id, $stage_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      $entity = $this->getDoctrine()->getRepository(Estimate::class)
+         ->find($estimate_id);
+      /** @var Estimate $entity */
+      if ($entity != null) {
+
+         $name = $entity->getName();
+
+         $entity->setStage(NULL);
+         if ($stage_id != '') {
+            $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
+               ->find($stage_id);
+            $entity->setStage($project_stage);
+         }
+
+         $em->flush();
+
+         //Salvar log
+         $log_operacion = "Update";
+         $log_categoria = "Estimate";
+         $log_descripcion = "The estimate is modified: $name";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * CargarDatosEstimate: Carga los datos de un estimate
+    *
+    * @param int $estimate_id Id
+    *
+    * @author Marcel
+    */
+   public function CargarDatosEstimate($estimate_id)
+   {
+      $resultado = array();
+      $arreglo_resultado = array();
+
+      $entity = $this->getDoctrine()->getRepository(Estimate::class)
+         ->find($estimate_id);
+      /** @var Estimate $entity */
+      if ($entity != null) {
+
+         $arreglo_resultado['project_id'] = $entity->getProjectId();
+         $arreglo_resultado['name'] = $entity->getName();
+         $arreglo_resultado['bidDeadline'] = $entity->getBidDeadline() ? $entity->getBidDeadline()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['priority'] = $entity->getPriority();
+         $arreglo_resultado['bidNo'] = $entity->getBidNo();
+         $arreglo_resultado['workHour'] = $entity->getWorkHour();
+         $arreglo_resultado['phone'] = $entity->getPhone();
+         $arreglo_resultado['email'] = $entity->getEmail();
+
+         $arreglo_resultado['jobWalk'] = $entity->getJobWalk() ? $entity->getJobWalk()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['rfiDueDate'] = $entity->getRfiDueDate() ? $entity->getRfiDueDate()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['projectStart'] = $entity->getProjectStart() ? $entity->getProjectStart()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['projectEnd'] = $entity->getProjectEnd() ? $entity->getProjectEnd()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['submittedDate'] = $entity->getSubmittedDate() ? $entity->getSubmittedDate()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['awardedDate'] = $entity->getAwardedDate() ? $entity->getAwardedDate()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['lostDate'] = $entity->getLostDate() ? $entity->getLostDate()->format('m/d/Y H:i') : "";
+         $arreglo_resultado['location'] = $entity->getLocation();
+         $arreglo_resultado['sector'] = $entity->getSector();
+         $arreglo_resultado['bidDescription'] = $entity->getBidDescription();
+         $arreglo_resultado['bidInstructions'] = $entity->getBidInstructions();
+         $arreglo_resultado['planLink'] = $entity->getPlanLink();
+         $arreglo_resultado['quoteReceived'] = $entity->getQuoteReceived();
+
+         $arreglo_resultado['stage_id'] = $entity->getStage() != null ? $entity->getStage()->getStageId() : '';
+         $arreglo_resultado['proposal_type_id'] = $entity->getProposalType() != null ? $entity->getProposalType()->getTypeId() : '';
+         $arreglo_resultado['status_id'] = $entity->getStatus() != null ? $entity->getStatus()->getStatusId() : '';
+
+         $county_id = $entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : null;
+         $arreglo_resultado['county_id'] = $county_id;
+
+         $arreglo_resultado['district_id'] = $entity->getDistrict() != null ? $entity->getDistrict()->getDistrictId() : '';
+         $arreglo_resultado['plan_downloading_id'] = $entity->getPlanDownloading() != null ? $entity->getPlanDownloading()->getPlanDownloadingId() : '';
+
+         // estimators ids
+         $estimators_id = $this->ListarEstimatorsId($estimate_id);
+         $arreglo_resultado['estimators_id'] = $estimators_id;
+
+         // project types ids
+         $project_types_id = $this->ListarProjectTypesId($estimate_id);
+         $arreglo_resultado['project_types_id'] = $project_types_id;
+
+         // bid deadlines
+         $bid_deadlines = $this->ListarBidDeadlines($estimate_id);
+         $arreglo_resultado['bid_deadlines'] = $bid_deadlines;
+
+         // items
+         $items = $this->ListarItemsDeEstimate($estimate_id);
+         $arreglo_resultado['items'] = $items;
+
+         // companys
+         $companys = $this->ListarCompanys($estimate_id);
+         $arreglo_resultado['companys'] = $companys;
+
+         $resultado['success'] = true;
+         $resultado['estimate'] = $arreglo_resultado;
+      }
+
+      return $resultado;
+   }
+
+   // listar los companys del estimate
+   private function ListarCompanys($estimate_id)
+   {
+      $companys = [];
+
+      $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
+         ->ListarCompanysDeEstimate($estimate_id);
+      foreach ($estimate_companys as $key => $estimate_company) {
+
+
+         $contact_id = "";
+         $contact = "";
+         $email = "";
+         $phone = "";
+         if ($estimate_company->getContact()) {
+            $contact_id = $estimate_company->getContact()->getContactId();
+            $contact = $estimate_company->getContact()->getName();
+            $email = $estimate_company->getContact()->getEmail();
+            $phone = $estimate_company->getContact()->getPhone();
+         }
+
+         // contacts
+         $contacts = $this->ListarContactsDeCompany($estimate_company->getCompany()->getCompanyId());
+
+
+         $companys[] = [
+            'id' => $estimate_company->getId(),
+            'company_id' => $estimate_company->getCompany()->getCompanyId(),
+            'company' => $estimate_company->getCompany()->getName(),
+            'contact_id' => $contact_id,
+            'contact' => $contact,
+            'email' => $email,
+            'phone' => $phone,
+            'contacts' => $contacts,
+            "posicion" => $key
+         ];
+      }
+
+      return $companys;
+   }
+
+   /**
+    * ListarItemsDeEstimate
+    * @param $estimate_id
+    * @return array
+    */
+   public function ListarItemsDeEstimate($estimate_id)
+   {
+      $items = [];
+
+      $lista = $this->getDoctrine()->getRepository(EstimateQuote::class)
+         ->ListarItemsDeEstimate($estimate_id);
+      foreach ($lista as $key => $value) {
+
+         $item = $this->DevolverItemDeEstimate($value, $key);
+         $items[] = $item;
+      }
+
+      return $items;
+   }
+
+   /**
+    * DevolverItemDeEstimate
+    * @param EstimateQuote $value
+    * @return array
+    */
+   public function DevolverItemDeEstimate($value, $key = -1)
+   {
+      $yield_calculation_name = $this->DevolverYieldCalculationDeItemProject($value);
+
+      $quantity = $value->getQuantity();
+      $price = $value->getPrice();
+      $total = $quantity * $price;
+
+      return [
+         'estimate_item_id' => $value->getId(),
+         "item_id" => $value->getItem()->getItemId(),
+         "item" => $value->getItem()->getDescription(),
+         "unit" => $value->getItem()->getUnit()->getDescription(),
+         "quantity" => $quantity,
+         "price" => $price,
+         "total" => $total,
+         "yield_calculation" => $value->getYieldCalculation(),
+         "yield_calculation_name" => $yield_calculation_name,
+         "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
+         "posicion" => $key
+      ];
+   }
+
+   // listar los bid deadlines del estimate
+   private function ListarBidDeadlines($estimate_id)
+   {
+      $bid_deadlines = [];
+
+      $estimate_bid_deadlines = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+         ->ListarBidDeadlineDeEstimate($estimate_id);
+      foreach ($estimate_bid_deadlines as $key => $estimate_bid_deadline) {
+         $bid_deadlines[] = [
+            'id' => $estimate_bid_deadline->getId(),
+            'bidDeadline' => $estimate_bid_deadline->getBidDeadline()->format('m/d/Y H:i'),
+            'tag' => $estimate_bid_deadline->getTag() ?? '',
+            'address' => $estimate_bid_deadline->getAddress() ?? '',
+            'company_id' => $estimate_bid_deadline->getCompany()->getCompanyId(),
+            'company' => $estimate_bid_deadline->getCompany()->getName(),
+            "posicion" => $key
+         ];
+      }
+
+      return $bid_deadlines;
+   }
+
+   // listar los estimators del estimate
+   private function ListarEstimatorsId($estimate_id)
+   {
+      $ids = [];
+
+      $estimate_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
+         ->ListarUsuariosDeEstimate($estimate_id);
+      foreach ($estimate_estimators as $estimate_estimator) {
+         $ids[] = $estimate_estimator->getUser()->getUsuarioId();
+      }
+
+      return $ids;
+   }
+
+   // listar los project types del estimate
+   private function ListarProjectTypesId($estimate_id)
+   {
+      $ids = [];
+
+      $estimate_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
+         ->ListarTypesDeEstimate($estimate_id);
+      foreach ($estimate_project_types as $estimate_project_type) {
+         $ids[] = $estimate_project_type->getType()->getTypeId();
+      }
+
+      return $ids;
+   }
+
+   /**
+    * EliminarEstimate: Elimina un rol en la BD
+    * @param int $estimate_id Id
+    * @author Marcel
+    */
+   public function EliminarEstimate($estimate_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      $entity = $this->getDoctrine()->getRepository(Estimate::class)
+         ->find($estimate_id);
+      /**@var Estimate $entity */
+      if ($entity != null) {
+
+         // eliminar informacion relacionada
+         $this->EliminarInformacionRelacionada($estimate_id);
+
+         $estimate_descripcion = $entity->getName();
+
+
+         $em->remove($entity);
+         $em->flush();
+
+         //Salvar log
+         $log_operacion = "Delete";
+         $log_categoria = "Estimate";
+         $log_descripcion = "The estimate is deleted: $estimate_descripcion";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * EliminarEstimates: Elimina los estimates seleccionados en la BD
+    * @param int $ids Ids
+    * @author Marcel
+    */
+   public function EliminarEstimates($ids)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      if ($ids != "") {
+         $ids = explode(',', $ids);
+         $cant_eliminada = 0;
+         $cant_total = 0;
+         foreach ($ids as $estimate_id) {
+            if ($estimate_id != "") {
+               $cant_total++;
+               $entity = $this->getDoctrine()->getRepository(Estimate::class)
+                  ->find($estimate_id);
+               /**@var Estimate $entity */
+               if ($entity != null) {
+
+                  // eliminar informacion relacionada
+                  $this->EliminarInformacionRelacionada($estimate_id);
+
+                  $estimate_descripcion = $entity->getName();
+
+                  $em->remove($entity);
+                  $cant_eliminada++;
+
+                  //Salvar log
+                  $log_operacion = "Delete";
+                  $log_categoria = "Estimate";
+                  $log_descripcion = "The estimate is deleted: $estimate_descripcion";
+                  $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+               }
             }
-        }
+         }
+      }
+      $em->flush();
 
-    }
+      if ($cant_eliminada == 0) {
+         $resultado['success'] = false;
+         $resultado['error'] = "The estimates could not be deleted, because they are associated with a invoice";
+      } else {
+         $resultado['success'] = true;
 
-    /**
-     * SalvarCompanys
-     * @param $companys
-     * @param Estimate $entity
-     * @return void
-     */
-    public function SalvarCompanys($entity, $companys)
-    {
-        $em = $this->getDoctrine()->getManager();
+         $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected estimates because they are associated with a invoice";
+         $resultado['message'] = $mensaje;
+      }
 
-        if (!empty($companys)) {
-            foreach ($companys as $value) {
+      return $resultado;
+   }
 
-                $estimate_company_entity = null;
+   // eliminar informacion relacionada
+   private function EliminarInformacionRelacionada($estimate_id)
+   {
+      $em = $this->getDoctrine()->getManager();
 
-                if (is_numeric($value->id)) {
-                    $estimate_company_entity = $this->getDoctrine()->getRepository(EstimateCompany::class)
-                        ->find($value->id);
-                }
+      // estimators
+      $estimates_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
+         ->ListarUsuariosDeEstimate($estimate_id);
+      foreach ($estimates_estimators as $estimate_estimator) {
+         $em->remove($estimate_estimator);
+      }
 
-                $is_new_estimate_company = false;
-                if ($estimate_company_entity == null) {
-                    $estimate_company_entity = new EstimateCompany();
-                    $is_new_estimate_company = true;
-                }
+      // project types
+      $estimates_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
+         ->ListarTypesDeEstimate($estimate_id);
+      foreach ($estimates_project_types as $estimate_project_type) {
+         $em->remove($estimate_project_type);
+      }
 
-                if ($value->company_id != '') {
-                    $company = $this->getDoctrine()->getRepository(Company::class)
-                        ->find($value->company_id);
-                    $estimate_company_entity->setCompany($company);
-                }
+      // bid deadlines
+      $bid_deadlines = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+         ->ListarBidDeadlineDeEstimate($estimate_id);
+      foreach ($bid_deadlines as $bid_deadline) {
+         $em->remove($bid_deadline);
+      }
 
-                if ($value->contact_id != '') {
-                    $contact = $this->getDoctrine()->getRepository(CompanyContact::class)
-                        ->find($value->contact_id);
-                    $estimate_company_entity->setContact($contact);
-                }
+      // items
+      $estimate_items = $this->getDoctrine()->getRepository(EstimateQuote::class)
+         ->ListarItemsDeEstimate($estimate_id);
+      foreach ($estimate_items as $estimate_item) {
+         $em->remove($estimate_item);
+      }
 
-                if ($is_new_estimate_company) {
-                    $estimate_company_entity->setEstimate($entity);
+      // companys
+      $companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
+         ->ListarCompanysDeEstimate($estimate_id);
+      foreach ($companys as $company) {
+         $em->remove($company);
+      }
+   }
 
-                    $em->persist($estimate_company_entity);
-                }
-            }
-        }
+   /**
+    * ActualizarEstimate: Actuializa los datos del rol en la BD
+    * @param int $estimate_id Id
+    * @author Marcel
+    */
+   public function ActualizarEstimate(
+      $estimate_id,
+      $project_id,
+      $name,
+      $bidDeadline,
+      $county_id,
+      $priority,
+      $bidNo,
+      $workHour,
+      $phone,
+      $email,
+      $stage_id,
+      $proposal_type_id,
+      $status_id,
+      $district_id,
+      $project_types_id,
+      $estimators_id,
+      $bid_deadlines,
+      $jobWalk,
+      $rfiDueDate,
+      $projectStart,
+      $projectEnd,
+      $submittedDate,
+      $awardedDate,
+      $lostDate,
+      $location,
+      $sector,
+      $plan_downloading_id,
+      $bidDescription,
+      $bidInstructions,
+      $planLink,
+      $quoteReceived,
+      $companys
+   ) {
+      $em = $this->getDoctrine()->getManager();
 
-    }
+      $entity = $this->getDoctrine()->getRepository(Estimate::class)
+         ->find($estimate_id);
+      /** @var Estimate $entity */
+      if ($entity != null) {
 
-    /**
-     * SalvarEstimate: Guarda los datos de estimate en la BD
-     * @param string $description Nombre
-     * @author Marcel
-     */
-    public function SalvarEstimate($project_id, $name, $bidDeadline, $county_id, $priority,
-                                   $bidNo, $workHour, $phone, $email, $stage_id, $proposal_type_id, $status_id, $district_id,
-                                   $project_types_id, $estimators_id, $bid_deadlines, $jobWalk, $rfiDueDate, $projectStart, $projectEnd, $submittedDate,
-                                   $awardedDate, $lostDate, $location, $sector, $plan_downloading_id, $bidDescription, $bidInstructions, $planLink, $quoteReceived,
-                                   $companys)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        //Verificar nombre
-        $estimate = $this->getDoctrine()->getRepository(Estimate::class)
+         //Verificar nombre
+         $estimate = $this->getDoctrine()->getRepository(Estimate::class)
             ->findOneBy(['name' => $name]);
-        if ($estimate != null) {
+         if ($estimate != null && $estimate_id != $estimate->getEstimateId()) {
             $resultado['success'] = false;
             $resultado['error'] = "The project estimate name is in use, please try entering another one.";
             return $resultado;
-        }
+         }
 
-        $entity = new Estimate();
+         $entity->setProjectId($project_id);
+         $entity->setName($name);
+         $entity->setPriority($priority);
+         $entity->setBidNo($bidNo);
+         $entity->setWorkHour($workHour);
+         $entity->setPhone($phone);
+         $entity->setEmail($email);
+         $entity->setLocation($location);
+         $entity->setSector($sector);
 
-        $entity->setProjectId($project_id);
-        $entity->setName($name);
-        $entity->setPriority($priority);
-        $entity->setBidNo($bidNo);
-        $entity->setWorkHour($workHour);
-        $entity->setPhone($phone);
-        $entity->setEmail($email);
-        $entity->setLocation($location);
-        $entity->setSector($sector);
+         $entity->setBidDescription($bidDescription);
+         $entity->setBidInstructions($bidInstructions);
+         $entity->setPlanLink($planLink);
+         $entity->setQuoteReceived($quoteReceived);
 
-        $entity->setBidDescription($bidDescription);
-        $entity->setBidInstructions($bidInstructions);
-        $entity->setPlanLink($planLink);
-        $entity->setQuoteReceived($quoteReceived);
-
-        if ($bidDeadline != '') {
+         $entity->setBidDeadline(NULL);
+         if ($bidDeadline != '') {
             $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadline);
             $entity->setBidDeadline($bidDeadline);
-        }
+         }
 
-        if ($stage_id != '') {
+         $entity->setStage(NULL);
+         if ($stage_id != '') {
             $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
-                ->find($stage_id);
+               ->find($stage_id);
             $entity->setStage($project_stage);
-        }
+         }
 
-        if ($proposal_type_id != '') {
+         $entity->setProposalType(NULL);
+         if ($proposal_type_id != '') {
             $proposal_type = $this->getDoctrine()->getRepository(ProposalType::class)
-                ->find($proposal_type_id);
+               ->find($proposal_type_id);
             $entity->setProposalType($proposal_type);
-        }
+         }
 
-        if ($status_id != '') {
+         $entity->setStatus(NULL);
+         if ($status_id != '') {
             $plan_status = $this->getDoctrine()->getRepository(PlanStatus::class)
-                ->find($status_id);
+               ->find($status_id);
             $entity->setStatus($plan_status);
-        }
+         }
 
-        if ($county_id != '') {
+         $entity->setCountyObj(NULL);
+         if ($county_id != '') {
             $county = $this->getDoctrine()->getRepository(County::class)
-                ->find($county_id);
+               ->find($county_id);
             $entity->setCountyObj($county);
-        }
+         }
 
-        if ($district_id != '') {
+         $entity->setDistrict(NULL);
+         if ($district_id != '') {
             $district = $this->getDoctrine()->getRepository(District::class)
-                ->find($district_id);
+               ->find($district_id);
             $entity->setDistrict($district);
-        }
+         }
 
-        if ($jobWalk != '') {
+         $entity->setJobWalk(NULL);
+         if ($jobWalk != '') {
             $jobWalk = \DateTime::createFromFormat('m/d/Y H:i', $jobWalk);
             $entity->setJobWalk($jobWalk);
-        }
+         }
 
-        if ($rfiDueDate != '') {
+         $entity->setRfiDueDate(NULL);
+         if ($rfiDueDate != '') {
             $rfiDueDate = \DateTime::createFromFormat('m/d/Y H:i', $rfiDueDate);
             $entity->setRfiDueDate($rfiDueDate);
-        }
+         }
 
-        if ($projectStart != '') {
+         $entity->setProjectStart(NULL);
+         if ($projectStart != '') {
             $projectStart = \DateTime::createFromFormat('m/d/Y H:i', $projectStart);
             $entity->setProjectStart($projectStart);
-        }
+         }
 
-        if ($projectEnd != '') {
+         $entity->setProjectEnd(NULL);
+         if ($projectEnd != '') {
             $projectEnd = \DateTime::createFromFormat('m/d/Y H:i', $projectEnd);
             $entity->setProjectEnd($projectEnd);
-        }
+         }
 
-        if ($submittedDate != '') {
+         $entity->setSubmittedDate(NULL);
+         if ($submittedDate != '') {
             $submittedDate = \DateTime::createFromFormat('m/d/Y H:i', $submittedDate);
             $entity->setSubmittedDate($submittedDate);
-        }
+         }
 
-        if ($awardedDate != '') {
+         $entity->setAwardedDate(NULL);
+         if ($awardedDate != '') {
             $awardedDate = \DateTime::createFromFormat('m/d/Y H:i', $awardedDate);
             $entity->setAwardedDate($awardedDate);
-        }
+         }
 
-        if ($lostDate != '') {
+         $entity->setLostDate(NULL);
+         if ($lostDate != '') {
             $lostDate = \DateTime::createFromFormat('m/d/Y H:i', $lostDate);
             $entity->setLostDate($lostDate);
-        }
+         }
 
-        if ($plan_downloading_id != '') {
+         $entity->setPlanDownloading(NULL);
+         if ($plan_downloading_id != '') {
             $plan_downloading = $this->getDoctrine()->getRepository(PlanDownloading::class)
-                ->find($plan_downloading_id);
+               ->find($plan_downloading_id);
             $entity->setPlanDownloading($plan_downloading);
-        }
+         }
 
-        $em->persist($entity);
+         // save project types
+         $this->SalvarProjectTypes($entity, $project_types_id, false);
 
-        // save project types
-        $this->SalvarProjectTypes($entity, $project_types_id);
+         // save estimators
+         $this->SalvarEstimators($entity, $estimators_id, false);
 
-        // save estimators
-        $this->SalvarEstimators($entity, $estimators_id);
+         // bid_deadlines
+         $this->SalvarBidDeadlines($entity, $bid_deadlines);
 
-        // bid_deadlines
-        $this->SalvarBidDeadlines($entity, $bid_deadlines);
+         // companys
+         $this->SalvarCompanys($entity, $companys);
 
-        // companys
-        $this->SalvarCompanys($entity, $companys);
+         $em->flush();
 
-        $em->flush();
+         //Salvar log
+         $log_operacion = "Update";
+         $log_categoria = "Estimate";
+         $log_descripcion = "The estimate is modified: $name";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-        //Salvar log
-        $log_operacion = "Add";
-        $log_categoria = "Project Estimate";
-        $log_descripcion = "The project estimate is added: $name";
-        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+         $resultado['success'] = true;
 
-        $resultado['success'] = true;
+         return $resultado;
+      }
+   }
 
-        return $resultado;
-    }
+   /**
+    * SalvarBidDeadlines
+    * @param $bid_deadlines
+    * @param Estimate $entity
+    * @return void
+    */
+   public function SalvarBidDeadlines($entity, $bid_deadlines)
+   {
+      $em = $this->getDoctrine()->getManager();
 
-    // salvar estimators
-    public function SalvarEstimators($entity, $estimators_id, $is_new = true)
-    {
-        $em = $this->getDoctrine()->getManager();
+      if (!empty($bid_deadlines)) {
+         foreach ($bid_deadlines as $value) {
 
-        // eliminar anteriores
-        if (!$is_new) {
-            $estimates_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-                ->ListarUsuariosDeEstimate($entity->getEstimateId());
-            foreach ($estimates_estimators as $estimate_estimator) {
-                $em->remove($estimate_estimator);
+            $bid_deadline_entity = null;
+
+            if (is_numeric($value->id)) {
+               $bid_deadline_entity = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+                  ->find($value->id);
             }
-        }
 
-        if ($estimators_id !== '') {
-
-            $estimators_id = explode(',', $estimators_id);
-
-            foreach ($estimators_id as $estimator_id) {
-                $user_entity = $this->getDoctrine()->getRepository(Usuario::class)
-                    ->find($estimator_id);
-                if ($user_entity !== null) {
-                    $estimate_estimator = new EstimateEstimator();
-
-                    $estimate_estimator->setEstimate($entity);
-                    $estimate_estimator->setUser($user_entity);
-
-                    $em->persist($estimate_estimator);
-                }
+            $is_new_bid_deadline = false;
+            if ($bid_deadline_entity == null) {
+               $bid_deadline_entity = new EstimateBidDeadline();
+               $is_new_bid_deadline = true;
             }
-        }
-    }
 
-    // salvar project types
-    public function SalvarProjectTypes($entity, $project_types_id, $is_new = true)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        // eliminar anteriores
-        if (!$is_new) {
-            $estimates_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->ListarTypesDeEstimate($entity->getEstimateId());
-            foreach ($estimates_project_types as $estimate_project_type) {
-                $em->remove($estimate_project_type);
+            if ($value->bidDeadline != '') {
+               $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $value->bidDeadline);
+               $bid_deadline_entity->setBidDeadline($bidDeadline);
             }
-        }
 
-        if ($project_types_id !== '') {
+            $bid_deadline_entity->setTag($value->tag);
+            $bid_deadline_entity->setAddress($value->address);
 
-            $project_types_id = explode(',', $project_types_id);
-
-            foreach ($project_types_id as $project_type_id) {
-                $project_type_entity = $this->getDoctrine()->getRepository(ProjectType::class)
-                    ->find($project_type_id);
-                if ($project_type_entity !== null) {
-                    $estimate_project_type = new EstimateProjectType();
-
-                    $estimate_project_type->setEstimate($entity);
-                    $estimate_project_type->setType($project_type_entity);
-
-                    $em->persist($estimate_project_type);
-                }
+            if ($value->company_id != '') {
+               $company = $this->getDoctrine()->getRepository(Company::class)
+                  ->find($value->company_id);
+               $bid_deadline_entity->setCompany($company);
             }
-        }
-    }
 
+            if ($is_new_bid_deadline) {
+               $bid_deadline_entity->setEstimate($entity);
 
-    /**
-     * ListarEstimates: Listar los estimates
-     *
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
-     *
-     * @author Marcel
-     */
-    public function ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $project_type_id,
-                                    $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin)
-    {
-        $arreglo_resultado = array();
-        $cont = 0;
-
-        // listar
-        $lista = [];
-        if ($project_type_id === "") {
-            $lista = $this->getDoctrine()->getRepository(Estimate::class)
-                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
-        } else {
-            $estimates_project_type = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
-            foreach ($estimates_project_type as $estimate_project_type) {
-                $lista[] = $estimate_project_type->getEstimate();
+               $em->persist($bid_deadline_entity);
             }
-        }
+         }
+      }
+   }
 
+   /**
+    * SalvarCompanys
+    * @param $companys
+    * @param Estimate $entity
+    * @return void
+    */
+   public function SalvarCompanys($entity, $companys)
+   {
+      $em = $this->getDoctrine()->getManager();
 
-        foreach ($lista as $value) {
-            $estimate_id = $value->getEstimateId();
+      if (!empty($companys)) {
+         foreach ($companys as $value) {
 
-            $acciones = $this->ListarAcciones($estimate_id);
+            $estimate_company_entity = null;
 
-            $bidDeadline = $value->getBidDeadline() ? $value->getBidDeadline()->format('m/d/Y H:i') : "Not set";
-
-            // companies
-            $companies = $this->ListarCompaniesParaListado($value);
-
-            // estimators
-            $estimators = $this->ListarEstimatorsParaListado($estimate_id);
-
-            // stage
-            $stage = $this->DevolverStageParaListado($estimate_id, $value->getStage());
-
-            // name
-            $name = $value->getName() . ($value->getQuoteReceived()
-                    ? ' <i class="fa fa-check-circle" style="color: green;" title="Quote received"></i>'
-                    : '');
-
-            $arreglo_resultado[$cont] = array(
-                "id" => $estimate_id,
-                "name" => $name,
-                "company" => $companies,
-                "bidDeadline" => $bidDeadline,
-                "estimators" => $estimators,
-                "stage" => $stage,
-                "acciones" => $acciones
-            );
-
-
-            $cont++;
-        }
-
-        return $arreglo_resultado;
-    }
-
-    // listar los companies para el listado
-    private function ListarCompaniesParaListado(Estimate $estimate)
-    {
-        $companies = [];
-
-        $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
-            ->ListarCompanysDeEstimate($estimate->getEstimateId());
-        foreach ($estimate_companys as $estimate_company) {
-            $companies[] = $estimate_company->getCompany()->getName();
-        }
-
-        $lista = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-            ->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
-        foreach ($lista as $value) {
-            $nombre = $value->getCompany()->getName();
-            if (!in_array($nombre, $companies)) {
-                $companies[] = $nombre;
+            if (is_numeric($value->id)) {
+               $estimate_company_entity = $this->getDoctrine()->getRepository(EstimateCompany::class)
+                  ->find($value->id);
             }
-        }
 
-        if (count($companies) === 0) {
-            return '';
-        }
+            $is_new_estimate_company = false;
+            if ($estimate_company_entity == null) {
+               $estimate_company_entity = new EstimateCompany();
+               $is_new_estimate_company = true;
+            }
 
-        $primerNombre = htmlspecialchars($companies[0], ENT_QUOTES, 'UTF-8');
-        $primerNombre_truncado = $this->truncate($primerNombre, 30);
-        $html = '<div class="d-inline-flex align-items-center" style="gap: 8px;">';
+            if ($value->company_id != '') {
+               $company = $this->getDoctrine()->getRepository(Company::class)
+                  ->find($value->company_id);
+               $estimate_company_entity->setCompany($company);
+            }
 
-        $restantes = array_slice($companies, 1);
+            if ($value->contact_id != '') {
+               $contact = $this->getDoctrine()->getRepository(CompanyContact::class)
+                  ->find($value->contact_id);
+               $estimate_company_entity->setContact($contact);
+            }
 
-        // Estilo base para los badges
-        $estiloBase = 'padding: 3px 9px; font-size: 11px;cursor:pointer; color: #FFF;';
+            if ($is_new_estimate_company) {
+               $estimate_company_entity->setEstimate($entity);
 
-        // Si hay más de una empresa, agregar borde izquierdo rojo al primer badge
-        $estiloPrincipal = $estiloBase;
-        if (count($restantes) > 0) {
-            $estiloPrincipal .= ' border-left: 3px solid red;';
-        }
+               $em->persist($estimate_company_entity);
+            }
+         }
+      }
+   }
 
-        // Badge principal
-        $html .= '<span class="badge badge-primary" style="' . $estiloPrincipal . '" title="' . $primerNombre . '">' . $primerNombre_truncado . '</span>';
+   /**
+    * SalvarEstimate: Guarda los datos de estimate en la BD
+    * @param string $description Nombre
+    * @author Marcel
+    */
+   public function SalvarEstimate(
+      $project_id,
+      $name,
+      $bidDeadline,
+      $county_id,
+      $priority,
+      $bidNo,
+      $workHour,
+      $phone,
+      $email,
+      $stage_id,
+      $proposal_type_id,
+      $status_id,
+      $district_id,
+      $project_types_id,
+      $estimators_id,
+      $bid_deadlines,
+      $jobWalk,
+      $rfiDueDate,
+      $projectStart,
+      $projectEnd,
+      $submittedDate,
+      $awardedDate,
+      $lostDate,
+      $location,
+      $sector,
+      $plan_downloading_id,
+      $bidDescription,
+      $bidInstructions,
+      $planLink,
+      $quoteReceived,
+      $companys
+   ) {
+      $em = $this->getDoctrine()->getManager();
 
-        if (count($restantes) > 0) {
-            // Badges del popover
-            $contenidoPopover = implode('', array_map(function ($c) use ($estiloBase) {
-                $c = htmlspecialchars($c, ENT_QUOTES, 'UTF-8');
-                return '<div class="mb-1"><span class="badge badge-primary" style="' . $estiloBase . '">' . $c . '</span></div>';
-            }, $restantes));
+      //Verificar nombre
+      $estimate = $this->getDoctrine()->getRepository(Estimate::class)
+         ->findOneBy(['name' => $name]);
+      if ($estimate != null) {
+         $resultado['success'] = false;
+         $resultado['error'] = "The project estimate name is in use, please try entering another one.";
+         return $resultado;
+      }
 
-            $dataContent = htmlspecialchars($contenidoPopover, ENT_QUOTES, 'UTF-8');
+      $entity = new Estimate();
 
-            $html .= '<span class="badge bg-primary popover-company"
+      $entity->setProjectId($project_id);
+      $entity->setName($name);
+      $entity->setPriority($priority);
+      $entity->setBidNo($bidNo);
+      $entity->setWorkHour($workHour);
+      $entity->setPhone($phone);
+      $entity->setEmail($email);
+      $entity->setLocation($location);
+      $entity->setSector($sector);
+
+      $entity->setBidDescription($bidDescription);
+      $entity->setBidInstructions($bidInstructions);
+      $entity->setPlanLink($planLink);
+      $entity->setQuoteReceived($quoteReceived);
+
+      if ($bidDeadline != '') {
+         $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadline);
+         $entity->setBidDeadline($bidDeadline);
+      }
+
+      if ($stage_id != '') {
+         $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
+            ->find($stage_id);
+         $entity->setStage($project_stage);
+      }
+
+      if ($proposal_type_id != '') {
+         $proposal_type = $this->getDoctrine()->getRepository(ProposalType::class)
+            ->find($proposal_type_id);
+         $entity->setProposalType($proposal_type);
+      }
+
+      if ($status_id != '') {
+         $plan_status = $this->getDoctrine()->getRepository(PlanStatus::class)
+            ->find($status_id);
+         $entity->setStatus($plan_status);
+      }
+
+      if ($county_id != '') {
+         $county = $this->getDoctrine()->getRepository(County::class)
+            ->find($county_id);
+         $entity->setCountyObj($county);
+      }
+
+      if ($district_id != '') {
+         $district = $this->getDoctrine()->getRepository(District::class)
+            ->find($district_id);
+         $entity->setDistrict($district);
+      }
+
+      if ($jobWalk != '') {
+         $jobWalk = \DateTime::createFromFormat('m/d/Y H:i', $jobWalk);
+         $entity->setJobWalk($jobWalk);
+      }
+
+      if ($rfiDueDate != '') {
+         $rfiDueDate = \DateTime::createFromFormat('m/d/Y H:i', $rfiDueDate);
+         $entity->setRfiDueDate($rfiDueDate);
+      }
+
+      if ($projectStart != '') {
+         $projectStart = \DateTime::createFromFormat('m/d/Y H:i', $projectStart);
+         $entity->setProjectStart($projectStart);
+      }
+
+      if ($projectEnd != '') {
+         $projectEnd = \DateTime::createFromFormat('m/d/Y H:i', $projectEnd);
+         $entity->setProjectEnd($projectEnd);
+      }
+
+      if ($submittedDate != '') {
+         $submittedDate = \DateTime::createFromFormat('m/d/Y H:i', $submittedDate);
+         $entity->setSubmittedDate($submittedDate);
+      }
+
+      if ($awardedDate != '') {
+         $awardedDate = \DateTime::createFromFormat('m/d/Y H:i', $awardedDate);
+         $entity->setAwardedDate($awardedDate);
+      }
+
+      if ($lostDate != '') {
+         $lostDate = \DateTime::createFromFormat('m/d/Y H:i', $lostDate);
+         $entity->setLostDate($lostDate);
+      }
+
+      if ($plan_downloading_id != '') {
+         $plan_downloading = $this->getDoctrine()->getRepository(PlanDownloading::class)
+            ->find($plan_downloading_id);
+         $entity->setPlanDownloading($plan_downloading);
+      }
+
+      $em->persist($entity);
+
+      // save project types
+      $this->SalvarProjectTypes($entity, $project_types_id);
+
+      // save estimators
+      $this->SalvarEstimators($entity, $estimators_id);
+
+      // bid_deadlines
+      $this->SalvarBidDeadlines($entity, $bid_deadlines);
+
+      // companys
+      $this->SalvarCompanys($entity, $companys);
+
+      $em->flush();
+
+      //Salvar log
+      $log_operacion = "Add";
+      $log_categoria = "Project Estimate";
+      $log_descripcion = "The project estimate is added: $name";
+      $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+      $resultado['success'] = true;
+
+      return $resultado;
+   }
+
+   // salvar estimators
+   public function SalvarEstimators($entity, $estimators_id, $is_new = true)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      // eliminar anteriores
+      if (!$is_new) {
+         $estimates_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
+            ->ListarUsuariosDeEstimate($entity->getEstimateId());
+         foreach ($estimates_estimators as $estimate_estimator) {
+            $em->remove($estimate_estimator);
+         }
+      }
+
+      if ($estimators_id !== '') {
+
+         $estimators_id = explode(',', $estimators_id);
+
+         foreach ($estimators_id as $estimator_id) {
+            $user_entity = $this->getDoctrine()->getRepository(Usuario::class)
+               ->find($estimator_id);
+            if ($user_entity !== null) {
+               $estimate_estimator = new EstimateEstimator();
+
+               $estimate_estimator->setEstimate($entity);
+               $estimate_estimator->setUser($user_entity);
+
+               $em->persist($estimate_estimator);
+            }
+         }
+      }
+   }
+
+   // salvar project types
+   public function SalvarProjectTypes($entity, $project_types_id, $is_new = true)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      // eliminar anteriores
+      if (!$is_new) {
+         $estimates_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
+            ->ListarTypesDeEstimate($entity->getEstimateId());
+         foreach ($estimates_project_types as $estimate_project_type) {
+            $em->remove($estimate_project_type);
+         }
+      }
+
+      if ($project_types_id !== '') {
+
+         $project_types_id = explode(',', $project_types_id);
+
+         foreach ($project_types_id as $project_type_id) {
+            $project_type_entity = $this->getDoctrine()->getRepository(ProjectType::class)
+               ->find($project_type_id);
+            if ($project_type_entity !== null) {
+               $estimate_project_type = new EstimateProjectType();
+
+               $estimate_project_type->setEstimate($entity);
+               $estimate_project_type->setType($project_type_entity);
+
+               $em->persist($estimate_project_type);
+            }
+         }
+      }
+   }
+
+
+   /**
+    * ListarEstimates: Listar los estimates
+    *
+    * @param int $start Inicio
+    * @param int $limit Limite
+    * @param string $sSearch Para buscar
+    *
+    * @author Marcel
+    */
+   public function ListarEstimates(
+      $start,
+      $limit,
+      $sSearch,
+      $iSortCol_0,
+      $sSortDir_0,
+      $stage_id,
+      $project_type_id,
+      $proposal_type_id,
+      $county_id,
+      $status_id,
+      $district_id,
+      $fecha_inicial,
+      $fecha_fin
+   ) {
+      $arreglo_resultado = array();
+      $cont = 0;
+
+      // listar
+      $lista = [];
+      if ($project_type_id === "") {
+         $lista = $this->getDoctrine()->getRepository(Estimate::class)
+            ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+      } else {
+         $estimates_project_type = $this->getDoctrine()->getRepository(EstimateProjectType::class)
+            ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+         foreach ($estimates_project_type as $estimate_project_type) {
+            $lista[] = $estimate_project_type->getEstimate();
+         }
+      }
+
+
+      foreach ($lista as $value) {
+         $estimate_id = $value->getEstimateId();
+
+         $acciones = $this->ListarAcciones($estimate_id);
+
+         $bidDeadline = $value->getBidDeadline() ? $value->getBidDeadline()->format('m/d/Y H:i') : "Not set";
+
+         // companies
+         $companies = $this->ListarCompaniesParaListado($value);
+
+         // estimators
+         $estimators = $this->ListarEstimatorsParaListado($estimate_id);
+
+         // stage
+         $stage = $this->DevolverStageParaListado($estimate_id, $value->getStage());
+
+         // name
+         $name = $value->getName() . ($value->getQuoteReceived()
+            ? ' <i class="fa fa-check-circle" style="color: green;" title="Quote received"></i>'
+            : '');
+
+         $arreglo_resultado[$cont] = array(
+            "id" => $estimate_id,
+            "name" => $name,
+            "company" => $companies,
+            "bidDeadline" => $bidDeadline,
+            "estimators" => $estimators,
+            "stage" => $stage,
+            "acciones" => $acciones
+         );
+
+
+         $cont++;
+      }
+
+      return $arreglo_resultado;
+   }
+
+   // listar los companies para el listado
+   private function ListarCompaniesParaListado(Estimate $estimate)
+   {
+      $companies = [];
+
+      $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
+         ->ListarCompanysDeEstimate($estimate->getEstimateId());
+      foreach ($estimate_companys as $estimate_company) {
+         $companies[] = $estimate_company->getCompany()->getName();
+      }
+
+      $lista = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
+         ->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
+      foreach ($lista as $value) {
+         $nombre = $value->getCompany()->getName();
+         if (!in_array($nombre, $companies)) {
+            $companies[] = $nombre;
+         }
+      }
+
+      if (count($companies) === 0) {
+         return '';
+      }
+
+      $primerNombre = htmlspecialchars($companies[0], ENT_QUOTES, 'UTF-8');
+      $primerNombre_truncado = $this->truncate($primerNombre, 30);
+      $html = '<div class="d-inline-flex align-items-center" style="gap: 8px;">';
+
+      $restantes = array_slice($companies, 1);
+
+      // Estilo base para los badges
+      $estiloBase = 'padding: 3px 9px; font-size: 11px;cursor:pointer; color: #FFF;';
+
+      // Si hay más de una empresa, agregar borde izquierdo rojo al primer badge
+      $estiloPrincipal = $estiloBase;
+      if (count($restantes) > 0) {
+         $estiloPrincipal .= ' border-left: 3px solid red;';
+      }
+
+      // Badge principal
+      $html .= '<span class="badge badge-primary" style="' . $estiloPrincipal . '" title="' . $primerNombre . '">' . $primerNombre_truncado . '</span>';
+
+      if (count($restantes) > 0) {
+         // Badges del popover
+         $contenidoPopover = implode('', array_map(function ($c) use ($estiloBase) {
+            $c = htmlspecialchars($c, ENT_QUOTES, 'UTF-8');
+            return '<div class="mb-1"><span class="badge badge-primary" style="' . $estiloBase . '">' . $c . '</span></div>';
+         }, $restantes));
+
+         $dataContent = htmlspecialchars($contenidoPopover, ENT_QUOTES, 'UTF-8');
+
+         $html .= '<span class="badge bg-primary popover-company"
                         data-bs-toggle="popover"
                         data-bs-html="true"
                         data-bs-content="' . $dataContent . '"
                         style="' . $estiloBase . '">+' . count($restantes) . '</span>';
-        }
+      }
 
-        $html .= '</div>';
+      $html .= '</div>';
 
-        return $html;
-    }
+      return $html;
+   }
 
 
-    // devolver stage stages
-    private function DevolverStageParaListado($estimate_id, ?ProjectStage $stage)
-    {
-        $html = "";
+   // devolver stage stages
+   private function DevolverStageParaListado($estimate_id, ?ProjectStage $stage)
+   {
+      $html = "";
 
-        if ($stage !== null) {
-            $stage_id = $stage->getStageId();
-            $descripcion = $stage->getDescription();
-            $color = $stage->getColor();
+      if ($stage !== null) {
+         $stage_id = $stage->getStageId();
+         $descripcion = $stage->getDescription();
+         $color = $stage->getColor();
 
-            $html = <<<HTML
+         $html = <<<HTML
                 <span class="change-stage" data-id="{$estimate_id}" data-stage="{$stage_id}" style="
                     background-color: {$color};
                     color: white;
@@ -1249,47 +1310,46 @@ class EstimateService extends Base
                     {$descripcion}
                 </span>
                 HTML;
+      }
 
-        }
+      return $html;
+   }
 
-        return $html;
-    }
+   // listar los estimators para el listado
+   private function ListarEstimatorsParaListado($estimate_id)
+   {
+      $estimators = [];
 
-    // listar los estimators para el listado
-    private function ListarEstimatorsParaListado($estimate_id)
-    {
-        $estimators = [];
+      // listar
+      $lista = $this->getDoctrine()->getRepository(EstimateEstimator::class)
+         ->ListarUsuariosDeEstimate($estimate_id);
+      foreach ($lista as $value) {
+         $nombre = $value->getUser()->getNombreCompleto();
+         $siglas = $this->generarAvatarHTML($nombre);
 
-        // listar
-        $lista = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-            ->ListarUsuariosDeEstimate($estimate_id);
-        foreach ($lista as $value) {
-            $nombre = $value->getUser()->getNombreCompleto();
-            $siglas = $this->generarAvatarHTML($nombre);
+         $estimators[] = $siglas;
+      }
 
-            $estimators[] = $siglas;
-        }
+      return implode(" ", $estimators);
+   }
 
-        return implode(" ", $estimators);
-    }
+   private function generarAvatarHTML($nombreCompleto)
+   {
+      // Extraer iniciales
+      $nombreCompleto = preg_replace('/\s+/', ' ', trim($nombreCompleto));
+      $partes = explode(' ', $nombreCompleto);
 
-    private function generarAvatarHTML($nombreCompleto)
-    {
-        // Extraer iniciales
-        $nombreCompleto = preg_replace('/\s+/', ' ', trim($nombreCompleto));
-        $partes = explode(' ', $nombreCompleto);
+      if (count($partes) < 2) return '';
 
-        if (count($partes) < 2) return '';
+      $inicialNombre = strtoupper(mb_substr($partes[0], 0, 1));
+      $inicialApellido = strtoupper(mb_substr($partes[1], 0, 1));
+      $iniciales = $inicialNombre . $inicialApellido;
 
-        $inicialNombre = strtoupper(mb_substr($partes[0], 0, 1));
-        $inicialApellido = strtoupper(mb_substr($partes[1], 0, 1));
-        $iniciales = $inicialNombre . $inicialApellido;
+      // Generar color aleatorio en formato hexadecimal
+      $color = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
 
-        // Generar color aleatorio en formato hexadecimal
-        $color = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
-
-        // HTML con estilo en línea
-        $html = <<<HTML
+      // HTML con estilo en línea
+      $html = <<<HTML
                 <div style="
                     width: 30px;
                     height: 30px;
@@ -1309,49 +1369,48 @@ class EstimateService extends Base
                 </div>
                 HTML;
 
-        return $html;
-    }
+      return $html;
+   }
 
-    /**
-     * TotalEstimates: Total de estimates
-     * @param string $sSearch Para buscar
-     * @author Marcel
-     */
-    public function TotalEstimates($sSearch, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin)
-    {
-        if ($project_type_id === '') {
-            return $this->getDoctrine()->getRepository(Estimate::class)
-                ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
-        } else {
-            return $this->getDoctrine()->getRepository(EstimateProjectType::class)
-                ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
-        }
+   /**
+    * TotalEstimates: Total de estimates
+    * @param string $sSearch Para buscar
+    * @author Marcel
+    */
+   public function TotalEstimates($sSearch, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin)
+   {
+      if ($project_type_id === '') {
+         return $this->getDoctrine()->getRepository(Estimate::class)
+            ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+      } else {
+         return $this->getDoctrine()->getRepository(EstimateProjectType::class)
+            ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+      }
+   }
 
-    }
+   /**
+    * ListarAcciones: Lista los permisos de un usuario de la BD
+    *
+    * @author Marcel
+    */
+   public function ListarAcciones($id)
+   {
+      $usuario = $this->getUser();
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 29);
 
-    /**
-     * ListarAcciones: Lista los permisos de un usuario de la BD
-     *
-     * @author Marcel
-     */
-    public function ListarAcciones($id)
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 29);
+      $acciones = '';
 
-        $acciones = '';
+      if (count($permiso) > 0) {
+         if ($permiso[0]['editar']) {
+            $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
+         } else {
+            $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
+         }
+         if ($permiso[0]['eliminar']) {
+            $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
+         }
+      }
 
-        if (count($permiso) > 0) {
-            if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-            } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-            }
-            if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-            }
-        }
-
-        return $acciones;
-    }
+      return $acciones;
+   }
 }
