@@ -33,6 +33,7 @@ use App\Entity\ReminderRecipient;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
 use App\Entity\UserQbwcToken;
+use App\Entity\Usuario;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Psr\Log\LoggerInterface;
@@ -76,8 +77,11 @@ class Base
       return $this->container->get('doctrine');
    }
 
-   // user
-   public function getUser(): ?UserInterface
+   /**
+    * Summary of getUser
+    * @return UserInterface|null|Usuario
+    */
+   public function getUser()
    {
       return $this->security->getUser();
    }

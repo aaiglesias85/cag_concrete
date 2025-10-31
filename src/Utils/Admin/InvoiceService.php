@@ -9,6 +9,9 @@ use App\Entity\InvoiceItem;
 
 use App\Entity\ProjectItem;
 use App\Entity\SyncQueueQbwc;
+use App\Repository\InvoiceItemRepository;
+use App\Repository\InvoiceRepository;
+use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -170,7 +173,9 @@ class InvoiceService extends Base
       $fila_inicio = 16;
       $fila = $fila_inicio;
 
-      $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice_id);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $items = $invoiceItemRepo->ListarItems($invoice_id);
 
       foreach ($items as $key => $value) {
 
@@ -381,8 +386,9 @@ class InvoiceService extends Base
    {
       $items = [];
 
-      $lista = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->ListarItems($invoice_id);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $lista = $invoiceItemRepo->ListarItems($invoice_id);
       foreach ($lista as $key => $value) {
 
          $contract_qty = $value->getProjectItem()->getQuantity();
@@ -452,8 +458,9 @@ class InvoiceService extends Base
    {
       $projects = [];
 
-      $lista = $this->getDoctrine()->getRepository(Project::class)
-         ->ListarOrdenados('', $company_id, '');
+      /** @var ProjectRepository $projectRepo */
+      $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+      $lista = $projectRepo->ListarOrdenados('', $company_id, '');
       foreach ($lista as $value) {
          $projects[] = [
             'project_id' => $value->getProjectId(),
@@ -571,8 +578,9 @@ class InvoiceService extends Base
       if ($entity != null) {
 
          // verificar fechas
-         $invoices = $this->getDoctrine()->getRepository(Invoice::class)
-            ->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+         /** @var InvoiceRepository $invoiceRepo */
+         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+         $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
          if (!empty($invoices) && $invoices[0]->getInvoiceId() != $entity->getInvoiceId()) {
             $resultado['success'] = false;
             $resultado['error'] = "An invoice already exists for that date range";
@@ -665,8 +673,9 @@ class InvoiceService extends Base
       $em = $this->getDoctrine()->getManager();
 
       // verificar fechas
-      $invoices = $this->getDoctrine()->getRepository(Invoice::class)
-         ->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
       if (!empty($invoices)) {
          $resultado['success'] = false;
          $resultado['error'] = "An invoice already exists for that date range";
@@ -705,7 +714,9 @@ class InvoiceService extends Base
          }
       } else {
          // number
-         $invoices = $this->getDoctrine()->getRepository(Invoice::class)->ListarInvoicesDeProject($project_id);
+         /** @var InvoiceRepository $invoiceRepo */
+         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+         $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
          $number = 1;
          if (!empty($invoices)) {
             $number = intval($invoices[0]->getNumber()) + 1;
@@ -851,16 +862,18 @@ class InvoiceService extends Base
     */
    public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin)
    {
-      $resultado = $this->getDoctrine()->getRepository(Invoice::class)
-         ->ListarInvoicesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $resultado = $invoiceRepo->ListarInvoicesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
 
       $data = [];
 
       foreach ($resultado['data'] as $value) {
          $invoice_id = $value->getInvoiceId();
 
-         $total = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->TotalInvoice($invoice_id);
+         /** @var InvoiceItemRepository $invoiceItemRepo */
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $total = $invoiceItemRepo->TotalInvoice($invoice_id);
 
          $data[] = array(
             "id" => $invoice_id,

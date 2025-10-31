@@ -28,6 +28,24 @@ use App\Entity\ScheduleConcreteVendorContact;
 use App\Entity\ScheduleEmployee;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
+use App\Repository\DataTrackingConcVendorRepository;
+use App\Repository\DataTrackingItemRepository;
+use App\Repository\DataTrackingLaborRepository;
+use App\Repository\DataTrackingMaterialRepository;
+use App\Repository\DataTrackingRepository;
+use App\Repository\DataTrackingSubcontractRepository;
+use App\Repository\InvoiceItemRepository;
+use App\Repository\InvoiceRepository;
+use App\Repository\NotificationRepository;
+use App\Repository\ProjectAttachmentRepository;
+use App\Repository\ProjectContactRepository;
+use App\Repository\ProjectItemRepository;
+use App\Repository\ProjectNotesRepository;
+use App\Repository\ProjectPriceAdjustmentRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\ScheduleConcreteVendorContactRepository;
+use App\Repository\ScheduleEmployeeRepository;
+use App\Repository\ScheduleRepository;
 use App\Utils\Base;
 
 class ProjectService extends Base
@@ -143,8 +161,9 @@ class ProjectService extends Base
     */
    public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending)
    {
-      $resultado = $this->getDoctrine()->getRepository(DataTracking::class)
-         ->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
+      /** @var DataTrackingRepository $dataTrackingRepo */
+      $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
+      $resultado = $dataTrackingRepo->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
 
       $data = [];
 
@@ -152,8 +171,9 @@ class ProjectService extends Base
          $data_tracking_id = $value->getId();
 
          // conc vendor
-         $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-            ->TotalConcUsed($data_tracking_id);
+         /** @var DataTrackingConcVendorRepository $dataTrackingConcVendorRepo */
+         $dataTrackingConcVendorRepo = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class);
+         $total_conc_used = $dataTrackingConcVendorRepo->TotalConcUsed($data_tracking_id);
 
          $total_concrete_yiel = $this->CalcularTotalConcreteYiel($data_tracking_id);
 
@@ -165,25 +185,30 @@ class ProjectService extends Base
                 ->TotalQuantity($data_tracking_id);*/
          $total_quantity_today = $total_conc_used;
 
-         $total_daily_today = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-            ->TotalDaily($data_tracking_id);
+         /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+         $total_daily_today = $dataTrackingItemRepo->TotalDaily($data_tracking_id);
 
-         $total_subcontract = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->TotalPrice($data_tracking_id);
+         /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
+         $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
+         $total_subcontract = $dataTrackingSubcontractRepo->TotalPrice($data_tracking_id);
 
          $total_daily_today = $total_daily_today - $total_subcontract;
 
 
          // concrete used price
-         $total_concrete = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-            ->TotalConcPrice($data_tracking_id);
+         /** @var DataTrackingConcVendorRepository $dataTrackingConcVendorRepo */
+         $dataTrackingConcVendorRepo = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class);
+         $total_concrete = $dataTrackingConcVendorRepo->TotalConcPrice($data_tracking_id);
 
 
-         $total_labor = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-            ->TotalLabor($data_tracking_id);
+         /** @var DataTrackingLaborRepository $dataTrackingLaborRepo */
+         $dataTrackingLaborRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
+         $total_labor = $dataTrackingLaborRepo->TotalLabor($data_tracking_id);
 
-         $total_material = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
-            ->TotalMaterials($data_tracking_id);
+         /** @var DataTrackingMaterialRepository $dataTrackingMaterialRepo */
+         $dataTrackingMaterialRepo = $this->getDoctrine()->getRepository(DataTrackingMaterial::class);
+         $total_material = $dataTrackingMaterialRepo->TotalMaterials($data_tracking_id);
 
          $total_people = $value->getTotalPeople();
          $overhead_price = $value->getOverheadPrice();
@@ -255,8 +280,9 @@ class ProjectService extends Base
    {
       $items = [];
 
-      $lista = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-         ->ListarLabor($data_tracking_id);
+      /** @var DataTrackingLaborRepository $dataTrackingLaborRepo */
+      $dataTrackingLaborRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
+      $lista = $dataTrackingLaborRepo->ListarLabor($data_tracking_id);
       foreach ($lista as $key => $value) {
 
          if ($value->getRole() === 'Lead' && ($value->getEmployee() !== null || $value->getEmployeeSubcontractor() !== null)) {
@@ -277,8 +303,9 @@ class ProjectService extends Base
    {
       $employees = [];
 
-      $project_employees = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-         ->ListarEmployeesDeProject($project_id);
+      /** @var DataTrackingLaborRepository $dataTrackingLaborRepo */
+      $dataTrackingLaborRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
+      $project_employees = $dataTrackingLaborRepo->ListarEmployeesDeProject($project_id);
 
       foreach ($project_employees as $key => $project_employee) {
          $value = $project_employee->getEmployee();
@@ -302,8 +329,9 @@ class ProjectService extends Base
    {
       $subcontractors = [];
 
-      $project_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-         ->ListarSubcontractorsDeProject($project_id);
+      /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
+      $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
+      $project_subcontractors = $dataTrackingSubcontractRepo->ListarSubcontractorsDeProject($project_id);
 
       foreach ($project_subcontractors as $key => $project_subcontractor) {
          $value = $project_subcontractor->getSubcontractor();
@@ -379,8 +407,9 @@ class ProjectService extends Base
 
       // validar si existe
       if ($item_id !== '') {
-         $project_item = $this->getDoctrine()->getRepository(ProjectItem::class)
-            ->BuscarItemProject($project_id, $item_id, $price);
+         /** @var ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $project_item = $projectItemRepo->BuscarItemProject($project_id, $item_id, $price);
          if (!empty($project_item) && $project_item_id != $project_item[0]->getId()) {
             $resultado['success'] = false;
             $resultado['error'] = "The item already exists in the project";
@@ -452,8 +481,9 @@ class ProjectService extends Base
          if ($is_new_project_item) {
 
             // marcar principal
-            $project_items = $this->getDoctrine()->getRepository(ProjectItem::class)
-               ->BuscarItemProject($project_id, $item_id);
+            /** @var ProjectItemRepository $projectItemRepo */
+            $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+            $project_items = $projectItemRepo->BuscarItemProject($project_id, $item_id);
             $principal = empty($project_items) ? true : false;
             $project_item_entity->setPrincipal($principal);
 
@@ -564,22 +594,25 @@ class ProjectService extends Base
       $em = $this->getDoctrine()->getManager();
 
       // data tracking
-      $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-         ->ListarDataTrackingsDeItem($project_item_id);
+      /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $data_tracking_items = $dataTrackingItemRepo->ListarDataTrackingsDeItem($project_item_id);
       foreach ($data_tracking_items as $data_tracking_item) {
          $em->remove($data_tracking_item);
       }
 
       // subcontractors
-      $data_tracking_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-         ->ListarSubcontractsDeItemProject($project_item_id);
+      /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
+      $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
+      $data_tracking_subcontractors = $dataTrackingSubcontractRepo->ListarSubcontractsDeItemProject($project_item_id);
       foreach ($data_tracking_subcontractors as $data_tracking_subcontractor) {
          $em->remove($data_tracking_subcontractor);
       }
 
       // invoices
-      $invoice_items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->ListarInvoicesDeItem($project_item_id);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $invoice_item) {
          $em->remove($invoice_item);
       }
@@ -595,15 +628,17 @@ class ProjectService extends Base
       $texto_error = '';
 
       // data tracking
-      $data_tracking = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-         ->ListarDataTrackingsDeItem($project_item_id);
+      /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $data_tracking = $dataTrackingItemRepo->ListarDataTrackingsDeItem($project_item_id);
       if (count($data_tracking) > 0) {
          $texto_error = "The item could not be deleted, because it is related to a data tracking";
       }
 
       // invoices
-      $invoices = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->ListarInvoicesDeItem($project_item_id);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $invoices = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       if (count($invoices) > 0) {
          $texto_error = "The item could not be deleted, because it is related to a invoice";
       }
@@ -662,8 +697,9 @@ class ProjectService extends Base
          $project_name = $project_entity->getName();
 
 
-         $notes = $this->getDoctrine()->getRepository(ProjectNotes::class)
-            ->ListarNotesDeProject($project_id, $from, $to);
+         /** @var ProjectNotesRepository $projectNotesRepo */
+         $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
+         $notes = $projectNotesRepo->ListarNotesDeProject($project_id, $from, $to);
          foreach ($notes as $entity) {
             $em->remove($entity);
          }
@@ -788,8 +824,9 @@ class ProjectService extends Base
     */
    public function ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin)
    {
-      $resultado = $this->getDoctrine()->getRepository(ProjectNotes::class)
-         ->ListarNotesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
+      /** @var ProjectNotesRepository $projectNotesRepo */
+      $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
+      $resultado = $projectNotesRepo->ListarNotesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
 
       $data = [];
 
@@ -819,8 +856,9 @@ class ProjectService extends Base
     */
    public function TotalNotes($sSearch, $project_id, $fecha_inicial, $fecha_fin)
    {
-      $total = $this->getDoctrine()->getRepository(ProjectNotes::class)
-         ->TotalNotes($sSearch, $project_id, $fecha_inicial, $fecha_fin);
+      /** @var ProjectNotesRepository $projectNotesRepo */
+      $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
+      $total = $projectNotesRepo->TotalNotes($sSearch, $project_id, $fecha_inicial, $fecha_fin);
 
       return $total;
    }
@@ -860,8 +898,9 @@ class ProjectService extends Base
    {
       $projects = [];
 
-      $lista = $this->getDoctrine()->getRepository(Project::class)
-         ->ListarOrdenados($search, $company_id, $inspector_id, $from, $to);
+      /** @var ProjectRepository $projectRepo */
+      $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+      $lista = $projectRepo->ListarOrdenados($search, $company_id, $inspector_id, $from, $to);
       foreach ($lista as $value) {
          $project_id = $value->getProjectId();
 
@@ -892,8 +931,9 @@ class ProjectService extends Base
 
          $is_valid = false;
 
-         $data_tracking = $this->getDoctrine()->getRepository(DataTracking::class)
-            ->ListarDataTracking($project_id);
+         /** @var DataTrackingRepository $dataTrackingRepo */
+         $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
+         $data_tracking = $dataTrackingRepo->ListarDataTracking($project_id);
 
          if ($status == 'working' && !empty($data_tracking)) {
             $is_valid = true;
@@ -919,20 +959,23 @@ class ProjectService extends Base
       $items = [];
 
       // listar items de project
-      $project_items = $this->getDoctrine()->getRepository(ProjectItem::class)
-         ->ListarItemsDeProject($project_id);
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $project_items = $projectItemRepo->ListarItemsDeProject($project_id);
       foreach ($project_items as $value) {
          $project_item_id = $value->getId();
 
-         $quantity = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-            ->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
+         /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+         $quantity = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
          if ($quantity > 0) {
             $contract_qty = $value->getQuantity();
             $price = $value->getPrice();
             $contract_amount = $contract_qty * $price;
 
-            $quantity_from_previous = $this->getDoctrine()->getRepository(InvoiceItem::class)
-               ->TotalPreviousQuantity($project_item_id);
+            /** @var InvoiceItemRepository $invoiceItemRepo */
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id);
 
             $quantity_completed = $quantity + $quantity_from_previous;
 
@@ -993,7 +1036,9 @@ class ProjectService extends Base
    {
       $total = 0;
 
-      $invoice_items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarInvoicesDeItem($project_item_id);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $value) {
          $total += $value->getPaidAmount();
       }
@@ -1010,7 +1055,9 @@ class ProjectService extends Base
    {
       $unpaid_quantity = 0;
 
-      $invoice_items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarInvoicesDeItem($project_item_id);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $value) {
          $quantity = $value->getQuantity();
          $paid_quantity = $value->getPaidQty();
@@ -1111,8 +1158,9 @@ class ProjectService extends Base
    {
       $archivos = [];
 
-      $project_archivos = $this->getDoctrine()->getRepository(ProjectAttachment::class)
-         ->ListarAttachmentsDeProject($project_id);
+      /** @var ProjectAttachmentRepository $projectAttachmentRepo */
+      $projectAttachmentRepo = $this->getDoctrine()->getRepository(ProjectAttachment::class);
+      $project_archivos = $projectAttachmentRepo->ListarAttachmentsDeProject($project_id);
       foreach ($project_archivos as $key => $project_archivo) {
          $archivos[] = [
             'id' => $project_archivo->getId(),
@@ -1134,8 +1182,9 @@ class ProjectService extends Base
    {
       $ajustes = [];
 
-      $project_ajustes = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class)
-         ->ListarAjustesDeProject($project_id);
+      /** @var ProjectPriceAdjustmentRepository $projectPriceAdjustmentRepo */
+      $projectPriceAdjustmentRepo = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class);
+      $project_ajustes = $projectPriceAdjustmentRepo->ListarAjustesDeProject($project_id);
       foreach ($project_ajustes as $key => $project_ajuste) {
          $ajustes[] = [
             'id' => $project_ajuste->getId(),
@@ -1157,14 +1206,16 @@ class ProjectService extends Base
    {
       $invoices = [];
 
-      $lista = $this->getDoctrine()->getRepository(Invoice::class)
-         ->ListarInvoicesDeProject($project_id);
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $lista = $invoiceRepo->ListarInvoicesDeProject($project_id);
       foreach ($lista as $key => $value) {
 
          $invoice_id = $value->getInvoiceId();
 
-         $total = $this->getDoctrine()->getRepository(InvoiceItem::class)
-            ->TotalInvoice($invoice_id);
+         /** @var InvoiceItemRepository $invoiceItemRepo */
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $total = $invoiceItemRepo->TotalInvoice($invoice_id);
 
          $invoice = [
             "invoice_id" => $invoice_id,
@@ -1194,8 +1245,9 @@ class ProjectService extends Base
    {
       $items = [];
 
-      $lista = $this->getDoctrine()->getRepository(ProjectItem::class)
-         ->ListarItemsDeProject($project_id);
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $lista = $projectItemRepo->ListarItemsDeProject($project_id);
       foreach ($lista as $key => $value) {
          $item = $this->DevolverItemDeProject($value, $key);
          $items[] = $item;
@@ -1278,21 +1330,24 @@ class ProjectService extends Base
       $em = $this->getDoctrine()->getManager();
 
       // schedules
-      $schedules = $this->getDoctrine()->getRepository(Schedule::class)
-         ->ListarSchedulesDeProject($project_id);
+      /** @var ScheduleRepository $scheduleRepo */
+      $scheduleRepo = $this->getDoctrine()->getRepository(Schedule::class);
+      $schedules = $scheduleRepo->ListarSchedulesDeProject($project_id);
       foreach ($schedules as $schedule) {
          $schedule_id = $schedule->getScheduleId();
 
          // contacts
-         $schedules_contact = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class)
-            ->ListarContactosDeSchedule($schedule_id);
+         /** @var ScheduleConcreteVendorContactRepository $scheduleConcreteVendorContactRepo */
+         $scheduleConcreteVendorContactRepo = $this->getDoctrine()->getRepository(ScheduleConcreteVendorContact::class);
+         $schedules_contact = $scheduleConcreteVendorContactRepo->ListarContactosDeSchedule($schedule_id);
          foreach ($schedules_contact as $schedule_contact) {
             $em->remove($schedule_contact);
          }
 
          // employees
-         $schedules_employees = $this->getDoctrine()->getRepository(ScheduleEmployee::class)
-            ->ListarEmployeesDeSchedule($schedule_id);
+         /** @var ScheduleEmployeeRepository $scheduleEmployeeRepo */
+         $scheduleEmployeeRepo = $this->getDoctrine()->getRepository(ScheduleEmployee::class);
+         $schedules_employees = $scheduleEmployeeRepo->ListarEmployeesDeSchedule($schedule_id);
          foreach ($schedules_employees as $schedules_employee) {
             $em->remove($schedules_employee);
          }
@@ -1302,8 +1357,9 @@ class ProjectService extends Base
 
 
       // invoices
-      $invoices = $this->getDoctrine()->getRepository(Invoice::class)
-         ->ListarInvoicesDeProject($project_id);
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
       foreach ($invoices as $invoice) {
          $invoice_id = $invoice->getInvoiceId();
 
@@ -1314,20 +1370,23 @@ class ProjectService extends Base
       }
 
       // contacts
-      $contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
-         ->ListarContacts($project_id);
+      /** @var ProjectContactRepository $projectContactRepo */
+      $projectContactRepo = $this->getDoctrine()->getRepository(ProjectContact::class);
+      $contacts = $projectContactRepo->ListarContacts($project_id);
       foreach ($contacts as $contact) {
          $em->remove($contact);
       }
 
       // items
-      $items = $this->getDoctrine()->getRepository(ProjectItem::class)
-         ->ListarItemsDeProject($project_id);
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $items = $projectItemRepo->ListarItemsDeProject($project_id);
       foreach ($items as $item) {
 
          // subcontractors
-         $data_tracking_subcontractors = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-            ->ListarSubcontractsDeItemProject($item->getId());
+         /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
+         $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
+         $data_tracking_subcontractors = $dataTrackingSubcontractRepo->ListarSubcontractsDeItemProject($item->getId());
          foreach ($data_tracking_subcontractors as $subcontractor) {
             $em->remove($subcontractor);
          }
@@ -1336,8 +1395,9 @@ class ProjectService extends Base
       }
 
       // data tracking
-      $data_tracking = $this->getDoctrine()->getRepository(DataTracking::class)
-         ->ListarDataTracking($project_id);
+      /** @var DataTrackingRepository $dataTrackingRepo */
+      $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
+      $data_tracking = $dataTrackingRepo->ListarDataTracking($project_id);
       foreach ($data_tracking as $data) {
 
          // eliminar informacion data tracking
@@ -1347,30 +1407,34 @@ class ProjectService extends Base
       }
 
       // notes
-      $notes = $this->getDoctrine()->getRepository(ProjectNotes::class)
-         ->ListarNotesDeProject($project_id);
+      /** @var ProjectNotesRepository $projectNotesRepo */
+      $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
+      $notes = $projectNotesRepo->ListarNotesDeProject($project_id);
       foreach ($notes as $note) {
          $em->remove($note);
       }
 
       // notificaciones
-      $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
-         ->ListarNotificacionesDeProject($project_id);
+      /** @var NotificationRepository $notificationRepo */
+      $notificationRepo = $this->getDoctrine()->getRepository(Notification::class);
+      $notificaciones = $notificationRepo->ListarNotificacionesDeProject($project_id);
       foreach ($notificaciones as $notificacion) {
          $em->remove($notificacion);
       }
 
       // prices adjuments
-      $ajustes_precio = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class)
-         ->ListarAjustesDeProject($project_id);
+      /** @var ProjectPriceAdjustmentRepository $projectPriceAdjustmentRepo */
+      $projectPriceAdjustmentRepo = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class);
+      $ajustes_precio = $projectPriceAdjustmentRepo->ListarAjustesDeProject($project_id);
       foreach ($ajustes_precio as $ajuste_precio) {
          $em->remove($ajuste_precio);
       }
 
       // attachments
       $dir = 'uploads/project/';
-      $attachments = $this->getDoctrine()->getRepository(ProjectAttachment::class)
-         ->ListarAttachmentsDeProject($project_id);
+      /** @var ProjectAttachmentRepository $projectAttachmentRepo */
+      $projectAttachmentRepo = $this->getDoctrine()->getRepository(ProjectAttachment::class);
+      $attachments = $projectAttachmentRepo->ListarAttachmentsDeProject($project_id);
       foreach ($attachments as $attachment) {
 
          //eliminar archivo
@@ -2163,42 +2227,29 @@ class ProjectService extends Base
       $projects = [];
 
       if ($sSearch != '') {
-         $lista = $this->getDoctrine()->getRepository(ProjectItem::class)
-            ->ListarProjects(
-               $start,
-               $limit,
-               $sSearch,
-               $iSortCol_0,
-               $sSortDir_0,
-               $company_id,
-               '',
-               $status,
-               $fecha_inicial,
-               $fecha_fin
-            );
+         /** @var ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $lista = $projectItemRepo->ListarProjects(
+            $start,
+            $limit,
+            $sSearch,
+            $iSortCol_0,
+            $sSortDir_0,
+            $company_id,
+            '',
+            $status,
+            $fecha_inicial,
+            $fecha_fin
+         );
          foreach ($lista as $p_i) {
             $projects[] = $p_i->getProject();
          }
 
          // si no encontro buscar en projects
          if (empty($projects)) {
-            $projects = $this->getDoctrine()->getRepository(Project::class)
-               ->ListarProjects(
-                  $start,
-                  $limit,
-                  $sSearch,
-                  $iSortCol_0,
-                  $sSortDir_0,
-                  $company_id,
-                  '',
-                  $status,
-                  $fecha_inicial,
-                  $fecha_fin
-               );
-         }
-      } else {
-         $projects = $this->getDoctrine()->getRepository(Project::class)
-            ->ListarProjects(
+            /** @var ProjectRepository $projectRepo */
+            $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+            $projects = $projectRepo->ListarProjects(
                $start,
                $limit,
                $sSearch,
@@ -2210,6 +2261,22 @@ class ProjectService extends Base
                $fecha_inicial,
                $fecha_fin
             );
+         }
+      } else {
+         /** @var ProjectRepository $projectRepo */
+         $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+         $projects = $projectRepo->ListarProjects(
+            $start,
+            $limit,
+            $sSearch,
+            $iSortCol_0,
+            $sSortDir_0,
+            $company_id,
+            '',
+            $status,
+            $fecha_inicial,
+            $fecha_fin
+         );
       }
 
       foreach ($projects as $value) {
@@ -2251,11 +2318,13 @@ class ProjectService extends Base
    public function TotalProjects($sSearch, $company_id, $status, $fecha_inicial, $fecha_fin)
    {
       if ($sSearch != '') {
-         $total = $this->getDoctrine()->getRepository(ProjectItem::class)
-            ->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin);
+         /** @var ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $total = $projectItemRepo->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin);
       } else {
-         $total = $this->getDoctrine()->getRepository(Project::class)
-            ->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin);
+         /** @var ProjectRepository $projectRepo */
+         $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+         $total = $projectRepo->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin);
       }
 
 

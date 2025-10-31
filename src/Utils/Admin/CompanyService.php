@@ -8,6 +8,11 @@ use App\Entity\Estimate;
 use App\Entity\EstimateBidDeadline;
 use App\Entity\EstimateCompany;
 use App\Entity\Project;
+use App\Repository\CompanyContactRepository;
+use App\Repository\CompanyRepository;
+use App\Repository\EstimateBidDeadlineRepository;
+use App\Repository\EstimateCompanyRepository;
+use App\Repository\ProjectRepository;
 use App\Utils\Base;
 
 class CompanyService extends Base
@@ -80,8 +85,9 @@ class CompanyService extends Base
       if ($entity != null) {
 
          // estimates
-         $estimates = $this->getDoctrine()->getRepository(EstimateCompany::class)
-            ->ListarEstimatesDeContact($contact_id);
+         /** @var EstimateCompanyRepository $estimateCompanyRepo */
+         $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
+         $estimates = $estimateCompanyRepo->ListarEstimatesDeContact($contact_id);
          foreach ($estimates as $estimate) {
             $em->remove($estimate);
          }
@@ -153,8 +159,9 @@ class CompanyService extends Base
    {
       $projects = [];
 
-      $company_projects = $this->getDoctrine()->getRepository(Project::class)
-         ->ListarProjectsDeCompany($company_id);
+      /** @var ProjectRepository $projectRepo */
+      $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+      $company_projects = $projectRepo->ListarProjectsDeCompany($company_id);
 
       foreach ($company_projects as $key => $value) {
          $project_id = $value->getProjectId();
@@ -196,8 +203,9 @@ class CompanyService extends Base
       if ($entity != null) {
 
          // projects
-         $projects = $this->getDoctrine()->getRepository(Project::class)
-            ->ListarProjectsDeCompany($company_id);
+         /** @var ProjectRepository $projectRepo */
+         $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+         $projects = $projectRepo->ListarProjectsDeCompany($company_id);
          if (count($projects) > 0) {
             $resultado['success'] = false;
             $resultado['error'] = "The company could not be deleted, because it is related to a project";
@@ -250,8 +258,9 @@ class CompanyService extends Base
                if ($entity != null) {
 
                   // projects
-                  $projects = $this->getDoctrine()->getRepository(Project::class)
-                     ->ListarProjectsDeCompany($company_id);
+                  /** @var ProjectRepository $projectRepo */
+                  $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+                  $projects = $projectRepo->ListarProjectsDeCompany($company_id);
                   if (count($projects) == 0) {
 
                      // eliminar info
@@ -297,12 +306,13 @@ class CompanyService extends Base
       $em = $this->getDoctrine()->getManager();
 
       // contacts
-      $contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
-         ->ListarContacts($company_id);
+      /** @var CompanyContactRepository $companyContactRepo */
+      $companyContactRepo = $this->getDoctrine()->getRepository(CompanyContact::class);
+      $contacts = $companyContactRepo->ListarContacts($company_id);
       foreach ($contacts as $contact) {
 
          // estimates
-         /** @var \App\Repository\EstimateCompanyRepository $estimateCompanyRepo */
+         /** @var EstimateCompanyRepository $estimateCompanyRepo */
          $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
          $estimates = $estimateCompanyRepo->ListarEstimatesDeContact($contact->getContactId());
          foreach ($estimates as $estimate) {
@@ -313,7 +323,7 @@ class CompanyService extends Base
       }
 
       // estimates
-      /** @var \App\Repository\EstimateCompanyRepository $estimateCompanyRepo */
+      /** @var EstimateCompanyRepository $estimateCompanyRepo */
       $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
       $estimates = $estimateCompanyRepo->ListarEstimatesDeCompany($company_id);
       foreach ($estimates as $estimate) {
@@ -321,8 +331,9 @@ class CompanyService extends Base
       }
 
       // bid deadline estimates
-      $bid_deadline_estimates = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-         ->ListarBidDeadlineEstimatesDeCompany($company_id);
+      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
+      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
+      $bid_deadline_estimates = $estimateBidDeadlineRepo->ListarBidDeadlineEstimatesDeCompany($company_id);
       foreach ($bid_deadline_estimates as $bid_deadline_estimate) {
          $em->remove($bid_deadline_estimate);
       }
@@ -474,8 +485,9 @@ class CompanyService extends Base
     */
    public function ListarCompanies($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
    {
-      $resultado = $this->getDoctrine()->getRepository(Company::class)
-         ->ListarCompaniesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+      /** @var CompanyRepository $companyRepo */
+      $companyRepo = $this->getDoctrine()->getRepository(Company::class);
+      $resultado = $companyRepo->ListarCompaniesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
       $data = [];
 

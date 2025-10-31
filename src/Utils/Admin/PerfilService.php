@@ -6,6 +6,8 @@ use App\Entity\Funcion;
 use App\Entity\PermisoPerfil;
 use App\Entity\Rol;
 use App\Entity\Usuario;
+use App\Repository\PermisoPerfilRepository;
+use App\Repository\UsuarioRepository;
 use App\Utils\Base;
 
 class PerfilService extends Base
@@ -22,8 +24,9 @@ class PerfilService extends Base
     {
         $permisos = array();
 
-        $perfil_permisos = $this->getDoctrine()->getRepository(PermisoPerfil::class)
-            ->ListarPermisosPerfil($perfil_id);
+        /** @var PermisoPerfilRepository $permisoPerfilRepo */
+        $permisoPerfilRepo = $this->getDoctrine()->getRepository(PermisoPerfil::class);
+        $perfil_permisos = $permisoPerfilRepo->ListarPermisosPerfil($perfil_id);
         foreach ($perfil_permisos as $permiso) {
 
             $ver = $permiso->getVer();
@@ -105,8 +108,9 @@ class PerfilService extends Base
             ->find($rol_id);
         /**@var Rol $rol */
         if ($rol != null) {
-            $usuarios = $this->getDoctrine()->getRepository(Usuario::class)
-                ->ListarUsuariosRol($rol_id);
+            /** @var UsuarioRepository $usuarioRepo */
+            $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
+            $usuarios = $usuarioRepo->ListarUsuariosRol($rol_id);
             if (count($usuarios) > 0) {
                 $resultado['success'] = false;
                 $resultado['error'] = "The profile could not be deleted, because it is related to a user";

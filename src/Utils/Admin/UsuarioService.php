@@ -25,8 +25,9 @@ class UsuarioService extends Base
     {
         $usuarios = [];
 
-        $lista = $this->getDoctrine()->getRepository(Usuario::class)
-            ->ListarOrdenados($search);
+        /** @var UsuarioRepository $usuarioRepo */
+        $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
+        $lista = $usuarioRepo->ListarOrdenados($search);
         foreach ($lista as $value) {
             $usuarios[] = [
                 'usuario_id' => $value->getUsuarioId(),
@@ -51,8 +52,9 @@ class UsuarioService extends Base
         $resultado = array();
 
         // primero busco el usuario
-        $usuario = $this->getDoctrine()->getRepository(Usuario::class)
-            ->BuscarUsuarioPorEmail($email);
+        /** @var UsuarioRepository $usuarioRepo */
+        $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
+        $usuario = $usuarioRepo->BuscarUsuarioPorEmail($email);
 
 
         /** @var Usuario $usuario */
@@ -171,8 +173,9 @@ class UsuarioService extends Base
     private function ListarPermisos($usuario_id)
     {
         $permisos = [];
-        $usuario_permisos = $this->getDoctrine()->getRepository(PermisoUsuario::class)
-            ->ListarPermisosUsuario($usuario_id);
+        /** @var PermisoUsuarioRepository $permisoUsuarioRepo */
+        $permisoUsuarioRepo = $this->getDoctrine()->getRepository(PermisoUsuario::class);
+        $usuario_permisos = $permisoUsuarioRepo->ListarPermisosUsuario($usuario_id);
         foreach ($usuario_permisos as $permiso) {
 
             $ver = $permiso->getVer();
@@ -233,8 +236,9 @@ class UsuarioService extends Base
         $resultado = array();
         $em = $this->getDoctrine()->getManager();
 
-        $usuario = $this->getDoctrine()->getRepository(Usuario::class)
-            ->BuscarUsuarioPorEmail($email);
+        /** @var UsuarioRepository $usuarioRepo */
+        $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
+        $usuario = $usuarioRepo->BuscarUsuarioPorEmail($email);
 
         if (!is_null($usuario)) {
 

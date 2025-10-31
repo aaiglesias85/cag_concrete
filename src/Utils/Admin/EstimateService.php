@@ -1254,8 +1254,9 @@ class EstimateService extends Base
          $companies[] = $estimate_company->getCompany()->getName();
       }
 
-      $lista = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-         ->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
+      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
+      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
+      $lista = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
       foreach ($lista as $value) {
          $nombre = $value->getCompany()->getName();
          if (!in_array($nombre, $companies)) {
@@ -1343,8 +1344,9 @@ class EstimateService extends Base
       $estimators = [];
 
       // listar
-      $lista = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-         ->ListarUsuariosDeEstimate($estimate_id);
+      /** @var EstimateEstimatorRepository $estimateEstimatorRepo */
+      $estimateEstimatorRepo = $this->getDoctrine()->getRepository(EstimateEstimator::class);
+      $lista = $estimateEstimatorRepo->ListarUsuariosDeEstimate($estimate_id);
       foreach ($lista as $value) {
          $nombre = $value->getUser()->getNombreCompleto();
          $siglas = $this->generarAvatarHTML($nombre);
@@ -1402,11 +1404,13 @@ class EstimateService extends Base
    public function TotalEstimates($sSearch, $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin)
    {
       if ($project_type_id === '') {
-         return $this->getDoctrine()->getRepository(Estimate::class)
-            ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+         /** @var EstimateRepository $estimateRepo */
+         $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+         return $estimateRepo->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
       } else {
-         return $this->getDoctrine()->getRepository(EstimateProjectType::class)
-            ->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+         /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
+         $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
+         return $estimateProjectTypeRepo->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
       }
    }
 
