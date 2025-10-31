@@ -251,7 +251,7 @@ class MaterialService extends Base
             "id" => $material_id,
             "name" => $value->getName(),
             "price" => $value->getPrice(),
-            "unit" => $value->getUnit()->getDescription(),
+            "unit" => $value->getUnit() != null ? $value->getUnit()->getDescription() : '',
          );
       }
 

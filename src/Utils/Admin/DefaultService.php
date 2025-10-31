@@ -135,7 +135,7 @@ class DefaultService extends Base
             $arreglo_resultado[] = [
                'material_id' => $material_id,
                'name' => $material->getName(),
-               'unit' => $material->getUnit()->getDescription(),
+               'unit' => $material->getUnit() != null ? $material->getUnit()->getDescription() : '',
                'quantity' => $quantity,
                'amount' => $amount
             ];
@@ -179,7 +179,7 @@ class DefaultService extends Base
             $arreglo_resultado[] = [
                'item_id' => $project_item_id,
                'name' => $project_item->getItem()->getDescription(),
-               'unit' => $project_item->getItem()->getUnit()->getDescription(),
+               'unit' => $project_item->getItem()->getUnit() != null ? $project_item->getItem()->getUnit()->getDescription() : '',
                'quantity' => $quantity,
                'amount' => $amount
             ];

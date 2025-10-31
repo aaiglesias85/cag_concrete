@@ -203,10 +203,11 @@ class InvoiceService extends Base
          $total_unpaid += $amount_unpaid;
 
          // Escribir fila
+         $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
          $objWorksheet
             ->setCellValue('A' . $fila, ($key + 1))
             ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getDescription())
-            ->setCellValue('E' . $fila, $value->getProjectItem()->getItem()->getUnit()->getDescription())
+            ->setCellValue('E' . $fila, $unit)
             ->setCellValue('F' . $fila, $price)
             ->setCellValue('G' . $fila, $contract_qty)
             ->setCellValue('H' . $fila, $contract_amount)
@@ -423,7 +424,7 @@ class InvoiceService extends Base
             "project_item_id" => $value->getProjectItem()->getId(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getDescription(),
-            "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
+            "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,
             "contract_amount" => $contract_amount,

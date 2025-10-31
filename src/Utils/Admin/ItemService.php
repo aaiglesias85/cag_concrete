@@ -44,7 +44,7 @@ class ItemService extends Base
          $arreglo_resultado['descripcion'] = $entity->getDescription();
          // $arreglo_resultado['price'] = $entity->getPrice();
          $arreglo_resultado['status'] = $entity->getStatus();
-         $arreglo_resultado['unit_id'] = $entity->getUnit()->getUnitId();
+         $arreglo_resultado['unit_id'] = $entity->getUnit() != null ? $entity->getUnit()->getUnitId() : '';
          $arreglo_resultado['yield_calculation'] = $entity->getYieldCalculation();
          $arreglo_resultado['equation_id'] = $entity->getEquation() != null ? $entity->getEquation()->getEquationId() : '';
 
@@ -472,7 +472,7 @@ class ItemService extends Base
             "description" => $value->getDescription(),
             // "price" => number_format($value->getPrice(), 2, '.', ','),
             "status" => $value->getStatus() ? 1 : 0,
-            "unit" => $value->getUnit()->getDescription(),
+            "unit" => $value->getUnit() != null ? $value->getUnit()->getDescription() : '',
             "yieldCalculation" => $yield_calculation,
          );
       }

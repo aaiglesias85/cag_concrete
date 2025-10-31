@@ -506,7 +506,7 @@ class PaymentService extends Base
             "project_item_id" => $value->getProjectItem()->getId(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getDescription(),
-            "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
+            "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,
             "contract_amount" => $contract_amount,

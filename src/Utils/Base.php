@@ -933,7 +933,7 @@ class Base
       return [
          "item_id" => $value->getItemId(),
          "item" => $value->getDescription(),
-         "unit" => $value->getUnit()->getDescription(),
+         "unit" => $value->getUnit() != null ? $value->getUnit()->getDescription() : '',
          "yield_calculation" => $value->getYieldCalculation(),
          "yield_calculation_name" => $yield_calculation_name,
          "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
@@ -1413,7 +1413,7 @@ class Base
             "project_item_id" => $value->getProjectItem()->getId(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getDescription(),
-            "unit" => $value->getProjectItem()->getItem()->getUnit()->getDescription(),
+            "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,
             "contract_amount" => $contract_amount,
