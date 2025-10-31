@@ -2131,7 +2131,9 @@ var Estimates = (function () {
                            $('#item option[value="' + item_new.item_id + '"]').attr('data-equation', item_new.equation_id);
                            $('#item option[value="' + item_new.item_id + '"]').attr('data-yield', item_new.yield_calculation);
 
-                           $('#item').select2();
+                           $('#item').select2({
+                              dropdownParent: $('#modal-item'), // Asegúrate de que es el ID del modal
+                           });
                         }
 
                         //actualizar lista
