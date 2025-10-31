@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\OverheadPrice;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class OverheadPriceRepository extends EntityRepository
+class OverheadPriceRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, OverheadPrice::class);
+    }
     /**
      * ListarOrdenados: Lista los overheads ordenados por nombre
      *

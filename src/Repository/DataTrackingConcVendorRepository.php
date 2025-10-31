@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\DataTrackingConcVendor;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class DataTrackingConcVendorRepository extends EntityRepository
+class DataTrackingConcVendorRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DataTrackingConcVendor::class);
+    }
     /**
      * ListarConcVendor: Lista la conc vendor del data tracking
      *

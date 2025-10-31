@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\County;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class CountyRepository extends EntityRepository
+class CountyRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, County::class);
+    }
 
     /**
      * ListarOrdenados: Lista los countys ordenados

@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\ProjectPriceAdjustment;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class ProjectPriceAdjustmentRepository extends EntityRepository
+class ProjectPriceAdjustmentRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ProjectPriceAdjustment::class);
+    }
 
     /**
      * ListarAjustesDeProject: Lista los prices adjustments de un proyecto

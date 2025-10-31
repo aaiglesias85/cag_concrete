@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\ScheduleEmployee;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ScheduleEmployeeRepository extends EntityRepository
+class ScheduleEmployeeRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ScheduleEmployee::class);
+    }
 
     /**
      * ListarEmployeesDeSchedule: Lista los employees de un schedule

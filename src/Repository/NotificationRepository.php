@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Notification;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class NotificationRepository extends EntityRepository
+class NotificationRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Notification::class);
+    }
     /**
      * ListarNotificationsDeUsuario: Lista las notificaciones de un usuario
      * @param int $usuario_id Id del usuario

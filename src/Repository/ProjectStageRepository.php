@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\ProjectStage;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ProjectStageRepository extends EntityRepository
+class ProjectStageRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ProjectStage::class);
+    }
 
     /**
      * ListarOrdenados: Lista los stages ordenados

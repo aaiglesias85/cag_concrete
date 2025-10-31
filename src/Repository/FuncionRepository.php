@@ -2,10 +2,16 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Funcion;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class FuncionRepository extends EntityRepository
+class FuncionRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Funcion::class);
+    }
 
     /**
      * ListarOrdenados: Lista las funciones ordenadas

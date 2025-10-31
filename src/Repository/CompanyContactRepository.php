@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\CompanyContact;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class CompanyContactRepository extends EntityRepository
+class CompanyContactRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, CompanyContact::class);
+    }
     /**
      * ListarContacts: Lista los contacts
      *

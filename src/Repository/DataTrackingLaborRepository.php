@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\DataTrackingLabor;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class DataTrackingLaborRepository extends EntityRepository
+class DataTrackingLaborRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DataTrackingLabor::class);
+    }
 
     /**
      * ListarLabor: Lista la labor del data tracking

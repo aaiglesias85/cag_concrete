@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\InvoiceItem;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class InvoiceItemRepository extends EntityRepository
+class InvoiceItemRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, InvoiceItem::class);
+    }
     /**
      * ListarItems: Lista los items asociados a una factura.
      *

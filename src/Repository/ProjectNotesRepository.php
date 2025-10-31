@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\ProjectNotes;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class ProjectNotesRepository extends EntityRepository
+class ProjectNotesRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ProjectNotes::class);
+    }
 
     /**
      * ListarNotesDeProject: Lista los notes

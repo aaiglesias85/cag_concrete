@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Log;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class LogRepository extends EntityRepository
+class LogRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Log::class);
+    }
     /**
      * ListarLogsDeUsuario: Lista los logs de un usuario de la BD
      * @param int $usuario_id Id del usuario

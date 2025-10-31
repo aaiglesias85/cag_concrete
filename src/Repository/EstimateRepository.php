@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Estimate;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class EstimateRepository extends EntityRepository
+class EstimateRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Estimate::class);
+    }
 
     /**
      * ListarEstimatesDeStage: Lista los estimates de un stage

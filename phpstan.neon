@@ -1,0 +1,27 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    
+    # Ignorar errores relacionados con métodos de repositorios personalizados
+    # Estos métodos existen en los repositorios pero el IDE no puede inferirlos automáticamente
+    ignoreErrors:
+        # Métodos personalizados de repositorios que comienzan con Listar
+        - '#Call to an undefined method Doctrine\\Persistence\\ObjectRepository::Listar[A-Za-z0-9]+\(\)#'
+        # Métodos personalizados de repositorios que comienzan con Total
+        - '#Call to an undefined method Doctrine\\Persistence\\ObjectRepository::Total[A-Za-z0-9]+\(\)#'
+        # Métodos personalizados de repositorios que comienzan con Buscar
+        - '#Call to an undefined method Doctrine\\Persistence\\ObjectRepository::Buscar[A-Za-z0-9]+\(\)#'
+        # Cualquier otro método personalizado en repositorios
+        - '#Call to an undefined method Doctrine\\Persistence\\ObjectRepository::[A-Z][a-zA-Z0-9]+\(\)#'
+        # Versión alternativa del mensaje de error
+        - '#Call to method .+::Listar[A-Za-z0-9]+\(\) on an unknown class Doctrine\\Persistence\\ObjectRepository#'
+        - '#Call to method .+::Total[A-Za-z0-9]+\(\) on an unknown class Doctrine\\Persistence\\ObjectRepository#'
+        - '#Call to method .+::Buscar[A-Za-z0-9]+\(\) on an unknown class Doctrine\\Persistence\\ObjectRepository#'
+        
+    # Excluir archivos de vendor
+    excludePaths:
+        - vendor
+        - var/cache
+        - var/log
+

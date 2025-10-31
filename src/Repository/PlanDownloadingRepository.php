@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\PlanDownloading;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class PlanDownloadingRepository extends EntityRepository
+class PlanDownloadingRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, PlanDownloading::class);
+    }
 
     /**
      * ListarOrdenados: Lista los planes ordenados

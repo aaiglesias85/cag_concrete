@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\SyncQueueQbwc;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class SyncQueueQbwcRepository extends EntityRepository
+class SyncQueueQbwcRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, SyncQueueQbwc::class);
+    }
     /**
      * ListarOrdenados: Lista la cola
      *

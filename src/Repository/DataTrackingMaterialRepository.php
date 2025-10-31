@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\DataTrackingMaterial;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class DataTrackingMaterialRepository extends EntityRepository
+class DataTrackingMaterialRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DataTrackingMaterial::class);
+    }
     /**
      * ListarMaterials: Lista los materials del data tracking
      *

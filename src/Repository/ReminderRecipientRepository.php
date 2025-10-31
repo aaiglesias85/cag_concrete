@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\ReminderRecipient;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class ReminderRecipientRepository extends EntityRepository
+class ReminderRecipientRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ReminderRecipient::class);
+    }
 
     /**
      * ListarUsuariosDeReminder: Lista los usuarios de un reminder

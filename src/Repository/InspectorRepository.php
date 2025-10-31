@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Inspector;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class InspectorRepository extends EntityRepository
+class InspectorRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Inspector::class);
+    }
     /**
      * ListarOrdenados: Lista los inspectores con estado activo y los ordena por nombre.
      *

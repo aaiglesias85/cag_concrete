@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\DataTrackingAttachment;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class DataTrackingAttachmentRepository extends EntityRepository
+class DataTrackingAttachmentRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DataTrackingAttachment::class);
+    }
 
     /**
      * ListarAttachmentsDeDataTracking: Lista los attachments

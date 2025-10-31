@@ -2,11 +2,16 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use App\Entity\PermisoPerfil;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class PermisoPerfilRepository extends EntityRepository
+class PermisoPerfilRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, PermisoPerfil::class);
+    }
 
     /**
      * ListarPermisosPerfil: Lista los permisos de un perfil

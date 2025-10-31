@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\ConcreteVendorContact;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class ConcreteVendorContactRepository extends EntityRepository
+class ConcreteVendorContactRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ConcreteVendorContact::class);
+    }
 
     /**
      * ListarContacts: Lista los contacts

@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\EstimateQuote;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class EstimateQuoteRepository extends EntityRepository
+class EstimateQuoteRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, EstimateQuote::class);
+    }
 
     /**
      * ListarItemsDeEstimate: Lista los items

@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\PermisoUsuario;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class PermisoUsuarioRepository extends EntityRepository
+class PermisoUsuarioRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, PermisoUsuario::class);
+    }
 
     /**
      * BuscarPermisoUsuario: Devuelve el permiso usuario

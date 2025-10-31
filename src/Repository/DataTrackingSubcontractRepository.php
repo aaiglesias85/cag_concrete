@@ -3,11 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\DataTrackingSubcontract;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class DataTrackingSubcontractRepository extends EntityRepository
+class DataTrackingSubcontractRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DataTrackingSubcontract::class);
+    }
 
     /**
      * ListarSubcontracts: Lista los subcontracts del data tracking

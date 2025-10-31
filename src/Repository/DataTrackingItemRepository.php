@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\DataTrackingItem;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class DataTrackingItemRepository extends EntityRepository
+class DataTrackingItemRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DataTrackingItem::class);
+    }
     /**
      * ListarItems: Lista los items del data tracking
      *

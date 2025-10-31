@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\PlanStatus;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class PlanStatusRepository extends EntityRepository
+class PlanStatusRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, PlanStatus::class);
+    }
 
     /**
      * ListarOrdenados: Lista los types ordenados
