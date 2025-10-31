@@ -61,10 +61,10 @@
                                     <option value="">Select</option>
                                     {% for item in items %}
                                         <option value="{{ item.itemId }}"
-                                                data-unit="{{ item.unit.description }}"
+                                                data-unit="{% if item.unit != null %}{{ item.unit.description }}{% endif %}"
                                                 data-yield="{{ item.yieldCalculation }}"
                                                 data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}">
-                                            {{ item.description }} - {{ item.unit.description }}
+                                            {{ item.description }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
                                         </option>
                                     {% endfor %}
                                 </select>
