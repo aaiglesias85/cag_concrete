@@ -1323,7 +1323,7 @@ class Base
       foreach ($items as $item) {
 
          // notes
-         $notes = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+         $notes = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
             ->ListarNotesDeItemInvoice($item->getId());
          foreach ($notes as $note) {
             $em->remove($note);
