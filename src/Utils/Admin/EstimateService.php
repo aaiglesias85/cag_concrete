@@ -20,6 +20,12 @@ use App\Entity\ProjectStage;
 use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Usuario;
+use App\Repository\EstimateBidDeadlineRepository;
+use App\Repository\EstimateCompanyRepository;
+use App\Repository\EstimateEstimatorRepository;
+use App\Repository\EstimateProjectTypeRepository;
+use App\Repository\EstimateQuoteRepository;
+use App\Repository\EstimateRepository;
 use App\Utils\Base;
 
 class EstimateService extends Base
@@ -79,8 +85,9 @@ class EstimateService extends Base
 
       // validar si existe
       if ($item_id !== '') {
-         $estimate_item = $this->getDoctrine()->getRepository(EstimateQuote::class)
-            ->BuscarItemEstimate($estimate_id, $item_id);
+         /** @var EstimateQuoteRepository $estimateQuoteRepo */
+         $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
+         $estimate_item = $estimateQuoteRepo->BuscarItemEstimate($estimate_id, $item_id);
          if (!empty($estimate_item) && $estimate_item_id != $estimate_item[0]->getId()) {
             $resultado['success'] = false;
             $resultado['error'] = "The item already exists in the project estimate";
@@ -358,8 +365,9 @@ class EstimateService extends Base
    {
       $companys = [];
 
-      $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
-         ->ListarCompanysDeEstimate($estimate_id);
+      /** @var EstimateCompanyRepository $estimateCompanyRepo */
+      $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
+      $estimate_companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate_id);
       foreach ($estimate_companys as $key => $estimate_company) {
 
 
@@ -403,8 +411,9 @@ class EstimateService extends Base
    {
       $items = [];
 
-      $lista = $this->getDoctrine()->getRepository(EstimateQuote::class)
-         ->ListarItemsDeEstimate($estimate_id);
+      /** @var EstimateQuoteRepository $estimateQuoteRepo */
+      $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
+      $lista = $estimateQuoteRepo->ListarItemsDeEstimate($estimate_id);
       foreach ($lista as $key => $value) {
 
          $item = $this->DevolverItemDeEstimate($value, $key);
@@ -447,8 +456,9 @@ class EstimateService extends Base
    {
       $bid_deadlines = [];
 
-      $estimate_bid_deadlines = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-         ->ListarBidDeadlineDeEstimate($estimate_id);
+      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
+      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
+      $estimate_bid_deadlines = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate_id);
       foreach ($estimate_bid_deadlines as $key => $estimate_bid_deadline) {
          $bid_deadlines[] = [
             'id' => $estimate_bid_deadline->getId(),
@@ -469,8 +479,9 @@ class EstimateService extends Base
    {
       $ids = [];
 
-      $estimate_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-         ->ListarUsuariosDeEstimate($estimate_id);
+      /** @var EstimateEstimatorRepository $estimateEstimatorRepo */
+      $estimateEstimatorRepo = $this->getDoctrine()->getRepository(EstimateEstimator::class);
+      $estimate_estimators = $estimateEstimatorRepo->ListarUsuariosDeEstimate($estimate_id);
       foreach ($estimate_estimators as $estimate_estimator) {
          $ids[] = $estimate_estimator->getUser()->getUsuarioId();
       }
@@ -483,8 +494,9 @@ class EstimateService extends Base
    {
       $ids = [];
 
-      $estimate_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-         ->ListarTypesDeEstimate($estimate_id);
+      /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
+      $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
+      $estimate_project_types = $estimateProjectTypeRepo->ListarTypesDeEstimate($estimate_id);
       foreach ($estimate_project_types as $estimate_project_type) {
          $ids[] = $estimate_project_type->getType()->getTypeId();
       }
@@ -589,36 +601,41 @@ class EstimateService extends Base
       $em = $this->getDoctrine()->getManager();
 
       // estimators
-      $estimates_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-         ->ListarUsuariosDeEstimate($estimate_id);
+      /** @var EstimateEstimatorRepository $estimateEstimatorRepo */
+      $estimateEstimatorRepo = $this->getDoctrine()->getRepository(EstimateEstimator::class);
+      $estimates_estimators = $estimateEstimatorRepo->ListarUsuariosDeEstimate($estimate_id);
       foreach ($estimates_estimators as $estimate_estimator) {
          $em->remove($estimate_estimator);
       }
 
       // project types
-      $estimates_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-         ->ListarTypesDeEstimate($estimate_id);
+      /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
+      $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
+      $estimates_project_types = $estimateProjectTypeRepo->ListarTypesDeEstimate($estimate_id);
       foreach ($estimates_project_types as $estimate_project_type) {
          $em->remove($estimate_project_type);
       }
 
       // bid deadlines
-      $bid_deadlines = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-         ->ListarBidDeadlineDeEstimate($estimate_id);
+      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
+      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
+      $bid_deadlines = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate_id);
       foreach ($bid_deadlines as $bid_deadline) {
          $em->remove($bid_deadline);
       }
 
       // items
-      $estimate_items = $this->getDoctrine()->getRepository(EstimateQuote::class)
-         ->ListarItemsDeEstimate($estimate_id);
+      /** @var EstimateQuoteRepository $estimateQuoteRepo */
+      $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
+      $estimate_items = $estimateQuoteRepo->ListarItemsDeEstimate($estimate_id);
       foreach ($estimate_items as $estimate_item) {
          $em->remove($estimate_item);
       }
 
       // companys
-      $companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
-         ->ListarCompanysDeEstimate($estimate_id);
+      /** @var EstimateCompanyRepository $estimateCompanyRepo */
+      $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
+      $companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate_id);
       foreach ($companys as $company) {
          $em->remove($company);
       }
@@ -1082,8 +1099,9 @@ class EstimateService extends Base
 
       // eliminar anteriores
       if (!$is_new) {
-         $estimates_estimators = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-            ->ListarUsuariosDeEstimate($entity->getEstimateId());
+         /** @var EstimateEstimatorRepository $estimateEstimatorRepo */
+         $estimateEstimatorRepo = $this->getDoctrine()->getRepository(EstimateEstimator::class);
+         $estimates_estimators = $estimateEstimatorRepo->ListarUsuariosDeEstimate($entity->getEstimateId());
          foreach ($estimates_estimators as $estimate_estimator) {
             $em->remove($estimate_estimator);
          }
@@ -1115,8 +1133,9 @@ class EstimateService extends Base
 
       // eliminar anteriores
       if (!$is_new) {
-         $estimates_project_types = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-            ->ListarTypesDeEstimate($entity->getEstimateId());
+         /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
+         $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
+         $estimates_project_types = $estimateProjectTypeRepo->ListarTypesDeEstimate($entity->getEstimateId());
          foreach ($estimates_project_types as $estimate_project_type) {
             $em->remove($estimate_project_type);
          }
@@ -1172,11 +1191,13 @@ class EstimateService extends Base
       // listar
       $lista = [];
       if ($project_type_id === "") {
-         $lista = $this->getDoctrine()->getRepository(Estimate::class)
-            ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
+         /** @var EstimateRepository $estimateRepo */
+         $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+         $lista = $estimateRepo->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $fecha_inicial, $fecha_fin);
       } else {
-         $estimates_project_type = $this->getDoctrine()->getRepository(EstimateProjectType::class)
-            ->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+         /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
+         $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
+         $estimates_project_type = $estimateProjectTypeRepo->ListarEstimates($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $stage_id, $proposal_type_id, $county_id, $status_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
          foreach ($estimates_project_type as $estimate_project_type) {
             $lista[] = $estimate_project_type->getEstimate();
          }
@@ -1226,8 +1247,9 @@ class EstimateService extends Base
    {
       $companies = [];
 
-      $estimate_companys = $this->getDoctrine()->getRepository(EstimateCompany::class)
-         ->ListarCompanysDeEstimate($estimate->getEstimateId());
+      /** @var EstimateCompanyRepository $estimateCompanyRepo */
+      $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
+      $estimate_companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate->getEstimateId());
       foreach ($estimate_companys as $estimate_company) {
          $companies[] = $estimate_company->getCompany()->getName();
       }
