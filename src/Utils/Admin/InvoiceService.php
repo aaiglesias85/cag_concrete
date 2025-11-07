@@ -185,13 +185,14 @@ class InvoiceService extends Base
          $total_contract_amount += $contract_amount;
 
          $quantity_from_previous = $value->getQuantityFromPrevious();
+         $quantity_brought_forward = $value->getQuantityBroughtForward() ?? $quantity_from_previous;
          $quantity = $value->getQuantity();
-         $quantity_completed = $quantity + $quantity_from_previous;
+         $quantity_completed = $quantity + $quantity_brought_forward;
 
          $amount = $quantity * $price;
          $total_amount_invoice_todate += $amount;
 
-         $amount_from_previous = $quantity_from_previous * $price;
+         $amount_from_previous = $quantity_brought_forward * $price;
          $total_amount_measured += $amount_from_previous;
 
          $amount_completed = $quantity_completed * $price;
@@ -401,13 +402,14 @@ class InvoiceService extends Base
 
          $quantity = $value->getQuantity();
 
-         $quantity_completed = $quantity + $quantity_from_previous;
+         $quantity_brought_forward = $value->getQuantityBroughtForward() ?? $quantity_from_previous;
+         $quantity_completed = $quantity + $quantity_brought_forward;
 
          $amount = $quantity * $price;
 
          $total_amount = $quantity_completed * $price;
 
-         $amount_from_previous = $quantity_from_previous * $price;
+         $amount_from_previous = $quantity_brought_forward * $price;
 
          $amount_completed = $quantity_completed * $price;
 
@@ -415,7 +417,6 @@ class InvoiceService extends Base
          $unpaid_qty = $value->getUnpaidQty() ?? ($quantity - $paid_qty);
          $amount_unpaid = $unpaid_qty * $price;
 
-         $quantity_brought_forward = $quantity_from_previous;
          $quantity_final = $quantity + $quantity_brought_forward;
          $amount_final = $quantity_final * $price;
 
@@ -836,6 +837,7 @@ class InvoiceService extends Base
          $invoice_item_entity->setUnpaidFromPrevious($value->unpaid_from_previous);
          $invoice_item_entity->setQuantity($value->quantity);
          $invoice_item_entity->setPrice($value->price);
+         $invoice_item_entity->setQuantityBroughtForward($value->quantity_brought_forward);
 
          if ($value->project_item_id != '') {
             $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)->find($value->project_item_id);

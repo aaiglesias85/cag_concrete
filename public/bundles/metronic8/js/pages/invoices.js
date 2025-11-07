@@ -1402,11 +1402,7 @@ var Invoices = (function () {
             targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
-               var output = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
-               if (invoice === null || !invoice.paid) {
-                  output = `<input type="number" class="form-control unpaid_qty" value="${data}" data-position="${row.posicion}" />`;
-               }
-               return `<div class="w-100px">${output}</div>`;
+               return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
             },
          },
          // amount_unpaid
@@ -1438,7 +1434,11 @@ var Invoices = (function () {
             targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               var value = data ?? 0;
+               if (invoice === null || !invoice.paid) {
+                  return `<div class="w-100px"><input type="number" class="form-control quantity_brought_forward" value="${value}" data-position="${row.posicion}" step="any" /></div>`;
+               }
+               return DatatableUtil.getRenderColumnDiv(value, 100);
             },
          },
          // quantity_final
@@ -1533,6 +1533,13 @@ var Invoices = (function () {
 
             // Columnas a sumar (índices)
             const colsToSum = [3, 5, 7, 9, 12];
+            const totalsSelectors = {
+               3: '#total_contract_amount',
+               5: '#total_amount_completed',
+               7: '#total_amount_unpaid',
+               9: '#total_amount_period',
+               12: '#total_amount_final',
+            };
 
             // Recorre todas las columnas visibles
             api.columns().every(function (idx) {
@@ -1540,12 +1547,21 @@ var Invoices = (function () {
 
                // Columna "Unit Price" (index 2)
                if (idx === 2) {
-                  footer.html('<strong>Total</strong>');
+                  footer.html('');
                }
                // Columnas de totales numéricos
                else if (colsToSum.includes(idx)) {
-                  const { page, total } = sumCol(idx);
-                  footer.html(`${MyApp.formatMoney(page, 2, '.', ',')}`);
+                  const { total } = sumCol(idx);
+
+                  const selector = totalsSelectors[idx];
+                  if (selector) {
+                     const $input = $(selector);
+                     if ($input.length) {
+                        $input.val(MyApp.formatMoney(total, 2, '.', ','));
+                     }
+                  }
+
+                  footer.html('');
                } else {
                   footer.html(''); // Limpia las demás
                }
@@ -1621,11 +1637,18 @@ var Invoices = (function () {
                items[posicion].price = price;
                items[posicion].amount = total;
 
-               var quantity_from_previous = items[posicion].quantity_from_previous ?? 0;
-               items[posicion].quantity_completed = quantity + quantity_from_previous;
+               var quantity_brought_forward = Number(items[posicion].quantity_brought_forward ?? 0);
+               items[posicion].quantity_brought_forward = quantity_brought_forward;
+               items[posicion].quantity_completed = quantity + quantity_brought_forward;
+
+               var amount_from_previous = quantity_brought_forward * price;
+               items[posicion].amount_from_previous = amount_from_previous;
 
                var total_amount = items[posicion].quantity_completed * price;
+               items[posicion].amount_completed = total_amount;
                items[posicion].total_amount = total_amount;
+               items[posicion].quantity_final = items[posicion].quantity_completed;
+               items[posicion].amount_final = total_amount;
             }
 
             //actualizar lista
@@ -1731,14 +1754,15 @@ var Invoices = (function () {
          actualizarTableListaItems();
       }
 
-      $(document).off('change', '#items-table-editable input.unpaid_qty');
-      $(document).on('change', '#items-table-editable input.unpaid_qty', function (e) {
+      $(document).off('change', '#items-table-editable input.quantity_brought_forward');
+      $(document).on('change', '#items-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
          if (items[posicion]) {
-            var quantity = Number($this.val());
-            items[posicion].unpaid_from_previous = quantity;
-            items[posicion].amount_unpaid = quantity * items[posicion].price;
+            var quantity = Number($this.val() || 0);
+
+            items[posicion].quantity_brought_forward = quantity;
+            items[posicion].quantity_final = items[posicion].quantity + items[posicion].quantity_brought_forward;
 
             actualizarTableListaItems();
          }

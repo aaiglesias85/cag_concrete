@@ -480,11 +480,39 @@
                               <div class="d-flex flex-wrap gap-3"></div>
 
                               <!-- Filtros -->
-                              <div class="d-flex flex-wrap align-items-center gap-3">
+                              <div class="d-flex align-items-center gap-3 flex-nowrap w-100">
                                  <!--search-->
-                                 <div class="position-relative w-250px">
+                                 <div class="position-relative w-250px flex-shrink-0">
                                     <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
                                     <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                 </div>
+
+                                 <!-- totales -->
+                                 <div class="d-flex gap-3 flex-nowrap flex-grow-1 overflow-auto" style="padding-bottom: 0.25rem">
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">Contract $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_contract_amount" disabled />
+                                    </div>
+
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">Total $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_amount_completed" disabled />
+                                    </div>
+
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">Unpaid $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_amount_unpaid" disabled />
+                                    </div>
+
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">This Period $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_amount_period" disabled />
+                                    </div>
+
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">Final Period $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_amount_final" disabled />
+                                    </div>
                                  </div>
                               </div>
                            </div>
@@ -511,38 +539,6 @@
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
-                              <tfoot>
-                                 <tr>
-                                    <th></th>
-                                    <!-- 0 item -->
-                                    <th></th>
-                                    <!-- 1 unit -->
-                                    <th></th>
-                                    <!-- 2 price -->
-                                    <th></th>
-                                    <!-- 3 contract_amount (sum) -->
-                                    <th></th>
-                                    <!-- 4 quantity_completed -->
-                                    <th></th>
-                                    <!-- 5 amount_completed (sum) -->
-                                    <th></th>
-                                    <!-- 6 unpaid_from_previous -->
-                                    <th></th>
-                                    <!-- 7 amount_unpaid (sum) -->
-                                    <th></th>
-                                    <!-- 8 quantity -->
-                                    <th></th>
-                                    <!-- 9 amount (sum) -->
-                                    <th></th>
-                                    <!-- 10 quantity_brought_forward -->
-                                    <th></th>
-                                    <!-- 11 quantity_final -->
-                                    <th></th>
-                                    <!-- 12 amount_final (sum) -->
-                                    <th></th>
-                                    <!-- 13 acciones -->
-                                 </tr>
-                              </tfoot>
                            </table>
                            <!--end::Datatable-->
                         </div>
