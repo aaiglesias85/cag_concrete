@@ -402,14 +402,14 @@ class InvoiceService extends Base
 
          $quantity = $value->getQuantity();
 
-         $quantity_brought_forward = $value->getQuantityBroughtForward() ?? $quantity_from_previous;
+         $quantity_brought_forward = $value->getQuantityBroughtForward();
          $quantity_completed = $quantity + $quantity_brought_forward;
 
          $amount = $quantity * $price;
 
          $total_amount = $quantity_completed * $price;
 
-         $amount_from_previous = $quantity_brought_forward * $price;
+         $amount_from_previous = $quantity_from_previous * $price;
 
          $amount_completed = $quantity_completed * $price;
 

@@ -994,7 +994,7 @@ class ProjectService extends Base
 
             $amount_unpaid = $unpaid_from_previous * $price;
 
-            $quantity_brought_forward = $quantity_from_previous;
+            $quantity_brought_forward = 0;
             $quantity_final = $quantity + $quantity_brought_forward;
             $amount_final = $quantity_final * $price;
 
