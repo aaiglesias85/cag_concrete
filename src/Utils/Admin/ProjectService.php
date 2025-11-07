@@ -968,7 +968,11 @@ class ProjectService extends Base
          /** @var DataTrackingItemRepository $dataTrackingItemRepo */
          $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
          $quantity = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
-         if ($quantity > 0) {
+
+         // calcular unpaid from previous
+         $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
+
+         if ($quantity > 0 || $unpaid_from_previous > 0) {
             $contract_qty = $value->getQuantity();
             $price = $value->getPrice();
             $contract_amount = $contract_qty * $price;
@@ -982,8 +986,6 @@ class ProjectService extends Base
             $amount = $quantity * $price;
 
             $total_amount = $quantity_completed * $price;
-
-            $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
 
             $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
 
