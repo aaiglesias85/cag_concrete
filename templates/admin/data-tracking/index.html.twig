@@ -161,7 +161,7 @@
                      <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                      <span class="kt-hidden-mobile font-weight-bold">New Measurement</span>
                   </button>
-                  {% endif %} {% if permisoInvoice.agregar %}
+                  {% endif %} {% if permisoInvoice and permisoInvoice.agregar %}
                   <button type="button" id="btn-nuevo-invoice" class="btn btn-warning me-2">
                      <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                      <span class="kt-hidden-mobile font-weight-bold">New Invoice</span>
@@ -2199,9 +2199,9 @@
    };
 
    var permisoInvoice = {
-       agregar: {% if permisoInvoice.agregar %}{{ permisoInvoice.agregar }}{% else %}0{% endif %}, // 1 o 0
-       editar: {% if permisoInvoice.editar %}{{ permisoInvoice.editar }}{% else %}0{% endif %},
-       eliminar: {% if permisoInvoice.eliminar %}{{ permisoInvoice.eliminar }}{% else %}0{% endif %}
+       agregar: {% if permisoInvoice and permisoInvoice.agregar %}{{ permisoInvoice.agregar }}{% else %}0{% endif %}, // 1 o 0
+       editar: {% if permisoInvoice and permisoInvoice.editar %}{{ permisoInvoice.editar }}{% else %}0{% endif %},
+       eliminar: {% if  permisoInvoice and permisoInvoice.eliminar %}{{ permisoInvoice.eliminar }}{% else %}0{% endif %}
    };
 
    var all_items = {{ items|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};

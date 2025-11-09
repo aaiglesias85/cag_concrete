@@ -21,555 +21,557 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DataTrackingController extends AbstractController
 {
-    private $projectService;
-    /**
-     * @var DataTrackingService
-     */
-    private $dataTrackingService;
+   private $projectService;
+   /**
+    * @var DataTrackingService
+    */
+   private $dataTrackingService;
 
-    public function __construct(DataTrackingService $dataTrackingService, ProjectService $projectService, )
-    {
-        $this->projectService = $projectService;
-        $this->dataTrackingService = $dataTrackingService;
-    }
+   public function __construct(DataTrackingService $dataTrackingService, ProjectService $projectService,)
+   {
+      $this->projectService = $projectService;
+      $this->dataTrackingService = $dataTrackingService;
+   }
 
-    public function index()
-    {
-        $usuario = $this->getUser();
-        $permiso = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
+   public function index()
+   {
+      $usuario = $this->getUser();
+      $permiso = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
+      if (count($permiso) > 0) {
+         if ($permiso[0]['ver']) {
 
-                // items
-                $items = $this->dataTrackingService->ListarTodosItems();
+            // items
+            $items = $this->dataTrackingService->ListarTodosItems();
 
-                // projects
-                $projects = $this->dataTrackingService->getDoctrine()->getRepository(Project::class)
-                    ->ListarOrdenados();
+            // projects
+            $projects = $this->dataTrackingService->getDoctrine()->getRepository(Project::class)
+               ->ListarOrdenados();
 
-                // inspectors
-                $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
-                    ->ListarOrdenados();
+            // inspectors
+            $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
+               ->ListarOrdenados();
 
-                // employees
-                $employees = $this->dataTrackingService->getDoctrine()->getRepository(Employee::class)
-                    ->ListarOrdenados();
+            // employees
+            $employees = $this->dataTrackingService->getDoctrine()->getRepository(Employee::class)
+               ->ListarOrdenados();
 
-                // materials
-                $materials = $this->dataTrackingService->getDoctrine()->getRepository(Material::class)
-                    ->ListarOrdenados();
+            // materials
+            $materials = $this->dataTrackingService->getDoctrine()->getRepository(Material::class)
+               ->ListarOrdenados();
 
-                // overheads
-                $overheads = $this->dataTrackingService->getDoctrine()->getRepository(OverheadPrice::class)
-                    ->ListarOrdenados();
+            // overheads
+            $overheads = $this->dataTrackingService->getDoctrine()->getRepository(OverheadPrice::class)
+               ->ListarOrdenados();
 
-                // subcontractors
-                $subcontractors = $this->dataTrackingService->getDoctrine()->getRepository(Subcontractor::class)
-                    ->ListarOrdenados();
+            // subcontractors
+            $subcontractors = $this->dataTrackingService->getDoctrine()->getRepository(Subcontractor::class)
+               ->ListarOrdenados();
 
-                // concrete vendors
-                $concrete_vendors = $this->dataTrackingService->getDoctrine()->getRepository(ConcreteVendor::class)
-                    ->ListarOrdenados();
+            // concrete vendors
+            $concrete_vendors = $this->dataTrackingService->getDoctrine()->getRepository(ConcreteVendor::class)
+               ->ListarOrdenados();
 
-                $permisoInvoice = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 11);
+            $permisoInvoice = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 11);
 
-                return $this->render('admin/data-tracking/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'permisoInvoice' => $permisoInvoice[0],
-                    'projects' => $projects,
-                    'items' => $items,
-                    'inspectors' => $inspectors,
-                    'employees' => $employees,
-                    'materials' => $materials,
-                    'overheads' => $overheads,
-                    'subcontractors' => $subcontractors,
-                    'concrete_vendors' => $concrete_vendors,
-                    'direccion_url' => $this->projectService->ObtenerURL()
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
-        }
-    }
+            return $this->render('admin/data-tracking/index.html.twig', array(
+               'permiso' => $permiso[0],
+               'permisoInvoice' => !empty($permisoInvoice) ? $permisoInvoice[0] : null,
+               'projects' => $projects,
+               'items' => $items,
+               'inspectors' => $inspectors,
+               'employees' => $employees,
+               'materials' => $materials,
+               'overheads' => $overheads,
+               'subcontractors' => $subcontractors,
+               'concrete_vendors' => $concrete_vendors,
+               'direccion_url' => $this->projectService->ObtenerURL()
+            ));
+         }
+      } else {
+         return $this->redirectToRoute('denegado');
+      }
+   }
 
-    /**
-     * listar Acción que lista el datatracking
-     *
-     */
-    public function listar(Request $request)
-    {
-        try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'project', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
-                defaultOrderField: 'date'
-            );
+   /**
+    * listar Acción que lista el datatracking
+    *
+    */
+   public function listar(Request $request)
+   {
+      try {
+         // parsear los parametros de la tabla
+         $dt = DataTablesHelper::parse(
+            $request,
+            allowedOrderFields: ['id', 'date', 'project', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
+            defaultOrderField: 'date'
+         );
 
-            // filtros
-            $project_id = $request->get('project_id');
-            $pending = $request->get('pending');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+         // filtros
+         $project_id = $request->get('project_id');
+         $pending = $request->get('pending');
+         $fecha_inicial = $request->get('fechaInicial');
+         $fecha_fin = $request->get('fechaFin');
 
-            // total + data en una sola llamada a tu servicio
-            $result = $this->dataTrackingService->ListarDataTrackings(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $project_id,
-                $fecha_inicial,
-                $fecha_fin,
-                $pending
-            );
+         // total + data en una sola llamada a tu servicio
+         $result = $this->dataTrackingService->ListarDataTrackings(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $project_id,
+            $fecha_inicial,
+            $fecha_fin,
+            $pending
+         );
 
-            $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
-            ];
+         $resultadoJson = [
+            'draw'            => $dt['draw'],
+            'data'            => $result['data'],
+            'recordsTotal'    => (int) $result['total'],
+            'recordsFiltered' => (int) $result['total'],
+         ];
 
-            return $this->json($resultadoJson);
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+         return $this->json($resultadoJson);
+      }
+   }
 
-            return $this->json($resultadoJson);
-        }
-    }
+   /**
+    * salvar Acción que inserta un menu en la BD
+    *
+    */
+   public function salvar(Request $request)
+   {
+      $data_tracking_id = $request->get('data_tracking_id');
 
-    /**
-     * salvar Acción que inserta un menu en la BD
-     *
-     */
-    public function salvar(Request $request)
-    {
-        $data_tracking_id = $request->get('data_tracking_id');
+      $project_id = $request->get('project_id');
+      $date = $request->get('date');
+      $inspector_id = $request->get('inspector_id');
+      $station_number = $request->get('station_number');
+      $measured_by = $request->get('measured_by');
+      $conc_vendor = $request->get('conc_vendor');
+      $conc_price = $request->get('conc_price');
+      $crew_lead = $request->get('crew_lead');
+      $notes = $request->get('notes');
+      $other_materials = $request->get('other_materials');
+      $total_conc_used = $request->get('total_conc_used');
+      $total_stamps = $request->get('total_stamps');
+      $total_people = $request->get('total_people');
+      $overhead_price_id = $request->get('overhead_price_id');
+      $color_used = $request->get('color_used');
+      $color_price = $request->get('color_price');
 
-        $project_id = $request->get('project_id');
-        $date = $request->get('date');
-        $inspector_id = $request->get('inspector_id');
-        $station_number = $request->get('station_number');
-        $measured_by = $request->get('measured_by');
-        $conc_vendor = $request->get('conc_vendor');
-        $conc_price = $request->get('conc_price');
-        $crew_lead = $request->get('crew_lead');
-        $notes = $request->get('notes');
-        $other_materials = $request->get('other_materials');
-        $total_conc_used = $request->get('total_conc_used');
-        $total_stamps = $request->get('total_stamps');
-        $total_people = $request->get('total_people');
-        $overhead_price_id = $request->get('overhead_price_id');
-        $color_used = $request->get('color_used');
-        $color_price = $request->get('color_price');
+      // conc_vendors
+      $conc_vendors = $request->get('conc_vendors');
+      $conc_vendors = json_decode($conc_vendors);
 
-        // conc_vendors
-        $conc_vendors = $request->get('conc_vendors');
-        $conc_vendors = json_decode($conc_vendors);
+      // items
+      $items = $request->get('items');
+      $items = json_decode($items);
 
-        // items
-        $items = $request->get('items');
-        $items = json_decode($items);
+      // labor
+      $labor = $request->get('labor');
+      $labor = json_decode($labor);
 
-        // labor
-        $labor = $request->get('labor');
-        $labor = json_decode($labor);
+      // materials
+      $materials = $request->get('materials');
+      $materials = json_decode($materials);
 
-        // materials
-        $materials = $request->get('materials');
-        $materials = json_decode($materials);
+      // subcontracts
+      $subcontracts = $request->get('subcontracts');
+      $subcontracts = json_decode($subcontracts);
 
-        // subcontracts
-        $subcontracts = $request->get('subcontracts');
-        $subcontracts = json_decode($subcontracts);
+      // archivos
+      $archivos = $request->get('archivos');
+      $archivos = json_decode($archivos);
 
-        // archivos
-        $archivos = $request->get('archivos');
-        $archivos = json_decode($archivos);
+      try {
 
-        try {
+         $resultado = $this->dataTrackingService->SalvarDataTracking(
+            $data_tracking_id,
+            $project_id,
+            $date,
+            $inspector_id,
+            $station_number,
+            $measured_by,
+            $conc_vendor,
+            $conc_price,
+            $crew_lead,
+            $notes,
+            $other_materials,
+            $total_conc_used,
+            $total_stamps,
+            $total_people,
+            $overhead_price_id,
+            $items,
+            $labor,
+            $materials,
+            $conc_vendors,
+            $color_used,
+            $color_price,
+            $subcontracts,
+            $archivos
+         );
 
-            $resultado = $this->dataTrackingService->SalvarDataTracking($data_tracking_id, $project_id, $date, $inspector_id,
-                $station_number, $measured_by, $conc_vendor, $conc_price, $crew_lead, $notes, $other_materials,
-                $total_conc_used, $total_stamps, $total_people, $overhead_price_id, $items, $labor, $materials,
-                $conc_vendors, $color_used, $color_price, $subcontracts, $archivos);
+         if ($resultado['success']) {
 
-            if ($resultado['success']) {
-
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
-            }
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
-
-            return $this->json($resultadoJson);
-        }
-    }
-
-    /**
-     * eliminar Acción que elimina un dataTracking en la BD
-     *
-     */
-    public function eliminar(Request $request)
-    {
-        $data_tracking_id = $request->get('data_tracking_id');
-
-        try {
-            $resultado = $this->dataTrackingService->EliminarDataTracking($data_tracking_id);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                return $this->json($resultadoJson);
-            }
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
 
             return $this->json($resultadoJson);
-        }
-    }
-
-    /**
-     * eliminarDataTrackings Acción que elimina los dataTrackings seleccionados en la BD
-     *
-     */
-    public function eliminarDataTrackings(Request $request)
-    {
-        $ids = $request->get('ids');
-
-        try {
-            $resultado = $this->dataTrackingService->EliminarDataTrackings($ids);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                return $this->json($resultadoJson);
-            }
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
 
             return $this->json($resultadoJson);
-        }
+         }
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
+         return $this->json($resultadoJson);
+      }
+   }
 
-    }
+   /**
+    * eliminar Acción que elimina un dataTracking en la BD
+    *
+    */
+   public function eliminar(Request $request)
+   {
+      $data_tracking_id = $request->get('data_tracking_id');
 
-    /**
-     * cargarDatos Acción que carga los datos del dataTracking en la BD
-     *
-     */
-    public function cargarDatos(Request $request)
-    {
-        $data_tracking_id = $request->get('data_tracking_id');
+      try {
+         $resultado = $this->dataTrackingService->EliminarDataTracking($data_tracking_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+            return $this->json($resultadoJson);
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+            return $this->json($resultadoJson);
+         }
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-        try {
-            $resultado = $this->dataTrackingService->CargarDatosDataTracking($data_tracking_id, $this->projectService);
-            if ($resultado['success']) {
+         return $this->json($resultadoJson);
+      }
+   }
 
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['data_tracking'] = $resultado['data_tracking'];
+   /**
+    * eliminarDataTrackings Acción que elimina los dataTrackings seleccionados en la BD
+    *
+    */
+   public function eliminarDataTrackings(Request $request)
+   {
+      $ids = $request->get('ids');
 
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+      try {
+         $resultado = $this->dataTrackingService->EliminarDataTrackings($ids);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+            return $this->json($resultadoJson);
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+            return $this->json($resultadoJson);
+         }
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-                return $this->json($resultadoJson);
-            }
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
+    * cargarDatos Acción que carga los datos del dataTracking en la BD
+    *
+    */
+   public function cargarDatos(Request $request)
+   {
+      $data_tracking_id = $request->get('data_tracking_id');
+
+      try {
+         $resultado = $this->dataTrackingService->CargarDatosDataTracking($data_tracking_id, $this->projectService);
+         if ($resultado['success']) {
+
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['data_tracking'] = $resultado['data_tracking'];
 
             return $this->json($resultadoJson);
-        }
-    }
-
-    /**
-     * eliminarItem Acción que elimina un item en la BD
-     *
-     */
-    public function eliminarItem(Request $request)
-    {
-        $data_tracking_item_id = $request->get('data_tracking_item_id');
-
-        try {
-            $resultado = $this->dataTrackingService->EliminarItemDataTracking($data_tracking_item_id);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
 
             return $this->json($resultadoJson);
+         }
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+         return $this->json($resultadoJson);
+      }
+   }
 
-            return $this->json($resultadoJson);
-        }
-    }
+   /**
+    * eliminarItem Acción que elimina un item en la BD
+    *
+    */
+   public function eliminarItem(Request $request)
+   {
+      $data_tracking_item_id = $request->get('data_tracking_item_id');
 
-    /**
-     * eliminarSubcontract Acción que elimina un subcontract en la BD
-     *
-     */
-    public function eliminarSubcontract(Request $request)
-    {
-        $subcontract_id = $request->get('subcontract_id');
+      try {
+         $resultado = $this->dataTrackingService->EliminarItemDataTracking($data_tracking_item_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-        try {
-            $resultado = $this->dataTrackingService->EliminarItemSubcontract($subcontract_id);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
+         return $this->json($resultadoJson);
+      }
+   }
 
-            return $this->json($resultadoJson);
+   /**
+    * eliminarSubcontract Acción que elimina un subcontract en la BD
+    *
+    */
+   public function eliminarSubcontract(Request $request)
+   {
+      $subcontract_id = $request->get('subcontract_id');
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+      try {
+         $resultado = $this->dataTrackingService->EliminarItemSubcontract($subcontract_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-            return $this->json($resultadoJson);
-        }
-    }
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-    /**
-     * eliminarLabor Acción que elimina un employee en la BD
-     *
-     */
-    public function eliminarLabor(Request $request)
-    {
-        $data_tracking_labor_id = $request->get('data_tracking_labor_id');
+         return $this->json($resultadoJson);
+      }
+   }
 
-        try {
-            $resultado = $this->dataTrackingService->EliminarLaborDataTracking($data_tracking_labor_id);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+   /**
+    * eliminarLabor Acción que elimina un employee en la BD
+    *
+    */
+   public function eliminarLabor(Request $request)
+   {
+      $data_tracking_labor_id = $request->get('data_tracking_labor_id');
 
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
+      try {
+         $resultado = $this->dataTrackingService->EliminarLaborDataTracking($data_tracking_labor_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-            return $this->json($resultadoJson);
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+         return $this->json($resultadoJson);
+      }
+   }
 
-            return $this->json($resultadoJson);
-        }
-    }
+   /**
+    * eliminarMaterial Acción que elimina un material en la BD
+    *
+    */
+   public function eliminarMaterial(Request $request)
+   {
+      $data_tracking_material_id = $request->get('data_tracking_material_id');
 
-    /**
-     * eliminarMaterial Acción que elimina un material en la BD
-     *
-     */
-    public function eliminarMaterial(Request $request)
-    {
-        $data_tracking_material_id = $request->get('data_tracking_material_id');
+      try {
+         $resultado = $this->dataTrackingService->EliminarMaterialDataTracking($data_tracking_material_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-        try {
-            $resultado = $this->dataTrackingService->EliminarMaterialDataTracking($data_tracking_material_id);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
+         return $this->json($resultadoJson);
+      }
+   }
 
-            return $this->json($resultadoJson);
+   /**
+    * eliminarConcVendor Acción que elimina un conc vendor en la BD
+    *
+    */
+   public function eliminarConcVendor(Request $request)
+   {
+      $data_tracking_conc_vendor_id = $request->get('data_tracking_conc_vendor_id');
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+      try {
+         $resultado = $this->dataTrackingService->EliminarConcVendorDataTracking($data_tracking_conc_vendor_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-            return $this->json($resultadoJson);
-        }
-    }
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-    /**
-     * eliminarConcVendor Acción que elimina un conc vendor en la BD
-     *
-     */
-    public function eliminarConcVendor(Request $request)
-    {
-        $data_tracking_conc_vendor_id = $request->get('data_tracking_conc_vendor_id');
+         return $this->json($resultadoJson);
+      }
+   }
 
-        try {
-            $resultado = $this->dataTrackingService->EliminarConcVendorDataTracking($data_tracking_conc_vendor_id);
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+   /**
+    * validarSiExiste Acción para verificar si existe un datatracking
+    *
+    */
+   public function validarSiExiste(Request $request)
+   {
+      $data_tracking_id = $request->get('data_tracking_id');
 
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
+      $project_id = $request->get('project_id');
+      $date = $request->get('date');
 
-            return $this->json($resultadoJson);
+      try {
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+         $existe = $this->dataTrackingService->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
 
-            return $this->json($resultadoJson);
-        }
-    }
+         $resultadoJson['success'] = true;
+         $resultadoJson['existe'] = $existe;
 
-    /**
-     * validarSiExiste Acción para verificar si existe un datatracking
-     *
-     */
-    public function validarSiExiste(Request $request)
-    {
-        $data_tracking_id = $request->get('data_tracking_id');
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-        $project_id = $request->get('project_id');
-        $date = $request->get('date');
+         return $this->json($resultadoJson);
+      }
+   }
 
-        try {
+   /**
+    * salvarArchivo Accion que salva un archivo en la BD
+    */
+   public function salvarArchivo(Request $request)
+   {
+      $resultadoJson = array();
 
-            $existe = $this->dataTrackingService->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
+      try {
 
+         $file = $request->files->get('file');
+
+         //Manejar el archivo
+         $dir = 'uploads/datatracking/';
+         $file_name = $this->dataTrackingService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
+
+         if ($file_name != '') {
             $resultadoJson['success'] = true;
-            $resultadoJson['existe'] = $existe;
+            $resultadoJson['message'] = "The operation was successful";
 
-            return $this->json($resultadoJson);
-
-        } catch (\Exception $e) {
+            $resultadoJson['name'] = $file_name;
+            $resultadoJson['size'] = filesize($dir . $file_name);
+         } else {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
+            $resultadoJson['error'] = 'No se pudo subir el archivo';
+         }
 
-            return $this->json($resultadoJson);
-        }
-    }
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
 
-    /**
-     * salvarArchivo Accion que salva un archivo en la BD
-     */
-    public function salvarArchivo(Request $request)
-    {
-        $resultadoJson = array();
+         return $this->json($resultadoJson);
+      }
+   }
 
-        try {
+   /**
+    * eliminarArchivo Acción que elimina un archivo en la BD
+    *
+    */
+   public function eliminarArchivo(Request $request)
+   {
+      $archivo = $request->get('archivo');
 
-            $file = $request->files->get('file');
+      try {
+         $resultado = $this->dataTrackingService->EliminarArchivo($archivo);
+         if ($resultado['success']) {
 
-            //Manejar el archivo
-            $dir = 'uploads/datatracking/';
-            $file_name = $this->dataTrackingService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-            if ($file_name != '') {
-                $resultadoJson['success'] = true;
-                $resultadoJson['message'] = "The operation was successful";
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-                $resultadoJson['name'] = $file_name;
-                $resultadoJson['size'] = filesize($dir . $file_name);
-            } else {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = 'No se pudo subir el archivo';
-            }
+         return $this->json($resultadoJson);
+      }
+   }
 
-            return $this->json($resultadoJson);
+   /**
+    * eliminarArchivos Acción que elimina un archivo en la BD
+    *
+    */
+   public function eliminarArchivos(Request $request)
+   {
+      $archivos = $request->get('archivos');
 
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
+      try {
+         $resultado = $this->dataTrackingService->EliminarArchivos($archivos);
+         if ($resultado['success']) {
 
-            return $this->json($resultadoJson);
-        }
-    }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
 
-    /**
-     * eliminarArchivo Acción que elimina un archivo en la BD
-     *
-     */
-    public function eliminarArchivo(Request $request)
-    {
-        $archivo = $request->get('archivo');
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
 
-        try {
-            $resultado = $this->dataTrackingService->EliminarArchivo($archivo);
-            if ($resultado['success']) {
-
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
-
-            return $this->json($resultadoJson);
-
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
-
-            return $this->json($resultadoJson);
-        }
-    }
-
-    /**
-     * eliminarArchivos Acción que elimina un archivo en la BD
-     *
-     */
-    public function eliminarArchivos(Request $request)
-    {
-        $archivos = $request->get('archivos');
-
-        try {
-            $resultado = $this->dataTrackingService->EliminarArchivos($archivos);
-            if ($resultado['success']) {
-
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
-
-            return $this->json($resultadoJson);
-
-        } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $e->getMessage();
-
-            return $this->json($resultadoJson);
-        }
-    }
+         return $this->json($resultadoJson);
+      }
+   }
 }
