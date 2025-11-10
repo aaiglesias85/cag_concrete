@@ -1156,8 +1156,11 @@ var Invoices = (function () {
       var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
 
       // reset
-      items = [];
-      actualizarTableListaItems();
+      var invoice_id = $('#invoice_id').val();
+      if (invoice_id == '') {
+         items = [];
+         actualizarTableListaItems();
+      }
 
       if (project_id != '' && start_date != '' && end_date != '') {
          var formData = new URLSearchParams();

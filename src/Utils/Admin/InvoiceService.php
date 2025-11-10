@@ -312,7 +312,7 @@ class InvoiceService extends Base
       /**@var InvoiceItem $entity */
       if ($entity != null) {
 
-         $item_name = $entity->getItem()->getDescription();
+         $item_name = $entity->getProjectItem()->getItem()->getDescription();
 
          $em->remove($entity);
          $em->flush();
