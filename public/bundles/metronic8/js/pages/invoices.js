@@ -1178,31 +1178,34 @@ var Invoices = (function () {
                      for (let item of response.items) {
                         var posicion = items.length;
 
-                        items.push({
-                           invoice_item_id: '',
-                           project_item_id: item.project_item_id,
-                           item_id: item.item_id,
-                           item: item.item,
-                           unit: item.unit,
-                           contract_qty: item.contract_qty,
-                           quantity: item.quantity,
-                           price: item.price,
-                           contract_amount: item.contract_amount,
-                           quantity_from_previous: item.quantity_from_previous ?? 0,
-                           unpaid_from_previous: item.unpaid_from_previous ?? 0,
-                           quantity_completed: item.quantity_completed,
-                           amount: item.amount,
-                           total_amount: item.total_amount,
-                           paid_amount_total: item.paid_amount_total,
-                           amount_from_previous: item.amount_from_previous,
-                           amount_completed: item.amount_completed,
-                           amount_unpaid: item.amount_unpaid,
-                           quantity_brought_forward: item.quantity_brought_forward,
-                           quantity_final: item.quantity_final,
-                           amount_final: item.amount_final,
-                           principal: item.principal,
-                           posicion: posicion,
-                        });
+                        // agregar si no existe en el array items el item.project_item_id
+                        if (!items.some((i) => Number(i.project_item_id) === Number(item.project_item_id))) {
+                           items.push({
+                              invoice_item_id: '',
+                              project_item_id: item.project_item_id,
+                              item_id: item.item_id,
+                              item: item.item,
+                              unit: item.unit,
+                              contract_qty: item.contract_qty,
+                              quantity: item.quantity,
+                              price: item.price,
+                              contract_amount: item.contract_amount,
+                              quantity_from_previous: item.quantity_from_previous ?? 0,
+                              unpaid_from_previous: item.unpaid_from_previous ?? 0,
+                              quantity_completed: item.quantity_completed,
+                              amount: item.amount,
+                              total_amount: item.total_amount,
+                              paid_amount_total: item.paid_amount_total,
+                              amount_from_previous: item.amount_from_previous,
+                              amount_completed: item.amount_completed,
+                              amount_unpaid: item.amount_unpaid,
+                              quantity_brought_forward: item.quantity_brought_forward,
+                              quantity_final: item.quantity_final,
+                              amount_final: item.amount_final,
+                              principal: item.principal,
+                              posicion: posicion,
+                           });
+                        }
                      }
                      actualizarTableListaItems();
                   } else {
