@@ -211,8 +211,10 @@ class InvoiceService extends Base
          $amount = $quantity * $price;
          $total_amount_invoice_todate += $amount;
 
-         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
-         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, $invoice_prev_id);
+        // $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
+         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int) $invoice_prev_id);
+         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, (int)$invoice_prev_id);
+         
 
          $total_amount_from_previous += $amount_from_previous;
 
