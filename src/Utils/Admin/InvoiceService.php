@@ -184,7 +184,7 @@ class InvoiceService extends Base
       $total_contract_amount = 0;
       $total_amount_invoice_todate = 0;
       $total_unpaid = 0;
-      $total_amount_measured = 0;
+      $total_amount_from_previous = 0;
       $total_amount_final = 0;
 
       $fila_inicio = 16;
@@ -214,7 +214,7 @@ class InvoiceService extends Base
          $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
          $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, $invoice_prev_id);
 
-         $total_amount_measured += $amount_from_previous;
+         $total_amount_from_previous += $amount_from_previous;
 
          $amount_completed = $quantity_completed * $price;
          $total_amount_final += $amount_completed;
@@ -259,7 +259,7 @@ class InvoiceService extends Base
       $objWorksheet->setCellValue("J$fila", $total_amount_invoice_todate)->getStyle("I$fila")->getFont()->setBold(true);
 
       $objWorksheet->setCellValue("K$fila", "TOTAL AMOUNT (PREVIOUS BILL):")->getStyle("K$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("L$fila", $total_amount_measured)->getStyle("L$fila")->getFont()->setBold(true);
+      $objWorksheet->setCellValue("L$fila", $total_amount_from_previous)->getStyle("L$fila")->getFont()->setBold(true);
 
       $objWorksheet->setCellValue("N$fila", "TOTAL BILLED AMOUNT (THIS PERIOD):")->getStyle("N$fila")->getFont()->setBold(true);
       $objWorksheet->setCellValue("O$fila", $total_amount_final)->getStyle("O$fila")->getFont()->setBold(true);
@@ -303,6 +303,52 @@ class InvoiceService extends Base
          ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('FFF2D068');
 
+
+      // Nuevos campos bajo total
+      $fila = $fila + 2;
+      $fila_retainage_inicio = $fila;
+      $porciento_retainage = 0.1;
+
+      // LESS RETAINAGE $
+      $objWorksheet->setCellValue("N$fila", "LESS RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
+
+      // aplicar 10 % al $total_amount_fina
+      $total_amount_final_10 = $total_amount_final * $porciento_retainage;
+      $objWorksheet->setCellValue("O$fila", $total_amount_final_10)->getStyle("O$fila")->getFont()->setBold(true);
+
+      $fila = $fila + 1;
+
+      // AMOUNT EARNED LESS RETAINAGE $
+      $objWorksheet->setCellValue("N$fila", "AMOUNT EARNED LESS RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
+      $amount_earned_less_retainage = $total_amount_final - $total_amount_final_10;
+      $objWorksheet->setCellValue("O$fila", $amount_earned_less_retainage)->getStyle("O$fila")->getFont()->setBold(true);
+
+      $fila = $fila + 1;
+
+      // LESS PREVIOUS APPLICATIONS $
+      $objWorksheet->setCellValue("N$fila", "LESS PREVIOUS APPLICATIONS $")->getStyle("N$fila")->getFont()->setBold(true);
+      $less_previous_applications = 0;
+      $objWorksheet->setCellValue("O$fila", $less_previous_applications)->getStyle("O$fila")->getFont()->setBold(true);
+
+      $fila = $fila + 1;
+
+      // CURRENT AMOUNT DUE $
+      $objWorksheet->setCellValue("N$fila", "CURRENT AMOUNT DUE $")->getStyle("N$fila")->getFont()->setBold(true);
+      $current_amount_due = $amount_earned_less_retainage - $less_previous_applications;
+      $objWorksheet->setCellValue("O$fila", $current_amount_due)->getStyle("O$fila")->getFont()->setBold(true);
+
+      $fila = $fila + 1;
+
+      // CURRENT RETAINAGE $
+      $objWorksheet->setCellValue("N$fila", "CURRENT RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
+      $current_retainage = $this->CalcularCurrentRetainage($project_id, $porciento_retainage);
+      $objWorksheet->setCellValue("O$fila", $current_retainage)->getStyle("O$fila")->getFont()->setBold(true);
+
+      // Color de fondo naranja para la sección final (N–O)
+      $objWorksheet->getStyle("N{$fila_retainage_inicio}:O{$fila}")
+         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+         ->getStartColor()->setARGB('FFFCD5B4');
+
       // Guardar Excel
       $fichero = "invoice-$number.xlsx";
       $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
@@ -315,6 +361,33 @@ class InvoiceService extends Base
       $url = $ruta . 'uploads/invoice/' . $fichero;
 
       return $url;
+   }
+
+   private function CalcularCurrentRetainage($project_id, $porciento_retainage)
+   {
+      if (empty($project_id) || empty($porciento_retainage)) {
+         return 0;
+      }
+
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
+      if (empty($invoices)) {
+         return 0;
+      }
+
+      $total_retainage = 0;
+      foreach ($invoices as $invoice) {
+         $invoice_total = $invoiceItemRepo->TotalInvoiceBroughtForward((string) $invoice->getInvoiceId());
+         if ($invoice_total > 0) {
+            $total_retainage += $invoice_total * $porciento_retainage;
+         }
+      }
+
+      return $total_retainage;
    }
 
 
