@@ -119,6 +119,23 @@ class InvoiceService extends Base
       $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
       /** @var Invoice $invoice_entity */
 
+      // listar invoices de project
+      $project_id = $invoice_entity->getProject()->getProjectId();
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
+      $invoice_prev_id = '';
+      $currentInvoiceId = (int) $invoice_id;
+      foreach ($invoices as $index => $invoice) {
+         if ((int) $invoice->getInvoiceId() === $currentInvoiceId) {
+            $prevInvoice = $invoices[$index + 1] ?? null;
+            if ($prevInvoice !== null) {
+               $invoice_prev_id = $prevInvoice->getInvoiceId();
+            }
+            break;
+         }
+      }
+
       // fecha actual
       $fecha_actual = date('m/d/Y');
       $objWorksheet->setCellValueExplicit("Q4", $fecha_actual, DataType::TYPE_STRING);
@@ -179,20 +196,24 @@ class InvoiceService extends Base
 
       foreach ($items as $key => $value) {
 
+         $project_item_id = $value->getProjectItem()->getId();
+
          $contract_qty = $value->getProjectItem()->getQuantity();
          $price = $value->getPrice();
          $contract_amount = $contract_qty * $price;
          $total_contract_amount += $contract_amount;
 
-         $quantity_from_previous = $value->getQuantityFromPrevious();
-         $quantity_brought_forward = $value->getQuantityBroughtForward() ?? $quantity_from_previous;
+
+         $quantity_brought_forward = $value->getQuantityBroughtForward();
          $quantity = $value->getQuantity();
          $quantity_completed = $quantity + $quantity_brought_forward;
 
          $amount = $quantity * $price;
          $total_amount_invoice_todate += $amount;
 
-         $amount_from_previous = $quantity_brought_forward * $price;
+         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
+         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, $invoice_prev_id);
+
          $total_amount_measured += $amount_from_previous;
 
          $amount_completed = $quantity_completed * $price;

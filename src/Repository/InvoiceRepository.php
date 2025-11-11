@@ -8,354 +8,386 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class InvoiceRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Invoice::class);
-    }
+   public function __construct(ManagerRegistry $registry)
+   {
+      parent::__construct($registry, Invoice::class);
+   }
 
-    /**
-     * ListarInvoicesDeProject: Lista los invoices de un project
-     *
-     * @return Invoice[]
-     */
-    public function ListarInvoicesDeProject($project_id)
-    {
-        $consulta = $this->createQueryBuilder('i')
-            ->leftJoin('i.project', 'p')
-            ->andWhere('p.projectId = :project_id')
+   /**
+    * ListarInvoicesDeProject: Lista los invoices de un project
+    *
+    * @return Invoice[]
+    */
+   public function ListarInvoicesDeProject($project_id)
+   {
+      $consulta = $this->createQueryBuilder('i')
+         ->leftJoin('i.project', 'p')
+         ->andWhere('p.projectId = :project_id')
+         ->setParameter('project_id', $project_id);
+
+      $consulta->orderBy('i.createdAt', "DESC");
+
+      return $consulta->getQuery()->getResult();
+   }
+
+   /**
+    * ListarInvoices: Lista los invoices con filtros y paginación
+    *
+    * @return Invoice[]
+    */
+   public function ListarInvoices(
+      int $start,
+      int $limit,
+      ?string $sSearch,
+      string $iSortCol_0,
+      string $sSortDir_0,
+      string $company_id = '',
+      string $project_id = '',
+      string $fecha_inicial = '',
+      string $fecha_fin = '',
+      string $paid = ''
+   ): array {
+
+      $qb = $this->createQueryBuilder('i')
+         ->leftJoin('i.project', 'p')
+         ->leftJoin('p.company', 'c');
+
+      // Filtros de búsqueda
+      if (!empty($sSearch)) {
+         $qb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search OR p.poCG LIKE :search')
+            ->setParameter('search', "%{$sSearch}%");
+      }
+
+      // Filtros adicionales
+      if (!empty($company_id)) {
+         $qb->andWhere('c.companyId = :company_id')
+            ->setParameter('company_id', $company_id);
+      }
+
+      if (!empty($project_id)) {
+         $qb->andWhere('p.projectId = :project_id')
             ->setParameter('project_id', $project_id);
+      }
 
-        $consulta->orderBy('i.createdAt', "DESC");
+      if (!empty($fecha_inicial)) {
+         $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+         $qb->andWhere('i.startDate >= :fecha_inicial')
+            ->setParameter('fecha_inicial', $fecha_inicial);
+      }
 
-        return $consulta->getQuery()->getResult();
-    }
+      if (!empty($fecha_fin)) {
+         $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+         $qb->andWhere('i.endDate <= :fecha_final')
+            ->setParameter('fecha_final', $fecha_fin);
+      }
 
-    /**
-     * ListarInvoices: Lista los invoices con filtros y paginación
-     *
-     * @return Invoice[]
-     */
-    public function ListarInvoices(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0,
-        string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $paid = ''): array {
+      if ($paid !== '') {
+         $qb->andWhere('i.paid = :paid')
+            ->setParameter('paid', $paid);
+      }
 
-        $qb = $this->createQueryBuilder('i')
-            ->leftJoin('i.project', 'p')
-            ->leftJoin('p.company', 'c');
+      // Ordenar por la columna seleccionada
+      $qb->orderBy("i.$iSortCol_0", $sSortDir_0);
 
-        // Filtros de búsqueda
-        if (!empty($sSearch)) {
-            $qb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search OR p.poCG LIKE :search')
-                ->setParameter('search', "%{$sSearch}%");
-        }
+      // Limitar los resultados con paginación
+      if ($limit > 0) {
+         $qb->setMaxResults($limit)
+            ->setFirstResult($start);
+      }
 
-        // Filtros adicionales
-        if (!empty($company_id)) {
-            $qb->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
+      return $qb->getQuery()->getResult();
+   }
 
-        if (!empty($project_id)) {
-            $qb->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
+   /**
+    * TotalInvoices: Total de invoices con filtros aplicados.
+    *
+    * @return int
+    */
+   public function TotalInvoices(?string $sSearch = '', string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $paid = ''): int
+   {
+      $qb = $this->createQueryBuilder('i')
+         ->select('COUNT(i.invoiceId)')
+         ->leftJoin('i.project', 'p')
+         ->leftJoin('p.company', 'c');
 
-        if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
-            $qb->andWhere('i.startDate >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
+      // Filtros de búsqueda
+      if (!empty($sSearch)) {
+         $qb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search OR p.poCG LIKE :search')
+            ->setParameter('search', "%{$sSearch}%");
+      }
 
-        if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
-            $qb->andWhere('i.endDate <= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
-        }
+      // Filtros adicionales
+      if (!empty($company_id)) {
+         $qb->andWhere('c.companyId = :company_id')
+            ->setParameter('company_id', $company_id);
+      }
 
-        if ($paid !== '') {
-            $qb->andWhere('i.paid = :paid')
-                ->setParameter('paid', $paid);
-        }
+      if (!empty($project_id)) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
 
-        // Ordenar por la columna seleccionada
-        $qb->orderBy("i.$iSortCol_0", $sSortDir_0);
+      if (!empty($fecha_inicial)) {
+         $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+         $qb->andWhere('i.startDate >= :fecha_inicial')
+            ->setParameter('fecha_inicial', $fecha_inicial);
+      }
 
-        // Limitar los resultados con paginación
-        if ($limit > 0) {
-            $qb->setMaxResults($limit)
-                ->setFirstResult($start);
-        }
+      if (!empty($fecha_fin)) {
+         $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+         $qb->andWhere('i.endDate <= :fecha_final')
+            ->setParameter('fecha_final', $fecha_fin);
+      }
 
-        return $qb->getQuery()->getResult();
-    }
+      if ($paid !== '') {
+         $qb->andWhere('i.paid = :paid')
+            ->setParameter('paid', $paid);
+      }
 
-    /**
-     * TotalInvoices: Total de invoices con filtros aplicados.
-     *
-     * @return int
-     */
-    public function TotalInvoices(?string $sSearch = '', string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $paid = ''): int {
-        $qb = $this->createQueryBuilder('i')
-            ->select('COUNT(i.invoiceId)')
-            ->leftJoin('i.project', 'p')
-            ->leftJoin('p.company', 'c');
-
-        // Filtros de búsqueda
-        if (!empty($sSearch)) {
-            $qb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search OR p.poCG LIKE :search')
-                ->setParameter('search', "%{$sSearch}%");
-        }
-
-        // Filtros adicionales
-        if (!empty($company_id)) {
-            $qb->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
-
-        if (!empty($project_id)) {
-            $qb->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
-
-        if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
-            $qb->andWhere('i.startDate >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
-
-        if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
-            $qb->andWhere('i.endDate <= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
-        }
-
-        if ($paid !== '') {
-            $qb->andWhere('i.paid = :paid')
-                ->setParameter('paid', $paid);
-        }
-
-        return (int) $qb->getQuery()->getSingleScalarResult();
-    }
+      return (int) $qb->getQuery()->getSingleScalarResult();
+   }
 
 
-    /**
-     * ListarInvoicesConTotal: Lista y cuenta aplicando los mismos filtros.
-     *
-     */
-    public function ListarInvoicesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'startDate',
-                                                        string $sortDir = 'DESC', string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $paid = ''): array {
+   /**
+    * ListarInvoicesConTotal: Lista y cuenta aplicando los mismos filtros.
+    *
+    */
+   public function ListarInvoicesConTotal(
+      int $start,
+      int $limit,
+      ?string $sSearch = null,
+      string $sortField = 'startDate',
+      string $sortDir = 'DESC',
+      string $company_id = '',
+      string $project_id = '',
+      string $fecha_inicial = '',
+      string $fecha_fin = '',
+      string $paid = ''
+   ): array {
 
-        // Whitelist de campos ordenables
-        $sortable = [
-            'id' => 'i.invoiceId',
-            'number' => 'i.number',
-            'company' => 'c.name',
-            'projectNumber' => 'p.projectNumber',
-            'project' => 'p.name',
-            'startDate' => 'i.startDate',
-            'endDate' => 'i.endDate',
-            'total' => 'i.number',
-            'notes' => 'i.notes',
-            'paid' => 'i.paid',
-            'createdAt' => 'i.createdAt',
-        ];
-        $orderBy = $sortable[$sortField] ?? 'i.startDate';
-        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+      // Whitelist de campos ordenables
+      $sortable = [
+         'id' => 'i.invoiceId',
+         'number' => 'i.number',
+         'company' => 'c.name',
+         'projectNumber' => 'p.projectNumber',
+         'project' => 'p.name',
+         'startDate' => 'i.startDate',
+         'endDate' => 'i.endDate',
+         'total' => 'i.number',
+         'notes' => 'i.notes',
+         'paid' => 'i.paid',
+         'createdAt' => 'i.createdAt',
+      ];
+      $orderBy = $sortable[$sortField] ?? 'i.startDate';
+      $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
 
-        // QB base con JOIN y filtros
-        $baseQb = $this->createQueryBuilder('i')
-            ->leftJoin('i.project', 'p')
-            ->leftJoin('p.company', 'c');
+      // QB base con JOIN y filtros
+      $baseQb = $this->createQueryBuilder('i')
+         ->leftJoin('i.project', 'p')
+         ->leftJoin('p.company', 'c');
 
-        // Filtros de búsqueda
-        if (!empty($sSearch)) {
-            $baseQb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR
+      // Filtros de búsqueda
+      if (!empty($sSearch)) {
+         $baseQb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR
              p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR
               p.poNumber LIKE :search OR p.poCG LIKE :search OR c.name LIKE :search')
-                ->setParameter('search', "%{$sSearch}%");
-        }
+            ->setParameter('search', "%{$sSearch}%");
+      }
 
-        // Filtros adicionales
-        if (!empty($company_id)) {
-            $baseQb->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
+      // Filtros adicionales
+      if (!empty($company_id)) {
+         $baseQb->andWhere('c.companyId = :company_id')
+            ->setParameter('company_id', $company_id);
+      }
 
-        if (!empty($project_id)) {
-            $baseQb->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
+      if (!empty($project_id)) {
+         $baseQb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
 
-        if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
-            $baseQb->andWhere('i.startDate >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
+      if (!empty($fecha_inicial)) {
+         $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+         $baseQb->andWhere('i.startDate >= :fecha_inicial')
+            ->setParameter('fecha_inicial', $fecha_inicial);
+      }
 
-        if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
-            $baseQb->andWhere('i.endDate <= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
-        }
+      if (!empty($fecha_fin)) {
+         $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+         $baseQb->andWhere('i.endDate <= :fecha_final')
+            ->setParameter('fecha_final', $fecha_fin);
+      }
 
-        if ($paid !== '') {
-            $baseQb->andWhere('i.paid = :paid')
-                ->setParameter('paid', $paid);
-        }
+      if ($paid !== '') {
+         $baseQb->andWhere('i.paid = :paid')
+            ->setParameter('paid', $paid);
+      }
 
-        // ---- Datos (con paginación y orden) ----
-        $dataQb = clone $baseQb;
-        $dataQb->orderBy($orderBy, $dir)
-            ->setFirstResult($start);
+      // ---- Datos (con paginación y orden) ----
+      $dataQb = clone $baseQb;
+      $dataQb->orderBy($orderBy, $dir)
+         ->setFirstResult($start);
 
-        if ($limit > 0) {
-            $dataQb->setMaxResults($limit);
-        }
+      if ($limit > 0) {
+         $dataQb->setMaxResults($limit);
+      }
 
-        $data = $dataQb->getQuery()->getResult();
+      $data = $dataQb->getQuery()->getResult();
 
-        // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
-        $countQb = clone $baseQb;
-        $countQb->resetDQLPart('orderBy')
-            ->select('COUNT(i.invoiceId)');
+      // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
+      $countQb = clone $baseQb;
+      $countQb->resetDQLPart('orderBy')
+         ->select('COUNT(i.invoiceId)');
 
-        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+      $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
-        return [
-            'data'  => $data,
-            'total' => $total, // total con el MISMO filtro aplicado
-        ];
-    }
-    
-    /**
-     * ListarInvoicesRangoFecha: Lista los invoices dentro de un rango de fechas con filtros.
-     *
-     * @return Invoice[]
-     */
-    public function ListarInvoicesRangoFecha(string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $status = ''): array {
-        $qb = $this->createQueryBuilder('i')
-            ->leftJoin('i.project', 'p')
-            ->leftJoin('p.company', 'c');
+      return [
+         'data'  => $data,
+         'total' => $total, // total con el MISMO filtro aplicado
+      ];
+   }
 
-        // Filtros adicionales
-        if (!empty($company_id)) {
-            $qb->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
+   /**
+    * ListarInvoicesRangoFecha: Lista los invoices dentro de un rango de fechas con filtros.
+    *
+    * @return Invoice[]
+    */
+   public function ListarInvoicesRangoFecha(string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $status = ''): array
+   {
+      $qb = $this->createQueryBuilder('i')
+         ->leftJoin('i.project', 'p')
+         ->leftJoin('p.company', 'c');
 
-        if (!empty($project_id)) {
-            $qb->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
+      // Filtros adicionales
+      if (!empty($company_id)) {
+         $qb->andWhere('c.companyId = :company_id')
+            ->setParameter('company_id', $company_id);
+      }
 
-        if (!empty($status)) {
-            $qb->andWhere('p.status = :status')
-                ->setParameter('status', $status);
-        }
+      if (!empty($project_id)) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
 
-        if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
-            $qb->andWhere('i.startDate >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
+      if (!empty($status)) {
+         $qb->andWhere('p.status = :status')
+            ->setParameter('status', $status);
+      }
 
-        if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
-            $qb->andWhere('i.endDate <= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
-        }
+      if (!empty($fecha_inicial)) {
+         $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+         $qb->andWhere('i.startDate >= :fecha_inicial')
+            ->setParameter('fecha_inicial', $fecha_inicial);
+      }
 
-        // Ordenar por la fecha de inicio
-        $qb->orderBy('i.startDate', 'ASC');
+      if (!empty($fecha_fin)) {
+         $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+         $qb->andWhere('i.endDate <= :fecha_final')
+            ->setParameter('fecha_final', $fecha_fin);
+      }
 
-        return $qb->getQuery()->getResult();
-    }
+      // Ordenar por la fecha de inicio
+      $qb->orderBy('i.startDate', 'ASC');
 
-    /**
-     * ListarInvoicesParaPaymentsConTotal: Lista y cuenta aplicando los mismos filtros.
-     *
-     */
-    public function ListarInvoicesParaPaymentsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'startDate',
-                                           string $sortDir = 'DESC', string $company_id = '', string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $paid = ''): array {
+      return $qb->getQuery()->getResult();
+   }
 
-        // Whitelist de campos ordenables
-        $sortable = [
-            'id' => 'i.invoiceId',
-            'number' => 'i.number',
-            'company' => 'c.name',
-            'projectNumber' => 'p.projectNumber',
-            'project' => 'p.name',
-            'startDate' => 'i.startDate',
-            'endDate' => 'i.endDate',
-            'total' => 'i.number',
-            'notes' => 'i.notes',
-            'paid' => 'i.paid',
-            'createdAt' => 'i.createdAt',
-        ];
-        $orderBy = $sortable[$sortField] ?? 'i.startDate';
-        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+   /**
+    * ListarInvoicesParaPaymentsConTotal: Lista y cuenta aplicando los mismos filtros.
+    *
+    */
+   public function ListarInvoicesParaPaymentsConTotal(
+      int $start,
+      int $limit,
+      ?string $sSearch = null,
+      string $sortField = 'startDate',
+      string $sortDir = 'DESC',
+      string $company_id = '',
+      string $project_id = '',
+      string $fecha_inicial = '',
+      string $fecha_fin = '',
+      string $paid = ''
+   ): array {
 
-        // QB base con JOIN y filtros
-        $baseQb = $this->createQueryBuilder('i')
-            ->leftJoin('i.project', 'p')
-            ->leftJoin('p.company', 'c');
+      // Whitelist de campos ordenables
+      $sortable = [
+         'id' => 'i.invoiceId',
+         'number' => 'i.number',
+         'company' => 'c.name',
+         'projectNumber' => 'p.projectNumber',
+         'project' => 'p.name',
+         'startDate' => 'i.startDate',
+         'endDate' => 'i.endDate',
+         'total' => 'i.number',
+         'notes' => 'i.notes',
+         'paid' => 'i.paid',
+         'createdAt' => 'i.createdAt',
+      ];
+      $orderBy = $sortable[$sortField] ?? 'i.startDate';
+      $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
 
-        // Filtros de búsqueda
-        if (!empty($sSearch)) {
-            $baseQb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR
+      // QB base con JOIN y filtros
+      $baseQb = $this->createQueryBuilder('i')
+         ->leftJoin('i.project', 'p')
+         ->leftJoin('p.company', 'c');
+
+      // Filtros de búsqueda
+      if (!empty($sSearch)) {
+         $baseQb->andWhere('i.number LIKE :search OR i.notes LIKE :search OR p.invoiceContact LIKE :search OR p.owner LIKE :search OR
              p.manager LIKE :search OR p.county LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR
               p.poNumber LIKE :search OR p.poCG LIKE :search OR c.name LIKE :search')
-                ->setParameter('search', "%{$sSearch}%");
-        }
+            ->setParameter('search', "%{$sSearch}%");
+      }
 
-        // Filtros adicionales
-        if (!empty($company_id)) {
-            $baseQb->andWhere('c.companyId = :company_id')
-                ->setParameter('company_id', $company_id);
-        }
+      // Filtros adicionales
+      if (!empty($company_id)) {
+         $baseQb->andWhere('c.companyId = :company_id')
+            ->setParameter('company_id', $company_id);
+      }
 
-        if (!empty($project_id)) {
-            $baseQb->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
+      if (!empty($project_id)) {
+         $baseQb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
 
-        if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
-            $baseQb->andWhere('i.startDate >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
-        }
+      if (!empty($fecha_inicial)) {
+         $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+         $baseQb->andWhere('i.startDate >= :fecha_inicial')
+            ->setParameter('fecha_inicial', $fecha_inicial);
+      }
 
-        if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
-            $baseQb->andWhere('i.endDate <= :fecha_final')
-                ->setParameter('fecha_final', $fecha_fin);
-        }
+      if (!empty($fecha_fin)) {
+         $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+         $baseQb->andWhere('i.endDate <= :fecha_final')
+            ->setParameter('fecha_final', $fecha_fin);
+      }
 
-        if ($paid !== '') {
-            $baseQb->andWhere('i.paid = :paid')
-                ->setParameter('paid', $paid);
-        }
+      if ($paid !== '') {
+         $baseQb->andWhere('i.paid = :paid')
+            ->setParameter('paid', $paid);
+      }
 
-        // ---- Datos (con paginación y orden) ----
-        $dataQb = clone $baseQb;
-        $dataQb->orderBy($orderBy, $dir)
-            ->setFirstResult($start);
+      // ---- Datos (con paginación y orden) ----
+      $dataQb = clone $baseQb;
+      $dataQb->orderBy($orderBy, $dir)
+         ->setFirstResult($start);
 
-        if ($limit > 0) {
-            $dataQb->setMaxResults($limit);
-        }
+      if ($limit > 0) {
+         $dataQb->setMaxResults($limit);
+      }
 
-        $data = $dataQb->getQuery()->getResult();
+      $data = $dataQb->getQuery()->getResult();
 
-        // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
-        $countQb = clone $baseQb;
-        $countQb->resetDQLPart('orderBy')
-            ->select('COUNT(i.invoiceId)');
+      // ---- Conteo filtrado (mismos filtros, sin orden/paginación) ----
+      $countQb = clone $baseQb;
+      $countQb->resetDQLPart('orderBy')
+         ->select('COUNT(i.invoiceId)');
 
-        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+      $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
-        return [
-            'data'  => $data,
-            'total' => $total, // total con el MISMO filtro aplicado
-        ];
-    }
+      return [
+         'data'  => $data,
+         'total' => $total, // total con el MISMO filtro aplicado
+      ];
+   }
 }

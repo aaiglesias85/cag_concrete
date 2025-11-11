@@ -958,6 +958,12 @@ class ProjectService extends Base
    {
       $items = [];
 
+      // listar invoices de project
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
+      $invoice_prev_id = !empty($invoices) ? $invoices[0]->getInvoiceId() : '';
+
       // listar items de project
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
@@ -979,7 +985,8 @@ class ProjectService extends Base
 
             /** @var InvoiceItemRepository $invoiceItemRepo */
             $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-            $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id);
+            $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
+            $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, $invoice_prev_id);
 
             $quantity_completed = $quantity + $quantity_from_previous;
 
@@ -990,7 +997,7 @@ class ProjectService extends Base
             $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
 
 
-            $amount_from_previous = $quantity_from_previous * $price;
+
 
             $amount_completed = $quantity_completed * $price;
 
