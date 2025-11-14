@@ -985,8 +985,8 @@ class ProjectService extends Base
 
             /** @var InvoiceItemRepository $invoiceItemRepo */
             $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-            $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
-            $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, $invoice_prev_id);
+            $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int)$invoice_prev_id);
+            $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id,(int) $invoice_prev_id);
 
             $quantity_completed = $quantity + $quantity_from_previous;
 
