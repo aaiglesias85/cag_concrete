@@ -40,6 +40,7 @@ class InvoiceService extends Base
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
       $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+
       if (!empty($invoices) && $invoices[0]->getInvoiceId() != $invoice_id) {
          $valid = false;
       }
