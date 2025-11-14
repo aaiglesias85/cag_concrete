@@ -235,13 +235,13 @@ class InvoiceService extends Base
             ->setCellValue('H' . $fila, $contract_amount)
             ->setCellValue('I' . $fila, $quantity)
             ->setCellValue('J' . $fila, $amount)
-            // ->setCellValue('J' . $fila, $unpaid_qty)
-            // ->setCellValue('K' . $fila, $amount_unpaid)
             ->setCellValue('K' . $fila, $quantity_from_previous)
             ->setCellValue('L' . $fila, $amount_from_previous)
-
             ->setCellValue('N' . $fila, $quantity_completed)
-            ->setCellValue('O' . $fila, $amount_completed);
+            ->setCellValue('O' . $fila, $amount_completed)
+            ->setCellValue('Q' . $fila, $unpaid_qty)
+            ->setCellValue('R' . $fila, $amount_unpaid)
+         ;
 
          // Aplicar bordes a toda la fila (A–P)
          $objWorksheet->getStyle("A{$fila}:L{$fila}")->applyFromArray($styleArray);
@@ -265,7 +265,7 @@ class InvoiceService extends Base
       $objWorksheet->setCellValue("O$fila", $total_amount_final)->getStyle("O$fila")->getFont()->setBold(true);
 
       $objWorksheet->setCellValue("Q$fila", "TOTAL PENDING BALANCE (BTD):")->getStyle("Q$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("R$fila", "")->getStyle("R$fila")->getFont()->setBold(true);
+      $objWorksheet->setCellValue("R$fila", $total_unpaid)->getStyle("R$fila")->getFont()->setBold(true);
 
       // Bordes de la fila total
       $objWorksheet->getStyle("G{$fila}:L{$fila}")->applyFromArray($styleArray);
