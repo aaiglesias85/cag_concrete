@@ -235,10 +235,10 @@ class InvoiceService extends Base
          $amount = $quantity * $price;
          $total_amount_invoice_todate += $amount;
 
-        // $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
+         // $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
          $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int) $invoice_prev_id);
          $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, (int)$invoice_prev_id);
-         
+
 
          $total_amount_from_previous += $amount_from_previous;
 
@@ -304,30 +304,30 @@ class InvoiceService extends Base
       $lastRow = $fila;
 
       //G-H (azul claro)
-      $objWorksheet->getStyle("G{$fila_inicio}:H{$lastRow}")
-         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-         ->getStartColor()->setARGB('FFDAEEF3');
+      // $objWorksheet->getStyle("G{$fila_inicio}:H{$lastRow}")
+      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+      //    ->getStartColor()->setARGB('FFDAEEF3');
 
       // I-J (rojo claro)
-      $objWorksheet->getStyle("I{$fila_inicio}:J{$lastRow}")
-         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-         ->getStartColor()->setARGB('FFF79494');
+      // $objWorksheet->getStyle("I{$fila_inicio}:J{$lastRow}")
+      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+      //    ->getStartColor()->setARGB('FFF79494');
 
       // K-L (naranja suave)
-      $objWorksheet->getStyle("K{$fila_inicio}:L{$lastRow}")
-         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-         ->getStartColor()->setARGB('FFFCD5B4');
+      // $objWorksheet->getStyle("K{$fila_inicio}:L{$lastRow}")
+      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+      //    ->getStartColor()->setARGB('FFFCD5B4');
 
 
       // N-O (verde claro)
-      $objWorksheet->getStyle("N{$fila_inicio}:O{$lastRow}")
-         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-         ->getStartColor()->setARGB('FFD8E4BC');
+      // $objWorksheet->getStyle("N{$fila_inicio}:O{$lastRow}")
+      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+      //    ->getStartColor()->setARGB('FFD8E4BC');
 
       // Q-R (amarillo claro)
-      $objWorksheet->getStyle("Q{$fila_inicio}:R{$lastRow}")
-         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-         ->getStartColor()->setARGB('FFF2D068');
+      // $objWorksheet->getStyle("Q{$fila_inicio}:R{$lastRow}")
+      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+      //    ->getStartColor()->setARGB('FFF2D068');
 
 
       // Nuevos campos bajo total
