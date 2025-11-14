@@ -329,4 +329,31 @@ class InvoiceController extends AbstractController
          return $this->json($resultadoJson);
       }
    }
+
+   /**
+    * validarInvoice Acción que valida un invoice en la BD
+    *
+    */
+   public function validar(Request $request)
+   {
+      $invoice_id = $request->get('invoice_id');
+      $project_id = $request->get('project_id');
+      $start_date = $request->get('start_date');
+      $end_date = $request->get('end_date');
+
+      try {
+
+         $resultado = $this->invoiceService->ValidarInvoice($invoice_id, $project_id, $start_date, $end_date);
+
+         $resultadoJson['success'] = true;
+         $resultadoJson['valid'] = $resultado;
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
 }

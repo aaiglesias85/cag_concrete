@@ -528,14 +528,17 @@ var Invoices = (function () {
    var totalTabs = 2;
    var initWizard = function () {
       $(document).off('click', '#form-invoice .wizard-tab');
-      $(document).on('click', '#form-invoice .wizard-tab', function (e) {
+      $(document).on('click', '#form-invoice .wizard-tab', async function (e) {
          e.preventDefault();
          var item = $(this).data('item');
 
          // validar
-         if (item > activeTab && !validWizard()) {
-            mostrarTab();
-            return;
+         if (item > activeTab) {
+            var canAdvance = await validWizard();
+            if (!canAdvance) {
+               mostrarTab();
+               return;
+            }
          }
 
          activeTab = parseInt(item);
@@ -557,7 +560,7 @@ var Invoices = (function () {
          }
 
          // marcar los pasos validos
-         marcarPasosValidosWizard();
+         await marcarPasosValidosWizard();
 
          //bug visual de la tabla que muestra las cols corridas
          switch (activeTab) {
@@ -569,8 +572,8 @@ var Invoices = (function () {
 
       //siguiente
       $(document).off('click', '#btn-wizard-siguiente');
-      $(document).on('click', '#btn-wizard-siguiente', function (e) {
-         if (validWizard()) {
+      $(document).on('click', '#btn-wizard-siguiente', async function (e) {
+         if (await validWizard()) {
             activeTab++;
             $('#btn-wizard-anterior').removeClass('hide');
             if (activeTab == totalTabs) {
@@ -621,15 +624,32 @@ var Invoices = (function () {
          KTUtil.removeClass(element, 'valid');
       });
    };
-   var validWizard = function () {
+   var validWizard = async function (options) {
+      options = options || {};
       var result = true;
       if (activeTab == 1) {
          var project_id = $('#project').val();
-         if (!validateForm() || project_id == '' || !isValidNumber()) {
+         var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
+         var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
+
+         if (!validateForm() || project_id == '' || start_date == '' || end_date == '' || !isValidNumber()) {
             result = false;
 
             if (project_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
+            }
+            if (start_date == '') {
+               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-start-date'), 'This field is required');
+            }
+            if (end_date == '') {
+               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-end-date'), 'This field is required');
+            }
+         }
+
+         if (result && !options.skipRemote) {
+            var invoiceValid = await validarInvoice();
+            if (!invoiceValid) {
+               result = false;
             }
          }
       }
@@ -637,20 +657,76 @@ var Invoices = (function () {
       return result;
    };
 
-   var marcarPasosValidosWizard = function () {
+   var marcarPasosValidosWizard = async function () {
       // reset
-      KTUtil.findAll(KTUtil.get('invoice-form'), '.nav-link').forEach(function (element, index) {
+      var navLinks = KTUtil.findAll(KTUtil.get('invoice-form'), '.nav-link');
+
+      navLinks.forEach(function (element) {
          KTUtil.removeClass(element, 'valid');
       });
 
-      KTUtil.findAll(KTUtil.get('invoice-form'), '.nav-link').forEach(function (element, index) {
+      var isCurrentStepValid = await validWizard({ skipRemote: true });
+
+      navLinks.forEach(function (element, index) {
          var tab = index + 1;
          if (tab < activeTab) {
-            if (validWizard(tab)) {
+            if (isCurrentStepValid) {
                KTUtil.addClass(element, 'valid');
             }
          }
       });
+   };
+
+   var validarInvoice = function () {
+      var project_id = $('#project').val();
+      var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
+      var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
+
+      if (project_id != '' && start_date != '' && end_date != '') {
+         var formData = new URLSearchParams();
+
+         var invoice_id = $('#invoice_id').val();
+         formData.set('invoice_id', invoice_id);
+
+         formData.set('project_id', project_id);
+         formData.set('start_date', start_date);
+
+         formData.set('end_date', end_date);
+
+         BlockUtil.block('#form-invoice');
+
+         return axios
+            .post('invoice/validarInvoice', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     if (!response.valid) {
+                        toastr.error('An invoice already exists for the selected dates.', '');
+                     }
+                     return response.valid;
+                  } else {
+                     if (response.error) {
+                        toastr.error(response.error, '');
+                     }
+                     return false;
+                  }
+               } else {
+                  toastr.error('Se produjo un error interno, por favor intente nuevamente.', '');
+                  return false;
+               }
+            })
+            .catch(function (error) {
+               MyUtil.catchErrorAxios(error);
+               return false;
+            })
+            .then(function (valid) {
+               BlockUtil.unblock('#form-invoice');
+               return valid;
+            });
+      }
+
+      return Promise.resolve(false);
    };
 
    //Nuevo

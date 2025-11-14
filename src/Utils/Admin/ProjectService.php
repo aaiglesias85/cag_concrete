@@ -996,9 +996,6 @@ class ProjectService extends Base
 
             $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
 
-
-
-
             $amount_completed = $quantity_completed * $price;
 
             $amount_unpaid = $unpaid_from_previous * $price;

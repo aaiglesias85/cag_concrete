@@ -25,6 +25,29 @@ class InvoiceService extends Base
 {
 
    /**
+    * ValidarInvoice: Valida un invoice en la BD
+    * @param string $invoice_id Id del invoice
+    * @param string $project_id Id del proyecto
+    * @param string $start_date Fecha inicial
+    * @param string $end_date Fecha final 
+    * @return bool
+    */
+   public function ValidarInvoice($invoice_id, $project_id, $start_date, $end_date)
+   {
+      $valid = true;
+
+      // verificar fechas
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+      if (!empty($invoices) && $invoices[0]->getInvoiceId() != $invoice_id) {
+         $valid = false;
+      }
+
+      return $valid;
+   }
+
+   /**
     * ChangeNumber: Cambiar el number de un invoice
     * @param int $invoice_id Id
     * @author Marcel
