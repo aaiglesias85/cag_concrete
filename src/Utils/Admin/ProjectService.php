@@ -1183,7 +1183,7 @@ class ProjectService extends Base
          $amount_completed = $quantity_completed * $price;
 
          // calcular porciento de completion
-         $porciento_completion = $quantity_completed / $quantity * 100;
+         $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
 
          $items[] = [
             'project_item_id' => $project_item_id,
