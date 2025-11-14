@@ -1146,11 +1146,62 @@ class ProjectService extends Base
          $archivos = $this->ListarArchivosDeProject($project_id);
          $arreglo_resultado['archivos'] = $archivos;
 
+         // completion
+         $items_completion = $this->ListarItemsCompletion($project_id);
+         $arreglo_resultado['items_completion'] = $items_completion;
+
+
          $resultado['success'] = true;
          $resultado['project'] = $arreglo_resultado;
       }
 
       return $resultado;
+   }
+
+   /**
+    * ListarItemsCompletion
+    * @param $project_id
+    * @return array
+    */
+   public function ListarItemsCompletion($project_id, $fecha_inicial = "", $fecha_fin = "")
+   {
+      $items = [];
+
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $lista = $projectItemRepo->ListarItemsDeProject($project_id);
+      foreach ($lista as $key => $value) {
+         $project_item_id = $value->getId();
+         $quantity = $value->getQuantity();
+         $price = $value->getPrice();
+         $total = $quantity * $price;
+
+         /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+         $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
+
+         $amount_completed = $quantity_completed * $price;
+
+         // calcular porciento de completion
+         $porciento_completion = $quantity_completed / $quantity * 100;
+
+         $items[] = [
+            'project_item_id' => $project_item_id,
+            "item_id" => $value->getItem()->getItemId(),
+            "item" => $value->getItem()->getDescription(),
+            "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
+            "quantity" => $quantity,
+            "price" => $price,
+            "total" => $total,
+            "quantity_completed" => $quantity_completed,
+            "amount_completed" => $amount_completed,
+            "porciento_completion" => $porciento_completion,
+            "principal" => $value->getPrincipal(),
+            "posicion" => $key
+         ];
+      }
+
+      return $items;
    }
 
    /**

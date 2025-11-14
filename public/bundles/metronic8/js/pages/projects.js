@@ -468,6 +468,10 @@ var Projects = (function () {
       archivos = [];
       actualizarTableListaArchivos();
 
+      // items completion
+      items_completion = [];
+      actualizarTableListaItemsCompletion();
+
       //Mostrar el primer tab
       if (reset_wizard) {
          resetWizard();
@@ -577,6 +581,9 @@ var Projects = (function () {
             case 8:
                actualizarTableListaArchivos();
                break;
+            case 9:
+               actualizarTableListaItemsCompletion();
+               break;
          }
       });
 
@@ -643,6 +650,10 @@ var Projects = (function () {
             case 8:
                $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
+               break;
+            case 9:
+               $('#tab-items-completion').tab('show');
+               actualizarTableListaItemsCompletion();
                break;
          }
       }, 0);
@@ -1078,8 +1089,12 @@ var Projects = (function () {
          archivos = project.archivos;
          actualizarTableListaArchivos();
 
+         // items completion
+         items_completion = project.items_completion;
+         actualizarTableListaItemsCompletion();
+
          // habilitar tab
-         totalTabs = 8;
+         totalTabs = 9;
          $('.nav-item-hide').removeClass('hide');
 
          event_change = false;
@@ -1288,6 +1303,14 @@ var Projects = (function () {
       FlatpickrUtil.initDate('datetimepicker-ajuste-precio-day', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
          container: modalElAjustes,
+      });
+
+      // filtros items completion
+      FlatpickrUtil.initDate('datetimepicker-desde-items-completion', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+      });
+      FlatpickrUtil.initDate('datetimepicker-hasta-items-completion', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
       });
    };
 
@@ -3419,6 +3442,166 @@ var Projects = (function () {
       });
    };
 
+   // items
+   var oTableItemsCompletion;
+   var items_completion = [];
+   var initTableItemsCompletion = function () {
+      const table = '#items-completion-table-editable';
+
+      // columns
+      const columns = [
+         { data: 'item' },
+         { data: 'unit' },
+         { data: 'quantity' },
+         { data: 'price' },
+         { data: 'total' },
+         { data: 'quantity_completed' },
+         { data: 'amount_completed' },
+         { data: 'porciento_completion' },
+      ];
+
+      // column defs
+      let columnDefs = [
+         {
+            targets: 2,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+            },
+         },
+         {
+            targets: 3,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 4,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 5,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+            },
+         },
+         {
+            targets: 6,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 7,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
+            },
+         },
+      ];
+
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
+
+      // order
+      const order = [[0, 'asc']];
+
+      // escapar contenido de la tabla
+      oTableItemsCompletion = DatatableUtil.initSafeDataTable(table, {
+         data: items_completion,
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+         // marcar secondary
+         createdRow: (row, data, index) => {
+            // console.log(data);
+            if (!data.principal) {
+               $(row).addClass('row-secondary');
+            }
+         },
+      });
+
+      handleSearchDatatableItemsCompletion();
+
+      // totals
+      $('#total_count_items_completion').val(items_completion.length);
+
+      var total = calcularMontoTotalItemsCompletion();
+      $('#total_total_items_completion').val(MyApp.formatearNumero(total, 2, '.', ','));
+   };
+   var handleSearchDatatableItemsCompletion = function () {
+      $(document).off('keyup', '#lista-items-completion [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-items-completion [data-table-filter="search"]', function (e) {
+         oTableItemsCompletion.search(e.target.value).draw();
+      });
+   };
+   var actualizarTableListaItemsCompletion = function () {
+      if (oTableItemsCompletion) {
+         oTableItemsCompletion.destroy();
+      }
+
+      initTableItemsCompletion();
+   };
+
+   var calcularMontoTotalItemsCompletion = function () {
+      var total = 0;
+      items_completion.forEach((item) => {
+         total += item.amount_completed;
+      });
+      return total;
+   };
+
+   var initAccionFiltrarItemsCompletion = function () {
+      $(document).off('click', '#btn-filtrar-items-completion');
+      $(document).on('click', '#btn-filtrar-items-completion', function (e) {
+         e.preventDefault();
+
+         btnClickFiltrarItemsCompletion();
+      });
+
+      var btnClickFiltrarItemsCompletion = function () {
+         var project_id = $('#project_id').val();
+         var fecha_inicial = FlatpickrUtil.getString('datetimepicker-desde-items-completion');
+         var fecha_fin = FlatpickrUtil.getString('datetimepicker-hasta-items-completion');
+
+         var formData = new URLSearchParams();
+         formData.set('project_id', project_id);
+         formData.set('fechaInicial', fecha_inicial);
+         formData.set('fechaFin', fecha_fin);
+
+         BlockUtil.block('#lista-items-completion');
+
+         axios
+            .post('project/listarItemsCompletion', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     //cargar datos
+                     items_completion = response.items;
+                     actualizarTableListaItemsCompletion();
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-items-completion');
+            });
+      };
+   };
+
    return {
       //main function to initiate the module
       init: function () {
@@ -3470,6 +3653,9 @@ var Projects = (function () {
          initAccionesConcVendor();
 
          initAccionChange();
+
+         // items completion
+         initAccionFiltrarItemsCompletion();
 
          // editar
          var project_id_edit = localStorage.getItem('project_id_edit');
