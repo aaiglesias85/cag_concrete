@@ -978,56 +978,54 @@ class ProjectService extends Base
          // calcular unpaid from previous
          $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
 
-         if ($quantity > 0 || $unpaid_from_previous > 0) {
-            $contract_qty = $value->getQuantity();
-            $price = $value->getPrice();
-            $contract_amount = $contract_qty * $price;
+         $contract_qty = $value->getQuantity();
+         $price = $value->getPrice();
+         $contract_amount = $contract_qty * $price;
 
-            /** @var InvoiceItemRepository $invoiceItemRepo */
-            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-            $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int)$invoice_prev_id);
-            $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id,(int) $invoice_prev_id);
+         /** @var InvoiceItemRepository $invoiceItemRepo */
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int)$invoice_prev_id);
+         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, (int) $invoice_prev_id);
 
-            $quantity_completed = $quantity + $quantity_from_previous;
+         $quantity_completed = $quantity + $quantity_from_previous;
 
-            $amount = $quantity * $price;
+         $amount = $quantity * $price;
 
-            $total_amount = $quantity_completed * $price;
+         $total_amount = $quantity_completed * $price;
 
-            $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
+         $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
 
-            $amount_completed = $quantity_completed * $price;
+         $amount_completed = $quantity_completed * $price;
 
-            $amount_unpaid = $unpaid_from_previous * $price;
+         $amount_unpaid = $unpaid_from_previous * $price;
 
-            $quantity_brought_forward = 0;
-            $quantity_final = $quantity + $quantity_brought_forward;
-            $amount_final = $quantity_final * $price;
+         $quantity_brought_forward = 0;
+         $quantity_final = $quantity + $quantity_brought_forward;
+         $amount_final = $quantity_final * $price;
 
-            $items[] = [
-               "project_item_id" => $project_item_id,
-               "item_id" => $value->getItem()->getItemId(),
-               "item" => $value->getItem()->getDescription(),
-               "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
-               "contract_qty" => $contract_qty,
-               "price" => $price,
-               "contract_amount" => $contract_amount,
-               "quantity_from_previous" => $quantity_from_previous ?? 0,
-               "unpaid_from_previous" => $unpaid_from_previous,
-               "quantity" => $quantity ?? 0,
-               "quantity_completed" => $quantity_completed,
-               "amount" => $amount,
-               "total_amount" => $total_amount,
-               "paid_amount_total" => $paid_amount_total,
-               "amount_from_previous" => $amount_from_previous,
-               "amount_completed" => $amount_completed,
-               "amount_unpaid" => $amount_unpaid,
-               "quantity_brought_forward" => $quantity_brought_forward,
-               "quantity_final" => $quantity_final,
-               "amount_final" => $amount_final,
-               "principal" => $value->getPrincipal()
-            ];
-         }
+         $items[] = [
+            "project_item_id" => $project_item_id,
+            "item_id" => $value->getItem()->getItemId(),
+            "item" => $value->getItem()->getDescription(),
+            "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
+            "contract_qty" => $contract_qty,
+            "price" => $price,
+            "contract_amount" => $contract_amount,
+            "quantity_from_previous" => $quantity_from_previous ?? 0,
+            "unpaid_from_previous" => $unpaid_from_previous,
+            "quantity" => $quantity ?? 0,
+            "quantity_completed" => $quantity_completed,
+            "amount" => $amount,
+            "total_amount" => $total_amount,
+            "paid_amount_total" => $paid_amount_total,
+            "amount_from_previous" => $amount_from_previous,
+            "amount_completed" => $amount_completed,
+            "amount_unpaid" => $amount_unpaid,
+            "quantity_brought_forward" => $quantity_brought_forward,
+            "quantity_final" => $quantity_final,
+            "amount_final" => $amount_final,
+            "principal" => $value->getPrincipal()
+         ];
       }
 
       return $items;

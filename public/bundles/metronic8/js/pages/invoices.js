@@ -483,6 +483,7 @@ var Invoices = (function () {
 
       // items
       items = [];
+      items_lista = [];
       actualizarTableListaItems();
 
       //Mostrar el primer tab
@@ -769,7 +770,7 @@ var Invoices = (function () {
 
          var project_id = $('#project').val();
 
-         if (validateForm() && project_id != '' && isValidNumber()) {
+         if (validateForm() && project_id != '' && isValidNumber() && items_lista.length > 0) {
             var formData = new URLSearchParams();
 
             var invoice_id = $('#invoice_id').val();
@@ -791,6 +792,8 @@ var Invoices = (function () {
 
             var paid = $('#paidactivo').prop('checked') ? 1 : 0;
             formData.set('paid', paid);
+
+            actualizarItems();
 
             formData.set('items', JSON.stringify(items));
 
@@ -827,6 +830,9 @@ var Invoices = (function () {
          } else {
             if (project_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
+            }
+            if (items_lista.length == 0) {
+               toastr.error('The list of items is empty, please add at least one item.', '');
             }
          }
       }
@@ -971,6 +977,14 @@ var Invoices = (function () {
 
          // items
          items = invoice.items;
+
+         // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
+         items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+         // setear la posicion
+         items_lista.forEach((item, index) => {
+            item.posicion = index;
+         });
+
          actualizarTableListaItems();
 
          event_change = false;
@@ -1286,6 +1300,14 @@ var Invoices = (function () {
                            });
                         }
                      }
+
+                     // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
+                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+                     // setear la posicion
+                     items_lista.forEach((item, index) => {
+                        item.posicion = index;
+                     });
+
                      actualizarTableListaItems();
                   } else {
                      toastr.error(response.error, '');
@@ -1407,6 +1429,7 @@ var Invoices = (function () {
    // items details
    var oTableItems;
    var items = [];
+   var items_lista = [];
    var nEditingRowItem = null;
    var rowDeleteItem = null;
    var initTableItems = function () {
@@ -1559,7 +1582,7 @@ var Invoices = (function () {
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
-         data: items,
+         data: items_lista,
          displayLength: 25,
          order: order,
          columns: columns,
@@ -1714,23 +1737,23 @@ var Invoices = (function () {
             var total = NumberUtil.getNumericValue('#item-total');
 
             var posicion = nEditingRowItem;
-            if (items[posicion]) {
-               items[posicion].quantity = quantity;
-               items[posicion].price = price;
-               items[posicion].amount = total;
+            if (items_lista[posicion]) {
+               items_lista[posicion].quantity = quantity;
+               items_lista[posicion].price = price;
+               items_lista[posicion].amount = total;
 
-               var quantity_brought_forward = Number(items[posicion].quantity_brought_forward ?? 0);
-               items[posicion].quantity_brought_forward = quantity_brought_forward;
-               items[posicion].quantity_completed = quantity + quantity_brought_forward;
+               var quantity_brought_forward = Number(items_lista[posicion].quantity_brought_forward ?? 0);
+               items_lista[posicion].quantity_brought_forward = quantity_brought_forward;
+               items_lista[posicion].quantity_completed = quantity + quantity_brought_forward;
 
                var amount_from_previous = quantity_brought_forward * price;
-               items[posicion].amount_from_previous = amount_from_previous;
+               items_lista[posicion].amount_from_previous = amount_from_previous;
 
-               var total_amount = items[posicion].quantity_completed * price;
-               items[posicion].amount_completed = total_amount;
-               items[posicion].total_amount = total_amount;
-               items[posicion].quantity_final = items[posicion].quantity_completed;
-               items[posicion].amount_final = total_amount;
+               var total_amount = items_lista[posicion].quantity_completed * price;
+               items_lista[posicion].amount_completed = total_amount;
+               items_lista[posicion].total_amount = total_amount;
+               items_lista[posicion].quantity_final = items_lista[posicion].quantity_completed;
+               items_lista[posicion].amount_final = total_amount;
             }
 
             //actualizar lista
@@ -1746,7 +1769,7 @@ var Invoices = (function () {
       $(document).off('click', '#items-table-editable a.edit');
       $(document).on('click', '#items-table-editable a.edit', function (e) {
          var posicion = $(this).data('posicion');
-         if (items[posicion]) {
+         if (items_lista[posicion]) {
             // reset
             resetFormItem();
 
@@ -1792,10 +1815,10 @@ var Invoices = (function () {
       });
 
       function eliminarItem(posicion) {
-         if (items[posicion]) {
-            if (items[posicion].invoice_item_id != '') {
+         if (items_lista[posicion]) {
+            if (items_lista[posicion].invoice_item_id != '') {
                var formData = new URLSearchParams();
-               formData.set('invoice_item_id', items[posicion].invoice_item_id);
+               formData.set('invoice_item_id', items_lista[posicion].invoice_item_id);
 
                BlockUtil.block('#lista-items');
 
@@ -1827,10 +1850,10 @@ var Invoices = (function () {
 
       function deleteItem(posicion) {
          //Eliminar
-         items.splice(posicion, 1);
+         items_lista.splice(posicion, 1);
          //actualizar posiciones
-         for (var i = 0; i < items.length; i++) {
-            items[i].posicion = i;
+         for (var i = 0; i < items_lista.length; i++) {
+            items_lista[i].posicion = i;
          }
          //actualizar lista
          actualizarTableListaItems();
@@ -1840,11 +1863,11 @@ var Invoices = (function () {
       $(document).on('change', '#items-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
-         if (items[posicion]) {
+         if (items_lista[posicion]) {
             var quantity = Number($this.val() || 0);
 
-            items[posicion].quantity_brought_forward = quantity;
-            items[posicion].quantity_final = items[posicion].quantity + items[posicion].quantity_brought_forward;
+            items_lista[posicion].quantity_brought_forward = quantity;
+            items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
 
             actualizarTableListaItems();
          }
@@ -1855,6 +1878,19 @@ var Invoices = (function () {
       MyUtil.resetForm('item-form');
 
       nEditingRowItem = null;
+   };
+
+   // devolver todos los items
+   var actualizarItems = function () {
+      // en items_sin_cant solo deben estar los que quantity y unpaid_from_previous 0
+      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_from_previous == 0);
+      // unir items_lista y items_sin_cant en items
+      items = items_lista.concat(items_sin_cant);
+
+      // actualiar posicion en items
+      items.forEach((item, index) => {
+         item.posicion = index;
+      });
    };
 
    return {
