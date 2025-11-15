@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-11-2025 a las 00:37:44
+-- Tiempo de generación: 15-11-2025 a las 16:55:31
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -713,7 +713,8 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (382, '2025-02-27', '', '', NULL, NULL, 'CARLOS: PREPWORK', NULL, NULL, NULL, 0.00, 3.00, 0.00, 0.00, 0.00, 0, '2025-03-03 22:46:19', NULL, 13, NULL, NULL),
 (383, '2025-02-28', '', '', NULL, NULL, 'CARLOS: PREPWORK', NULL, NULL, NULL, 0.00, 3.00, 0.00, 0.00, 0.00, 0, '2025-03-03 22:46:47', NULL, 13, NULL, NULL),
 (384, '2025-02-28', '', '', NULL, NULL, 'FRANCISCO(27): POURED CLASS B WIDEN, C&G, SW', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:48:32', NULL, 87, NULL, NULL),
-(385, '2025-02-28', '', '', NULL, NULL, 'GERARDO(21): POURED C&G, FLUME, RAMPS', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:50:02', NULL, 257, NULL, NULL);
+(385, '2025-02-28', '', '', NULL, NULL, 'GERARDO(21): POURED C&G, FLUME, RAMPS', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:50:02', NULL, 257, NULL, NULL),
+(386, '2025-11-07', '4335435', 'Marcel', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 1.00, 286.00, 10.00, 10.00, 0, '2025-11-07 18:04:47', NULL, 69, 11, 1);
 
 -- --------------------------------------------------------
 
@@ -963,7 +964,8 @@ INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`,
 (229, NULL, 24.00, 150.00, 380, 20),
 (230, NULL, 11.50, 150.00, 381, 20),
 (231, NULL, 27.00, 150.00, 384, 2),
-(232, NULL, 21.00, 150.00, 385, 1);
+(232, NULL, 21.00, 150.00, 385, 1),
+(233, NULL, 5.00, 100.00, 386, 3);
 
 -- --------------------------------------------------------
 
@@ -1304,7 +1306,9 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_trac
 (356, 0.000000, 21.00, '', 384, 637),
 (357, 0.000000, 34.50, '', 384, 629),
 (358, 0.000000, 31.00, '', 385, 1575),
-(359, 0.000000, 3.00, '\n', 385, 1577);
+(359, 0.000000, 3.00, '\n', 385, 1577),
+(360, 10.000000, 52.00, 'test', 386, 507),
+(361, 5.000000, 58.00, 'test', 386, 509);
 
 -- --------------------------------------------------------
 
@@ -2752,7 +2756,8 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `color`
 (1464, 12.00, 35.00, 'Laborer', NULL, 385, 47, NULL),
 (1465, 12.00, 35.00, 'Laborer', NULL, 385, 5, NULL),
 (1466, 12.00, 35.00, 'Laborer', NULL, 385, 15, NULL),
-(1467, 12.00, 35.00, 'Laborer', NULL, 385, 30, NULL);
+(1467, 12.00, 35.00, 'Laborer', NULL, 385, 30, NULL),
+(1468, 5.00, 20.00, 'Laborer', '#34BFA3', 386, 35, NULL);
 
 -- --------------------------------------------------------
 
@@ -2780,7 +2785,8 @@ INSERT INTO `data_tracking_material` (`id`, `quantity`, `price`, `data_tracking_
 (5, 14.00, 250.00, 207, 6),
 (9, 2.00, 250.00, 233, 6),
 (10, 2.00, 250.00, 234, 6),
-(11, 1.00, 250.00, 290, 6);
+(11, 1.00, 250.00, 290, 6),
+(12, 5.00, 1.50, 386, 20);
 
 -- --------------------------------------------------------
 
@@ -2973,90 +2979,109 @@ CREATE TABLE `employee` (
   `name` varchar(255) NOT NULL,
   `hourly_rate` float(8,2) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
-  `color` varchar(50) DEFAULT NULL
+  `color` varchar(50) DEFAULT NULL,
+  `address` text,
+  `phone` varchar(50) DEFAULT NULL,
+  `cert_rate_type` varchar(255) DEFAULT NULL,
+  `social_security_number` varchar(50) DEFAULT NULL,
+  `apprentice_percentage` decimal(18,2) DEFAULT NULL,
+  `work_code` varchar(50) DEFAULT NULL,
+  `ethnicity_race` varchar(255) DEFAULT NULL,
+  `gender_id` int(11) DEFAULT NULL,
+  `date_hired` date DEFAULT NULL,
+  `date_terminated` date DEFAULT NULL,
+  `reason_terminated` varchar(255) DEFAULT NULL,
+  `time_card_notes` varchar(255) DEFAULT NULL,
+  `regular_rate_per_hour` decimal(18,2) DEFAULT NULL,
+  `overtime_rate_per_hour` decimal(18,2) DEFAULT NULL,
+  `special_rate_per_hour` decimal(18,2) DEFAULT NULL,
+  `trade_licenses_info` text,
+  `notes` text,
+  `is_osha_10_certified` tinyint(1) DEFAULT NULL,
+  `is_veteran` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`) VALUES
-(1, 'Andres Mendoza', 20.00, 'Laborer', NULL),
-(2, 'Angel Orona', 20.00, 'Laborer', NULL),
-(3, 'Camilo Romero', 20.00, 'Laborer', NULL),
-(4, 'Carlos Arroyo', 25.00, 'Lead', '#BF3142'),
-(5, 'Carlos Jose Loasiga', 20.00, 'Laborer', NULL),
-(6, 'Cruz Cortez', 25.00, 'Lead', '#3147BF'),
-(7, 'David Sendejas (Jose Perez)', 20.00, 'Laborer', NULL),
-(8, 'Dennis Alvarez', 20.00, 'Laborer', NULL),
-(9, 'Eliud Pazos', 20.00, 'Laborer', NULL),
-(10, 'Emilio Romero', 20.00, 'Laborer', NULL),
-(11, 'Fernando Arredondo', 20.00, 'Laborer', NULL),
-(12, 'Francisco Narciso', 20.00, 'Laborer', NULL),
-(13, 'Gadiel Urias Mendoza', 20.00, 'Laborer', NULL),
-(14, 'Geoffrey Fabio Restrepo', 20.00, 'Laborer', NULL),
-(15, 'Gerardo Alvarado', 20.00, 'Laborer', NULL),
-(16, 'Hector Camarillo', 20.00, 'Laborer', NULL),
-(17, 'Helmer Osciel Cruz', 20.00, 'Laborer', NULL),
-(18, 'Homero Mares', 20.00, 'Laborer', NULL),
-(19, 'Jesus Martinez Galvez', 20.00, 'Laborer', NULL),
-(20, 'Jordan Vicuna Hernandez', 20.00, 'Laborer', NULL),
-(21, 'Jose Camarillo', 20.00, 'Laborer', NULL),
-(22, 'Jose Manuel Martinez', 20.00, 'Laborer', NULL),
-(23, 'Juan Cazares', 20.00, 'Laborer', NULL),
-(24, 'Juan Trejo', 20.00, 'Laborer', NULL),
-(25, 'Kevin Garcia', 20.00, 'Laborer', NULL),
-(26, 'Luis G.Cordova', 20.00, 'Laborer', NULL),
-(27, 'Miguel Garcia', 20.00, 'Laborer', NULL),
-(28, 'Noel Josias Mendoza', 20.00, 'Laborer', NULL),
-(29, 'Orlais Lores-Mayeta', 20.00, 'Laborer', NULL),
-(30, 'Oscar Alvarado', 20.00, 'Laborer', NULL),
-(31, 'Pedro Garcia', 20.00, 'Laborer', NULL),
-(32, 'Raul Cazares', 20.00, 'Laborer', NULL),
-(33, 'Roberto Alvarado', 20.00, 'Laborer', NULL),
-(34, 'Ruben Murillo', 20.00, 'Laborer', NULL),
-(35, '\"Tate\" Vincente Bly', 20.00, 'Laborer', '#142EC7'),
-(36, 'Wilbert Rutilio', 20.00, 'Laborer', NULL),
-(37, 'Francisco Gutierrez', 25.00, 'Lead', '#34BFA3'),
-(38, 'Jose Duarte', 25.00, 'Lead', '#BFBA31'),
-(39, 'Julian Bautista', 25.00, 'Lead', '#BF8231'),
-(40, 'Miguel Murillo', 25.00, 'Lead', '#AFB5C7'),
-(41, 'Victor Cordova', 25.00, 'Lead', '#BF9231'),
-(42, 'Victor Soriano', 25.00, 'Lead', '#BF3157'),
-(43, 'Victor Suarez', 25.00, 'Lead', '#BA31BF'),
-(44, 'Juan Avalos', 20.00, 'Laborer', NULL),
-(45, 'Juan Manuel Sanchez Garcia', 20.00, 'Laborer', NULL),
-(46, 'Jesus Avalos', 20.00, 'Laborer', NULL),
-(47, 'Alfredo Chegue', 20.00, 'Laborer', NULL),
-(48, 'Victorino Luna', 25.00, 'Subcontractor', NULL),
-(49, 'Abram Sanchez', 25.00, 'Subcontractor', NULL),
-(50, 'Armando Bautista', 25.00, 'Subcontractor', NULL),
-(51, 'Sergio Rodriguez', 25.00, 'Subcontractor', NULL),
-(52, 'Osvaldo Rosales', 25.00, 'Subcontractor', NULL),
-(53, 'Jose Luis Rosales', 25.00, 'Subcontractor', NULL),
-(54, 'Saul Olguin', 25.00, 'Subcontractor', NULL),
-(55, 'Isael Olguin', 25.00, 'Subcontractor', NULL),
-(56, 'Luis Oliver', 25.00, 'Subcontractor', NULL),
-(57, 'Christopher Sandoval', 25.00, 'Subcontractor', NULL),
-(58, 'Victor Garcia', 25.00, 'Subcontractor', NULL),
-(59, 'Daniel Diaz', 25.00, 'Subcontractor', NULL),
-(60, 'Lucas Hernandez', 25.00, 'Subcontractor', NULL),
-(61, 'Edmundo Martinez', 25.00, 'Subcontractor', NULL),
-(62, 'Luis Fernando Rosales', 25.00, 'Subcontractor', NULL),
-(63, 'Guillermo Cuevas', 25.00, 'Subcontractor', NULL),
-(64, 'Gerardo Yacxi', 25.00, 'Subcontractor', NULL),
-(65, 'Saul Cano', 25.00, 'Subcontractor', NULL),
-(66, 'Silvano Escorza', 25.00, 'Subcontractor', NULL),
-(67, 'Test test', 25.00, 'Subcontractor', NULL),
-(68, 'Francisco Duran', 25.00, 'Subcontractor', NULL),
-(69, 'Francisco Camarillo', 25.00, 'Subcontractor', NULL),
-(70, 'Arcadio Duran', 25.00, 'Subcontractor', NULL),
-(71, 'Octavio Perez', 25.00, 'Subcontractor', NULL),
-(72, 'Ilse Sanchez', 25.00, 'Subcontractor', NULL),
-(73, 'Jose Covarrubias', 20.00, 'Laborer', NULL),
-(74, 'Brayan Moya', 20.00, 'Laborer', NULL),
-(75, 'Mauricio Lopez', 25.00, 'Subcontractor', NULL),
-(76, 'Armando Bautista-Laborer', 20.00, 'Laborer', NULL);
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `ethnicity_race`, `gender_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`) VALUES
+(1, 'Andres Mendoza', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'Angel Orona', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 'Camilo Romero', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 'Carlos Arroyo', 25.00, 'Lead', '#BF3142', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 'Carlos Jose Loasiga', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 'Cruz Cortez', 25.00, 'Lead', '#3147BF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, 'David Sendejas (Jose Perez)', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(8, 'Dennis Alvarez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(9, 'Eliud Pazos', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(10, 'Emilio Romero', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 'Fernando Arredondo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, 'Francisco Narciso', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, 'Gadiel Urias Mendoza', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(14, 'Geoffrey Fabio Restrepo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(15, 'Gerardo Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(16, 'Hector Camarillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(17, 'Helmer Osciel Cruz', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(18, 'Homero Mares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(19, 'Jesus Martinez Galvez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(20, 'Jordan Vicuna Hernandez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(21, 'Jose Camarillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(22, 'Jose Manuel Martinez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(23, 'Juan Cazares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(24, 'Juan Trejo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(25, 'Kevin Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(26, 'Luis G.Cordova', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(27, 'Miguel Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(28, 'Noel Josias Mendoza', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(29, 'Orlais Lores-Mayeta', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(30, 'Oscar Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(31, 'Pedro Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(32, 'Raul Cazares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(33, 'Roberto Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(34, 'Ruben Murillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(35, '\"Tate\" Vincente Bly', 20.00, 'Laborer', '#142EC7', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(36, 'Wilbert Rutilio', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(37, 'Francisco Gutierrez', 25.00, 'Lead', '#34BFA3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(38, 'Jose Duarte', 25.00, 'Lead', '#BFBA31', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(39, 'Julian Bautista', 25.00, 'Lead', '#BF8231', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(40, 'Miguel Murillo', 25.00, 'Lead', '#AFB5C7', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(41, 'Victor Cordova', 25.00, 'Lead', '#BF9231', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(42, 'Victor Soriano', 25.00, 'Lead', '#BF3157', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(43, 'Victor Suarez', 25.00, 'Lead', '#BA31BF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(44, 'Juan Avalos', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(45, 'Juan Manuel Sanchez Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(46, 'Jesus Avalos', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(47, 'Alfredo Chegue', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(48, 'Victorino Luna', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(49, 'Abram Sanchez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(50, 'Armando Bautista', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(51, 'Sergio Rodriguez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(52, 'Osvaldo Rosales', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(53, 'Jose Luis Rosales', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(54, 'Saul Olguin', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(55, 'Isael Olguin', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(56, 'Luis Oliver', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(57, 'Christopher Sandoval', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(58, 'Victor Garcia', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(59, 'Daniel Diaz', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(60, 'Lucas Hernandez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(61, 'Edmundo Martinez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(62, 'Luis Fernando Rosales', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(63, 'Guillermo Cuevas', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(64, 'Gerardo Yacxi', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(65, 'Saul Cano', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(66, 'Silvano Escorza', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(67, 'Test test', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(68, 'Francisco Duran', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(69, 'Francisco Camarillo', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(70, 'Arcadio Duran', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(71, 'Octavio Perez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(72, 'Ilse Sanchez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(73, 'Jose Covarrubias', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(74, 'Brayan Moya', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(75, 'Mauricio Lopez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(76, 'Armando Bautista-Laborer', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3330,7 +3355,21 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (30, 'plan_downloading', 'Plans Downloading'),
 (31, 'holiday', 'Holidays'),
 (32, 'county', 'County'),
-(33, 'payment', 'Payments');
+(33, 'payment', 'Payments'),
+(34, 'gender', 'Genders');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `gender`
+--
+
+CREATE TABLE `gender` (
+  `gender_id` int(11) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `classification` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -3405,16 +3444,16 @@ CREATE TABLE `invoice` (
 --
 
 INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`) VALUES
-(3, '2', '2023-12-01', '2025-01-31', 'test test test', 0, '2025-01-10 14:42:23', '2025-01-10 14:48:19', 53, NULL, NULL),
-(8, '4', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:22:41', NULL, 53, NULL, NULL),
-(9, '5', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:31:15', NULL, 53, NULL, NULL),
+(3, '2', '2023-12-01', '2025-01-31', 'test test test', 0, '2025-01-10 14:42:23', '2025-11-14 03:01:32', 53, NULL, NULL),
+(8, '4', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:22:41', '2025-11-14 03:01:27', 53, NULL, NULL),
 (10, '6', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:38:37', '2025-02-05 19:43:56', 52, NULL, NULL),
 (11, '7', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 19:56:05', NULL, 87, NULL, NULL),
 (12, '8', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:19:37', NULL, 87, NULL, NULL),
 (13, '9', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:24:03', NULL, 87, NULL, NULL),
 (14, '10', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:26:13', NULL, 87, NULL, NULL),
 (15, '11', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:28:09', '2025-02-10 15:46:18', 87, NULL, NULL),
-(16, '1', '2025-02-01', '2025-02-26', 'test', 0, '2025-02-26 15:23:01', '2025-09-10 22:52:19', 127, '34234443534534534555', '23423432');
+(16, '1', '2025-02-01', '2025-02-26', 'test', 0, '2025-02-26 15:23:01', '2025-09-10 22:52:19', 127, '34234443534534534555', '23423432'),
+(18, '1', '2025-10-01', '2025-10-31', 'test', 0, '2025-11-14 03:04:17', NULL, 171, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3457,15 +3496,9 @@ CREATE TABLE `invoice_item` (
 
 INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previous`, `quantity`, `price`, `paid_qty`, `unpaid_qty`, `quantity_brought_forward`, `paid_amount`, `paid_amount_total`, `invoice_id`, `project_item_id`, `txn_id`) VALUES
 (1, NULL, 0.000000, NULL, 34.00, NULL, NULL, NULL, NULL, NULL, 0, 60, NULL),
-(6, 0.000000, 0.000000, 131.560000, 50.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 3, 392, NULL),
-(7, 0.000000, 0.000000, NULL, 107.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 3, 393, NULL),
-(8, 0.000000, 0.000000, NULL, 386.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 3, 394, NULL),
 (74, 131.560000, 0.000000, NULL, 50.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 8, 392, NULL),
 (75, 0.000000, 0.000000, 241.890000, 107.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 8, 393, NULL),
 (76, 0.000000, 0.000000, 7.000000, 386.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 8, 394, NULL),
-(77, 131.560000, 0.000000, 20.890000, 50.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 9, 392, NULL),
-(78, 241.890000, 0.000000, 221.000000, 107.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 9, 393, NULL),
-(79, 7.000000, 0.000000, 7.000000, 386.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 9, 394, NULL),
 (80, 0.000000, 0.000000, NULL, 54.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 10, 380, NULL),
 (81, 0.000000, 0.000000, NULL, 143.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 10, 381, NULL),
 (82, 0.000000, 0.000000, NULL, 143.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 10, 382, NULL),
@@ -3572,7 +3605,14 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (183, 0.000000, 0.000000, 33.730000, 80.00, 33.730000, NULL, NULL, 2698.400000, 2698.400000, 16, 858, NULL),
 (184, 0.000000, 0.000000, 106.000000, 26.00, 106.000000, NULL, NULL, 2756.000000, 2756.000000, 16, 859, NULL),
 (185, 0.000000, 0.000000, 60.000000, 31.00, 60.000000, NULL, NULL, 1860.000000, 1860.000000, 16, 860, NULL),
-(186, 0.000000, 0.000000, 0.000000, 31.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 16, 861, NULL);
+(186, 0.000000, 0.000000, 0.000000, 31.00, 0.000000, NULL, NULL, 0.000000, 0.000000, 16, 861, NULL),
+(187, 152.450000, 152.450000, 152.450000, 50.00, NULL, NULL, 0.000000, NULL, NULL, 3, 392, NULL),
+(188, 462.890000, 462.890000, 221.000000, 107.00, NULL, NULL, 0.000000, NULL, NULL, 3, 393, NULL),
+(189, 14.000000, 14.000000, 7.000000, 386.00, NULL, NULL, 0.000000, NULL, NULL, 3, 394, NULL),
+(193, 0.000000, 0.000000, 0.000000, 125.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1076, NULL),
+(194, 0.000000, 0.000000, 0.000000, 175.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1077, NULL),
+(195, 0.000000, 0.000000, 0.000000, 2400.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1078, NULL),
+(196, 0.000000, 0.000000, 0.000000, 55.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1079, NULL);
 
 -- --------------------------------------------------------
 
@@ -5181,7 +5221,27 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4013, 'Update', 'Invoice', 'The invoice #3 is modified', '::1', '2025-10-31 01:25:06', 1),
 (4014, 'Delete', 'Invoice', 'The invoice #3 is deleted', '::1', '2025-10-31 01:25:32', 1),
 (4015, 'Update', 'Estimate', 'The estimate is modified: Other project', '::1', '2025-10-31 01:40:49', 1),
-(4016, 'Update', 'Unit', 'The unit is modified: BUCKET', '::1', '2025-10-31 03:07:35', 1);
+(4016, 'Update', 'Unit', 'The unit is modified: BUCKET', '::1', '2025-10-31 03:07:35', 1),
+(4017, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-11-07 01:01:20', 1),
+(4018, 'Add', 'Data Tracking', 'The data tracking is add, Project: ERS05055 - EVERMORE NORTH BLVD, Date: 11/07/2025', '::1', '2025-11-07 18:04:47', 1),
+(4019, 'Update', 'User', 'The user is modified: Administrator Concrete', '::1', '2025-11-09 15:42:41', 1),
+(4020, 'Update', 'User', 'The user is modified: Administrator Concrete', '::1', '2025-11-09 15:43:19', 1),
+(4021, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-11-10 02:32:02', 1),
+(4022, 'Delete', 'Item Invoice', 'The item details invoice is deleted: CONC MEDIAN, 6 IN', '::1', '2025-11-10 02:35:10', 1),
+(4023, 'Delete', 'Item Invoice', 'The item details invoice is deleted: CLASS B CONC, BASE OR PVMT WIDENING', '::1', '2025-11-10 02:35:15', 1),
+(4024, 'Delete', 'Item Invoice', 'The item details invoice is deleted: PLAIN CONC DITCH PAVING 4 IN', '::1', '2025-11-10 02:35:38', 1),
+(4025, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-11-10 02:37:15', 1),
+(4026, 'Add', 'Invoice', 'The invoice #6 is added', '::1', '2025-11-11 01:07:20', 1),
+(4027, 'Delete', 'Invoice', 'The invoice #5 is deleted', '::1', '2025-11-14 02:13:56', 1),
+(4028, 'Update', 'Invoice', 'The invoice #4 is modified', '::1', '2025-11-14 03:01:27', 1),
+(4029, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-11-14 03:01:32', 1),
+(4030, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-11-14 03:04:17', 1),
+(4031, 'Delete', 'Invoice', 'The invoice #6 is deleted', '::1', '2025-11-14 03:05:48', 1),
+(4032, 'Update', 'Project', 'The project is modified: Test', '::1', '2025-11-15 14:43:56', 1),
+(4033, 'Update', 'Project', 'The project is modified: SR 59 BRIDGE', '::1', '2025-11-15 15:06:27', 1),
+(4034, 'Update', 'User', 'The user is modified: Marcel Curbelo Carmona', '::1', '2025-11-15 15:53:24', 1),
+(4035, 'Update', 'Project', 'The project is modified: TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', '::1', '2025-11-15 15:54:08', 1),
+(4036, 'Update', 'Project', 'The project is modified: TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', '::1', '2025-11-15 15:57:08', 1);
 
 -- --------------------------------------------------------
 
@@ -5257,7 +5317,8 @@ CREATE TABLE `notification` (
 
 INSERT INTO `notification` (`id`, `content`, `readed`, `created_at`, `user_id`, `project_id`) VALUES
 (42, 'Project ERS05034 - 0009011 OCONEE US 441 SR 53 WIDENING is close to its due date 01/29/2025', 1, '2025-01-26 21:08:46', 1, 229),
-(72, 'Project TTC00000000001 - TESTING PROJECT FOR SOFTWARE is close to its due date 02/20/2025', 1, '2025-02-20 12:45:05', 1, 254);
+(72, 'Project TTC00000000001 - TESTING PROJECT FOR SOFTWARE is close to its due date 02/20/2025', 1, '2025-02-20 12:45:05', 1, 254),
+(73, 'AL22000 - TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO invoice due date 11/20/2025 (in 5 days)', 0, '2025-11-15 12:57:11', 2, 170);
 
 -- --------------------------------------------------------
 
@@ -5528,7 +5589,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (167, 'FC-8552', 'AL22003', '', 'FULTON COUNTY 11551521-10', 'FULTON COUNTY 11551521-10', NULL, 'ALS', '1551521-10', 43800.00, 0, 'FULTON', 0, '', 0, '2018-02-09', '2019-02-09', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 19:57:34', '2025-01-09 20:00:21', NULL, 14, NULL, 8, NULL),
 (168, '0012672', 'AL22002', 'B1CBA1700726-0', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN BA', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN BA', NULL, 'GDOT', '1551701', 182140.00, 1, 'BARROW', 0, '', 0, '2018-03-17', '2019-03-17', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 20:03:09', '2025-01-09 20:05:05', NULL, 14, NULL, 34, NULL),
 (169, '0012669', 'AL22001', 'B1CBA1700765-0', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS AT CH', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS AT CH', NULL, 'GDOT', '1551703', 236100.00, 1, 'CHEROKEE', 0, '', 1, '2018-03-07', '2019-03-07', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 20:06:31', '2025-01-09 20:15:34', NULL, 14, NULL, 30, NULL),
-(170, '0012673', 'AL22000', '', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', NULL, 'GDOT', '1551704', 146960.00, 1, 'ROCKDA', 0, '', 0, '2018-03-17', '2019-03-17', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 20:21:13', '2025-02-14 16:41:25', NULL, 14, NULL, 82, NULL),
+(170, '0012673', 'AL22000', '', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', 'TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO', 'undefined', 'GDOT', '1551704', 146960.00, 1, 'ROCKDA', 0, '', 0, '2018-03-17', '2019-03-17', '2025-11-20', '', 2, 'undefined', 'undefined', 0.00, 0.00, 0, '', '2025-01-09 20:21:13', '2025-11-15 15:57:08', '2025-11-15 15:54:08', 14, NULL, 82, NULL),
 (171, 'M005779', 'APAC47000', 'B3CBA1902085-0', 'SCREVEN COUNTY M005779', 'SCREVEN COUNTY M005779', NULL, 'GDOT', 'M005779', 11520.00, 1, 'SCREVEN', 0, '', 0, '2020-03-23', '2020-10-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 20:53:18', '2025-01-09 21:11:13', NULL, 13, NULL, 83, NULL),
 (172, '118250101', 'APAC47001', '', 'STILES AVENUE - CITY OF SAVANNAH (AECOM)', 'STILES AVENUE - CITY OF SAVANNAH (AECOM)', NULL, 'APAC - ATLANTIC INC', '765072', 256315.00, 1, 'CITY OF SAVANNAH', 0, '', 1, '2021-10-20', '2022-10-20', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 21:06:12', '2025-01-09 21:08:02', NULL, 13, NULL, 84, NULL),
 (173, 'TE-709-03', 'APAC47002', '', 'GWINNETT STREET WIDENING', 'GWINNETT STREET WIDENING', NULL, 'CITY OF SAVANNAH', '765067', 362749.00, 0, 'CITY OF SAVANNAH', 0, '', 0, '2022-02-21', '2023-02-21', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-10 13:26:42', '2025-01-10 13:34:37', NULL, 13, NULL, 84, NULL),
@@ -5611,7 +5672,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (253, '0012867', 'ERS05079', '24-213', 'AGUSTA -COA- WHEELER SUM OUT', 'AGUSTA -COA- WHEELER SUM OUT', NULL, 'CITY OF AUGUTA', '50449', 851574.43, 0, 'RICHMOND', 0, '', 0, '2025-02-04', '2026-08-06', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 19:39:53', '2025-02-28 19:46:29', NULL, 5, NULL, 35, NULL),
 (254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', NULL, 'C&G CONCRETE', '00011122223333', 442418.00, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', '2025-02-20', 'Andres Iglesias', 1, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-10 16:43:27', '2025-02-20 15:42:20', NULL, 46, NULL, 8, NULL),
 (255, 'M006468', 'CWM04110', 'B1CBA2402829-0', 'SR 314 MILL INLAY RESURFACE', 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', NULL, 7, NULL, 22, NULL),
-(256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', NULL, 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-10 20:26:00', '2025-04-16 01:22:09', NULL, 5, NULL, 73, NULL),
+(256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', 'undefined', 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', '2025-02-10 20:26:00', '2025-11-15 15:06:27', '2025-11-15 15:06:27', 5, NULL, 73, NULL),
 (257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', NULL, 7, NULL, 11, NULL),
 (259, '0012757 & 0012758', 'SAV57000', '', 'MMIP PROJECT', 'I-16 & I-95 MMIP PROJECT', NULL, 'GDOT', 'SMC-056-S', 1435095.12, 1, 'CHATHAM', 0, '', 0, '2020-10-02', '2025-10-31', NULL, '', 3, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-11 21:19:30', '2025-06-06 22:44:03', NULL, 47, NULL, 28, NULL),
 (260, '24112201', 'PC25032', 'B1CBA2402749-0', 'SR 15', 'SR 15 ', NULL, 'GDOT', '1886', 6050.00, 1, 'GREENE', 0, '', 1, '2025-01-31', '2025-10-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-13 14:10:07', '2025-08-02 00:01:38', NULL, 12, NULL, 111, NULL),
@@ -5654,7 +5715,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (299, '0013614', 'ERS05029', 'B3CBA2002348-0', 'US 441 WIDENING', 'US 441 WIDENING', NULL, 'GDOT', '60256', 643843.25, 1, 'MORGAN', 0, '', 1, '2021-03-09', '2022-03-10', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-03 20:59:26', '2025-03-03 21:11:29', NULL, 5, NULL, 46, NULL),
 (300, 'ITB #20-30', 'ERS05025', '', '2020 SPLOST MILLING & RESURF', '2020 SPLOST MILLING & RESURF', NULL, 'E. R. SNELL', 'ITB #20-30', 137500.00, 0, 'CLAYTON', 0, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-03 21:42:27', '2025-03-03 22:04:56', NULL, 5, NULL, 22, NULL),
 (301, 'ITB #20-03', 'ERS05026', '', '2020 SPLOST MILLING & RESURFACING', '2020 SPLOST MILLING & RESURFACING', NULL, 'E. R. SNELL', 'ITB #20-03', 229710.00, 0, 'CLAYTON', 1, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-03 22:13:17', '2025-03-03 22:20:19', NULL, 5, NULL, 22, NULL),
-(302, '435435', '34324', '', 'Test', 'WR', 'undefined', 'Test', '43543543', 0.00, 0, NULL, 0, '', 0, NULL, NULL, NULL, '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', '2025-09-17 02:34:22', '2025-09-17 02:39:59', '2025-09-17 02:34:22', 14, NULL, 59, NULL),
+(302, '435435', '34324', '', 'Test', 'WR', 'undefined', 'Test', '43543543', 1.00, 0, NULL, 0, '', 0, NULL, NULL, '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', '2025-09-17 02:34:22', '2025-11-15 14:43:56', '2025-09-17 02:34:22', 14, NULL, 59, NULL),
 (303, '345', '345', '', '3246', '2346', 'undefined', '346', '345', 0.00, 0, NULL, 0, '', 0, NULL, NULL, NULL, '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', '2025-09-17 02:55:11', NULL, '2025-09-17 02:55:11', 14, NULL, 45, NULL);
 
 -- --------------------------------------------------------
@@ -8063,7 +8124,20 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (739, 'Add New Item: ADJUST DROP INLET TO GRADE', '2025-09-19', 69),
 (740, 'Add New Item: test', '2025-09-19', 69),
 (741, 'Add New Item: test h', '2025-09-19', 69),
-(742, 'Add New Item: Test 2 upd 33', '2025-11-06', 302);
+(742, 'Add New Item: Test 2 upd 33', '2025-11-06', 302),
+(743, 'Change contract amount, old value: 0', '2025-11-15', 302),
+(744, 'Change due date, old value: ', '2025-11-15', 302),
+(745, 'Change location, old value: ', '2025-11-15', 256),
+(746, 'Change due date, old value: ', '2025-11-15', 256),
+(747, 'Change concrete quote price, old value: ', '2025-11-15', 256),
+(748, 'Change concrete quote price escalator, old value: ', '2025-11-15', 256),
+(749, 'Change concrete time periodo every n, old value: ', '2025-11-15', 256),
+(750, 'Change location, old value: ', '2025-11-15', 170),
+(751, 'Change due date, old value: ', '2025-11-15', 170),
+(752, 'Change concrete quote price, old value: ', '2025-11-15', 170),
+(753, 'Change concrete quote price escalator, old value: ', '2025-11-15', 170),
+(754, 'Change concrete time periodo every n, old value: ', '2025-11-15', 170),
+(755, 'Change due date, old value: 11/18/2025', '2025-11-15', 170);
 
 -- --------------------------------------------------------
 
@@ -8359,7 +8433,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (218, 1, 0, 0, 0, 6, 30),
 (219, 1, 0, 0, 0, 6, 31),
 (220, 1, 0, 0, 0, 6, 32),
-(221, 1, 1, 1, 1, 1, 33);
+(221, 1, 1, 1, 1, 1, 33),
+(222, 1, 1, 1, 1, 1, 34);
 
 -- --------------------------------------------------------
 
@@ -9041,7 +9116,10 @@ CREATE TABLE `sync_queue_qbwc` (
 INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`, `created_at`) VALUES
 (1, 'invoice', 16, 'pendiente', 0, '2025-06-22 18:33:51'),
 (2, 'item', 296, 'pendiente', 0, '2025-07-20 19:27:45'),
-(3, 'item', 297, 'pendiente', 0, '2025-07-20 19:28:37');
+(3, 'item', 297, 'pendiente', 0, '2025-07-20 19:28:37'),
+(4, 'invoice', 3, 'pendiente', 0, '2025-11-07 01:01:20'),
+(6, 'invoice', 8, 'pendiente', 0, '2025-11-14 03:01:27'),
+(7, 'invoice', 18, 'pendiente', 0, '2025-11-14 03:04:17');
 
 -- --------------------------------------------------------
 
@@ -9100,8 +9178,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `phone`, `created_at`, `updated_at`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@example.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, 0, '(999) 999-9999', '2024-04-12 09:24:44', '2025-10-26 22:01:13', 1),
-(2, 'Marcel', 'Curbelo Carmona', 'cyborgmnk@gmail.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, 1, '(994) 356-4654', '2025-05-31 16:44:32', '2025-10-26 22:01:21', 1),
+(1, 'Administrator', 'Concrete', 'admin@example.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, 0, '(999) 999-9999', '2024-04-12 09:24:44', '2025-11-09 15:43:19', 1),
+(2, 'Marcel', 'Curbelo Carmona', 'cyborgmnk@gmail.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, 1, '(994) 356-4654', '2025-05-31 16:44:32', '2025-11-15 15:53:24', 4),
 (3, 'Andres', 'Iglesias', 'aaiglesias85@gmail.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, 0, '(345) 465-4654', '2025-05-31 16:45:22', '2025-10-26 22:01:07', 1),
 (10, 'test', 'test', 'test@test.com', '$2y$12$BOatgu1QzGTVsMXEX/WSL.wLp3EkXwVuHi7i.rtP2wUQJ.j4ub6Hi', 1, 0, '', NULL, '2025-10-26 22:01:29', 1);
 
@@ -9159,72 +9237,6 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (965, 1, 1, 1, 1, 3, 31),
 (966, 1, 1, 1, 1, 3, 32),
 (967, 1, 1, 1, 1, 3, 33),
-(968, 1, 1, 1, 1, 1, 1),
-(969, 1, 1, 1, 1, 1, 2),
-(970, 1, 1, 1, 1, 1, 3),
-(971, 1, 1, 1, 1, 1, 4),
-(972, 1, 1, 1, 1, 1, 5),
-(973, 1, 1, 1, 1, 1, 6),
-(974, 1, 1, 1, 1, 1, 7),
-(975, 1, 1, 1, 1, 1, 8),
-(976, 1, 1, 1, 1, 1, 9),
-(977, 1, 1, 1, 1, 1, 10),
-(978, 1, 1, 1, 1, 1, 11),
-(979, 1, 1, 1, 1, 1, 12),
-(980, 1, 1, 1, 1, 1, 13),
-(981, 1, 1, 1, 1, 1, 14),
-(982, 1, 1, 1, 1, 1, 15),
-(983, 1, 1, 1, 1, 1, 16),
-(984, 1, 1, 1, 1, 1, 17),
-(985, 1, 1, 1, 1, 1, 18),
-(986, 1, 1, 1, 1, 1, 19),
-(987, 1, 1, 1, 1, 1, 20),
-(988, 1, 1, 1, 1, 1, 21),
-(989, 1, 1, 1, 1, 1, 22),
-(990, 1, 1, 1, 1, 1, 23),
-(991, 1, 1, 1, 1, 1, 24),
-(992, 1, 1, 1, 1, 1, 25),
-(993, 1, 1, 1, 1, 1, 26),
-(994, 1, 1, 1, 1, 1, 27),
-(995, 1, 1, 1, 1, 1, 28),
-(996, 1, 1, 1, 1, 1, 29),
-(997, 1, 1, 1, 1, 1, 30),
-(998, 1, 1, 1, 1, 1, 31),
-(999, 1, 1, 1, 1, 1, 32),
-(1000, 1, 1, 1, 1, 1, 33),
-(1001, 1, 1, 1, 1, 2, 1),
-(1002, 1, 1, 1, 1, 2, 2),
-(1003, 1, 1, 1, 1, 2, 3),
-(1004, 1, 1, 1, 1, 2, 4),
-(1005, 1, 1, 1, 1, 2, 5),
-(1006, 1, 1, 1, 1, 2, 6),
-(1007, 1, 1, 1, 1, 2, 7),
-(1008, 1, 1, 1, 1, 2, 8),
-(1009, 1, 1, 1, 1, 2, 9),
-(1010, 1, 1, 1, 1, 2, 10),
-(1011, 1, 1, 1, 1, 2, 11),
-(1012, 1, 1, 1, 1, 2, 12),
-(1013, 1, 1, 1, 1, 2, 13),
-(1014, 1, 1, 1, 1, 2, 14),
-(1015, 1, 1, 1, 1, 2, 15),
-(1016, 1, 1, 1, 1, 2, 16),
-(1017, 1, 1, 1, 1, 2, 17),
-(1018, 1, 1, 1, 1, 2, 18),
-(1019, 1, 1, 1, 1, 2, 19),
-(1020, 1, 1, 1, 1, 2, 20),
-(1021, 1, 1, 1, 1, 2, 21),
-(1022, 1, 1, 1, 1, 2, 22),
-(1023, 1, 1, 1, 1, 2, 23),
-(1024, 1, 1, 1, 1, 2, 24),
-(1025, 1, 1, 1, 1, 2, 25),
-(1026, 1, 1, 1, 1, 2, 26),
-(1027, 1, 1, 1, 1, 2, 27),
-(1028, 1, 1, 1, 1, 2, 28),
-(1029, 1, 1, 1, 1, 2, 29),
-(1030, 1, 1, 1, 1, 2, 30),
-(1031, 1, 1, 1, 1, 2, 31),
-(1032, 1, 1, 1, 1, 2, 32),
-(1033, 1, 1, 1, 1, 2, 33),
 (1034, 1, 1, 1, 1, 10, 1),
 (1035, 1, 1, 1, 1, 10, 2),
 (1036, 1, 1, 1, 1, 10, 3),
@@ -9257,7 +9269,55 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (1063, 1, 1, 1, 1, 10, 30),
 (1064, 1, 1, 1, 1, 10, 31),
 (1065, 1, 1, 1, 1, 10, 32),
-(1066, 1, 1, 1, 1, 10, 33);
+(1066, 1, 1, 1, 1, 10, 33),
+(1099, 1, 1, 1, 1, 1, 1),
+(1100, 1, 1, 1, 1, 1, 2),
+(1101, 1, 1, 1, 1, 1, 3),
+(1102, 1, 1, 1, 1, 1, 4),
+(1103, 1, 1, 1, 1, 1, 5),
+(1104, 1, 1, 1, 1, 1, 6),
+(1105, 1, 1, 1, 1, 1, 7),
+(1106, 1, 1, 1, 1, 1, 8),
+(1107, 1, 1, 1, 1, 1, 9),
+(1108, 1, 1, 1, 1, 1, 10),
+(1109, 1, 1, 1, 1, 1, 11),
+(1110, 1, 1, 1, 1, 1, 12),
+(1111, 1, 1, 1, 1, 1, 13),
+(1112, 1, 1, 1, 1, 1, 14),
+(1113, 1, 1, 1, 1, 1, 15),
+(1114, 1, 1, 1, 1, 1, 16),
+(1115, 1, 1, 1, 1, 1, 17),
+(1116, 1, 1, 1, 1, 1, 18),
+(1117, 1, 1, 1, 1, 1, 19),
+(1118, 1, 1, 1, 1, 1, 20),
+(1119, 1, 1, 1, 1, 1, 21),
+(1120, 1, 1, 1, 1, 1, 22),
+(1121, 1, 1, 1, 1, 1, 23),
+(1122, 1, 1, 1, 1, 1, 24),
+(1123, 1, 1, 1, 1, 1, 25),
+(1124, 1, 1, 1, 1, 1, 26),
+(1125, 1, 1, 1, 1, 1, 27),
+(1126, 1, 1, 1, 1, 1, 28),
+(1127, 1, 1, 1, 1, 1, 29),
+(1128, 1, 1, 1, 1, 1, 30),
+(1129, 1, 1, 1, 1, 1, 31),
+(1130, 1, 1, 1, 1, 1, 32),
+(1131, 1, 1, 1, 1, 1, 33),
+(1132, 1, 1, 1, 1, 2, 1),
+(1133, 1, 0, 0, 0, 2, 2),
+(1134, 1, 0, 0, 0, 2, 3),
+(1135, 1, 0, 0, 0, 2, 4),
+(1136, 1, 0, 0, 0, 2, 7),
+(1137, 1, 0, 0, 0, 2, 8),
+(1138, 1, 0, 0, 0, 2, 9),
+(1139, 1, 0, 0, 0, 2, 10),
+(1140, 1, 1, 1, 1, 2, 11),
+(1141, 1, 1, 1, 1, 2, 12),
+(1142, 1, 0, 0, 0, 2, 13),
+(1143, 1, 1, 1, 1, 2, 14),
+(1144, 1, 1, 1, 1, 2, 15),
+(1145, 1, 1, 1, 1, 2, 16),
+(1146, 1, 1, 1, 1, 1, 34);
 
 -- --------------------------------------------------------
 
@@ -9399,7 +9459,8 @@ ALTER TABLE `district`
 -- Indices de la tabla `employee`
 --
 ALTER TABLE `employee`
-  ADD PRIMARY KEY (`employee_id`);
+  ADD PRIMARY KEY (`employee_id`),
+  ADD KEY `gender_id` (`gender_id`);
 
 --
 -- Indices de la tabla `equation`
@@ -9468,6 +9529,12 @@ ALTER TABLE `estimate_quote`
 --
 ALTER TABLE `function`
   ADD PRIMARY KEY (`function_id`);
+
+--
+-- Indices de la tabla `gender`
+--
+ALTER TABLE `gender`
+  ADD PRIMARY KEY (`gender_id`);
 
 --
 -- Indices de la tabla `holiday`
@@ -9778,7 +9845,7 @@ ALTER TABLE `county`
 -- AUTO_INCREMENT de la tabla `data_tracking`
 --
 ALTER TABLE `data_tracking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=386;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=387;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_attachment`
@@ -9790,25 +9857,25 @@ ALTER TABLE `data_tracking_attachment`
 -- AUTO_INCREMENT de la tabla `data_tracking_conc_vendor`
 --
 ALTER TABLE `data_tracking_conc_vendor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=233;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_item`
 --
 ALTER TABLE `data_tracking_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=360;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=362;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_labor`
 --
 ALTER TABLE `data_tracking_labor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1468;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1469;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_material`
 --
 ALTER TABLE `data_tracking_material`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_subcontract`
@@ -9874,7 +9941,13 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT de la tabla `gender`
+--
+ALTER TABLE `gender`
+  MODIFY `gender_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -9892,7 +9965,7 @@ ALTER TABLE `inspector`
 -- AUTO_INCREMENT de la tabla `invoice`
 --
 ALTER TABLE `invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_attachment`
@@ -9904,7 +9977,7 @@ ALTER TABLE `invoice_attachment`
 -- AUTO_INCREMENT de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=197;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_notes`
@@ -9928,7 +10001,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4017;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4037;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -9940,7 +10013,7 @@ ALTER TABLE `material`
 -- AUTO_INCREMENT de la tabla `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT de la tabla `overhead_price`
@@ -9988,7 +10061,7 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=743;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=756;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
@@ -10036,7 +10109,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=223;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -10078,7 +10151,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -10096,7 +10169,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1067;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1147;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -10177,6 +10250,12 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
+
+--
+-- Filtros para la tabla `employee`
+--
+ALTER TABLE `employee`
+  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`gender_id`) REFERENCES `gender` (`gender_id`);
 
 --
 -- Filtros para la tabla `estimate`

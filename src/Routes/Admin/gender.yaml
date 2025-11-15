@@ -1,0 +1,23 @@
+gender:
+   path: /genders
+   defaults: { _controller: App\Controller\Admin\GenderController::index }
+
+listarGenderAdmin:
+   path: /gender/listar
+   defaults: { _controller: App\Controller\Admin\GenderController::listar, _format: json }
+
+eliminarGenderAdmin:
+   path: /gender/eliminarGender
+   defaults: { _controller: App\Controller\Admin\GenderController::eliminar, _format: json }
+
+eliminarGendersAdmin:
+   path: /gender/eliminarGenders
+   defaults: { _controller: App\Controller\Admin\GenderController::eliminarGenders, _format: json }
+
+salvarGenderAdmin:
+   path: /gender/salvarGender
+   defaults: { _controller: App\Controller\Admin\GenderController::salvar, _format: json }
+
+cargarDatosGenderAdmin:
+   path: /gender/cargarDatos
+   defaults: { _controller: App\Controller\Admin\GenderController::cargarDatos, _format: json }

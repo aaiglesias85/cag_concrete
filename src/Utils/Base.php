@@ -392,6 +392,7 @@ class Base
       $menuHoliday = false;
       $menuCounty = false;
       $menuPayment = false;
+      $menuGender = false;
 
       // obtener permisos
       $permisos = $this->ListarPermisosDeUsuario($usuario_id);
@@ -495,6 +496,10 @@ class Base
          if ($permiso['funcion_id'] == 33 && $permiso['ver']) {
             $menuPayment = true;
          }
+
+         if ($permiso['funcion_id'] == 34 && $permiso['ver']) {
+            $menuGender = true;
+         }
       }
 
       return [
@@ -531,6 +536,7 @@ class Base
          'menuHoliday' => $menuHoliday,
          'menuCounty' => $menuCounty,
          'menuPayment' => $menuPayment,
+         'menuGender' => $menuGender,
       ];
    }
 

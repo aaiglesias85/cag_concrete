@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-11-2025 a las 00:37:34
+-- Tiempo de generación: 15-11-2025 a las 16:55:24
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -351,19 +351,38 @@ CREATE TABLE `employee` (
   `name` varchar(255) NOT NULL,
   `hourly_rate` float(8,2) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
-  `color` varchar(50) DEFAULT NULL
+  `color` varchar(50) DEFAULT NULL,
+  `address` text,
+  `phone` varchar(50) DEFAULT NULL,
+  `cert_rate_type` varchar(255) DEFAULT NULL,
+  `social_security_number` varchar(50) DEFAULT NULL,
+  `apprentice_percentage` decimal(18,2) DEFAULT NULL,
+  `work_code` varchar(50) DEFAULT NULL,
+  `ethnicity_race` varchar(255) DEFAULT NULL,
+  `gender_id` int(11) DEFAULT NULL,
+  `date_hired` date DEFAULT NULL,
+  `date_terminated` date DEFAULT NULL,
+  `reason_terminated` varchar(255) DEFAULT NULL,
+  `time_card_notes` varchar(255) DEFAULT NULL,
+  `regular_rate_per_hour` decimal(18,2) DEFAULT NULL,
+  `overtime_rate_per_hour` decimal(18,2) DEFAULT NULL,
+  `special_rate_per_hour` decimal(18,2) DEFAULT NULL,
+  `trade_licenses_info` text,
+  `notes` text,
+  `is_osha_10_certified` tinyint(1) DEFAULT NULL,
+  `is_veteran` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`) VALUES
-(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', NULL),
-(2, 'Andres Iglesias', 70.00, 'Developer', NULL),
-(3, 'Geydis Marquez', 5.00, 'Jefe', NULL),
-(4, 'Luis Miguel', 2.00, 'RRHH', NULL),
-(5, 'Brian Marcel', 2.00, 'Ayudante', NULL);
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `ethnicity_race`, `gender_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`) VALUES
+(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'Andres Iglesias', 70.00, 'Developer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 'Geydis Marquez', 5.00, 'Jefe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 'Luis Miguel', 2.00, 'RRHH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 'Brian Marcel', 2.00, 'Ayudante', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -542,7 +561,21 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (30, 'plan_downloading', 'Plans Downloading'),
 (31, 'holiday', 'Holidays'),
 (32, 'county', 'County'),
-(33, 'payment', 'Payments');
+(33, 'payment', 'Payments'),
+(34, 'gender', 'Genders');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `gender`
+--
+
+CREATE TABLE `gender` (
+  `gender_id` int(11) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `classification` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1585,7 +1618,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (42, 1, 1, 1, 1, 1, 30),
 (43, 1, 1, 1, 1, 1, 31),
 (44, 1, 1, 1, 1, 1, 32),
-(45, 1, 1, 1, 1, 1, 33);
+(45, 1, 1, 1, 1, 1, 33),
+(46, 1, 1, 1, 1, 1, 34);
 
 -- --------------------------------------------------------
 
@@ -1796,7 +1830,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (34, 1, 1, 1, 1, 1, 30),
 (35, 1, 1, 1, 1, 1, 31),
 (36, 1, 1, 1, 1, 1, 32),
-(37, 1, 1, 1, 1, 1, 33);
+(37, 1, 1, 1, 1, 1, 33),
+(38, 1, 1, 1, 1, 1, 34);
 
 -- --------------------------------------------------------
 
@@ -1922,7 +1957,8 @@ ALTER TABLE `district`
 -- Indices de la tabla `employee`
 --
 ALTER TABLE `employee`
-  ADD PRIMARY KEY (`employee_id`);
+  ADD PRIMARY KEY (`employee_id`),
+  ADD KEY `gender_id` (`gender_id`);
 
 --
 -- Indices de la tabla `equation`
@@ -1991,6 +2027,12 @@ ALTER TABLE `estimate_quote`
 --
 ALTER TABLE `function`
   ADD PRIMARY KEY (`function_id`);
+
+--
+-- Indices de la tabla `gender`
+--
+ALTER TABLE `gender`
+  ADD PRIMARY KEY (`gender_id`);
 
 --
 -- Indices de la tabla `holiday`
@@ -2400,7 +2442,13 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT de la tabla `gender`
+--
+ALTER TABLE `gender`
+  MODIFY `gender_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -2562,7 +2610,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2622,7 +2670,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -2703,6 +2751,12 @@ ALTER TABLE `data_tracking_subcontract`
   ADD CONSTRAINT `Refdatatrackingsubcontract36` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Refdatatrackingsubcontract37` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
   ADD CONSTRAINT `Refdatatrackingsubcontract38` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`);
+
+--
+-- Filtros para la tabla `employee`
+--
+ALTER TABLE `employee`
+  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`gender_id`) REFERENCES `gender` (`gender_id`);
 
 --
 -- Filtros para la tabla `estimate`
