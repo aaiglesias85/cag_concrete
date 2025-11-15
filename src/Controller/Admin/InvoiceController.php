@@ -340,13 +340,14 @@ class InvoiceController extends AbstractController
       $project_id = $request->get('project_id');
       $start_date = $request->get('start_date');
       $end_date = $request->get('end_date');
+      $number = $request->get('number');
 
       try {
 
-         $resultado = $this->invoiceService->ValidarInvoice($invoice_id, $project_id, $start_date, $end_date);
+         $resultado = $this->invoiceService->ValidarInvoice($invoice_id, $project_id, $start_date, $end_date, $number);
 
          $resultadoJson['success'] = true;
-         $resultadoJson['valid'] = $resultado;
+         $resultadoJson['error'] = $resultado;
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {

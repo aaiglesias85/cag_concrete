@@ -30,11 +30,11 @@ class InvoiceService extends Base
     * @param string $project_id Id del proyecto
     * @param string $start_date Fecha inicial
     * @param string $end_date Fecha final 
-    * @return bool
+    * @return string
     */
-   public function ValidarInvoice($invoice_id, $project_id, $start_date, $end_date)
+   public function ValidarInvoice($invoice_id, $project_id, $start_date, $end_date, $number)
    {
-      $valid = true;
+      $error = '';
 
       // verificar fechas
       /** @var InvoiceRepository $invoiceRepo */
@@ -42,10 +42,36 @@ class InvoiceService extends Base
       $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
 
       if (!empty($invoices) && $invoices[0]->getInvoiceId() != $invoice_id) {
-         $valid = false;
+         $error = 'An invoice already exists for that date range';
       }
 
-      return $valid;
+      // verificar que la fecha inicial no sea mayor que la inicial
+      if ($start_date != '') {
+         $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
+      }
+
+      if ($end_date != '') {
+         $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
+      }
+
+      if ($start_date && $end_date) {
+         if ($start_date > $end_date) {
+            $error = "The start date cannot be greater than the end date.";
+         }
+      } else {
+         $error = "Incorrect date format";
+      }
+
+      // verificar number
+      if ($number !== '') {
+         $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+            ->findOneBy(['number' => $number, 'project' => $project_id]);
+         if ($invoice != null) {
+            $error = "The invoice number is in use, please try entering another one.";
+         }
+      }
+
+      return $error;
    }
 
    /**

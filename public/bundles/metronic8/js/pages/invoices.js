@@ -474,7 +474,10 @@ var Invoices = (function () {
       MyUtil.limpiarSelect('#project');
 
       FlatpickrUtil.clear('datetimepicker-start-date');
+      FlatpickrUtil.setMaxDate('datetimepicker-start-date', null);
+
       FlatpickrUtil.clear('datetimepicker-end-date');
+      FlatpickrUtil.setMinDate('datetimepicker-end-date', null);
 
       $('#paidactivo').prop('checked', false);
 
@@ -682,6 +685,7 @@ var Invoices = (function () {
       var project_id = $('#project').val();
       var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
       var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
+      var number = $('#number').val();
 
       if (project_id != '' && start_date != '' && end_date != '') {
          var formData = new URLSearchParams();
@@ -694,6 +698,8 @@ var Invoices = (function () {
 
          formData.set('end_date', end_date);
 
+         formData.set('number', number);
+
          BlockUtil.block('#form-invoice');
 
          return axios
@@ -702,14 +708,13 @@ var Invoices = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
-                     if (!response.valid) {
-                        toastr.error('An invoice already exists for the selected dates.', '');
-                     }
-                     return response.valid;
-                  } else {
-                     if (response.error) {
+                     if (response.error !== '') {
                         toastr.error(response.error, '');
+                        return false;
                      }
+                     return true;
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
                      return false;
                   }
                } else {
@@ -973,7 +978,7 @@ var Invoices = (function () {
 
          $('#company').on('change', changeCompany);
          $('#project').on('change', listarItems);
-         initChangeTempus();
+         initChangeFlatpickr();
 
          // items
          items = invoice.items;
@@ -1174,7 +1179,7 @@ var Invoices = (function () {
       // init widgets generales
       MyApp.initWidgets();
 
-      initTempus();
+      initFlatpickr();
 
       // change
       $('#filtro-company').change(changeFiltroCompany);
@@ -1188,7 +1193,7 @@ var Invoices = (function () {
 
    var offChangeStart;
    var offChangeEnd;
-   var initTempus = function () {
+   var initFlatpickr = function () {
       // filtros fechas
       const desdeInput = document.getElementById('datetimepicker-desde');
       const desdeGroup = desdeInput.closest('.input-group');
@@ -1220,13 +1225,23 @@ var Invoices = (function () {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
       });
 
-      initChangeTempus();
+      initChangeFlatpickr();
    };
-   var initChangeTempus = function () {
+   var initChangeFlatpickr = function () {
       offChangeStart = FlatpickrUtil.on('datetimepicker-start-date', 'change', ({ selectedDates, dateStr, instance }) => {
          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
          // selectedDates[0] => objeto Date nativo (si hay selección)
          console.log('Cambió la fecha:', dateStr, selectedDates[0]);
+
+         const d = selectedDates?.[0];
+         if (!d) return;
+
+         FlatpickrUtil.setMinDate('datetimepicker-end-date', d);
+
+         const hasta = FlatpickrUtil.getDate('datetimepicker-end-date');
+         if (hasta && hasta < d) {
+            FlatpickrUtil.setDate('datetimepicker-end-date', d);
+         }
 
          listarItems();
       });
@@ -1235,6 +1250,16 @@ var Invoices = (function () {
          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
          // selectedDates[0] => objeto Date nativo (si hay selección)
          console.log('Cambió la fecha:', dateStr, selectedDates[0]);
+
+         const d = selectedDates?.[0];
+         if (!d) return;
+
+         FlatpickrUtil.setMaxDate('datetimepicker-start-date', d);
+
+         const desde = FlatpickrUtil.getDate('datetimepicker-start-date');
+         if (desde && desde > d) {
+            FlatpickrUtil.setDate('datetimepicker-start-date', d);
+         }
 
          listarItems();
       });
