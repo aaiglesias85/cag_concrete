@@ -396,10 +396,13 @@ class InvoiceService extends Base
       $current_retainage = $this->CalcularCurrentRetainage($project_id, $porciento_retainage);
       $objWorksheet->setCellValue("O$fila", $current_retainage)->getStyle("O$fila")->getFont()->setBold(true);
 
+      // aplicar borde
+      $objWorksheet->getStyle("N{$fila_retainage_inicio}:O{$fila}")->applyFromArray($styleArray);
+
       // Color de fondo naranja para la sección final (N–O)
-      $objWorksheet->getStyle("N{$fila_retainage_inicio}:O{$fila}")
-         ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-         ->getStartColor()->setARGB('FFFCD5B4');
+      // $objWorksheet->getStyle("N{$fila_retainage_inicio}:O{$fila}")
+      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+      //    ->getStartColor()->setARGB('FFFCD5B4');
 
       // Guardar Excel
       $fichero = "invoice-$number.xlsx";
