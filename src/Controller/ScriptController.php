@@ -11,87 +11,87 @@ use Symfony\Component\HttpFoundation\Response;
 class ScriptController extends AbstractController
 {
 
-    private $scriptService;
+   private $scriptService;
 
-    public function __construct(ScriptService $scriptService)
-    {
-        $this->scriptService = $scriptService;
-    }
+   public function __construct(ScriptService $scriptService)
+   {
+      $this->scriptService = $scriptService;
+   }
 
-    public function definirpendingdatatracking()
-    {
-        $this->scriptService->DefinirPendingDataTracking();
+   public function definirpendingdatatracking()
+   {
+      $this->scriptService->DefinirPendingDataTracking();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definirnotificacionesduedate()
-    {
-        $this->scriptService->DefinirNotificacionesDueDate();
+   public function definirnotificacionesduedate()
+   {
+      $this->scriptService->DefinirNotificacionesDueDate();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definiryieldcalculationitem()
-    {
-        $this->scriptService->DefinirYieldCalculationItem();
+   public function definiryieldcalculationitem()
+   {
+      $this->scriptService->DefinirYieldCalculationItem();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definirsubcontractordatatrackingprojectitem()
-    {
-        $this->scriptService->DefinirSubcontractorDatatrackingProjectItem();
+   public function definirsubcontractordatatrackingprojectitem()
+   {
+      $this->scriptService->DefinirSubcontractorDatatrackingProjectItem();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definirconcretevendordatatracking()
-    {
-        $this->scriptService->DefinirConcreteVendorDataTracking();
+   public function definirconcretevendordatatracking()
+   {
+      $this->scriptService->DefinirConcreteVendorDataTracking();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definircountyprojectestimate()
-    {
-        $this->scriptService->DefinirCountyProjectEstimate();
+   public function definircountyprojectestimate()
+   {
+      $this->scriptService->DefinirCountyProjectEstimate();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definircompanyestimate()
-    {
-        $this->scriptService->DefinirCompanyEstimate();
+   public function definircompanyestimate()
+   {
+      $this->scriptService->DefinirCompanyEstimate();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function cronreminders()
-    {
-        $this->scriptService->CronReminders();
+   public function cronreminders()
+   {
+      $this->scriptService->CronReminders();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function cronajusteprecio()
-    {
-        $this->scriptService->CronAjustePrecio();
+   public function cronajusteprecio()
+   {
+      $this->scriptService->CronAjustePrecio();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function definiritemprincipal()
-    {
-        $this->scriptService->DefinirItemPrincipal();
+   public function definiritemprincipal()
+   {
+      $this->scriptService->DefinirItemPrincipal();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 
-    public function cronajusteconcretequoteprecio()
-    {
-        $this->scriptService->CronAjustePrecioConcreteVendor();
+   public function cronajusteconcretequoteprecio()
+   {
+      $this->scriptService->CronAjustePrecioConcreteVendor();
 
-        return new Response('OK', 200);
-    }
+      return new Response('OK', 200);
+   }
 }
