@@ -943,7 +943,7 @@ var Invoices = (function () {
          $('#number').val(invoice.number);
 
          $('#company').off('change', changeCompany);
-         $('#project').off('change', listarItems);
+         $('#project').off('change', changeProject);
 
          offChangeStart();
          offChangeEnd();
@@ -952,7 +952,7 @@ var Invoices = (function () {
          $('#company').trigger('change');
 
          //Llenar select
-         var projects = invoice.projects;
+         projects = invoice.projects;
          for (var i = 0; i < projects.length; i++) {
             var descripcion = `${projects[i].number} - ${projects[i].description}`;
             $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
@@ -977,7 +977,7 @@ var Invoices = (function () {
          $('#paidactivo').prop('checked', invoice.paid);
 
          $('#company').on('change', changeCompany);
-         $('#project').on('change', listarItems);
+         $('#project').on('change', changeProject);
          initChangeFlatpickr();
 
          // items
@@ -1184,7 +1184,7 @@ var Invoices = (function () {
       // change
       $('#filtro-company').change(changeFiltroCompany);
       $('#company').change(changeCompany);
-      $('#project').change(listarItems);
+      $('#project').change(changeProject);
 
       $('#item').change(changeItem);
       $('#item-quantity').change(calcularTotalItem);
@@ -1263,6 +1263,73 @@ var Invoices = (function () {
 
          listarItems();
       });
+   };
+
+   // change project
+   var changeProject = function () {
+      // definir fechas
+      definirFechasDueDate();
+
+      // listar items
+      listarItems();
+   };
+
+   var definirFechasDueDate = function () {
+      // reset
+      FlatpickrUtil.setDate('datetimepicker-start-date', '');
+      FlatpickrUtil.setDate('datetimepicker-end-date', '');
+
+      var project_id = $('#project').val();
+      if (!project_id || !Array.isArray(projects)) {
+         return;
+      }
+
+      var project = projects.find((p) => String(p.project_id) === String(project_id));
+      if (!project) {
+         return;
+      }
+
+      var due_date = project.invoice_due_date;
+      if (!due_date) {
+         return;
+      }
+
+      var partes = due_date.split('/');
+      if (partes.length !== 3) {
+         return;
+      }
+
+      var mes = parseInt(partes[0], 10) - 1;
+      var dia = parseInt(partes[1], 10);
+      var anio = parseInt(partes[2], 10);
+
+      if (isNaN(mes) || isNaN(dia) || isNaN(anio)) {
+         return;
+      }
+
+      var dueDate = new Date(anio, mes, dia);
+      if (isNaN(dueDate.getTime())) {
+         return;
+      }
+
+      var today = new Date();
+      var currentMonth = today.getMonth();
+      var currentYear = today.getFullYear();
+
+      var prevMonthDate = new Date(currentYear, currentMonth - 1, 1);
+      var prevMonth = prevMonthDate.getMonth();
+      var prevYear = prevMonthDate.getFullYear();
+
+      var startDate = new Date(prevYear, prevMonth, dia);
+      startDate.setDate(startDate.getDate() + 1);
+
+      var endDate = new Date(currentYear, currentMonth, dia);
+
+      FlatpickrUtil.setDate('datetimepicker-start-date', startDate);
+      FlatpickrUtil.setDate('datetimepicker-end-date', endDate);
+
+      FlatpickrUtil.setMaxDate('datetimepicker-start-date', endDate);
+      FlatpickrUtil.setMinDate('datetimepicker-end-date', startDate);
    };
 
    var listarItems = function () {
@@ -1348,6 +1415,7 @@ var Invoices = (function () {
       }
    };
 
+   var projects = [];
    var changeCompany = function () {
       var company_id = $('#company').val();
 
@@ -1368,7 +1436,7 @@ var Invoices = (function () {
                   var response = res.data;
                   if (response.success) {
                      //Llenar select
-                     var projects = response.projects;
+                     projects = response.projects;
                      for (var i = 0; i < projects.length; i++) {
                         var descripcion = `${projects[i].number} - ${projects[i].description}`;
                         $('#project').append(new Option(descripcion, projects[i].project_id, false, false));
@@ -1624,6 +1692,9 @@ var Invoices = (function () {
             start: 1,
             end: 1,
          },
+
+         scrollCollapse: true,
+         scrollX: true,
 
          columns: columns,
          columnDefs: columnDefs,

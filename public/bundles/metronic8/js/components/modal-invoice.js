@@ -24,6 +24,9 @@ var ModalInvoice = (function () {
       FlatpickrUtil.clear('start-date-invoice-modal');
       FlatpickrUtil.clear('end-date-invoice-modal');
 
+      FlatpickrUtil.setMaxDate('start-date-invoice-modal', null);
+      FlatpickrUtil.setMinDate('end-date-invoice-modal', null);
+
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('invoice-modal-form'));
 
@@ -301,7 +304,7 @@ var ModalInvoice = (function () {
 
       // change
       $('#company-invoice-modal').change(changeCompany);
-      $('#project-invoice-modal').change(listarItems);
+      $('#project-invoice-modal').change(changeProject);
 
       $('#item-invoice-modal').change(changeItem);
       $('#item-quantity-invoice-modal').change(calcularTotalItem);
@@ -342,6 +345,72 @@ var ModalInvoice = (function () {
 
          listarItems();
       });
+   };
+
+   var changeProject = function () {
+      // definir fechas
+      definirFechasDueDate();
+
+      // listar items
+      listarItems();
+   };
+
+   var definirFechasDueDate = function () {
+      // reset
+      FlatpickrUtil.setDate('start-date-invoice-modal', '');
+      FlatpickrUtil.setDate('end-date-invoice-modal', '');
+
+      var project_id = $('#project-invoice-modal').val();
+      if (!project_id || !Array.isArray(projects)) {
+         return;
+      }
+
+      var project = projects.find((p) => String(p.project_id) === String(project_id));
+      if (!project) {
+         return;
+      }
+
+      var due_date = project.invoice_due_date;
+      if (!due_date) {
+         return;
+      }
+
+      var partes = due_date.split('/');
+      if (partes.length !== 3) {
+         return;
+      }
+
+      var mes = parseInt(partes[0], 10) - 1;
+      var dia = parseInt(partes[1], 10);
+      var anio = parseInt(partes[2], 10);
+
+      if (isNaN(mes) || isNaN(dia) || isNaN(anio)) {
+         return;
+      }
+
+      var dueDate = new Date(anio, mes, dia);
+      if (isNaN(dueDate.getTime())) {
+         return;
+      }
+
+      var today = new Date();
+      var currentMonth = today.getMonth();
+      var currentYear = today.getFullYear();
+
+      var prevMonthDate = new Date(currentYear, currentMonth - 1, 1);
+      var prevMonth = prevMonthDate.getMonth();
+      var prevYear = prevMonthDate.getFullYear();
+
+      var startDate = new Date(prevYear, prevMonth, dia);
+      startDate.setDate(startDate.getDate() + 1);
+
+      var endDate = new Date(currentYear, currentMonth, dia);
+
+      FlatpickrUtil.setDate('start-date-invoice-modal', startDate);
+      FlatpickrUtil.setDate('end-date-invoice-modal', endDate);
+
+      FlatpickrUtil.setMaxDate('start-date-invoice-modal', endDate);
+      FlatpickrUtil.setMinDate('end-date-invoice-modal', startDate);
    };
 
    var listarItems = function () {
@@ -413,6 +482,7 @@ var ModalInvoice = (function () {
       }
    };
 
+   var projects = [];
    var changeCompany = function () {
       var company_id = $('#company-invoice-modal').val();
 
@@ -433,7 +503,7 @@ var ModalInvoice = (function () {
                   var response = res.data;
                   if (response.success) {
                      //Llenar select
-                     var projects = response.projects;
+                     projects = response.projects;
                      for (var i = 0; i < projects.length; i++) {
                         var descripcion = `${projects[i].number} - ${projects[i].description}`;
                         $('#project-invoice-modal').append(new Option(descripcion, projects[i].project_id, false, false));
@@ -443,6 +513,8 @@ var ModalInvoice = (function () {
                      // select
                      $('#project-invoice-modal').val(project_id_param);
                      $('#project-invoice-modal').trigger('change');
+
+                     definirFechasDueDate();
                   } else {
                      toastr.error(response.error, '');
                   }

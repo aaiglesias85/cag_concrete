@@ -911,6 +911,7 @@ class ProjectService extends Base
                'number' => $value->getProjectNumber(),
                'name' => $value->getName(),
                'description' => $value->getDescription(),
+               'invoice_due_date' => $value->getDueDate() != null ? $value->getDueDate()->format('m/d/Y') : '',
             ];
          }
       }
