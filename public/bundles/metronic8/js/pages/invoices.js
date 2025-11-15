@@ -1465,6 +1465,7 @@ var Invoices = (function () {
          { data: 'item' },
          { data: 'unit' },
          { data: 'price' },
+         { data: 'contract_qty' },
          { data: 'contract_amount' }, // 3 (sum)
          { data: 'quantity_completed' },
          { data: 'amount_completed' }, // 5 (sum)
@@ -1503,7 +1504,7 @@ var Invoices = (function () {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
-         // contract_amount
+         // contract_qty
          {
             targets: 3,
             className: 'text-center',
@@ -1511,9 +1512,17 @@ var Invoices = (function () {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
-         // quantity_completed
+         // contract_amount
          {
             targets: 4,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+            },
+         },
+         // quantity_completed
+         {
+            targets: 5,
             className: 'text-center',
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 100);
@@ -1521,7 +1530,7 @@ var Invoices = (function () {
          },
          // amount_completed
          {
-            targets: 5,
+            targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -1529,7 +1538,7 @@ var Invoices = (function () {
          },
          // unpaid_from_previous
          {
-            targets: 6,
+            targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
                return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
@@ -1537,7 +1546,7 @@ var Invoices = (function () {
          },
          // amount_unpaid
          {
-            targets: 7,
+            targets: 8,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -1545,7 +1554,7 @@ var Invoices = (function () {
          },
          // quantity
          {
-            targets: 8,
+            targets: 9,
             className: 'text-center',
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 100);
@@ -1553,7 +1562,7 @@ var Invoices = (function () {
          },
          // amount
          {
-            targets: 9,
+            targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -1561,7 +1570,7 @@ var Invoices = (function () {
          },
          // quantity_brought_forward
          {
-            targets: 10,
+            targets: 11,
             className: 'text-center',
             render: function (data, type, row) {
                var value = data ?? 0;
@@ -1573,7 +1582,7 @@ var Invoices = (function () {
          },
          // quantity_final
          {
-            targets: 11,
+            targets: 12,
             className: 'text-center',
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 100);
@@ -1581,7 +1590,7 @@ var Invoices = (function () {
          },
          // amount_final
          {
-            targets: 12,
+            targets: 13,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -1610,6 +1619,12 @@ var Invoices = (function () {
          data: items_lista,
          displayLength: 25,
          order: order,
+
+         fixedColumns: {
+            start: 1,
+            end: 1,
+         },
+
          columns: columns,
          columnDefs: columnDefs,
          language: language,
