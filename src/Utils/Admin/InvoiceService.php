@@ -66,7 +66,7 @@ class InvoiceService extends Base
       if ($number !== '') {
          $invoice = $this->getDoctrine()->getRepository(Invoice::class)
             ->findOneBy(['number' => $number, 'project' => $project_id]);
-         if ($invoice != null) {
+         if ($invoice != null && $invoice->getInvoiceId() != $invoice_id) {
             $error = "The invoice number is in use, please try entering another one.";
          }
       }
