@@ -39,7 +39,7 @@ class InvoiceService extends Base
       // verificar fechas
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-      $invoices = $invoiceRepo->ListarInvoicesRangoFecha('',(string)$project_id, $start_date, $end_date);
+      $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, (string) $start_date, (string) $end_date);
 
       if (!empty($invoices) && $invoices[0]->getInvoiceId() != $invoice_id) {
          $error = 'An invoice already exists for that date range';
