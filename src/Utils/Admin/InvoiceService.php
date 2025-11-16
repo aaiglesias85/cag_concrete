@@ -61,11 +61,11 @@ class InvoiceService extends Base
       } else {
          $error = "Incorrect date format";
       }
-
+      
       // verificar number
       if ($number !== '') {
          $invoice = $this->getDoctrine()->getRepository(Invoice::class)
-            ->findOneBy(['number' => $number, 'project' => $project_id]);
+            ->findOneBy(['number' => $number, 'project' => (string)$project_id]);
          if ($invoice != null && $invoice->getInvoiceId() != $invoice_id) {
             $error = "The invoice number is in use, please try entering another one.";
          }
