@@ -1,0 +1,23 @@
+employee_rrhh:
+   path: /employees-rrhh
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::index }
+
+listarEmployeeRrhhAdmin:
+   path: /employee-rrhh/listar
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::listar, _format: json }
+
+eliminarEmployeeRrhhAdmin:
+   path: /employee-rrhh/eliminar
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::eliminar, _format: json }
+
+eliminarEmployeesRrhhAdmin:
+   path: /employee-rrhh/eliminarVarios
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::eliminarVarios, _format: json }
+
+salvarEmployeeRrhhAdmin:
+   path: /employee-rrhh/salvarEmployee
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::salvar, _format: json }
+
+cargarDatosEmployeeRrhhAdmin:
+   path: /employee-rrhh/cargarDatos
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::cargarDatos, _format: json }

@@ -1,0 +1,510 @@
+{% extends 'admin/layout.html.twig' %} {% block subtitle %} - Employees{% endblock %} {% block stylesheetspecific %}
+
+<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<style>
+   .dt-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px; /* cuadrado con puntas suaves */
+      display: inline-block;
+      margin-right: 0.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.15); /* mejora percepción en colores claros */
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); /* opcional */
+   }
+</style>
+{% endblock %} {% block content %}
+
+<!--begin::Toolbar-->
+<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+   <!--begin::Toolbar container-->
+   <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+      <!--begin::Page title-->
+      <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+         <!--begin::Title-->
+         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Employees</h1>
+         <!--end::Title-->
+         <!--begin::Breadcrumb-->
+         <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+            <!--begin::Item-->
+            <li class="breadcrumb-item text-muted">
+               <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
+            </li>
+            <!--end::Item-->
+            <!--begin::Item-->
+            <li class="breadcrumb-item">
+               <span class="bullet bg-gray-500 w-5px h-2px"></span>
+            </li>
+            <!--end::Item-->
+            <!--begin::Item-->
+            <li class="breadcrumb-item text-muted">Manage Employees</li>
+            <!--end::Item-->
+         </ul>
+         <!--end::Breadcrumb-->
+      </div>
+      <!--end::Page title-->
+      <!--begin::Actions-->
+      <div class="d-flex align-items-center gap-2 gap-lg-3"></div>
+      <!--end::Actions-->
+   </div>
+   <!--end::Toolbar container-->
+</div>
+<!--end::Toolbar-->
+<!--begin::Content-->
+<div id="kt_app_content" class="app-content flex-column-fluid">
+   <!--begin::Content container-->
+   <div id="kt_app_content_container" class="app-container container-fluid">
+      <!-- lista -->
+      <div id="lista-employee" class="card card-sticky">
+         <div
+            class="card-header border-0 pt-6"
+            data-kt-sticky="true"
+            data-kt-sticky-name="lista-employee"
+            data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+            data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+            data-kt-sticky-left="auto"
+            data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+            data-kt-sticky-animation="false"
+            data-kt-sticky-zindex="95"
+         >
+            <div class="card-title">
+               <div class="d-flex align-items-center position-relative my-1">
+                  <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                     <span class="path1"></span>
+                     <span class="path2"></span>
+                  </i>
+                  <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-13" placeholder="Search..." />
+               </div>
+            </div>
+            <div class="card-toolbar">
+               <div class="d-flex justify-content-end">
+                  <!-- new -->
+                  {% if permiso.agregar %}
+                  <button type="button" id="btn-nuevo-employee" class="btn btn-success me-2">
+                     <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">New</span>
+                  </button>
+                  {% endif %}
+
+                  <!-- delete -->
+                  {% if permiso.eliminar %}
+                  <button type="button" id="btn-eliminar-employee" class="btn btn-danger me-2 hide">
+                     <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">Delete</span>
+                  </button>
+                  {% endif %}
+
+                  <!-- export -->
+                  <div>
+                     <!--begin::Export buttons-->
+                     <div id="employee-table-editable-export" class="d-none"></div>
+                     <!--end::Export buttons-->
+
+                     <!--begin::Export dropdown-->
+                     <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                     </button>
+
+                     <!--begin::Menu-->
+                     <div
+                        id="employee_export_menu"
+                        class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                        data-kt-menu="true"
+                     >
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="copy"> Copy to clipboard </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="excel"> Export to Excel </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="csv"> Export CSV </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="pdf"> Export to PDF </a>
+                        </div>
+                        <!--end::Menu item-->
+                     </div>
+                     <!--end::Menu-->
+                     <!--end::Export dropdown-->
+
+                     <!--begin::Hide default export buttons-->
+                     <div id="employee-table-editable-buttons" class="d-none"></div>
+                     <!--end::Hide default export buttons-->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="card-body">
+            <!--begin::Datatable-->
+            <table id="employee-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+               <thead>
+                  <tr class="fw-bold fs-6 text-gray-800 px-7">
+                     {% if permiso.eliminar %}
+                     <th class="w-10px pe-2">
+                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                           <input class="form-check-input check-select-all" type="checkbox" data-kt-check="true" data-kt-check-target="#employee-table-editable .form-check-input" value="1" />
+                        </div>
+                     </th>
+                     {% endif %}
+                     <th>Social Security #</th>
+                     <th>Name</th>
+                     <th>Address</th>
+                     <th>Phone</th>
+                     <th>Gender</th>
+                     <th>Ethnicity/Race</th>
+                     <th>Status</th>
+                     <th class="text-end min-w-100px">Actions</th>
+                  </tr>
+               </thead>
+               <tbody class="text-gray-600 fw-semibold"></tbody>
+            </table>
+            <!--end::Datatable-->
+         </div>
+      </div>
+
+      <!-- form -->
+      <div id="form-employee" class="card card-sticky hide">
+         <div
+            class="card-header"
+            data-kt-sticky="true"
+            data-kt-sticky-name="form-employee"
+            data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+            data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+            data-kt-sticky-left="auto"
+            data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '60px', xl: '60px'}"
+            data-kt-sticky-animation="false"
+            data-kt-sticky-zindex="95"
+         >
+            <div class="card-title">
+               <h3 class="card-label">New employee:</h3>
+            </div>
+            <div class="card-toolbar">
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-project me-2">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
+               </a>
+
+               <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
+                  <i class="la la-arrow-left me-2"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
+               </button>
+
+               <button id="btn-wizard-siguiente" class="btn btn-primary me-2" type="button">
+                  <span class="kt-hidden-mobile font-weight-bold">Next</span>
+                  <i class="la la-arrow-right ms-2"></i>
+               </button>
+
+               {% if permiso.agregar or permiso.editar %}
+               <button type="button" id="btn-wizard-finalizar" class="btn btn-success">
+                  <i class="la la-check"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Save</span>
+               </button>
+               {% endif %}
+            </div>
+         </div>
+
+         <form class="form" id="employee-form" action="javascript:;" enctype="multipart/form-data" method="post">
+            <input type="hidden" id="employee_id" name="employee_id" />
+
+            <div class="card-body">
+               <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
+                  <li class="nav-item">
+                     <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">1</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">General</div>
+                              <div class="wizard-desc">General information</div>
+                           </div>
+                           <span class="svg-icon ps-6">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+               </ul>
+
+               <div class="tab-content">
+                  <div class="tab-pane fade show active" id="tab-content-general" role="tabpanel">
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-6">
+                              <label class="form-label required">
+                                 <span class="ic-step-number">1</span>
+                                 Name
+                              </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="name" name="name" />
+                           </div>
+                           <div class="col-md-3">
+                              <label class="form-label"> Social Security # </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="social_security_number" name="socialsecuritynumber" />
+                           </div>
+                           <div class="col-md-3">
+                              <label class="form-label"> Cert Rate Type </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="cert_rate_type" name="certratetype" />
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-8">
+                              <label class="form-label">
+                                 <span class="ic-step-number">2</span>
+                                 Address
+                              </label>
+                              <div class="input-group input-group-solid">
+                                 <span class="input-group-text">
+                                    <i class="ki-duotone ki-geolocation"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                                 <input type="text" class="form-control form-control-validate event-change" id="address" name="address" />
+                              </div>
+                           </div>
+                           <div class="col-md-4">
+                              <label class="form-label"> Phone </label>
+                              <div class="input-group input-group-solid">
+                                 <span class="input-group-text"><i class="la la-phone"></i></span>
+                                 <input type="text" class="form-control form-control-validate input-phone event-change" id="phone" name="phone" autocomplete="off" />
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-2">
+                              <label class="form-label">
+                                 <span class="ic-step-number">3</span>
+                                 Apprentice Percentage
+                              </label>
+                              <input
+                                 type="text"
+                                 class="form-control form-control-validate form-control-solid form-control-number event-change"
+                                 id="apprentice_percentage"
+                                 name="apprenticepercentage"
+                              />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Reg. Rate/Hour </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid form-control-number event-change" id="regular_rate_per_hour" name="regularrateperhour" />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> O.T. Rate/Hour </label>
+                              <input
+                                 type="text"
+                                 class="form-control form-control-validate form-control-solid form-control-number event-change"
+                                 id="overtime_rate_per_hour"
+                                 name="overtimerateperhour"
+                              />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> S.T. Rate/Hour </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid form-control-number event-change" id="special_rate_per_hour" name="specialrateperhour" />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Work Code </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="work_code" name="workcode" />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Ethnicity/Race </label>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid" id="race" name="race">
+                                 <option value="">Select</option>
+                                 {% for item in races %}
+                                 <option value="{{ item.raceId }}">{{ item.description }}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-2">
+                              <label class="form-label">
+                                 <span class="ic-step-number">4</span>
+                                 Gender
+                              </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="gender" name="gender" />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Work Code </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="work_code" name="workcode" />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Date Hired </label>
+                              <div class="input-group input-group-solid">
+                                 <input type="text" class="form-control" placeholder="Select a date" id="date_hired" autocomplete="off" name="datehired" />
+                                 <span class="input-group-text">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                              </div>
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Date Terminated </label>
+                              <div class="input-group input-group-solid">
+                                 <input type="text" class="form-control" placeholder="Select a date" id="date_terminated" autocomplete="off" name="dateterminated" />
+                                 <span class="input-group-text">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                              </div>
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> OSHA 10 Certified </label>
+                              <div>
+                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="is_osha_10_certified" class="form-check-input" />
+                                    <label class="form-check-label" for="is_osha_10_certified"> Yes / No </label>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label">Veteran </label>
+                              <div>
+                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="is_veteran" class="form-check-input" />
+                                    <label class="form-check-label" for="is_veteran"> Yes / No </label>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-5">
+                              <label class="form-label">
+                                 <span class="ic-step-number">5</span>
+                                 Reason Terminated
+                              </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="reason_terminated" name="reasonterminated" />
+                           </div>
+                           <div class="col-md-5">
+                              <label class="form-label"> Time Card Notes </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="time_card_notes" name="timecardnotes" />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label">Status </label>
+                              <div>
+                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="status" class="form-check-input" />
+                                    <label class="form-check-label" for="status"> Active / Inactive </label>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-6">
+                              <label class="form-label">
+                                 <span class="ic-step-number">6</span>
+                                 Trade Licenses
+                              </label>
+                              <textarea class="form-control form-control-validate form-control-solid event-change" rows="3" id="trade_licenses" name="tradelicenses"></textarea>
+                           </div>
+                           <div class="col-md-6">
+                              <label class="form-label"> Notes </label>
+                              <textarea class="form-control form-control-validate form-control-solid event-change" rows="3" id="notes" name="notes"></textarea>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
+   <!--end::Content container-->
+</div>
+<!--end::Content-->
+
+{% endblock %} {% block javascriptsspecific %}
+
+<!-- Google maps-->
+<script>
+   ((g) => {
+      var h,
+         a,
+         k,
+         p = 'The Google Maps JavaScript API',
+         c = 'google',
+         l = 'importLibrary',
+         q = '__ib__',
+         m = document,
+         b = window;
+      b = b[c] || (b[c] = {});
+      var d = b.maps || (b.maps = {}),
+         r = new Set(),
+         e = new URLSearchParams(),
+         u = () =>
+            h ||
+            (h = new Promise(async (f, n) => {
+               await (a = m.createElement('script'));
+               e.set('libraries', [...r] + '');
+               for (k in g)
+                  e.set(
+                     k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()),
+                     g[k],
+                  );
+               e.set('callback', c + '.maps.' + q);
+               a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+               d[q] = f;
+               a.onerror = () => (h = n(Error(p + ' could not load.')));
+               a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+               m.head.append(a);
+            }));
+      d[l] ? console.warn(p + ' only loads once. Ignoring:', g) : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+   })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
+</script>
+
+<script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+
+<!-- datatable fixed column -->
+<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+
+<script src="{{ asset('bundles/metronic8/js/pages/employees-rrhh.js') }}?{{ 'now' | date('U') }}"></script>
+<script>
+
+   var permiso = {
+       agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
+       editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
+       eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
+   };
+
+   jQuery(document).ready(function () {
+       EmployeesRrhh.init();
+   });
+</script>
+{% endblock %}

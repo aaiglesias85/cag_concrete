@@ -1,4 +1,4 @@
-var Employees = (function () {
+var EmployeesRrhh = (function () {
    var rowDelete = null;
 
    //Inicializar table
@@ -6,7 +6,7 @@ var Employees = (function () {
    var initTable = function () {
       const table = '#employee-table-editable';
       // datasource
-      const datasource = DatatableUtil.getDataTableDatasource(`employee/listar`);
+      const datasource = DatatableUtil.getDataTableDatasource(`employee-rrhh/listar`);
 
       // columns
       const columns = getColumnsTable();
@@ -18,7 +18,7 @@ var Employees = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order
-      const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+      const order = permiso.eliminar ? [[2, 'asc']] : [[1, 'asc']];
 
       oTable = $(table).DataTable({
          searchDelay: 500,
@@ -29,6 +29,15 @@ var Employees = (function () {
          stateSave: true,
          displayLength: 25,
          stateSaveParams: DatatableUtil.stateSaveParams,
+
+         fixedColumns: {
+            start: 2,
+            end: 1,
+         },
+         // paging: false,
+         scrollCollapse: true,
+         scrollX: true,
+         // scrollY: 500,
 
          /*displayLength: 15,
             lengthMenu: [
@@ -72,7 +81,7 @@ var Employees = (function () {
       if (permiso.eliminar) {
          columns.push({ data: 'id' });
       }
-      columns.push({ data: 'name' }, { data: 'hourlyRate' }, { data: 'position' }, { data: null });
+      columns.push({ data: 'socialSecurityNumber' }, { data: 'name' }, { data: 'address' }, { data: 'phone' }, { data: 'gender' }, { data: 'race' }, { data: 'status' }, { data: null });
 
       return columns;
    };
@@ -86,17 +95,41 @@ var Employees = (function () {
          {
             targets: 1,
             render: function (data, type, row) {
-               if (type !== 'display') return data; // mantiene orden/búsqueda por texto
-
-               if (!row.color) return data;
-
-               return `
-                          <span class="d-inline-flex align-items-center">
-                            <span class="dt-color-dot" style="background:${row.color}"></span>
-                            <span>${data}</span>
-                          </span>
-                        `;
+               return DatatableUtil.getRenderColumnDiv(data, 150);
             },
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 200);
+            },
+         },
+         {
+            targets: 3,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 200);
+            },
+         },
+         {
+            targets: 4,
+            render: DatatableUtil.getRenderColumnPhone,
+         },
+         {
+            targets: 5,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 150);
+            },
+         },
+         {
+            targets: 6,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 150);
+            },
+         },
+         {
+            targets: 7,
+            className: 'text-center',
+            render: DatatableUtil.getRenderColumnEstado,
          },
       ];
 
@@ -105,17 +138,41 @@ var Employees = (function () {
             {
                targets: 0,
                render: function (data, type, row) {
-                  if (type !== 'display') return data; // mantiene orden/búsqueda por texto
-
-                  if (!color) return data;
-
-                  return `
-                          <span class="d-inline-flex align-items-center">
-                            <span class="dt-color-dot" style="background:${color}"></span>
-                            <span>${data}</span>
-                          </span>
-                        `;
+                  return DatatableUtil.getRenderColumnDiv(data, 150);
                },
+            },
+            {
+               targets: 1,
+               render: function (data, type, row) {
+                  return DatatableUtil.getRenderColumnDiv(data, 200);
+               },
+            },
+            {
+               targets: 2,
+               render: function (data, type, row) {
+                  return DatatableUtil.getRenderColumnDiv(data, 200);
+               },
+            },
+            {
+               targets: 3,
+               render: DatatableUtil.getRenderColumnPhone,
+            },
+            {
+               targets: 4,
+               render: function (data, type, row) {
+                  return DatatableUtil.getRenderColumnDiv(data, 150);
+               },
+            },
+            {
+               targets: 5,
+               render: function (data, type, row) {
+                  return DatatableUtil.getRenderColumnDiv(data, 150);
+               },
+            },
+            {
+               targets: 6,
+               className: 'text-center',
+               render: DatatableUtil.getRenderColumnEstado,
             },
          ];
       }
@@ -257,7 +314,20 @@ var Employees = (function () {
       // reset form
       MyUtil.resetForm('employee-form');
 
-      $('#color').minicolors('value', '#17C653');
+      $('#race').val('');
+      $('#race').trigger('change');
+
+      FlatpickrUtil.clear('date_hired');
+      FlatpickrUtil.clear('date_terminated');
+
+      $('#is_osha_10_certified').prop('checked', false);
+      $('#is_veteran').prop('checked', false);
+      $('#status').prop('checked', true);
+
+      // tooltips selects
+      MyApp.resetErrorMessageValidateSelect(KTUtil.get('employee-form'));
+
+      resetWizard();
 
       event_change = false;
    };
@@ -271,9 +341,6 @@ var Employees = (function () {
 
       var constraints = {
          name: {
-            presence: { message: 'This field is required' },
-         },
-         hourlyrate: {
             presence: { message: 'This field is required' },
          },
       };
@@ -290,6 +357,121 @@ var Employees = (function () {
       MyUtil.attachChangeValidacion(form, constraints);
 
       return result;
+   };
+
+   //Wizard
+   var activeTab = 1;
+   var totalTabs = 1;
+   var initWizard = function () {
+      $(document).off('click', '#form-employee .wizard-tab');
+      $(document).on('click', '#form-employee .wizard-tab', function (e) {
+         e.preventDefault();
+         var item = $(this).data('item');
+
+         // validar
+         if (item > activeTab && !validWizard()) {
+            mostrarTab();
+            return;
+         }
+
+         activeTab = parseInt(item);
+
+         if (activeTab < totalTabs) {
+            // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+         }
+         if (activeTab == 1) {
+            $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide');
+         }
+         if (activeTab > 1) {
+            $('#btn-wizard-anterior').removeClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide');
+         }
+         if (activeTab == totalTabs) {
+            // $('#btn-wizard-finalizar').removeClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+         }
+
+         // marcar los pasos validos
+         marcarPasosValidosWizard();
+      });
+
+      //siguiente
+      $(document).off('click', '#btn-wizard-siguiente');
+      $(document).on('click', '#btn-wizard-siguiente', function (e) {
+         if (validWizard()) {
+            activeTab++;
+            $('#btn-wizard-anterior').removeClass('hide');
+            if (activeTab == totalTabs) {
+               $('#btn-wizard-finalizar').removeClass('hide');
+               $('#btn-wizard-siguiente').addClass('hide');
+            }
+
+            mostrarTab();
+         }
+      });
+      //anterior
+      $(document).off('click', '#btn-wizard-anterior');
+      $(document).on('click', '#btn-wizard-anterior', function (e) {
+         activeTab--;
+         if (activeTab == 1) {
+            $('#btn-wizard-anterior').addClass('hide');
+         }
+         if (activeTab < totalTabs) {
+            $('#btn-wizard-finalizar').addClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide');
+         }
+         mostrarTab();
+      });
+   };
+   var mostrarTab = function () {
+      setTimeout(function () {
+         switch (activeTab) {
+            case 1:
+               $('#tab-general').tab('show');
+               break;
+         }
+      }, 0);
+   };
+   var resetWizard = function () {
+      activeTab = 1;
+      totalTabs = 1;
+      mostrarTab();
+      // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+      $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+      $('#btn-wizard-siguiente').removeClass('hide');
+      $('.nav-item-hide').removeClass('hide').addClass('hide');
+
+      // reset valid
+      KTUtil.findAll(KTUtil.get('employee-form'), '.nav-link').forEach(function (element, index) {
+         KTUtil.removeClass(element, 'valid');
+      });
+   };
+   var validWizard = function () {
+      var result = true;
+      if (activeTab == 1) {
+         if (!validateForm()) {
+            result = false;
+         }
+      }
+
+      return result;
+   };
+
+   var marcarPasosValidosWizard = function () {
+      // reset
+      KTUtil.findAll(KTUtil.get('employee-form'), '.nav-link').forEach(function (element, index) {
+         KTUtil.removeClass(element, 'valid');
+      });
+
+      KTUtil.findAll(KTUtil.get('employee-form'), '.nav-link').forEach(function (element, index) {
+         var tab = index + 1;
+         if (tab < activeTab) {
+            if (validWizard(tab)) {
+               KTUtil.addClass(element, 'valid');
+            }
+         }
+      });
    };
 
    //Nuevo
@@ -315,8 +497,8 @@ var Employees = (function () {
 
    //Salvar
    var initAccionSalvar = function () {
-      $(document).off('click', '#btn-salvar-employee');
-      $(document).on('click', '#btn-salvar-employee', function (e) {
+      $(document).off('click', '#btn-wizard-finalizar');
+      $(document).on('click', '#btn-wizard-finalizar', function (e) {
          btnClickSalvarForm();
       });
 
@@ -334,19 +516,70 @@ var Employees = (function () {
             var name = $('#name').val();
             formData.set('name', name);
 
-            var hourly_rate = $('#hourly_rate').val();
-            formData.set('hourly_rate', hourly_rate);
+            var address = $('#address').val();
+            formData.set('address', address);
 
-            var position = $('#position').val();
-            formData.set('position', position);
+            var phone = $('#phone').val();
+            formData.set('phone', phone);
 
-            var color = $('#color').val();
-            formData.set('color', color);
+            var cert_rate_type = $('#cert_rate_type').val();
+            formData.set('cert_rate_type', cert_rate_type);
+
+            var social_security_number = $('#social_security_number').val();
+            formData.set('social_security_number', social_security_number);
+
+            var apprentice_percentage = NumberUtil.getNumericValue('#apprentice_percentage');
+            formData.set('apprentice_percentage', apprentice_percentage);
+
+            var work_code = $('#work_code').val();
+            formData.set('work_code', work_code);
+
+            var gender = $('#gender').val();
+            formData.set('gender', gender);
+
+            var race_id = $('#race').val();
+            formData.set('race_id', race_id);
+
+            var date_hired = FlatpickrUtil.getString('date_hired');
+            formData.set('date_hired', date_hired);
+
+            var date_terminated = FlatpickrUtil.getString('date_terminated');
+            formData.set('date_terminated', date_terminated);
+
+            var reason_terminated = $('#reason_terminated').val();
+            formData.set('reason_terminated', reason_terminated);
+
+            var time_card_notes = $('#time_card_notes').val();
+            formData.set('time_card_notes', time_card_notes);
+
+            var regular_rate_per_hour = NumberUtil.getNumericValue('#regular_rate_per_hour');
+            formData.set('regular_rate_per_hour', regular_rate_per_hour);
+
+            var overtime_rate_per_hour = NumberUtil.getNumericValue('#overtime_rate_per_hour');
+            formData.set('overtime_rate_per_hour', overtime_rate_per_hour);
+
+            var special_rate_per_hour = NumberUtil.getNumericValue('#special_rate_per_hour');
+            formData.set('special_rate_per_hour', special_rate_per_hour);
+
+            var trade_licenses_info = $('#trade_licenses').val();
+            formData.set('trade_licenses_info', trade_licenses_info);
+
+            var notes = $('#notes').val();
+            formData.set('notes', notes);
+
+            var is_osha_10_certified = $('#is_osha_10_certified').prop('checked') ? 1 : 0;
+            formData.set('is_osha_10_certified', is_osha_10_certified);
+
+            var is_veteran = $('#is_veteran').prop('checked') ? 1 : 0;
+            formData.set('is_veteran', is_veteran);
+
+            var status = $('#status').prop('checked') ? 1 : 0;
+            formData.set('status', status);
 
             BlockUtil.block('#form-employee');
 
             axios
-               .post('employee/salvarEmployee', formData, { responseType: 'json' })
+               .post('employee-rrhh/salvar', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -428,7 +661,7 @@ var Employees = (function () {
          BlockUtil.block('#form-employee');
 
          axios
-            .post('employee/cargarDatos', formData, { responseType: 'json' })
+            .post('employee-rrhh/cargarDatos', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -451,9 +684,43 @@ var Employees = (function () {
             KTUtil.find(KTUtil.get('form-employee'), '.card-label').innerHTML = 'Update Employee: ' + employee.name;
 
             $('#name').val(employee.name);
-            $('#hourly_rate').val(employee.hourly_rate);
-            $('#position').val(employee.position);
-            $('#color').minicolors('value', employee.color);
+
+            $('#address').val(employee.address);
+            $('#phone').val(employee.phone);
+            $('#cert_rate_type').val(employee.cert_rate_type);
+            $('#social_security_number').val(employee.social_security_number);
+
+            NumberUtil.setFormattedValue('#apprentice_percentage', employee.apprentice_percentage, { decimals: 2 });
+
+            $('#work_code').val(employee.work_code);
+            $('#gender').val(employee.gender);
+
+            $('#race').val(employee.race_id);
+            $('#race').trigger('change');
+
+            if (employee.date_hired) {
+               const date_hired = MyApp.convertirStringAFechaHora(employee.date_hired);
+               FlatpickrUtil.setDate('date_hired', date_hired);
+            }
+
+            if (employee.date_terminated) {
+               const date_terminated = MyApp.convertirStringAFechaHora(employee.date_terminated);
+               FlatpickrUtil.setDate('date_terminated', date_terminated);
+            }
+
+            $('#reason_terminated').val(employee.reason_terminated);
+            $('#time_card_notes').val(employee.time_card_notes);
+
+            NumberUtil.setFormattedValue('#regular_rate_per_hour', employee.regular_rate_per_hour, { decimals: 2 });
+            NumberUtil.setFormattedValue('#overtime_rate_per_hour', employee.overtime_rate_per_hour, { decimals: 2 });
+            NumberUtil.setFormattedValue('#special_rate_per_hour', employee.special_rate_per_hour, { decimals: 2 });
+
+            $('#trade_licenses').val(employee.trade_licenses_info);
+            $('#notes').val(employee.notes);
+
+            $('#is_osha_10_certified').prop('checked', employee.is_osha_10_certified);
+            $('#is_veteran').prop('checked', employee.is_veteran);
+            $('#status').prop('checked', employee.status);
 
             event_change = false;
          }
@@ -504,7 +771,7 @@ var Employees = (function () {
          BlockUtil.block('#lista-employee');
 
          axios
-            .post('employee/eliminarEmployee', formData, { responseType: 'json' })
+            .post('employee-rrhh/eliminar', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -535,7 +802,7 @@ var Employees = (function () {
          BlockUtil.block('#lista-employee');
 
          axios
-            .post('employee/eliminarEmployees', formData, { responseType: 'json' })
+            .post('employee-rrhh/eliminarVarios', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -561,18 +828,55 @@ var Employees = (function () {
       // init widgets generales
       MyApp.initWidgets();
 
-      $('#color').minicolors({
-         control: 'hue',
-         format: 'hex',
-         defaultValue: '#17C653',
-         inline: false,
-         letterCase: 'uppercase',
-         opacity: false,
-         position: 'bottom left',
-         change: function (hex, opacity) {
-            if (!hex) return;
-         },
-         theme: 'bootstrap',
+      initFlatpickr();
+
+      Inputmask({
+         mask: '(999) 999-9999',
+      }).mask('.input-phone');
+
+      // google maps
+      inicializarAutocomplete();
+   };
+
+   var initFlatpickr = function () {
+      // date hired
+      FlatpickrUtil.initDate('date_hired', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+      });
+
+      // date terminated
+      FlatpickrUtil.initDate('date_terminated', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+      });
+   };
+
+   // google maps
+   var latitud = '';
+   var longitud = '';
+   var inicializarAutocomplete = async function () {
+      // Cargar librería de Places
+      await google.maps.importLibrary('places');
+
+      const input = document.getElementById('address');
+
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+         types: ['address'], // Solo direcciones
+         componentRestrictions: { country: 'us' }, // Opcional: restringir a país (ej: Chile)
+      });
+
+      autocomplete.addListener('place_changed', function () {
+         const place = autocomplete.getPlace();
+
+         if (!place.geometry) {
+            console.log('No se pudo obtener ubicación.');
+            return;
+         }
+
+         latitud = place.geometry.location.lat();
+         longitud = place.geometry.location.lng();
+
+         console.log('Dirección seleccionada:', place.formatted_address);
+         console.log('Coordenadas:', place.geometry?.location?.toString());
       });
    };
 
@@ -582,6 +886,8 @@ var Employees = (function () {
          initWidgets();
 
          initTable();
+
+         initWizard();
 
          initAccionNuevo();
          initAccionSalvar();

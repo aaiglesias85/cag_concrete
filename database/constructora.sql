@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 15-11-2025 a las 18:33:21
+-- Tiempo de generación: 16-11-2025 a las 15:28:56
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -563,7 +563,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (31, 'holiday', 'Holidays'),
 (32, 'county', 'County'),
 (33, 'payment', 'Payments'),
-(34, 'race', 'Races');
+(34, 'race', 'Races'),
+(35, 'employee_rrhh', 'Employees');
 
 -- --------------------------------------------------------
 
@@ -1633,7 +1634,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (43, 1, 1, 1, 1, 1, 31),
 (44, 1, 1, 1, 1, 1, 32),
 (45, 1, 1, 1, 1, 1, 33),
-(46, 1, 1, 1, 1, 1, 34);
+(46, 1, 1, 1, 1, 1, 34),
+(47, 1, 1, 1, 1, 1, 35);
 
 -- --------------------------------------------------------
 
@@ -1845,7 +1847,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (35, 1, 1, 1, 1, 1, 31),
 (36, 1, 1, 1, 1, 1, 32),
 (37, 1, 1, 1, 1, 1, 33),
-(38, 1, 1, 1, 1, 1, 34);
+(38, 1, 1, 1, 1, 1, 34),
+(39, 1, 1, 1, 1, 1, 35);
 
 -- --------------------------------------------------------
 
@@ -2456,7 +2459,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -2624,7 +2627,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2684,7 +2687,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`

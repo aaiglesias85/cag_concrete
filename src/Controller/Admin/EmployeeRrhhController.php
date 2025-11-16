@@ -3,18 +3,18 @@
 namespace App\Controller\Admin;
 
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\EmployeeService;
+use App\Utils\Admin\EmployeeRrhhService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\RaceRepository;
 use App\Entity\Race;
 
-class EmployeeController extends AbstractController
+class EmployeeRrhhController extends AbstractController
 {
 
    private $employeeService;
 
-   public function __construct(EmployeeService $employeeService)
+   public function __construct(EmployeeRrhhService $employeeService)
    {
       $this->employeeService = $employeeService;
    }
@@ -22,7 +22,7 @@ class EmployeeController extends AbstractController
    public function index()
    {
       $usuario = $this->getUser();
-      $permiso = $this->employeeService->BuscarPermiso($usuario->getUsuarioId(), 14);
+      $permiso = $this->employeeService->BuscarPermiso($usuario->getUsuarioId(), 35);
       if (count($permiso) > 0) {
          if ($permiso[0]['ver']) {
 
@@ -31,7 +31,7 @@ class EmployeeController extends AbstractController
             $raceRepo = $this->employeeService->getDoctrine()->getRepository(Race::class);
             $races = $raceRepo->ListarOrdenados();
 
-            return $this->render('admin/employee/index.html.twig', array(
+            return $this->render('admin/employee-rrhh/index.html.twig', array(
                'permiso' => $permiso[0],
                'races' => $races
             ));
@@ -51,7 +51,7 @@ class EmployeeController extends AbstractController
          // parsear los parametros de la tabla
          $dt = DataTablesHelper::parse(
             $request,
-            allowedOrderFields: ['id', 'name', 'hourlyRate', 'position'],
+            allowedOrderFields: ['id', 'socialSecurityNumber', 'name', 'address', 'phone', 'gender', 'race', 'status'],
             defaultOrderField: 'name'
          );
 
@@ -89,16 +89,33 @@ class EmployeeController extends AbstractController
       $employee_id = $request->get('employee_id');
 
       $name = $request->get('name');
-      $hourly_rate = $request->get('hourly_rate');
-      $position = $request->get('position');
-      $color = $request->get('color');
+      $address = $request->get('address');
+      $phone = $request->get('phone');
+      $cert_rate_type = $request->get('cert_rate_type');
+      $social_security_number = $request->get('social_security_number');
+      $apprentice_percentage = $request->get('apprentice_percentage');
+      $work_code = $request->get('work_code');
+      $gender = $request->get('gender');
+      $race_id = $request->get('race_id');
+      $date_hired = $request->get('date_hired');
+      $date_terminated = $request->get('date_terminated');
+      $reason_terminated = $request->get('reason_terminated');
+      $time_card_notes = $request->get('time_card_notes');
+      $regular_rate_per_hour = $request->get('regular_rate_per_hour');
+      $overtime_rate_per_hour = $request->get('overtime_rate_per_hour');
+      $special_rate_per_hour = $request->get('special_rate_per_hour');
+      $trade_licenses_info = $request->get('trade_licenses_info');
+      $notes = $request->get('notes');
+      $is_osha_10_certified = $request->get('is_osha_10_certified');
+      $is_veteran = $request->get('is_veteran');
+      $status = $request->get('status');
 
       try {
 
          if ($employee_id == "") {
-            $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $position, $color);
+            $resultado = $this->employeeService->SalvarEmployee($name, $address, $phone, $cert_rate_type, $social_security_number, $apprentice_percentage, $work_code, $gender, $race_id, $date_hired, $date_terminated, $reason_terminated, $time_card_notes, $regular_rate_per_hour, $overtime_rate_per_hour, $special_rate_per_hour, $trade_licenses_info, $notes, $is_osha_10_certified, $is_veteran, $status);
          } else {
-            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $position, $color);
+            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name,  $address, $phone, $cert_rate_type, $social_security_number, $apprentice_percentage, $work_code, $gender, $race_id, $date_hired, $date_terminated, $reason_terminated, $time_card_notes, $regular_rate_per_hour, $overtime_rate_per_hour, $special_rate_per_hour, $trade_licenses_info, $notes, $is_osha_10_certified, $is_veteran, $status);
          }
 
          if ($resultado['success']) {
@@ -131,7 +148,7 @@ class EmployeeController extends AbstractController
       $employee_id = $request->get('employee_id');
 
       try {
-         $resultado = $this->employeeService->EliminarEmployee($employee_id);
+         $resultado = $this->employeeService->Eliminar($employee_id);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -150,15 +167,15 @@ class EmployeeController extends AbstractController
    }
 
    /**
-    * eliminarEmployees Acción que elimina los employees seleccionados en la BD
+    * eliminarVarios Acción que elimina los employees seleccionados en la BD
     *
     */
-   public function eliminarEmployees(Request $request)
+   public function eliminarVarios(Request $request)
    {
       $ids = $request->get('ids');
 
       try {
-         $resultado = $this->employeeService->EliminarEmployees($ids);
+         $resultado = $this->employeeService->EliminarVarios($ids);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -198,30 +215,6 @@ class EmployeeController extends AbstractController
 
             return $this->json($resultadoJson);
          }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarProjects Acción que lista los projects de employee
-    *
-    */
-   public function listarProjects(Request $request)
-   {
-      $employee_id = $request->get('employee_id');
-
-      try {
-
-         $projects = $this->employeeService->ListarProjects($employee_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['projects'] = $projects;
-
-         return $this->json($resultadoJson);
       } catch (\Exception $e) {
          $resultadoJson['success'] = false;
          $resultadoJson['error'] = $e->getMessage();

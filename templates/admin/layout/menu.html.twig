@@ -426,6 +426,70 @@
 
                {% endif %}
 
+               <!-- menu RRHH -->
+               {% if menu.menuRace or menu.menuEmployeeRrhh %}
+               <div class="menu-item pt-5">
+                  <div class="menu-content">
+                     <span class="menu-heading fw-bold text-uppercase fs-7">RRHH</span>
+                  </div>
+               </div>
+
+               <!-- menu libraries -->
+               {% if menu.menuRace %}
+
+               <!--begin:Menu item-->
+               <div
+                  data-kt-menu-trigger="click"
+                  class="menu-item menu-accordion
+                                {{ activeRoute == 'race' ? 'here show' }}
+                            "
+               >
+                  <!--begin:Menu link-->
+                  <span class="menu-link">
+                     <span class="menu-icon">
+                        <i class="ki-duotone ki-abstract-26 fs-2">
+                           <span class="path1"></span>
+                           <span class="path2"></span>
+                        </i>
+                     </span>
+                     <span class="menu-title">Libraries</span>
+                     <span class="menu-arrow"></span>
+                  </span>
+                  <!--end:Menu link-->
+                  <!--begin:Menu sub-->
+                  <div class="menu-sub menu-sub-accordion">
+                     <!--begin:Menu item-->
+                     {% if menu.menuRace %}
+                     <div class="menu-item">
+                        <a class="menu-link {{ activeRoute == 'race' ? 'active' }}" href="{{ url('race') }}">
+                           <span class="menu-bullet">
+                              <span class="bullet bullet-dot"></span>
+                           </span>
+                           <span class="menu-title">Ethnicity/Race</span>
+                        </a>
+                     </div>
+                     {% endif %}
+                     <!--end:Menu item-->
+                  </div>
+                  <!--end:Menu sub-->
+               </div>
+               <!--end:Menu item-->
+
+               {% endif %} {% if menu.menuEmployeeRrhh %}
+               <div class="menu-item">
+                  <a class="menu-link {{ activeRoute == 'employees-rrhh' ? 'active' }}" href="{{ url('employee_rrhh') }}">
+                     <span class="menu-icon">
+                        <i class="ki-duotone ki-address-book fs-2">
+                           <span class="path1"></span>
+                           <span class="path2"></span>
+                           <span class="path3"></span>
+                        </i>
+                     </span>
+                     <span class="menu-title">Employees</span>
+                  </a>
+               </div>
+               {% endif %} {% endif %}
+
                <!-- menu Libraries and Settings -->
                {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuHoliday or menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or
                menu.menuAdvertisement or menu.menuReminder or menu.menuRol or menu.menuUsuario or menu.menuLog or menu.menuNotification %}
@@ -438,7 +502,7 @@
 
                <!-- menu libraries -->
                {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuHoliday or menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or
-               menu.menuAdvertisement or menu.menuReminder or menu.menuRace %}
+               menu.menuAdvertisement or menu.menuReminder %}
 
                <!--begin:Menu item-->
                <div
@@ -447,7 +511,7 @@
                                 {{ activeRoute == 'unit' or activeRoute == 'equation' or activeRoute == 'item' or
                                 activeRoute == 'inspectors' or activeRoute == 'employee' or activeRoute == 'material' or
                                 activeRoute == 'overheadprice' or activeRoute == 'advertisement' or activeRoute == 'reminder' or
-                                activeRoute == 'holiday' or activeRoute == 'race' ? 'here show' }}
+                                activeRoute == 'holiday' ? 'here show' }}
                             "
                >
                   <!--begin:Menu link-->
@@ -523,19 +587,6 @@
                         </a>
                      </div>
                      {% endif %}
-
-                     <!--begin:Menu item-->
-                     {% if menu.menuRace %}
-                     <div class="menu-item">
-                        <a class="menu-link {{ activeRoute == 'race' ? 'active' }}" href="{{ url('race') }}">
-                           <span class="menu-bullet">
-                              <span class="bullet bullet-dot"></span>
-                           </span>
-                           <span class="menu-title">Ethnicity/Race</span>
-                        </a>
-                     </div>
-                     {% endif %}
-                     <!--end:Menu item-->
                      <!--begin:Menu item-->
                      {% if menu.menuOverhead %}
                      <div class="menu-item">

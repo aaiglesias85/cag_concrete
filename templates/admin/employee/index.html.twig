@@ -1,6 +1,5 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Employees{% endblock %} {% block stylesheetspecific %}
 <link href="{{ asset('bundles/metronic8/plugins/jquery-minicolors/jquery.minicolors.css') }}" rel="stylesheet" />
-<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
 <style>
    .dt-color-dot {
       width: 12px;
@@ -154,15 +153,9 @@
                         </div>
                      </th>
                      {% endif %}
-                     <th>Social Security #</th>
                      <th>Name</th>
-                     <th>Address</th>
-                     <th>Phone</th>
-                     <th>Gender</th>
-                     <th>Ethnicity/Race</th>
                      <th>Hourly Rate</th>
                      <th>Position</th>
-                     <th>Status</th>
                      <th class="text-end min-w-100px">Actions</th>
                   </tr>
                </thead>
@@ -189,24 +182,21 @@
                <h3 class="card-label">New employee:</h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-project me-2">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-employee me-2">
+                  <i class="ki-duotone ki-arrow-left fs-1">
+                     <span class="path1"></span>
+                     <span class="path2"></span>
+                  </i>
+
+                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
                </a>
 
-               <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
-                  <i class="la la-arrow-left me-2"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
-               </button>
-
-               <button id="btn-wizard-siguiente" class="btn btn-primary me-2" type="button">
-                  <span class="kt-hidden-mobile font-weight-bold">Next</span>
-                  <i class="la la-arrow-right ms-2"></i>
-               </button>
-
                {% if permiso.agregar or permiso.editar %}
-               <button type="button" id="btn-wizard-finalizar" class="btn btn-success">
-                  <i class="la la-check"></i>
+               <button type="button" id="btn-salvar-employee" class="btn btn-success">
+                  <i class="ki-duotone ki-double-check fs-1 me-2">
+                     <span class="path1"></span>
+                     <span class="path2"></span>
+                  </i>
                   <span class="kt-hidden-mobile font-weight-bold">Save</span>
                </button>
                {% endif %}
@@ -217,237 +207,38 @@
             <input type="hidden" id="employee_id" name="employee_id" />
 
             <div class="card-body">
-               <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
-                  <li class="nav-item">
-                     <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
-                        <div class="wizard-wrapper">
-                           <span class="wizard-number">
-                              <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">1</span>
-                           </span>
-                           <div class="wizard-label">
-                              <div class="wizard-title">General</div>
-                              <div class="wizard-desc">General information</div>
-                           </div>
-                           <span class="svg-icon ps-6">
-                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
-                                    <rect
-                                       fill="#000000"
-                                       opacity="0.3"
-                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
-                                       x="7.5"
-                                       y="7.5"
-                                       width="2"
-                                       height="9"
-                                       rx="1"
-                                    ></rect>
-                                    <path
-                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
-                                       fill="#000000"
-                                       fill-rule="nonzero"
-                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
-                                    ></path>
-                                 </g>
-                              </svg>
-                           </span>
-                        </div>
-                     </a>
-                  </li>
-               </ul>
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Name
+                  </label>
+                  <input type="text" class="form-control form-control-validate form-control-solid event-change" id="name" name="name" />
+               </div>
 
-               <div class="tab-content">
-                  <div class="tab-pane fade show active" id="tab-content-general" role="tabpanel">
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-6">
-                              <label class="form-label required">
-                                 <span class="ic-step-number">1</span>
-                                 Name
-                              </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="name" name="name" />
-                           </div>
-                           <div class="col-md-3">
-                              <label class="form-label"> Social Security # </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="social_security_number" name="socialsecuritynumber" />
-                           </div>
-                           <div class="col-md-3">
-                              <label class="form-label"> Cert Rate Type </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="cert_rate_type" name="certratetype" />
-                           </div>
-                        </div>
+               <div class="form-group ic-form-group">
+                  <div class="row">
+                     <div class="col-md-2">
+                        <label class="form-label required">
+                           <span class="ic-step-number">2</span>
+                           Hourly Rate
+                        </label>
+                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="hourly_rate" name="hourlyrate" />
                      </div>
+                     <div class="col-md-4">
+                        <label class="form-label"> Position </label>
+                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="position" name="position" />
+                     </div>
+                  </div>
+               </div>
 
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-8">
-                              <label class="form-label">
-                                 <span class="ic-step-number">2</span>
-                                 Address
-                              </label>
-                              <div class="input-group input-group-solid">
-                                 <span class="input-group-text">
-                                    <i class="ki-duotone ki-geolocation"><span class="path1"></span><span class="path2"></span></i>
-                                 </span>
-                                 <input type="text" class="form-control form-control-validate event-change" id="address" name="address" />
-                              </div>
-                           </div>
-                           <div class="col-md-4">
-                              <label class="form-label"> Phone </label>
-                              <div class="input-group input-group-solid">
-                                 <span class="input-group-text"><i class="la la-phone"></i></span>
-                                 <input type="text" class="form-control form-control-validate input-phone event-change" id="phone" name="phone" autocomplete="off" />
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-2">
-                              <label class="form-label">
-                                 <span class="ic-step-number">3</span>
-                                 Apprentice Percentage
-                              </label>
-                              <input
-                                 type="text"
-                                 class="form-control form-control-validate form-control-solid form-control-number event-change"
-                                 id="apprentice_percentage"
-                                 name="apprenticepercentage"
-                              />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Reg. Rate/Hour </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid form-control-number event-change" id="regular_rate_per_hour" name="regularrateperhour" />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> O.T. Rate/Hour </label>
-                              <input
-                                 type="text"
-                                 class="form-control form-control-validate form-control-solid form-control-number event-change"
-                                 id="overtime_rate_per_hour"
-                                 name="overtimerateperhour"
-                              />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> S.T. Rate/Hour </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid form-control-number event-change" id="special_rate_per_hour" name="specialrateperhour" />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Work Code </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="work_code" name="workcode" />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Ethnicity/Race </label>
-                              <select class="form-control form-select form-select2 select-validate form-select-solid" id="race" name="race">
-                                 <option value="">Select</option>
-                                 {% for item in races %}
-                                 <option value="{{ item.raceId }}">{{ item.description }}</option>
-                                 {% endfor %}
-                              </select>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-3">
-                              <label class="form-label"> Gender </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="gender" name="gender" />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label required"> Hourly Rate </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid form-control-number event-change" id="hourly_rate" name="hourlyrate" />
-                           </div>
-                           <div class="col-md-3">
-                              <label class="form-label"> Position </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="position" name="position" />
-                           </div>
-                           <div class="col-md-4">
-                              <label class="form-label"> Color </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="color" name="color" />
-                           </div>
-                        </div>
-                     </div>
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-2">
-                              <label class="form-label"> Work Code </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="work_code" name="workcode" />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Date Hired </label>
-                              <div class="input-group input-group-solid">
-                                 <input type="text" class="form-control" placeholder="Select a date" id="date_hired" autocomplete="off" name="datehired" />
-                                 <span class="input-group-text">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                                 </span>
-                              </div>
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Date Terminated </label>
-                              <div class="input-group input-group-solid">
-                                 <input type="text" class="form-control" placeholder="Select a date" id="date_terminated" autocomplete="off" name="dateterminated" />
-                                 <span class="input-group-text">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                                 </span>
-                              </div>
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> OSHA 10 Certified </label>
-                              <div>
-                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                                    <input type="checkbox" id="is_osha_10_certified" class="form-check-input" />
-                                    <label class="form-check-label" for="is_osha_10_certified"> Yes / No </label>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label">Veteran </label>
-                              <div>
-                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                                    <input type="checkbox" id="is_veteran" class="form-check-input" />
-                                    <label class="form-check-label" for="is_veteran"> Yes / No </label>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label">Status </label>
-                              <div>
-                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                                    <input type="checkbox" id="status" class="form-check-input" />
-                                    <label class="form-check-label" for="status"> Active / Inactive </label>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-6">
-                              <label class="form-label"> Reason Terminated </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="reason_terminated" name="reasonterminated" />
-                           </div>
-                           <div class="col-md-6">
-                              <label class="form-label"> Time Card Notes </label>
-                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="time_card_notes" name="timecardnotes" />
-                           </div>
-                        </div>
-                     </div>
-
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-6">
-                              <label class="form-label"> Trade Licenses </label>
-                              <textarea class="form-control form-control-validate form-control-solid event-change" rows="3" id="trade_licenses" name="tradelicenses"></textarea>
-                           </div>
-                           <div class="col-md-6">
-                              <label class="form-label"> Notes </label>
-                              <textarea class="form-control form-control-validate form-control-solid event-change" rows="3" id="notes" name="notes"></textarea>
-                           </div>
-                        </div>
+               <div class="form-group ic-form-group">
+                  <label class="form-label">
+                     <span class="ic-step-number">3</span>
+                     Color
+                  </label>
+                  <div class="row">
+                     <div class="col-md-2">
+                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="color" name="color" />
                      </div>
                   </div>
                </div>
@@ -460,50 +251,8 @@
 <!--end::Content-->
 
 {% endblock %} {% block javascriptsspecific %}
-
-<!-- Google maps-->
-<script>
-   ((g) => {
-      var h,
-         a,
-         k,
-         p = 'The Google Maps JavaScript API',
-         c = 'google',
-         l = 'importLibrary',
-         q = '__ib__',
-         m = document,
-         b = window;
-      b = b[c] || (b[c] = {});
-      var d = b.maps || (b.maps = {}),
-         r = new Set(),
-         e = new URLSearchParams(),
-         u = () =>
-            h ||
-            (h = new Promise(async (f, n) => {
-               await (a = m.createElement('script'));
-               e.set('libraries', [...r] + '');
-               for (k in g)
-                  e.set(
-                     k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()),
-                     g[k],
-                  );
-               e.set('callback', c + '.maps.' + q);
-               a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-               d[q] = f;
-               a.onerror = () => (h = n(Error(p + ' could not load.')));
-               a.nonce = m.querySelector('script[nonce]')?.nonce || '';
-               m.head.append(a);
-            }));
-      d[l] ? console.warn(p + ' only loads once. Ignoring:', g) : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
-   })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
-</script>
-
 <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/plugins/jquery-minicolors/jquery.minicolors.min.js') }}"></script>
-
-<!-- datatable fixed column -->
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
 
 <script src="{{ asset('bundles/metronic8/js/pages/employees.js') }}?{{ 'now' | date('U') }}"></script>
 <script>

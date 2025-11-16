@@ -1351,7 +1351,7 @@ var Invoices = (function () {
          formData.set('start_date', start_date);
          formData.set('end_date', end_date);
 
-         BlockUtil.block('#lista-items');
+         // BlockUtil.block('#lista-items');
 
          axios
             .post('project/listarItemsParaInvoice', formData, { responseType: 'json' })
@@ -1410,7 +1410,7 @@ var Invoices = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#lista-items');
+               // BlockUtil.unblock('#lista-items');
             });
       }
    };

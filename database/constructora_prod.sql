@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 15-11-2025 a las 18:33:27
+-- Tiempo de generación: 16-11-2025 a las 15:29:05
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -3041,7 +3041,7 @@ INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color
 (32, 'Raul Cazares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
 (33, 'Roberto Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
 (34, 'Ruben Murillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(35, '\"Tate\" Vincente Bly', 20.00, 'Laborer', '#142EC7', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(35, '\"Tate\" Vincente Bly', 34.00, 'Laborer', '#142EC7', '123 William Street, Nueva York, EE. UU.', '(343) 243-2432', '', '4543543', 0.00, '', '', 4, '2025-11-01', '2025-11-30', '', '', 0.00, 0.00, 0.00, '', '', 1, 1, 1),
 (36, 'Wilbert Rutilio', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
 (37, 'Francisco Gutierrez', 25.00, 'Lead', '#34BFA3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
 (38, 'Jose Duarte', 25.00, 'Lead', '#BFBA31', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
@@ -3357,7 +3357,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (31, 'holiday', 'Holidays'),
 (32, 'county', 'County'),
 (33, 'payment', 'Payments'),
-(34, 'race', 'Races');
+(34, 'race', 'Races'),
+(35, 'employee_rrhh', 'Employees');
 
 -- --------------------------------------------------------
 
@@ -5239,7 +5240,8 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4043, 'Add', 'Gender', 'The gender is added: Other', '::1', '2025-11-15 17:20:23', 1),
 (4044, 'Add', 'Race', 'The race is added: TEst', '::1', '2025-11-15 18:24:50', 1),
 (4045, 'Update', 'Race', 'The race is modified: TEst', '::1', '2025-11-15 18:24:57', 1),
-(4046, 'Delete', 'Race', 'The race is deleted: TEst', '::1', '2025-11-15 18:25:20', 1);
+(4046, 'Delete', 'Race', 'The race is deleted: TEst', '::1', '2025-11-15 18:25:20', 1),
+(4047, 'Update', 'Employee', 'The employee is modified: \"Tate\" Vincente Bly', '::1', '2025-11-16 01:40:24', 1);
 
 -- --------------------------------------------------------
 
@@ -8458,7 +8460,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (219, 1, 0, 0, 0, 6, 31),
 (220, 1, 0, 0, 0, 6, 32),
 (221, 1, 1, 1, 1, 1, 33),
-(222, 1, 1, 1, 1, 1, 34);
+(222, 1, 1, 1, 1, 1, 34),
+(223, 1, 1, 1, 1, 1, 35);
 
 -- --------------------------------------------------------
 
@@ -9341,7 +9344,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (1143, 1, 1, 1, 1, 2, 14),
 (1144, 1, 1, 1, 1, 2, 15),
 (1145, 1, 1, 1, 1, 2, 16),
-(1146, 1, 1, 1, 1, 1, 34);
+(1146, 1, 1, 1, 1, 1, 34),
+(1147, 1, 1, 1, 1, 1, 35);
 
 -- --------------------------------------------------------
 
@@ -9965,7 +9969,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -10019,7 +10023,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4047;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4048;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10133,7 +10137,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=223;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=224;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -10193,7 +10197,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1147;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1148;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`

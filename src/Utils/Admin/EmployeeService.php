@@ -102,27 +102,6 @@ class EmployeeService extends Base
          $arreglo_resultado['position'] = $entity->getPosition();
          $arreglo_resultado['color'] = $entity->getColor();
 
-         $arreglo_resultado['address'] = $entity->getAddress();
-         $arreglo_resultado['phone'] = $entity->getPhone();
-         $arreglo_resultado['cert_rate_type'] = $entity->getCertRateType();
-         $arreglo_resultado['social_security_number'] = $entity->getSocialSecurityNumber();
-         $arreglo_resultado['apprentice_percentage'] = $entity->getApprenticePercentage();
-         $arreglo_resultado['work_code'] = $entity->getWorkCode();
-         $arreglo_resultado['gender'] = $entity->getGender();
-         $arreglo_resultado['race'] = $entity->getRace() ? $entity->getRace()->getDescription() : "";
-         $arreglo_resultado['date_hired'] = $entity->getDateHired() ? $entity->getDateHired()->format('m/d/Y') : "";
-         $arreglo_resultado['date_terminated'] = $entity->getDateTerminated() ? $entity->getDateTerminated()->format('m/d/Y') : "";
-         $arreglo_resultado['reason_terminated'] = $entity->getReasonTerminated();
-         $arreglo_resultado['time_card_notes'] = $entity->getTimeCardNotes();
-         $arreglo_resultado['regular_rate_per_hour'] = $entity->getRegularRatePerHour();
-         $arreglo_resultado['overtime_rate_per_hour'] = $entity->getOvertimeRatePerHour();
-         $arreglo_resultado['special_rate_per_hour'] = $entity->getSpecialRatePerHour();
-         $arreglo_resultado['trade_licenses_info'] = $entity->getTradeLicensesInfo();
-         $arreglo_resultado['notes'] = $entity->getNotes();
-         $arreglo_resultado['is_osha_10_certified'] = $entity->getIsOsha10Certified();
-         $arreglo_resultado['is_veteran'] = $entity->getIsVeteran();
-         $arreglo_resultado['status'] = $entity->getStatus() ? 1 : 0;
-
          $resultado['success'] = true;
          $resultado['employee'] = $arreglo_resultado;
       }
@@ -253,26 +232,6 @@ class EmployeeService extends Base
       $hourly_rate,
       $position,
       $color,
-      $address,
-      $phone,
-      $cert_rate_type,
-      $social_security_number,
-      $apprentice_percentage,
-      $work_code,
-      $gender,
-      $race_id,
-      $date_hired,
-      $date_terminated,
-      $reason_terminated,
-      $time_card_notes,
-      $regular_rate_per_hour,
-      $overtime_rate_per_hour,
-      $special_rate_per_hour,
-      $trade_licenses_info,
-      $notes,
-      $is_osha_10_certified,
-      $is_veteran,
-      $status
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -281,56 +240,13 @@ class EmployeeService extends Base
       /** @var Employee $entity */
       if ($entity != null) {
 
-         //Verificar social security number
-         if ($social_security_number != "") {
-            $employee = $this->getDoctrine()->getRepository(Employee::class)
-               ->findOneBy(['socialSecurityNumber' => $social_security_number]);
-            if ($employee != null && $entity->getEmployeeId() != $employee->getEmployeeId()) {
-               $resultado['success'] = false;
-               $resultado['error'] = "The social security number is in use, please try entering another one.";
-               return $resultado;
-            }
-         }
+
 
          $entity->setName($name);
          $entity->setHourlyRate($hourly_rate);
          $entity->setPosition($position);
          $entity->setColor($color);
 
-         $entity->setAddress($address);
-         $entity->setPhone($phone);
-         $entity->setCertRateType($cert_rate_type);
-         $entity->setSocialSecurityNumber($social_security_number);
-         $entity->setApprenticePercentage($apprentice_percentage);
-         $entity->setWorkCode($work_code);
-         $entity->setGender($gender);
-
-         if ($race_id != "") {
-            $race = $this->getDoctrine()->getRepository(Race::class)
-               ->find($race_id);
-            $entity->setRace($race);
-         }
-
-         if ($date_hired != "") {
-            $date_hired = \DateTime::createFromFormat('m/d/Y', $date_hired);
-            $entity->setDateHired($date_hired);
-         }
-
-         if ($date_terminated != "") {
-            $date_terminated = \DateTime::createFromFormat('m/d/Y', $date_terminated);
-            $entity->setDateTerminated($date_terminated);
-         }
-
-         $entity->setReasonTerminated($reason_terminated);
-         $entity->setTimeCardNotes($time_card_notes);
-         $entity->setRegularRatePerHour($regular_rate_per_hour);
-         $entity->setOvertimeRatePerHour($overtime_rate_per_hour);
-         $entity->setSpecialRatePerHour($special_rate_per_hour);
-         $entity->setTradeLicensesInfo($trade_licenses_info);
-         $entity->setNotes($notes);
-         $entity->setIsOsha10Certified($is_osha_10_certified);
-         $entity->setIsVeteran($is_veteran);
-         $entity->setStatus($status);
 
          $em->flush();
 
@@ -356,40 +272,9 @@ class EmployeeService extends Base
       $name,
       $hourly_rate,
       $position,
-      $color,
-      $address,
-      $phone,
-      $cert_rate_type,
-      $social_security_number,
-      $apprentice_percentage,
-      $work_code,
-      $gender,
-      $race_id,
-      $date_hired,
-      $date_terminated,
-      $reason_terminated,
-      $time_card_notes,
-      $regular_rate_per_hour,
-      $overtime_rate_per_hour,
-      $special_rate_per_hour,
-      $trade_licenses_info,
-      $notes,
-      $is_osha_10_certified,
-      $is_veteran,
-      $status
+      $color
    ) {
       $em = $this->getDoctrine()->getManager();
-
-      //Verificar social security number
-      if ($social_security_number != "") {
-         $employee = $this->getDoctrine()->getRepository(Employee::class)
-            ->findOneBy(['socialSecurityNumber' => $social_security_number]);
-         if ($employee != null) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The social security number is in use, please try entering another one.";
-            return $resultado;
-         }
-      }
 
       $entity = new Employee();
 
@@ -397,41 +282,6 @@ class EmployeeService extends Base
       $entity->setHourlyRate($hourly_rate);
       $entity->setPosition($position);
       $entity->setColor($color);
-
-      $entity->setAddress($address);
-      $entity->setPhone($phone);
-      $entity->setCertRateType($cert_rate_type);
-      $entity->setSocialSecurityNumber($social_security_number);
-      $entity->setApprenticePercentage($apprentice_percentage);
-      $entity->setWorkCode($work_code);
-      $entity->setGender($gender);
-
-      if ($race_id != "") {
-         $race = $this->getDoctrine()->getRepository(Race::class)
-            ->find($race_id);
-         $entity->setRace($race);
-      }
-
-      if ($date_hired != "") {
-         $date_hired = \DateTime::createFromFormat('m/d/Y', $date_hired);
-         $entity->setDateHired($date_hired);
-      }
-
-      if ($date_terminated != "") {
-         $date_terminated = \DateTime::createFromFormat('m/d/Y', $date_terminated);
-         $entity->setDateTerminated($date_terminated);
-      }
-
-      $entity->setReasonTerminated($reason_terminated);
-      $entity->setTimeCardNotes($time_card_notes);
-      $entity->setRegularRatePerHour($regular_rate_per_hour);
-      $entity->setOvertimeRatePerHour($overtime_rate_per_hour);
-      $entity->setSpecialRatePerHour($special_rate_per_hour);
-      $entity->setTradeLicensesInfo($trade_licenses_info);
-      $entity->setNotes($notes);
-      $entity->setIsOsha10Certified($is_osha_10_certified);
-      $entity->setIsVeteran($is_veteran);
-      $entity->setStatus($status);
 
       $em->persist($entity);
 
@@ -475,26 +325,7 @@ class EmployeeService extends Base
             "hourlyRate" => $value->getHourlyRate(),
             "position" => $value->getPosition(),
             "color" => $value->getColor(),
-            "address" => $value->getAddress(),
-            "phone" => $value->getPhone() ?? '',
-            "certRateType" => $value->getCertRateType(),
-            "socialSecurityNumber" => $value->getSocialSecurityNumber(),
-            "apprenticePercentage" => $value->getApprenticePercentage(),
-            "workCode" => $value->getWorkCode(),
-            "race" => $value->getRace() ? $value->getRace()->getDescription() : "",
-            "gender" => $value->getGender(),
-            "dateHired" => $value->getDateHired() ? $value->getDateHired()->format('m/d/Y') : "",
-            "dateTerminated" => $value->getDateTerminated() ? $value->getDateTerminated()->format('m/d/Y') : "",
-            "reasonTerminated" => $value->getReasonTerminated(),
-            "timeCardNotes" => $value->getTimeCardNotes(),
-            "regularRatePerHour" => $value->getRegularRatePerHour(),
-            "overtimeRatePerHour" => $value->getOvertimeRatePerHour(),
-            "specialRatePerHour" => $value->getSpecialRatePerHour(),
-            "tradeLicensesInfo" => $value->getTradeLicensesInfo(),
-            "notes" => $value->getNotes(),
-            "isOsha10Certified" => $value->getIsOsha10Certified(),
-            "isVeteran" => $value->getIsVeteran(),
-            "status" => $value->getStatus() ? 1 : 0,
+
          );
       }
 
